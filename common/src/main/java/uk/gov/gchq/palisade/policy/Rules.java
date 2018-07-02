@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.koryphe.predicate.KoryphePredicate;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
@@ -150,6 +151,10 @@ public class Rules<T> {
     public Rules<T> simpleFunctionRule(final String id, final Function<T, T> rule) {
         rules.put(id, new WrappedRule<>(rule));
         return this;
+    }
+
+    public Rules<T> tuplePredicateRule(final String id, final KoryphePredicate<?> predicate, final String... string) {
+        return predicateRule(id, new TuplePredicateRule(predicate, string));
     }
 
     @Override

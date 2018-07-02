@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,10 +42,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -171,7 +170,7 @@ public class JSONSerialiser {
         }
 
         final String moduleFactories = System.getProperty(JSON_SERIALISER_MODULES, "");
-        final Set<String> factoryClasses = new HashSet<>(Arrays.asList(moduleFactories.split(",")));
+        final Set<String> factoryClasses = Sets.newHashSet(moduleFactories.split(","));
         factoryClasses.remove("");
         for (final String factoryClass : factoryClasses) {
             final JSONSerialiserModules factory;

@@ -47,7 +47,8 @@ import uk.gov.gchq.palisade.User;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.CLASS,
         include = As.EXISTING_PROPERTY,
-        property = "class"
+        property = "class",
+        defaultImpl = TuplePredicateRule.class
 )
 public interface Rule<T> {
     /**

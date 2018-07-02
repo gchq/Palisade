@@ -41,7 +41,19 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
 
     public ExampleSimpleRestClient() {
         super();
+        initialiseRestServices();
+    }
 
+    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
+        return super.read(filename, RESOURCE_TYPE, userId, justification);
+    }
+
+    @Override
+    protected Serialiser<?, ExampleObj> createSerialiser() {
+        return new ExampleObjSerialiser();
+    }
+
+    private void initialiseRestServices() {
         // The user authorisation owner or sys admin needs to add the user
         final UserService userService = createUserService();
         userService.addUser(
@@ -93,14 +105,5 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, RESOURCE_TYPE, userId, justification);
-    }
-
-    @Override
-    protected Serialiser<?, ExampleObj> createSerialiser() {
-        return new ExampleObjSerialiser();
     }
 }
