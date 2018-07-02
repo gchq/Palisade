@@ -22,9 +22,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.koryphe.predicate.KoryphePredicate;
+import uk.gov.gchq.koryphe.tuple.function.TupleAdaptedFunction;
+import uk.gov.gchq.koryphe.tuple.predicate.TupleAdaptedPredicate;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.policy.adapted.tuple.TupleAdaptedPredicateRule;
+import uk.gov.gchq.palisade.policy.adapted.tuple.TupleAdaptedRule;
 
 import java.util.LinkedHashMap;
 import java.util.function.Function;
@@ -116,14 +119,15 @@ public class Rules<T> {
     }
 
     /**
-     * Adds a predicate rule.
+     * Adds a simple function rule that just takes the record and returns a modified record or null if the record should be fully redacted.
+     * Note - using this means your rule will not be given the User or Justification.
      *
      * @param id   the unique rule id
-     * @param rule the predicate rule
+     * @param rule the simple function rule
      * @return this Rules instance
      */
-    public Rules<T> predicateRule(final String id, final PredicateRule<T> rule) {
-        rules.put(id, rule);
+    public Rules<T> rule(final String id, final Function<T, T> rule) {
+        rules.put(id, new WrappedRule<>(rule));
         return this;
     }
 
@@ -135,26 +139,28 @@ public class Rules<T> {
      * @param rule the simple predicate rule
      * @return this Rules instance
      */
-    public Rules<T> simplePredicateRule(final String id, final Predicate<T> rule) {
+    public Rules<T> rule(final String id, final Predicate<T> rule) {
         rules.put(id, new WrappedRule<>(rule));
         return this;
     }
 
-    /**
-     * Adds a simple function rule that just takes the record and returns a modified record or null if the record should be fully redacted.
-     * Note - using this means your rule will not be given the User or Justification.
-     *
-     * @param id   the unique rule id
-     * @param rule the simple function rule
-     * @return this Rules instance
-     */
-    public Rules<T> simpleFunctionRule(final String id, final Function<T, T> rule) {
-        rules.put(id, new WrappedRule<>(rule));
-        return this;
+    public <P> Rules<T> rule(final String id, final Rule<P> rule, final String[] selection, final String[] projection) {
+        return rule(id, new TupleAdaptedRule(rule, selection, projection));
     }
 
-    public Rules<T> tuplePredicateRule(final String id, final KoryphePredicate<?> predicate, final String... string) {
-        return predicateRule(id, new TuplePredicateRule(predicate, string));
+    public <P> Rules<T> rule(final String id, final PredicateRule<P> rule, final String... selection) {
+        return rule(id, new TupleAdaptedPredicateRule(rule, selection));
+    }
+
+    public <F> Rules<T> rule(final String id, final Function<F, F> rule, final String[] selection, final String[] projection) {
+        final TupleAdaptedFunction function = new TupleAdaptedFunction<>(rule);
+        function.setSelection(selection);
+        function.setProjection(projection);
+        return rule(id, function);
+    }
+
+    public <P> Rules<T> rule(final String id, final Predicate<P> predicate, final String... selection) {
+        return rule(id, new TupleAdaptedPredicate(predicate, selection));
     }
 
     @Override

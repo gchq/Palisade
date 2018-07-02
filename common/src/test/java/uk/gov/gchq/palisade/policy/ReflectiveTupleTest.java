@@ -97,9 +97,9 @@ public class ReflectiveTupleTest {
         }
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void shouldNotPut() throws Exception {
-        testObj.put("", "");
+    @Test
+    public void shouldPut() throws Exception {
+        fail("Need to write tests");
     }
 
     @Test(expected = UnsupportedOperationException.class)

@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example.client;
 
+import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
@@ -23,7 +24,6 @@ import uk.gov.gchq.palisade.data.service.reader.DataReader;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
-import uk.gov.gchq.palisade.example.function.IsTimestampMoreThan;
 import uk.gov.gchq.palisade.example.function.IsVisible;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
@@ -81,13 +81,13 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                         new FileResource("file1", RESOURCE_TYPE),
                         new Policy<ExampleObj>()
                                 .message("Age off and visibility filtering")
-                                .predicateRule(
-                                        "visibility",
-                                        new IsVisible()
+                                .rule(
+                                        "1-visibilityRule",
+                                        new IsVisible(), "visibility"
                                 )
-                                .simplePredicateRule(
-                                        "ageOff",
-                                        new IsTimestampMoreThan(12L)
+                                .rule(
+                                        "2-ageOffRule",
+                                        new IsMoreThan(12L), "timestamp"
                                 )
                 )
         );

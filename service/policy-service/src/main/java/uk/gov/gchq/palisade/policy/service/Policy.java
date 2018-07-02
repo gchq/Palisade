@@ -34,7 +34,7 @@ import java.util.function.Predicate;
  * policy is for/doing.
  *
  * @param <T> The Java class that the rules expect the records of
- *                        data to be in the format of.
+ *            data to be in the format of.
  */
 public class Policy<T> {
     private String message;
@@ -63,7 +63,7 @@ public class Policy<T> {
     /**
      * Default constructor
      *
-     * @param rules the set of rules that need to be applied to the resource.
+     * @param rules   the set of rules that need to be applied to the resource.
      * @param message a user friendly message stating what the policy does.
      */
     public Policy(final Rules<T> rules, final String message) {
@@ -86,23 +86,38 @@ public class Policy<T> {
         return this;
     }
 
-    public Policy<T> rule(final String ruleId, final Rule<T> rule) {
-        rules.rule(ruleId, rule);
+    public Policy<T> rule(final String id, final Rule<T> rule) {
+        rules.rule(id, rule);
         return this;
     }
 
-    public Policy<T> predicateRule(final String ruleId, final PredicateRule<T> rule) {
-        rules.predicateRule(ruleId, rule);
+    public Policy<T> rule(final String id, final Predicate<T> rule) {
+        rules.rule(id, rule);
         return this;
     }
 
-    public Policy<T> simplePredicateRule(final String ruleId, final Predicate<T> rule) {
-        rules.simplePredicateRule(ruleId, rule);
+    public Policy<T> rule(final String id, final Function<T, T> rule) {
+        rules.rule(id, rule);
         return this;
     }
 
-    public Policy<T> simpleFunctionRule(final String ruleId, final Function<T, T> rule) {
-        rules.simpleFunctionRule(ruleId, rule);
+    public Policy<T> rule(final String id, final PredicateRule<?> rule, final String... string) {
+        rules.rule(id, rule, string);
+        return this;
+    }
+
+    public Policy<T> rule(final String id, final Rule<?> rule, final String[] selection, final String[] projection) {
+        rules.rule(id, rule, selection, projection);
+        return this;
+    }
+
+    public Policy<T> rule(final String id, final Predicate<?> rule, final String... string) {
+        rules.rule(id, rule, string);
+        return this;
+    }
+
+    public <F> Policy<T> rule(final String id, final Function<F, F> rule, final String[] selection, final String[] projection) {
+        rules.rule(id, rule, selection, projection);
         return this;
     }
 

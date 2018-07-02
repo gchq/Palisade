@@ -73,25 +73,36 @@ public class ReflectiveTuple implements Tuple<String> {
         this.methodCache = methodCache;
     }
 
+    public Object getRecord() {
+        return record;
+    }
+
     @Override
     public Object get(final String reference) {
         Object selection;
         try {
-            selection = getMethodSelection(record, reference);
+            selection = invokeMethodGet(record, reference);
         } catch (final IllegalAccessException | NoSuchMethodException | InvocationTargetException ignored) {
             try {
-                selection = getFieldSelection(record, reference);
+                selection = invokeFieldGet(record, reference);
             } catch (final IllegalAccessException | NoSuchFieldException ignore) {
                 throw new RuntimeException(String.format(SELECTION_S_DOES_NOT_EXIST, reference));
             }
         }
-
         return selection;
     }
 
     @Override
     public void put(final String reference, final Object value) {
-        throw new UnsupportedOperationException("This " + getClass().getSimpleName() + " is currently read only");
+        try {
+            invokeMethodPut(record, reference, value);
+        } catch (final IllegalAccessException | NoSuchMethodException | InvocationTargetException ignored) {
+            try {
+                invokeFieldPut(record, reference, value);
+            } catch (final IllegalAccessException | NoSuchFieldException ignore) {
+                throw new RuntimeException(String.format(SELECTION_S_DOES_NOT_EXIST, reference));
+            }
+        }
     }
 
     @Override
@@ -99,20 +110,30 @@ public class ReflectiveTuple implements Tuple<String> {
         throw new UnsupportedOperationException("This " + getClass().getSimpleName() + " does not support listing all values.");
     }
 
-    private Object getFieldSelection(final Object item, final String reference) throws IllegalAccessException, NoSuchFieldException {
+    private Object invokeFieldGet(final Object item, final String reference) throws IllegalAccessException, NoSuchFieldException {
         //invoked value can be null
         return getField(item.getClass(), reference).get(item);
     }
 
-    private Object getMethodSelection(final Object item, final String reference) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private Object invokeMethodGet(final Object item, final String reference) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method method;
         try {
-            method = getMethod(item.getClass(), getPrefixRef("get", reference));
+            method = getGetMethod(item.getClass(), getPrefixRef("get", reference));
         } catch (final Exception e) {
-            method = getMethod(item.getClass(), getPrefixRef("is", reference));
+            // ignore
+            method = getGetMethod(item.getClass(), getPrefixRef("is", reference));
         }
+
         //invoked value can be null
         return method.invoke(item);
+    }
+
+    private void invokeFieldPut(final Object item, final String reference, final Object value) throws IllegalAccessException, NoSuchFieldException {
+        getField(item.getClass(), reference).set(item, value);
+    }
+
+    private void invokeMethodPut(final Object item, final String reference, final Object value) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        getSetMethod(item.getClass(), getPrefixRef("set", reference)).invoke(item, value);
     }
 
     private Field getField(final Class<?> aClass, final String reference) throws NoSuchFieldException {
@@ -125,10 +146,26 @@ public class ReflectiveTuple implements Tuple<String> {
         return rtn;
     }
 
-    private Method getMethod(final Class<?> aClass, final String reference) throws NoSuchMethodException {
+    private Method getGetMethod(final Class<?> aClass, final String reference) throws NoSuchMethodException {
         Method rtn = methodCache.get(aClass, reference);
         if (isNull(rtn)) {
             rtn = aClass.getMethod(reference);
+            if (0 != rtn.getParameterCount()) {
+                throw new NoSuchMethodException("Getter " + reference + " should take no arguments but it takes " + rtn.getParameterCount());
+            }
+            this.methodCache.put(aClass, reference, rtn);
+        }
+
+        return rtn;
+    }
+
+    private Method getSetMethod(final Class<?> aClass, final String reference) throws NoSuchMethodException {
+        Method rtn = methodCache.get(aClass, reference);
+        if (isNull(rtn)) {
+            rtn = aClass.getMethod(reference);
+            if (1 != rtn.getParameterCount()) {
+                throw new NoSuchMethodException("Setter " + reference + " should only take 1 argument but it takes " + rtn.getParameterCount());
+            }
             this.methodCache.put(aClass, reference, rtn);
         }
 

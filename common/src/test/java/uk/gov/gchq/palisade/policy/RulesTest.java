@@ -12,23 +12,23 @@ import static org.junit.Assert.assertEquals;
 public class RulesTest {
 
     private Rules rules;
-    private byte[] serialise;
+    private byte[] json;
 
     @Before
     public void setUp() throws Exception {
         rules = new Rules<>()
                 .message("Age off and visibility filtering")
-                .tuplePredicateRule(
+                .rule(
                         "ageOff",
                         new IsMoreThan(10),
                         "timestamp"
                 );
-        serialise = JSONSerialiser.serialise(rules, true);
+        json = JSONSerialiser.serialise(rules, true);
     }
 
     @Test
     public void shouldSerialiseToEqualObject() throws Exception {
-        Rules deserialise = JSONSerialiser.deserialise(serialise, Rules.class);
+        Rules deserialise = JSONSerialiser.deserialise(json, Rules.class);
         final String thisSerialise = new String(JSONSerialiser.serialise(this.rules, true));
         final String thatSerialise = new String(JSONSerialiser.serialise(deserialise, true));
 
@@ -45,16 +45,19 @@ public class RulesTest {
                 "  \"rules\" : {%n" +
                 "    \"ageOff\" : {%n" +
                 "      \"predicate\" : {%n" +
-                "        \"class\" : \"uk.gov.gchq.koryphe.impl.predicate.IsMoreThan\",%n" +
-                "        \"orEqualTo\" : false,%n" +
-                "        \"value\" : 10%n" +
-                "      },%n" +
-                "      \"selection\" : [ \"timestamp\" ]%n" +
+                "        \"class\" : \"uk.gov.gchq.koryphe.tuple.predicate.TupleAdaptedPredicate\",%n" +
+                "        \"selection\" : [ \"timestamp\" ],%n" +
+                "        \"predicate\" : {%n" +
+                "          \"class\" : \"uk.gov.gchq.koryphe.impl.predicate.IsMoreThan\",%n" +
+                "          \"orEqualTo\" : false,%n" +
+                "          \"value\" : 10%n" +
+                "        }%n" +
+                "      }%n" +
                 "    }%n" +
                 "  }%n" +
                 "}");
 
-        assertEquals(text, new String(serialise));
+        assertEquals(text, new String(json));
     }
 
     @Test
@@ -65,11 +68,14 @@ public class RulesTest {
                 "  \"rules\" : {%n" +
                 "    \"ageOff\" : {%n" +
                 "      \"predicate\" : {%n" +
-                "        \"class\" : \"uk.gov.gchq.koryphe.impl.predicate.IsMoreThan\",%n" +
-                "        \"orEqualTo\" : false,%n" +
-                "        \"value\" : 10%n" +
-                "      },%n" +
-                "      \"selection\" : [ \"timestamp\" ]%n" +
+                "        \"class\" : \"uk.gov.gchq.koryphe.tuple.predicate.TupleAdaptedPredicate\",%n" +
+                "        \"selection\" : [ \"timestamp\" ],%n" +
+                "        \"predicate\" : {%n" +
+                "          \"class\" : \"uk.gov.gchq.koryphe.impl.predicate.IsMoreThan\",%n" +
+                "          \"orEqualTo\" : false,%n" +
+                "          \"value\" : 10%n" +
+                "        }%n" +
+                "      }%n" +
                 "    }%n" +
                 "  }%n" +
                 "}");

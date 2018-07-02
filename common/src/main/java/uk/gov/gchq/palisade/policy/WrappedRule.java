@@ -27,6 +27,8 @@ import uk.gov.gchq.koryphe.tuple.predicate.TupleAdaptedPredicate;
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.policy.adapted.tuple.TupleAdaptedPredicateRule;
+import uk.gov.gchq.palisade.policy.adapted.tuple.TupleAdaptedRule;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -90,6 +92,29 @@ public class WrappedRule<T> implements Rule<T> {
         this.predicate = predicate;
     }
 
+    public <P> WrappedRule(final Rule<P> rule, final String[] selection, final String[] projection) {
+        this(new TupleAdaptedRule(rule, selection, projection));
+    }
+
+    public <P> WrappedRule(final PredicateRule<P> rule, final String... selection) {
+        this(new TupleAdaptedPredicateRule(rule, selection));
+    }
+
+    public <F> WrappedRule(final Function<F, F> rule, final String[] selection, final String[] projection) {
+        this(createTuple(rule, selection, projection));
+    }
+
+    public <P> WrappedRule(final Predicate<P> predicate, final String... selection) {
+        this(new TupleAdaptedPredicate(predicate, selection));
+    }
+
+    public static <F> TupleAdaptedFunction createTuple(final Function<F, F> rule, final String[] selection, final String[] projection) {
+        final TupleAdaptedFunction function = new TupleAdaptedFunction<>(rule);
+        function.setSelection(selection);
+        function.setProjection(projection);
+        return function;
+    }
+
     @JsonCreator
     public WrappedRule(@JsonProperty("rule") final Rule<T> rule,
                        @JsonProperty("function") final Function<T, T> function,
@@ -147,6 +172,11 @@ public class WrappedRule<T> implements Rule<T> {
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class", defaultImpl = TupleAdaptedPredicate.class)
     public Predicate<T> getPredicate() {
         return predicate;
+    }
+
+    @Override
+    public String _getClass() {
+        return null;
     }
 
     @Override

@@ -18,12 +18,11 @@ package uk.gov.gchq.palisade.example.function;
 
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.policy.PredicateRule;
 
-public class IsVisible implements PredicateRule<ExampleObj> {
+public class IsVisible implements PredicateRule<String> {
     @Override
-    public boolean test(final ExampleObj obj, final User user, final Justification justification) {
-        return user.getAuths().contains(obj.getVisibility());
+    public boolean test(final String visibility, final User user, final Justification justification) {
+        return user.getAuths().contains(visibility);
     }
 }
