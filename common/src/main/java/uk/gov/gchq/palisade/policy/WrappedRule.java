@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
+import uk.gov.gchq.koryphe.tuple.function.TupleAdaptedFunction;
+import uk.gov.gchq.koryphe.tuple.predicate.TupleAdaptedPredicate;
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
@@ -137,12 +139,12 @@ public class WrappedRule<T> implements Rule<T> {
         return rule;
     }
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class", defaultImpl = TupleAdaptedFunction.class)
     public Function<T, T> getFunction() {
         return function;
     }
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class", defaultImpl = TupleAdaptedPredicate.class)
     public Predicate<T> getPredicate() {
         return predicate;
     }

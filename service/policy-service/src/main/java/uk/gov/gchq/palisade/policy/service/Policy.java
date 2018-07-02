@@ -33,12 +33,12 @@ import java.util.function.Predicate;
  * resource and is provided with a user friendly message to explain what the
  * policy is for/doing.
  *
- * @param <RULE_DATA_TYPE> The Java class that the rules expect the records of
+ * @param <T> The Java class that the rules expect the records of
  *                        data to be in the format of.
  */
-public class Policy<RULE_DATA_TYPE> {
+public class Policy<T> {
     private String message;
-    private Rules<RULE_DATA_TYPE> rules;
+    private Rules<T> rules;
     // TODO policies may need owners to control who can modify them.
 
     // no-args constructor required
@@ -56,7 +56,7 @@ public class Policy<RULE_DATA_TYPE> {
     /**
      * @param rules the set of rules that need to be applied to the resource.
      */
-    public Policy(final Rules<RULE_DATA_TYPE> rules) {
+    public Policy(final Rules<T> rules) {
         this(rules, "");
     }
 
@@ -66,7 +66,7 @@ public class Policy<RULE_DATA_TYPE> {
      * @param rules the set of rules that need to be applied to the resource.
      * @param message a user friendly message stating what the policy does.
      */
-    public Policy(final Rules<RULE_DATA_TYPE> rules, final String message) {
+    public Policy(final Rules<T> rules, final String message) {
         Objects.requireNonNull(rules);
         Objects.requireNonNull(message);
         this.rules = rules;
@@ -81,27 +81,27 @@ public class Policy<RULE_DATA_TYPE> {
         return message;
     }
 
-    public Policy<RULE_DATA_TYPE> message(final String message) {
+    public Policy<T> message(final String message) {
         this.message = message;
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> rule(final String ruleId, final Rule<RULE_DATA_TYPE> rule) {
+    public Policy<T> rule(final String ruleId, final Rule<T> rule) {
         rules.rule(ruleId, rule);
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> predicateRule(final String ruleId, final PredicateRule<RULE_DATA_TYPE> rule) {
+    public Policy<T> predicateRule(final String ruleId, final PredicateRule<T> rule) {
         rules.predicateRule(ruleId, rule);
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> simplePredicateRule(final String ruleId, final Predicate<RULE_DATA_TYPE> rule) {
+    public Policy<T> simplePredicateRule(final String ruleId, final Predicate<T> rule) {
         rules.simplePredicateRule(ruleId, rule);
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> simpleFunctionRule(final String ruleId, final Function<RULE_DATA_TYPE, RULE_DATA_TYPE> rule) {
+    public Policy<T> simpleFunctionRule(final String ruleId, final Function<T, T> rule) {
         rules.simpleFunctionRule(ruleId, rule);
         return this;
     }
