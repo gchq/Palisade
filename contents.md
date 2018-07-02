@@ -22,4 +22,4 @@
 * Other
   * [Ways of Working](doc/other/ways_of_working.md) 
 
-* [Javadoc](ref://doc/javadoc/index.html)
+* [Javadoc](ref://doc/javadoc)
