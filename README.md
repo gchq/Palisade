@@ -55,9 +55,6 @@ If required, Palisade allows an organisation to use centralised services which e
 ![Palisade Overview](doc/img/Palisade_overview.jpg)
 
 
-## Licence
-Palisade is licensed under the Apache 2 license.
-
 ## Getting started
 
 To get started, clone the Palisade repo: 
@@ -74,6 +71,16 @@ These example should provide a good start to understanding how Palisade works.
 For more details about the code structure see the [Developer Guide](doc/developer_guide.md)
 
 For details about possible use cases, see the [Use Cases](doc/use_cases.md)
+
+
+## Documentation
+
+Our documentation can be found [here](https://gchq.github.io/Palisade).
+
+
+## Licence
+Palisade is licensed under the Apache 2 license.
+
 
 ## Contributing
 
