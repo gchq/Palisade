@@ -1,0 +1,21 @@
+{
+  "class": "uk.gov.gchq.palisade.service.impl.SimplePalisadeService",
+  "policyService": {
+    "class": "uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService",
+    "baseUrl": "http://localhost:8081/policy"
+  },
+  "resourceService": {
+    "class": "uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService",
+    "baseUrl": "http://localhost:8082/resource"
+  },
+  "userService": {
+    "class": "uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService",
+    "baseUrl": "http://localhost:8083/user"
+  },
+  "cacheService": {
+    "class": "uk.gov.gchq.palisade.cache.service.impl.HashMapCacheService"
+  },
+  "auditService": {
+    "class": "uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService"
+  }
+}

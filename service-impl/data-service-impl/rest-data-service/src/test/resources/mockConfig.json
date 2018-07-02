@@ -1,0 +1,3 @@
+{
+  "class": "uk.gov.gchq.palisade.data.service.impl.MockDataService"
+}

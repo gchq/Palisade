@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2018 Crown Copyright
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+    <!-- Copied from blog: http://uniqueexperiments.blogspot.co.uk/2015/09/foolproof-method-of-excluding-resteasy.html -->
+    <deployment>
+        <exclude-subsystems>
+            <subsystem name="jaxrs"/>
+            <subsystem name="webservices"/>
+            <subsystem name="resteasy"/>
+        </exclude-subsystems>
+        <exclusions>
+            <module name="javaee.api"/>
+            <module name="javax.ws.rs.api"/>
+            <module name="org.jboss.as.jaxrs"/>
+            <module name="org.jboss.resteasy.resteasy-jaxrs"/>
+            <module name="org.jboss.resteasy.resteasy-cdi"/>
+            <module name="org.jboss.resteasy.jackson-provider"/>
+            <module name="org.jboss.resteasy.resteasy-atom-provider"/>
+            <module name="org.jboss.resteasy.resteasy-hibernatevalidator-provider"/>
+            <module name="org.jboss.resteasy.resteasy-jaxb-provider"/>
+            <module name="org.jboss.resteasy.resteasy-jettison-provider"/>
+            <module name="org.jboss.resteasy.resteasy-jackson-provider"/>
+            <module name="org.jboss.resteasy.resteasy-jsapi"/>
+            <module name="org.jboss.resteasy.resteasy-multipart-provider"/>
+            <module name="org.jboss.resteasy.resteasy-yaml-provider"/>
+            <module name="org.codehaus.jackson.jackson-core-asl"/>
+            <module name="org.codehaus.jackson.jackson-jaxrs"/>
+            <module name="org.codehaus.jackson.jackson-mapper-asl"/>
+            <module name="org.codehaus.jackson.jackson-xc"/>
+            <module name="org.codehaus.jettison"/>
+            <module name="org.jboss.as.webservices.*"/>
+            <module name="org.jboss.ws.*"/>
+        </exclusions>
+    </deployment>
+</jboss-deployment-structure>

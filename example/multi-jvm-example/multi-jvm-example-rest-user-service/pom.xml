@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2018 Crown Copyright
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>uk.gov.gchq.palisade</groupId>
+        <artifactId>multi-jvm-example</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <artifactId>multi-jvm-example-rest-user-service</artifactId>
+    <packaging>war</packaging>
+
+    <properties>
+        <standalone-path/>
+        <standalone-port>8080</standalone-port>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>hashmap-user-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>multi-jvm-example-model</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>rest-user-service</artifactId>
+            <version>${project.parent.version}</version>
+            <classifier>classes</classifier>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${dependency.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.parent.groupId}</groupId>
+                                    <artifactId>rest-user-service</artifactId>
+                                    <version>${project.parent.version}</version>
+                                    <type>war</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>
+                                        ${project.build.directory}/${project.artifactId}-${project.version}
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven-war-plugin.version}</version>
+                <configuration>
+                    <attachClasses>true</attachClasses>
+                    <classesClassifier>classes</classesClassifier>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>multi-jvm-example-rest-user-service</id>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <version>2.0</version>
+                        <configuration>
+                            <path>/${standalone-path}</path>
+                            <port>${standalone-port}</port>
+                            <systemProperties>
+                                <palisade.properties.app.title>
+                                    ${project.artifactId}
+                                </palisade.properties.app.title>
+                                <palisade.rest.basePath>
+                                    ${standalone-path}
+                                </palisade.rest.basePath>
+                                <palisade.rest.user.service.config.path>
+                                    ${project.build.outputDirectory}/userConfig.json
+                                </palisade.rest.user.service.config.path>
+                                <palisade.error-mode.debug>
+                                    true
+                                </palisade.error-mode.debug>
+                            </systemProperties>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>deploy</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>run-war</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
