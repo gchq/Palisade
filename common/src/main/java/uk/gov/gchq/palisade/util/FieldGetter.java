@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.function;
+package uk.gov.gchq.palisade.util;
 
-import uk.gov.gchq.palisade.Justification;
-import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.policy.PredicateRule;
+import java.util.function.BiFunction;
 
-public class IsVisible implements PredicateRule<String> {
-    @Override
-    public boolean test(final String visibility, final User user, final Justification justification) {
-        return user.getAuths().contains(visibility);
-    }
+
+public interface FieldGetter<T> extends BiFunction<T, String, Object> {
 }

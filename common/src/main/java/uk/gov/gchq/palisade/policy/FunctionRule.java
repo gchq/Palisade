@@ -27,41 +27,42 @@ import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
+
 /**
- * A {@link PredicateRule} is helper implementation of {@link Rule}. It is useful
+ * A {@link FunctionRule} is helper implementation of {@link Rule}. It is useful
  * when you need to set simple rules that don't require the {@link User} or {@link Justification}.
  *
  * @param <T> The type of the record. In normal cases the raw data will be deserialised
  *            by the record reader before being passed to the {@link Rule#apply(Object, User, Justification)}.
  */
 @JsonPropertyOrder(alphabetic = true)
-public class PredicateRule<T> implements Rule<T> {
-    private final Predicate<T> predicate;
+public class FunctionRule<T> implements Rule<T> {
+    private final Function<T, T> function;
 
     /**
-     * Constructs a {@link PredicateRule} with a given simple predicate rule to apply.
+     * Constructs a {@link FunctionRule} with a given simple function rule to apply.
      * Note - using this means your rule will not be given the User or Justification.
      *
-     * @param predicate the simple {@link Predicate} rule to wrap.
+     * @param function the simple {@link Function} rule to wrap.
      */
     @JsonCreator
-    public PredicateRule(@JsonProperty("predicate") final Predicate<T> predicate) {
-        requireNonNull(predicate, "WrappedRule was initialised with a null predicate");
-        this.predicate = predicate;
+    public FunctionRule(@JsonProperty("function") final Function<T, T> function) {
+        requireNonNull(function, "WrappedRule was initialised with a null function");
+        this.function = function;
     }
 
     @Override
     public T apply(final T obj, final User user, final Justification justification) {
-        return predicate.test(obj) ? obj : null;
+        return function.apply(obj);
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
-    public Predicate<T> getPredicate() {
-        return predicate;
+    public Function<T, T> getFunction() {
+        return function;
     }
 
     @Override
@@ -74,24 +75,24 @@ public class PredicateRule<T> implements Rule<T> {
             return false;
         }
 
-        final PredicateRule<?> that = (PredicateRule<?>) o;
+        final FunctionRule<?> that = (FunctionRule<?>) o;
 
         return new EqualsBuilder()
-                .append(predicate, that.predicate)
+                .append(function, that.function)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(11, 37)
-                .append(predicate)
+        return new HashCodeBuilder(7, 37)
+                .append(function)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("predicate", predicate)
+                .append("function", function)
                 .toString();
     }
 }

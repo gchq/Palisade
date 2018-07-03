@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 
 /**
  * <p>
@@ -48,7 +49,7 @@ import uk.gov.gchq.palisade.User;
         use = JsonTypeInfo.Id.CLASS,
         include = As.EXISTING_PROPERTY,
         property = "class",
-        defaultImpl = WrappedRule.class
+        defaultImpl = TupleRule.class
 )
 public interface Rule<T> {
     /**

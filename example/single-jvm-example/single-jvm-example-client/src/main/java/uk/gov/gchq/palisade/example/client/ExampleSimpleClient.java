@@ -16,7 +16,9 @@
 
 package uk.gov.gchq.palisade.example.client;
 
+import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
 import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
+import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
@@ -24,7 +26,9 @@ import uk.gov.gchq.palisade.data.service.reader.DataReader;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
-import uk.gov.gchq.palisade.example.function.IsVisible;
+import uk.gov.gchq.palisade.example.rule.If;
+import uk.gov.gchq.palisade.example.rule.IsVisible;
+import uk.gov.gchq.palisade.example.rule.SetValue;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
@@ -37,6 +41,9 @@ import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.stream.Stream;
+
+import static uk.gov.gchq.palisade.Util.project;
+import static uk.gov.gchq.palisade.Util.select;
 
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
@@ -76,21 +83,34 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     @Override
     protected PolicyService createPolicyService() {
         final PolicyService policyService = super.createPolicyService();
-        policyService.setPolicy(
-                new SetPolicyRequest(
-                        new FileResource("file1", RESOURCE_TYPE),
-                        new Policy<ExampleObj>()
-                                .message("Age off and visibility filtering")
-                                .rule(
-                                        "1-visibilityRule",
-                                        new IsVisible(), "visibility"
-                                )
-                                .rule(
-                                        "2-ageOffRule",
-                                        new IsMoreThan(12L), "timestamp"
-                                )
-                )
+        final SetPolicyRequest request = new SetPolicyRequest(
+                new FileResource("file1", RESOURCE_TYPE),
+                new Policy<ExampleObj>()
+                        .message("Visibility, ageOff and property redaction")
+                        .rule(
+                                "1-visibility",
+                                select("Record.visibility", "User.auths"),
+                                new IsVisible()
+                        )
+                        .rule(
+                                "2-ageOff",
+                                select("Record.timestamp"),
+                                new IsMoreThan(12L)
+                        )
+                        .rule(
+                                "3-redactProperty",
+                                select("User.roles", "Record.property"),
+                                new If<>()
+                                        .predicate(0, new Not<>(new CollectionContains("admin")))
+                                        .then(1, new SetValue<>("redacted")),
+                                project("User.roles", "Record.property")
+                        )
         );
+
+        policyService.setPolicy(
+                request
+        );
+
         return policyService;
     }
 

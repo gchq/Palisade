@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.policy;
+package uk.gov.gchq.palisade.policy.tuple;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.gchq.palisade.policy.ReflectiveTuple.Cache;
+import uk.gov.gchq.palisade.policy.tuple.ReflectiveTuple.Cache;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;

@@ -17,19 +17,47 @@
 package uk.gov.gchq.palisade;
 
 import uk.gov.gchq.koryphe.tuple.Tuple;
-import uk.gov.gchq.palisade.policy.ReflectiveTuple;
+import uk.gov.gchq.palisade.policy.tuple.ReflectiveTuple;
 import uk.gov.gchq.palisade.policy.Rule;
 import uk.gov.gchq.palisade.policy.Rules;
+import uk.gov.gchq.palisade.util.FieldGetter;
+import uk.gov.gchq.palisade.util.FieldSetter;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public final class Util {
     private Util() {
+    }
+
+    public static String[] arr(final String... strings) {
+        return strings;
+    }
+
+    public static String[] select(final String... strings) {
+        return strings;
+    }
+
+    public static String[] project(final String... strings) {
+        return strings;
+    }
+
+    public static Integer[] arr(final Integer... strings) {
+        return strings;
+    }
+
+    public static Integer[] select(final Integer... strings) {
+        return strings;
+    }
+
+    public static Integer[] project(final Integer... strings) {
+        return strings;
     }
 
     public static <K, V> Map<K, V> newHashMap(final Collection<Entry<K, V>> entries) {
@@ -73,6 +101,73 @@ public final class Util {
             }
         }
         return null != tuple ? (T) tuple.getRecord() : null;
+    }
 
+    public static <T> Object getField(
+            final T instance,
+            final Map<String, FieldGetter<T>> getters,
+            final String reference) {
+        return getField(instance, getters, reference, null);
+    }
+
+    public static <T> Object getField(
+            final T instance,
+            final Map<String, FieldGetter<T>> getters,
+            final String reference,
+            final Function<String, Object> notFound) {
+        final int fieldEnd = reference.indexOf(".");
+        final String field;
+        String subfield = null;
+        if (fieldEnd > -1) {
+            field = reference.substring(0, fieldEnd);
+            if (fieldEnd + 1 < reference.length()) {
+                subfield = reference.substring(fieldEnd + 1);
+            }
+        } else {
+            field = reference;
+        }
+
+        final FieldGetter<T> getter = getters.get(field);
+        final Object result;
+        if (null != getter) {
+            result = getter.apply(instance, subfield);
+        } else if (null != notFound) {
+            result = notFound.apply(field);
+        } else {
+            result = null;
+        }
+        return result;
+    }
+
+    public static <T> void setField(final T instance,
+                                    final Map<String, FieldSetter<T>> setters,
+                                    final String reference,
+                                    final Object value) {
+        setField(instance, setters, reference, value, null);
+    }
+
+    public static <T> void setField(final T instance,
+                                    final Map<String, FieldSetter<T>> setters,
+                                    final String reference,
+                                    final Object value,
+                                    final Consumer<String> notFound) {
+        final int fieldEnd = reference.indexOf(".");
+        final String field;
+        String subfield = null;
+        if (fieldEnd > -1) {
+            field = reference.substring(0, fieldEnd);
+            if (fieldEnd + 1 < reference.length()) {
+                subfield = reference.substring(fieldEnd + 1);
+            }
+        } else {
+            field = reference;
+        }
+
+        final FieldSetter<T> setter = setters.get(field);
+        if (null != setter) {
+            setter.accept(instance, subfield, value);
+        } else if (null != notFound) {
+            notFound.accept(field);
+        }
     }
 }

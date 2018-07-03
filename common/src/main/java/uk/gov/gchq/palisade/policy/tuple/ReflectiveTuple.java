@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.policy;
+package uk.gov.gchq.palisade.policy.tuple;
 
 import uk.gov.gchq.koryphe.tuple.Tuple;
 
@@ -150,9 +150,6 @@ public class ReflectiveTuple implements Tuple<String> {
         Method rtn = methodCache.get(aClass, reference);
         if (isNull(rtn)) {
             rtn = aClass.getMethod(reference);
-            if (0 != rtn.getParameterCount()) {
-                throw new NoSuchMethodException("Getter " + reference + " should take no arguments but it takes " + rtn.getParameterCount());
-            }
             this.methodCache.put(aClass, reference, rtn);
         }
 
@@ -162,9 +159,14 @@ public class ReflectiveTuple implements Tuple<String> {
     private Method getSetMethod(final Class<?> aClass, final String reference) throws NoSuchMethodException {
         Method rtn = methodCache.get(aClass, reference);
         if (isNull(rtn)) {
-            rtn = aClass.getMethod(reference);
-            if (1 != rtn.getParameterCount()) {
-                throw new NoSuchMethodException("Setter " + reference + " should only take 1 argument but it takes " + rtn.getParameterCount());
+            for (final Method method : aClass.getMethods()) {
+                if (method.getName().equals(reference) && 1 == method.getParameterCount()) {
+                    rtn = method;
+                    break;
+                }
+            }
+            if (isNull(rtn)) {
+                throw new NoSuchMethodException("No public setter " + reference + " in class " + aClass.getName());
             }
             this.methodCache.put(aClass, reference, rtn);
         }

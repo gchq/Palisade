@@ -19,9 +19,9 @@ public class RulesTest {
         rules = new Rules<>()
                 .message("Age off and visibility filtering")
                 .rule(
-                        "ageOff",
-                        new IsMoreThan(10),
-                        "timestamp"
+                        "ageOffRule",
+                        "timestamp",
+                        new IsMoreThan(10)
                 );
         json = JSONSerialiser.serialise(rules, true);
     }
@@ -43,15 +43,12 @@ public class RulesTest {
         final String text = String.format("{%n" +
                 "  \"message\" : \"Age off and visibility filtering\",%n" +
                 "  \"rules\" : {%n" +
-                "    \"ageOff\" : {%n" +
+                "    \"ageOffRule\" : {%n" +
+                "      \"selection\" : [ \"timestamp\" ],%n" +
                 "      \"predicate\" : {%n" +
-                "        \"class\" : \"uk.gov.gchq.koryphe.tuple.predicate.TupleAdaptedPredicate\",%n" +
-                "        \"selection\" : [ \"timestamp\" ],%n" +
-                "        \"predicate\" : {%n" +
-                "          \"class\" : \"uk.gov.gchq.koryphe.impl.predicate.IsMoreThan\",%n" +
-                "          \"orEqualTo\" : false,%n" +
-                "          \"value\" : 10%n" +
-                "        }%n" +
+                "        \"class\" : \"uk.gov.gchq.koryphe.impl.predicate.IsMoreThan\",%n" +
+                "        \"orEqualTo\" : false,%n" +
+                "        \"value\" : 10%n" +
                 "      }%n" +
                 "    }%n" +
                 "  }%n" +
@@ -66,15 +63,12 @@ public class RulesTest {
         final String text = String.format("{%n" +
                 "  \"message\" : \"Age off and visibility filtering\",%n" +
                 "  \"rules\" : {%n" +
-                "    \"ageOff\" : {%n" +
+                "    \"ageOffRule\" : {%n" +
+                "      \"selection\" : [ \"timestamp\" ],%n" +
                 "      \"predicate\" : {%n" +
-                "        \"class\" : \"uk.gov.gchq.koryphe.tuple.predicate.TupleAdaptedPredicate\",%n" +
-                "        \"selection\" : [ \"timestamp\" ],%n" +
-                "        \"predicate\" : {%n" +
-                "          \"class\" : \"uk.gov.gchq.koryphe.impl.predicate.IsMoreThan\",%n" +
-                "          \"orEqualTo\" : false,%n" +
-                "          \"value\" : 10%n" +
-                "        }%n" +
+                "        \"class\" : \"uk.gov.gchq.koryphe.impl.predicate.IsMoreThan\",%n" +
+                "        \"orEqualTo\" : false,%n" +
+                "        \"value\" : 10%n" +
                 "      }%n" +
                 "    }%n" +
                 "  }%n" +

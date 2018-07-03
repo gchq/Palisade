@@ -19,8 +19,13 @@ package uk.gov.gchq.palisade;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.util.FieldGetter;
+import uk.gov.gchq.palisade.util.FieldSetter;
+
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -36,9 +41,25 @@ import java.util.Set;
  * </p>
  */
 public class User {
+    public static final String NAMESPACE = "User";
+    public static final String USER_ID = "userId";
+    public static final String ROLES = "roles";
+    public static final String AUTHS = "auths";
+
+    private static final Map<String, FieldGetter<User>> FIELD_GETTERS = createFieldGetters();
+    private static final Map<String, FieldSetter<User>> FIELD_SETTERS = createFieldSetters();
+
     private UserId userId = new UserId();
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
+
+    public Object getField(final String reference) {
+        return Util.getField(this, FIELD_GETTERS, reference);
+    }
+
+    public void setField(final String reference, final Object value) {
+        Util.setField(this, FIELD_SETTERS, reference, value);
+    }
 
     public Set<String> getAuths() {
         return auths;
@@ -91,6 +112,14 @@ public class User {
         return this;
     }
 
+    public void setRoles(final Set<String> roles) {
+        this.roles = roles;
+    }
+
+    public void setAuths(final Set<String> auths) {
+        this.auths = auths;
+    }
+
     public UserId getUserId() {
         return userId;
     }
@@ -134,5 +163,21 @@ public class User {
                 .append("roles", roles)
                 .append("auths", auths)
                 .toString();
+    }
+
+    private static Map<String, FieldGetter<User>> createFieldGetters() {
+        Map<String, FieldGetter<User>> map = new HashMap<>();
+        map.put(USER_ID, (user, subfield) -> user.userId.getField(subfield));
+        map.put(ROLES, (user, subfield) -> user.getRoles());
+        map.put(AUTHS, (user, subfield) -> user.getAuths());
+        return Collections.unmodifiableMap(map);
+    }
+
+    private static Map<String, FieldSetter<User>> createFieldSetters() {
+        Map<String, FieldSetter<User>> map = new HashMap<>();
+        map.put(USER_ID, (user, subfield, value) -> user.userId.setField(subfield, value));
+        map.put(ROLES, (user, subfield, value) -> user.setRoles(((Set<String>) value)));
+        map.put(AUTHS, (user, subfield, value) -> user.setAuths(((Set<String>) value)));
+        return Collections.unmodifiableMap(map);
     }
 }

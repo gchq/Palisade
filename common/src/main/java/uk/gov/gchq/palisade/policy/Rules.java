@@ -22,12 +22,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.koryphe.tuple.function.TupleAdaptedFunction;
-import uk.gov.gchq.koryphe.tuple.predicate.TupleAdaptedPredicate;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.policy.adapted.tuple.TupleAdaptedPredicateRule;
-import uk.gov.gchq.palisade.policy.adapted.tuple.TupleAdaptedRule;
+import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 
 import java.util.LinkedHashMap;
 import java.util.function.Function;
@@ -127,7 +124,7 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> rule(final String id, final Function<T, T> rule) {
-        rules.put(id, new WrappedRule<>(rule));
+        rules.put(id, new FunctionRule<>(rule));
         return this;
     }
 
@@ -140,27 +137,34 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> rule(final String id, final Predicate<T> rule) {
-        rules.put(id, new WrappedRule<>(rule));
+        rules.put(id, new PredicateRule<>(rule));
         return this;
     }
 
-    public <P> Rules<T> rule(final String id, final Rule<P> rule, final String[] selection, final String[] projection) {
-        return rule(id, new TupleAdaptedRule(rule, selection, projection));
+    public Rules<T> rule(final String id,
+                         final String selection,
+                         final Function<?, ?> function,
+                         final String projection) {
+        return rule(id, new TupleRule<>(selection, function, projection));
     }
 
-    public <P> Rules<T> rule(final String id, final PredicateRule<P> rule, final String... selection) {
-        return rule(id, new TupleAdaptedPredicateRule(rule, selection));
+    public Rules<T> rule(final String id,
+                         final String[] selection,
+                         final Function<?, ?> function,
+                         final String[] projection) {
+        return rule(id, new TupleRule<>(selection, function, projection));
     }
 
-    public <F> Rules<T> rule(final String id, final Function<F, F> rule, final String[] selection, final String[] projection) {
-        final TupleAdaptedFunction function = new TupleAdaptedFunction<>(rule);
-        function.setSelection(selection);
-        function.setProjection(projection);
-        return rule(id, function);
+    public Rules<T> rule(final String id,
+                         final String selection,
+                         final Predicate<?> predicate) {
+        return rule(id, new TupleRule<>(selection, predicate));
     }
 
-    public <P> Rules<T> rule(final String id, final Predicate<P> predicate, final String... selection) {
-        return rule(id, new TupleAdaptedPredicate(predicate, selection));
+    public Rules<T> rule(final String id,
+                         final String[] selection,
+                         final Predicate<?> predicate) {
+        return rule(id, new TupleRule<>(selection, predicate));
     }
 
     @Override

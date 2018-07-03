@@ -14,15 +14,30 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.function;
+package uk.gov.gchq.palisade.example.rule;
 
-import uk.gov.gchq.palisade.Justification;
-import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.policy.PredicateRule;
+import uk.gov.gchq.koryphe.function.KorypheFunction;
 
-public class IsVisible implements PredicateRule<String> {
+public class Append extends KorypheFunction<String, String> {
+    private String suffix;
+
+    public Append() {
+    }
+
+    public Append(final String suffix) {
+        this.suffix = suffix;
+    }
+
     @Override
-    public boolean test(final String visibility, final User user, final Justification justification) {
-        return user.getAuths().contains(visibility);
+    public String apply(final String value) {
+        return value + suffix;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(final String suffix) {
+        this.suffix = suffix;
     }
 }

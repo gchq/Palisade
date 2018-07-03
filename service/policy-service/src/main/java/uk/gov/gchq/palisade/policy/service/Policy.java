@@ -20,7 +20,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.policy.PredicateRule;
 import uk.gov.gchq.palisade.policy.Rule;
 import uk.gov.gchq.palisade.policy.Rules;
 
@@ -91,33 +90,43 @@ public class Policy<T> {
         return this;
     }
 
+    public Policy<T> rule(final String id, final Function<T, T> function) {
+        rules.rule(id, function);
+        return this;
+    }
+
     public Policy<T> rule(final String id, final Predicate<T> rule) {
         rules.rule(id, rule);
         return this;
     }
 
-    public Policy<T> rule(final String id, final Function<T, T> rule) {
-        rules.rule(id, rule);
+    public Policy<T> rule(final String id,
+                          final String selection,
+                          final Function<?, ?> function,
+                          final String projection) {
+        rules.rule(id, selection, function, projection);
         return this;
     }
 
-    public Policy<T> rule(final String id, final PredicateRule<?> rule, final String... string) {
-        rules.rule(id, rule, string);
+    public Policy<T> rule(final String id,
+                          final String[] selection,
+                          final Function<?, ?> function,
+                          final String[] projection) {
+        rules.rule(id, selection, function, projection);
         return this;
     }
 
-    public Policy<T> rule(final String id, final Rule<?> rule, final String[] selection, final String[] projection) {
-        rules.rule(id, rule, selection, projection);
+    public Policy<T> rule(final String id,
+                          final String selection,
+                          final Predicate<?> predicate) {
+        rules.rule(id, selection, predicate);
         return this;
     }
 
-    public Policy<T> rule(final String id, final Predicate<?> rule, final String... string) {
-        rules.rule(id, rule, string);
-        return this;
-    }
-
-    public <F> Policy<T> rule(final String id, final Function<F, F> rule, final String[] selection, final String[] projection) {
-        rules.rule(id, rule, selection, projection);
+    public Policy<T> rule(final String id,
+                          final String[] selection,
+                          final Predicate<?> predicate) {
+        rules.rule(id, selection, predicate);
         return this;
     }
 
