@@ -67,7 +67,7 @@ public interface PolicyService extends Service {
      * @param request a {@link SetPolicyRequest} containing the
      *                         resource and the policy to set on that resource.
      * @return a {@link CompletableFuture} {@link Boolean} which is true if
-     * the policy was sucessfully set.
+     * the policy was successfully set.
      */
     CompletableFuture<Boolean> setPolicy(final SetPolicyRequest request);
 

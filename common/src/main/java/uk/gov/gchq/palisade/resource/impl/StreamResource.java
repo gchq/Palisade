@@ -17,11 +17,13 @@
 package uk.gov.gchq.palisade.resource.impl;
 
 import uk.gov.gchq.palisade.resource.AbstractResource;
-import uk.gov.gchq.palisade.resource.ContainerResource;
+import uk.gov.gchq.palisade.resource.ChildResource;
+import uk.gov.gchq.palisade.resource.ParentResource;
 
-public class StreamResource extends AbstractResource implements ContainerResource {
+public class StreamResource extends AbstractResource implements ChildResource {
     long start;
     long end;
+    private ParentResource parent;
 
     public StreamResource() {
     }
@@ -36,5 +38,15 @@ public class StreamResource extends AbstractResource implements ContainerResourc
 
     public StreamResource(final String id, final String type, final String format) {
         super(id, type, format);
+    }
+
+    @Override
+    public ParentResource getParent() {
+        return parent;
+    }
+
+    @Override
+    public void setParent(final ParentResource parent) {
+        this.parent = parent;
     }
 }
