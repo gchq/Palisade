@@ -21,7 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import uk.gov.gchq.palisade.resource.ContainerResource;
+import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -71,7 +71,7 @@ public class RestResourceServiceV1IT {
         final ResourceService resourceService = Mockito.mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
 
-        final ContainerResource dir = new DirectoryResource("dir1", "type1", "format1");
+        final ParentResource dir = new DirectoryResource("dir1", "type1", "format1");
         final FileResource file = new FileResource("file1", "type1", "format1");
         final ConnectionDetail connectionDetail = new SimpleConnectionDetail("details");
         final AddResourceRequest request = new AddResourceRequest(dir, file, connectionDetail);

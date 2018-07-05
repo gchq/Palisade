@@ -2,7 +2,7 @@
   "class": "uk.gov.gchq.palisade.resource.service.HashMapResourceService",
   "resources": [
     {
-      "container": {
+      "parent": {
         "class": "uk.gov.gchq.palisade.resource.impl.DirectoryResource",
         "id": "dir1",
         "type": "exampleObj"
