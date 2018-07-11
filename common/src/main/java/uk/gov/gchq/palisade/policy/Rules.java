@@ -168,14 +168,17 @@ public class Rules<T> {
                         .append(thisKeySet, thatKeySet);
 
                 if (builder.isEquals()) {
-                    final String[] ruleNames = thisKeySet.toArray(new String[thisKeySet.size()]);
-                    for (int i = 0; i < this.rules.size() && builder.isEquals(); i++) {
-                        final Rule thisRule = this.rules.get(ruleNames[i]);
-                        final Rule thatRule = that.getRules().get(ruleNames[i]);
+                    for (String ruleName : thisKeySet) {
+                        final Rule thisRule = this.rules.get(ruleName);
+                        final Rule thatRule = that.getRules().get(ruleName);
                         builder.append(thisRule.getClass(), thatRule.getClass());
                         if (builder.isEquals()) {
                             // This is expensive - but we don't have any other way of doing it
                             builder.append(JSONSerialiser.serialise(thisRule), JSONSerialiser.serialise(thatRule));
+                        }
+
+                        if (!builder.isEquals()) {
+                            break;
                         }
                     }
                 }
