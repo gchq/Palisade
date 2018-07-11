@@ -98,6 +98,7 @@ public class ReflectiveTupleTest {
     }
 
     @Test
+    @org.junit.Ignore(value = "testing and class is being moved to koryphe")
     public void shouldPut() throws Exception {
         fail("Need to write tests");
     }

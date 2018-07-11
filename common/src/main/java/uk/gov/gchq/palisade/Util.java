@@ -17,9 +17,9 @@
 package uk.gov.gchq.palisade;
 
 import uk.gov.gchq.koryphe.tuple.Tuple;
-import uk.gov.gchq.palisade.policy.tuple.ReflectiveTuple;
 import uk.gov.gchq.palisade.policy.Rule;
 import uk.gov.gchq.palisade.policy.Rules;
+import uk.gov.gchq.palisade.policy.tuple.ReflectiveTuple;
 import uk.gov.gchq.palisade.util.FieldGetter;
 import uk.gov.gchq.palisade.util.FieldSetter;
 
