@@ -25,4 +25,14 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>hashmap-resource-service</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>uk.gov.gchq.palisade</groupId>
+            <artifactId>resource-service</artifactId>
+            <version>${parent.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
