@@ -26,6 +26,7 @@ import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -154,30 +155,46 @@ public class Rules<T> {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
+        boolean rtn = (this == o);
+        if (!rtn) {
+            if (o != null && this.getClass() == o.getClass()) {
+
+                final Rules<?> that = (Rules<?>) o;
+
+                final EqualsBuilder builder = new EqualsBuilder()
+                        .append(message, that.message)
+                        .append(this.rules.keySet(), that.getRules().keySet());
+
+                if (builder.isEquals()) {
+                    for (final Entry<String, Rule<T>> entry : this.rules.entrySet()) {
+                        final String ruleName = entry.getKey();
+                        final Rule thisRule = entry.getValue();
+                        final Rule thatRule = that.getRules().get(ruleName);
+
+                        builder.append(thisRule.getClass(), thatRule.getClass());
+                        if (builder.isEquals()) {
+                            // This is expensive - but we don't have any other way of doing it
+                            builder.append(JSONSerialiser.serialise(thisRule), JSONSerialiser.serialise(thatRule));
+                        }
+
+                        if (!builder.isEquals()) {
+                            break;
+                        }
+                    }
+                }
+                rtn = builder.isEquals();
+            }
         }
 
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        final Rules<?> rules1 = (Rules<?>) o;
-
-        return new EqualsBuilder()
-                .append(message, rules1.message)
-                        // TODO This is expensive - but we don't have any other way of doing it
-                .append(JSONSerialiser.serialise(rules), JSONSerialiser.serialise(rules1.rules))
-                .isEquals();
+        return rtn;
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(message)
-                        // TODO This is expensive - but we don't have any other way of doing it
-                .append(JSONSerialiser.serialise(rules))
-                .toHashCode();
+        final HashCodeBuilder builder = new HashCodeBuilder(17, 37)
+                .append(message);
+        rules.forEach((s, tRule) -> builder.append(s).append(JSONSerialiser.serialise(tRule)));
+        return builder.toHashCode();
     }
 
     @Override
