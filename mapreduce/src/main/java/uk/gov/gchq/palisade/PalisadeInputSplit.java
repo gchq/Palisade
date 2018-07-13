@@ -16,9 +16,11 @@
 package uk.gov.gchq.palisade;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.util.StringUtils;
+
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
