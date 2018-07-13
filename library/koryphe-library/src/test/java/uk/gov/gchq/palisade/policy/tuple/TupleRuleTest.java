@@ -174,12 +174,12 @@ public class TupleRuleTest {
         //when
         final TestObj actual = testObject.apply(record, null, just);
         //then
-        assertEquals(record,actual);
+        assertEquals(record, actual);
         assertEquals(FROM_RULE, just.getJustification());
     }
 
 
-    private class TestObj {
+    public static class TestObj {
         public static final String VAL_1 = "val1";
         public String var1 = VAL_1;
         public String var2;
@@ -192,6 +192,4 @@ public class TupleRuleTest {
             return var2;
         }
     }
-
-
 }

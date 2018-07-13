@@ -27,7 +27,7 @@
     <artifactId>koryphe-library</artifactId>
 
     <properties>
-        <koryphe.version>1.4.0</koryphe.version>
+        <koryphe.version>1.5.0-RC1</koryphe.version>
     </properties>
 
     <dependencies>
