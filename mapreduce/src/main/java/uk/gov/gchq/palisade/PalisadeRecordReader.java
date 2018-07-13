@@ -53,7 +53,7 @@ public class PalisadeRecordReader extends RecordReader {
 
     @Override
     public float getProgress() throws IOException, InterruptedException {
-        return (float) Math.random(); //hehehe
+        return 0;
     }
 
     @Override

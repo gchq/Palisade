@@ -15,10 +15,11 @@
  */
 package uk.gov.gchq.palisade;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.util.StringUtils;
-
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 
@@ -66,6 +67,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
      * @return always returns 0
      */
     @Override
+    @JsonIgnore
     public long getLength() throws IOException, InterruptedException {
         return 0;
     }
@@ -76,18 +78,39 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
      * @return always returns an empty string array
      */
     @Override
+    @JsonIgnore
     public String[] getLocations() throws IOException, InterruptedException {
         return StringUtils.emptyStringArray;
     }
 
     @Override
     public void write(final DataOutput dataOutput) throws IOException {
-        //TODO
+        Objects.requireNonNull(dataOutput, "dataOutput");
+        //serialise this class to JSON and write out
+        byte[] serial = JSONSerialiser.serialise(this);
+        dataOutput.writeInt(serial.length);
+        dataOutput.write(serial);
     }
 
     @Override
     public void readFields(final DataInput dataInput) throws IOException {
-        //validate all fields on deserialise
-        //TODO
+        Objects.requireNonNull(dataInput, "dataInput");
+        int length = dataInput.readInt();
+        //validate length
+        if (length < 0) {
+            throw new IOException("illegal negative length on deserialisation");
+        }
+        //make buffer and read
+        byte[] buffer = new byte[length];
+        dataInput.readFully(buffer);
+        //deserialise
+        PalisadeInputSplit other = JSONSerialiser.deserialise(buffer, PalisadeInputSplit.class);
+        Objects.requireNonNull(other.getRequestId(), "requestId");
+        Objects.requireNonNull(other.getResource(), "resource");
+        Objects.requireNonNull(other.getConnectionDetail(), "connectionDetail");
+        //all clear
+        this.requestId = other.getRequestId();
+        this.resource = other.getResource();
+        this.connectionDetail = other.getConnectionDetail();
     }
 }
