@@ -28,11 +28,12 @@ public class PalisadeRecordReader extends RecordReader {
     }
 
     @Override
-    public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
-        Objects.requireNonNull(inputSplit,"inputSplit");
-        Objects.requireNonNull(taskAttemptContext,"taskAttemptContext");
-        if (inputSplit instanceof PalisadeInputSplit)
-            throw new ClassCastException("input split MUST be instance of "+PalisadeInputSplit.class.getName());
+    public void initialize(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
+        Objects.requireNonNull(inputSplit, "inputSplit");
+        Objects.requireNonNull(taskAttemptContext, "taskAttemptContext");
+        if (inputSplit instanceof PalisadeInputSplit) {
+            throw new ClassCastException("input split MUST be instance of " + PalisadeInputSplit.class.getName());
+        }
     }
 
     @Override

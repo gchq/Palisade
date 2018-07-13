@@ -21,6 +21,7 @@ import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.StringUtils;
+
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
@@ -43,13 +44,14 @@ public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
     private static PalisadeService palisadeService;
 
     @Override
-    public List<InputSplit> getSplits(JobContext context) throws IOException, InterruptedException {
+    public List<InputSplit> getSplits(final JobContext context) throws IOException, InterruptedException {
         Objects.requireNonNull(context, "context");
         //get the list for this job
         List<RegisterDataRequest> reqs = getDataRequests(context);
         //sanity check
-        if (reqs.isEmpty())
+        if (reqs.isEmpty()) {
             throw new IllegalStateException("No data requests have been registered for this job");
+        }
 
         //store local and call through method, don't access direct!
         PalisadeService serv = getPalisadeService();
@@ -86,7 +88,7 @@ public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
         return new ArrayList<>(splits);
     }
 
-    public static synchronized void setPalisadeService(PalisadeService service) {
+    public static synchronized void setPalisadeService(final PalisadeService service) {
         Objects.requireNonNull(service, "service");
         PalisadeInputFormat.palisadeService = service;
     }
@@ -101,11 +103,11 @@ public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
      * Creates a {@link uk.gov.gchq.palisade.PalisadeRecordReader}.
      */
     @Override
-    public RecordReader<K, V> createRecordReader(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedExceptio {
+    public RecordReader<K, V> createRecordReader(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
         return new PalisadeRecordReader();
     }
 
-    public static void addDataRequest(JobContext context, RegisterDataRequest request) throws IOException {
+    public static void addDataRequest(final JobContext context, final RegisterDataRequest request) throws IOException {
         Objects.requireNonNull(context, "context");
         Objects.requireNonNull(request, "request");
         //fetch the existing ones
@@ -117,7 +119,7 @@ public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
         context.getConfiguration().set(REGISTER_REQUESTS_KEY, reqs);
     }
 
-    public static List<RegisterDataRequest> getDataRequests(JobContext context) {
+    public static List<RegisterDataRequest> getDataRequests(final JobContext context) {
         Objects.requireNonNull(context, "context");
         //retrieve the requests added so far
         String reqs = context.getConfiguration().get(REGISTER_REQUESTS_KEY, "");

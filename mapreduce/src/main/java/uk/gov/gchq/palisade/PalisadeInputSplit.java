@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.util.StringUtils;
+
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 
@@ -38,7 +39,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
     public PalisadeInputSplit() {
     }
 
-    public PalisadeInputSplit(RequestId requestId, Resource resource, ConnectionDetail connectionDetail) {
+    public PalisadeInputSplit(final RequestId requestId, final Resource resource, final ConnectionDetail connectionDetail) {
         Objects.requireNonNull(requestId, "requestId");
         Objects.requireNonNull(resource, "resource");
         Objects.requireNonNull(connectionDetail, "connectionDetail");
@@ -80,12 +81,12 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
     }
 
     @Override
-    public void write(DataOutput dataOutput) throws IOException {
+    public void write(final DataOutput dataOutput) throws IOException {
         //TODO
     }
 
     @Override
-    public void readFields(DataInput dataInput) throws IOException {
+    public void readFields(final DataInput dataInput) throws IOException {
         //validate all fields on deserialise
         //TODO
     }
