@@ -17,12 +17,20 @@ package uk.gov.gchq.palisade;
 
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.util.StringUtils;
+import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Objects;
 
 public class PalisadeInputSplit extends InputSplit implements Writable {
+
+    private RequestId requestId;
+    private Resource resource;
+    private ConnectionDetail connectionDetail;
 
     /**
      * No-arg constructor required by Hadoop to de-serialise.
@@ -30,23 +38,55 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
     public PalisadeInputSplit() {
     }
 
+    public PalisadeInputSplit(RequestId requestId, Resource resource, ConnectionDetail connectionDetail) {
+        Objects.requireNonNull(requestId, "requestId");
+        Objects.requireNonNull(resource, "resource");
+        Objects.requireNonNull(connectionDetail, "connectionDetail");
+        this.requestId = requestId;
+        this.resource = resource;
+        this.connectionDetail = connectionDetail;
+    }
+
+    public RequestId getRequestId() {
+        return requestId;
+    }
+
+    public Resource getResource() {
+        return resource;
+    }
+
+    public ConnectionDetail getConnectionDetail() {
+        return connectionDetail;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return always returns 0
+     */
     @Override
     public long getLength() throws IOException, InterruptedException {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return always returns an empty string array
+     */
     @Override
     public String[] getLocations() throws IOException, InterruptedException {
-        return new String[0];
+        return StringUtils.emptyStringArray;
     }
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-
+        //TODO
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
         //validate all fields on deserialise
+        //TODO
     }
 }
