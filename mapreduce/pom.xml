@@ -24,12 +24,15 @@
         <artifactId>palisade</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>client-impl</artifactId>
-    <packaging>pom</packaging>
 
-    <modules>
-        <module>simple-client</module>
-        <module>simple-rest-client</module>
-        <module>mapreduce-client</module>
-    </modules>
+    <artifactId>mapreduce</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>2.6.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

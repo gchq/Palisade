@@ -30,6 +30,7 @@
         <module>service-impl</module>
         <module>client-impl</module>
         <module>example</module>
+        <module>mapreduce</module>
     </modules>
 
     <developers>
