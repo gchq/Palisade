@@ -16,10 +16,8 @@
 
 package uk.gov.gchq.palisade;
 
-import uk.gov.gchq.koryphe.tuple.Tuple;
 import uk.gov.gchq.palisade.policy.Rule;
 import uk.gov.gchq.palisade.policy.Rules;
-import uk.gov.gchq.palisade.policy.tuple.ReflectiveTuple;
 import uk.gov.gchq.palisade.util.FieldGetter;
 import uk.gov.gchq.palisade.util.FieldSetter;
 
@@ -80,27 +78,14 @@ public final class Util {
             return record;
         }
 
-        if (record instanceof Tuple) {
-            T updatedRecord = record;
-            for (final Rule<T> resourceRule : rules.getRules().values()) {
-                updatedRecord = resourceRule.apply(updatedRecord, user, justification);
-                if (null == updatedRecord) {
-                    break;
-                }
-            }
-            return updatedRecord;
-
-        }
-
-        ReflectiveTuple tuple = new ReflectiveTuple(record);
+        T outputRecord = record;
         for (final Rule resourceRule : rules.getRules().values()) {
-            // TODO: need to fix generics
-            tuple = (ReflectiveTuple) resourceRule.apply(tuple, user, justification);
-            if (null == tuple) {
+            outputRecord = (T) resourceRule.apply(outputRecord, user, justification);
+            if (null == outputRecord) {
                 break;
             }
         }
-        return null != tuple ? (T) tuple.getRecord() : null;
+        return outputRecord;
     }
 
     public static <T> Object getField(

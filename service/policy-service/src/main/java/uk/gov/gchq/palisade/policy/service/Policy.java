@@ -100,36 +100,6 @@ public class Policy<T> {
         return this;
     }
 
-    public Policy<T> rule(final String id,
-                          final String selection,
-                          final Function<?, ?> function,
-                          final String projection) {
-        rules.rule(id, selection, function, projection);
-        return this;
-    }
-
-    public Policy<T> rule(final String id,
-                          final String[] selection,
-                          final Function<?, ?> function,
-                          final String[] projection) {
-        rules.rule(id, selection, function, projection);
-        return this;
-    }
-
-    public Policy<T> rule(final String id,
-                          final String selection,
-                          final Predicate<?> predicate) {
-        rules.rule(id, selection, predicate);
-        return this;
-    }
-
-    public Policy<T> rule(final String id,
-                          final String[] selection,
-                          final Predicate<?> predicate) {
-        rules.rule(id, selection, predicate);
-        return this;
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {

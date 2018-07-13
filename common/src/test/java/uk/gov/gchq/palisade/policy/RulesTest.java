@@ -3,7 +3,6 @@ package uk.gov.gchq.palisade.policy;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.util.JsonAssert;
 
@@ -11,17 +10,14 @@ import static org.junit.Assert.assertEquals;
 
 public class RulesTest {
 
-    private Rules rules;
+    private Rules<String> rules;
     private byte[] json;
 
     @Before
     public void setUp() throws Exception {
-        rules = new Rules<>()
+        rules = new Rules<String>()
                 .message("Age off and visibility filtering")
-                .rule(
-                        "ageOffRule",
-                        "timestamp",
-                        new IsMoreThan(10)
+                .rule("ageOffRule", new TestRule()
                 );
         json = JSONSerialiser.serialise(rules, true);
     }
@@ -39,17 +35,11 @@ public class RulesTest {
 
     @Test
     public void shouldSerialiseTo() throws Exception {
-        //Without the optional classes
         final String text = String.format("{%n" +
                 "  \"message\" : \"Age off and visibility filtering\",%n" +
                 "  \"rules\" : {%n" +
                 "    \"ageOffRule\" : {%n" +
-                "      \"selection\" : [ \"timestamp\" ],%n" +
-                "      \"predicate\" : {%n" +
-                "        \"class\" : \"uk.gov.gchq.koryphe.impl.predicate.IsMoreThan\",%n" +
-                "        \"orEqualTo\" : false,%n" +
-                "        \"value\" : 10%n" +
-                "      }%n" +
+                "      \"class\" : \"uk.gov.gchq.palisade.policy.TestRule\"%n" +
                 "    }%n" +
                 "  }%n" +
                 "}");
@@ -59,17 +49,11 @@ public class RulesTest {
 
     @Test
     public void shouldDeserialiseText() throws Exception {
-        //with or without the optional classes
         final String text = String.format("{%n" +
                 "  \"message\" : \"Age off and visibility filtering\",%n" +
                 "  \"rules\" : {%n" +
                 "    \"ageOffRule\" : {%n" +
-                "      \"selection\" : [ \"timestamp\" ],%n" +
-                "      \"predicate\" : {%n" +
-                "        \"class\" : \"uk.gov.gchq.koryphe.impl.predicate.IsMoreThan\",%n" +
-                "        \"orEqualTo\" : false,%n" +
-                "        \"value\" : 10%n" +
-                "      }%n" +
+                "      \"class\" : \"uk.gov.gchq.palisade.policy.TestRule\"%n" +
                 "    }%n" +
                 "  }%n" +
                 "}");

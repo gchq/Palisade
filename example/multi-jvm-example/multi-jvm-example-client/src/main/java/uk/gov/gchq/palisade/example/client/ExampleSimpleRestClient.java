@@ -30,6 +30,7 @@ import uk.gov.gchq.palisade.example.rule.SetValue;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
@@ -61,8 +62,9 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
     }
 
     private void initialiseRestServices() {
-        // The user authorisation owner or sys admin needs to add the user
         final UserService userService = createUserService();
+
+        // The user authorisation owner or sys admin needs to add the users.
         userService.addUser(
                 new AddUserRequest(
                         new User()
@@ -80,35 +82,46 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                 )
         );
 
-        // The policy owner or sys admin needs to add the policies
         final PolicyService policyService = createPolicyService();
-        policyService.setPolicy(
-                new SetPolicyRequest(
-                        new FileResource("file1", RESOURCE_TYPE),
-                        new Policy<ExampleObj>()
-                                .message("Visibility, ageOff and property redaction")
-                                .rule(
-                                        "1-visibility",
+
+        // The policy owner or sys admin needs to add the policies
+        final SetPolicyRequest request = new SetPolicyRequest(
+                new FileResource("file1", RESOURCE_TYPE),
+                new Policy<ExampleObj>()
+                        .message("Visibility, ageOff and property redaction")
+                        .rule(
+                                "1-visibility",
+                                new TupleRule<>(
                                         select("Record.visibility", "User.auths"),
                                         new IsVisible()
                                 )
-                                .rule(
-                                        "2-ageOff",
+                        )
+                        .rule(
+                                "2-ageOff",
+                                new TupleRule<>(
                                         select("Record.timestamp"),
                                         new IsMoreThan(12L)
                                 )
-                                .rule(
-                                        "3-redactProperty",
+                        )
+                        .rule(
+                                "3-redactProperty",
+                                new TupleRule<>(
                                         select("User.roles", "Record.property"),
-                                        new If<>().predicate(0, new Not<>(new CollectionContains("admin")))
-                                                .then(1, new SetValue<>("redacted"), 1),
+                                        new If<>()
+                                                .predicate(0, new Not<>(new CollectionContains("admin")))
+                                                .then(1, new SetValue<>("redacted")),
                                         project("User.roles", "Record.property")
                                 )
-                )
+                        )
         );
 
-        // The sys admin needs to add the resources
+        policyService.setPolicy(
+                request
+        );
+
         final ResourceService resourceService = super.createResourceService();
+
+        // The sys admin needs to add the resources
         resourceService.addResource(new AddResourceRequest(
                 new DirectoryResource("dir1", RESOURCE_TYPE),
                 new FileResource("file1", RESOURCE_TYPE),

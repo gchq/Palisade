@@ -144,11 +144,6 @@ public class TupleRule<T> implements Rule<T> {
     }
 
     @Override
-    public String _getClass() {
-        return null;
-    }
-
-    @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;

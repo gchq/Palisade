@@ -24,7 +24,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 
 import java.util.LinkedHashMap;
 import java.util.function.Function;
@@ -139,32 +138,6 @@ public class Rules<T> {
     public Rules<T> rule(final String id, final Predicate<T> rule) {
         rules.put(id, new PredicateRule<>(rule));
         return this;
-    }
-
-    public Rules<T> rule(final String id,
-                         final String selection,
-                         final Function<?, ?> function,
-                         final String projection) {
-        return rule(id, new TupleRule<>(selection, function, projection));
-    }
-
-    public Rules<T> rule(final String id,
-                         final String[] selection,
-                         final Function<?, ?> function,
-                         final String[] projection) {
-        return rule(id, new TupleRule<>(selection, function, projection));
-    }
-
-    public Rules<T> rule(final String id,
-                         final String selection,
-                         final Predicate<?> predicate) {
-        return rule(id, new TupleRule<>(selection, predicate));
-    }
-
-    public Rules<T> rule(final String id,
-                         final String[] selection,
-                         final Predicate<?> predicate) {
-        return rule(id, new TupleRule<>(selection, predicate));
     }
 
     @Override

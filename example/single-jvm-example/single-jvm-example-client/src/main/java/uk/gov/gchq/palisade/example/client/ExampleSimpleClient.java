@@ -32,6 +32,7 @@ import uk.gov.gchq.palisade.example.rule.SetValue;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
@@ -59,8 +60,9 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
 
     @Override
     protected UserService createUserService() {
-        // The user authorisation owner or sys admin needs to add the users.
         final UserService userService = super.createUserService();
+
+        // The user authorisation owner or sys admin needs to add the users.
         userService.addUser(
                 new AddUserRequest(
                         new User()
@@ -77,33 +79,42 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 .roles("user")
                 )
         );
+
         return userService;
     }
 
     @Override
     protected PolicyService createPolicyService() {
         final PolicyService policyService = super.createPolicyService();
+
+        // The policy owner or sys admin needs to add the policies
         final SetPolicyRequest request = new SetPolicyRequest(
                 new FileResource("file1", RESOURCE_TYPE),
                 new Policy<ExampleObj>()
                         .message("Visibility, ageOff and property redaction")
                         .rule(
                                 "1-visibility",
-                                select("Record.visibility", "User.auths"),
-                                new IsVisible()
+                                new TupleRule<>(
+                                        select("Record.visibility", "User.auths"),
+                                        new IsVisible()
+                                )
                         )
                         .rule(
                                 "2-ageOff",
-                                select("Record.timestamp"),
-                                new IsMoreThan(12L)
+                                new TupleRule<>(
+                                        select("Record.timestamp"),
+                                        new IsMoreThan(12L)
+                                )
                         )
                         .rule(
                                 "3-redactProperty",
-                                select("User.roles", "Record.property"),
-                                new If<>()
-                                        .predicate(0, new Not<>(new CollectionContains("admin")))
-                                        .then(1, new SetValue<>("redacted")),
-                                project("User.roles", "Record.property")
+                                new TupleRule<>(
+                                        select("User.roles", "Record.property"),
+                                        new If<>()
+                                                .predicate(0, new Not<>(new CollectionContains("admin")))
+                                                .then(1, new SetValue<>("redacted")),
+                                        project("User.roles", "Record.property")
+                                )
                         )
         );
 
@@ -117,16 +128,14 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     @Override
     protected ResourceService createResourceService() {
         final ResourceService resourceService = super.createResourceService();
+
+        // The sys admin needs to add the resources
         resourceService.addResource(new AddResourceRequest(
                 new DirectoryResource("dir1", RESOURCE_TYPE),
                 new FileResource("file1", RESOURCE_TYPE),
                 new SimpleConnectionDetail()
         ));
-        resourceService.addResource(new AddResourceRequest(
-                new DirectoryResource("dir1", RESOURCE_TYPE),
-                new FileResource("file1", RESOURCE_TYPE),
-                new SimpleConnectionDetail()
-        ));
+
         return resourceService;
     }
 

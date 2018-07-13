@@ -151,8 +151,16 @@ public class If<I, O> extends KorypheFunction<I, O> {
         return this;
     }
 
+    public If<I, O> then(final Integer selectionProjection, final Function<?, ?> then) {
+        return then(selectionProjection, then, selectionProjection);
+    }
+
     public If<I, O> then(final Integer selection, final Function<?, ?> then, final Integer projection) {
         return then(arr(selection), then, arr(projection));
+    }
+
+    public If<I, O> then(final Integer[] selectionProjection, final Function<?, ?> then) {
+        return then(selectionProjection, then, selectionProjection);
     }
 
     public If<I, O> then(final Integer[] selection, final Function<?, ?> then, final Integer[] projection) {
@@ -176,8 +184,16 @@ public class If<I, O> extends KorypheFunction<I, O> {
         return this;
     }
 
+    public If<I, O> otherwise(final Integer selectionProjection, final Function<?, ?> then) {
+        return otherwise(selectionProjection, then);
+    }
+
     public If<I, O> otherwise(final Integer selection, final Function<?, ?> then, final Integer projection) {
         return otherwise(arr(selection), then, arr(projection));
+    }
+
+    public If<I, O> otherwise(final Integer[] selectionProjection, final Function<?, ?> then) {
+        return otherwise(selectionProjection, then, selectionProjection);
     }
 
     public If<I, O> otherwise(final Integer[] selection, final Function<?, ?> then, final Integer[] projection) {

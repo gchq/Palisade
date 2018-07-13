@@ -29,6 +29,7 @@
         <module>service</module>
         <module>service-impl</module>
         <module>client-impl</module>
+        <module>library</module>
         <module>example</module>
     </modules>
 
@@ -62,7 +63,6 @@
         <maven-war-plugin.version>3.0.0</maven-war-plugin.version>
         <apache.commons.version>3.3.2</apache.commons.version>
         <guava.version>13.0.1</guava.version>
-        <koryphe.version>1.4.0</koryphe.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <jersey.version>2.25</jersey.version>
