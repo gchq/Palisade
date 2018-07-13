@@ -26,7 +26,7 @@ import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
 import java.util.LinkedHashMap;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -161,16 +161,16 @@ public class Rules<T> {
 
                 final Rules<?> that = (Rules<?>) o;
 
-                final Set<String> thisKeySet = this.rules.keySet();
-                final Set<String> thatKeySet = that.getRules().keySet();
                 final EqualsBuilder builder = new EqualsBuilder()
                         .append(message, that.message)
-                        .append(thisKeySet, thatKeySet);
+                        .append(this.rules.keySet(), that.getRules().keySet());
 
                 if (builder.isEquals()) {
-                    for (String ruleName : thisKeySet) {
-                        final Rule thisRule = this.rules.get(ruleName);
+                    for (final Entry<String, Rule<T>> entry : this.rules.entrySet()) {
+                        final String ruleName = entry.getKey();
+                        final Rule thisRule = entry.getValue();
                         final Rule thatRule = that.getRules().get(ruleName);
+
                         builder.append(thisRule.getClass(), thatRule.getClass());
                         if (builder.isEquals()) {
                             // This is expensive - but we don't have any other way of doing it
