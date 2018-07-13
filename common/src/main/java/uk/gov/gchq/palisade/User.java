@@ -80,6 +80,11 @@ public class User {
         return this;
     }
 
+    public User auths(final Set<String> auths) {
+        this.auths.addAll(auths);
+        return this;
+    }
+
     /**
      * Adds the user roles.
      *
@@ -88,6 +93,11 @@ public class User {
      */
     public User roles(final String... roles) {
         Collections.addAll(this.roles, roles);
+        return this;
+    }
+
+    public User roles(final Set<String> roles) {
+        this.roles.addAll(roles);
         return this;
     }
 
