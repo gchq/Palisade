@@ -25,6 +25,10 @@ import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * A {@code ProxyRestConnectionDetail} is a {@link ConnectionDetail} that
+ * takes a {@link ProxyRestService} {@link Class} and a url {@code String}.
+ */
 public class ProxyRestConnectionDetail implements ConnectionDetail {
     private Class<? extends ProxyRestService> proxyRestServiceClass;
     private String url;
@@ -32,6 +36,13 @@ public class ProxyRestConnectionDetail implements ConnectionDetail {
     public ProxyRestConnectionDetail() {
     }
 
+    /**
+     * Constructs a {@link ProxyRestConnectionDetail} with the Class of the {@link ProxyRestService}
+     * to use and a url String.
+     *
+     * @param proxyRestServiceClass the Class of the {@link ProxyRestService} to use
+     * @param url                   the url String.
+     */
     public ProxyRestConnectionDetail(final Class<? extends ProxyRestService> proxyRestServiceClass, final String url) {
         this.proxyRestServiceClass = proxyRestServiceClass;
         this.url = url;

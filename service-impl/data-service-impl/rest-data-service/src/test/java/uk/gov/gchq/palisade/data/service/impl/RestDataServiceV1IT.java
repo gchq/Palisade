@@ -28,7 +28,6 @@ import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
-import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
@@ -41,7 +40,6 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class RestDataServiceV1IT {
@@ -73,8 +71,8 @@ public class RestDataServiceV1IT {
         final FileResource resource1 = new FileResource("file1");
         final FileResource resource2 = new FileResource("file1");
         final Map<Resource, ConnectionDetail> resources = new HashMap<>();
-        resources.put(resource1, new SimpleConnectionDetail(mock(Service.class)));
-        resources.put(resource2, new SimpleConnectionDetail(mock(Service.class)));
+        resources.put(resource1, new SimpleConnectionDetail());
+        resources.put(resource2, new SimpleConnectionDetail());
 
         final Stream<String> data = Stream.of("item1", "item2");
         final ReadRequest request = new ReadRequest(new DataRequestResponse(new RequestId("id1"), resources));

@@ -31,7 +31,6 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
-import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 
@@ -74,7 +73,7 @@ public class RestResourceServiceV1IT {
 
         final ParentResource dir = new DirectoryResource("dir1", "type1", "format1");
         final FileResource file = new FileResource("file1", "type1", "format1");
-        final AddResourceRequest request = new AddResourceRequest(dir, file, new SimpleConnectionDetail(mock(Service.class)));
+        final AddResourceRequest request = new AddResourceRequest(dir, file, new SimpleConnectionDetail());
 
         given(resourceService.addResource(request)).willReturn(CompletableFuture.completedFuture(true));
 
@@ -95,8 +94,8 @@ public class RestResourceServiceV1IT {
         final GetResourcesByResourceRequest request = new GetResourcesByResourceRequest(new DirectoryResource("dir1"));
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource("file1"), new SimpleConnectionDetail(mock(Service.class)));
-        expectedResult.put(new FileResource("file2"), new SimpleConnectionDetail(mock(Service.class)));
+        expectedResult.put(new FileResource("file1"), new SimpleConnectionDetail());
+        expectedResult.put(new FileResource("file2"), new SimpleConnectionDetail());
 
         given(resourceService.getResourcesByResource(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
@@ -117,7 +116,7 @@ public class RestResourceServiceV1IT {
         final GetResourcesByIdRequest request = new GetResourcesByIdRequest("file1");
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource("file1"), new SimpleConnectionDetail(mock(Service.class)));
+        expectedResult.put(new FileResource("file1"), new SimpleConnectionDetail());
 
         given(resourceService.getResourcesById(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
@@ -138,7 +137,7 @@ public class RestResourceServiceV1IT {
         final GetResourcesByTypeRequest request = new GetResourcesByTypeRequest("type1");
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource("file1", "type1", "format1"), new SimpleConnectionDetail(mock(Service.class)));
+        expectedResult.put(new FileResource("file1", "type1", "format1"), new SimpleConnectionDetail());
 
         given(resourceService.getResourcesByType(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
@@ -159,7 +158,7 @@ public class RestResourceServiceV1IT {
         final GetResourcesByFormatRequest request = new GetResourcesByFormatRequest("format1");
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource("file1", "type1", "format1"), new SimpleConnectionDetail(mock(Service.class)));
+        expectedResult.put(new FileResource("file1", "type1", "format1"), new SimpleConnectionDetail());
 
         given(resourceService.getResourcesByFormat(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
