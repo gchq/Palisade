@@ -24,43 +24,39 @@ import org.apache.hadoop.util.StringUtils;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 
+import javax.xml.crypto.Data;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 
 public class PalisadeInputSplit extends InputSplit implements Writable {
 
-    private RequestId requestId;
-    private Resource resource;
-    private ConnectionDetail connectionDetail;
+    private DataRequestResponse requestResponse;
 
     /**
      * No-arg constructor required by Hadoop to de-serialise.
      */
     public PalisadeInputSplit() {
+        requestResponse = new DataRequestResponse();
     }
 
-    public PalisadeInputSplit(final RequestId requestId, final Resource resource, final ConnectionDetail connectionDetail) {
+    public PalisadeInputSplit(final RequestId requestId, final Map<Resource, ConnectionDetail> resources) {
         Objects.requireNonNull(requestId, "requestId");
-        Objects.requireNonNull(resource, "resource");
-        Objects.requireNonNull(connectionDetail, "connectionDetail");
-        this.requestId = requestId;
-        this.resource = resource;
-        this.connectionDetail = connectionDetail;
+        Objects.requireNonNull(resources, "resources");
+        requestResponse = new DataRequestResponse(requestId, resources);
     }
 
-    public RequestId getRequestId() {
-        return requestId;
+    public PalisadeInputSplit(final DataRequestResponse requestResponse) {
+        Objects.requireNonNull(requestResponse);
+        this.requestResponse = new DataRequestResponse(requestResponse);
     }
 
-    public Resource getResource() {
-        return resource;
-    }
-
-    public ConnectionDetail getConnectionDetail() {
-        return connectionDetail;
+    public DataRequestResponse getRequestResponse() {
+        return requestResponse;
     }
 
     /**
@@ -107,12 +103,8 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
         dataInput.readFully(buffer);
         //deserialise
         PalisadeInputSplit other = JSONSerialiser.deserialise(buffer, PalisadeInputSplit.class);
-        Objects.requireNonNull(other.getRequestId(), "requestId");
-        Objects.requireNonNull(other.getResource(), "resource");
-        Objects.requireNonNull(other.getConnectionDetail(), "connectionDetail");
+        Objects.requireNonNull(other.requestResponse);
         //all clear
-        this.requestId = other.getRequestId();
-        this.resource = other.getResource();
-        this.connectionDetail = other.getConnectionDetail();
+        this.requestResponse = other.requestResponse;
     }
 }

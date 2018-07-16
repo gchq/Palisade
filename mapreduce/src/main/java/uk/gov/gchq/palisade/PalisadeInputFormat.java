@@ -23,23 +23,34 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.StringUtils;
 
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.PrimitiveIterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Phaser;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
     public static final Charset UTF8 = Charset.forName("UTF-8");
 
     public static final String REGISTER_REQUESTS_KEY = "uk.gov.gchq.palisade.mapreduce.registered.requests";
+
+    public static final String MAXIMUM_MAP_HINT_KEY = "uk.gov.gchq.palisade.mapreduce.max.map.hint";
+
+    public static final int DEFAULT_MAX_MAP_HINT = 0;
 
     private static PalisadeService palisadeService;
 
@@ -62,19 +73,36 @@ public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
         * that all the resources have been added to the final list. Therefore, we use a Phaser to keep count of the number
         * of registration requests that have been completed.*/
         final Phaser counter = new Phaser(1); //register self
+        //how many mappers hinted at?
+        int maxMapHint = getMaxMapTasksHint(context);
+        final int maxCounter = (maxMapHint == 0) ? Integer.MAX_VALUE : maxMapHint;
+        //create a stream for round robining resources
+        IntStream index = IntStream.iterate(0, x -> (x + 1) % maxCounter);
 
         for (RegisterDataRequest req : reqs) {
-            counter.register();
+            counter.register(); //tell the phaser we have another party active
+            //this counter determines which mapper gets which resource
+            final PrimitiveIterator.OfInt indexIt = index.iterator();
             //send request to the Palisade service
             serv.registerDataRequest(req)
-                    //when the response comes back create a input split per resource
+                    //when the response comes back create input splits based on max mapper hint
                     .thenApplyAsync(response -> {
-                        RequestId id = response.getRequestId();
-                        //make a new input split for each resource in the response
-                        return response.getResources().entrySet().stream()
-                                //create the input split
-                                .map(entry -> new PalisadeInputSplit(id, entry.getKey(), entry.getValue()))
-                                        //this is a partial list of input splits for this response
+                        //make map of input split number -> list of resource,connectiondetail pairs
+                        Map<Integer, List<Map.Entry<Resource, ConnectionDetail>>> grouped =
+                                response.getResources().entrySet().stream()
+                                        .collect(Collectors.groupingBy(ignored -> indexIt.next()));
+                        //now convert these groups into input splits
+                        return grouped.values().stream()
+                                //convert the list of entries into a map
+                                .map(list -> list
+                                                .stream()
+                                                .collect(
+                                                        Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+                                                )
+                                )
+                                        //wrap into an input split
+                                .map(m -> new PalisadeInputSplit(response.getRequestId(), m))
+                                        //finally make that a list
                                 .collect(Collectors.toList());
                     })
                             //then add them to the complete list
@@ -132,5 +160,36 @@ public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
                 .map(x -> JSONSerialiser.deserialise(x, RegisterDataRequest.class))
                         //into a list
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Set a hint for the maximum number of map tasks that the given job should be split into. Note that this is a hint
+     * and the system is free to ignore it. There will always be at least one map task per data request generated,
+     * however since each request may require multiple ${@link uk.gov.gchq.palisade.resource.Resource}s to be processed,
+     * this method allows the client to provide a hint at how widely those resouces should be spread across map tasks.
+     *
+     * @param context the job to set the maximum hint for
+     * @param maxMaps the maximum number of mappers desired, a value of 0 implies no limit
+     * @throws NullPointerException     if {@code context} is null
+     * @throws IllegalArgumentException if {@code maxMaps} is negative
+     */
+    public static void setMaxMapTasksHint(final JobContext context, final int maxMaps) {
+        Objects.requireNonNull(context);
+        if (maxMaps < 0) {
+            throw new IllegalArgumentException("maxMaps must be >= 0");
+        }
+        context.getConfiguration().setInt(MAXIMUM_MAP_HINT_KEY, maxMaps);
+    }
+
+    /**
+     * Get the maximum number of mappers hint set for a job. A value of zero means no limit has been set.
+     *
+     * @param context the job to retrieve the details for
+     * @return the maximum number of map tasks hint
+     * @throws NullPointerException if {@code context} is null
+     */
+    public static int getMaxMapTasksHint(final JobContext context) {
+        Objects.requireNonNull(context);
+        return context.getConfiguration().getInt(MAXIMUM_MAP_HINT_KEY, DEFAULT_MAX_MAP_HINT);
     }
 }
