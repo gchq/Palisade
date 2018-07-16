@@ -19,7 +19,6 @@ package uk.gov.gchq.palisade.resource.service.impl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.Resource;
@@ -32,6 +31,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
+import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 
@@ -43,6 +43,7 @@ import java.util.concurrent.CompletableFuture;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class RestResourceServiceV1IT {
@@ -68,13 +69,12 @@ public class RestResourceServiceV1IT {
     @Test
     public void shouldAddResource() throws IOException {
         // Given
-        final ResourceService resourceService = Mockito.mock(ResourceService.class);
+        final ResourceService resourceService = mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
 
         final ParentResource dir = new DirectoryResource("dir1", "type1", "format1");
         final FileResource file = new FileResource("file1", "type1", "format1");
-        final ConnectionDetail connectionDetail = new SimpleConnectionDetail("details");
-        final AddResourceRequest request = new AddResourceRequest(dir, file, connectionDetail);
+        final AddResourceRequest request = new AddResourceRequest(dir, file, new SimpleConnectionDetail(mock(Service.class)));
 
         given(resourceService.addResource(request)).willReturn(CompletableFuture.completedFuture(true));
 
@@ -89,14 +89,14 @@ public class RestResourceServiceV1IT {
     @Test
     public void shouldGetResourcesByResource() throws IOException {
         // Given
-        final ResourceService resourceService = Mockito.mock(ResourceService.class);
+        final ResourceService resourceService = mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
 
         final GetResourcesByResourceRequest request = new GetResourcesByResourceRequest(new DirectoryResource("dir1"));
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource("file1"), new SimpleConnectionDetail("details1"));
-        expectedResult.put(new FileResource("file2"), new SimpleConnectionDetail("details2"));
+        expectedResult.put(new FileResource("file1"), new SimpleConnectionDetail(mock(Service.class)));
+        expectedResult.put(new FileResource("file2"), new SimpleConnectionDetail(mock(Service.class)));
 
         given(resourceService.getResourcesByResource(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
@@ -111,13 +111,13 @@ public class RestResourceServiceV1IT {
     @Test
     public void shouldGetResourcesById() throws IOException {
         // Given
-        final ResourceService resourceService = Mockito.mock(ResourceService.class);
+        final ResourceService resourceService = mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
 
         final GetResourcesByIdRequest request = new GetResourcesByIdRequest("file1");
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource("file1"), new SimpleConnectionDetail("details"));
+        expectedResult.put(new FileResource("file1"), new SimpleConnectionDetail(mock(Service.class)));
 
         given(resourceService.getResourcesById(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
@@ -132,13 +132,13 @@ public class RestResourceServiceV1IT {
     @Test
     public void shouldGetResourcesByType() throws IOException {
         // Given
-        final ResourceService resourceService = Mockito.mock(ResourceService.class);
+        final ResourceService resourceService = mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
 
         final GetResourcesByTypeRequest request = new GetResourcesByTypeRequest("type1");
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource("file1", "type1", "format1"), new SimpleConnectionDetail("details"));
+        expectedResult.put(new FileResource("file1", "type1", "format1"), new SimpleConnectionDetail(mock(Service.class)));
 
         given(resourceService.getResourcesByType(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
@@ -153,13 +153,13 @@ public class RestResourceServiceV1IT {
     @Test
     public void shouldGetResourcesByFormat() throws IOException {
         // Given
-        final ResourceService resourceService = Mockito.mock(ResourceService.class);
+        final ResourceService resourceService = mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
 
         final GetResourcesByFormatRequest request = new GetResourcesByFormatRequest("format1");
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource("file1", "type1", "format1"), new SimpleConnectionDetail("details"));
+        expectedResult.put(new FileResource("file1", "type1", "format1"), new SimpleConnectionDetail(mock(Service.class)));
 
         given(resourceService.getResourcesByFormat(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 

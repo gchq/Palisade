@@ -19,21 +19,18 @@ package uk.gov.gchq.palisade.example.client;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
-import uk.gov.gchq.palisade.data.service.reader.DataReader;
+import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.function.IsTimestampMoreThan;
 import uk.gov.gchq.palisade.example.function.IsVisible;
 import uk.gov.gchq.palisade.policy.service.Policy;
-import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
-import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
-import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.stream.Stream;
@@ -41,19 +38,10 @@ import java.util.stream.Stream;
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
 
-    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, RESOURCE_TYPE, userId, justification);
-    }
+    public ExampleSimpleClient() {
+        super();
 
-    @Override
-    protected Serialiser<?, ExampleObj> createSerialiser() {
-        return new ExampleObjSerialiser();
-    }
-
-    @Override
-    protected UserService createUserService() {
-        // The user authorisation owner or sys admin needs to add the users.
-        final UserService userService = super.createUserService();
+        // The user authorisation owner or sys admin needs to add the user
         userService.addUser(
                 new AddUserRequest(
                         new User()
@@ -70,12 +58,8 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 .roles("user")
                 )
         );
-        return userService;
-    }
 
-    @Override
-    protected PolicyService createPolicyService() {
-        final PolicyService policyService = super.createPolicyService();
+        // The policy owner or sys admin needs to add the policies
         policyService.setPolicy(
                 new SetPolicyRequest(
                         new FileResource("file1", RESOURCE_TYPE),
@@ -91,27 +75,28 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 )
                 )
         );
-        return policyService;
-    }
 
-    @Override
-    protected ResourceService createResourceService() {
-        final ResourceService resourceService = super.createResourceService();
+        // The sys admin needs to add the resources
         resourceService.addResource(new AddResourceRequest(
                 new DirectoryResource("dir1", RESOURCE_TYPE),
                 new FileResource("file1", RESOURCE_TYPE),
-                new SimpleConnectionDetail()
+                new SimpleConnectionDetail(new SimpleDataService(palisadeService, new ExampleSimpleDataReader()))
         ));
-        resourceService.addResource(new AddResourceRequest(
-                new DirectoryResource("dir1", RESOURCE_TYPE),
-                new FileResource("file1", RESOURCE_TYPE),
-                new SimpleConnectionDetail()
-        ));
-        return resourceService;
+
+        // Wait for the users, policies and resources to be loaded
+        try {
+            Thread.sleep(1000);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
+        return super.read(filename, RESOURCE_TYPE, userId, justification);
     }
 
     @Override
-    protected DataReader createDataReader() {
-        return new ExampleSimpleDataReader();
+    protected Serialiser<?, ExampleObj> createSerialiser() {
+        return new ExampleObjSerialiser();
     }
 }

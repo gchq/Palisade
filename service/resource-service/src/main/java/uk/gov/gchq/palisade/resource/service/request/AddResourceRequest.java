@@ -38,13 +38,26 @@ public class AddResourceRequest extends Request {
     }
 
     /**
-     * Default constructor
+     * Constructs an {@link AddResourceRequest} with no connection details
+     *
+     * @param parent   The parent resource, so a {@link uk.gov.gchq.palisade.resource.impl.SystemResource}
+     *                 if it is a {@link uk.gov.gchq.palisade.resource.impl.StreamResource}/{@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} to be added,
+     *                 or a {@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} if it is a {@link uk.gov.gchq.palisade.resource.impl.FileResource}.
+     * @param resource The {@link Resource} to be added.
+     */
+    public AddResourceRequest(final ParentResource parent, final Resource resource) {
+        this.parent = parent;
+        this.resource = resource;
+    }
+
+    /**
+     * Constructs an {@link AddResourceRequest}
      *
      * @param parent           The parent resource, so a {@link uk.gov.gchq.palisade.resource.impl.SystemResource}
      *                         if it is a {@link uk.gov.gchq.palisade.resource.impl.StreamResource}/{@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} to be added,
      *                         or a {@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} if it is a {@link uk.gov.gchq.palisade.resource.impl.FileResource}.
      * @param resource         The {@link Resource} to be added.
-     * @param connectionDetail Details of how to get to the data, in the format expected by the {@code DataService}.
+     * @param connectionDetail Details of how to get to the data from the {@code DataService}.
      */
     public AddResourceRequest(final ParentResource parent, final Resource resource, final ConnectionDetail connectionDetail) {
         this.parent = parent;
