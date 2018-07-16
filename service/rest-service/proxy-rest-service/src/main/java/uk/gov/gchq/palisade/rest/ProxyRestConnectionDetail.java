@@ -49,6 +49,7 @@ public class ProxyRestConnectionDetail implements ConnectionDetail {
         this.url = url;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <S extends Service> S createService() {
         requireNonNull(serviceClass, "serviceClass is required");
