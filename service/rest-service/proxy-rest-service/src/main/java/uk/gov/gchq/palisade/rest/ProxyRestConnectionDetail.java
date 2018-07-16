@@ -30,43 +30,44 @@ import static java.util.Objects.requireNonNull;
  * takes a {@link ProxyRestService} {@link Class} and a url {@code String}.
  */
 public class ProxyRestConnectionDetail implements ConnectionDetail {
-    private Class<? extends ProxyRestService> proxyRestServiceClass;
+    private Class<? extends ProxyRestService> serviceClass;
     private String url;
 
     public ProxyRestConnectionDetail() {
+        this(NullProxyRestService.class, "");
     }
 
     /**
      * Constructs a {@link ProxyRestConnectionDetail} with the Class of the {@link ProxyRestService}
      * to use and a url String.
      *
-     * @param proxyRestServiceClass the Class of the {@link ProxyRestService} to use
-     * @param url                   the url String.
+     * @param serviceClass the Class of the {@link ProxyRestService} to use
+     * @param url          the url String.
      */
-    public ProxyRestConnectionDetail(final Class<? extends ProxyRestService> proxyRestServiceClass, final String url) {
-        this.proxyRestServiceClass = proxyRestServiceClass;
+    public ProxyRestConnectionDetail(final Class<? extends ProxyRestService> serviceClass, final String url) {
+        this.serviceClass = serviceClass;
         this.url = url;
     }
 
     @Override
     public <S extends Service> S createService() {
-        requireNonNull(proxyRestServiceClass, "proxyRestServiceClass is required");
+        requireNonNull(serviceClass, "serviceClass is required");
         final ProxyRestService service;
         try {
-            service = proxyRestServiceClass.newInstance();
+            service = serviceClass.newInstance();
         } catch (final InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("Unable to create service " + proxyRestServiceClass.getName(), e);
+            throw new RuntimeException("Unable to create service " + serviceClass.getName(), e);
         }
         service.setBaseUrl(url);
         return (S) service;
     }
 
-    public Class<? extends ProxyRestService> getProxyRestServiceClass() {
-        return proxyRestServiceClass;
+    public Class<? extends ProxyRestService> getServiceClass() {
+        return serviceClass;
     }
 
-    public void setProxyRestServiceClass(final Class<? extends ProxyRestService> proxyRestServiceClass) {
-        this.proxyRestServiceClass = proxyRestServiceClass;
+    public void setServiceClass(final Class<? extends ProxyRestService> serviceClass) {
+        this.serviceClass = serviceClass;
     }
 
     public String getUrl() {
@@ -90,7 +91,7 @@ public class ProxyRestConnectionDetail implements ConnectionDetail {
         final ProxyRestConnectionDetail that = (ProxyRestConnectionDetail) o;
 
         return new EqualsBuilder()
-                .append(proxyRestServiceClass, that.proxyRestServiceClass)
+                .append(serviceClass, that.serviceClass)
                 .append(url, that.url)
                 .isEquals();
     }
@@ -98,7 +99,7 @@ public class ProxyRestConnectionDetail implements ConnectionDetail {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(7, 37)
-                .append(proxyRestServiceClass)
+                .append(serviceClass)
                 .append(url)
                 .toHashCode();
     }
@@ -106,7 +107,7 @@ public class ProxyRestConnectionDetail implements ConnectionDetail {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("proxyRestServiceClass", proxyRestServiceClass)
+                .append("serviceClass", serviceClass)
                 .append("url", url)
                 .toString();
     }
