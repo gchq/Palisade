@@ -49,7 +49,7 @@ import java.util.stream.IntStream;
  * @param <K> The key type being retrieved from the requested resources
  * @param <V> The value type for the map task
  */
-public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
+public class PalisadeInputFormat<K extends Resource, V> extends InputFormat<K, V> {
     /**
      * Char-set for serialising data.
      */
@@ -195,10 +195,9 @@ public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
      * <p>
      * Creates a {@link uk.gov.gchq.palisade.PalisadeRecordReader}.
      */
-    @SuppressWarnings("unchecked")
     @Override
     public RecordReader<K, V> createRecordReader(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
-        return new PalisadeRecordReader();
+        return new PalisadeRecordReader<>();
     }
 
     /**
