@@ -21,7 +21,6 @@ import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.StringUtils;
-
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.PalisadeService;
@@ -34,14 +33,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.PrimitiveIterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Phaser;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
     public static final Charset UTF8 = Charset.forName("UTF-8");
@@ -80,32 +78,44 @@ public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
         IntStream index = IntStream.iterate(0, x -> (x + 1) % maxCounter);
 
         for (RegisterDataRequest req : reqs) {
-            counter.register(); //tell the phaser we have another party active
-            //this counter determines which mapper gets which resource
+            //tell the phaser we have another party active
+            counter.register();
+            //this iterator determines which mapper gets which resource
             final PrimitiveIterator.OfInt indexIt = index.iterator();
             //send request to the Palisade service
             serv.registerDataRequest(req)
                     //when the response comes back create input splits based on max mapper hint
-                    .thenApplyAsync(response -> {
-                        //make map of input split number -> list of resource,connectiondetail pairs
-                        Map<Integer, List<Map.Entry<Resource, ConnectionDetail>>> grouped =
-                                response.getResources().entrySet().stream()
-                                        .collect(Collectors.groupingBy(ignored -> indexIt.next()));
-                        //now convert these groups into input splits
-                        return grouped.values().stream()
-                                //convert the list of entries into a map
-                                .map(list -> list
-                                                .stream()
-                                                .collect(
-                                                        Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
-                                                )
-                                )
-                                        //wrap into an input split
-                                .map(m -> new PalisadeInputSplit(response.getRequestId(), m))
-                                        //finally make that a list
-                                .collect(Collectors.toList());
-                    })
-                            //then add them to the complete list
+                    .thenApplyAsync(response ->
+                            response.getResources().entrySet().stream()
+                                    .collect(
+                                            //group by the indexIt, which will round robin the resources to
+                                            //different groupings
+                                            Collectors.groupingBy(ignored -> indexIt.next(),
+                                                    //create downstream collector to convert the
+                                                    //List<Map.Entry<Resource,ConnectionDetail>> into a map
+                                                    Collector.of(
+                                                            //Supplier
+                                                            HashMap<Resource, ConnectionDetail>::new,
+                                                            //Accumulator
+                                                            (map, entry) -> {
+                                                                map.put(entry.getKey(), entry.getValue());
+                                                            },
+                                                            //Combiner
+                                                            (leftMap, rightMap) -> {
+                                                                leftMap.putAll(rightMap);
+                                                                return leftMap;
+                                                            }
+                                                    )
+                                            )
+                                    )
+                                            //now take the values of that map (we don't care about the keys)
+                                    .values()
+                                    .stream()
+                                            //make each map into an input split
+                                    .map(m -> new PalisadeInputSplit(response.getRequestId(), m))
+                                            //reduce to a list
+                                    .collect(Collectors.toList()))
+                            //then add them to the master list (which is thread safe)
                     .thenAccept(splits::addAll)
                             //signal this has finished
                     .whenComplete((r, e) -> counter.arriveAndDeregister());
@@ -152,7 +162,7 @@ public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
         //retrieve the requests added so far
         String reqs = context.getConfiguration().get(REGISTER_REQUESTS_KEY, "");
         //split these up and decode
-        String[] splitReqs = StringUtils.split(",");
+        String[] splitReqs = StringUtils.split(reqs);
         return Arrays.stream(splitReqs)
                 //lose the empties
                 .filter(x -> !x.isEmpty())
