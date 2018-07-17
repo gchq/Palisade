@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class HDFSResourceService implements ResourceService {
@@ -62,14 +63,35 @@ public class HDFSResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
+        final Predicate<HDFSResourceDetails> filterPredicate = resourceDetails -> request.getResourceId().equals(resourceDetails.getId());
+        return getMapCompletableFuture(filterPredicate);
+    }
+
+    @Override
+    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
+        final Predicate<HDFSResourceDetails> filterPredicate = resourceDetails -> request.getType().equals(resourceDetails.getType());
+        return getMapCompletableFuture(filterPredicate);
+    }
+
+    @Override
+    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(final GetResourcesByFormatRequest request) {
+        final Predicate<HDFSResourceDetails> filterPredicate = resourceDetails -> request.getFormat().equals(resourceDetails.getFormat());
+        return getMapCompletableFuture(filterPredicate);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    private CompletableFuture<Map<Resource, ConnectionDetail>> getMapCompletableFuture(final Predicate<HDFSResourceDetails> filterPredicate) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                final String resourceId = request.getResourceId();
                 final RemoteIterator<LocatedFileStatus> remoteIterator = this.fileSystem.listFiles(new Path(this.jobConf.get(RESOURCE_ROOT_PATH)), true);
                 return getFileNames(remoteIterator)
                         .stream()
                         .map(HDFSResourceDetails::getResourceDetailsFromFileName)
-                        .filter(resourceDetails -> resourceId.equals(resourceDetails.getId()))
+                        .filter(filterPredicate)
                         .map(resourceDetails -> new FileResource(resourceDetails.getId(), resourceDetails.getType(), resourceDetails.getFormat()))
                         .collect(Collectors.toMap(fileResource -> fileResource, ignore -> new NullConnectionDetail()));
 
@@ -79,21 +101,6 @@ public class HDFSResourceService implements ResourceService {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
-        throw new UnsupportedOperationException("Not yet implemented.");
-    }
-
-    @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(final GetResourcesByFormatRequest request) {
-        throw new UnsupportedOperationException("Not yet implemented.");
-    }
-
-    @Override
-    public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
-        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     protected static Collection<String> getFileNames(final RemoteIterator<LocatedFileStatus> remoteIterator) throws IOException {

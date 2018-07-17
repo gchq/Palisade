@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.impl.ResourceServiceTest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.NullConnectionDetail;
 
@@ -77,6 +79,52 @@ public class HDFSResourceServiceTest extends ResourceServiceTest {
         //when
         final HDFSResourceService service = new HDFSResourceService(conf);
         final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest("00001"));
+
+        //then
+        assertEquals(expected, resourcesById.join());
+    }
+
+    @Test
+    public void shouldGetResourceByType() throws Exception {
+        //given
+        final JobConf conf = createConf();
+        conf.set(HDFSResourceService.RESOURCE_ROOT_PATH, testFolder.getRoot().getAbsolutePath());
+
+        final Path inputPath = new Path(conf.get(HDFSResourceService.RESOURCE_ROOT_PATH) + "/inputDir");
+        final FileSystem fs = FileSystem.get(createConf());
+        fs.mkdirs(inputPath);
+        final String idValue = "00001";
+        writeFile(inputPath, fs, idValue, FORMAT_VALUE, TYPE_VALUE);
+        final HashMap<Resource, ConnectionDetail> expected = Maps.newHashMap();
+        final Resource key = new FileResource("00001", TYPE_VALUE, FORMAT_VALUE);
+        expected.put(key, new NullConnectionDetail());
+
+        //when
+        final HDFSResourceService service = new HDFSResourceService(conf);
+        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesByType(new GetResourcesByTypeRequest(TYPE_VALUE));
+
+        //then
+        assertEquals(expected, resourcesById.join());
+    }
+
+    @Test
+    public void shouldGetResourceByFormat() throws Exception {
+        //given
+        final JobConf conf = createConf();
+        conf.set(HDFSResourceService.RESOURCE_ROOT_PATH, testFolder.getRoot().getAbsolutePath());
+
+        final Path inputPath = new Path(conf.get(HDFSResourceService.RESOURCE_ROOT_PATH) + "/inputDir");
+        final FileSystem fs = FileSystem.get(createConf());
+        fs.mkdirs(inputPath);
+        final String idValue = "00001";
+        writeFile(inputPath, fs, idValue, FORMAT_VALUE, TYPE_VALUE);
+        final HashMap<Resource, ConnectionDetail> expected = Maps.newHashMap();
+        final Resource key = new FileResource("00001", TYPE_VALUE, FORMAT_VALUE);
+        expected.put(key, new NullConnectionDetail());
+
+        //when
+        final HDFSResourceService service = new HDFSResourceService(conf);
+        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesByFormat(new GetResourcesByFormatRequest(FORMAT_VALUE));
 
         //then
         assertEquals(expected, resourcesById.join());
