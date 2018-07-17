@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -35,11 +36,12 @@ import java.util.Set;
  * The user auths are used specifically to decide what visibilities users can see.
  * </p>
  */
-public class User {
+public class User implements Cloneable {
     private UserId userId = new UserId();
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
 
+    @SuppressFBWarnings("CN_IDIOM_NO_SUPER_CALL")
     @SuppressWarnings("CloneDoesntCallSuperClone")
     public User clone() {
         return new User().userId(userId.clone()).auths(auths).roles(roles);

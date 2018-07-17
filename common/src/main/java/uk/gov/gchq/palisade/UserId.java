@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -23,7 +24,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * A {@link UserId} uniquely identifies a {@link User}. By default the ID will
  * be set to "UNKNOWN".
  */
-public class UserId {
+public class UserId implements Cloneable {
     /**
      * The default user ID - "UNKNOWN".
      */
@@ -50,6 +51,7 @@ public class UserId {
         }
     }
 
+    @SuppressFBWarnings("CN_IDIOM_NO_SUPER_CALL")
     @SuppressWarnings("CloneDoesntCallSuperClone")
     public UserId clone() {
         return new UserId(id);
