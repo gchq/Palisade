@@ -32,6 +32,7 @@ import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
@@ -41,7 +42,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
         super();
 
         // The user authorisation owner or sys admin needs to add the user
-        userService.addUser(
+        final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest(
                         new User()
                                 .userId("Alice")
@@ -49,7 +50,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                                 .roles("user", "admin")
                 )
         );
-        userService.addUser(
+        final CompletableFuture<Boolean> userBobStatus = userService.addUser(
                 new AddUserRequest(
                         new User()
                                 .userId("Bob")
@@ -59,7 +60,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
         );
 
         // The policy owner or sys admin needs to add the policies
-        policyService.setPolicy(
+        final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
                 new SetPolicyRequest(
                         new FileResource("file1", RESOURCE_TYPE),
                         new Policy<ExampleObj>()
@@ -76,18 +77,14 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
         );
 
         // The sys admin needs to add the resources
-        resourceService.addResource(new AddResourceRequest(
+        final CompletableFuture<Boolean> resourceStatus = resourceService.addResource(new AddResourceRequest(
                 new DirectoryResource("dir1", RESOURCE_TYPE),
                 new FileResource("file1", RESOURCE_TYPE),
                 new ProxyRestConnectionDetail(ProxyRestDataService.class, "http://localhost:8084/data")
         ));
 
         // Wait for the users, policies and resources to be loaded
-        try {
-            Thread.sleep(1000);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
+        CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();
     }
 
     public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {

@@ -53,6 +53,7 @@ public class SimpleConnectionDetail implements ConnectionDetail {
         this.service = service;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <S extends Service> S createService() {
         return (S) service;
