@@ -35,5 +35,5 @@ public abstract class ResourceServiceTest {
         assertEquals(resource, resultMap.keySet().iterator().next());
     }
 
-    public abstract ResourceService getResourceService();
+    public abstract ResourceService getResourceService() throws Exception;
 }
