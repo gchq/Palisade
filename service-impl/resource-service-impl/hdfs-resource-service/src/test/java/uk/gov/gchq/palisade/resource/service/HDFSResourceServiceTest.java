@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
-import uk.gov.gchq.palisade.resource.service.HDFSResourceService.FORMAT_FIELDS;
 import uk.gov.gchq.palisade.resource.service.impl.ResourceServiceTest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
@@ -28,7 +27,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertEquals;
-import static uk.gov.gchq.palisade.resource.service.HDFSResourceService.getFileNameFromResourceDetails;
+import static uk.gov.gchq.palisade.resource.service.HDFSResourceDetails.getFileNameFromResourceDetails;
 
 public class HDFSResourceServiceTest extends ResourceServiceTest {
 
@@ -83,12 +82,9 @@ public class HDFSResourceServiceTest extends ResourceServiceTest {
         assertEquals(expected, resourcesById.join());
     }
 
-    private void writeFile(final Path inputPath, final FileSystem fs, final String id, final String txt, final String bob) throws IOException {
+    private void writeFile(final Path inputPath, final FileSystem fs, final String id, final String txt, final String type) throws IOException {
         //Write Some file
-        final String[] resourceDetails = new String[FORMAT_FIELDS.length()];
-        resourceDetails[FORMAT_FIELDS.type.pos()] = bob;
-        resourceDetails[FORMAT_FIELDS.id.pos()] = id;
-        resourceDetails[FORMAT_FIELDS.format.pos()] = txt;
+        final HDFSResourceDetails resourceDetails = new HDFSResourceDetails(id, type, txt);
 
         final Path filePath = new Path(inputPath, getFileNameFromResourceDetails(resourceDetails));
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fs.create(filePath, true)))) {
