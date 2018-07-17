@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
+import uk.gov.gchq.palisade.service.Service;
+
 /**
  * A High level API for passing details of how to connect to a resource
  */
@@ -31,6 +33,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
         defaultImpl = SimpleConnectionDetail.class
 )
 public interface ConnectionDetail {
+    <S extends Service> S createService();
+
     @JsonGetter("class")
     default String _getClass() {
         return getClass().getName();
