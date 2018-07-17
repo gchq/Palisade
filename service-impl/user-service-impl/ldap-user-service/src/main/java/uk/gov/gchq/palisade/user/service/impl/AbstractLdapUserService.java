@@ -56,7 +56,6 @@ import static java.util.Objects.requireNonNull;
  * An {@code AbstractLdapUserService} is an implementation of a {@link UserService} that
  * connects to LDAP to lookup users.
  * </p>
- * <p>
  * To use this LDAP user service you will
  * need to extend this class and implement 3 methods:
  * <ul>
@@ -70,7 +69,6 @@ import static java.util.Objects.requireNonNull;
  * {@link #getRoles(UserId, Map, LdapContext)}
  * </li>
  * </ul>
- * </p>
  * <p>
  * This abstract implementation also includes a basic cache to reduce the number
  * of calls to LDAP. The default time to live for the cache is 24 hours. You
