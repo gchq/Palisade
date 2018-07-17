@@ -21,6 +21,7 @@ import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.StringUtils;
+
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.PalisadeService;
@@ -140,6 +141,7 @@ public class PalisadeInputFormat<K, V> extends InputFormat<K, V> {
      * <p>
      * Creates a {@link uk.gov.gchq.palisade.PalisadeRecordReader}.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public RecordReader<K, V> createRecordReader(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
         return new PalisadeRecordReader();

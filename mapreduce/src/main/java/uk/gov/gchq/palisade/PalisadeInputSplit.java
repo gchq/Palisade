@@ -33,8 +33,15 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * The input split for {@link PalisadeInputFormat}. This class contains all the information for describing the resources
+ * for one split and the necessary connection methods for finding the data services responsible for finding those
+ * resources.
+ */
 public class PalisadeInputSplit extends InputSplit implements Writable {
-
+    /**
+     * The response object that contains all the details
+     */
     private DataRequestResponse requestResponse;
 
     /**
@@ -44,17 +51,35 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
         requestResponse = new DataRequestResponse();
     }
 
+    /**
+     * Create a new input split. The given details are wrapped inside a new {@link DataRequestResponse} object.
+     *
+     * @param requestId the request ID for this split
+     * @param resources the resources to be processed by this split
+     * @throws NullPointerException if anything is null
+     */
     public PalisadeInputSplit(final RequestId requestId, final Map<Resource, ConnectionDetail> resources) {
         Objects.requireNonNull(requestId, "requestId");
         Objects.requireNonNull(resources, "resources");
         requestResponse = new DataRequestResponse(requestId, resources);
     }
 
+    /**
+     * Create a new input split. The request response is stored inside this input split.
+     *
+     * @param requestResponse the response object
+     * @throws NullPointerException if {@code requestResponse} is null
+     */
     public PalisadeInputSplit(final DataRequestResponse requestResponse) {
         Objects.requireNonNull(requestResponse);
         this.requestResponse = new DataRequestResponse(requestResponse);
     }
 
+    /**
+     * Get the response for this input split. This response object may contain many resources for a single request.
+     *
+     * @return the response object
+     */
     public DataRequestResponse getRequestResponse() {
         return requestResponse;
     }
@@ -81,6 +106,9 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
         return StringUtils.emptyStringArray;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void write(final DataOutput dataOutput) throws IOException {
         Objects.requireNonNull(dataOutput, "dataOutput");
@@ -90,6 +118,9 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
         dataOutput.write(serial);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readFields(final DataInput dataInput) throws IOException {
         Objects.requireNonNull(dataInput, "dataInput");
