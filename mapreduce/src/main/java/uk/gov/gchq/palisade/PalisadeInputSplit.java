@@ -86,17 +86,21 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * We measure length according to the number of resources that this split will process.
      *
-     * @return always returns 0
+     * @return the number of resources contained in this split
      */
     @Override
     @JsonIgnore
     public long getLength() throws IOException, InterruptedException {
-        return 0;
+        return getRequestResponse().getResources().size();
     }
 
     /**
      * {@inheritDoc}
+     * <p>
+     * We don't implement about data locality, so this always returns an empty array.
      *
      * @return always returns an empty string array
      */

@@ -18,11 +18,14 @@ package uk.gov.gchq.palisade;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class PalisadeRecordReader extends RecordReader {
+
+    private DataRequestResponse resourceDetails;
 
     public PalisadeRecordReader() {
     }
@@ -34,6 +37,13 @@ public class PalisadeRecordReader extends RecordReader {
         if (inputSplit instanceof PalisadeInputSplit) {
             throw new ClassCastException("input split MUST be instance of " + PalisadeInputSplit.class.getName());
         }
+        PalisadeInputSplit pis = (PalisadeInputSplit) inputSplit;
+        resourceDetails = pis.getRequestResponse();
+        //sanity check
+        if (resourceDetails == null) {
+            throw new IOException(new NullPointerException("no resource details in input split"));
+        }
+
     }
 
     @Override
@@ -51,11 +61,17 @@ public class PalisadeRecordReader extends RecordReader {
         return null;
     }
 
+    /**
+     * {@inheritDoc} Current implementation always returns 0.
+     */
     @Override
     public float getProgress() throws IOException, InterruptedException {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() throws IOException {
 
