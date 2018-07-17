@@ -16,7 +16,7 @@
 
 package uk.gov.gchq.palisade;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -41,10 +41,17 @@ public class User implements Cloneable {
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
 
-    @SuppressFBWarnings("CN_IDIOM_NO_SUPER_CALL")
-    @SuppressWarnings("CloneDoesntCallSuperClone")
     public User clone() {
-        return new User().userId(userId.clone()).auths(auths).roles(roles);
+        User clone;
+        try {
+            clone = (User) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new User();
+        }
+        clone.userId = userId.clone();
+        clone.roles = Sets.newHashSet(roles);
+        clone.auths = Sets.newHashSet(auths);
+        return clone;
     }
 
     public Set<String> getAuths() {

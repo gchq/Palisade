@@ -16,7 +16,6 @@
 
 package uk.gov.gchq.palisade;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -29,7 +28,7 @@ public class UserId implements Cloneable {
      * The default user ID - "UNKNOWN".
      */
     public static final String UNKNOWN_USER_ID = "UNKNOWN";
-    private final String id;
+    private String id;
 
     /**
      * Constructs a {@link UserId} with the default user ID of "UNKNOWN".
@@ -51,10 +50,15 @@ public class UserId implements Cloneable {
         }
     }
 
-    @SuppressFBWarnings("CN_IDIOM_NO_SUPER_CALL")
-    @SuppressWarnings("CloneDoesntCallSuperClone")
     public UserId clone() {
-        return new UserId(id);
+        UserId clone;
+        try {
+            clone = (UserId) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new UserId();
+        }
+        clone.id = id;
+        return clone;
     }
 
     public String getId() {
