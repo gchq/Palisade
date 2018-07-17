@@ -50,6 +50,11 @@ public class UserId {
         }
     }
 
+    @SuppressWarnings("CloneDoesntCallSuperClone")
+    public UserId clone() {
+        return new UserId(id);
+    }
+
     public String getId() {
         return id;
     }

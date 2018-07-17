@@ -40,6 +40,11 @@ public class User {
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
 
+    @SuppressWarnings("CloneDoesntCallSuperClone")
+    public User clone() {
+        return new User().userId(userId.clone()).auths(auths).roles(roles);
+    }
+
     public Set<String> getAuths() {
         return auths;
     }
