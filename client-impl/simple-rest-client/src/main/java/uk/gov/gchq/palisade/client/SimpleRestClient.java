@@ -16,9 +16,6 @@
 
 package uk.gov.gchq.palisade.client;
 
-import uk.gov.gchq.palisade.data.service.DataService;
-import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
-import uk.gov.gchq.palisade.data.service.reader.DataReader;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
@@ -47,15 +44,5 @@ public class SimpleRestClient<T> extends SimpleClient<T> {
     @Override
     protected UserService createUserService() {
         return new ProxyRestUserService("http://localhost:8083/user");
-    }
-
-    @Override
-    protected DataService createDataService() {
-        return new ProxyRestDataService("http://localhost:8084/data");
-    }
-
-    @Override
-    protected DataReader createDataReader() {
-        throw new UnsupportedOperationException("This should never be called.");
     }
 }

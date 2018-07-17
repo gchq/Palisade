@@ -25,53 +25,74 @@ import uk.gov.gchq.palisade.cache.service.impl.HashMapCacheService;
 import uk.gov.gchq.palisade.data.serialise.NullSerialiser;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
-import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
-import uk.gov.gchq.palisade.data.service.reader.DataReader;
-import uk.gov.gchq.palisade.data.service.reader.SimpleDataReader;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HashMapPolicyService;
+import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.service.HashMapResourceService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
+import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class SimpleClient<T> {
-    private final Serialiser<?, T> serialiser;
-    private final PalisadeService palisadeService;
-    private final DataService dataService;
+    protected final Serialiser<?, T> serialiser;
+    protected final ResourceService resourceService;
+    protected final AuditService auditService;
+    protected final PolicyService policyService;
+    protected final UserService userService;
+    protected final CacheService cacheService;
+    protected final PalisadeService palisadeService;
 
     public SimpleClient() {
         this.serialiser = createSerialiser();
+        this.resourceService = createResourceService();
+        this.auditService = createAuditService();
+        this.policyService = createPolicyService();
+        this.userService = createUserService();
+        this.cacheService = createCacheService();
         this.palisadeService = createPalisadeService();
-        this.dataService = createDataService();
     }
 
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String justification) {
         Objects.requireNonNull(palisadeService);
-        Objects.requireNonNull(dataService);
         final RegisterDataRequest dataRequest = new RegisterDataRequest(filename, new UserId(userId), new Justification(justification));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
-        final CompletableFuture<ReadResponse<Object>> futureResponse = dataService.read(new ReadRequest(dataRequestResponse));
-        return futureResponse.thenApply(response -> response.getData().map(((Serialiser<Object, T>) serialiser)::deserialise)).join();
+        final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
+
+        // TODO: this should be optimised so we don't make multiple calls to the same dataService.
+        for (final Entry<Resource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
+            final ConnectionDetail connectionDetail = entry.getValue();
+            final DataService dataService = connectionDetail.createService();
+            final CompletableFuture<ReadResponse<Object>> futureResponse = dataService.read(new ReadRequest(dataRequestResponse));
+            final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
+                    response -> response.getData().map(((Serialiser<Object, T>) serialiser)::deserialise)
+            );
+            futureResults.add(futureResult);
+        }
+
+        return futureResults.stream().flatMap(CompletableFuture::join);
     }
 
     protected PalisadeService createPalisadeService() {
         return new SimplePalisadeService(
-                createResourceService(),
-                createAuditService(),
-                createPolicyService(),
-                createUserService(),
-                createCacheService()
+                resourceService,
+                auditService,
+                policyService,
+                userService,
+                cacheService
         );
     }
 
@@ -94,14 +115,6 @@ public class SimpleClient<T> {
 
     protected UserService createUserService() {
         return new HashMapUserService();
-    }
-
-    protected DataService createDataService() {
-        return new SimpleDataService(palisadeService, createDataReader());
-    }
-
-    protected DataReader createDataReader() {
-        return new SimpleDataReader();
     }
 
     protected Serialiser<?, T> createSerialiser() {

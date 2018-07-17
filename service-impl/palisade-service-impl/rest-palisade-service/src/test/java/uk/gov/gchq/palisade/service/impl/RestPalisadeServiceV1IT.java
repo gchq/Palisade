@@ -79,8 +79,8 @@ public class RestPalisadeServiceV1IT {
         final RegisterDataRequest request = new RegisterDataRequest("file1", userId, justification);
 
         final Map<Resource, ConnectionDetail> resources = new HashMap<>();
-        resources.put(resource1, new SimpleConnectionDetail("details1"));
-        resources.put(resource2, new SimpleConnectionDetail("details2"));
+        resources.put(resource1, new SimpleConnectionDetail());
+        resources.put(resource2, new SimpleConnectionDetail());
         final DataRequestResponse expectedResult = new DataRequestResponse(new RequestId("id1"), resources);
         given(palisadeService.registerDataRequest(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
@@ -101,8 +101,8 @@ public class RestPalisadeServiceV1IT {
         final FileResource resource1 = new FileResource("file1");
         final FileResource resource2 = new FileResource("file1");
         final Map<Resource, ConnectionDetail> resources = new HashMap<>();
-        resources.put(resource1, new SimpleConnectionDetail("details1"));
-        resources.put(resource2, new SimpleConnectionDetail("details2"));
+        resources.put(resource1, new SimpleConnectionDetail());
+        resources.put(resource2, new SimpleConnectionDetail());
         final DataRequestResponse request = new DataRequestResponse(new RequestId("id1"), resources);
 
         final UserId userId = new UserId("user01");
