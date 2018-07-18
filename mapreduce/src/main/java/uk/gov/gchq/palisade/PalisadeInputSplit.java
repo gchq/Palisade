@@ -26,7 +26,6 @@ import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 
-import javax.xml.crypto.Data;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
