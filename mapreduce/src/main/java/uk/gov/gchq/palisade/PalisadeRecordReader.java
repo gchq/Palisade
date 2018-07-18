@@ -134,7 +134,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      * @throws NullPointerException for null parameters
      */
     @SuppressWarnings("unchecked")
-    private Serialiser<Object, V> createSerialiser(TaskAttemptContext taskAttemptContext) throws IOException {
+    private Serialiser<Object, V> createSerialiser(final TaskAttemptContext taskAttemptContext) throws IOException {
         String serialConfig = taskAttemptContext.getConfiguration().get(PalisadeInputFormat.SERLIALISER_CONFIG_KEY);
         Objects.requireNonNull(taskAttemptContext);
 

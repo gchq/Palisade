@@ -282,10 +282,10 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
         return context.getConfiguration().getInt(MAXIMUM_MAP_HINT_KEY, DEFAULT_MAX_MAP_HINT);
     }
 
-    public static <I,O> void setSerialiser(final JobContext context,final Serialiser<I,O> serialiser) {
-        Objects.requireNonNull(context,"context");
-        Objects.requireNonNull(serialiser,"serialiser");
+    public static <I, O> void setSerialiser(final JobContext context, final Serialiser<I, O> serialiser) {
+        Objects.requireNonNull(context, "context");
+        Objects.requireNonNull(serialiser, "serialiser");
         context.getConfiguration().set(SERIALISER_CLASSNAME_KEY, serialiser.getClass().getName());
-        context.getConfiguration().set(SERLIALISER_CONFIG_KEY,new String(JSONSerialiser.serialise(serialiser),UTF8));
+        context.getConfiguration().set(SERLIALISER_CONFIG_KEY, new String(JSONSerialiser.serialise(serialiser), UTF8));
     }
 }
