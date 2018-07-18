@@ -46,10 +46,9 @@ import java.util.stream.IntStream;
  * The main client class for using Palisade data inside of the Hadoop framework. Clients should set this class as the
  * input format for a MapReduce job inside their client code.
  *
- * @param <K> The key type being retrieved from the requested resources
  * @param <V> The value type for the map task
  */
-public class PalisadeInputFormat<K extends Resource, V> extends InputFormat<K, V> {
+public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     /**
      * Char-set for serialising data.
      */
@@ -196,7 +195,7 @@ public class PalisadeInputFormat<K extends Resource, V> extends InputFormat<K, V
      * Creates a {@link uk.gov.gchq.palisade.PalisadeRecordReader}.
      */
     @Override
-    public RecordReader<K, V> createRecordReader(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
+    public RecordReader<Resource, V> createRecordReader(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
         return new PalisadeRecordReader<>();
     }
 

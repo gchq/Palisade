@@ -18,31 +18,80 @@ package uk.gov.gchq.palisade;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
+import uk.gov.gchq.palisade.data.service.DataService;
+import uk.gov.gchq.palisade.data.service.request.ReadRequest;
+import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
-public class PalisadeRecordReader<K extends Resource, V> extends RecordReader<K, V> {
+/**
+ * The main {@link RecordReader} class for Palisade MapReduce clients. This class implements the logic for connecting to
+ * a data service and retrieving the results from the returned stream. It will contact the necessary data service for
+ * each resource in turn from the {@link PalisadeInputSplit} provided to it. Clients can retrieve the current resource
+ * being processed by calling {@link PalisadeRecordReader#getCurrentKey()}. Therefore, in the client MapReduce code, the
+ * key will become the current resource being processed and the value will become the current item from that resource.
+ *
+ * @param <V> the value type which will be de-serialised from the resources this input split is processing
+ */
+public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
 
+    /**
+     * The request that is being processed in this task.
+     */
     private DataRequestResponse resourceDetails;
 
-    private K currentKey;
+    /**
+     * Iterates through the resources to be processed.
+     */
+    private Iterator<Map.Entry<Resource, ConnectionDetail>> resIt;
 
+    /**
+     * Value supplier.
+     */
+    private Iterator<V> itemIt;
+
+    /**
+     * The current Palisade resource being processed.
+     */
+    private Resource currentKey;
+
+    /**
+     * The current value in a resource.
+     */
     private V currentValue;
 
+    /**
+     * The Palisade serialiser that will be used to decode each item from the resources being processed.
+     */
     private Serialiser<Object, V> serialiser;
 
+    /**
+     * Count of number of resources already processed, used for Haodop progress monitoring.
+     */
     private int processed;
 
+    /**
+     * No-arg constructor.
+     */
     public PalisadeRecordReader() {
     }
 
     //TODO: how does the record reader know what serialiser to use? Do we send that with the job configuration? How
     //do we know the classname? I guess we send that too...hmm
+    //TODO: error handling
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void initialize(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
         Objects.requireNonNull(inputSplit, "inputSplit");
@@ -51,41 +100,93 @@ public class PalisadeRecordReader<K extends Resource, V> extends RecordReader<K,
             throw new ClassCastException("input split MUST be instance of " + PalisadeInputSplit.class.getName());
         }
         PalisadeInputSplit pis = (PalisadeInputSplit) inputSplit;
-        resourceDetails = pis.getRequestResponse();
         //sanity check
-        if (resourceDetails == null) {
+        DataRequestResponse reqDetails = pis.getRequestResponse();
+        if (reqDetails == null) {
             throw new IOException(new NullPointerException("no resource details in input split"));
         }
-
+        resourceDetails = reqDetails;
+        resIt = reqDetails.getResources().entrySet().iterator();
+        //TODO: go get the serialiser
+        currentKey = null;
+        currentValue = null;
+        processed = 0;
     }
 
-    /*
-
-             TODO: this should be optimised so we don't make multiple calls to the same dataService.
-            for (final Entry<Resource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
-                final ConnectionDetail connectionDetail = entry.getValue();
-                final DataService dataService = connectionDetail.createService();
-
-                final CompletableFuture<ReadResponse<Object>> futureResponse = dataService.read(new ReadRequest(dataRequestResponse));
-                final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
-                        response -> response.getData().map(((Serialiser<Object, T>) serialiser)::deserialise)
-                );
-                futureResults.add(futureResult);
-            }
-
-            return futureResults.stream().flatMap(CompletableFuture::join);
+    /**
+     * {@inheritDoc}
      */
-    
     @Override
     public boolean nextKeyValue() throws IOException, InterruptedException {
-        return false;
+        //if we don't have a current item iterator or it's empty...
+        while (itemIt == null || !itemIt.hasNext()) {
+            //...try to move to the next one, if we can't then we're done
+            if (!moveToNextResource()) {
+                return false;
+            }
+        }
+        //by now we've either got an item iterator with results or returned
+        currentValue = itemIt.next();
+        return true;
     }
 
+    /**
+     * Move to the next resource in the list of resources for this input split. This co-ordinates the logic for moving
+     * to the next resource.
+     *
+     * @return true iff we have a successfully moved to a new data stream for the next resource
+     */
+    private boolean moveToNextResource() {
+        //do we have a resource iterator?
+        if (resIt == null) {
+            return false;
+        } else {
+            //any resources left to process?
+            if (resIt.hasNext()) {
+                //set up the next resource
+                setupItemStream();
+                return true;
+            } else {
+                //end of things to be iterated
+                resIt = null;
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Internal method to move to the next resource in our iterator of resources. This makes the actual call to the data
+     * service and waits for the request to complete before extracting the data stream iterator which clients will use.
+     * If successful there will be a new item iterator set up and ready to retrieve data.
+     */
+    private void setupItemStream() {
+        Map.Entry<Resource, ConnectionDetail> entry = resIt.next();
+        final Resource resource = entry.getKey();
+        final ConnectionDetail conDetails = entry.getValue();
+        //stash the resource
+        currentKey = resource;
+        final DataService service = conDetails.createService();
+        //create the singleton resource request for this resource
+        final DataRequestResponse singleResourceRequest = new DataRequestResponse(resourceDetails.getRequestId(),
+                resource, conDetails);
+        //lodge request with the data service
+        final CompletableFuture<ReadResponse<Object>> futureResponse = service.read(new ReadRequest(singleResourceRequest));
+        //when this future completes, we should have an iterator of things once we deserialise
+        itemIt = futureResponse.thenApply(response -> response.getData().map(serialiser::deserialise).iterator()).join();
+        processed++;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public K getCurrentKey() throws IOException, InterruptedException {
+    public Resource getCurrentKey() throws IOException, InterruptedException {
         return currentKey;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public V getCurrentValue() throws IOException, InterruptedException {
         return currentValue;
@@ -109,6 +210,8 @@ public class PalisadeRecordReader<K extends Resource, V> extends RecordReader<K,
         resourceDetails = null;
         currentKey = null;
         currentValue = null;
+        resIt = null;
+        itemIt = null;
         serialiser = null;
         processed = 0;
 
