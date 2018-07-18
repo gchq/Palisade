@@ -22,6 +22,7 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.StringUtils;
 
+import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.PalisadeService;
@@ -62,8 +63,17 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     /**
      * Hadoop configuration key for setting the client hint for the maximum number of mappers.
      */
-
     public static final String MAXIMUM_MAP_HINT_KEY = "uk.gov.gchq.palisade.mapreduce.max.map.hint";
+
+    /**
+     * Hadoop configuration key for setting the serialiser class name.
+     */
+    public static final String SERIALISER_CLASSNAME_KEY = "uk.gov.gchq.palisade.mapreduce.serialiser.class";
+
+    /**
+     * Hadoop configuration key for setting the serialiser configuration.
+     */
+    public static final String SERLIALISER_CONFIG_KEY = "uk.gov.gchq.palisade.mapreduce.serialiser.conf";
 
     /**
      * Default number of mappers to use. Hint only. Zero means unlimited.
@@ -270,5 +280,12 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     public static int getMaxMapTasksHint(final JobContext context) {
         Objects.requireNonNull(context);
         return context.getConfiguration().getInt(MAXIMUM_MAP_HINT_KEY, DEFAULT_MAX_MAP_HINT);
+    }
+
+    public static <I,O> void setSerialiser(final JobContext context,final Serialiser<I,O> serialiser) {
+        Objects.requireNonNull(context,"context");
+        Objects.requireNonNull(serialiser,"serialiser");
+        context.getConfiguration().set(SERIALISER_CLASSNAME_KEY, serialiser.getClass().getName());
+        context.getConfiguration().set(SERLIALISER_CONFIG_KEY,new String(JSONSerialiser.serialise(serialiser),UTF8));
     }
 }

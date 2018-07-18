@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
@@ -43,6 +44,18 @@ import java.util.concurrent.CompletableFuture;
  * @param <V> the value type which will be de-serialised from the resources this input split is processing
  */
 public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
+    /*
+     * Internal class description:
+     * This class currently requests each Resource from its data service sequentially. We avoid launching all the
+     * requests to the data service(s) in parallel because Hadoop's processing of tasks in an individual map task is necessarily
+     * serial. If we launch multiple requests for data in parallel, but Hadoop/the user's MapReduce job spends a long
+     * time processing the first Resource(s), then the data services waiting to send the ones later in the list may timeout.
+     * Thus, we only make the request to the data service responsible for an individual resource when we need it. This
+     * change in the future and SHOULD NOT be relied upon in any implementation decisions.
+     *
+     * In order to do this, we create a DataRequestResponse for each Resource and send it to the data service created by
+     * the corresponding ConnectionDetail object.
+     */
 
     /**
      * The request that is being processed in this task.
@@ -85,8 +98,6 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
     public PalisadeRecordReader() {
     }
 
-    //TODO: how does the record reader know what serialiser to use? Do we send that with the job configuration? How
-    //do we know the classname? I guess we send that too...hmm
     //TODO: error handling
 
     /**
@@ -107,10 +118,41 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
         }
         resourceDetails = reqDetails;
         resIt = reqDetails.getResources().entrySet().iterator();
-        //TODO: go get the serialiser
+        serialiser = createSerialiser(taskAttemptContext);
         currentKey = null;
         currentValue = null;
         processed = 0;
+    }
+
+    /**
+     * Creates the serialiser for this record reader from the details stored in the job configuration.
+     *
+     * @param taskAttemptContext the task details
+     * @return a serialiser
+     * @throws IOException          if the necessary items aren't in the configuration or the Serialiser couldn't be
+     *                              created
+     * @throws NullPointerException for null parameters
+     */
+    @SuppressWarnings("unchecked")
+    private Serialiser<Object, V> createSerialiser(TaskAttemptContext taskAttemptContext) throws IOException {
+        String serialConfig = taskAttemptContext.getConfiguration().get(PalisadeInputFormat.SERLIALISER_CONFIG_KEY);
+        Objects.requireNonNull(taskAttemptContext);
+
+        String className = taskAttemptContext.getConfiguration().get(PalisadeInputFormat.SERIALISER_CLASSNAME_KEY);
+        if (className == null) {
+            throw new IOException("No serialisation classname set. Have you called PalisadeInputFormat.setSerialiser() ?");
+        }
+
+        if (serialConfig == null) {
+            throw new IOException("No serialisation configuration set. Have you called PalisadeInputFormat.setSerialiser() ?");
+        }
+
+        //try to deserialise
+        try {
+            return (Serialiser<Object, V>) JSONSerialiser.deserialise(serialConfig, Class.forName(className).asSubclass(Serialiser.class));
+        } catch (Exception e) {
+            throw new IOException("Couldn't create serialiser", e);
+        }
     }
 
     /**
