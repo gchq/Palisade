@@ -44,6 +44,11 @@ public class HDFSResourceDetails {
     }
 
     protected static String getFileNameFromResourceDetails(final HDFSResourceDetails resourceDetails) {
-        return String.format(FILE_NAME_FORMAT, resourceDetails.getType(), resourceDetails.getId(), resourceDetails.getFormat());
+        return getFileNameFromResourceDetails(resourceDetails.getId(), resourceDetails.getType(), resourceDetails.getFormat());
+    }
+
+    protected static String getFileNameFromResourceDetails(final String id, final String type, final String format) {
+        //Type, Id, Format
+        return String.format(FILE_NAME_FORMAT, type, id, format);
     }
 }

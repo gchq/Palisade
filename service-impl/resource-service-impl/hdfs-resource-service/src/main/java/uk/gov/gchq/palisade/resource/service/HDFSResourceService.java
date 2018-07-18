@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -46,11 +47,13 @@ import java.util.stream.Collectors;
 public class HDFSResourceService implements ResourceService {
     public static final String RESOURCE_ROOT_PATH = "resource.root.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(HDFSResourceService.class);
+    public static final String ADD_RESOURCE_ERROR = "AddResource is not supported by HDFSResourceService resources should be added/created via regular HDFS behaviour.";
 
     private final JobConf jobConf;
     private final FileSystem fileSystem;
 
     public HDFSResourceService(JobConf jobConf) throws IOException {
+        Objects.requireNonNull(jobConf.get(RESOURCE_ROOT_PATH), RESOURCE_ROOT_PATH + " in JobConf has not been set.");
         this.jobConf = jobConf;
         this.fileSystem = FileSystem.get(jobConf);
     }
@@ -81,7 +84,7 @@ public class HDFSResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        throw new UnsupportedOperationException(ADD_RESOURCE_ERROR);
     }
 
     private CompletableFuture<Map<Resource, ConnectionDetail>> getMapCompletableFuture(final Predicate<HDFSResourceDetails> filterPredicate) {
@@ -92,7 +95,7 @@ public class HDFSResourceService implements ResourceService {
                         .stream()
                         .map(HDFSResourceDetails::getResourceDetailsFromFileName)
                         .filter(filterPredicate)
-                        .map(resourceDetails -> new FileResource(resourceDetails.getId(), resourceDetails.getType(), resourceDetails.getFormat()))
+                        .map(resourceDetails -> (Resource) new FileResource(resourceDetails.getId(), resourceDetails.getType(), resourceDetails.getFormat()))
                         .collect(Collectors.toMap(fileResource -> fileResource, ignore -> new NullConnectionDetail()));
 
             } catch (RuntimeException e) {
