@@ -15,6 +15,64 @@
  */
 package uk.gov.gchq.palisade;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.StubResource;
+import uk.gov.gchq.palisade.service.Service;
+import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.request.DataRequestResponse;
+import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
 public class PalisadeInputSplitTest {
 
+    @Test(expected = IOException.class)
+    public void shouldntAcceptNegativeLength() throws IOException {
+        //Given
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(buffer);
+        dos.writeInt(-1);
+        //When
+        ByteArrayInputStream bis = new ByteArrayInputStream(buffer.toByteArray());
+        DataInputStream dis = new DataInputStream(bis);
+        PalisadeInputSplit test = new PalisadeInputSplit();
+        test.readFields(dis);
+        //Then - throws IOException
+        Assert.fail("exception expected");
+    }
+
+    private StubResource stubResource = new StubResource("test type","test id","test format");
+    private StubConnectionDetail stubConnectionDetail = new StubConnectionDetail("test con");
+
+    @Test
+    public void shouldSerialiseToEqualObject() throws IOException {
+        //Given
+        DataRequestResponse drr = new DataRequestResponse();
+        drr.setRequestId(new RequestId("test string"));
+        drr.getResources().put(stubResource, stubConnectionDetail);
+        PalisadeInputSplit test = new PalisadeInputSplit(drr);
+
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(buffer);
+        //When
+        test.write(dos);
+        ByteArrayInputStream bis = new ByteArrayInputStream(buffer.toByteArray());
+        DataInputStream dis = new DataInputStream(bis);
+        PalisadeInputSplit readBack = new PalisadeInputSplit();
+        readBack.readFields(dis);
+        //Then
+        Assert.assertEquals(test, readBack);
+    }
 }

@@ -17,6 +17,8 @@ package uk.gov.gchq.palisade;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.util.StringUtils;
@@ -140,5 +142,36 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
         Objects.requireNonNull(other.requestResponse);
         //all clear
         this.requestResponse = other.requestResponse;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final PalisadeInputSplit other = (PalisadeInputSplit) o;
+
+        return new EqualsBuilder()
+                .append(requestResponse, other.requestResponse)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(13, 27)
+                .append(requestResponse)
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("requestResponse", requestResponse)
+                .toString();
     }
 }
