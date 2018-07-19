@@ -318,7 +318,7 @@ public abstract class AbstractLdapUserService implements UserService {
     }
 
     /**
-     * Formats an input string before being set to LDAP. Essentially it just
+     * Formats an input string before being sent to LDAP. Essentially it just
      * escapes some characters.
      * Override this method to add additional formatting.
      *
