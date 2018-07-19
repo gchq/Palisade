@@ -262,7 +262,7 @@ public abstract class AbstractLdapUserService implements UserService {
         final Map<String, Object> attributes = new HashMap<>();
         final String[] requestAttrs = getAttributeNames();
         if (null != requestAttrs && requestAttrs.length > 0) {
-            final Attributes userAttrs = context.getAttributes(escapeLdapSearchFilter(userId.getId()), requestAttrs);
+            final Attributes userAttrs = context.getAttributes(formatInput(userId.getId()), requestAttrs);
             if (null != userAttrs) {
                 for (final String requestAttr : requestAttrs) {
                     final Attribute attribute = userAttrs.get(requestAttr);
@@ -293,7 +293,7 @@ public abstract class AbstractLdapUserService implements UserService {
                                       final String... attrs) throws NamingException {
         final NamingEnumeration<SearchResult> attrResults = context.search(
                 name,
-                new BasicAttributes(attrIdForUserId, escapeLdapSearchFilter(userId.getId())),
+                new BasicAttributes(attrIdForUserId, formatInput(userId.getId())),
                 attrs
         );
 
@@ -317,14 +317,21 @@ public abstract class AbstractLdapUserService implements UserService {
         return results;
     }
 
-    protected String escapeLdapSearchFilter(final String input) {
+    /**
+     * Formats an input string before being set to LDAP. Essentially it just
+     * escapes some characters.
+     * Override this method to add additional formatting.
+     *
+     * @param input the input string to be formatted.
+     * @return the formatted string
+     */
+    protected String formatInput(final String input) {
         String result = input;
         for (final String escapedChar : ESCAPED_CHARS) {
             result = result.replace(escapedChar, "\\" + escapedChar);
         }
         return result;
     }
-
 
     public long getCacheTTlHours() {
         return cacheTtlHours;

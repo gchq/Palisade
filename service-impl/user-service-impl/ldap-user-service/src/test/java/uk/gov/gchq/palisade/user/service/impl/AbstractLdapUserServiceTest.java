@@ -217,7 +217,7 @@ public class AbstractLdapUserServiceTest {
                 .collect(Collectors.joining());
 
         // When
-        final String result = service.escapeLdapSearchFilter(input);
+        final String result = service.formatInput(input);
 
         // Then
         final String expectedResult = "test input: " + Stream.of(AbstractLdapUserService.ESCAPED_CHARS)
