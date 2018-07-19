@@ -54,9 +54,19 @@ public class TupleRule<T> implements Rule<T> {
     private final TupleAdaptedPredicate<String, ?> predicate;
 
     public TupleRule(final String selection,
+                     final Function<?, ?> function) {
+        this(arr(selection), function);
+    }
+
+    public TupleRule(final String selection,
                      final Function<?, ?> function,
                      final String projection) {
         this(arr(selection), function, arr(projection));
+    }
+
+    public TupleRule(final String[] selection,
+                     final Function<?, ?> function) {
+        this(selection, function, null, selection);
     }
 
     public TupleRule(final String[] selection,
@@ -102,26 +112,26 @@ public class TupleRule<T> implements Rule<T> {
 
     @Override
     public T apply(final T record, final User user, final Justification justification) {
-        final boolean unwrap;
-        final PalisadeTuple tuple;
-        if (record instanceof Tuple) {
-            tuple = new PalisadeTuple(((Tuple<String>) record), user, justification);
-            unwrap = false;
+        final T rtn;
+
+        final boolean isTupleRecord = record instanceof Tuple;
+        final Tuple<String> recordTuple;
+        if (isTupleRecord) {
+            recordTuple = (Tuple<String>) record;
         } else {
-            tuple = new PalisadeTuple(new ReflectiveTuple(record), user, justification);
-            unwrap = true;
+            recordTuple = new ReflectiveTuple(record);
         }
 
-        final T rtn;
+        final PalisadeTuple palisadeTuple = new PalisadeTuple(recordTuple, user, justification);
         if (null != function) {
-            final Object updatedTuple = ((PalisadeTuple) function.apply(tuple)).getRecord();
-            if (unwrap) {
+            final Object updatedTuple = ((PalisadeTuple) function.apply(palisadeTuple)).getRecord();
+            if (!isTupleRecord) {
                 rtn = (T) ((ReflectiveTuple) updatedTuple).getRecord();
             } else {
                 rtn = (T) updatedTuple;
             }
         } else {
-            rtn = predicate.test(tuple) ? record : null;
+            rtn = predicate.test(palisadeTuple) ? record : null;
         }
         return rtn;
     }

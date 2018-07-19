@@ -35,7 +35,12 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-model</artifactId>
+            <artifactId>example-model</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>example-data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

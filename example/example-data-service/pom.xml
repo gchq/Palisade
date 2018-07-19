@@ -24,11 +24,19 @@
         <artifactId>example</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>single-jvm-example</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>example-data-service</artifactId>
 
-    <modules>
-        <module>single-jvm-example-client</module>
-        <module>single-jvm-example-runner</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>simple-data-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>example-model</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>

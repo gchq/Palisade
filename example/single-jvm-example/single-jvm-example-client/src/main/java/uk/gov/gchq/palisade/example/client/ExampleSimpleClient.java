@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example.client;
 
+import uk.gov.gchq.koryphe.impl.function.SetValue;
 import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
 import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
 import uk.gov.gchq.koryphe.impl.predicate.Not;
@@ -26,9 +27,11 @@ import uk.gov.gchq.palisade.data.service.reader.DataReader;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
-import uk.gov.gchq.palisade.example.rule.If;
-import uk.gov.gchq.palisade.example.rule.IsVisible;
-import uk.gov.gchq.palisade.example.rule.SetValue;
+import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
+import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
+import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
+import uk.gov.gchq.palisade.example.rule.function.If;
+import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
@@ -43,7 +46,6 @@ import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.stream.Stream;
 
-import static uk.gov.gchq.palisade.Util.project;
 import static uk.gov.gchq.palisade.Util.select;
 
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
@@ -88,7 +90,34 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         final PolicyService policyService = super.createPolicyService();
 
         // The policy owner or sys admin needs to add the policies
-        final SetPolicyRequest request = new SetPolicyRequest(
+
+        // You can either implement the Rule interface for your Policy rules or
+        // you can chain together combinations of Koryphe functions/predicates.
+        // Both of the following policies have the same logic, but using
+        // koryphe means you don't need to define lots of different rules for
+        // different types of objects.
+
+        // Using Custom Rule implementations - without Koryphe
+        final SetPolicyRequest customPolicies = new SetPolicyRequest(
+                new FileResource("file1", RESOURCE_TYPE),
+                new Policy<ExampleObj>()
+                        .message("Visibility, ageOff and property redaction")
+                        .rule(
+                                "1-visibility",
+                                new IsExampleObjVisible()
+                        )
+                        .rule(
+                                "2-ageOff",
+                                new IsExampleObjRecent(12L)
+                        )
+                        .rule(
+                                "3-redactProperty",
+                                new RedactExampleObjProperty()
+                        )
+        );
+
+        // Using Koryphe's functions/predicates
+        final SetPolicyRequest koryphePolicies = new SetPolicyRequest(
                 new FileResource("file1", RESOURCE_TYPE),
                 new Policy<ExampleObj>()
                         .message("Visibility, ageOff and property redaction")
@@ -96,7 +125,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 "1-visibility",
                                 new TupleRule<>(
                                         select("Record.visibility", "User.auths"),
-                                        new IsVisible()
+                                        new IsXInCollectionY()
                                 )
                         )
                         .rule(
@@ -112,14 +141,14 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                         select("User.roles", "Record.property"),
                                         new If<>()
                                                 .predicate(0, new Not<>(new CollectionContains("admin")))
-                                                .then(1, new SetValue<>("redacted")),
-                                        project("User.roles", "Record.property")
+                                                .then(1, new SetValue("redacted"))
                                 )
                         )
         );
 
+
         policyService.setPolicy(
-                request
+                koryphePolicies
         );
 
         return policyService;

@@ -32,7 +32,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>uk.gov.gchq.palisade</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${pom.parent.version}</version>
         </dependency>

@@ -28,7 +28,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>multi-jvm-example-model</module>
         <module>multi-jvm-example-rest-palisade-service</module>
         <module>multi-jvm-example-rest-policy-service</module>
         <module>multi-jvm-example-rest-resource-service</module>
