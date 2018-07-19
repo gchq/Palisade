@@ -240,7 +240,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
     @Override
     public float getProgress() throws IOException, InterruptedException {
         return (resourceDetails != null && resourceDetails.getResources().size() > 0)
-                ? processed / resourceDetails.getResources().size()
+                ? (float) processed / resourceDetails.getResources().size()
                 : 0;
     }
 
