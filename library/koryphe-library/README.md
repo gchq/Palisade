@@ -20,7 +20,7 @@ limitations under the License.
 
 This library adds Koryphe Functions/Predicates to Palisade.
 
-<img src="doc/img/koryphe_logo_text.png" width="200">
+<img src="../../doc/img/koryphe_logo_text.png" width="200">
 
 [Koryphe](https://github.com/gchq/koryphe) provides several lightweight 
 reusable functions and predicates that can be chained together and applied
