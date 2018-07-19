@@ -45,13 +45,12 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     /**
      * Default constructor
      *
-     * @param resource The resource to be accessed
-     * @param user The user that requested the data
+     * @param resource      The resource to be accessed
+     * @param user          The user that requested the data
      * @param justification The Justification that the user provided for why they want the data
-     * @param rules The list of rules to be applied to the data to ensure policy compliance
-     * @param <RULES_DATA_TYPE> is the Java class that the Rules expect the data to be in the format of.
+     * @param rules         The list of rules to be applied to the data to ensure policy compliance
      */
-    public <RULES_DATA_TYPE> DataReaderRequest(final Resource resource, final User user, final Justification justification, final Rules<RULES_DATA_TYPE> rules) {
+    public DataReaderRequest(final Resource resource, final User user, final Justification justification, final Rules<RULES_DATA_TYPE> rules) {
         this.resource = resource;
         this.user = user;
         this.justification = justification;

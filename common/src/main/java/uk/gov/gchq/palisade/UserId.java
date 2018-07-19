@@ -30,7 +30,7 @@ import java.util.Map;
  * A {@link UserId} uniquely identifies a {@link User}. By default the ID will
  * be set to "UNKNOWN".
  */
-public class UserId {
+public class UserId implements Cloneable {
     /**
      * The default user ID - "UNKNOWN".
      */
@@ -63,12 +63,24 @@ public class UserId {
         }
     }
 
+
     public Object getField(final String reference) {
         return Util.getField(this, FIELD_GETTERS, reference);
     }
 
     public void setField(final String reference, final Object value) {
         Util.setField(this, FIELD_SETTERS, reference, value);
+    }
+
+    public UserId clone() {
+        UserId clone;
+        try {
+            clone = (UserId) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new UserId();
+        }
+        clone.id = id;
+        return clone;
     }
 
     public String getId() {

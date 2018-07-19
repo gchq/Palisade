@@ -14,24 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.resource.impl;
+package uk.gov.gchq.palisade.rest;
 
-import uk.gov.gchq.palisade.resource.AbstractResource;
-import uk.gov.gchq.palisade.resource.ParentResource;
-
-public class SystemResource extends AbstractResource implements ParentResource {
-    public SystemResource() {
-    }
-
-    public SystemResource(final String id) {
-        super(id);
-    }
-
-    public SystemResource(final String id, final String type) {
-        super(id, type);
-    }
-
-    public SystemResource(final String id, final String type, final String format) {
-        super(id, type, format);
-    }
+public class NullProxyRestService extends ProxyRestService {
 }

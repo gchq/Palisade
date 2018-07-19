@@ -23,7 +23,7 @@ import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
-import uk.gov.gchq.palisade.data.service.reader.DataReader;
+import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
@@ -38,18 +38,23 @@ import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
-import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static uk.gov.gchq.palisade.Util.select;
 
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
+
+    public ExampleSimpleClient() {
+        super();
+        initialiseServices();
+    }
 
     public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
         return super.read(filename, RESOURCE_TYPE, userId, justification);
@@ -60,12 +65,11 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         return new ExampleObjSerialiser();
     }
 
-    @Override
-    protected UserService createUserService() {
-        final UserService userService = super.createUserService();
+    private void initialiseServices() {
+        final UserService userService = createUserService();
 
         // The user authorisation owner or sys admin needs to add the users.
-        userService.addUser(
+        final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest(
                         new User()
                                 .userId("Alice")
@@ -73,7 +77,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 .roles("user", "admin")
                 )
         );
-        userService.addUser(
+        final CompletableFuture<Boolean> userBobStatus = userService.addUser(
                 new AddUserRequest(
                         new User()
                                 .userId("Bob")
@@ -82,12 +86,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                 )
         );
 
-        return userService;
-    }
-
-    @Override
-    protected PolicyService createPolicyService() {
-        final PolicyService policyService = super.createPolicyService();
+        final PolicyService policyService = createPolicyService();
 
         // The policy owner or sys admin needs to add the policies
 
@@ -146,30 +145,19 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                         )
         );
 
-
-        policyService.setPolicy(
+        // The policy owner or sys admin needs to add the policies
+        final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
                 koryphePolicies
         );
 
-        return policyService;
-    }
-
-    @Override
-    protected ResourceService createResourceService() {
-        final ResourceService resourceService = super.createResourceService();
-
         // The sys admin needs to add the resources
-        resourceService.addResource(new AddResourceRequest(
+        final CompletableFuture<Boolean> resourceStatus = resourceService.addResource(new AddResourceRequest(
                 new DirectoryResource("dir1", RESOURCE_TYPE),
                 new FileResource("file1", RESOURCE_TYPE),
-                new SimpleConnectionDetail()
+                new SimpleConnectionDetail(new SimpleDataService(palisadeService, new ExampleSimpleDataReader()))
         ));
 
-        return resourceService;
-    }
-
-    @Override
-    protected DataReader createDataReader() {
-        return new ExampleSimpleDataReader();
+        // Wait for the users, policies and resources to be loaded
+        CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();
     }
 }

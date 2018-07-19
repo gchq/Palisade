@@ -23,6 +23,7 @@ import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.SimpleRestClient;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
+import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
@@ -38,12 +39,14 @@ import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
+import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+import static uk.gov.gchq.palisade.Util.project;
 import static uk.gov.gchq.palisade.Util.select;
 
 public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
@@ -51,7 +54,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
 
     public ExampleSimpleRestClient() {
         super();
-        initialiseRestServices();
+        initialiseServices();
     }
 
     public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
@@ -63,11 +66,11 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
         return new ExampleObjSerialiser();
     }
 
-    private void initialiseRestServices() {
+    private void initialiseServices() {
         final UserService userService = createUserService();
 
         // The user authorisation owner or sys admin needs to add the users.
-        userService.addUser(
+        final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest(
                         new User()
                                 .userId("Alice")
@@ -75,7 +78,8 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                                 .roles("user", "admin")
                 )
         );
-        userService.addUser(
+
+        final CompletableFuture<Boolean> userBobStatus = userService.addUser(
                 new AddUserRequest(
                         new User()
                                 .userId("Bob")
@@ -138,23 +142,27 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                                         select("User.roles", "Record.property"),
                                         new If<>()
                                                 .predicate(0, new Not<>(new CollectionContains("admin")))
-                                                .then(1, new SetValue("redacted"))
+                                                .then(1, new SetValue("redacted")),
+                                        project("User.roles", "Record.property")
                                 )
                         )
         );
 
-
-        policyService.setPolicy(
+        // The policy owner or sys admin needs to add the policies
+        final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
                 koryphePolicies
         );
 
-        final ResourceService resourceService = super.createResourceService();
+        final ResourceService resourceService = createResourceService();
 
         // The sys admin needs to add the resources
-        resourceService.addResource(new AddResourceRequest(
+        final CompletableFuture<Boolean> resourceStatus = resourceService.addResource(new AddResourceRequest(
                 new DirectoryResource("dir1", RESOURCE_TYPE),
                 new FileResource("file1", RESOURCE_TYPE),
-                new SimpleConnectionDetail()
+                new ProxyRestConnectionDetail(ProxyRestDataService.class, "http://localhost:8084/data")
         ));
+
+        // Wait for the users, policies and resources to be loaded
+        CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();
     }
 }

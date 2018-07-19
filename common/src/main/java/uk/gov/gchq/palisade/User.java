@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -40,7 +41,7 @@ import java.util.Set;
  * The user auths are used specifically to decide what visibilities users can see.
  * </p>
  */
-public class User {
+public class User implements Cloneable {
     public static final String NAMESPACE = "User";
     public static final String USER_ID = "userId";
     public static final String ROLES = "roles";
@@ -59,6 +60,19 @@ public class User {
 
     public void setField(final String reference, final Object value) {
         Util.setField(this, FIELD_SETTERS, reference, value);
+    }
+
+    public User clone() {
+        User clone;
+        try {
+            clone = (User) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new User();
+        }
+        clone.userId = userId.clone();
+        clone.roles = Sets.newHashSet(roles);
+        clone.auths = Sets.newHashSet(auths);
+        return clone;
     }
 
     public Set<String> getAuths() {
@@ -101,6 +115,16 @@ public class User {
         return this;
     }
 
+    public User auths(final Set<String> auths) {
+        this.auths.addAll(auths);
+        return this;
+    }
+
+    public void setAuths(final Set<String> auths) {
+        this.auths = auths;
+    }
+
+
     /**
      * Adds the user roles.
      *
@@ -116,8 +140,9 @@ public class User {
         this.roles = roles;
     }
 
-    public void setAuths(final Set<String> auths) {
-        this.auths = auths;
+    public User roles(final Set<String> roles) {
+        this.roles.addAll(roles);
+        return this;
     }
 
     public UserId getUserId() {

@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.resource.impl;
+package uk.gov.gchq.palisade.service;
 
-import uk.gov.gchq.palisade.resource.AbstractResource;
-import uk.gov.gchq.palisade.resource.ParentResource;
-
-public class SystemResource extends AbstractResource implements ParentResource {
-    public SystemResource() {
+/**
+ * A null implementation of the {@link Service} that prevents hitting
+ * {@link NullPointerException}s if your deployment does not require a
+ * {@link Service}, but one is expected.
+ */
+public class NullService implements Service {
+    @Override
+    public boolean equals(final Object obj) {
+        return null != obj && getClass().equals(obj.getClass());
     }
 
-    public SystemResource(final String id) {
-        super(id);
-    }
-
-    public SystemResource(final String id, final String type) {
-        super(id, type);
-    }
-
-    public SystemResource(final String id, final String type, final String format) {
-        super(id, type, format);
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

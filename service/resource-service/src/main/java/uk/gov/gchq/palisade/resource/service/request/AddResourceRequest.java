@@ -20,7 +20,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.resource.ContainerResource;
+import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
@@ -29,7 +29,7 @@ import uk.gov.gchq.palisade.service.request.Request;
  * This class is used to request that details about a resource is added to the {@link uk.gov.gchq.palisade.resource.service.ResourceService}.
  */
 public class AddResourceRequest extends Request {
-    private ContainerResource container;
+    private ParentResource parent;
     private Resource resource;
     private ConnectionDetail connectionDetail;
 
@@ -38,26 +38,39 @@ public class AddResourceRequest extends Request {
     }
 
     /**
-     * Default constructor
+     * Constructs an {@link AddResourceRequest} with no connection details
      *
-     * @param container        The parent resource, so a {@link uk.gov.gchq.palisade.resource.impl.SystemResource}
+     * @param parent   The parent resource, so a {@link uk.gov.gchq.palisade.resource.impl.SystemResource}
+     *                 if it is a {@link uk.gov.gchq.palisade.resource.impl.StreamResource}/{@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} to be added,
+     *                 or a {@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} if it is a {@link uk.gov.gchq.palisade.resource.impl.FileResource}.
+     * @param resource The {@link Resource} to be added.
+     */
+    public AddResourceRequest(final ParentResource parent, final Resource resource) {
+        this.parent = parent;
+        this.resource = resource;
+    }
+
+    /**
+     * Constructs an {@link AddResourceRequest}
+     *
+     * @param parent           The parent resource, so a {@link uk.gov.gchq.palisade.resource.impl.SystemResource}
      *                         if it is a {@link uk.gov.gchq.palisade.resource.impl.StreamResource}/{@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} to be added,
      *                         or a {@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} if it is a {@link uk.gov.gchq.palisade.resource.impl.FileResource}.
      * @param resource         The {@link Resource} to be added.
-     * @param connectionDetail Details of how to get to the data, in the format expected by the {@code DataService}.
+     * @param connectionDetail Details of how to get to the data from the {@code DataService}.
      */
-    public AddResourceRequest(final ContainerResource container, final Resource resource, final ConnectionDetail connectionDetail) {
-        this.container = container;
+    public AddResourceRequest(final ParentResource parent, final Resource resource, final ConnectionDetail connectionDetail) {
+        this.parent = parent;
         this.resource = resource;
         this.connectionDetail = connectionDetail;
     }
 
-    public ContainerResource getContainer() {
-        return container;
+    public ParentResource getParent() {
+        return parent;
     }
 
-    public void setContainer(final ContainerResource container) {
-        this.container = container;
+    public void setParent(final ParentResource parent) {
+        this.parent = parent;
     }
 
     public Resource getResource() {
@@ -89,7 +102,7 @@ public class AddResourceRequest extends Request {
         final AddResourceRequest that = (AddResourceRequest) o;
 
         return new EqualsBuilder()
-                .append(container, that.container)
+                .append(parent, that.parent)
                 .append(resource, that.resource)
                 .append(connectionDetail, that.connectionDetail)
                 .isEquals();
@@ -98,7 +111,7 @@ public class AddResourceRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(container)
+                .append(parent)
                 .append(resource)
                 .append(connectionDetail)
                 .toHashCode();
@@ -107,7 +120,7 @@ public class AddResourceRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("container", container)
+                .append("parent", parent)
                 .append("resource", resource)
                 .append("connectionDetail", connectionDetail)
                 .toString();

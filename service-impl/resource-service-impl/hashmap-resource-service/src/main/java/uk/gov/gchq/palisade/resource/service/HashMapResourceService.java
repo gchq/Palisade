@@ -114,10 +114,10 @@ public class HashMapResourceService implements ResourceService {
         indexResource(request.getResource().getType(), request.getResource(), request.getConnectionDetail(), typeToResources);
         indexResource(request.getResource().getFormat(), request.getResource(), request.getConnectionDetail(), formatToResources);
 
-        indexResource(request.getContainer(), request.getResource(), request.getConnectionDetail(), resourceToResources);
-        indexResource(request.getContainer().getId(), request.getResource(), request.getConnectionDetail(), idToResources);
-        indexResource(request.getContainer().getType(), request.getResource(), request.getConnectionDetail(), typeToResources);
-        indexResource(request.getContainer().getFormat(), request.getResource(), request.getConnectionDetail(), formatToResources);
+        indexResource(request.getParent(), request.getResource(), request.getConnectionDetail(), resourceToResources);
+        indexResource(request.getParent().getId(), request.getResource(), request.getConnectionDetail(), idToResources);
+        indexResource(request.getParent().getType(), request.getResource(), request.getConnectionDetail(), typeToResources);
+        indexResource(request.getParent().getFormat(), request.getResource(), request.getConnectionDetail(), formatToResources);
         return CompletableFuture.completedFuture(true);
     }
 
