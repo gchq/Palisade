@@ -39,13 +39,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class HDFSResourceService implements ResourceService {
-    public static final String RESOURCE_ROOT_PATH = "resource.root.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(HDFSResourceService.class);
     public static final String ADD_RESOURCE_ERROR = "AddResource is not supported by HDFSResourceService resources should be added/created via regular HDFS behaviour.";
 
@@ -53,7 +51,6 @@ public class HDFSResourceService implements ResourceService {
     private final FileSystem fileSystem;
 
     public HDFSResourceService(JobConf jobConf) throws IOException {
-        Objects.requireNonNull(jobConf.get(RESOURCE_ROOT_PATH), RESOURCE_ROOT_PATH + " in JobConf has not been set.");
         this.jobConf = jobConf;
         this.fileSystem = FileSystem.get(jobConf);
     }
@@ -66,38 +63,14 @@ public class HDFSResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
-        final Predicate<HDFSResourceDetails> filterPredicate = resourceDetails -> request.getResourceId().equals(resourceDetails.getId());
-        return getMapCompletableFuture(filterPredicate);
-    }
-
-    @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
-        final Predicate<HDFSResourceDetails> filterPredicate = resourceDetails -> request.getType().equals(resourceDetails.getType());
-        return getMapCompletableFuture(filterPredicate);
-    }
-
-    @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(final GetResourcesByFormatRequest request) {
-        final Predicate<HDFSResourceDetails> filterPredicate = resourceDetails -> request.getFormat().equals(resourceDetails.getFormat());
-        return getMapCompletableFuture(filterPredicate);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
-        throw new UnsupportedOperationException(ADD_RESOURCE_ERROR);
-    }
-
-    private CompletableFuture<Map<Resource, ConnectionDetail>> getMapCompletableFuture(final Predicate<HDFSResourceDetails> filterPredicate) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                final RemoteIterator<LocatedFileStatus> remoteIterator = this.fileSystem.listFiles(new Path(this.jobConf.get(RESOURCE_ROOT_PATH)), true);
-                return getFileNames(remoteIterator)
+                final RemoteIterator<LocatedFileStatus> remoteIterator = this.fileSystem.listFiles(new Path(request.getResourceId()), true);
+                return getPaths(remoteIterator)
                         .stream()
-                        .map(HDFSResourceDetails::getResourceDetailsFromFileName)
-                        .filter(filterPredicate)
-                        .map(resourceDetails -> (Resource) new FileResource(resourceDetails.getId(), resourceDetails.getType(), resourceDetails.getFormat()))
+                        .map(HDFSResourceDetails::getResourceDetailsFromPath)
+                        .map(resourceDetails -> (Resource) new FileResource(resourceDetails.getConnectionDetail(), resourceDetails.getType(), resourceDetails.getFormat()))
                         .collect(Collectors.toMap(fileResource -> fileResource, ignore -> new NullConnectionDetail()));
-
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
@@ -106,14 +79,29 @@ public class HDFSResourceService implements ResourceService {
         });
     }
 
-    protected static Collection<String> getFileNames(final RemoteIterator<LocatedFileStatus> remoteIterator) throws IOException {
-        final ArrayList<String> names = Lists.newArrayList();
+    @Override
+    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
+        throw new UnsupportedOperationException("should this get all types be scoped/limited? During test the fs may scan the whole computer.");
+    }
+
+    @Override
+    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(final GetResourcesByFormatRequest request) {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    @Override
+    public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
+        throw new UnsupportedOperationException(ADD_RESOURCE_ERROR);
+    }
+
+    protected static Collection<String> getPaths(final RemoteIterator<LocatedFileStatus> remoteIterator) throws IOException {
+        final ArrayList<String> paths = Lists.newArrayList();
         while (remoteIterator.hasNext()) {
             final LocatedFileStatus next = remoteIterator.next();
-            final String name = next.getPath().getName();
-            names.add(name);
+            final String pathWithoutFSName = next.getPath().toString().split(Pattern.quote(":"))[1];
+            paths.add(pathWithoutFSName);
         }
-        return names;
+        return paths;
     }
 
 
