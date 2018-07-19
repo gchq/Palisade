@@ -30,32 +30,72 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+
+/**
+ * Common utility methods.
+ */
 public final class Util {
     private Util() {
     }
 
-    public static String[] arr(final String... strings) {
-        return strings;
+    /**
+     * Converts varargs strings into an array.
+     *
+     * @param input the input varargs to convert to an array
+     * @return an array containing the input values
+     */
+    public static String[] arr(final String... input) {
+        return input;
     }
 
-    public static String[] select(final String... strings) {
-        return strings;
+    /**
+     * Converts varargs strings into an array. Named as 'select' for readability.
+     *
+     * @param input the input varargs to convert to an array
+     * @return an array containing the input values
+     */
+    public static String[] select(final String... input) {
+        return input;
     }
 
-    public static String[] project(final String... strings) {
-        return strings;
+    /**
+     * Converts varargs strings into an array. Named as 'project' for readability.
+     *
+     * @param input the input varargs to convert to an array
+     * @return an array containing the input values
+     */
+    public static String[] project(final String... input) {
+        return input;
     }
 
-    public static Integer[] arr(final Integer... strings) {
-        return strings;
+    /**
+     * Converts varargs integers into an array.
+     *
+     * @param input the input varargs to convert to an array
+     * @return an array containing the input values
+     */
+    public static Integer[] arr(final Integer... input) {
+        return input;
     }
 
-    public static Integer[] select(final Integer... strings) {
-        return strings;
+    /**
+     * Converts varargs integers into an array. Named as 'select' for readability.
+     *
+     * @param input the input varargs to convert to an array
+     * @return an array containing the input values
+     */
+    public static Integer[] select(final Integer... input) {
+        return input;
     }
 
-    public static Integer[] project(final Integer... strings) {
-        return strings;
+    /**
+     * Converts varargs integers into an array. Named as 'project' for readability.
+     *
+     * @param input the input varargs to convert to an array
+     * @return an array containing the input values
+     */
+    public static Integer[] project(final Integer... input) {
+        return input;
     }
 
     public static <K, V> Map<K, V> newHashMap(final Collection<Entry<K, V>> entries) {
