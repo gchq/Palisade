@@ -100,7 +100,7 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      * @see PalisadeInputFormat#setMaxMapTasksHint(JobContext, int)
      */
     @Override
-    public List<InputSplit> getSplits(final JobContext context) throws IOException, InterruptedException {
+    public List<InputSplit> getSplits(final JobContext context) throws IOException {
         Objects.requireNonNull(context, "context");
         //check we have a service set
         if (palisadeService == null) {
@@ -364,6 +364,7 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      * @throws IOException          if de-serialisation could not happen
      * @throws NullPointerException if parameter is null
      */
+    @SuppressWarnings("unchecked")
     public static <V> Serialiser<Object, V> getSerialiser(final Configuration conf) throws IOException {
         Objects.requireNonNull(conf, "conf");
         String serialConfig = conf.get(PalisadeInputFormat.SERLIALISER_CONFIG_KEY);
