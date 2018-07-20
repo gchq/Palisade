@@ -204,6 +204,7 @@ public class PalisadeInputFormatTest {
         List<PalisadeInputSplit> result = PalisadeInputFormat.toInputSplits(request, index);
         //Then
         assertEquals(1, result.size());
+        assertEquals(5, result.get(0).getRequestResponse().getResources().size())
     }
 
     @Test
