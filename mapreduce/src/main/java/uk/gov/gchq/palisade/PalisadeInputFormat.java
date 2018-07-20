@@ -15,18 +15,19 @@
  */
 package uk.gov.gchq.palisade;
 
+import org.apache.avro.data.Json;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.StringUtils;
-
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.PrimitiveIterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -134,45 +136,65 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
             //send request to the Palisade service
             serv.registerDataRequest(req)
                     //when the response comes back create input splits based on max mapper hint
-                    .thenApplyAsync(response ->
-                            response.getResources().entrySet().stream()
-                                    .collect(
-                                            //group by the indexIt, which will round robin the resources to
-                                            //different groupings
-                                            Collectors.groupingBy(ignored -> indexIt.next(),
-                                                    //create downstream collector to convert the
-                                                    //List<Map.Entry<Resource,ConnectionDetail>> into a map
-                                                    Collector.of(
-                                                            //Supplier
-                                                            HashMap<Resource, ConnectionDetail>::new,
-                                                            //Accumulator
-                                                            (map, entry) -> {
-                                                                map.put(entry.getKey(), entry.getValue());
-                                                            },
-                                                            //Combiner
-                                                            (leftMap, rightMap) -> {
-                                                                leftMap.putAll(rightMap);
-                                                                return leftMap;
-                                                            }
-                                                    )
-                                            )
-                                    )
-                                            //now take the values of that map (we don't care about the keys)
-                                    .values()
-                                    .stream()
-                                            //make each map into an input split
-                                    .map(m -> new PalisadeInputSplit(response.getRequestId(), m))
-                                            //reduce to a list
-                                    .collect(Collectors.toList()))
+                    .thenApplyAsync(response -> PalisadeInputFormat.toInputSplits(response, indexIt))
                             //then add them to the master list (which is thread safe)
                     .thenAccept(splits::addAll)
                             //signal this has finished
                     .whenComplete((r, e) -> counter.arriveAndDeregister());
         }
-
         //wait for everything to finish
         counter.awaitAdvance(counter.arriveAndDeregister());
         return new ArrayList<>(splits);
+    }
+
+    /**
+     * Takes a response from the Palisade service and creates a list of input splits. A response may contain many
+     * resources, which we wish to split across multiple input splits. Using the provided iterator, this will
+     * round-robin resources to input splits by grouping them and then making a list of those groups. New {@link
+     * DataRequestResponse}s are created inside the input splits to contain the new distributions.
+     *
+     * @param response the initial response
+     * @param indexIt  the iterator that provides the keys to group the individual resources
+     * @return a list of input splits
+     */
+    public static List<PalisadeInputSplit> toInputSplits(final DataRequestResponse response,
+                                                         final PrimitiveIterator.OfInt indexIt) {
+        Objects.requireNonNull(response);
+        Objects.requireNonNull(indexIt);
+        return response.getResources().entrySet().stream()
+                //group by the indexIt, which will round robin the resources to
+                //different groupings
+                .collect(Collectors.groupingBy(ignored -> indexIt.next(), listToMapCollector()))
+                        //now take the values of that map (we don't care about the keys)
+                .values()
+                .stream()
+                        //make each map into an input split
+                .map(m -> new PalisadeInputSplit(response.getRequestId(), m))
+                        //reduce to a list
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns a {@link Collector} that reduces a stream of {@link java.util.Map.Entry} into the corresponding {@link
+     * Map} with those mappings.
+     *
+     * @param <K> the key type of the entries being converted to a map
+     * @param <R> the value type of the entries
+     * @return a collector that reduces a stream to a map
+     */
+    public static <K, R> Collector<Map.Entry<K, R>, Map<K, R>, Map<K, R>> listToMapCollector() {
+        return Collector.of(
+                //Supplier
+                HashMap<K, R>::new,
+                //Accumulator
+                (map, entry) -> {
+                    map.put(entry.getKey(), entry.getValue());
+                },
+                //Combiner
+                (leftMap, rightMap) -> {
+                    leftMap.putAll(rightMap);
+                    return leftMap;
+                });
     }
 
     /**
@@ -220,13 +242,23 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     public static void addDataRequest(final JobContext context, final RegisterDataRequest request) {
         Objects.requireNonNull(context, "context");
         Objects.requireNonNull(request, "request");
-        //fetch the existing ones
-        String reqs = context.getConfiguration().get(REGISTER_REQUESTS_KEY, "");
-        //serialise the request
-        String serialised = new String(JSONSerialiser.serialise(request), UTF8);
-        //add this to the list of requests
-        reqs = reqs + ',' + serialised;
-        context.getConfiguration().set(REGISTER_REQUESTS_KEY, reqs);
+        List<RegisterDataRequest> reqs = getDataRequests(context);
+        reqs.add(request);
+        context.getConfiguration().set(REGISTER_REQUESTS_KEY, new String(JSONSerialiser.serialise(reqs.toArray(new RegisterDataRequest[0])), UTF8));
+    }
+
+    /**
+     * Add all the given requests to a job.
+     *
+     * @param context  the job to add to
+     * @param requests array of requests
+     * @throws NullPointerException for null parameters
+     */
+    public static void addDataRequests(final JobContext context, final RegisterDataRequest... requests) {
+        Objects.requireNonNull(requests, "requests");
+        for (final RegisterDataRequest req : requests) {
+            addDataRequest(context, req);
+        }
     }
 
     /**
@@ -239,16 +271,9 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     public static List<RegisterDataRequest> getDataRequests(final JobContext context) {
         Objects.requireNonNull(context, "context");
         //retrieve the requests added so far
-        String reqs = context.getConfiguration().get(REGISTER_REQUESTS_KEY, "");
-        //split these up and decode
-        String[] splitReqs = StringUtils.split(reqs);
-        return Arrays.stream(splitReqs)
-                //lose the empties
-                .filter(x -> !x.isEmpty())
-                        //convert back to Java classes
-                .map(x -> JSONSerialiser.deserialise(x, RegisterDataRequest.class))
-                        //into a list
-                .collect(Collectors.toList());
+        String reqs = context.getConfiguration().get(REGISTER_REQUESTS_KEY, "[]");
+        RegisterDataRequest[] reqArray = JSONSerialiser.deserialise(reqs, RegisterDataRequest[].class);
+        return Arrays.stream(reqArray).collect(Collectors.toList());
     }
 
     /**
@@ -282,10 +307,81 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
         return context.getConfiguration().getInt(MAXIMUM_MAP_HINT_KEY, DEFAULT_MAX_MAP_HINT);
     }
 
-    public static <I, O> void setSerialiser(final JobContext context, final Serialiser<I, O> serialiser) {
+    /**
+     * Sets the {@link Serialiser} for a given job. This takes the given serialiser and serialisers <i>that</i> into the
+     * configuration for the specified job. This allows the Hadoop {@link RecordReader} to create the serialiser inside
+     * the MapReduce job for the de-serialisation step before sending the data to the map task. The serialiser will be
+     * serialised into JSON and the resulting string stored inside the Hadoop configuration object.
+     *
+     * @param context    the job to configure
+     * @param serialiser the serialiser that can decode the value type this job is processing
+     */
+    public static <V> void setSerialiser(final JobContext context, final Serialiser<Object, V> serialiser) {
         Objects.requireNonNull(context, "context");
         Objects.requireNonNull(serialiser, "serialiser");
-        context.getConfiguration().set(SERIALISER_CLASSNAME_KEY, serialiser.getClass().getName());
-        context.getConfiguration().set(SERLIALISER_CONFIG_KEY, new String(JSONSerialiser.serialise(serialiser), UTF8));
+        setSerialiser(context.getConfiguration(), serialiser);
+    }
+
+    /**
+     * Sets the {@link Serialiser} for a given configuration. This takes the given serialiser and serialisers
+     * <i>that</i> into the configuration. This allows the Hadoop {@link RecordReader} to create the serialiser inside
+     * the MapReduce job for the de-serialisation step before sending the data to the map task. The serialiser will be
+     * serialised into JSON and the resulting string stored inside the Hadoop configuration object.
+     *
+     * @param conf       the job to configure
+     * @param serialiser the serialiser that can decode the value type this job is processing
+     * @throws NullPointerException for null parameters
+     */
+    public static <V> void setSerialiser(final Configuration conf, final Serialiser<Object, V> serialiser) {
+        Objects.requireNonNull(conf, "conf");
+        Objects.requireNonNull(serialiser, "serialiser");
+        conf.set(SERIALISER_CLASSNAME_KEY, serialiser.getClass().getName());
+        conf.set(SERLIALISER_CONFIG_KEY, new String(JSONSerialiser.serialise(serialiser), UTF8));
+    }
+
+    /**
+     * Creates the de-serialiser from the information stored in a given job context. This uses a JSON serialiser to
+     * create the serialiser from data stored.
+     *
+     * @param context the job
+     * @param <V>     the value type of the serialiser
+     * @return the serialiser from this configuration
+     * @throws IOException          if de-serialisation could not happen
+     * @throws NullPointerException if anything is null
+     */
+    public static <V> Serialiser<Object, V> getSerialiser(final JobContext context) throws IOException {
+        Objects.requireNonNull(context, "context");
+        return getSerialiser(context.getConfiguration());
+    }
+
+    /**
+     * Creates the de-serialiser from the information stored in a given configuration. This uses a JSON serialiser to
+     * create the serialiser from data stored.
+     *
+     * @param conf the configuration object for a job
+     * @param <V>  the value type of the serialiser
+     * @return the serialiser from this configuration
+     * @throws IOException          if de-serialisation could not happen
+     * @throws NullPointerException if parameter is null
+     */
+    public static <V> Serialiser<Object, V> getSerialiser(final Configuration conf) throws IOException {
+        Objects.requireNonNull(conf, "conf");
+        String serialConfig = conf.get(PalisadeInputFormat.SERLIALISER_CONFIG_KEY);
+
+        String className = conf.get(PalisadeInputFormat.SERIALISER_CLASSNAME_KEY);
+        if (className == null) {
+            throw new IOException("No serialisation classname set. Have you called PalisadeInputFormat.setSerialiser() ?");
+        }
+
+        if (serialConfig == null) {
+            throw new IOException("No serialisation configuration set. Have you called PalisadeInputFormat.setSerialiser() ?");
+        }
+
+        //try to deserialise
+        try {
+            return (Serialiser<Object, V>) JSONSerialiser.deserialise(serialConfig, Class.forName(className).asSubclass(Serialiser.class));
+        } catch (Exception e) {
+            throw new IOException("Couldn't create serialiser", e);
+        }
     }
 }

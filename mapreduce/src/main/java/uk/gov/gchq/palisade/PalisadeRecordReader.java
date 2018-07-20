@@ -118,41 +118,10 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
         }
         resourceDetails = reqDetails;
         resIt = reqDetails.getResources().entrySet().iterator();
-        serialiser = createSerialiser(taskAttemptContext);
+        serialiser = PalisadeInputFormat.getSerialiser(taskAttemptContext);
         currentKey = null;
         currentValue = null;
         processed = 0;
-    }
-
-    /**
-     * Creates the serialiser for this record reader from the details stored in the job configuration.
-     *
-     * @param taskAttemptContext the task details
-     * @return a serialiser
-     * @throws IOException          if the necessary items aren't in the configuration or the Serialiser couldn't be
-     *                              created
-     * @throws NullPointerException for null parameters
-     */
-    @SuppressWarnings("unchecked")
-    private Serialiser<Object, V> createSerialiser(final TaskAttemptContext taskAttemptContext) throws IOException {
-        String serialConfig = taskAttemptContext.getConfiguration().get(PalisadeInputFormat.SERLIALISER_CONFIG_KEY);
-        Objects.requireNonNull(taskAttemptContext);
-
-        String className = taskAttemptContext.getConfiguration().get(PalisadeInputFormat.SERIALISER_CLASSNAME_KEY);
-        if (className == null) {
-            throw new IOException("No serialisation classname set. Have you called PalisadeInputFormat.setSerialiser() ?");
-        }
-
-        if (serialConfig == null) {
-            throw new IOException("No serialisation configuration set. Have you called PalisadeInputFormat.setSerialiser() ?");
-        }
-
-        //try to deserialise
-        try {
-            return (Serialiser<Object, V>) JSONSerialiser.deserialise(serialConfig, Class.forName(className).asSubclass(Serialiser.class));
-        } catch (Exception e) {
-            throw new IOException("Couldn't create serialiser", e);
-        }
     }
 
     /**
