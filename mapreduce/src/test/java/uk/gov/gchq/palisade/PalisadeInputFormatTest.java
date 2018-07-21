@@ -1,37 +1,39 @@
 package uk.gov.gchq.palisade;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.StubSerialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.StubResource;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.PrimitiveIterator;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
-
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class PalisadeInputFormatTest {
 
@@ -184,16 +186,25 @@ public class PalisadeInputFormatTest {
         assertEquals(Collections.emptyList(), result);
     }
 
-    private static DataRequestResponse request;
+    private static RegisterDataRequest request1;
+    private static DataRequestResponse req1Response;
+    private static RegisterDataRequest request2;
+    private static DataRequestResponse req2Response;
 
     @BeforeClass
     public static void setup() {
-        request = new DataRequestResponse();
-        request.getResources().put(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"));
-        request.getResources().put(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"));
-        request.getResources().put(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"));
-        request.getResources().put(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"));
-        request.getResources().put(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
+        request1 = new RegisterDataRequest("res1", new UserId("user1"), new Justification("just1"));
+        req1Response = new DataRequestResponse();
+        req1Response.getResources().put(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"));
+        req1Response.getResources().put(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"));
+        req1Response.getResources().put(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"));
+        req1Response.getResources().put(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"));
+        req1Response.getResources().put(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
+
+        request2 = new RegisterDataRequest("res2", new UserId("user2"), new Justification("just2"));
+        req2Response = new DataRequestResponse();
+        req2Response.getResources().put(new StubResource("type_a", "id6", "format6"), new StubConnectionDetail("con6"));
+        req2Response.getResources().put(new StubResource("type_b", "id7", "format7"), new StubConnectionDetail("con7"));
     }
 
     @Test
@@ -201,10 +212,10 @@ public class PalisadeInputFormatTest {
         //Given - ask for a single split
         PrimitiveIterator.OfInt index = IntStream.generate(() -> 1).iterator();
         //When
-        List<PalisadeInputSplit> result = PalisadeInputFormat.toInputSplits(request, index);
+        List<PalisadeInputSplit> result = PalisadeInputFormat.toInputSplits(req1Response, index);
         //Then
         assertEquals(1, result.size());
-        assertEquals(5, result.get(0).getRequestResponse().getResources().size())
+        assertEquals(5, result.get(0).getRequestResponse().getResources().size());
     }
 
     @Test
@@ -212,7 +223,7 @@ public class PalisadeInputFormatTest {
         //Given - ask for 3 splits
         PrimitiveIterator.OfInt index = IntStream.of(0, 1, 2, 0, 1, 2, 0, 1, 2).iterator();
         //When
-        List<PalisadeInputSplit> result = PalisadeInputFormat.toInputSplits(request, index);
+        List<PalisadeInputSplit> result = PalisadeInputFormat.toInputSplits(req1Response, index);
         //Then
         assertEquals(3, result.size());
         //should be two in the first two splits, one in the last
@@ -243,7 +254,122 @@ public class PalisadeInputFormatTest {
         assertEquals(5, merged.size());
     }
 
-/* Tests to write
-test create split from a known list to one mapper, several
- */
+    /**
+     * Simulate a job set up, mock up a job and a palisade service and ask the input format to create splits for it
+     *
+     * @param maxMapHint maximum mappers to set
+     * @param reqs       the map of requests and responses for a palisade service
+     * @return input splits
+     * @throws IOException shouldn't happen
+     */
+    public List<InputSplit> callGetSplits(int maxMapHint, Map<RegisterDataRequest, DataRequestResponse> reqs) throws IOException {
+        Configuration c = new Configuration();
+        JobContext mockJob = Mockito.mock(JobContext.class);
+        when(mockJob.getConfiguration()).thenReturn(c);
+        //make a mock palisade service that the input format can talk to
+        PalisadeService palisadeService = Mockito.mock(PalisadeService.class);
+        //tell it what to respond with
+        for (Map.Entry<RegisterDataRequest, DataRequestResponse> req : reqs.entrySet()) {
+            when(palisadeService.registerDataRequest(req.getKey())).thenReturn(CompletableFuture.completedFuture(req.getValue()));
+        }
+        //configure the input format as the client would
+        PalisadeInputFormat.setMaxMapTasksHint(mockJob, maxMapHint);
+        PalisadeInputFormat.setPalisadeService(palisadeService);
+        for (RegisterDataRequest req : reqs.keySet()) {
+            PalisadeInputFormat.addDataRequest(mockJob, req);
+        }
+        //simulate a job run
+        PalisadeInputFormat<String> pif = new PalisadeInputFormat<>();
+        return pif.getSplits(mockJob);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <R extends InputSplit> List<R> convert(List<InputSplit> list) {
+        return (List<R>) list;
+    }
+
+    @Test
+    public void shouldCreateOneSplitFromOneRequest() throws IOException {
+        //Given
+        Map<RegisterDataRequest, DataRequestResponse> resources = new HashMap<>();
+        resources.put(request1, req1Response);
+        //When
+        List<PalisadeInputSplit> splits = convert(callGetSplits(1, resources));
+        //Then
+        checkForExpectedResources(splits, 1, 5);
+    }
+
+    @Test
+    public void shouldCreateTwoSplitFromOneRequest() throws IOException {
+        //Given
+        Map<RegisterDataRequest, DataRequestResponse> resources = new HashMap<>();
+        resources.put(request1, req1Response);
+        //When
+        List<PalisadeInputSplit> splits = convert(callGetSplits(2, resources));
+        //Then
+        checkForExpectedResources(splits, 2, 5);
+    }
+
+    @Test
+    public void shouldCreateManySplitFromOneRequest() throws IOException {
+        //Given
+        Map<RegisterDataRequest, DataRequestResponse> resources = new HashMap<>();
+        resources.put(request1, req1Response);
+        //When
+        List<PalisadeInputSplit> splits = convert(callGetSplits(99999, resources));
+        //Then
+        checkForExpectedResources(splits, 5, 5);
+    }
+
+    @Test
+    public void shouldCreateTwoSplitsFromTwoRequests() throws IOException {
+        //Given
+        Map<RegisterDataRequest, DataRequestResponse> resources = new HashMap<>();
+        resources.put(request1, req1Response);
+        resources.put(request2, req2Response);
+        //When
+        List<PalisadeInputSplit> splits = convert(callGetSplits(1, resources));
+        //Then
+        checkForExpectedResources(splits, 2, 7);
+    }
+
+    @Test
+    public void shouldCreateFourSplitsFromTwoRequests() throws IOException {
+        //Given
+        Map<RegisterDataRequest, DataRequestResponse> resources = new HashMap<>();
+        resources.put(request1, req1Response);
+        resources.put(request2, req2Response);
+        //When
+        List<PalisadeInputSplit> splits = convert(callGetSplits(2, resources));
+        //Then
+        checkForExpectedResources(splits, 4, 7);
+    }
+
+    @Test
+    public void shouldCreateManySplitsFromTwoRequests() throws IOException {
+        //Given
+        Map<RegisterDataRequest, DataRequestResponse> resources = new HashMap<>();
+        resources.put(request1, req1Response);
+        resources.put(request2, req2Response);
+        //When
+        List<PalisadeInputSplit> splits = convert(callGetSplits(7, resources));
+        //Then
+        checkForExpectedResources(splits, 7, 7);
+    }
+
+    private void checkForExpectedResources(List<PalisadeInputSplit> splits, int expectedSplits, int expectedNumberResources) {
+        assertEquals(expectedSplits, splits.size());
+        //combine all the resources from both splits and check we have all 5 resources covered
+        //first check expectedTotal total
+        assertEquals(expectedNumberResources, splits
+                .stream()
+                .flatMap(split -> split.getRequestResponse().getResources().entrySet().stream())
+                .count());
+        //check for no duplicates
+        Set<Resource> allResponses = splits
+                .stream()
+                .flatMap(split -> split.getRequestResponse().getResources().keySet().stream())
+                .collect(Collectors.toSet());
+        assertEquals(expectedNumberResources, allResponses.size());
+    }
 }

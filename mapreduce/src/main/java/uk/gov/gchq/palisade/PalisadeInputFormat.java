@@ -126,13 +126,12 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
         int maxMapHint = getMaxMapTasksHint(context);
         final int maxCounter = (maxMapHint == 0) ? Integer.MAX_VALUE : maxMapHint;
         //create a stream for round robining resources
-        IntStream index = IntStream.iterate(0, x -> (x + 1) % maxCounter);
 
         for (RegisterDataRequest req : reqs) {
             //tell the phaser we have another party active
             counter.register();
             //this iterator determines which mapper gets which resource
-            final PrimitiveIterator.OfInt indexIt = index.iterator();
+            final PrimitiveIterator.OfInt indexIt = IntStream.iterate(0, x -> (x + 1) % maxCounter).iterator();
             //send request to the Palisade service
             serv.registerDataRequest(req)
                     //when the response comes back create input splits based on max mapper hint
