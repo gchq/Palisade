@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.PrimitiveIterator;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -34,7 +35,6 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class PalisadeInputFormatTest {
@@ -272,7 +272,14 @@ public class PalisadeInputFormatTest {
         PalisadeService palisadeService = Mockito.mock(PalisadeService.class);
         //tell it what to respond with
         for (Map.Entry<RegisterDataRequest, DataRequestResponse> req : reqs.entrySet()) {
-            when(palisadeService.registerDataRequest(req.getKey())).thenReturn(CompletableFuture.completedFuture(req.getValue()));
+            when(palisadeService.registerDataRequest(req.getKey())).thenReturn(CompletableFuture.supplyAsync(() -> {
+                //wait random time for the palisade service to process the resource
+                try {
+                    Thread.sleep(ThreadLocalRandom.current().nextInt(0, 500));
+                } catch (InterruptedException e) {
+                }
+                return req.getValue();
+            }));
         }
         //configure the input format as the client would
         PalisadeInputFormat.setMaxMapTasksHint(mockJob, maxMapHint);

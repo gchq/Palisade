@@ -104,10 +104,10 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
+    public void initialize(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException {
         Objects.requireNonNull(inputSplit, "inputSplit");
         Objects.requireNonNull(taskAttemptContext, "taskAttemptContext");
-        if (inputSplit instanceof PalisadeInputSplit) {
+        if (!(inputSplit instanceof PalisadeInputSplit)) {
             throw new ClassCastException("input split MUST be instance of " + PalisadeInputSplit.class.getName());
         }
         PalisadeInputSplit pis = (PalisadeInputSplit) inputSplit;
@@ -128,7 +128,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      * {@inheritDoc}
      */
     @Override
-    public boolean nextKeyValue() throws IOException, InterruptedException {
+    public boolean nextKeyValue() throws IOException {
         //if we don't have a current item iterator or it's empty...
         while (itemIt == null || !itemIt.hasNext()) {
             //...try to move to the next one, if we can't then we're done
@@ -191,7 +191,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      * {@inheritDoc}
      */
     @Override
-    public Resource getCurrentKey() throws IOException, InterruptedException {
+    public Resource getCurrentKey() throws IOException {
         return currentKey;
     }
 
@@ -199,7 +199,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      * {@inheritDoc}
      */
     @Override
-    public V getCurrentValue() throws IOException, InterruptedException {
+    public V getCurrentValue() throws IOException {
         return currentValue;
     }
 
@@ -207,7 +207,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      * {@inheritDoc} Counts completed resource as units of progress.
      */
     @Override
-    public float getProgress() throws IOException, InterruptedException {
+    public float getProgress() throws IOException {
         return (resourceDetails != null && resourceDetails.getResources().size() > 0)
                 ? (float) processed / resourceDetails.getResources().size()
                 : 0;
@@ -225,6 +225,5 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
         itemIt = null;
         serialiser = null;
         processed = 0;
-
     }
 }
