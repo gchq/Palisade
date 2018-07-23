@@ -96,7 +96,8 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      * across multiple data requests. This may be added in the future.
      *
      * @throws IllegalStateException if no data requests have been added with {@link PalisadeInputFormat#addDataRequest(JobContext,
-     *                               RegisterDataRequest)} or if no Palisade service has been set
+     *                               RegisterDataRequest)} or if no Palisade service has been set or if the maximum map
+     *                               hint is negative
      * @see PalisadeInputFormat#setMaxMapTasksHint(JobContext, int)
      */
     @Override
@@ -112,6 +113,11 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
         if (reqs.isEmpty()) {
             throw new IllegalStateException("No data requests have been registered for this job");
         }
+        //how many mappers hinted at?
+        int maxMapHint = getMaxMapTasksHint(context);
+        if (maxMapHint < 0) {
+            throw new IllegalStateException("Max map hint illegally set to negative number");
+        }
 
         //store local and call through method, don't access direct!
         PalisadeService serv = getPalisadeService();
@@ -122,8 +128,6 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
         * that all the resources have been added to the final list. Therefore, we use a Phaser to keep count of the number
         * of registration requests that have been completed.*/
         final Phaser counter = new Phaser(1); //register self
-        //how many mappers hinted at?
-        int maxMapHint = getMaxMapTasksHint(context);
         final int maxCounter = (maxMapHint == 0) ? Integer.MAX_VALUE : maxMapHint;
         //create a stream for round robining resources
 

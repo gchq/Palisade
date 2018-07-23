@@ -5,7 +5,9 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import org.mockito.Mockito;
+
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.StubSerialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
@@ -357,6 +359,18 @@ public class PalisadeInputFormatTest {
         checkForExpectedResources(splits, 7, 7);
     }
 
+    @Test
+    public void shouldCreateManySplitsFromTwoRequestsNoMapHint() throws IOException {
+        //Given
+        Map<RegisterDataRequest, DataRequestResponse> resources = new HashMap<>();
+        resources.put(request1, req1Response);
+        resources.put(request2, req2Response);
+        //When
+        List<PalisadeInputSplit> splits = convert(callGetSplits(0, resources));
+        //Then
+        checkForExpectedResources(splits, 7, 7);
+    }
+
     private void checkForExpectedResources(List<PalisadeInputSplit> splits, int expectedSplits, int expectedNumberResources) {
         assertEquals(expectedSplits, splits.size());
         //combine all the resources from both splits and check we have all 5 resources covered
@@ -371,5 +385,43 @@ public class PalisadeInputFormatTest {
                 .flatMap(split -> split.getRequestResponse().getResources().keySet().stream())
                 .collect(Collectors.toSet());
         assertEquals(expectedNumberResources, allResponses.size());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowOnNegativeMapHint() throws IOException {
+        //Given
+        Configuration c = new Configuration();
+        JobContext mockJob = Mockito.mock(JobContext.class);
+        when(mockJob.getConfiguration()).thenReturn(c);
+        //make a mock palisade service that the input format can talk to
+        PalisadeService palisadeService = Mockito.mock(PalisadeService.class);
+        //When
+        PalisadeInputFormat.addDataRequest(mockJob, request1);
+        c.setInt(PalisadeInputFormat.MAXIMUM_MAP_HINT_KEY, -1);
+        //directly put illegal value into config
+        //Then
+        new PalisadeInputFormat<String>().getSplits(mockJob);
+        fail("Should throw exception");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowOnNoPalisadeService() throws IOException {
+        //Given
+        JobContext mockJob = Mockito.mock(JobContext.class);
+        //When - nothing
+        //Then
+        new PalisadeInputFormat<String>().getSplits(mockJob);
+        fail("Should throw exception");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowWhenMaxMapHintNegative() {
+        //Given
+        Configuration c = new Configuration();
+        JobContext mockJob = Mockito.mock(JobContext.class);
+        when(mockJob.getConfiguration()).thenReturn(c);
+        //When
+        PalisadeInputFormat.setMaxMapTasksHint(mockJob, -1);
+        fail("Should throw exception");
     }
 }
