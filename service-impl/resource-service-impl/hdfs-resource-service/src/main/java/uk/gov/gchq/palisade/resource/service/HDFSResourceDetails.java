@@ -1,7 +1,6 @@
 package uk.gov.gchq.palisade.resource.service;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.resource.Resource;
 
 import java.util.regex.Pattern;
 
@@ -11,11 +10,7 @@ public class HDFSResourceDetails {
     public static final String FILE_NAME_FORMAT = "%s" + TYPE_DEL + "%s" + FORMAT_DEL + "%s";
     private String connectionDetail, type, format;
 
-    public HDFSResourceDetails(Resource resource) {
-//        this(resource.getId(), resource.getType(), resource.getFormat());
-    }
-
-    public HDFSResourceDetails(final String connectionDetail, final String type, final String format, final String name) {
+    public HDFSResourceDetails(final String connectionDetail, final String type, final String format) {
         this.connectionDetail = connectionDetail;
         this.type = type;
         this.format = format;
@@ -33,9 +28,9 @@ public class HDFSResourceDetails {
         return format;
     }
 
-    protected static HDFSResourceDetails getResourceDetailsFromPath(final String path) {
+    protected static HDFSResourceDetails getResourceDetailsFromConnectionDetails(final String connectionDetail) {
         //The mirror of the FILE_NAME_FORMAT
-        final String[] split = path.split(Pattern.quote("/"));
+        final String[] split = connectionDetail.split(Pattern.quote("/"));
         final String fileString = split[split.length - 1];
         final String[] typeSplit = fileString.split(TYPE_DEL);
         if (typeSplit.length == 2) {
@@ -45,15 +40,10 @@ public class HDFSResourceDetails {
                 final String name = idSplit[0];
                 final String format = idSplit[1];
 
-                return new HDFSResourceDetails(path, type, format, name);
+                return new HDFSResourceDetails(connectionDetail, type, format);
             }
         }
         throw new IllegalArgumentException("Incorrect format expected:" + FILE_NAME_FORMAT + " found: " + fileString);
-    }
-
-    protected static String getFileNameFromResourceDetails(final String name, final String type, final String format) {
-        //Type, Id, Format
-        return String.format(FILE_NAME_FORMAT, type, name, format);
     }
 
     @Override

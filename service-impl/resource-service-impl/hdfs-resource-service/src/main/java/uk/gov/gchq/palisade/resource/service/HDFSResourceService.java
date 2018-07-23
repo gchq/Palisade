@@ -68,7 +68,7 @@ public class HDFSResourceService implements ResourceService {
                 final RemoteIterator<LocatedFileStatus> remoteIterator = this.fileSystem.listFiles(new Path(request.getResourceId()), true);
                 return getPaths(remoteIterator)
                         .stream()
-                        .map(HDFSResourceDetails::getResourceDetailsFromPath)
+                        .map(HDFSResourceDetails::getResourceDetailsFromConnectionDetails)
                         .map(resourceDetails -> (Resource) new FileResource(resourceDetails.getConnectionDetail(), resourceDetails.getType(), resourceDetails.getFormat()))
                         .collect(Collectors.toMap(fileResource -> fileResource, ignore -> new NullConnectionDetail()));
             } catch (RuntimeException e) {

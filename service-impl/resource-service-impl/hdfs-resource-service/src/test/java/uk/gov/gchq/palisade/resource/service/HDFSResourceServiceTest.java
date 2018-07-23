@@ -29,7 +29,6 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static uk.gov.gchq.palisade.resource.service.HDFSResourceDetails.getFileNameFromResourceDetails;
 
 public class HDFSResourceServiceTest {
 
@@ -159,5 +158,10 @@ public class HDFSResourceServiceTest {
         final JobConf conf = new JobConf();
         conf.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT);
         return conf;
+    }
+
+    private static String getFileNameFromResourceDetails(final String name, final String type, final String format) {
+        //Type, Id, Format
+        return String.format(HDFSResourceDetails.FILE_NAME_FORMAT, type, name, format);
     }
 }
