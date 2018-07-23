@@ -32,9 +32,11 @@ public class StubConnectionDetail implements ConnectionDetail {
 
     private String con;
 
+    private Service serviceToCreate;
+
     @Override
     public <S extends Service> S createService() {
-        return null;
+        return (S) getServiceToCreate();
     }
 
     public String getCon() {
@@ -59,6 +61,7 @@ public class StubConnectionDetail implements ConnectionDetail {
 
         return new EqualsBuilder()
                 .append(con, stub.con)
+                .append(getServiceToCreate(), stub.getServiceToCreate())
                 .isEquals();
     }
 
@@ -66,6 +69,7 @@ public class StubConnectionDetail implements ConnectionDetail {
     public int hashCode() {
         return new HashCodeBuilder(7, 11)
                 .append(con)
+                .append(getServiceToCreate())
                 .toHashCode();
     }
 
@@ -73,6 +77,16 @@ public class StubConnectionDetail implements ConnectionDetail {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("con", con)
+                .append("serviceToCreate", getServiceToCreate())
                 .toString();
+    }
+
+    public Service getServiceToCreate() {
+        return serviceToCreate;
+    }
+
+    public StubConnectionDetail setServiceToCreate(Service serviceToCreate) {
+        this.serviceToCreate = serviceToCreate;
+        return this;
     }
 }

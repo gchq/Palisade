@@ -42,7 +42,7 @@ public class PalisadeInputFormatTest {
     @Test
     public void shouldSerialiseandDeserialise() throws IOException {
         //Given
-        StubSerialiser<Object> serial = new StubSerialiser<>("nothing");
+        StubSerialiser serial = new StubSerialiser("nothing");
         Configuration c = new Configuration();
         //When
         PalisadeInputFormat.setSerialiser(c, serial);

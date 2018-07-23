@@ -335,7 +335,7 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      * @param serialiser the serialiser that can decode the value type this job is processing
      * @throws NullPointerException for null parameters
      */
-    public static <V> void setSerialiser(final Configuration conf, final Serialiser<Object, V> serialiser) {
+    public static <K extends Object, V> void setSerialiser(final Configuration conf, final Serialiser<K, V> serialiser) {
         Objects.requireNonNull(conf, "conf");
         Objects.requireNonNull(serialiser, "serialiser");
         conf.set(SERIALISER_CLASSNAME_KEY, serialiser.getClass().getName());

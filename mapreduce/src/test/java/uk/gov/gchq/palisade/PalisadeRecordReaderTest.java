@@ -22,18 +22,25 @@ import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.StubSerialiser;
+import uk.gov.gchq.palisade.data.service.DataService;
+import uk.gov.gchq.palisade.data.service.request.ReadRequest;
+import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.StubResource;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
+import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
 public class PalisadeRecordReaderTest {
@@ -53,14 +60,23 @@ public class PalisadeRecordReaderTest {
     public static void setup() {
         conf = new Configuration();
         //make sure this is available for the tests
-        serialiser=new StubSerialiser<>("test_serialiser");
-        PalisadeInputFormat.setSerialiser(conf,serialiser);
+        serialiser = new StubSerialiser("test_serialiser");
+        PalisadeInputFormat.setSerialiser(conf, serialiser);
         con = new TaskAttemptContextImpl(conf, new TaskAttemptID());
+        //make the data service that can either respond with some fake
+        //data or an empty stream
+        mockDataService = mock(DataService.class);
+        //explicitly declare the generic type as Mockito thinks it should
+        //be ReadResponse<Object>
+        readResponse = new ReadResponse<>();
+        Mockito.<CompletableFuture<ReadResponse<String>>>when(mockDataService.read(any(ReadRequest.class))).thenReturn(CompletableFuture.completedFuture(readResponse));
     }
 
     private static Configuration conf;
     private static TaskAttemptContext con;
-    private static Serialiser<Object,String> serialiser;
+    private static Serialiser<String, String> serialiser;
+    private static DataService mockDataService;
+    private static ReadResponse<String> readResponse;
 
     @Test
     public void shouldReportZeroProgressWhenClose() throws Exception {
@@ -96,19 +112,21 @@ public class PalisadeRecordReaderTest {
     @Test
     public void shouldReturnFalseAfterClosed() throws IOException {
         //Given
-        PalisadeRecordReader<String> prr=new PalisadeRecordReader<>();
+        PalisadeRecordReader<String> prr = new PalisadeRecordReader<>();
         DataRequestResponse response = new DataRequestResponse();
-        response.getResources().put(new StubResource("type_a", "id1", "format6"), new StubConnectionDetail("con1"));
-        response.getResources().put(new StubResource("type_b", "id2", "format7"), new StubConnectionDetail("con2"));
+        response.getResources().put(new StubResource("type_a", "id1", "format6"), new StubConnectionDetail("con1").setServiceToCreate(mockDataService));
+        response.getResources().put(new StubResource("type_b", "id2", "format7"), new StubConnectionDetail("con2").setServiceToCreate(mockDataService));
 
-        PalisadeInputSplit split=new PalisadeInputSplit(response);
+        readResponse.setData(Stream.of("value1", "value2"));
+
         //When
-        prr.initialize(split,con);
+        PalisadeInputSplit split = new PalisadeInputSplit(response);
+        prr.initialize(split, con);
         //start the stream reading
         prr.nextKeyValue();
         prr.nextKeyValue();
         prr.close();
         //Then
-        assertTrue(prr.nextKeyValue());
+        assertFalse(prr.nextKeyValue());
     }
 }

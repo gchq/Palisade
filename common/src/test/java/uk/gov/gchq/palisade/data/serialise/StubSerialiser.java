@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.data.serialise;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class StubSerialiser<T> implements Serialiser<T,String> {
+public class StubSerialiser implements Serialiser<String, String> {
 
     public String getT() {
         return t;
@@ -30,14 +30,16 @@ public class StubSerialiser<T> implements Serialiser<T,String> {
 
     private String t;
 
-    public StubSerialiser() {}
+    public StubSerialiser() {
+    }
+
     public StubSerialiser(String t) {
-        this.t=t;
+        this.t = t;
     }
 
     @Override
-    public T serialise(String object) {
-        return null;
+    public String serialise(String object) {
+        return object;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class StubSerialiser<T> implements Serialiser<T,String> {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        StubSerialiser<?> that = (StubSerialiser<?>) o;
+        StubSerialiser that = (StubSerialiser) o;
 
         return new EqualsBuilder()
                 .append(t, that.t)
@@ -61,7 +63,7 @@ public class StubSerialiser<T> implements Serialiser<T,String> {
     }
 
     @Override
-    public String deserialise(T form) {
-        return null;
+    public String deserialise(String form) {
+        return form;
     }
 }

@@ -113,8 +113,8 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
         PalisadeInputSplit pis = (PalisadeInputSplit) inputSplit;
         //sanity check
         DataRequestResponse reqDetails = pis.getRequestResponse();
-        if (reqDetails == null) {
-            throw new IOException(new NullPointerException("no resource details in input split"));
+        if (reqDetails.getResources().isEmpty()) {
+            throw new IOException("no resource details in input split");
         }
         resourceDetails = reqDetails;
         resIt = reqDetails.getResources().entrySet().iterator();
