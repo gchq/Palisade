@@ -29,6 +29,7 @@ import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.StubResource;
+import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
@@ -48,6 +49,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class PalisadeRecordReaderTest {
 
@@ -118,6 +121,40 @@ public class PalisadeRecordReaderTest {
     }
 
     /**
+     * Validate that a record reader is returning the expected results in order and that {@link
+     * PalisadeRecordReader#nextKeyValue()} is responding correctly.
+     *
+     * @param expected   the list of items expected
+     * @param testReader the reader under test
+     * @param <T>        value type of reader
+     * @throws IOException that shouldn't happen
+     */
+    private static <T> void readValuesAndValidate(Stream<T> expected, PalisadeRecordReader<T> testReader) throws IOException {
+        expected.forEach(item -> {
+            try {
+                assertTrue(testReader.nextKeyValue());
+                assertEquals(item, testReader.getCurrentValue());
+            } catch (IOException e) {
+                fail("unexpected IOException on test");
+                e.printStackTrace();
+            }
+        });
+        assertFalse(testReader.nextKeyValue());
+    }
+
+    /**
+     * Validates that the read method for each mock data service was called once. This method assumes that each resource
+     * in the DataResponseRequest has its own unique mock DataService.
+     *
+     * @param response the collection of all responses that will have been read
+     */
+    private static void verifyMocksCalled(DataRequestResponse response) {
+        for (ConnectionDetail entry : response.getResources().values()) {
+            verify(((DataService) entry.createService()), times(1)).read(any());
+        }
+    }
+
+    /**
      * Creates a DataService that will respond to any request with the given data.
      *
      * @param dataToReturn collection of data that will be streamed back from the data reader
@@ -149,6 +186,7 @@ public class PalisadeRecordReaderTest {
         prr.initialize(split, con);
         //Then
         readValuesAndValidate(returnResources.stream(), prr);
+        verifyMocksCalled(response);
     }
 
     @Test
@@ -168,6 +206,7 @@ public class PalisadeRecordReaderTest {
         prr.initialize(split, con);
         //Then
         readValuesAndValidate(Stream.concat(returnResources.stream(), Stream.empty()), prr);
+        verifyMocksCalled(response);
     }
 
     @Test
@@ -182,6 +221,7 @@ public class PalisadeRecordReaderTest {
         prr.initialize(split, con);
         //Then
         readValuesAndValidate(Stream.empty(), prr);
+        verifyMocksCalled(response);
     }
 
     @Test
@@ -199,6 +239,7 @@ public class PalisadeRecordReaderTest {
         prr.initialize(split, con);
         //Then
         readValuesAndValidate(Stream.concat(Stream.empty(), returnResources.stream()), prr);
+        verifyMocksCalled(response);
     }
 
     @Test
@@ -216,6 +257,7 @@ public class PalisadeRecordReaderTest {
         prr.initialize(split, con);
         //Then
         readValuesAndValidate(Stream.concat(returnResources.stream(), returnResources2.stream()), prr);
+        verifyMocksCalled(response);
     }
 
     @Test
@@ -235,6 +277,7 @@ public class PalisadeRecordReaderTest {
         prr.initialize(split, con);
         //Then
         readValuesAndValidate(Stream.concat(returnResources.stream(), returnResources2.stream()), prr);
+        verifyMocksCalled(response);
     }
 
     @Test
@@ -250,27 +293,6 @@ public class PalisadeRecordReaderTest {
         prr.initialize(split, con);
         //Then
         readValuesAndValidate(Stream.empty(), prr);
-    }
-
-    /**
-     * Validate that a record reader is returning the expected results in order and that {@link
-     * PalisadeRecordReader#nextKeyValue()} is responding correctly.
-     *
-     * @param expected   the list of items expected
-     * @param testReader the reader under test
-     * @param <T>        value type of reader
-     * @throws IOException that shouldn't happen
-     */
-    private static <T> void readValuesAndValidate(Stream<T> expected, PalisadeRecordReader<T> testReader) throws IOException {
-        expected.forEach(item -> {
-            try {
-                assertTrue(testReader.nextKeyValue());
-                assertEquals(item, testReader.getCurrentValue());
-            } catch (IOException e) {
-                fail("unexpected IOException on test");
-                e.printStackTrace();
-            }
-        });
-        assertFalse(testReader.nextKeyValue());
+        verifyMocksCalled(response);
     }
 }
