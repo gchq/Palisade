@@ -33,28 +33,23 @@ import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
 public class PalisadeRecordReaderTest {
-    /*
-    * Tests to write
-    * make the stubconnectiondetail return dataservice that can either return results or nothing
-    * test nothing else returned after close called
-    * test all records come back from one and two resources
-    * test records come back from empty resources
-    * test records come back from one resource one empty
-    * test iterator cascades with one then empty then one
-    * use a treemap
-    * test should return each key value in turn correctly
-     */
 
     @BeforeClass
     public static void setup() {
@@ -63,20 +58,11 @@ public class PalisadeRecordReaderTest {
         serialiser = new StubSerialiser("test_serialiser");
         PalisadeInputFormat.setSerialiser(conf, serialiser);
         con = new TaskAttemptContextImpl(conf, new TaskAttemptID());
-        //make the data service that can either respond with some fake
-        //data or an empty stream
-        mockDataService = mock(DataService.class);
-        //explicitly declare the generic type as Mockito thinks it should
-        //be ReadResponse<Object>
-        readResponse = new ReadResponse<>();
-        Mockito.<CompletableFuture<ReadResponse<String>>>when(mockDataService.read(any(ReadRequest.class))).thenReturn(CompletableFuture.completedFuture(readResponse));
     }
 
     private static Configuration conf;
     private static TaskAttemptContext con;
     private static Serialiser<String, String> serialiser;
-    private static DataService mockDataService;
-    private static ReadResponse<String> readResponse;
 
     @Test
     public void shouldReportZeroProgressWhenClose() throws Exception {
@@ -114,10 +100,11 @@ public class PalisadeRecordReaderTest {
         //Given
         PalisadeRecordReader<String> prr = new PalisadeRecordReader<>();
         DataRequestResponse response = new DataRequestResponse();
-        response.getResources().put(new StubResource("type_a", "id1", "format6"), new StubConnectionDetail("con1").setServiceToCreate(mockDataService));
-        response.getResources().put(new StubResource("type_b", "id2", "format7"), new StubConnectionDetail("con2").setServiceToCreate(mockDataService));
-
-        readResponse.setData(Stream.of("value1", "value2"));
+        Collection<String> resData = Arrays.asList("s1", "s2", "s3", "s4");
+        response.getResources().put(new StubResource("type_a", "id1", "format1"), new StubConnectionDetail("con1")
+                .setServiceToCreate(createMockDS(resData)));
+        response.getResources().put(new StubResource("type_b", "id2", "format2"), new StubConnectionDetail("con2")
+                .setServiceToCreate(createMockDS(resData)));
 
         //When
         PalisadeInputSplit split = new PalisadeInputSplit(response);
@@ -128,5 +115,162 @@ public class PalisadeRecordReaderTest {
         prr.close();
         //Then
         assertFalse(prr.nextKeyValue());
+    }
+
+    /**
+     * Creates a DataService that will respond to any request with the given data.
+     *
+     * @param dataToReturn collection of data that will be streamed back from the data reader
+     * @param <T>          the value type of the items
+     * @return a mock data service instance
+     */
+    private static <T> DataService createMockDS(Collection<T> dataToReturn) {
+        //create the simulated response
+        ReadResponse<T> readResponse = new ReadResponse<>();
+        readResponse.setData(dataToReturn.stream());
+        //mock a data service to return it
+        DataService mock = mock(DataService.class);
+        Mockito.<CompletableFuture<ReadResponse<T>>>when(mock.read(any(ReadRequest.class)))
+                .thenReturn(CompletableFuture.completedFuture(readResponse));
+        return mock;
+    }
+
+    @Test
+    public void shouldReadbackResourcesFromOneResource() throws IOException {
+        //Given
+        PalisadeRecordReader<String> prr = new PalisadeRecordReader<>();
+        DataRequestResponse response = new DataRequestResponse();
+        //set up some data
+        List<String> returnResources = Arrays.asList("s1", "s2", "s3", "s4");
+        //set up the mock data service
+        response.getResources().put(new StubResource("type_a", "id1", "format1"), new StubConnectionDetail("con1").setServiceToCreate(createMockDS(returnResources)));
+        //When
+        PalisadeInputSplit split = new PalisadeInputSplit(response);
+        prr.initialize(split, con);
+        //Then
+        readValuesAndValidate(returnResources.stream(), prr);
+    }
+
+    @Test
+    public void shouldReadbackResultsFromOneResourcePlusOneEmpty() throws IOException {
+        PalisadeRecordReader<String> prr = new PalisadeRecordReader<>();
+        //inject a treemap to ensure iteration order
+        DataRequestResponse response = new DataRequestResponse(new RequestId("test"), new TreeMap<>());
+        //set up some data
+        List<String> returnResources = Arrays.asList("s1", "s2", "s3", "s4");
+        response.getResources().put(new StubResource("type_a", "id1", "format1"),
+                new StubConnectionDetail("con1").setServiceToCreate(createMockDS(returnResources)));
+        //make an empty resource response
+        response.getResources().put(new StubResource("type_b", "id2", "format2"),
+                new StubConnectionDetail("con2").setServiceToCreate(createMockDS(Collections.emptyList())));
+        //When
+        PalisadeInputSplit split = new PalisadeInputSplit(response);
+        prr.initialize(split, con);
+        //Then
+        readValuesAndValidate(Stream.concat(returnResources.stream(), Stream.empty()), prr);
+    }
+
+    @Test
+    public void shouldReadbackNothingFromEmptyResource() throws IOException {
+        PalisadeRecordReader<String> prr = new PalisadeRecordReader<>();
+        DataRequestResponse response = new DataRequestResponse();
+        //make an empty resource response
+        response.getResources().put(new StubResource("type_a", "id1", "format1"),
+                new StubConnectionDetail("con1").setServiceToCreate(createMockDS(Collections.emptyList())));
+        //When
+        PalisadeInputSplit split = new PalisadeInputSplit(response);
+        prr.initialize(split, con);
+        //Then
+        readValuesAndValidate(Stream.empty(), prr);
+    }
+
+    @Test
+    public void shouldReadbackResultsFromEmptyResourceThenOneResourceWithData() throws IOException {
+        PalisadeRecordReader<String> prr = new PalisadeRecordReader<>();
+        DataRequestResponse response = new DataRequestResponse(new RequestId("test"), new TreeMap<>());
+        //make an empty resource response
+        response.getResources().put(new StubResource("type_a", "id1", "format1"),
+                new StubConnectionDetail("con1").setServiceToCreate(createMockDS(Collections.emptyList())));
+        //set up some data
+        List<String> returnResources = Arrays.asList("s1", "s2", "s3", "s4");
+        response.getResources().put(new StubResource("type_b", "id2", "format2"), new StubConnectionDetail("con2").setServiceToCreate(createMockDS(returnResources)));
+        //When
+        PalisadeInputSplit split = new PalisadeInputSplit(response);
+        prr.initialize(split, con);
+        //Then
+        readValuesAndValidate(Stream.concat(Stream.empty(), returnResources.stream()), prr);
+    }
+
+    @Test
+    public void shouldReturnResultsFromTwoResources() throws IOException {
+        PalisadeRecordReader<String> prr = new PalisadeRecordReader<>();
+        DataRequestResponse response = new DataRequestResponse(new RequestId("test"), new TreeMap<>());
+        //set up some data
+        List<String> returnResources = Arrays.asList("s1", "s2", "s3", "s4");
+        response.getResources().put(new StubResource("type_a", "id1", "format1"), new StubConnectionDetail("con1").setServiceToCreate(createMockDS(returnResources)));
+        //add more data
+        List<String> returnResources2 = Arrays.asList("s5", "s6", "s7", "s8");
+        response.getResources().put(new StubResource("type_b", "id2", "format2"), new StubConnectionDetail("con2").setServiceToCreate(createMockDS(returnResources2)));
+        //When
+        PalisadeInputSplit split = new PalisadeInputSplit(response);
+        prr.initialize(split, con);
+        //Then
+        readValuesAndValidate(Stream.concat(returnResources.stream(), returnResources2.stream()), prr);
+    }
+
+    @Test
+    public void shouldReturnResultsFromTwoResourcesWithEmptyInBetween() throws IOException {
+        PalisadeRecordReader<String> prr = new PalisadeRecordReader<>();
+        DataRequestResponse response = new DataRequestResponse(new RequestId("test"), new TreeMap<>());
+        //set up some data
+        List<String> returnResources = Arrays.asList("s1", "s2", "s3", "s4");
+        response.getResources().put(new StubResource("type_a", "id1", "format1"), new StubConnectionDetail("con1").setServiceToCreate(createMockDS(returnResources)));
+        //add an empty
+        response.getResources().put(new StubResource("type_b", "id2", "format2"), new StubConnectionDetail("con2").setServiceToCreate(createMockDS(Collections.emptyList())));
+        //add more data
+        List<String> returnResources2 = Arrays.asList("s5", "s6", "s7", "s8");
+        response.getResources().put(new StubResource("type_c", "id3", "format3"), new StubConnectionDetail("con3").setServiceToCreate(createMockDS(returnResources2)));
+        //When
+        PalisadeInputSplit split = new PalisadeInputSplit(response);
+        prr.initialize(split, con);
+        //Then
+        readValuesAndValidate(Stream.concat(returnResources.stream(), returnResources2.stream()), prr);
+    }
+
+    @Test
+    public void shouldReturnNothingFromEmpties() throws IOException {
+        PalisadeRecordReader<String> prr = new PalisadeRecordReader<>();
+        DataRequestResponse response = new DataRequestResponse(new RequestId("test"), new TreeMap<>());
+        //add empty resources
+        response.getResources().put(new StubResource("type_a", "id1", "format1"), new StubConnectionDetail("con1").setServiceToCreate(createMockDS(Collections.emptyList())));
+        response.getResources().put(new StubResource("type_b", "id2", "format2"), new StubConnectionDetail("con2").setServiceToCreate(createMockDS(Collections.emptyList())));
+        response.getResources().put(new StubResource("type_c", "id3", "format3"), new StubConnectionDetail("con3").setServiceToCreate(createMockDS(Collections.emptyList())));
+        //When
+        PalisadeInputSplit split = new PalisadeInputSplit(response);
+        prr.initialize(split, con);
+        //Then
+        readValuesAndValidate(Stream.empty(), prr);
+    }
+
+    /**
+     * Validate that a record reader is returning the expected results in order and that {@link
+     * PalisadeRecordReader#nextKeyValue()} is responding correctly.
+     *
+     * @param expected   the list of items expected
+     * @param testReader the reader under test
+     * @param <T>        value type of reader
+     * @throws IOException that shouldn't happen
+     */
+    private static <T> void readValuesAndValidate(Stream<T> expected, PalisadeRecordReader<T> testReader) throws IOException {
+        expected.forEach(item -> {
+            try {
+                assertTrue(testReader.nextKeyValue());
+                assertEquals(item, testReader.getCurrentValue());
+            } catch (IOException e) {
+                fail("unexpected IOException on test");
+                e.printStackTrace();
+            }
+        });
+        assertFalse(testReader.nextKeyValue());
     }
 }

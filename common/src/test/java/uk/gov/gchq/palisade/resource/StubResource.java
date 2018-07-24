@@ -20,8 +20,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.ToStringBuilder;
 
 import javax.rmi.CORBA.Stub;
+import java.util.Comparator;
 
-public class StubResource implements Resource {
+public class StubResource implements Resource, Comparable<StubResource> {
 
     private String type;
     private String id;
@@ -102,6 +103,18 @@ public class StubResource implements Resource {
                 .append("id", id)
                 .append("type", type)
                 .toString();
+    }
+
+    private static Comparator<StubResource> comp = Comparator.comparing(StubResource::getFormat).thenComparing(StubResource::getType).thenComparing(StubResource::getId);
+
+    /**
+     * {@inheritDoc}
+     *
+     * Implemented to allow this class to be used in TreeMaps in tests.
+     */
+    @Override
+    public int compareTo(StubResource o) {
+        return comp.compare(this, o);
     }
 }
 
