@@ -34,16 +34,20 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
-import uk.gov.gchq.palisade.service.request.NullConnectionDetail;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
 
 public class HDFSResourceService implements ResourceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HDFSResourceService.class);
@@ -52,17 +56,23 @@ public class HDFSResourceService implements ResourceService {
 
     private final JobConf jobConf;
     private final FileSystem fileSystem;
+    private final HashMap<String, ConnectionDetail> dataFormat = new HashMap<>();
+    private final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
 
-    public HDFSResourceService(JobConf jobConf) throws IOException {
+    public HDFSResourceService(JobConf jobConf, final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) throws IOException {
         this.jobConf = jobConf;
         this.fileSystem = FileSystem.get(jobConf);
+        this.dataFormat.putAll(dataFormat);
+        dataFormat.values().removeIf(Objects::isNull);
+        this.dataType.putAll(dataType);
+        dataType.values().removeIf(Objects::isNull);
     }
-
 
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
         return getResourcesById(new GetResourcesByIdRequest(request.getResource().getId()));
     }
+
 
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
@@ -71,11 +81,12 @@ public class HDFSResourceService implements ResourceService {
             throw new UnsupportedOperationException(String.format(ERROR_OUT_SCOPE, resourceId, jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)));
         }
 
-        final Predicate<HDFSResourceDetails> predicate = d -> true;
-        return getMapCompletableFuture(resourceId, predicate);
+        final Predicate<HDFSResourceDetails> predicate = (HDFSResourceDetails detail) -> nonNull(dataType.get(detail.getType()));
+        final Function<HDFSResourceDetails, ConnectionDetail> connectionDetailFunction = resourceDetails -> dataType.get(resourceDetails.getType());
+        return getMapCompletableFuture(resourceId, predicate, connectionDetailFunction);
     }
 
-    private CompletableFuture<Map<Resource, ConnectionDetail>> getMapCompletableFuture(final String pathString, final Predicate<HDFSResourceDetails> predicate) {
+    private CompletableFuture<Map<Resource, ConnectionDetail>> getMapCompletableFuture(final String pathString, final Predicate<HDFSResourceDetails> predicate, final Function<HDFSResourceDetails, ConnectionDetail> connectionDetailFunction) {
         return CompletableFuture.supplyAsync(() -> {
             try {
 
@@ -85,9 +96,8 @@ public class HDFSResourceService implements ResourceService {
                         .map(HDFSResourceDetails::getResourceDetailsFromConnectionDetails)
                         .filter(predicate)
                         .collect(Collectors.toMap(
-                                (HDFSResourceDetails resourceDetails) ->
-                                        new FileResource(resourceDetails.getConnectionDetail(), resourceDetails.getType(), resourceDetails.getFormat()),
-                                ignore -> new NullConnectionDetail()
+                                (HDFSResourceDetails resourceDetails) -> new FileResource(resourceDetails.getConnectionDetail(), resourceDetails.getType(), resourceDetails.getFormat()),
+                                connectionDetailFunction
                         ));
             } catch (RuntimeException e) {
                 throw e;
@@ -100,15 +110,17 @@ public class HDFSResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
         final String pathString = jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
-        final Predicate<HDFSResourceDetails> predicate = hdfsResourceDetails -> request.getType().equals(hdfsResourceDetails.getType());
-        return getMapCompletableFuture(pathString, predicate);
+        final Predicate<HDFSResourceDetails> predicate = detail -> nonNull(dataType.get(detail.getType())) && request.getType().equals(detail.getType());
+        final Function<HDFSResourceDetails, ConnectionDetail> connectionDetailFunction = resourceDetails -> dataType.get(resourceDetails.getType());
+        return getMapCompletableFuture(pathString, predicate, connectionDetailFunction);
     }
 
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(final GetResourcesByFormatRequest request) {
         final String pathString = jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
-        final Predicate<HDFSResourceDetails> predicate = hdfsResourceDetails -> request.getFormat().equals(hdfsResourceDetails.getFormat());
-        return getMapCompletableFuture(pathString, predicate);
+        final Predicate<HDFSResourceDetails> predicate = detail -> nonNull(dataFormat.get(detail.getFormat())) && request.getFormat().equals(detail.getFormat());
+        final Function<HDFSResourceDetails, ConnectionDetail> connectionDetailFunction = resourceDetails -> dataFormat.get(resourceDetails.getFormat());
+        return getMapCompletableFuture(pathString, predicate, connectionDetailFunction);
     }
 
     @Override
@@ -125,7 +137,6 @@ public class HDFSResourceService implements ResourceService {
         }
         return paths;
     }
-
 
 }
 
