@@ -13,8 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.NullConnectionDetail;
@@ -78,7 +81,7 @@ public class HDFSResourceServiceTest {
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf);
-        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(id));
+        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest("file:///" + id));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -95,7 +98,7 @@ public class HDFSResourceServiceTest {
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf);
-        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(id));
+        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest("file:///" + id));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -122,12 +125,37 @@ public class HDFSResourceServiceTest {
 
     @Test
     public void shouldGetResourcesByFormat() throws Exception {
-        fail("not implemented");
+        //given
+        final String id = inputPathString;
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
+        writeFile(fs, inputPathString, "00003", FORMAT_VALUE + 2, TYPE_VALUE);
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), new NullConnectionDetail());
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), new NullConnectionDetail());
+
+        //when
+        final HDFSResourceService service = new HDFSResourceService(conf);
+        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesByFormat(new GetResourcesByFormatRequest(FORMAT_VALUE));
+
+        //then
+        assertEquals(expected, resourcesById.join());
     }
 
     @Test
     public void shouldGetResourcesByResource() throws Exception {
-        fail("not implemented");
+        //given
+        final String id = inputPathString;
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), new NullConnectionDetail());
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), new NullConnectionDetail());
+
+        //when
+        final HDFSResourceService service = new HDFSResourceService(conf);
+        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesByResource(new GetResourcesByResourceRequest(new DirectoryResource("file:///" + id)));
+
+        //then
+        assertEquals(expected, resourcesById.join());
     }
 
     @Test
@@ -156,7 +184,7 @@ public class HDFSResourceServiceTest {
     private JobConf createConf() {
         // Set up local conf
         final JobConf conf = new JobConf();
-        conf.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT);
+        conf.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT + testFolder.getRoot().getAbsolutePath());
         return conf;
     }
 

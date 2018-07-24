@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.resource.service;
 
 import com.google.common.collect.Lists;
+import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -58,17 +60,29 @@ public class HDFSResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        return getResourcesById(new GetResourcesByIdRequest(request.getResource().getId()));
     }
 
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
+        final String resourceId = request.getResourceId();
+        if (!resourceId.contains(jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY))) {
+            throw new UnsupportedOperationException("resource ID is out of scope of the this resource Service. Found: " + resourceId + " expected: " + jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY));
+        }
+
+        final Predicate<HDFSResourceDetails> predicate = d -> true;
+        return getMapCompletableFuture(resourceId, predicate);
+    }
+
+    private CompletableFuture<Map<Resource, ConnectionDetail>> getMapCompletableFuture(final String pathString, final Predicate<HDFSResourceDetails> predicate) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                final RemoteIterator<LocatedFileStatus> remoteIterator = this.fileSystem.listFiles(new Path(request.getResourceId()), true);
+
+                final RemoteIterator<LocatedFileStatus> remoteIterator = this.fileSystem.listFiles(new Path(pathString), true);
                 return getPaths(remoteIterator)
                         .stream()
                         .map(HDFSResourceDetails::getResourceDetailsFromConnectionDetails)
+                        .filter(predicate)
                         .map(resourceDetails -> (Resource) new FileResource(resourceDetails.getConnectionDetail(), resourceDetails.getType(), resourceDetails.getFormat()))
                         .collect(Collectors.toMap(fileResource -> fileResource, ignore -> new NullConnectionDetail()));
             } catch (RuntimeException e) {
@@ -81,12 +95,16 @@ public class HDFSResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
-        throw new UnsupportedOperationException("should this get all types be scoped/limited? During test the fs may scan the whole computer.");
+        final String pathString = jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+        final Predicate<HDFSResourceDetails> predicate = hdfsResourceDetails -> request.getType().equals(hdfsResourceDetails.getType());
+        return getMapCompletableFuture(pathString, predicate);
     }
 
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(final GetResourcesByFormatRequest request) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        final String pathString = jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+        final Predicate<HDFSResourceDetails> predicate = hdfsResourceDetails -> request.getFormat().equals(hdfsResourceDetails.getFormat());
+        return getMapCompletableFuture(pathString, predicate);
     }
 
     @Override
