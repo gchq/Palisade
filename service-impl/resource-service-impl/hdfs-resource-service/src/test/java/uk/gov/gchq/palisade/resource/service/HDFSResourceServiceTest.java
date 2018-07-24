@@ -88,6 +88,23 @@ public class HDFSResourceServiceTest {
     }
 
     @Test
+    public void shouldGetResourcesOutsideOfScope() throws Exception {
+        //given
+        final String id = inputPathString + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
+
+        //when
+        final HDFSResourceService service = new HDFSResourceService(conf);
+        final String found = "hdfs:///" + id;
+        try {
+            final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(found));
+            fail("exception expected");
+        } catch (Exception e) {
+            //then
+            assertEquals(String.format(HDFSResourceService.ERROR_OUT_SCOPE, found, conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)), e.getMessage());
+        }
+    }
+
+    @Test
     public void shouldGetResourcesByIdOfAFolder() throws Exception {
         //given
         final String id = inputPathString;

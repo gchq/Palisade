@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 public class HDFSResourceService implements ResourceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HDFSResourceService.class);
     public static final String ADD_RESOURCE_ERROR = "AddResource is not supported by HDFSResourceService resources should be added/created via regular HDFS behaviour.";
+    public static final String ERROR_OUT_SCOPE = "resource ID is out of scope of the this resource Service. Found: %s expected: %s";
 
     private final JobConf jobConf;
     private final FileSystem fileSystem;
@@ -67,7 +68,7 @@ public class HDFSResourceService implements ResourceService {
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         final String resourceId = request.getResourceId();
         if (!resourceId.contains(jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY))) {
-            throw new UnsupportedOperationException("resource ID is out of scope of the this resource Service. Found: " + resourceId + " expected: " + jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY));
+            throw new UnsupportedOperationException(String.format(ERROR_OUT_SCOPE, resourceId, jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)));
         }
 
         final Predicate<HDFSResourceDetails> predicate = d -> true;
@@ -83,8 +84,11 @@ public class HDFSResourceService implements ResourceService {
                         .stream()
                         .map(HDFSResourceDetails::getResourceDetailsFromConnectionDetails)
                         .filter(predicate)
-                        .map(resourceDetails -> (Resource) new FileResource(resourceDetails.getConnectionDetail(), resourceDetails.getType(), resourceDetails.getFormat()))
-                        .collect(Collectors.toMap(fileResource -> fileResource, ignore -> new NullConnectionDetail()));
+                        .collect(Collectors.toMap(
+                                (HDFSResourceDetails resourceDetails) ->
+                                        new FileResource(resourceDetails.getConnectionDetail(), resourceDetails.getType(), resourceDetails.getFormat()),
+                                ignore -> new NullConnectionDetail()
+                        ));
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
