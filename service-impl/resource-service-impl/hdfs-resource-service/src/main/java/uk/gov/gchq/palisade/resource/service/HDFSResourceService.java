@@ -16,7 +16,13 @@
 
 package uk.gov.gchq.palisade.resource.service;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
@@ -40,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -47,6 +54,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class HDFSResourceService implements ResourceService {
@@ -66,6 +74,16 @@ public class HDFSResourceService implements ResourceService {
         dataFormat.values().removeIf(Objects::isNull);
         this.dataType.putAll(dataType);
         dataType.values().removeIf(Objects::isNull);
+    }
+
+    @JsonCreator
+    public HDFSResourceService(@JsonProperty("jobConf") Map<String, String> jobConf,
+                               @JsonProperty("dataFormat") final HashMap<String, ConnectionDetail> dataFormat,
+                               @JsonProperty("dataType") final HashMap<String, ConnectionDetail> dataType) throws IOException {
+        this(new JobConf(), dataFormat, dataType);
+        for (Entry<String, String> entry : jobConf.entrySet()) {
+            this.jobConf.set(entry.getKey(), entry.getValue());
+        }
     }
 
     @Override
@@ -138,5 +156,68 @@ public class HDFSResourceService implements ResourceService {
         return paths;
     }
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
+    public HashMap<String, ConnectionDetail> getDataType() {
+        return dataType;
+    }
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
+    public HashMap<String, ConnectionDetail> getDataFormat() {
+        return dataFormat;
+    }
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
+    public Map<String, String> getJobConf() {
+        final JobConf plain = new JobConf();
+        Map<String, String> rtn = Maps.newHashMap();
+        for (Entry<String, String> entry : jobConf) {
+            final String s = plain.get(entry.getKey());
+            final String s2 = jobConf.get(entry.getKey());
+            if (isNull(s) || !s.equals(s2)) {
+                rtn.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return rtn;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        } else if (isNull(o)) {
+            return false;
+        }
+
+        final EqualsBuilder builder = new EqualsBuilder();
+        builder.append(this.getClass(), o.getClass());
+        if (builder.isEquals()) {
+            final HDFSResourceService that = (HDFSResourceService) o;
+            builder.append(this.fileSystem, that.fileSystem);
+            builder.append(this.dataFormat, that.dataFormat);
+            builder.append(this.dataType, that.dataType);
+            if (builder.isEquals()) {
+                builder.append(this.jobConf.size(), that.jobConf.size());
+                for (Entry<String, String> entry : this.jobConf) {
+                    final String lhs = this.jobConf.get(entry.getKey());
+                    final String rhs = that.jobConf.get(entry.getKey());
+                    builder.append(lhs, rhs);
+                    if (!builder.isEquals()) {
+                        break;
+                    }
+                }
+            }
+        }
+        return builder.isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(19, 17)
+                .append(jobConf)
+                .append(fileSystem)
+                .append(dataFormat)
+                .append(dataType)
+                .build();
+    }
 }
 

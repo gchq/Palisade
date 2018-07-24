@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -71,7 +72,7 @@ public class HDFSResourceServiceTest {
     public void setUp() throws Exception {
         conf = createConf();
         inputPathString = testFolder.getRoot().getAbsolutePath() + "/inputDir";
-        fs = FileSystem.get(createConf());
+        fs = FileSystem.get(conf);
         fs.mkdirs(new Path(inputPathString));
         expected = Maps.newHashMap();
         dataFormat = new HashMap<>();
@@ -192,6 +193,43 @@ public class HDFSResourceServiceTest {
         } catch (UnsupportedOperationException e) {
             assertEquals(HDFSResourceService.ADD_RESOURCE_ERROR, e.getMessage());
         }
+    }
+
+    @Test
+    public void shouldJSONSerialiser() throws Exception {
+        dataFormat.clear();
+        dataType.clear();
+
+        dataFormat.put("testKey1", new SimpleConnectionDetail("myDetails"));
+        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
+        final byte[] serialise = JSONSerialiser.serialise(service, true);
+
+        final String expected = "{\n" +
+                "  \"class\" : \"uk.gov.gchq.palisade.resource.service.HDFSResourceService\",\n" +
+                "  \"dataFormat\" : {\n" +
+                "    \"testKey1\" : {\n" +
+                "      \"class\" : \"uk.gov.gchq.palisade.service.request.SimpleConnectionDetail\",\n" +
+                "      \"details\" : \"myDetails\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"dataType\" : { },\n" +
+                "  \"jobConf\" : {\n" +
+                "    \"mapreduce.job.hdfs-servers\" : \"${fs.defaultFS}\"\n" +
+                "  }\n" +
+                "}\n";
+
+        final String StringOfSerialised = new String(serialise);
+        final String[] split = StringOfSerialised.split(System.lineSeparator());
+        final StringBuilder modified = new StringBuilder();
+        for (String s : split) {
+            if (!s.startsWith("    \"fs.defaultFS")) {
+                modified.append(s).append(System.lineSeparator());
+            }
+        }
+
+        final String modifiedActual = modified.toString();
+        assertEquals(StringOfSerialised, expected, modifiedActual);
+        assertEquals(StringOfSerialised, service, JSONSerialiser.deserialise(serialise, HDFSResourceService.class));
     }
 
     private void writeFile(final FileSystem fs, final String parentPath, final String name, final String format, final String type) throws IOException {
