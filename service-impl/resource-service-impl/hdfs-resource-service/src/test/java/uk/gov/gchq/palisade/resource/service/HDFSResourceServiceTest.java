@@ -214,7 +214,6 @@ public class HDFSResourceServiceTest {
                 "  },\n" +
                 "  \"dataType\" : { },\n" +
                 "  \"jobConf\" : {\n" +
-                "    \"mapreduce.job.hdfs-servers\" : \"${fs.defaultFS}\"\n" +
                 "  }\n" +
                 "}\n";
 

@@ -168,16 +168,25 @@ public class HDFSResourceService implements ResourceService {
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
     public Map<String, String> getJobConf() {
-        final JobConf plain = new JobConf();
         Map<String, String> rtn = Maps.newHashMap();
+        Map<String, String> plainJobConfWithoutResolvingValues= getPlainJobConfWithoutResolvingValues();
+
         for (Entry<String, String> entry : jobConf) {
-            final String s = plain.get(entry.getKey());
-            final String s2 = jobConf.get(entry.getKey());
-            if (isNull(s) || !s.equals(s2)) {
+            final String plainValue = plainJobConfWithoutResolvingValues.get(entry.getKey());
+            final String thisValue = entry.getValue();
+            if (isNull(plainValue) || !plainValue.equals(thisValue)) {
                 rtn.put(entry.getKey(), entry.getValue());
             }
         }
         return rtn;
+    }
+
+    private Map<String, String> getPlainJobConfWithoutResolvingValues() {
+        Map<String, String> plainMapWithoutResolvingValues = new HashMap<>();
+        for (Entry<String, String> entry : new JobConf()) {
+            plainMapWithoutResolvingValues.put(entry.getKey(), entry.getValue());
+        }
+        return plainMapWithoutResolvingValues;
     }
 
     @Override
