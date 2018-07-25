@@ -41,7 +41,7 @@ mvn clean install -Pquick
 
 2. Start the REST services
 
-The services can be started within Docker containers or running within a local Tomcat.
+The services can be started within Docker containers or ran within a local Tomcat.
 
 To run them in them in a local Tomcat:
 
@@ -80,7 +80,7 @@ INFO: Starting ProtocolHandler ["http-bio-8084"]
 To run them in Docker:
 
 ```bash
-  ./scripts/dockerComposeUp.sh
+  ./example/multi-jvm-example/scripts/dockerComposeUp.sh
 ```
 
 You can check the containers are available:
