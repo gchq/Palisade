@@ -8,7 +8,7 @@ The core API for the resource service.
 
 The resource service is the Palisade component that determines what resources are available that meet a specific
 (type of) request and how they should be accessed. This interface details several methods for obtaining a list of
-resources, e.g. by type or by data serialisedFormat. The methods of this service all return `CompletableFuture`s of
+resources, e.g. by type or by data serialised format. The methods of this service all return `CompletableFuture`s of
 `Map`s which link a valid Palisade `Resource` with a `ConnectionDetail` object. The
 `ConnectionDetail` objects contain information on how to set up a connection to retrieve a particular resource.
 Implementations of this service do not deal with the filtering or application of security policy to the resources.
