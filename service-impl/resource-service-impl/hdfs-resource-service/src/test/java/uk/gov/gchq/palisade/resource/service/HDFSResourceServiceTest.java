@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +39,23 @@ public class HDFSResourceServiceTest {
 
     public static final String FORMAT_VALUE = "txt";
     public static final String TYPE_VALUE = "bob";
-    private static final Logger LOGGER = LoggerFactory.getLogger(HDFSResourceServiceTest.class);
+    public static final String FILE_NAME_VALUE_00001 = "00001";
     public static final String FILE_NAME_VALUE_00002 = "00002";
-
+    public static final String FILE = "file:///";
+    public static final String HDFS = "hdfs:///";
     public static File TMP_DIRECTORY;
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder(TMP_DIRECTORY);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HDFSResourceServiceTest.class);
+    private SimpleConnectionDetail simpleFormat;
+    private SimpleConnectionDetail simpleType;
+    private HashMap<String, ConnectionDetail> dataFormat;
+    private HashMap<String, ConnectionDetail> dataType;
+    private JobConf conf;
+    private String inputPathString;
+    private FileSystem fs;
+    private HashMap<Resource, ConnectionDetail> expected;
 
     static {
         final String tmpDirectoryProperty = System.getProperty("java.io.tmpdir");
@@ -56,17 +68,8 @@ public class HDFSResourceServiceTest {
         }
     }
 
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder(TMP_DIRECTORY);
-    private JobConf conf;
-    private String inputPathString;
-    private FileSystem fs;
-    private HashMap<Resource, ConnectionDetail> expected;
-    public static final String FILE_NAME_VALUE_00001 = "00001";
-    private HashMap<String, ConnectionDetail> dataFormat;
-    private HashMap<String, ConnectionDetail> dataType;
-    private final SimpleConnectionDetail mockFormatDetails = Mockito.mock(SimpleConnectionDetail.class);
-    private final SimpleConnectionDetail mockTypeDetails = (SimpleConnectionDetail) Mockito.mock(SimpleConnectionDetail.class);
+    public HDFSResourceServiceTest() {
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -76,9 +79,11 @@ public class HDFSResourceServiceTest {
         fs.mkdirs(new Path(inputPathString));
         expected = Maps.newHashMap();
         dataFormat = new HashMap<>();
-        dataFormat.put(FORMAT_VALUE, mockFormatDetails);
+        simpleFormat = new SimpleConnectionDetail("simpleFormat");
+        dataFormat.put(FORMAT_VALUE, simpleFormat);
         dataType = new HashMap<>();
-        dataType.put(TYPE_VALUE, mockTypeDetails);
+        simpleType = new SimpleConnectionDetail("simpleType");
+        dataType.put(TYPE_VALUE, simpleType);
     }
 
     @Test
@@ -86,12 +91,12 @@ public class HDFSResourceServiceTest {
         //given
         final String id = inputPathString + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
-        writeFile(fs, inputPathString, "00002", FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource(id, TYPE_VALUE, FORMAT_VALUE), mockTypeDetails);
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
+        expected.put(new FileResource(id, TYPE_VALUE, FORMAT_VALUE), simpleType);
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest("file:///" + id));
+        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(FILE + id));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -104,9 +109,9 @@ public class HDFSResourceServiceTest {
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final String found = "hdfs:///" + id;
+        final String found = HDFS + id;
         try {
-            final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(found));
+            service.getResourcesById(new GetResourcesByIdRequest(found));
             fail("exception expected");
         } catch (Exception e) {
             //then
@@ -120,12 +125,12 @@ public class HDFSResourceServiceTest {
         final String id = inputPathString;
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), mockTypeDetails);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), mockTypeDetails);
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest("file:///" + id));
+        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(FILE + id));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -138,8 +143,8 @@ public class HDFSResourceServiceTest {
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, "00003", FORMAT_VALUE, TYPE_VALUE + 2);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), mockTypeDetails);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), mockTypeDetails);
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
@@ -157,8 +162,8 @@ public class HDFSResourceServiceTest {
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, "00003", FORMAT_VALUE + 2, TYPE_VALUE);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), mockFormatDetails);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), mockFormatDetails);
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
@@ -174,8 +179,8 @@ public class HDFSResourceServiceTest {
         final String id = inputPathString;
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), mockTypeDetails);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), mockTypeDetails);
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
+        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
         final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesByResource(new GetResourcesByResourceRequest(new DirectoryResource("file:///" + id)));

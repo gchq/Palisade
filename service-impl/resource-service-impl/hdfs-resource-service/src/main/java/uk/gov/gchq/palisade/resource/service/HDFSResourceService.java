@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileSystem;
@@ -49,7 +49,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -64,16 +63,12 @@ public class HDFSResourceService implements ResourceService {
 
     private final JobConf jobConf;
     private final FileSystem fileSystem;
-    private final HashMap<String, ConnectionDetail> dataFormat = new HashMap<>();
-    private final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
+    private final ConnectionDetailStorage connectionDetailStorage;
 
     public HDFSResourceService(JobConf jobConf, final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) throws IOException {
         this.jobConf = jobConf;
         this.fileSystem = FileSystem.get(jobConf);
-        this.dataFormat.putAll(dataFormat);
-        dataFormat.values().removeIf(Objects::isNull);
-        this.dataType.putAll(dataType);
-        dataType.values().removeIf(Objects::isNull);
+        this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
     }
 
     @JsonCreator
@@ -91,20 +86,17 @@ public class HDFSResourceService implements ResourceService {
         return getResourcesById(new GetResourcesByIdRequest(request.getResource().getId()));
     }
 
-
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         final String resourceId = request.getResourceId();
         if (!resourceId.contains(jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY))) {
-            throw new UnsupportedOperationException(String.format(ERROR_OUT_SCOPE, resourceId, jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)));
+            throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)));
         }
-
-        final Predicate<HDFSResourceDetails> predicate = (HDFSResourceDetails detail) -> nonNull(dataType.get(detail.getType()));
-        final Function<HDFSResourceDetails, ConnectionDetail> connectionDetailFunction = resourceDetails -> dataType.get(resourceDetails.getType());
-        return getMapCompletableFuture(resourceId, predicate, connectionDetailFunction);
+        return getMapCompletableFuture(resourceId, ignore -> true);
     }
 
-    private CompletableFuture<Map<Resource, ConnectionDetail>> getMapCompletableFuture(final String pathString, final Predicate<HDFSResourceDetails> predicate, final Function<HDFSResourceDetails, ConnectionDetail> connectionDetailFunction) {
+
+    private CompletableFuture<Map<Resource, ConnectionDetail>> getMapCompletableFuture(final String pathString, final Predicate<HDFSResourceDetails> predicate) {
         return CompletableFuture.supplyAsync(() -> {
             try {
 
@@ -112,10 +104,11 @@ public class HDFSResourceService implements ResourceService {
                 return getPaths(remoteIterator)
                         .stream()
                         .map(HDFSResourceDetails::getResourceDetailsFromConnectionDetails)
+                        .filter(detail -> nonNull(connectionDetailStorage.get(detail.getType(), detail.getFormat())))
                         .filter(predicate)
                         .collect(Collectors.toMap(
                                 (HDFSResourceDetails resourceDetails) -> new FileResource(resourceDetails.getConnectionDetail(), resourceDetails.getType(), resourceDetails.getFormat()),
-                                connectionDetailFunction
+                                resourceDetails -> connectionDetailStorage.get(resourceDetails.getType(), resourceDetails.getFormat())
                         ));
             } catch (RuntimeException e) {
                 throw e;
@@ -128,17 +121,15 @@ public class HDFSResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
         final String pathString = jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
-        final Predicate<HDFSResourceDetails> predicate = detail -> nonNull(dataType.get(detail.getType())) && request.getType().equals(detail.getType());
-        final Function<HDFSResourceDetails, ConnectionDetail> connectionDetailFunction = resourceDetails -> dataType.get(resourceDetails.getType());
-        return getMapCompletableFuture(pathString, predicate, connectionDetailFunction);
+        final Predicate<HDFSResourceDetails> predicate = detail -> request.getType().equals(detail.getType());
+        return getMapCompletableFuture(pathString, predicate);
     }
 
     @Override
     public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(final GetResourcesByFormatRequest request) {
         final String pathString = jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
-        final Predicate<HDFSResourceDetails> predicate = detail -> nonNull(dataFormat.get(detail.getFormat())) && request.getFormat().equals(detail.getFormat());
-        final Function<HDFSResourceDetails, ConnectionDetail> connectionDetailFunction = resourceDetails -> dataFormat.get(resourceDetails.getFormat());
-        return getMapCompletableFuture(pathString, predicate, connectionDetailFunction);
+        final Predicate<HDFSResourceDetails> predicate = detail -> request.getFormat().equals(detail.getFormat());
+        return getMapCompletableFuture(pathString, predicate);
     }
 
     @Override
@@ -158,18 +149,18 @@ public class HDFSResourceService implements ResourceService {
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
     public HashMap<String, ConnectionDetail> getDataType() {
-        return dataType;
+        return connectionDetailStorage.getDataType();
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
     public HashMap<String, ConnectionDetail> getDataFormat() {
-        return dataFormat;
+        return connectionDetailStorage.getDataFormat();
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
     public Map<String, String> getJobConf() {
         Map<String, String> rtn = Maps.newHashMap();
-        Map<String, String> plainJobConfWithoutResolvingValues= getPlainJobConfWithoutResolvingValues();
+        Map<String, String> plainJobConfWithoutResolvingValues = getPlainJobConfWithoutResolvingValues();
 
         for (Entry<String, String> entry : jobConf) {
             final String plainValue = plainJobConfWithoutResolvingValues.get(entry.getKey());
@@ -191,42 +182,95 @@ public class HDFSResourceService implements ResourceService {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        } else if (isNull(o)) {
-            return false;
-        }
+        if (this == o) return true;
 
-        final EqualsBuilder builder = new EqualsBuilder();
-        builder.append(this.getClass(), o.getClass());
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final HDFSResourceService that = (HDFSResourceService) o;
+
+        final EqualsBuilder builder = new EqualsBuilder()
+                .append(this.fileSystem, that.fileSystem)
+                .append(this.connectionDetailStorage, that.connectionDetailStorage);
+
         if (builder.isEquals()) {
-            final HDFSResourceService that = (HDFSResourceService) o;
-            builder.append(this.fileSystem, that.fileSystem);
-            builder.append(this.dataFormat, that.dataFormat);
-            builder.append(this.dataType, that.dataType);
-            if (builder.isEquals()) {
-                builder.append(this.jobConf.size(), that.jobConf.size());
-                for (Entry<String, String> entry : this.jobConf) {
-                    final String lhs = this.jobConf.get(entry.getKey());
-                    final String rhs = that.jobConf.get(entry.getKey());
-                    builder.append(lhs, rhs);
-                    if (!builder.isEquals()) {
-                        break;
-                    }
+            builder.append(this.jobConf.size(), that.jobConf.size());
+            for (Entry<String, String> entry : this.jobConf) {
+                final String lhs = this.jobConf.get(entry.getKey());
+                final String rhs = that.jobConf.get(entry.getKey());
+                builder.append(lhs, rhs);
+                if (!builder.isEquals()) {
+                    break;
                 }
             }
         }
+
         return builder.isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(19, 17)
+        return new HashCodeBuilder(17, 37)
                 .append(jobConf)
                 .append(fileSystem)
-                .append(dataFormat)
-                .append(dataType)
-                .build();
+                .append(connectionDetailStorage)
+                .toHashCode();
+    }
+
+    private class ConnectionDetailStorage {
+        private final HashMap<String, ConnectionDetail> dataFormat = new HashMap<>();
+        private final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
+
+        public ConnectionDetailStorage(HashMap<String, ConnectionDetail> dataFormat, HashMap<String, ConnectionDetail> dataType) {
+            if (nonNull(dataFormat)) {
+                this.dataFormat.putAll(dataFormat);
+                this.dataFormat.values().removeIf(Objects::isNull);
+            }
+            if (nonNull(dataType)) {
+                this.dataType.putAll(dataType);
+                this.dataType.values().removeIf(Objects::isNull);
+            }
+        }
+
+        public ConnectionDetail get(final String type, final String format) {
+            ConnectionDetail rtn = dataType.get(type);
+            if (Objects.isNull(rtn)) {
+                rtn = dataFormat.get(format);
+                if (Objects.isNull(rtn)) {
+                    throw new IllegalStateException(String.format("Connection detail could not be found for type: %s format: %s", type, format));
+                }
+            }
+            return rtn;
+        }
+
+        public HashMap<String, ConnectionDetail> getDataFormat() {
+            return new HashMap<>(dataFormat);
+        }
+
+        public HashMap<String, ConnectionDetail> getDataType() {
+            return new HashMap<>(dataType);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+
+            if (o == null || getClass() != o.getClass()) return false;
+
+            final ConnectionDetailStorage that = (ConnectionDetailStorage) o;
+
+            return new EqualsBuilder()
+                    .append(this.dataFormat, that.dataFormat)
+                    .append(this.dataType, that.dataType)
+                    .isEquals();
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder(17, 37)
+                    .append(dataFormat)
+                    .append(dataType)
+                    .toHashCode();
+        }
     }
 }
 
