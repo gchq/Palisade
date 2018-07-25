@@ -1,0 +1,20 @@
+{
+  "class": "uk.gov.gchq.palisade.resource.service.HashMapResourceService",
+  "resources": [
+    {
+      "container": {
+        "class": "uk.gov.gchq.palisade.resource.impl.DirectoryResource",
+        "id": "dir1",
+        "type": "exampleObj"
+      },
+      "resource": {
+        "class": "uk.gov.gchq.palisade.resource.impl.FileResource",
+        "id": "file1",
+        "type": "exampleObj"
+      },
+      "connectionDetail": {
+        "class": "uk.gov.gchq.palisade.service.request.SimpleConnectionDetail"
+      }
+    }
+  ]
+}
