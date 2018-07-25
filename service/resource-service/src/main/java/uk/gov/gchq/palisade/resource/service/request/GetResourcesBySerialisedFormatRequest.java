@@ -24,31 +24,31 @@ import uk.gov.gchq.palisade.service.request.Request;
 
 /**
  * This class is used to request a list of {@link uk.gov.gchq.palisade.resource.Resource}'s
- * from the {@link uk.gov.gchq.palisade.resource.service.ResourceService} based on the format of those resources.
- * For example getting a list of all {@link uk.gov.gchq.palisade.resource.Resource}'s where the format is CSV.
+ * from the {@link uk.gov.gchq.palisade.resource.service.ResourceService} based on the serialisedFormat of those resources.
+ * For example getting a list of all {@link uk.gov.gchq.palisade.resource.Resource}'s where the serialisedFormat is CSV.
  */
-public class GetResourcesByFormatRequest extends Request {
-    private String format;
+public class GetResourcesBySerialisedFormatRequest extends Request {
+    private String serialisedFormat;
 
     // no-args constructor required
-    public GetResourcesByFormatRequest() {
+    public GetResourcesBySerialisedFormatRequest() {
     }
 
     /**
      * Default constructor
      *
-     * @param format The format of the {@link uk.gov.gchq.palisade.resource.Resource}'s that you want to know about.
+     * @param serialisedFormat The serialisedFormat of the {@link uk.gov.gchq.palisade.resource.Resource}'s that you want to know about.
      */
-    public GetResourcesByFormatRequest(final String format) {
-        this.format = format;
+    public GetResourcesBySerialisedFormatRequest(final String serialisedFormat) {
+        this.serialisedFormat = serialisedFormat;
     }
 
-    public String getFormat() {
-        return format;
+    public String getSerialisedFormat() {
+        return serialisedFormat;
     }
 
-    public void setFormat(final String format) {
-        this.format = format;
+    public void setSerialisedFormat(final String serialisedFormat) {
+        this.serialisedFormat = serialisedFormat;
     }
 
     @Override
@@ -61,24 +61,24 @@ public class GetResourcesByFormatRequest extends Request {
             return false;
         }
 
-        final GetResourcesByFormatRequest that = (GetResourcesByFormatRequest) o;
+        final GetResourcesBySerialisedFormatRequest that = (GetResourcesBySerialisedFormatRequest) o;
 
         return new EqualsBuilder()
-                .append(format, that.format)
+                .append(serialisedFormat, that.serialisedFormat)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 31)
-                .append(format)
+                .append(serialisedFormat)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("format", format)
+                .append("serialisedFormat", serialisedFormat)
                 .toString();
     }
 }

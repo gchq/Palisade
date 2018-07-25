@@ -31,6 +31,7 @@
         <module>hashmap-user-service</module>
         <module>rest-user-service</module>
         <module>proxy-rest-user-service</module>
+        <module>ldap-user-service</module>
     </modules>
 
     <dependencies>

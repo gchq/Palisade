@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -35,10 +36,23 @@ import java.util.Set;
  * The user auths are used specifically to decide what visibilities users can see.
  * </p>
  */
-public class User {
+public class User implements Cloneable {
     private UserId userId = new UserId();
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
+
+    public User clone() {
+        User clone;
+        try {
+            clone = (User) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new User();
+        }
+        clone.userId = userId.clone();
+        clone.roles = Sets.newHashSet(roles);
+        clone.auths = Sets.newHashSet(auths);
+        return clone;
+    }
 
     public Set<String> getAuths() {
         return auths;
@@ -80,6 +94,11 @@ public class User {
         return this;
     }
 
+    public User auths(final Set<String> auths) {
+        this.auths.addAll(auths);
+        return this;
+    }
+
     /**
      * Adds the user roles.
      *
@@ -88,6 +107,11 @@ public class User {
      */
     public User roles(final String... roles) {
         Collections.addAll(this.roles, roles);
+        return this;
+    }
+
+    public User roles(final Set<String> roles) {
+        this.roles.addAll(roles);
         return this;
     }
 

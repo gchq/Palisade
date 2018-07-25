@@ -31,7 +31,7 @@ public class SystemResource extends AbstractResource implements ParentResource {
         super(id, type);
     }
 
-    public SystemResource(final String id, final String type, final String format) {
-        super(id, type, format);
+    public SystemResource(final String id, final String type, final String serialisedFormat) {
+        super(id, type, serialisedFormat);
     }
 }

@@ -16,9 +16,9 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
@@ -80,10 +80,10 @@ public class HDFSResourceServiceTest {
         fs.mkdirs(new Path(inputPathString));
         expected = Maps.newHashMap();
         dataFormat = new HashMap<>();
-        simpleFormat = new SimpleConnectionDetail("simpleFormat");
+        simpleFormat = new SimpleConnectionDetail();
         dataFormat.put(FORMAT_VALUE, simpleFormat);
         dataType = new HashMap<>();
-        simpleType = new SimpleConnectionDetail("simpleType");
+        simpleType = new SimpleConnectionDetail();
         dataType.put(TYPE_VALUE, simpleType);
     }
 
@@ -168,7 +168,7 @@ public class HDFSResourceServiceTest {
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesByFormat(new GetResourcesByFormatRequest(FORMAT_VALUE));
+        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesBySerialisedFormat(new GetResourcesBySerialisedFormatRequest(FORMAT_VALUE));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -206,7 +206,7 @@ public class HDFSResourceServiceTest {
         dataFormat.clear();
         dataType.clear();
 
-        dataFormat.put("testKey1", new SimpleConnectionDetail("myDetails"));
+        dataFormat.put("testKey1", new SimpleConnectionDetail());
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
         final byte[] serialise = JSONSerialiser.serialise(service, true);
 
@@ -215,7 +215,10 @@ public class HDFSResourceServiceTest {
                 "  \"dataFormat\" : {\n" +
                 "    \"testKey1\" : {\n" +
                 "      \"class\" : \"uk.gov.gchq.palisade.service.request.SimpleConnectionDetail\",\n" +
-                "      \"details\" : \"myDetails\"\n" +
+                "      \"service\" : {\n" +
+                "        \"class\" : \"uk.gov.gchq.palisade.service.NullService\",\n" +
+                "        \"class\" : \"uk.gov.gchq.palisade.service.NullService\"\n" +
+                "      }\n" +
                 "    }\n" +
                 "  },\n" +
                 "  \"dataType\" : { },\n" +
