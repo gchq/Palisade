@@ -58,8 +58,9 @@ import static java.util.Objects.nonNull;
 
 public class HDFSResourceService implements ResourceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HDFSResourceService.class);
-    public static final String ADD_RESOURCE_ERROR = "AddResource is not supported by HDFSResourceService resources should be added/created via regular HDFS behaviour.";
+    public static final String ERROR_ADD_RESOURCE = "AddResource is not supported by HDFSResourceService resources should be added/created via regular HDFS behaviour.";
     public static final String ERROR_OUT_SCOPE = "resource ID is out of scope of the this resource Service. Found: %s expected: %s";
+    public static final String ERROR_DETAIL_NOT_FOUND = "Connection detail could not be found for type: %s format: %s";
 
     private final JobConf jobConf;
     private final FileSystem fileSystem;
@@ -99,7 +100,6 @@ public class HDFSResourceService implements ResourceService {
     private CompletableFuture<Map<Resource, ConnectionDetail>> getMapCompletableFuture(final String pathString, final Predicate<HDFSResourceDetails> predicate) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-
                 final RemoteIterator<LocatedFileStatus> remoteIterator = this.fileSystem.listFiles(new Path(pathString), true);
                 return getPaths(remoteIterator)
                         .stream()
@@ -134,7 +134,7 @@ public class HDFSResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
-        throw new UnsupportedOperationException(ADD_RESOURCE_ERROR);
+        throw new UnsupportedOperationException(ERROR_ADD_RESOURCE);
     }
 
     protected static Collection<String> getPaths(final RemoteIterator<LocatedFileStatus> remoteIterator) throws IOException {
@@ -236,7 +236,7 @@ public class HDFSResourceService implements ResourceService {
             if (Objects.isNull(rtn)) {
                 rtn = dataFormat.get(format);
                 if (Objects.isNull(rtn)) {
-                    throw new IllegalStateException(String.format("Connection detail could not be found for type: %s format: %s", type, format));
+                    throw new IllegalStateException(String.format(ERROR_DETAIL_NOT_FOUND, type, format));
                 }
             }
             return rtn;

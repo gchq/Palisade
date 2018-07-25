@@ -30,6 +30,7 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -196,7 +197,7 @@ public class HDFSResourceServiceTest {
             service.addResource(null);
             fail("exception expected");
         } catch (UnsupportedOperationException e) {
-            assertEquals(HDFSResourceService.ADD_RESOURCE_ERROR, e.getMessage());
+            assertEquals(HDFSResourceService.ERROR_ADD_RESOURCE, e.getMessage());
         }
     }
 
@@ -234,6 +235,45 @@ public class HDFSResourceServiceTest {
         final String modifiedActual = modified.toString();
         assertEquals(StringOfSerialised, expected, modifiedActual);
         assertEquals(StringOfSerialised, service, JSONSerialiser.deserialise(serialise, HDFSResourceService.class));
+    }
+
+    @Test
+    public void shouldErrorWithNotConnectionDetails() throws Exception {
+        //given
+        dataFormat.clear();
+        dataType.clear();
+        final String id = inputPathString + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
+        expected.put(new FileResource(id, TYPE_VALUE, FORMAT_VALUE), simpleType);
+
+        //when
+        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
+        try {
+            final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(FILE + id));
+            resourcesById.get();
+            fail("exception expected");
+        } catch (ExecutionException e) {
+            //then
+            assertEquals(String.format(HDFSResourceService.ERROR_DETAIL_NOT_FOUND, TYPE_VALUE, FORMAT_VALUE), e.getCause().getMessage());
+        }
+    }
+
+    @Test
+    public void shouldGetFormatConnectionWhenNoTypeConnection() throws Exception {
+        //given
+        dataType.clear();
+        final String id = inputPathString + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
+        expected.put(new FileResource(id, TYPE_VALUE, FORMAT_VALUE), simpleFormat);
+
+        //when
+        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
+        final CompletableFuture<Map<Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(FILE + id));
+
+        //then
+        assertEquals(expected, resourcesById.join());
     }
 
     private void writeFile(final FileSystem fs, final String parentPath, final String name, final String format, final String type) throws IOException {
