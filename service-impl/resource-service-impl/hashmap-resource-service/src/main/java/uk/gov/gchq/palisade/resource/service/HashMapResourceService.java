@@ -16,7 +16,6 @@
 
 package uk.gov.gchq.palisade.resource.service;
 
-import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByFormatRequest;
@@ -29,7 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -111,19 +109,15 @@ public class HashMapResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
-        final Resource resource = request.getResource();
-        indexResource(resource, resource, request.getConnectionDetail(), resourceToResources);
-        indexResource(resource.getId(), resource, request.getConnectionDetail(), idToResources);
-        indexResource(resource.getType(), resource, request.getConnectionDetail(), typeToResources);
-        indexResource(resource.getFormat(), resource, request.getConnectionDetail(), formatToResources);
+        indexResource(request.getResource(), request.getResource(), request.getConnectionDetail(), resourceToResources);
+        indexResource(request.getResource().getId(), request.getResource(), request.getConnectionDetail(), idToResources);
+        indexResource(request.getResource().getType(), request.getResource(), request.getConnectionDetail(), typeToResources);
+        indexResource(request.getResource().getFormat(), request.getResource(), request.getConnectionDetail(), formatToResources);
 
-        final ParentResource parent = request.getParent();
-        if (Objects.nonNull(parent)) {
-            indexResource(parent, resource, request.getConnectionDetail(), resourceToResources);
-            indexResource(parent.getId(), resource, request.getConnectionDetail(), idToResources);
-            indexResource(parent.getType(), resource, request.getConnectionDetail(), typeToResources);
-            indexResource(parent.getFormat(), resource, request.getConnectionDetail(), formatToResources);
-        }
+        indexResource(request.getParent(), request.getResource(), request.getConnectionDetail(), resourceToResources);
+        indexResource(request.getParent().getId(), request.getResource(), request.getConnectionDetail(), idToResources);
+        indexResource(request.getParent().getType(), request.getResource(), request.getConnectionDetail(), typeToResources);
+        indexResource(request.getParent().getFormat(), request.getResource(), request.getConnectionDetail(), formatToResources);
         return CompletableFuture.completedFuture(true);
     }
 
