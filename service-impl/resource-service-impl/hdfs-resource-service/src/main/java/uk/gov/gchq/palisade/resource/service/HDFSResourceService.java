@@ -66,14 +66,14 @@ public class HDFSResourceService implements ResourceService {
     private final FileSystem fileSystem;
     private final ConnectionDetailStorage connectionDetailStorage;
 
-    public HDFSResourceService(JobConf jobConf, final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) throws IOException {
+    public HDFSResourceService(final JobConf jobConf, final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) throws IOException {
         this.jobConf = jobConf;
         this.fileSystem = FileSystem.get(jobConf);
         this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
     }
 
     @JsonCreator
-    public HDFSResourceService(@JsonProperty("jobConf") Map<String, String> jobConf,
+    public HDFSResourceService(@JsonProperty("jobConf") final Map<String, String> jobConf,
                                @JsonProperty("dataFormat") final HashMap<String, ConnectionDetail> dataFormat,
                                @JsonProperty("dataType") final HashMap<String, ConnectionDetail> dataType) throws IOException {
         this(new JobConf(), dataFormat, dataType);
@@ -104,7 +104,6 @@ public class HDFSResourceService implements ResourceService {
                 return getPaths(remoteIterator)
                         .stream()
                         .map(HDFSResourceDetails::getResourceDetailsFromConnectionDetails)
-                        .filter(detail -> nonNull(connectionDetailStorage.get(detail.getType(), detail.getFormat())))
                         .filter(predicate)
                         .collect(Collectors.toMap(
                                 (HDFSResourceDetails resourceDetails) -> new FileResource(resourceDetails.getConnectionDetail(), resourceDetails.getType(), resourceDetails.getFormat()),
@@ -182,9 +181,13 @@ public class HDFSResourceService implements ResourceService {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final HDFSResourceService that = (HDFSResourceService) o;
 
@@ -220,7 +223,7 @@ public class HDFSResourceService implements ResourceService {
         private final HashMap<String, ConnectionDetail> dataFormat = new HashMap<>();
         private final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
 
-        public ConnectionDetailStorage(HashMap<String, ConnectionDetail> dataFormat, HashMap<String, ConnectionDetail> dataType) {
+        ConnectionDetailStorage(final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) {
             if (nonNull(dataFormat)) {
                 this.dataFormat.putAll(dataFormat);
                 this.dataFormat.values().removeIf(Objects::isNull);
@@ -252,9 +255,13 @@ public class HDFSResourceService implements ResourceService {
 
         @Override
         public boolean equals(final Object o) {
-            if (this == o) return true;
+            if (this == o) {
+                return true;
+            }
 
-            if (o == null || getClass() != o.getClass()) return false;
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
 
             final ConnectionDetailStorage that = (ConnectionDetailStorage) o;
 
