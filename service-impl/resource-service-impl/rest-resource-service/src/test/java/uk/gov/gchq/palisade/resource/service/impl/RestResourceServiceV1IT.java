@@ -26,9 +26,9 @@ import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
@@ -155,18 +155,18 @@ public class RestResourceServiceV1IT {
         final ResourceService resourceService = mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
 
-        final GetResourcesByFormatRequest request = new GetResourcesByFormatRequest("format1");
+        final GetResourcesBySerialisedFormatRequest request = new GetResourcesBySerialisedFormatRequest("format1");
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
         expectedResult.put(new FileResource("file1", "type1", "format1"), new SimpleConnectionDetail());
 
-        given(resourceService.getResourcesByFormat(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
+        given(resourceService.getResourcesBySerialisedFormat(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
-        final Map<Resource, ConnectionDetail> result = proxy.getResourcesByFormat(request).join();
+        final Map<Resource, ConnectionDetail> result = proxy.getResourcesBySerialisedFormat(request).join();
 
         // Then
         assertEquals(expectedResult, result);
-        verify(resourceService).getResourcesByFormat(request);
+        verify(resourceService).getResourcesBySerialisedFormat(request);
     }
 }

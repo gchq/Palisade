@@ -28,9 +28,9 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
@@ -136,7 +136,7 @@ public class RestResourceServiceV1 implements ResourceService {
     }
 
     @POST
-    @Path("/getResourcesByFormat")
+    @Path("/getResourcesBySerialisedFormat")
     @ApiOperation(value = "Returns the resources",
             response = DataRequestConfig.class)
     @ApiResponses(value = {
@@ -144,15 +144,15 @@ public class RestResourceServiceV1 implements ResourceService {
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
     public Map<Resource, ConnectionDetail> getResourcesByFormatSync(
-            @ApiParam(value = "The request") final GetResourcesByFormatRequest request) {
-        return getResourcesByFormat(request).join();
+            @ApiParam(value = "The request") final GetResourcesBySerialisedFormatRequest request) {
+        return getResourcesBySerialisedFormat(request).join();
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(
-            final GetResourcesByFormatRequest request) {
-        LOGGER.debug("Invoking getResourcesByFormat: {}", request);
-        return delegate.getResourcesByFormat(request);
+    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesBySerialisedFormat(
+            final GetResourcesBySerialisedFormatRequest request) {
+        LOGGER.debug("Invoking getResourcesBySerialisedFormat: {}", request);
+        return delegate.getResourcesBySerialisedFormat(request);
     }
 
     @PUT
