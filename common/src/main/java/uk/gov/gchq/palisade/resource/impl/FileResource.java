@@ -35,8 +35,8 @@ public class FileResource extends AbstractResource implements ChildResource {
         super(id, type);
     }
 
-    public FileResource(final String id, final String type, final String format) {
-        super(id, type, format);
+    public FileResource(final String id, final String type, final String serialisedFormat) {
+        super(id, type, serialisedFormat);
     }
 
     @Override
