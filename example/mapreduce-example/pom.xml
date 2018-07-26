@@ -21,11 +21,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>client-impl</artifactId>
+        <artifactId>example</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-
-    <artifactId>mapreduce-client</artifactId>
-
+    <artifactId>mapreduce-example</artifactId>
+    <packaging>jar</packaging>
 
 </project>

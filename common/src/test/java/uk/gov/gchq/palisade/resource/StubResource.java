@@ -59,12 +59,12 @@ public class StubResource implements Resource, Comparable<StubResource> {
     }
 
     @Override
-    public String getFormat() {
+    public String getSerialisedFormat() {
         return format;
     }
 
     @Override
-    public void setFormat(String format) {
+    public void setSerialisedFormat(String format) {
         this.format = format;
     }
 
@@ -105,7 +105,7 @@ public class StubResource implements Resource, Comparable<StubResource> {
                 .toString();
     }
 
-    private static Comparator<StubResource> comp = Comparator.comparing(StubResource::getFormat).thenComparing(StubResource::getType).thenComparing(StubResource::getId);
+    private static Comparator<StubResource> comp = Comparator.comparing(StubResource::getSerialisedFormat).thenComparing(StubResource::getType).thenComparing(StubResource::getId);
 
     /**
      * {@inheritDoc}
