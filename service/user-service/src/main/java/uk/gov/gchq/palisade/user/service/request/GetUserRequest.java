@@ -84,6 +84,7 @@ public class GetUserRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("userId", userId)
                 .toString();
     }

@@ -142,6 +142,7 @@ public class AuditRequest extends Request {
         final AuditRequest that = (AuditRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(justification, that.justification)
                 .append(user, that.user)
                 .append(resource, that.resource)
@@ -153,6 +154,7 @@ public class AuditRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(19, 37)
+                .appendSuper(super.hashCode())
                 .append(justification)
                 .append(user)
                 .append(resource)
@@ -164,6 +166,7 @@ public class AuditRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("justification", justification)
                 .append("user", user)
                 .append("resource", resource)

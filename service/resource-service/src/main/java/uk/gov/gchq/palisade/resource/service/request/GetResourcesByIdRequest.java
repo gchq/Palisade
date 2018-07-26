@@ -65,6 +65,7 @@ public class GetResourcesByIdRequest extends Request {
         final GetResourcesByIdRequest that = (GetResourcesByIdRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(resourceId, that.resourceId)
                 .isEquals();
     }
@@ -72,6 +73,7 @@ public class GetResourcesByIdRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(13, 37)
+                .appendSuper(super.hashCode())
                 .append(resourceId)
                 .toHashCode();
     }
@@ -79,6 +81,7 @@ public class GetResourcesByIdRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("resourceId", resourceId)
                 .toString();
     }

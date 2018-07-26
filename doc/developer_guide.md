@@ -56,7 +56,7 @@ The data service is responsible for connecting to the data and sanitising the da
 [Check out the data service readme for more details](../service/data-service/README.md)
 
 #### Data Reader
-The job of the data reader is to read a single resource, serialise it into the format that the set of rules for this resource will expect and then apply those rules before passing the data back to the data service. The data reader should also be able to push down filters where appropriate to optimise the read process, e.g. to only retrieve certain columns from a columnar database or a particular row range.
+The job of the data reader is to read a single resource, de-serialise it into the format that the set of rules for this resource will expect and then apply those rules before passing the data back to the data service. The data reader should also be able to push down filters where appropriate to optimise the read process, e.g. to only retrieve certain columns from a columnar database or a particular row range.
 
 ### Audit Service
 The audit service is responsible for recording audit logs as requested by other services.

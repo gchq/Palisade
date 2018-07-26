@@ -90,6 +90,7 @@ public class GetPolicyRequest extends Request {
         final GetPolicyRequest that = (GetPolicyRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(user, that.user)
                 .append(justification, that.justification)
                 .append(resources, that.resources)
@@ -99,6 +100,7 @@ public class GetPolicyRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(19, 29)
+                .appendSuper(super.hashCode())
                 .append(user)
                 .append(justification)
                 .append(resources)
@@ -108,6 +110,7 @@ public class GetPolicyRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("user", user)
                 .append("justification", justification)
                 .append("resources", resources)

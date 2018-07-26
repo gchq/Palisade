@@ -102,6 +102,7 @@ public class AddResourceRequest extends Request {
         final AddResourceRequest that = (AddResourceRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(parent, that.parent)
                 .append(resource, that.resource)
                 .append(connectionDetail, that.connectionDetail)
@@ -111,6 +112,7 @@ public class AddResourceRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
                 .append(parent)
                 .append(resource)
                 .append(connectionDetail)
@@ -120,6 +122,7 @@ public class AddResourceRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("parent", parent)
                 .append("resource", resource)
                 .append("connectionDetail", connectionDetail)

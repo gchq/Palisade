@@ -86,6 +86,7 @@ public class RegisterDataRequest extends Request {
         final RegisterDataRequest that = (RegisterDataRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(userId, that.userId)
                 .append(justification, that.justification)
                 .append(resource, that.resource)
@@ -95,6 +96,7 @@ public class RegisterDataRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(59, 67)
+                .appendSuper(super.hashCode())
                 .append(userId)
                 .append(justification)
                 .append(resource)
@@ -104,6 +106,7 @@ public class RegisterDataRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("userId", userId)
                 .append("justification", justification)
                 .append("resource", resource)

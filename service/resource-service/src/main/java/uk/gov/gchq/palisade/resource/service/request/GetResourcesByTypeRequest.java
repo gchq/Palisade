@@ -64,6 +64,7 @@ public class GetResourcesByTypeRequest extends Request {
         final GetResourcesByTypeRequest that = (GetResourcesByTypeRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(type, that.type)
                 .isEquals();
     }
@@ -71,6 +72,7 @@ public class GetResourcesByTypeRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 41)
+                .appendSuper(super.hashCode())
                 .append(type)
                 .toHashCode();
     }
@@ -78,6 +80,7 @@ public class GetResourcesByTypeRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("type", type)
                 .toString();
     }
