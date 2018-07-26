@@ -19,6 +19,11 @@ import uk.gov.gchq.palisade.ToStringBuilder;
 
 import java.util.regex.Pattern;
 
+/**
+ * A storage class for the resources within {@link HDFSResourceService}.
+ * <p>
+ * This class has logic for manipulating the path of the resource into [connectionDetail, type, format]
+ */
 public class HDFSResourceDetails {
     public static final String TYPE_DEL = "_";
     public static final String FORMAT_DEL = ".";

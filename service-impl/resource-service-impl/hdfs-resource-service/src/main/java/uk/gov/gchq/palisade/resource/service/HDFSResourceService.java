@@ -59,6 +59,14 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+/**
+ * A implementation of the ResourceService for HDFS.
+ * <p>
+ * This service is for the retrieval of Resources only. Resources cannot be added via this service,
+ * they should be added through the actual real HDFS.
+ *
+ * @see ResourceService
+ */
 @JsonPropertyOrder(value = {"class", "conf", "dataFormat", "dataType"}, alphabetic = true)
 public class HDFSResourceService implements ResourceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HDFSResourceService.class);
