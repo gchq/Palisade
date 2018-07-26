@@ -82,6 +82,7 @@ public class AddUserRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("user", user)
                 .toString();
     }

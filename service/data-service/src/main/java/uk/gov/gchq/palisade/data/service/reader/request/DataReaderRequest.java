@@ -103,6 +103,7 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
         final DataReaderRequest<?> that = (DataReaderRequest<?>) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(resource, that.resource)
                 .append(user, that.user)
                 .append(justification, that.justification)
@@ -113,6 +114,7 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 73)
+                .appendSuper(super.hashCode())
                 .append(resource)
                 .append(user)
                 .append(justification)
@@ -123,6 +125,7 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("resource", resource)
                 .append("user", user)
                 .append("justification", justification)

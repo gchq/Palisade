@@ -64,6 +64,7 @@ public class GetResourcesBySerialisedFormatRequest extends Request {
         final GetResourcesBySerialisedFormatRequest that = (GetResourcesBySerialisedFormatRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(serialisedFormat, that.serialisedFormat)
                 .isEquals();
     }
@@ -71,6 +72,7 @@ public class GetResourcesBySerialisedFormatRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 31)
+                .appendSuper(super.hashCode())
                 .append(serialisedFormat)
                 .toHashCode();
     }
@@ -78,6 +80,7 @@ public class GetResourcesBySerialisedFormatRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("serialisedFormat", serialisedFormat)
                 .toString();
     }

@@ -123,6 +123,7 @@ public class CanAccessRequest extends Request {
         final CanAccessRequest that = (CanAccessRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(user, that.user)
                 .append(resource, that.resource)
                 .append(justification, that.justification)
@@ -132,6 +133,7 @@ public class CanAccessRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(11, 13)
+                .appendSuper(super.hashCode())
                 .append(user)
                 .append(resource)
                 .append(justification)
@@ -141,6 +143,7 @@ public class CanAccessRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("user", user)
                 .append("resource", resource)
                 .append("justification", justification)
