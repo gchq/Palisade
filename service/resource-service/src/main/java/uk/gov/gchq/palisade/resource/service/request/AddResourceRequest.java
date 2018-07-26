@@ -38,31 +38,30 @@ public class AddResourceRequest extends Request {
     }
 
     /**
-     * Constructs an {@link AddResourceRequest} with no connection details
-     *
-     * @param parent   The parent resource, so a {@link uk.gov.gchq.palisade.resource.impl.SystemResource}
-     *                 if it is a {@link uk.gov.gchq.palisade.resource.impl.StreamResource}/{@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} to be added,
-     *                 or a {@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} if it is a {@link uk.gov.gchq.palisade.resource.impl.FileResource}.
-     * @param resource The {@link Resource} to be added.
+     * @param parent The parent resource, so a {@link uk.gov.gchq.palisade.resource.impl.SystemResource}
+     * @return the {@link AddResourceRequest}
      */
-    public AddResourceRequest(final ParentResource parent, final Resource resource) {
+    public AddResourceRequest parent(final ParentResource parent) {
         this.parent = parent;
-        this.resource = resource;
+        return this;
     }
 
     /**
-     * Constructs an {@link AddResourceRequest}
-     *
-     * @param parent           The parent resource, so a {@link uk.gov.gchq.palisade.resource.impl.SystemResource}
-     *                         if it is a {@link uk.gov.gchq.palisade.resource.impl.StreamResource}/{@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} to be added,
-     *                         or a {@link uk.gov.gchq.palisade.resource.impl.DirectoryResource} if it is a {@link uk.gov.gchq.palisade.resource.impl.FileResource}.
-     * @param resource         The {@link Resource} to be added.
-     * @param connectionDetail Details of how to get to the data from the {@code DataService}.
+     * @param resource The {@link Resource} to be added.
+     * @return the {@link AddResourceRequest}
      */
-    public AddResourceRequest(final ParentResource parent, final Resource resource, final ConnectionDetail connectionDetail) {
-        this.parent = parent;
+    public AddResourceRequest resource(final Resource resource) {
         this.resource = resource;
+        return this;
+    }
+
+    /**
+     * @param connectionDetail Details of how to get to the data from the {@code DataService}.
+     * @return the {@link AddResourceRequest}
+     */
+    public AddResourceRequest connectionDetail(final ConnectionDetail connectionDetail) {
         this.connectionDetail = connectionDetail;
+        return this;
     }
 
     public ParentResource getParent() {

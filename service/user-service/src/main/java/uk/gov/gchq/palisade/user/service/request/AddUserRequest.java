@@ -36,13 +36,9 @@ public class AddUserRequest extends Request {
     public AddUserRequest() {
     }
 
-    /**
-     * Constructs an {@link AddUserRequest} without the given {@link User}.
-     *
-     * @param user the user to add
-     */
-    public AddUserRequest(final User user) {
+    public AddUserRequest user(final User user) {
         this.user = user;
+        return this;
     }
 
     public User getUser() {
