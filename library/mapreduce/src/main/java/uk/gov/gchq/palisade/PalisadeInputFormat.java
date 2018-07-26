@@ -15,33 +15,31 @@
  */
 package uk.gov.gchq.palisade;
 
-import org.apache.avro.data.Json;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.util.StringUtils;
+
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.PrimitiveIterator;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.Phaser;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -78,14 +76,21 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     public static final String SERLIALISER_CONFIG_KEY = "uk.gov.gchq.palisade.mapreduce.serialiser.conf";
 
     /**
+     * Hadoop configuration key for setting the job UUID. Used for setting the {@link PalisadeService} for a job.
+     */
+    public static final String UUID_KEY = "uk.gov.gchq.palisade.mapreduce.job.uuid";
+
+    /**
      * Default number of mappers to use. Hint only. Zero means unlimited.
      */
     public static final int DEFAULT_MAX_MAP_HINT = 0;
 
     /**
-     * The Palisade service instance that serves as the central point for gathering data.
+     * Map that stores relationship between unique IDs and the {@link PalisadeService} needed by that job. We use UUIDs
+     * instead of the {@link JobContext}, as we need to guarantee that they can be used as map keys. The UUID is then
+     * stored in the job.
      */
-    private static PalisadeService palisadeService;
+    private static final Map<UUID, PalisadeService> PALISADE_SERVICE_MAP = new ConcurrentHashMap<>();
 
     /**
      * {@inheritDoc}
@@ -103,8 +108,9 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     @Override
     public List<InputSplit> getSplits(final JobContext context) throws IOException {
         Objects.requireNonNull(context, "context");
+        PalisadeService palService = getPalisadeService(context);
         //check we have a service set
-        if (palisadeService == null) {
+        if (palService == null) {
             throw new IllegalStateException("no Palisade service has been specified");
         }
         //get the list for this job
@@ -119,109 +125,59 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
             throw new IllegalStateException("Max map hint illegally set to negative number");
         }
 
-        //store local and call through method, don't access direct!
-        PalisadeService serv = getPalisadeService();
-
         ConcurrentLinkedDeque<InputSplit> splits = new ConcurrentLinkedDeque<>();
         /*Each RegisterDataRequest may result in multiple resources, each of which should be in it's own input split.
         *These may complete at different rates in any order, so we need to know when all of them have finished to know
-        * that all the resources have been added to the final list. Therefore, we use a Phaser to keep count of the number
-        * of registration requests that have been completed.*/
-        final Phaser counter = new Phaser(1); //register self
+        * that all the resources have been added to the final list.*/
         final int maxCounter = (maxMapHint == 0) ? Integer.MAX_VALUE : maxMapHint;
         //create a stream for round robining resources
-
+        final CompletableFuture[] futures = new CompletableFuture[reqs.size()];
+        int i = 0;
         for (RegisterDataRequest req : reqs) {
-            //tell the phaser we have another party active
-            counter.register();
             //this iterator determines which mapper gets which resource
             final PrimitiveIterator.OfInt indexIt = IntStream.iterate(0, x -> (x + 1) % maxCounter).iterator();
             //send request to the Palisade service
-            serv.registerDataRequest(req)
+            futures[i] = palService.registerDataRequest(req)
                     //when the response comes back create input splits based on max mapper hint
-                    .thenApplyAsync(response -> PalisadeInputFormat.toInputSplits(response, indexIt))
+                    .thenApplyAsync(response -> InputFormatUtils.toInputSplits(response, indexIt))
                             //then add them to the master list (which is thread safe)
-                    .thenAccept(splits::addAll)
-                            //signal this has finished
-                    .whenComplete((r, e) -> counter.arriveAndDeregister());
+                    .thenAccept(splits::addAll);
+            i++;
         }
         //wait for everything to finish
-        counter.awaitAdvance(counter.arriveAndDeregister());
+        CompletableFuture.allOf(futures).join();
         return new ArrayList<>(splits);
     }
 
     /**
-     * Takes a response from the Palisade service and creates a list of input splits. A response may contain many
-     * resources, which we wish to split across multiple input splits. Using the provided iterator, this will
-     * round-robin resources to input splits by grouping them and then making a list of those groups. New {@link
-     * DataRequestResponse}s are created inside the input splits to contain the new distributions.
+     * Set the {@link PalisadeService} to be used by a job. This MUST be set by clients before the job launches.
      *
-     * @param response the initial response
-     * @param indexIt  the iterator that provides the keys to group the individual resources
-     * @return a list of input splits
+     * @param context the job to set the service for
+     * @param service the {@link PalisadeService} that requests should be sent to for this job
+     * @throws NullPointerException if anything is null
      */
-    public static List<PalisadeInputSplit> toInputSplits(final DataRequestResponse response,
-                                                         final PrimitiveIterator.OfInt indexIt) {
-        Objects.requireNonNull(response);
-        Objects.requireNonNull(indexIt);
-        return response.getResources().entrySet().stream()
-                //group by the indexIt, which will round robin the resources to
-                //different groupings
-                .collect(Collectors.groupingBy(ignored -> indexIt.next(), listToMapCollector()))
-                        //now take the values of that map (we don't care about the keys)
-                .values()
-                .stream()
-                        //make each map into an input split
-                .map(m -> new PalisadeInputSplit(response.getRequestId(), m))
-                        //reduce to a list
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Returns a {@link Collector} that reduces a stream of {@link java.util.Map.Entry} into the corresponding {@link
-     * Map} with those mappings.
-     *
-     * @param <K> the key type of the entries being converted to a map
-     * @param <R> the value type of the entries
-     * @return a collector that reduces a stream to a map
-     */
-    public static <K, R> Collector<Map.Entry<K, R>, Map<K, R>, Map<K, R>> listToMapCollector() {
-        return Collector.of(
-                //Supplier
-                HashMap<K, R>::new,
-                //Accumulator
-                (map, entry) -> {
-                    map.put(entry.getKey(), entry.getValue());
-                },
-                //Combiner
-                (leftMap, rightMap) -> {
-                    leftMap.putAll(rightMap);
-                    return leftMap;
-                });
-    }
-
-    /**
-     * Specify the Palisade service instance to use for requests. This should be set by clients before the job
-     * launches.
-     *
-     * @param service the Palisade service that requests should be sent to for all jobs
-     * @throws NullPointerException if {@code service} is null
-     */
-    public static synchronized void setPalisadeService(final PalisadeService service) {
+    public static synchronized void setPalisadeService(final JobContext context, final PalisadeService service) {
         //method is syncced in case Hadoop tries to access it from another thread.
+        Objects.requireNonNull(context, "context");
         Objects.requireNonNull(service, "service");
-        PalisadeInputFormat.palisadeService = service;
+        //get UUID
+        UUID uuid = InputFormatUtils.fetchUUIDForJob(context);
+        //stash in map
+        PALISADE_SERVICE_MAP.put(uuid, service);
     }
 
     /**
-     * Get the current Palisade service.
+     * Get the current {@link PalisadeService} for a job.
      *
-     * @return the service
+     * @param context the job to fetch the service for
+     * @return the service or null if none set
+     * @throws NullPointerException if {@code context} is null
      * @apiNote This method should ALWAYS be used instead of accessing the field directly, even internally in this
      * class.
      */
-    public static synchronized PalisadeService getPalisadeService() {
-        return palisadeService;
+    public static synchronized PalisadeService getPalisadeService(final JobContext context) {
+        Objects.requireNonNull(context, "context");
+        return PALISADE_SERVICE_MAP.getOrDefault(InputFormatUtils.fetchUUIDForJob(context), null);
     }
 
     /**
@@ -318,6 +274,7 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      *
      * @param context    the job to configure
      * @param serialiser the serialiser that can decode the value type this job is processing
+     * @param <V>        the output type of the {@link Serialiser}
      */
     public static <V> void setSerialiser(final JobContext context, final Serialiser<Object, V> serialiser) {
         Objects.requireNonNull(context, "context");
@@ -333,6 +290,8 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      *
      * @param conf       the job to configure
      * @param serialiser the serialiser that can decode the value type this job is processing
+     * @param <K>        the input type of the {@link Serialiser}
+     * @param <V>        the output type of the {@link Serialiser}
      * @throws NullPointerException for null parameters
      */
     public static <K extends Object, V> void setSerialiser(final Configuration conf, final Serialiser<K, V> serialiser) {
@@ -370,9 +329,9 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     @SuppressWarnings("unchecked")
     public static <V> Serialiser<Object, V> getSerialiser(final Configuration conf) throws IOException {
         Objects.requireNonNull(conf, "conf");
-        String serialConfig = conf.get(PalisadeInputFormat.SERLIALISER_CONFIG_KEY);
+        String serialConfig = conf.get(SERLIALISER_CONFIG_KEY);
 
-        String className = conf.get(PalisadeInputFormat.SERIALISER_CLASSNAME_KEY);
+        String className = conf.get(SERIALISER_CLASSNAME_KEY);
         if (className == null) {
             throw new IOException("No serialisation classname set. Have you called PalisadeInputFormat.setSerialiser() ?");
         }

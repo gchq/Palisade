@@ -15,10 +15,9 @@
  */
 package uk.gov.gchq.palisade;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.util.StringUtils;
@@ -93,7 +92,6 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
      * @return the number of resources contained in this split
      */
     @Override
-    @JsonIgnore
     public long getLength() throws IOException, InterruptedException {
         return getRequestResponse().getResources().size();
     }
@@ -106,7 +104,6 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
      * @return always returns an empty string array
      */
     @Override
-    @JsonIgnore
     public String[] getLocations() throws IOException, InterruptedException {
         return StringUtils.emptyStringArray;
     }
@@ -118,7 +115,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
     public void write(final DataOutput dataOutput) throws IOException {
         Objects.requireNonNull(dataOutput, "dataOutput");
         //serialise this class to JSON and write out
-        byte[] serial = JSONSerialiser.serialise(this);
+        byte[] serial = JSONSerialiser.serialise(requestResponse);
         dataOutput.writeInt(serial.length);
         dataOutput.write(serial);
     }
@@ -138,10 +135,10 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
         byte[] buffer = new byte[length];
         dataInput.readFully(buffer);
         //deserialise
-        PalisadeInputSplit other = JSONSerialiser.deserialise(buffer, PalisadeInputSplit.class);
-        Objects.requireNonNull(other.requestResponse);
+        DataRequestResponse deserialisedResponse = JSONSerialiser.deserialise(buffer, DataRequestResponse.class);
+        Objects.requireNonNull(deserialisedResponse, "deserialised request response was null");
         //all clear
-        this.requestResponse = other.requestResponse;
+        this.requestResponse = deserialisedResponse;
     }
 
     @Override
@@ -163,7 +160,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(13, 27)
+        return new HashCodeBuilder(13, 29)
                 .append(requestResponse)
                 .toHashCode();
     }

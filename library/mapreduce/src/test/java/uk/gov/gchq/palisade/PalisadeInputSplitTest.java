@@ -35,7 +35,6 @@ import java.io.IOException;
 
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class PalisadeInputSplitTest {
 
     @Test(expected = IOException.class)
@@ -44,10 +43,10 @@ public class PalisadeInputSplitTest {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(buffer);
         dos.writeInt(-1);
-        //When
         ByteArrayInputStream bis = new ByteArrayInputStream(buffer.toByteArray());
         DataInputStream dis = new DataInputStream(bis);
         PalisadeInputSplit test = new PalisadeInputSplit();
+        //When
         test.readFields(dis);
         //Then - throws IOException
         Assert.fail("exception expected");
