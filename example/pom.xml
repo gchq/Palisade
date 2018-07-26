@@ -30,6 +30,6 @@
     <modules>
         <module>single-jvm-example</module>
         <module>multi-jvm-example</module>
-        <module>mapreduce-example</module>
+        <!--<module>mapreduce-example</module>-->
     </modules>
 </project>
