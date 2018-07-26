@@ -45,7 +45,6 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,6 +65,7 @@ public class HDFSResourceService implements ResourceService {
     public static final String ERROR_ADD_RESOURCE = "AddResource is not supported by HDFSResourceService resources should be added/created via regular HDFS behaviour.";
     public static final String ERROR_OUT_SCOPE = "resource ID is out of scope of the this resource Service. Found: %s expected: %s";
     public static final String ERROR_DETAIL_NOT_FOUND = "Connection detail could not be found for type: %s format: %s";
+    public static final String ERROR_RESOLVING_PARENTS = "Error occurred while resolving resourceParents";
 
     private final Configuration conf;
     private final FileSystem fileSystem;
@@ -101,7 +101,6 @@ public class HDFSResourceService implements ResourceService {
         return getMapCompletableFuture(resourceId, ignore -> true);
     }
 
-
     private CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getMapCompletableFuture(final String pathString, final Predicate<HDFSResourceDetails> predicate) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -114,11 +113,7 @@ public class HDFSResourceService implements ResourceService {
                                 (HDFSResourceDetails resourceDetails) -> {
                                     final String connectionDetail = resourceDetails.getConnectionDetail();
                                     final FileResource fileFileResource = new FileResource(connectionDetail, resourceDetails.getType(), resourceDetails.getFormat());
-//                                    try {
-//                                        resolveParents(fileFileResource, conf);
-//                                    } catch (IOException e) {
-//                                        e.printStackTrace();
-//                                    }
+                                    resolveParents(fileFileResource, conf);
                                     return fileFileResource;
                                 },
                                 resourceDetails -> connectionDetailStorage.get(resourceDetails.getType(), resourceDetails.getFormat())
@@ -131,31 +126,22 @@ public class HDFSResourceService implements ResourceService {
         });
     }
 
-    public static void resolveParents(final ChildResource resource, final Configuration jobConf) throws IOException {
-        final String connectionDetail = resource.getId();
+    public static void resolveParents(final ChildResource resource, final Configuration conf) {
+        try {
+            final String connectionDetail = resource.getId();
+            final Path path = new Path(connectionDetail);
+            final int fileDepth = path.depth();
+            final int fsDepth = new Path(conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)).depth();
 
-
-        final Path path = new Path(connectionDetail);
-        final Path parent1 = path.getParent();
-        final URI uri = path.toUri();
-        final String s = uri.toString();
-        final boolean root = path.isRoot();
-        FileSystem fileSystem = path.getFileSystem(jobConf);
-        final Path homeDirectory = fileSystem.getHomeDirectory();
-
-
-        final String substring = connectionDetail.substring(0, connectionDetail.lastIndexOf("/"));
-        final String id = jobConf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
-        if (!substring.isEmpty() || !substring.equals(id)) {
-            DirectoryResource parent = new DirectoryResource(substring);
-            resource.setParent(parent);
-            resolveParents(parent, jobConf);
-        } else {
-            if (nonNull(id) && !id.isEmpty() && substring.equals(id)) {
-                resource.setParent(new SystemResource(id));
+            if (fileDepth > fsDepth + 1) {
+                DirectoryResource parent = new DirectoryResource(path.getParent().toString());
+                resource.setParent(parent);
+                resolveParents(parent, conf);
             } else {
-                throw new RuntimeException("while resolving parents of a resource: " + resource + " no id was found for the filesystem default");
+                resource.setParent(new SystemResource(path.getParent().toString()));
             }
+        } catch (Exception e) {
+            throw new RuntimeException(ERROR_RESOLVING_PARENTS, e);
         }
     }
 

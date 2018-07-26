@@ -13,8 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.resource.ChildResource;
+import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
@@ -32,6 +35,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class HDFSFileResourceServiceTest {
@@ -281,10 +286,41 @@ public class HDFSFileResourceServiceTest {
 
     @Test
     public void shouldResolveParents() throws Exception {
-        final String parent = inputPathString + "/" + "folder1" + "/" + "folder2";
+        final String parent = testFolder.getRoot().getAbsolutePath() + "/inputDir" + "/" + "folder1" + "/" + "folder2";
         final String id = parent + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
         final FileResource fileResource = new FileResource(id);
         HDFSResourceService.resolveParents(fileResource, conf);
+
+        final ParentResource parent1 = fileResource.getParent();
+        assertEquals(parent, parent1.getId());
+
+        assertTrue(parent1 instanceof ChildResource);
+        assertTrue(parent1 instanceof DirectoryResource);
+        final ChildResource child = (ChildResource) parent1;
+        HDFSResourceService.resolveParents(child, conf);
+        final ParentResource parent2 = child.getParent();
+        assertEquals(testFolder.getRoot().getAbsolutePath() + "/inputDir" + "/" + "folder1", parent2.getId());
+
+        assertTrue(parent2 instanceof ChildResource);
+        assertTrue(parent2 instanceof DirectoryResource);
+        final ChildResource child2 = (ChildResource) parent2;
+        HDFSResourceService.resolveParents(child2, conf);
+        final ParentResource parent3 = child2.getParent();
+        assertEquals(testFolder.getRoot().getAbsolutePath() + "/inputDir", parent3.getId());
+
+        assertTrue(parent3 instanceof ChildResource);
+        assertTrue(parent3 instanceof DirectoryResource);
+        final ChildResource child3 = (ChildResource) parent3;
+        HDFSResourceService.resolveParents(child3, conf);
+        final ParentResource parent4 = child3.getParent();
+        assertEquals(testFolder.getRoot().getAbsolutePath(), parent4.getId());
+
+        assertTrue(parent4 instanceof SystemResource);
+        assertFalse(parent4 instanceof DirectoryResource);
+        final SystemResource sysRes = (SystemResource) parent4;
+        assertEquals(testFolder.getRoot().getAbsolutePath(), sysRes.getId());
+
+
     }
 
     private void writeFile(final FileSystem fs, final String parentPath, final String name, final String format, final String type) throws IOException {
