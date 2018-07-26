@@ -42,7 +42,7 @@ public class ExampleSimpleDataReader extends SimpleDataReader {
 
     private static Map<Resource, List<?>> createExampleData() {
         final Map<Resource, List<?>> data = new ConcurrentHashMap<>();
-        data.put(new FileResource("file1", "exampleObj"),
+        data.put(new FileResource().id("file1").type("exampleObj"),
                 Stream.of(new ExampleObj("item1a", "public", 1),
                         new ExampleObj("item1b", "public", 10),
                         new ExampleObj("item1c", "public", 20),

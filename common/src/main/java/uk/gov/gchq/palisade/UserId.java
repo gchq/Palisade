@@ -34,20 +34,16 @@ public class UserId implements Cloneable {
      * Constructs a {@link UserId} with the default user ID of "UNKNOWN".
      */
     public UserId() {
-        this(UNKNOWN_USER_ID);
+        id(UNKNOWN_USER_ID);
     }
 
-    /**
-     * Constructs a {@link UserId} with the provided user ID.
-     *
-     * @param id the unique ID of the {@link User}.
-     */
-    public UserId(final String id) {
+    public UserId id(final String id) {
         if (null == id) {
             this.id = UNKNOWN_USER_ID;
         } else {
             this.id = id;
         }
+        return this;
     }
 
     public UserId clone() {

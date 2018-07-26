@@ -68,14 +68,14 @@ public class RestDataServiceV1IT {
         final DataService dataService = Mockito.mock(DataService.class);
         MockDataService.setMock(dataService);
 
-        final FileResource resource1 = new FileResource("file1");
-        final FileResource resource2 = new FileResource("file1");
+        final FileResource resource1 = new FileResource().id("file1");
+        final FileResource resource2 = new FileResource().id("file1");
         final Map<Resource, ConnectionDetail> resources = new HashMap<>();
         resources.put(resource1, new SimpleConnectionDetail());
         resources.put(resource2, new SimpleConnectionDetail());
 
         final Stream<String> data = Stream.of("item1", "item2");
-        final ReadRequest request = new ReadRequest(new DataRequestResponse(new RequestId("id1"), resources));
+        final ReadRequest request = new ReadRequest().dataRequestResponse(new DataRequestResponse().requestId(new RequestId().id("id1")).resources(resources));
 
         final ReadResponse<String> expectedResult = new ReadResponse<>(data, "some message");
         final CompletableFuture futureExpectedResult = CompletableFuture.completedFuture(expectedResult);

@@ -69,7 +69,7 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User userId(final String userId) {
-        return userId(new UserId(userId));
+        return userId(new UserId().id(userId));
     }
 
     /**

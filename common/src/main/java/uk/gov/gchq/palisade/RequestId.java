@@ -27,15 +27,16 @@ public class RequestId {
     private String id;
 
     public RequestId() {
-        this(UNKNOWN_REQUEST_ID);
+        id(UNKNOWN_REQUEST_ID);
     }
 
-    public RequestId(final String id) {
+    public RequestId id(final String id) {
         if (null == id) {
             this.id = UNKNOWN_REQUEST_ID;
         } else {
             this.id = id;
         }
+        return this;
     }
 
     public String getId() {
