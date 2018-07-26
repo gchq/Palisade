@@ -65,11 +65,11 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                         new FileResource("file1", RESOURCE_TYPE),
                         new Policy<ExampleObj>()
                                 .message("Age off and visibility filtering")
-                                .predicateRule(
+                                .recordLevelPredicateRule(
                                         "visibility",
                                         new IsVisible()
                                 )
-                                .simplePredicateRule(
+                                .recordLevelSimplePredicateRule(
                                         "ageOff",
                                         new IsTimestampMoreThan(12L)
                                 )

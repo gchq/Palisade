@@ -47,7 +47,6 @@ public interface PolicyService extends Service {
      * they are allowed access to the resource.
      */
     // TODO: should this return bitmap  = READ, WRITE,EXECUTE ?
-    // TODO could this work on a list of resources the same way as the getPolicy method does?
     CompletableFuture<Boolean> canAccess(final CanAccessRequest request);
 
     /**

@@ -98,7 +98,7 @@ public class MultiPolicy {
     @JsonIgnore
     public Map<Resource, Rules> getRuleMap() {
         final Map<Resource, Rules> rules = new HashMap<>(getPolicies().size());
-        getPolicies().forEach((r, p) -> rules.put(r, p.getRules()));
+        getPolicies().forEach((r, p) -> rules.put(r, p.getRecordRules()));
         return rules;
     }
 

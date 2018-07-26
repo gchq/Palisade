@@ -55,7 +55,7 @@ public interface Rule<T> {
      *
      * @param record        the record to be checked.
      * @param user          the user
-     * @param justification the query justificaiton
+     * @param justification the query justification
      * @return the modified record or null if the record should be fully redacted.
      */
     T apply(final T record, final User user, final Justification justification);

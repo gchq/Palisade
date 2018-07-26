@@ -37,6 +37,7 @@ import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -76,7 +77,7 @@ public class RestPolicyServiceV1IT {
         final UserId userId = new UserId("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
         final Justification justification = new Justification("justification1");
-        final CanAccessRequest request = new CanAccessRequest(resource, user, justification);
+        final CanAccessRequest request = new CanAccessRequest(Collections.singletonList(resource), user, justification);
 
         given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(true));
 
