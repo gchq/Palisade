@@ -95,6 +95,7 @@ public class DataRequestConfig extends Request {
         final DataRequestConfig that = (DataRequestConfig) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(user, that.user)
                 .append(justification, that.justification)
                 .append(rules, that.rules)
@@ -104,6 +105,7 @@ public class DataRequestConfig extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(53, 37)
+                .appendSuper(super.hashCode())
                 .append(user)
                 .append(justification)
                 .append(rules)
@@ -113,6 +115,7 @@ public class DataRequestConfig extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("user", user)
                 .append("justification", justification)
                 .append("rules", rules)

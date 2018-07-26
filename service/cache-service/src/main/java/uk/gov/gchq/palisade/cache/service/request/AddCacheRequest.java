@@ -136,6 +136,7 @@ public class AddCacheRequest extends Request {
         final AddCacheRequest that = (AddCacheRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(requestId, that.requestId)
                 .append(dataRequestConfig, that.dataRequestConfig)
                 .append(timeToLive, that.timeToLive)
@@ -145,6 +146,7 @@ public class AddCacheRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(23, 37)
+                .appendSuper(super.hashCode())
                 .append(requestId)
                 .append(dataRequestConfig)
                 .append(timeToLive)
@@ -154,6 +156,7 @@ public class AddCacheRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("requestId", requestId)
                 .append("dataRequestConfig", dataRequestConfig)
                 .append("TTL", timeToLive)

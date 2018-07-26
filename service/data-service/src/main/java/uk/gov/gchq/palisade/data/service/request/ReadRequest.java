@@ -91,6 +91,7 @@ public class ReadRequest extends Request {
         final ReadRequest that = (ReadRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(dataRequestResponse, that.dataRequestResponse)
                 .isEquals();
     }
@@ -98,6 +99,7 @@ public class ReadRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(47, 37)
+                .appendSuper(super.hashCode())
                 .append(dataRequestResponse)
                 .toHashCode();
     }
@@ -105,6 +107,7 @@ public class ReadRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("dataRequestResponse", dataRequestResponse)
                 .toString();
     }
