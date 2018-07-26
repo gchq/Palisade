@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.resource.impl;
+package uk.gov.gchq.palisade.resource;
 
-import uk.gov.gchq.palisade.resource.AbstractResource;
-import uk.gov.gchq.palisade.resource.Resource;
+/**
+ * This interface indicates that a resource has a parent resource provides
+ * getter and setters to get the parent resource.
+ */
+public interface ChildResource extends Resource {
 
-public class RecordResource extends AbstractResource implements Resource {
-    public RecordResource() {
-    }
+    ParentResource getParent();
 
-    public RecordResource(final String id) {
-        super(id);
-    }
+    void setParent(final ParentResource parent);
 
-    public RecordResource(final String id, final String type) {
-        super(id, type);
-    }
-
-    public RecordResource(final String id, final String type, final String format) {
-        super(id, type, format);
-    }
 }

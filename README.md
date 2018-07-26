@@ -18,7 +18,7 @@ limitations under the License.
 
 # <img src="logos/logo.svg" width="180">
 
-#### Scalable Data Policy Management and Application
+#### Scalable Data Policy Management and Enforcement
 
 ## Status
 <span style="color:red">

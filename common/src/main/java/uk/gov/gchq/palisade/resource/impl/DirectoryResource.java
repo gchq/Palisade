@@ -17,9 +17,12 @@
 package uk.gov.gchq.palisade.resource.impl;
 
 import uk.gov.gchq.palisade.resource.AbstractResource;
-import uk.gov.gchq.palisade.resource.ContainerResource;
+import uk.gov.gchq.palisade.resource.ChildResource;
+import uk.gov.gchq.palisade.resource.ParentResource;
 
-public class DirectoryResource extends AbstractResource implements ContainerResource {
+public class DirectoryResource extends AbstractResource implements ChildResource, ParentResource {
+
+    private ParentResource parent;
 
     public DirectoryResource() {
     }
@@ -32,7 +35,17 @@ public class DirectoryResource extends AbstractResource implements ContainerReso
         super(id, type);
     }
 
-    public DirectoryResource(final String id, final String type, final String format) {
-        super(id, type, format);
+    public DirectoryResource(final String id, final String type, final String serialisedFormat) {
+        super(id, type, serialisedFormat);
+    }
+
+    @Override
+    public ParentResource getParent() {
+        return parent;
+    }
+
+    @Override
+    public void setParent(final ParentResource parentId) {
+        this.parent = parentId;
     }
 }

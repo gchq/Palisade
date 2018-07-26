@@ -17,9 +17,9 @@
 package uk.gov.gchq.palisade.resource.impl;
 
 import uk.gov.gchq.palisade.resource.AbstractResource;
-import uk.gov.gchq.palisade.resource.ContainerResource;
+import uk.gov.gchq.palisade.resource.ParentResource;
 
-public class SystemResource extends AbstractResource implements ContainerResource {
+public class SystemResource extends AbstractResource implements ParentResource {
     public SystemResource() {
     }
 
@@ -31,7 +31,7 @@ public class SystemResource extends AbstractResource implements ContainerResourc
         super(id, type);
     }
 
-    public SystemResource(final String id, final String type, final String format) {
-        super(id, type, format);
+    public SystemResource(final String id, final String type, final String serialisedFormat) {
+        super(id, type, serialisedFormat);
     }
 }
