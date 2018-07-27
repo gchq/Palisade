@@ -19,10 +19,6 @@
 	</parent>
 	<artifactId>example</artifactId>
 	<packaging>pom</packaging>
-	
-	<properties>
-		<avro.version>1.8.2</avro.version>
-	</properties>
 
 	<modules>
 		<module>single-jvm-example</module>
@@ -30,27 +26,4 @@
 		<module>complex-data-example-avro</module>
 		<module>complex-data-example</module>
 	</modules>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.avro</groupId>
-			<artifactId>avro</artifactId>
-			<version>${avro.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.avro</groupId>
-			<artifactId>avro-maven-plugin</artifactId>
-			<version>${avro.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.avro</groupId>
-			<artifactId>avro-compiler</artifactId>
-			<version>${avro.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.avro</groupId>
-			<artifactId>avro-ipc</artifactId>
-			<version>${avro.version}</version>
-		</dependency>
-	</dependencies>
 </project>

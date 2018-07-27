@@ -1,4 +1,4 @@
-@namespace("uk.gov.gchq.palisade")
+@namespace("uk.gov.gchq.palisade.example.complexdata")
 protocol RecipeProtocol
 {
 	record Ingredient

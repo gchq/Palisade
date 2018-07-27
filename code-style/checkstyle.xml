@@ -20,6 +20,9 @@
         "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="target\/generated\-sources\/avro\/"/>
+    </module>
     <module name="Translation"/>
     <module name="FileLength"/>
     <module name="NewlineAtEndOfFile">
