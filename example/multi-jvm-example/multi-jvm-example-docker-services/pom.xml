@@ -22,7 +22,7 @@
                 <executions>
                     <execution>
                         <id>unpack-palisade-service-war</id>
-                        <phase>compile</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -43,7 +43,7 @@
                     </execution>
                     <execution>
                         <id>unpack-data-service-war</id>
-                        <phase>compile</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -64,7 +64,7 @@
                     </execution>
                     <execution>
                         <id>unpack-policy-service-war</id>
-                        <phase>compile</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -85,7 +85,7 @@
                     </execution>
                     <execution>
                         <id>unpack-resource-service-war</id>
-                        <phase>compile</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -106,7 +106,7 @@
                     </execution>
                     <execution>
                         <id>unpack-user-service-war</id>
-                        <phase>compile</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
