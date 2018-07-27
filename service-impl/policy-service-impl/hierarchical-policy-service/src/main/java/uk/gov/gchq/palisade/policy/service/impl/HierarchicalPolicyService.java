@@ -68,19 +68,21 @@ public class HierarchicalPolicyService implements PolicyService {
 
     @Override
     public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request) {
-
             Justification justification = request.getJustification();
             User user = request.getUser();
             Collection<Resource> resources = request.getResources();
-            CanAccessResponse response = new CanAccessResponse(
-                    resources.stream()
-                            .map(resource -> {
-                                Rules<Resource> rules = getApplicableRules(resource, true, resource.getType());
-                                return Util.applyRules(resource, user, justification, rules);
-                            })
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.toList()));
+            CanAccessResponse response = new CanAccessResponse(canAccess(justification, user, resources));
         return CompletableFuture.completedFuture(response);
+    }
+
+    private Collection<Resource> canAccess(final Justification justification, final User user, final Collection<Resource> resources) {
+        return resources.stream()
+                .map(resource -> {
+                    Rules<Resource> rules = getApplicableRules(resource, true, resource.getType());
+                    return Util.applyRules(resource, user, justification, rules);
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private <T> Rules<T> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
@@ -121,7 +123,16 @@ public class HierarchicalPolicyService implements PolicyService {
 
     @Override
     public CompletableFuture<MultiPolicy> getPolicy(final GetPolicyRequest request) {
-        return null;
+        Justification justification = request.getJustification();
+        User user = request.getUser();
+        Collection<Resource> resources = request.getResources();
+        Collection<Resource> canAccessResources = canAccess(justification, user, resources);
+        HashMap<Resource, Policy> map = new HashMap<>();
+        canAccessResources.forEach(resource -> {
+            Rules rules = getApplicableRules(resource, false, resource.getType());
+            map.put(resource, new Policy<>(rules, rules.getMessage()));
+        });
+        return CompletableFuture.completedFuture(new MultiPolicy(map));
     }
 
     @Override
