@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 
 public class ExampleSimpleDataReader extends SimpleDataReader {
     public ExampleSimpleDataReader() {
-        super(createExampleData(), createExampleSerialisers());
+        super.data(createExampleData()).serialisers(createExampleSerialisers());
     }
 
     private static Map<String, Serialiser<?, ?>> createExampleSerialisers() {

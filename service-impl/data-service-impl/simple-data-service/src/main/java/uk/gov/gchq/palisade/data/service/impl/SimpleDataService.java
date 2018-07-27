@@ -105,7 +105,7 @@ public class SimpleDataService implements DataService {
                     );
                 }
             }
-            final ReadResponse<T> response = new ReadResponse<>(allData);
+            final ReadResponse<T> response = new ReadResponse().data(allData);
             LOGGER.debug("Returning from read: {}", response);
             return response;
         });

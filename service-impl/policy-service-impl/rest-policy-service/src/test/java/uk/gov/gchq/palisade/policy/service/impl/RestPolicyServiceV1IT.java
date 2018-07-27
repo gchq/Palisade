@@ -102,9 +102,9 @@ public class RestPolicyServiceV1IT {
         final GetPolicyRequest request = new GetPolicyRequest().user(user).justification(justification).resources(Arrays.asList(resource1, resource2));
 
         final Map<Resource, Policy> policies = new HashMap<>();
-        policies.put(resource1, new Policy("policy1"));
-        policies.put(resource2, new Policy("policy2"));
-        final MultiPolicy expectedResult = new MultiPolicy(policies);
+        policies.put(resource1, new Policy().message("policy1"));
+        policies.put(resource2, new Policy().message("policy2"));
+        final MultiPolicy expectedResult = new MultiPolicy().policies(policies);
         given(policyService.getPolicy(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
@@ -122,7 +122,7 @@ public class RestPolicyServiceV1IT {
         MockPolicyService.setMock(policyService);
 
         final FileResource resource1 = new FileResource().id("file1");
-        final SetPolicyRequest request = new SetPolicyRequest().resource(resource1).policy(new Policy("policy1"));
+        final SetPolicyRequest request = new SetPolicyRequest().resource(resource1).policy(new Policy().message("policy1"));
 
         given(policyService.setPolicy(request)).willReturn(CompletableFuture.completedFuture(true));
 

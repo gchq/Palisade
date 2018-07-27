@@ -46,6 +46,10 @@ public class UserId implements Cloneable {
         return this;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public UserId clone() {
         UserId clone;
         try {
@@ -55,10 +59,6 @@ public class UserId implements Cloneable {
         }
         clone.id = id;
         return clone;
-    }
-
-    public String getId() {
-        return id;
     }
 
     @Override

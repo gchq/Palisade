@@ -77,7 +77,7 @@ public class RestDataServiceV1IT {
         final Stream<String> data = Stream.of("item1", "item2");
         final ReadRequest request = new ReadRequest().dataRequestResponse(new DataRequestResponse().requestId(new RequestId().id("id1")).resources(resources));
 
-        final ReadResponse<String> expectedResult = new ReadResponse<>(data, "some message");
+        final ReadResponse<String> expectedResult = new ReadResponse().data(data).message("some message");
         final CompletableFuture futureExpectedResult = CompletableFuture.completedFuture(expectedResult);
         given(dataService.read(request)).willReturn(futureExpectedResult);
 

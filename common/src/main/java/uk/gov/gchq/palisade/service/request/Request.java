@@ -31,7 +31,7 @@ public abstract class Request {
     private String id;
 
     public Request() {
-        id = UUID.randomUUID().toString();
+        id(UUID.randomUUID().toString());
     }
 
     public Request id(final String id) {

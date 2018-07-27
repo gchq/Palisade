@@ -38,7 +38,7 @@ public class SimpleConnectionDetail implements ConnectionDetail {
     private Service service;
 
     public SimpleConnectionDetail() {
-        this.service(new NullService());
+        service(new NullService());
     }
 
     public SimpleConnectionDetail service(final Service service) {
