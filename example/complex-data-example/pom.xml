@@ -14,43 +14,38 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>uk.gov.gchq.palisade</groupId>
-		<artifactId>palisade</artifactId>
+		<artifactId>example</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>example</artifactId>
-	<packaging>pom</packaging>
-	
-	<properties>
-		<avro.version>1.8.2</avro.version>
-	</properties>
+	<artifactId>complex-data-example</artifactId>
 
-	<modules>
-		<module>single-jvm-example</module>
-		<module>multi-jvm-example</module>
-		<module>complex-data-example-avro</module>
-		<module>complex-data-example</module>
-	</modules>
+	<properties>
+		<checkstyle.skip>true</checkstyle.skip>
+	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.avro</groupId>
-			<artifactId>avro</artifactId>
-			<version>${avro.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.avro</groupId>
-			<artifactId>avro-maven-plugin</artifactId>
-			<version>${avro.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.avro</groupId>
-			<artifactId>avro-compiler</artifactId>
-			<version>${avro.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.avro</groupId>
-			<artifactId>avro-ipc</artifactId>
-			<version>${avro.version}</version>
+			<groupId>uk.gov.gchq.palisade</groupId>
+			<artifactId>complex-data-example-avro</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>none</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>

@@ -1,0 +1,24 @@
+@namespace("uk.gov.gchq.palisade")
+protocol RecipeProtocol
+{
+	record Ingredient
+	{
+		string	name;
+		string	measurement;
+		bytes	quantity;
+	}
+	
+	record Step
+	{
+		array <Ingredient>	ingredients;
+		string instruction;
+	}
+	
+	record Recipe
+	{
+		string	name;
+		long	calories;
+		array <Step>	steps;
+		string additionalInstructions;
+	}
+}
