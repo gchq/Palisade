@@ -35,7 +35,7 @@ public interface PredicateRule<T> extends Rule<T> {
      * @param justification the query justificaiton
      * @return true if the record should be kept, false if the record should be redacted.
      */
-    boolean test(final T record, final User user, final Justification justification);
+    boolean test(T record, User user, Justification justification);
 
     @Override
     default T apply(final T obj, final User user, final Justification justification) {

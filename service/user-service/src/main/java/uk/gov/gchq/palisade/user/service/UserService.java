@@ -52,7 +52,7 @@ public interface UserService extends Service {
      * @return a {@link CompletableFuture} which will be fulfilled with the user details
      * @throws NoSuchUserIdException if the contained {@link uk.gov.gchq.palisade.UserId} could not be found
      */
-    CompletableFuture<User> getUser(final GetUserRequest request) throws NoSuchUserIdException;
+    CompletableFuture<User> getUser(GetUserRequest request) throws NoSuchUserIdException;
 
     /**
      * Adds the contained user to the {@link UserService}. The given request will contain the {@link User} which
@@ -61,7 +61,7 @@ public interface UserService extends Service {
      * @param request the request specifying the user with details to add
      * @return a {@link CompletableFuture} which will complete as ${@code true} once the user has been added
      */
-    CompletableFuture<Boolean> addUser(final AddUserRequest request);
+    CompletableFuture<Boolean> addUser(AddUserRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {

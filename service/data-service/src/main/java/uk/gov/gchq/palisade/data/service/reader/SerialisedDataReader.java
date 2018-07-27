@@ -106,7 +106,7 @@ public abstract class SerialisedDataReader implements DataReader {
      * @param resource the resource to be accessed
      * @return a stream of data in the format that the client expects the data to be in.
      */
-    protected abstract Stream<?> readRaw(final Resource resource);
+    protected abstract Stream<?> readRaw(Resource resource);
 
     public <RAW_DATA_TYPE, RULES_DATA_TYPE> Serialiser<RAW_DATA_TYPE, RULES_DATA_TYPE> getSerialiser(final String type) {
         Serialiser<?, ?> serialiser = serialisers.get(type);

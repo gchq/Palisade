@@ -57,7 +57,7 @@ public interface DataService extends Service {
      *         the expected format and/or a message (error/warning/info) to be
      *         returned to the client.
      */
-    <RAW_DATA_TYPE> CompletableFuture<ReadResponse<RAW_DATA_TYPE>> read(final ReadRequest request);
+    <RAW_DATA_TYPE> CompletableFuture<ReadResponse<RAW_DATA_TYPE>> read(ReadRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {

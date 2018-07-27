@@ -48,7 +48,7 @@ public interface AuditService extends Service {
      * @param request An {@link AuditRequest} object that contains the details
      *                required to create an audit log.
      */
-    void audit(final AuditRequest request);
+    void audit(AuditRequest request);
 
     default void audit(final List<AuditRequest> requests) {
         requests.forEach(this::audit);

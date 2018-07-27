@@ -328,7 +328,7 @@ public class JSONSerialiser {
      * @throws RuntimeException if the bytes fail to deserialise
      */
     public static <T> T deserialise(final InputStream stream, final Class<T> clazz) {
-        try (final InputStream stream2 = stream) {
+        try (InputStream stream2 = stream) {
             final byte[] bytes = IOUtils.toByteArray(stream2);
             return deserialise(bytes, clazz);
         } catch (final IOException e) {
@@ -359,7 +359,7 @@ public class JSONSerialiser {
      * @throws RuntimeException if the bytes fail to deserialise
      */
     public static <T> T deserialise(final InputStream stream, final TypeReference<T> type) {
-        try (final InputStream stream2 = stream) {
+        try (InputStream stream2 = stream) {
             final byte[] bytes = IOUtils.toByteArray(stream2);
             return deserialise(bytes, type);
         } catch (final IOException e) {

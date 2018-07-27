@@ -44,11 +44,11 @@ public interface Resource {
 
     String getSerialisedFormat();
 
-    void setId(final String id);
+    void setId(String id);
 
-    void setType(final String type);
+    void setType(String type);
 
-    void setSerialisedFormat(final String serialisedFormat);
+    void setSerialisedFormat(String serialisedFormat);
 
     @JsonGetter("class")
     default String _getClass() {

@@ -23,7 +23,7 @@ public interface BytesSerialiser<T> extends Serialiser<byte[], T> {
      * @param object the object to be serialised
      * @return the serialised bytes
      */
-    byte[] serialise(final T object);
+    byte[] serialise(T object);
 
     /**
      * Deserialise some bytes into an object.
@@ -31,5 +31,5 @@ public interface BytesSerialiser<T> extends Serialiser<byte[], T> {
      * @param bytes the bytes to deserialise
      * @return the deserialised object
      */
-    T deserialise(final byte[] bytes);
+    T deserialise(byte[] bytes);
 }

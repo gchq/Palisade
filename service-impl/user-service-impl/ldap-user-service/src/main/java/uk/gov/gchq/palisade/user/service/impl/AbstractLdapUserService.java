@@ -220,7 +220,7 @@ public abstract class AbstractLdapUserService implements UserService {
      * @return the {@link Set} of user auths
      * @throws NamingException if a naming exception is encountered whilst interacting with LDAP
      */
-    protected abstract Set<String> getAuths(final UserId userId, final Map<String, Object> userAttrs, final LdapContext context) throws NamingException;
+    protected abstract Set<String> getAuths(UserId userId, Map<String, Object> userAttrs, LdapContext context) throws NamingException;
 
     /**
      * <p>
@@ -236,7 +236,7 @@ public abstract class AbstractLdapUserService implements UserService {
      * @return the {@link Set} of user roles
      * @throws NamingException if a naming exception is encountered whilst interacting with LDAP
      */
-    protected abstract Set<String> getRoles(final UserId userId, final Map<String, Object> userAttrs, final LdapContext context) throws NamingException;
+    protected abstract Set<String> getRoles(UserId userId, Map<String, Object> userAttrs, LdapContext context) throws NamingException;
 
     protected LdapContext createContext(final String ldapConfigPath) throws IOException, NamingException {
         final Properties config = new Properties();

@@ -25,7 +25,7 @@ public interface Serialiser<I, O> extends Serializable {
      * @param object the object to be serialised
      * @return the serialised bytes
      */
-    I serialise(final O object);
+    I serialise(O object);
 
     /**
      * Deserialise some bytes into an object.
@@ -33,5 +33,5 @@ public interface Serialiser<I, O> extends Serializable {
      * @param bytes the bytes to deserialise
      * @return the deserialised object
      */
-    O deserialise(final I bytes);
+    O deserialise(I bytes);
 }

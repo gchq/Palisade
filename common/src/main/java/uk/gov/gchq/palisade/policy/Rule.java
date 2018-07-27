@@ -58,7 +58,7 @@ public interface Rule<T> {
      * @param justification the query justificaiton
      * @return the modified record or null if the record should be fully redacted.
      */
-    T apply(final T record, final User user, final Justification justification);
+    T apply(T record, User user, Justification justification);
 
     @JsonGetter("class")
     default String _getClass() {

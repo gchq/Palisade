@@ -54,7 +54,7 @@ public interface PalisadeService extends Service {
      * they asked for a data set) and how to connect to the relevant data service
      * to get that data.
      */
-    CompletableFuture<DataRequestResponse> registerDataRequest(final RegisterDataRequest request);
+    CompletableFuture<DataRequestResponse> registerDataRequest(RegisterDataRequest request);
 
     /**
      * This method is used by the data service's to request the trusted details
@@ -66,7 +66,7 @@ public interface PalisadeService extends Service {
      * data service requires to apply the necessary filtering/transformations to
      * the data.
      */
-    CompletableFuture<DataRequestConfig> getDataRequestConfig(final DataRequestResponse request);
+    CompletableFuture<DataRequestConfig> getDataRequestConfig(DataRequestResponse request);
 
     // TODO handling adding resources?
 

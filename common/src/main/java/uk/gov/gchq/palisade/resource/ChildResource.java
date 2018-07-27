@@ -24,6 +24,6 @@ public interface ChildResource extends Resource {
 
     ParentResource getParent();
 
-    void setParent(final ParentResource parent);
+    void setParent(ParentResource parent);
 
 }

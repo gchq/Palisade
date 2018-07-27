@@ -48,7 +48,7 @@ public interface PolicyService extends Service {
      */
     // TODO: should this return bitmap  = READ, WRITE,EXECUTE ?
     // TODO could this work on a list of resources the same way as the getPolicy method does?
-    CompletableFuture<Boolean> canAccess(final CanAccessRequest request);
+    CompletableFuture<Boolean> canAccess(CanAccessRequest request);
 
     /**
      * This method gets the record level {@link Policy}'s that apply to the list
@@ -59,7 +59,7 @@ public interface PolicyService extends Service {
      *                list of the resources the user wants access too.
      * @return a {@link MultiPolicy} containing the mapping of resource to {@link Policy}
      */
-    CompletableFuture<MultiPolicy> getPolicy(final GetPolicyRequest request);
+    CompletableFuture<MultiPolicy> getPolicy(GetPolicyRequest request);
 
     /**
      * This method allows for the setting of a policy to a resource.
@@ -69,7 +69,7 @@ public interface PolicyService extends Service {
      * @return a {@link CompletableFuture} {@link Boolean} which is true if
      * the policy was successfully set.
      */
-    CompletableFuture<Boolean> setPolicy(final SetPolicyRequest request);
+    CompletableFuture<Boolean> setPolicy(SetPolicyRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {

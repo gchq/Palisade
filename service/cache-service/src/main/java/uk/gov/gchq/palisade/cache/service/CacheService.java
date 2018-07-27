@@ -48,7 +48,7 @@ public interface CacheService extends Service {
      * @return a {@link CompletableFuture} which would be true once the
      * information has been cached.
      */
-    CompletableFuture<Boolean> add(final AddCacheRequest request);
+    CompletableFuture<Boolean> add(AddCacheRequest request);
 
     /**
      * Pull out of the cache the information related to the unique requestId
@@ -62,7 +62,7 @@ public interface CacheService extends Service {
      * @return The {@link DataRequestConfig} relating to the unique requestId
      * that is stored in the cache.
      */
-    CompletableFuture<DataRequestConfig> get(final GetCacheRequest request);
+    CompletableFuture<DataRequestConfig> get(GetCacheRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {

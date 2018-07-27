@@ -62,7 +62,7 @@ public interface ResourceService extends Service {
      * @return a {@link CompletableFuture} that upon completion will contain a map of how to retrieve the available
      * resources
      */
-    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request);
+    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByResource(GetResourcesByResourceRequest request);
 
     /**
      * Retrieve resource and connection details by resource ID. The request object allows the client to specify the
@@ -72,7 +72,7 @@ public interface ResourceService extends Service {
      * @return a {@link CompletableFuture} that upon completion will contain details on how to retrieve the requested
      * resource.
      */
-    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request);
+    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(GetResourcesByIdRequest request);
 
     /**
      * Obtain a list of resources that match a specifc resource type. This method allows a client to obtain potentially
@@ -84,7 +84,7 @@ public interface ResourceService extends Service {
      * @return {@link CompletableFuture} that upon completion will contain the connection details for all resources
      * matching a type
      */
-    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request);
+    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(GetResourcesByTypeRequest request);
 
     /**
      * Find all resources that match a particular data format. Resources of a particular data format may not share a
@@ -96,7 +96,7 @@ public interface ResourceService extends Service {
      * @return a {@link CompletableFuture} that upon completion will contain the details on how to retrieve the
      * resources
      */
-    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request);
+    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesBySerialisedFormat(GetResourcesBySerialisedFormatRequest request);
 
     /**
      * Informs Palisade about a specific resource that it may return to users. This lets Palisade clients request access
@@ -107,7 +107,7 @@ public interface ResourceService extends Service {
      * @return a {@link CompletableFuture} that will complete as true once the resource has been added to this {@link
      * ResourceService}
      */
-    CompletableFuture<Boolean> addResource(final AddResourceRequest request);
+    CompletableFuture<Boolean> addResource(AddResourceRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {
