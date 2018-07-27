@@ -30,6 +30,7 @@ import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
@@ -79,13 +80,13 @@ public class RestPolicyServiceV1IT {
         final Justification justification = new Justification("justification1");
         final CanAccessRequest request = new CanAccessRequest(Collections.singletonList(resource), user, justification);
 
-        given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(true));
+        given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(new CanAccessResponse(Collections.singletonList(resource))));
 
         // When
-        final Boolean result = proxy.canAccess(request).join();
+        final CanAccessResponse result = proxy.canAccess(request).join();
 
         // Then
-        assertTrue(result);
+        assertEquals(result.getCanAccessResources(), Collections.singletonList(resource));
         verify(policyService).canAccess(request);
     }
 

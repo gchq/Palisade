@@ -19,17 +19,25 @@ package uk.gov.gchq.palisade.policy.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.Util;
+import uk.gov.gchq.palisade.policy.Rules;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
+import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.Resource;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * By having the policies stored in several key value stores we can attach policies
@@ -48,9 +56,67 @@ public class HierarchicalPolicyService implements PolicyService {
     private HashMap<String, Policy> dataTypePoliciesMap;
     private HashMap<Resource, Policy> resourcePoliciesMap;
 
+    public HierarchicalPolicyService() {
+        this.dataTypePoliciesMap = new HashMap<>();
+        this.resourcePoliciesMap = new HashMap<>();
+    }
+
+    public HierarchicalPolicyService(final HashMap<String, Policy> dataTypePoliciesMap, final HashMap<Resource, Policy> resourcePoliciesMap) {
+        this.dataTypePoliciesMap = dataTypePoliciesMap;
+        this.resourcePoliciesMap = resourcePoliciesMap;
+    }
+
     @Override
-    public CompletableFuture<Boolean> canAccess(final CanAccessRequest request) {
-        return null;
+    public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request) {
+
+            Justification justification = request.getJustification();
+            User user = request.getUser();
+            Collection<Resource> resources = request.getResources();
+            CanAccessResponse response = new CanAccessResponse(
+                    resources.stream()
+                            .map(resource -> {
+                                Rules<Resource> rules = getApplicableRules(resource, true, resource.getType());
+                                return Util.applyRules(resource, user, justification, rules);
+                            })
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList()));
+        return CompletableFuture.completedFuture(response);
+    }
+
+    private <T> Rules<T> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
+
+        Rules<T> inheritedRules;
+        if (resource instanceof ChildResource) {
+            inheritedRules = getApplicableRules(((ChildResource) resource).getParent(), canAccessRequest, originalDataType);
+        } else {
+            Policy inheritedPolicy = dataTypePoliciesMap.getOrDefault(originalDataType, new Policy());
+            if (canAccessRequest) {
+                inheritedRules = inheritedPolicy.getResourceRules();
+            } else {
+                inheritedRules = inheritedPolicy.getRecordRules();
+            }
+        }
+        Policy newPolicy = resourcePoliciesMap.getOrDefault(resource, null);
+        if (newPolicy == null) {
+            return inheritedRules;
+        } else {
+            Rules<T> newRules;
+            if (canAccessRequest) {
+                newRules = newPolicy.getResourceRules();
+            } else {
+                newRules = newPolicy.getRecordRules();
+            }
+            return mergeRules(inheritedRules, newRules);
+        }
+    }
+
+    private <T> Rules<T> mergeRules(final Rules<T> inheritedRules, final Rules<T> newRules) {
+        if (!inheritedRules.getMessage().equals("")) {
+            inheritedRules.message(inheritedRules.getMessage() + "; " + newRules.getMessage());
+        } else {
+            inheritedRules.message(newRules.getMessage());
+        }
+        return inheritedRules.rules(newRules.getRules());
     }
 
     @Override
@@ -61,6 +127,8 @@ public class HierarchicalPolicyService implements PolicyService {
     @Override
     public CompletableFuture<Boolean> setPolicy(final SetPolicyRequest request) {
         Objects.requireNonNull(request);
+        Objects.requireNonNull(request.getPolicy());
+        Objects.requireNonNull(request.getResource());
         Resource resource = request.getResource();
         if (resource.getId() == null) {
             if (resource.getType() != null) {
@@ -68,7 +136,8 @@ public class HierarchicalPolicyService implements PolicyService {
                 LOGGER.debug("Set %s to data type %s", request.getPolicy(), resource.getType());
             } else {
                 LOGGER.debug("The resource provided does not have the id or type field populated. Therefore the policy can not be added: %s", resource);
-//                return new IOException("The resource provided does not have the id or type field populated. Therefore the policy can not be added.");
+                // TODO how can we throw an exception back to the user?
+//                throw new IOException("The resource provided does not have the id or type field populated. Therefore the policy can not be added.");
                 return CompletableFuture.completedFuture(Boolean.FALSE);
             }
         } else {

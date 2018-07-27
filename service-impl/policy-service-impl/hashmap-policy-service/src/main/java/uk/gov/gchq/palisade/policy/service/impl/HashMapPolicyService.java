@@ -25,8 +25,10 @@ import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.Resource;
 
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -54,8 +56,8 @@ public class HashMapPolicyService implements PolicyService {
     }
 
     @Override
-    public CompletableFuture<Boolean> canAccess(final CanAccessRequest request) {
-        return CompletableFuture.completedFuture(true);
+    public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request) {
+        return CompletableFuture.completedFuture(new CanAccessResponse(Collections.emptyList()));
     }
 
     @Override
