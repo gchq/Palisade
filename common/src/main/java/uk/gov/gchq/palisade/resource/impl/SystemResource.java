@@ -24,17 +24,17 @@ public class SystemResource extends AbstractResource implements ParentResource {
     }
 
     public SystemResource id(final String id) {
-        this.id(id);
+        super.id(id);
         return this;
     }
 
     public SystemResource type(final String type) {
-        this.type(type);
+        super.type(type);
         return this;
     }
 
     public SystemResource serialisedFormat(final String serialisedFormat) {
-        this.serialisedFormat(serialisedFormat);
+        super.serialisedFormat(serialisedFormat);
         return this;
     }
 }
