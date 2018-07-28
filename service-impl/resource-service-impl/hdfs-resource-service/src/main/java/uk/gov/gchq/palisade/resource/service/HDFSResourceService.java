@@ -97,7 +97,7 @@ public class HDFSResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
-        return getResourcesById(new GetResourcesByIdRequest(request.getResource().getId()));
+        return getResourcesById(new GetResourcesByIdRequest().resourceId(request.getResource().getId()));
     }
 
     @Override
@@ -120,7 +120,7 @@ public class HDFSResourceService implements ResourceService {
                         .collect(Collectors.toMap(
                                 (HDFSResourceDetails resourceDetails) -> {
                                     final String connectionDetail = resourceDetails.getConnectionDetail();
-                                    final FileResource fileFileResource = new FileResource(connectionDetail, resourceDetails.getType(), resourceDetails.getFormat());
+                                    final FileResource fileFileResource = new FileResource().id(connectionDetail).type(resourceDetails.getType()).serialisedFormat(resourceDetails.getFormat());
                                     resolveParents(fileFileResource, conf);
                                     return fileFileResource;
                                 },
@@ -142,11 +142,11 @@ public class HDFSResourceService implements ResourceService {
             final int fsDepth = new Path(conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)).depth();
 
             if (fileDepth > fsDepth + 1) {
-                DirectoryResource parent = new DirectoryResource(path.getParent().toString());
+                DirectoryResource parent = new DirectoryResource().id(path.getParent().toString());
                 resource.setParent(parent);
                 resolveParents(parent, conf);
             } else {
-                resource.setParent(new SystemResource(path.getParent().toString()));
+                resource.setParent(new SystemResource().id(path.getParent().toString()));
             }
         } catch (Exception e) {
             throw new RuntimeException(ERROR_RESOLVING_PARENTS, e);
