@@ -34,8 +34,9 @@ public class GetCacheRequest extends Request {
     public GetCacheRequest() {
     }
 
-    public GetCacheRequest(final RequestId requestId) {
+    public GetCacheRequest requestId(final RequestId requestId) {
         this.requestId = requestId;
+        return this;
     }
 
     public RequestId getRequestId() {

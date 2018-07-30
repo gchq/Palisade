@@ -37,12 +37,12 @@ public class GetResourcesByResourceRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resource The {@link Resource} you want to run an {@code ls} on.
+     * @param resource the {@link Resource} you want to run an {@code ls} on
+     * @return the {@link GetResourcesByResourceRequest}
      */
-    public GetResourcesByResourceRequest(final Resource resource) {
+    public GetResourcesByResourceRequest resource(final Resource resource) {
         this.resource = resource;
+        return this;
     }
 
     public Resource getResource() {

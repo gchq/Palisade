@@ -28,16 +28,19 @@ public class StreamResource extends AbstractResource implements ChildResource {
     public StreamResource() {
     }
 
-    public StreamResource(final String id) {
-        super(id);
+    public StreamResource id(final String id) {
+        super.id(id);
+        return this;
     }
 
-    public StreamResource(final String id, final String type) {
-        super(id, type);
+    public StreamResource type(final String type) {
+        super.type(type);
+        return this;
     }
 
-    public StreamResource(final String id, final String type, final String serialisedFormat) {
-        super(id, type, serialisedFormat);
+    public StreamResource serialisedFormat(final String serialisedFormat) {
+        super.serialisedFormat(serialisedFormat);
+        return this;
     }
 
     @Override

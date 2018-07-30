@@ -40,17 +40,30 @@ public class CanAccessRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resource The {@link Resource} to be accessed.
-     * @param user The {@link User} wanting access to the resource.
-     * @param justification The {@link Justification} of why the user needs
-     *                      access to the resource.
+     * @param resource the {@link Resource} to be accessed
+     * @return the {@link CanAccessRequest}
      */
-    public CanAccessRequest(final Resource resource, final User user, final Justification justification) {
-        this.user = user;
+    public CanAccessRequest resource(final Resource resource) {
         this.resource = resource;
+        return this;
+    }
+
+    /**
+     * @param user the {@link User} wanting access to the resource
+     * @return the {@link CanAccessRequest}
+     */
+    public CanAccessRequest user(final User user) {
+        this.user = user;
+        return this;
+    }
+
+    /**
+     * @param justification the {@link Justification} of why the user needs access to the resource
+     * @return the {@link CanAccessRequest}
+     */
+    public CanAccessRequest justification(final Justification justification) {
         this.justification = justification;
+        return this;
     }
 
     /**
@@ -58,8 +71,8 @@ public class CanAccessRequest extends Request {
      * chain of asynchronous requests.
      *
      * @param futureResource a completable future that will return a {@link Resource}.
-     * @param futureUser a completable future that will return a {@link User}.
-     * @param justification the justification that the user stated for why they want access to the data.
+     * @param futureUser     a completable future that will return a {@link User}.
+     * @param justification  the justification that the user stated for why they want access to the data.
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
@@ -67,15 +80,15 @@ public class CanAccessRequest extends Request {
             final CompletableFuture<User> futureUser,
             final Justification justification) {
         return CompletableFuture.allOf(futureResource, futureUser)
-                .thenApply(t -> new CanAccessRequest(futureResource.join(), futureUser.join(), justification));
+                .thenApply(t -> new CanAccessRequest().resource(futureResource.join()).user(futureUser.join()).justification(justification));
     }
 
     /**
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param resource a {@link Resource} that the user wants access to.
-     * @param futureUser a completable future that will return a {@link User}.
+     * @param resource      a {@link Resource} that the user wants access to.
+     * @param futureUser    a completable future that will return a {@link User}.
      * @param justification the justification that the user stated for why they want access to the data.
      * @return a completable future containing the {@link CanAccessRequest}.
      */
@@ -83,7 +96,7 @@ public class CanAccessRequest extends Request {
             final Resource resource,
             final CompletableFuture<User> futureUser,
             final Justification justification) {
-        return futureUser.thenApply(auths -> new CanAccessRequest(resource, futureUser.join(), justification));
+        return futureUser.thenApply(auths -> new CanAccessRequest().resource(resource).user(futureUser.join()).justification(justification));
     }
 
     public Resource getResource() {

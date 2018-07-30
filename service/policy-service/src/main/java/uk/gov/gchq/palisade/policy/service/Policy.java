@@ -34,7 +34,7 @@ import java.util.function.Predicate;
  * policy is for/doing.
  *
  * @param <RULE_DATA_TYPE> The Java class that the rules expect the records of
- *                        data to be in the format of.
+ *                         data to be in the format of.
  */
 public class Policy<RULE_DATA_TYPE> {
     private String message;
@@ -43,27 +43,24 @@ public class Policy<RULE_DATA_TYPE> {
 
     // no-args constructor required
     public Policy() {
-        this("");
+        message("");
+        rules(new Rules<>());
     }
 
-    /**
-     * @param message a user friendly message stating what the policy does.
-     */
-    public Policy(final String message) {
-        this(new Rules<>(), message);
+    public Policy<RULE_DATA_TYPE> message(final String message) {
+        this.message = message;
+        return this;
     }
 
-    /**
-     * @param rules the set of rules that need to be applied to the resource.
-     */
-    public Policy(final Rules<RULE_DATA_TYPE> rules) {
-        this(rules, "");
+    public Policy<RULE_DATA_TYPE> rules(final Rules<RULE_DATA_TYPE> rules) {
+        this.rules = rules;
+        return this;
     }
 
     /**
      * Default constructor
      *
-     * @param rules the set of rules that need to be applied to the resource.
+     * @param rules   the set of rules that need to be applied to the resource.
      * @param message a user friendly message stating what the policy does.
      */
     public Policy(final Rules<RULE_DATA_TYPE> rules, final String message) {
@@ -79,11 +76,6 @@ public class Policy<RULE_DATA_TYPE> {
 
     public String getMessage() {
         return message;
-    }
-
-    public Policy<RULE_DATA_TYPE> message(final String message) {
-        this.message = message;
-        return this;
     }
 
     public Policy<RULE_DATA_TYPE> rule(final String ruleId, final Rule<RULE_DATA_TYPE> rule) {

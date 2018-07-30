@@ -97,11 +97,11 @@ public class HDFSFileResourceServiceTest {
         final String id = inputPathString + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource(id, TYPE_VALUE, FORMAT_VALUE), simpleType);
+        expected.put(new FileResource().id(id).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(FILE + id));
+        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -116,7 +116,7 @@ public class HDFSFileResourceServiceTest {
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
         final String found = HDFS + id;
         try {
-            service.getResourcesById(new GetResourcesByIdRequest(found));
+            service.getResourcesById(new GetResourcesByIdRequest().resourceId(found));
             fail("exception expected");
         } catch (Exception e) {
             //then
@@ -130,12 +130,12 @@ public class HDFSFileResourceServiceTest {
         final String id = inputPathString;
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
+        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
+        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(FILE + id));
+        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -148,12 +148,12 @@ public class HDFSFileResourceServiceTest {
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, "00003", FORMAT_VALUE, TYPE_VALUE + 2);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
+        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
+        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesByType(new GetResourcesByTypeRequest(TYPE_VALUE));
+        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesByType(new GetResourcesByTypeRequest().type(TYPE_VALUE));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -167,12 +167,12 @@ public class HDFSFileResourceServiceTest {
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, "00003", FORMAT_VALUE + 2, TYPE_VALUE);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
+        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
+        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesBySerialisedFormat(new GetResourcesBySerialisedFormatRequest(FORMAT_VALUE));
+        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesBySerialisedFormat(new GetResourcesBySerialisedFormatRequest().serialisedFormat(FORMAT_VALUE));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -184,11 +184,11 @@ public class HDFSFileResourceServiceTest {
         final String id = inputPathString;
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
-        expected.put(new FileResource(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE), TYPE_VALUE, FORMAT_VALUE), simpleType);
+        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
+        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesByResource(new GetResourcesByResourceRequest(new DirectoryResource("file:///" + id)));
+        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesByResource(new GetResourcesByResourceRequest().resource(new DirectoryResource().id("file:///" + id)));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -252,12 +252,12 @@ public class HDFSFileResourceServiceTest {
         final String id = inputPathString + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource(id, TYPE_VALUE, FORMAT_VALUE), simpleType);
+        expected.put(new FileResource().id(id).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
         try {
-            final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(FILE + id));
+            final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
             resourcesById.get();
             fail("exception expected");
         } catch (ExecutionException e) {
@@ -273,11 +273,11 @@ public class HDFSFileResourceServiceTest {
         final String id = inputPathString + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource(id, TYPE_VALUE, FORMAT_VALUE), simpleFormat);
+        expected.put(new FileResource().id(id).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleFormat);
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest(FILE + id));
+        final CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -288,7 +288,7 @@ public class HDFSFileResourceServiceTest {
     public void shouldResolveParents() throws Exception {
         final String parent = testFolder.getRoot().getAbsolutePath() + "/inputDir" + "/" + "folder1" + "/" + "folder2";
         final String id = parent + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
-        final FileResource fileResource = new FileResource(id);
+        final FileResource fileResource = new FileResource().id(id);
         HDFSResourceService.resolveParents(fileResource, conf);
 
         final ParentResource parent1 = fileResource.getParent();
