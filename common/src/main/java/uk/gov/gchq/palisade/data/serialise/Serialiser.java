@@ -20,18 +20,18 @@ import java.io.Serializable;
 public interface Serialiser<I, O> extends Serializable {
 
     /**
-     * Serialise some object into bytes.
+     * Serialise some object into a different object type.
      *
      * @param object the object to be serialised
-     * @return the serialised bytes
+     * @return the serialised form
      */
     I serialise(final O object);
 
     /**
-     * Deserialise some bytes into an object.
+     * Deserialise some serialised data type into an object.
      *
-     * @param bytes the bytes to deserialise
+     * @param encoded the encoded form to deserialise
      * @return the deserialised object
      */
-    O deserialise(final I bytes);
+    O deserialise(final I encoded);
 }
