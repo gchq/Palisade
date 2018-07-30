@@ -34,30 +34,26 @@ import java.util.Map;
  * data service the resources field might have been changed to be a subset of the resources.
  */
 public class DataRequestResponse {
-    public RequestId requestId;
-    public Map<Resource, ConnectionDetail> resources;
+    public RequestId requestId = new RequestId();
+    public Map<Resource, ConnectionDetail> resources = new HashMap<>();
 
-    public DataRequestResponse() {
-        this(new RequestId());
-    }
-
-    public DataRequestResponse(final RequestId requestId) {
-        this(requestId, new HashMap<>());
-    }
-
-    public DataRequestResponse(final RequestId requestId, final Map<Resource, ConnectionDetail> resources) {
+    public DataRequestResponse requestId(final RequestId requestId) {
         this.requestId = requestId;
-        this.resources = resources;
+        return this;
     }
 
-    public DataRequestResponse(final DataRequestResponse other) {
-        this(other.getRequestId());
-        resources.putAll(other.getResources());
-    }
-
-    public DataRequestResponse(final RequestId requestId, final Resource resource, final ConnectionDetail connectionDetail) {
-        this(requestId);
+    public DataRequestResponse resource(final Resource resource, final ConnectionDetail connectionDetail) {
         resources.put(resource, connectionDetail);
+        return this;
+    }
+
+    public DataRequestResponse resources(final Map<Resource, ConnectionDetail> resources) {
+        this.resources = resources;
+        return this;
+    }
+
+    public DataRequestResponse resources(final DataRequestResponse requestResponse) {
+        return this.requestId(requestResponse.getRequestId()).resources(requestResponse.getResources());
     }
 
     public RequestId getRequestId() {

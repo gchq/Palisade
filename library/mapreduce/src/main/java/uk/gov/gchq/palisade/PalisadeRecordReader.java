@@ -40,17 +40,15 @@ import java.util.concurrent.CompletableFuture;
  * being processed by calling {@link PalisadeRecordReader#getCurrentKey()}. Therefore, in the client MapReduce code, the
  * key will become the current resource being processed and the value will become the current item from that resource.
  *
- * @implNote   This class currently requests each Resource from its data service sequentially. We avoid launching all the
- * requests to the data service(s) in parallel because Hadoop's processing of tasks in an individual map task is necessarily
- * serial. If we launch multiple requests for data in parallel, but Hadoop/the user's MapReduce job spends a long
- * time processing the first Resource(s), then the data services waiting to send the ones later in the list may timeout.
- * Thus, we only make the request to the {@link DataService} responsible for an individual resource when we need it. This
- * may change in the future and SHOULD NOT be relied upon in any implementation decisions.
- *
- * @implNote In order to do this, we create a DataRequestResponse for each Resource and send it to the data service created by
- * the corresponding ConnectionDetail object.
- *
  * @param <V> the value type which will be de-serialised from the resources this input split is processing
+ * @implNote This class currently requests each Resource from its data service sequentially. We avoid launching all the
+ * requests to the data service(s) in parallel because Hadoop's processing of tasks in an individual map task is
+ * necessarily serial. If we launch multiple requests for data in parallel, but Hadoop/the user's MapReduce job spends a
+ * long time processing the first Resource(s), then the data services waiting to send the ones later in the list may
+ * timeout. Thus, we only make the request to the {@link DataService} responsible for an individual resource when we
+ * need it. This may change in the future and SHOULD NOT be relied upon in any implementation decisions.
+ * @implNote In order to do this, we create a DataRequestResponse for each Resource and send it to the data service
+ * created by the corresponding ConnectionDetail object.
  */
 public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
     /**
@@ -172,10 +170,11 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
         currentKey = resource;
         final DataService service = conDetails.createService();
         //create the singleton resource request for this resource
-        final DataRequestResponse singleResourceRequest = new DataRequestResponse(resourceDetails.getRequestId(),
-                resource, conDetails);
+        final DataRequestResponse singleResourceRequest = new DataRequestResponse()
+                .requestId(resourceDetails.getRequestId())
+                .resource(resource, conDetails);
         //lodge request with the data service
-        final CompletableFuture<ReadResponse<Object>> futureResponse = service.read(new ReadRequest(singleResourceRequest));
+        final CompletableFuture<ReadResponse<Object>> futureResponse = service.read(new ReadRequest().dataRequestResponse(singleResourceRequest));
         //when this future completes, we should have an iterator of things once we deserialise
         itemIt = futureResponse.thenApply(response -> response.getData().map(serialiser::deserialise).iterator())
                 //force code to block at this point waiting for resource data to become available

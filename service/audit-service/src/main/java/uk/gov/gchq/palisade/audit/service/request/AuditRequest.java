@@ -46,47 +46,53 @@ public class AuditRequest extends Request {
     }
 
     /**
-     * The default constructor if there are no errors
-     *
-     * @param resource          {@link Resource} which contains the relevant
-     *                          details about the resource being accessed
-     * @param user              {@link User} which is the user accessing the
-     *                          resource
-     * @param justification     {@link Justification} is the reason for the
-     *                          user accessing the resource
-     * @param howItWasProcessed {@link String} is an explanation of what
-     *                          filtering/transformations are being applied to
-     *                          the data returned to the user
+     * @param justification {@link Justification} is the reason for the
+     *                      user accessing the resource
+     * @return the {@link AuditRequest}
      */
-    public AuditRequest(final Resource resource, final User user,
-                        final Justification justification,
-                        final String howItWasProcessed) {
-        this(resource, user, justification, howItWasProcessed, null);
+    public AuditRequest justification(final Justification justification) {
+        this.justification = justification;
+        return this;
     }
 
     /**
-     * The default constructor if there are errors
-     *
-     * @param resource          {@link Resource} which contains the relevant
-     *                          details about the resource being accessed
-     * @param user              {@link User} which is the user accessing the
-     *                          resource
-     * @param justification     {@link Justification} is the reason for the
-     *                          user accessing the resource
+     * @param user {@link User} which is the user accessing the
+     *             resource
+     * @return the {@link AuditRequest}
+     */
+    public AuditRequest user(final User user) {
+        this.user = user;
+        return this;
+    }
+
+    /**
+     * @param resource {@link Resource} which contains the relevant
+     *                 details about the resource being accessed
+     * @return the {@link AuditRequest}
+     */
+    public AuditRequest resource(final Resource resource) {
+        this.resource = resource;
+        return this;
+    }
+
+    /**
      * @param howItWasProcessed {@link String} is an explanation of what
      *                          filtering/transformations are being applied to
      *                          the data returned to the user
-     * @param exception         {@link Exception} thrown while trying to access the data
+     * @return the {@link AuditRequest}
      */
-    public AuditRequest(final Resource resource, final User user,
-                        final Justification justification,
-                        final String howItWasProcessed,
-                        final Exception exception) {
-        this.user = user;
-        this.justification = justification;
-        this.resource = resource;
+    public AuditRequest howItWasProcessed(final String howItWasProcessed) {
         this.howItWasProcessed = howItWasProcessed;
+        return this;
+    }
+
+    /**
+     * @param exception {@link Exception} thrown while trying to access the data
+     * @return the {@link AuditRequest}
+     */
+    public AuditRequest exception(final Exception exception) {
         this.exception = exception;
+        return this;
     }
 
     public Justification getJustification() {

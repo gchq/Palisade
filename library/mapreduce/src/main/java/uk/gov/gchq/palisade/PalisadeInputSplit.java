@@ -61,7 +61,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
     public PalisadeInputSplit(final RequestId requestId, final Map<Resource, ConnectionDetail> resources) {
         Objects.requireNonNull(requestId, "requestId");
         Objects.requireNonNull(resources, "resources");
-        requestResponse = new DataRequestResponse(requestId, resources);
+        requestResponse = new DataRequestResponse().requestId(requestId).resources(resources);
     }
 
     /**
@@ -72,7 +72,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
      */
     public PalisadeInputSplit(final DataRequestResponse requestResponse) {
         Objects.requireNonNull(requestResponse);
-        this.requestResponse = new DataRequestResponse(requestResponse);
+        this.requestResponse = new DataRequestResponse().resources(requestResponse);
     }
 
     /**

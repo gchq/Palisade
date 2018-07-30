@@ -43,7 +43,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
 
         // The user authorisation owner or sys admin needs to add the user
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
-                new AddUserRequest(
+                new AddUserRequest().user(
                         new User()
                                 .userId("Alice")
                                 .auths("public", "private")
@@ -51,7 +51,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                 )
         );
         final CompletableFuture<Boolean> userBobStatus = userService.addUser(
-                new AddUserRequest(
+                new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
                                 .auths("public")
@@ -61,27 +61,29 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
 
         // The policy owner or sys admin needs to add the policies
         final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
-                new SetPolicyRequest(
-                        new FileResource("file1", RESOURCE_TYPE),
-                        new Policy<ExampleObj>()
-                                .message("Age off and visibility filtering")
-                                .predicateRule(
-                                        "visibility",
-                                        new IsVisible()
-                                )
-                                .simplePredicateRule(
-                                        "ageOff",
-                                        new IsTimestampMoreThan(12L)
-                                )
-                )
+                new SetPolicyRequest().resource(
+                        new FileResource().id("file1").type(RESOURCE_TYPE))
+                        .policy(
+                                new Policy<ExampleObj>()
+                                        .message("Age off and visibility filtering")
+                                        .predicateRule(
+                                                "visibility",
+                                                new IsVisible()
+                                        )
+                                        .simplePredicateRule(
+                                                "ageOff",
+                                                new IsTimestampMoreThan(12L)
+                                        )
+                        )
         );
 
         // The sys admin needs to add the resources
-        final CompletableFuture<Boolean> resourceStatus = resourceService.addResource(new AddResourceRequest(
-                new DirectoryResource("dir1", RESOURCE_TYPE),
-                new FileResource("file1", RESOURCE_TYPE),
-                new ProxyRestConnectionDetail(ProxyRestDataService.class, "http://localhost:8084/data")
-        ));
+        final CompletableFuture<Boolean> resourceStatus = resourceService
+                .addResource(new AddResourceRequest()
+                                .parent(new DirectoryResource().id("dir1").type(RESOURCE_TYPE))
+                                .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
+                                .connectionDetail(new ProxyRestConnectionDetail(ProxyRestDataService.class, "http://localhost:8084/data"))
+                );
 
         // Wait for the users, policies and resources to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();

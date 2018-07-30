@@ -67,7 +67,7 @@
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <jersey.version>2.25</jersey.version>
         <servlet-api.version>3.1.0</servlet-api.version>
-        <hadoop.version>2.6.0</hadoop.version>
+        <hadoop.version>2.6.5</hadoop.version>
 
         <!-- Testing properties -->
         <junit.version>4.12</junit.version>

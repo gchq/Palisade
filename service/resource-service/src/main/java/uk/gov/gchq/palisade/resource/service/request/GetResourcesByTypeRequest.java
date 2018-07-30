@@ -35,12 +35,12 @@ public class GetResourcesByTypeRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param type The type of the {@link uk.gov.gchq.palisade.resource.Resource}'s that you want to know about.
+     * @param type the type of the {@link uk.gov.gchq.palisade.resource.Resource}'s that you want to know about
+     * @return the {@link GetResourcesByTypeRequest}
      */
-    public GetResourcesByTypeRequest(final String type) {
+    public GetResourcesByTypeRequest type(final String type) {
         this.type = type;
+        return this;
     }
 
     public String getType() {
