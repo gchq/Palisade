@@ -33,6 +33,7 @@ import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.Resource;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
@@ -85,7 +86,7 @@ public class HierarchicalPolicyService implements PolicyService {
                 .collect(Collectors.toList());
     }
 
-    private <T> Rules<T> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
+    protected <T> Rules<T> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
 
         Rules<T> inheritedRules;
         if (resource instanceof ChildResource) {
@@ -113,9 +114,9 @@ public class HierarchicalPolicyService implements PolicyService {
     }
 
     private <T> Rules<T> mergeRules(final Rules<T> inheritedRules, final Rules<T> newRules) {
-        if (!inheritedRules.getMessage().equals("")) {
-            inheritedRules.message(inheritedRules.getMessage() + "; " + newRules.getMessage());
-        } else {
+        if (!inheritedRules.getMessage().equals("") && !newRules.getMessage().equals("")) {
+            inheritedRules.message(inheritedRules.getMessage() + ", " + newRules.getMessage());
+        } else if (!newRules.getMessage().equals("")) {
             inheritedRules.message(newRules.getMessage());
         }
         return inheritedRules.rules(newRules.getRules());
@@ -130,7 +131,7 @@ public class HierarchicalPolicyService implements PolicyService {
         HashMap<Resource, Policy> map = new HashMap<>();
         canAccessResources.forEach(resource -> {
             Rules rules = getApplicableRules(resource, false, resource.getType());
-            map.put(resource, new Policy<>(rules, rules.getMessage()));
+            map.put(resource, new Policy<>(rules, new Rules<>()));
         });
         return CompletableFuture.completedFuture(new MultiPolicy(map));
     }
@@ -147,9 +148,9 @@ public class HierarchicalPolicyService implements PolicyService {
                 LOGGER.debug("Set %s to data type %s", request.getPolicy(), resource.getType());
             } else {
                 LOGGER.debug("The resource provided does not have the id or type field populated. Therefore the policy can not be added: %s", resource);
-                // TODO how can we throw an exception back to the user?
-//                throw new IOException("The resource provided does not have the id or type field populated. Therefore the policy can not be added.");
-                return CompletableFuture.completedFuture(Boolean.FALSE);
+                final CompletableFuture<Boolean> future = new CompletableFuture<>();
+                future.completeExceptionally(new IOException("The resource provided does not have the id or type field populated. Therefore the policy can not be added."));
+                return future;
             }
         } else {
             resourcePoliciesMap.put(resource, request.getPolicy());

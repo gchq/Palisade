@@ -27,63 +27,43 @@ import uk.gov.gchq.palisade.policy.Rules;
 import uk.gov.gchq.palisade.resource.Resource;
 
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * This class is used to encapsulate the {@link Rules} that apply to a
- * resource and is provided with a user friendly message to explain what the
- * policy is for/doing. This class can also be used to hold Policy service
- * specific attributes that the rest of the Palisade system does not care about.
+ * This class is used to store the information that is required by the policy
+ * service but not needed by the rest of the palisade services. That includes
+ * separating the rules that need to be applied at the resource level or the record level.
  *
  * @param <RULE_DATA_TYPE> The Java class that the rules expect the records of
  *                        data to be in the format of.
  */
 public class Policy<RULE_DATA_TYPE> {
-    private String message;
     private Rules<RULE_DATA_TYPE> recordRules;
     private Rules<Resource> resourceRules;
     private User owner;
 
     // no-args constructor required
     public Policy() {
-        this("");
-    }
-
-    /**
-     * @param message a user friendly message stating what the policy does.
-     */
-    public Policy(final String message) {
-        this(new Rules<>(), message);
-    }
-
-    /**
-     * @param rules the set of rules that need to be applied to the resource.
-     */
-    public Policy(final Rules<RULE_DATA_TYPE> rules) {
-        this(rules, "");
+        this(new Rules<>(), new Rules<>());
     }
 
     /**
      * Default constructor
      *
-     * @param recordRules the set of rules that need to be applied to the resource.
-     * @param message a user friendly message stating what the policy does.
+     * @param recordRules the set of rules that need to be applied to the resource at the record level.
+     * @param resourceRules the set of rules that need to be applied to the resource at the resource level.
      */
-    public Policy(final Rules<RULE_DATA_TYPE> recordRules, final String message) {
+    public Policy(final Rules<RULE_DATA_TYPE> recordRules, final Rules<Resource> resourceRules) {
         Objects.requireNonNull(recordRules);
-        Objects.requireNonNull(message);
+        Objects.requireNonNull(resourceRules);
         this.recordRules = recordRules;
-        this.message = message;
+        this.resourceRules = resourceRules;
     }
 
     public String getMessage() {
-        return message;
-    }
-
-    public Policy<RULE_DATA_TYPE> message(final String message) {
-        this.message = message;
-        return this;
+        return resourceRules.getMessage() + ", " + recordRules.getMessage();
     }
 
     public Rules<RULE_DATA_TYPE> getRecordRules() {
@@ -102,43 +82,64 @@ public class Policy<RULE_DATA_TYPE> {
         this.resourceRules = resourceRules;
     }
 
-    public Policy<RULE_DATA_TYPE> rule(final String ruleId, final Rule<RULE_DATA_TYPE> rule) {
-        recordRules.rule(ruleId, rule);
+    private String generateUUID() {
+        return UUID.randomUUID().toString();
+    }
+
+    private void addMessage(String newMessage, Rules rules) {
+        String currentMessage = rules.getMessage();
+        if (currentMessage == null || currentMessage.equals("")) {
+            rules.message(newMessage);
+        } else {
+            rules.message(currentMessage + ", " + newMessage);
+        }
+    }
+
+    public Policy<RULE_DATA_TYPE> recordLevelRule(final String message, final Rule<RULE_DATA_TYPE> rule) {
+        recordRules.rule(generateUUID(), rule);
+        addMessage(message, recordRules);
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> recordLevelPredicateRule(final String ruleId, final PredicateRule<RULE_DATA_TYPE> rule) {
-        recordRules.predicateRule(ruleId, rule);
+    public Policy<RULE_DATA_TYPE> recordLevelPredicateRule(final String message, final PredicateRule<RULE_DATA_TYPE> rule) {
+        recordRules.predicateRule(generateUUID(), rule);
+        addMessage(message, recordRules);
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> recordLevelSimplePredicateRule(final String ruleId, final Predicate<RULE_DATA_TYPE> rule) {
-        recordRules.simplePredicateRule(ruleId, rule);
+    public Policy<RULE_DATA_TYPE> recordLevelSimplePredicateRule(final String message, final Predicate<RULE_DATA_TYPE> rule) {
+        recordRules.simplePredicateRule(generateUUID(), rule);
+        addMessage(message, recordRules);
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> recordLevelSimpleFunctionRule(final String ruleId, final Function<RULE_DATA_TYPE, RULE_DATA_TYPE> rule) {
-        recordRules.simpleFunctionRule(ruleId, rule);
+    public Policy<RULE_DATA_TYPE> recordLevelSimpleFunctionRule(final String message, final Function<RULE_DATA_TYPE, RULE_DATA_TYPE> rule) {
+        recordRules.simpleFunctionRule(generateUUID(), rule);
+        addMessage(message, recordRules);
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> resourceLevelRule(final String ruleId, final Rule<Resource> rule) {
-        resourceRules.rule(ruleId, rule);
+    public Policy<RULE_DATA_TYPE> resourceLevelRule(final String message, final Rule<Resource> rule) {
+        resourceRules.rule(generateUUID(), rule);
+        addMessage(message, resourceRules);
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> resourceLevelPredicateRule(final String ruleId, final PredicateRule<Resource> rule) {
-        resourceRules.predicateRule(ruleId, rule);
+    public Policy<RULE_DATA_TYPE> resourceLevelPredicateRule(final String message, final PredicateRule<Resource> rule) {
+        resourceRules.predicateRule(generateUUID(), rule);
+        addMessage(message, resourceRules);
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> resourceLevelSimplePredicateRule(final String ruleId, final Predicate<Resource> rule) {
-        resourceRules.simplePredicateRule(ruleId, rule);
+    public Policy<RULE_DATA_TYPE> resourceLevelSimplePredicateRule(final String message, final Predicate<Resource> rule) {
+        resourceRules.simplePredicateRule(generateUUID(), rule);
+        addMessage(message, resourceRules);
         return this;
     }
 
-    public Policy<RULE_DATA_TYPE> resourceLevelSimpleFunctionRule(final String ruleId, final Function<Resource, Resource> rule) {
-        resourceRules.simpleFunctionRule(ruleId, rule);
+    public Policy<RULE_DATA_TYPE> resourceLevelSimpleFunctionRule(final String message, final Function<Resource, Resource> rule) {
+        resourceRules.simpleFunctionRule(generateUUID(), rule);
+        addMessage(message, resourceRules);
         return this;
     }
 
@@ -163,27 +164,27 @@ public class Policy<RULE_DATA_TYPE> {
         final Policy<?> policy = (Policy<?>) o;
 
         return new EqualsBuilder()
-                .append(message, policy.message)
                 .append(resourceRules, policy.resourceRules)
                 .append(recordRules, policy.recordRules)
+                .append(owner, policy.owner)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(message)
                 .append(resourceRules)
                 .append(recordRules)
+                .append(owner)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("message", message)
                 .append("resourceRules", resourceRules)
                 .append("recordRules", recordRules)
+                .append("owner", owner)
                 .toString();
     }
 }
