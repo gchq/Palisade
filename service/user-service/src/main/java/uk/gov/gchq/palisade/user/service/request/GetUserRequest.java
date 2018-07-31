@@ -39,12 +39,12 @@ public class GetUserRequest extends Request {
     }
 
     /**
-     * Constructs a {@link GetUserRequest} with a provided {@link UserId}.
-     *
      * @param userId the id of the {@link uk.gov.gchq.palisade.User} you want
+     * @return the {@link GetUserRequest}
      */
-    public GetUserRequest(final UserId userId) {
+    public GetUserRequest userId(final UserId userId) {
         this.userId = userId;
+        return this;
     }
 
     public UserId getUserId() {
@@ -84,6 +84,7 @@ public class GetUserRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("userId", userId)
                 .toString();
     }

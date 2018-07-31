@@ -48,23 +48,21 @@ public class ReadResponse<RAW_DATA_TYPE> {
     }
 
     /**
-     * Default constructor
-     *
      * @param data a stream of data in the expected format
+     * @return the {@link ReadResponse}
      */
-    public ReadResponse(final Stream<RAW_DATA_TYPE> data) {
+    public ReadResponse<RAW_DATA_TYPE> data(final Stream<RAW_DATA_TYPE> data) {
         this.data = data;
+        return this;
     }
 
     /**
-     * Constructor if you also need to send a message with the stream of data
-     *
-     * @param data a stream of data in the expected format
      * @param message a message for the client
+     * @return the {@link ReadResponse}
      */
-    public ReadResponse(final Stream<RAW_DATA_TYPE> data, final String message) {
-        this.data = data;
+    public ReadResponse<RAW_DATA_TYPE> message(final String message) {
         this.message = message;
+        return this;
     }
 
     public Stream<RAW_DATA_TYPE> getData() {

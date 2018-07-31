@@ -42,17 +42,17 @@ public class ReadRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
      * @param dataRequestResponse {@link DataRequestResponse} that should
      *                            have been returned when the client registered
      *                            the data access request with the
      *                            {@link uk.gov.gchq.palisade.service.PalisadeService}.
      *                            The {@link DataRequestResponse} can be modified
-     *                            to only contain a subset of the list of resources to be read.
+     *                            to only contain a subset of the list of resources to be read
+     * @return the {@link DataRequestResponse}
      */
-    public ReadRequest(final DataRequestResponse dataRequestResponse) {
+    public ReadRequest dataRequestResponse(final DataRequestResponse dataRequestResponse) {
         this.dataRequestResponse = dataRequestResponse;
+        return this;
     }
 
     /**
@@ -67,7 +67,7 @@ public class ReadRequest extends Request {
      */
     public static CompletableFuture<ReadRequest> create(
             final CompletableFuture<DataRequestResponse> futureRequestResponse) {
-        return futureRequestResponse.thenApply(t -> new ReadRequest(futureRequestResponse.join()));
+        return futureRequestResponse.thenApply(t -> new ReadRequest().dataRequestResponse(futureRequestResponse.join()));
     }
 
     public DataRequestResponse getDataRequestResponse() {
@@ -91,6 +91,7 @@ public class ReadRequest extends Request {
         final ReadRequest that = (ReadRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(dataRequestResponse, that.dataRequestResponse)
                 .isEquals();
     }
@@ -98,6 +99,7 @@ public class ReadRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(47, 37)
+                .appendSuper(super.hashCode())
                 .append(dataRequestResponse)
                 .toHashCode();
     }
@@ -105,6 +107,7 @@ public class ReadRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("dataRequestResponse", dataRequestResponse)
                 .toString();
     }

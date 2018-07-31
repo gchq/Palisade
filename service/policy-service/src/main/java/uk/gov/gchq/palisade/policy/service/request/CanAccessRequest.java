@@ -41,17 +41,30 @@ public class CanAccessRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resources A collection of {@link Resource}'s to be accessed.
-     * @param user The {@link User} wanting access to the resource.
-     * @param justification The {@link Justification} of why the user needs
-     *                      access to the resource.
+     * @param resources the collection of {@link Resource}'s to be accessed
+     * @return the {@link CanAccessRequest}
      */
-    public CanAccessRequest(final Collection<Resource> resources, final User user, final Justification justification) {
-        this.user = user;
+    public CanAccessRequest resources(final Collection<Resource> resources) {
         this.resources = resources;
+        return this;
+    }
+
+    /**
+     * @param user the {@link User} wanting access to the resource
+     * @return the {@link CanAccessRequest}
+     */
+    public CanAccessRequest user(final User user) {
+        this.user = user;
+        return this;
+    }
+
+    /**
+     * @param justification the {@link Justification} of why the user needs access to the resource
+     * @return the {@link CanAccessRequest}
+     */
+    public CanAccessRequest justification(final Justification justification) {
         this.justification = justification;
+        return this;
     }
 
     /**
@@ -67,8 +80,8 @@ public class CanAccessRequest extends Request {
             final CompletableFuture<? extends Collection<Resource>> futureResources,
             final CompletableFuture<User> futureUser,
             final Justification justification) {
-        return CompletableFuture.allOf(futureResources, futureUser)
-                .thenApply(t -> new CanAccessRequest(futureResources.join(), futureUser.join(), justification));
+        return CompletableFuture.allOf(futureResource, futureUser)
+                .thenApply(t -> new CanAccessRequest().resource(futureResources.join()).user(futureUser.join()).justification(justification));
     }
 
     /**
@@ -84,7 +97,7 @@ public class CanAccessRequest extends Request {
             final Collection<Resource> resources,
             final CompletableFuture<User> futureUser,
             final Justification justification) {
-        return futureUser.thenApply(auths -> new CanAccessRequest(resources, futureUser.join(), justification));
+        return futureUser.thenApply(auths -> new CanAccessRequest().resources(resources).user(futureUser.join()).justification(justification));
     }
 
     public Collection<Resource> getResources() {
@@ -124,6 +137,7 @@ public class CanAccessRequest extends Request {
         final CanAccessRequest that = (CanAccessRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(user, that.user)
                 .append(resources, that.resources)
                 .append(justification, that.justification)
@@ -133,6 +147,7 @@ public class CanAccessRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(11, 13)
+                .appendSuper(super.hashCode())
                 .append(user)
                 .append(resources)
                 .append(justification)
@@ -142,6 +157,7 @@ public class CanAccessRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("user", user)
                 .append("resources", resources)
                 .append("justification", justification)

@@ -72,16 +72,16 @@ public class RestPalisadeServiceV1IT {
         final PalisadeService palisadeService = Mockito.mock(PalisadeService.class);
         MockPalisadeService.setMock(palisadeService);
 
-        final FileResource resource1 = new FileResource("file1");
-        final FileResource resource2 = new FileResource("file1");
-        final UserId userId = new UserId("user01");
-        final Justification justification = new Justification("justification1");
-        final RegisterDataRequest request = new RegisterDataRequest("file1", userId, justification);
+        final FileResource resource1 = new FileResource().id("file1");
+        final FileResource resource2 = new FileResource().id("file1");
+        final UserId userId = new UserId().id("user01");
+        final Justification justification = new Justification().justification("justification1");
+        final RegisterDataRequest request = new RegisterDataRequest().resource("file1").userId(userId).justification(justification);
 
         final Map<Resource, ConnectionDetail> resources = new HashMap<>();
         resources.put(resource1, new SimpleConnectionDetail());
         resources.put(resource2, new SimpleConnectionDetail());
-        final DataRequestResponse expectedResult = new DataRequestResponse(new RequestId("id1"), resources);
+        final DataRequestResponse expectedResult = new DataRequestResponse().requestId(new RequestId().id("id1")).resources(resources);
         given(palisadeService.registerDataRequest(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
@@ -98,19 +98,19 @@ public class RestPalisadeServiceV1IT {
         final PalisadeService palisadeService = Mockito.mock(PalisadeService.class);
         MockPalisadeService.setMock(palisadeService);
 
-        final FileResource resource1 = new FileResource("file1");
-        final FileResource resource2 = new FileResource("file1");
+        final FileResource resource1 = new FileResource().id("file1");
+        final FileResource resource2 = new FileResource().id("file1");
         final Map<Resource, ConnectionDetail> resources = new HashMap<>();
         resources.put(resource1, new SimpleConnectionDetail());
         resources.put(resource2, new SimpleConnectionDetail());
-        final DataRequestResponse request = new DataRequestResponse(new RequestId("id1"), resources);
+        final DataRequestResponse request = new DataRequestResponse().requestId(new RequestId().id("id1")).resources(resources);
 
-        final UserId userId = new UserId("user01");
+        final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
-        final Justification justification = new Justification("justification1");
+        final Justification justification = new Justification().justification("justification1");
         final Map<Resource, Rules> rules = new HashMap<>();
         rules.put(resource1, new Rules<String>().rule("testRule", new TestRule()));
-        final DataRequestConfig expectedResult = new DataRequestConfig(user, justification, rules);
+        final DataRequestConfig expectedResult = new DataRequestConfig().user(user).justification(justification).rules(rules);
         given(palisadeService.getDataRequestConfig(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When

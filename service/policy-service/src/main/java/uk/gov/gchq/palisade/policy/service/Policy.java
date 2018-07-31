@@ -37,7 +37,7 @@ import java.util.function.Predicate;
  * separating the rules that need to be applied at the resource level or the record level.
  *
  * @param <RULE_DATA_TYPE> The Java class that the rules expect the records of
- *                        data to be in the format of.
+ *                         data to be in the format of.
  */
 public class Policy<RULE_DATA_TYPE> {
     private Rules<RULE_DATA_TYPE> recordRules;
@@ -46,7 +46,17 @@ public class Policy<RULE_DATA_TYPE> {
 
     // no-args constructor required
     public Policy() {
-        this(new Rules<>(), new Rules<>());
+        rules(new Rules<>());
+    }
+
+    public Policy<RULE_DATA_TYPE> recordRules(final Rules<RULE_DATA_TYPE> recordRules) {
+        this.recordRules = recordRules;
+        return this;
+    }
+
+    public Policy<RULE_DATA_TYPE> resourceRules(final Rules<Resource> resourceRules) {
+        this.resourceRules = resourceRules;
+        return this;
     }
 
     /**
