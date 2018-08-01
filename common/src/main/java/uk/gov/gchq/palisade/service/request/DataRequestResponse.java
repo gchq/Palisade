@@ -25,6 +25,7 @@ import uk.gov.gchq.palisade.resource.Resource;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This is the high level API object that is used to pass back to the client the information it requires to connect to
@@ -43,6 +44,8 @@ public class DataRequestResponse {
     }
 
     public DataRequestResponse resource(final Resource resource, final ConnectionDetail connectionDetail) {
+        Objects.nonNull(resource);
+        Objects.nonNull(connectionDetail);
         resources.put(resource, connectionDetail);
         return this;
     }

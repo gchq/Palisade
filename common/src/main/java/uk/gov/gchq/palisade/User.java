@@ -22,6 +22,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -69,11 +70,13 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User auths(final String... auths) {
+        Objects.nonNull(auths);
         Collections.addAll(this.auths, auths);
         return this;
     }
 
     public User auths(final Set<String> auths) {
+        Objects.nonNull(auths);
         this.auths.addAll(auths);
         return this;
     }
@@ -85,11 +88,13 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User roles(final String... roles) {
+        Objects.nonNull(roles);
         Collections.addAll(this.roles, roles);
         return this;
     }
 
     public User roles(final Set<String> roles) {
+        Objects.nonNull(roles);
         this.roles.addAll(roles);
         return this;
     }

@@ -27,6 +27,7 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -99,6 +100,7 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> rules(final LinkedHashMap<String, Rule<T>> rules) {
+        Objects.nonNull(rules);
         this.rules.putAll(rules);
         return this;
     }
@@ -111,6 +113,7 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> rule(final String id, final Rule<T> rule) {
+        Objects.nonNull(id);
         rules.put(id, rule);
         return this;
     }
@@ -123,6 +126,8 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> predicateRule(final String id, final PredicateRule<T> rule) {
+        Objects.nonNull(id);
+        Objects.nonNull(rule);
         rules.put(id, rule);
         return this;
     }
@@ -136,6 +141,8 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> simplePredicateRule(final String id, final Predicate<T> rule) {
+        Objects.nonNull(id);
+        Objects.nonNull(rule);
         rules.put(id, new WrappedRule<>(rule));
         return this;
     }
@@ -149,8 +156,10 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> simpleFunctionRule(final String id, final Function<T, T> rule) {
+        Objects.nonNull(id);
+        Objects.nonNull(rule);
         rules.put(id, new WrappedRule<>(rule));
-        return this;
+            return this;
     }
 
     @Override
