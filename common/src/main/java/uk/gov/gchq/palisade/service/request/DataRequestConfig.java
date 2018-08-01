@@ -22,12 +22,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.policy.Rules;
+import uk.gov.gchq.palisade.policy.MultiPolicy;
+import uk.gov.gchq.palisade.policy.Policy;
 import uk.gov.gchq.palisade.resource.Resource;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * This is the high level API for the object that contains all the information
@@ -37,7 +34,7 @@ import java.util.Objects;
 public class DataRequestConfig extends Request {
     private User user = new User();
     private Justification justification = new Justification();
-    private Map<Resource, Rules> rules = new HashMap<>();
+    private MultiPolicy multiPolicy = new MultiPolicy();
 
     public DataRequestConfig() {
     }
@@ -52,8 +49,13 @@ public class DataRequestConfig extends Request {
         return this;
     }
 
-    public DataRequestConfig rules(final Map<Resource, Rules> rules) {
-        this.rules = rules;
+    public DataRequestConfig multiPolicy(final MultiPolicy multiPolicy) {
+        this.multiPolicy = multiPolicy;
+        return this;
+    }
+
+    public DataRequestConfig policy(final Resource resource, final Policy policy) {
+        this.multiPolicy.setPolicy(resource, policy);
         return this;
     }
 
@@ -65,21 +67,12 @@ public class DataRequestConfig extends Request {
         this.user = user;
     }
 
-    public Map<Resource, Rules> getRules() {
-        return rules;
+    public MultiPolicy getMultiPolicy() {
+        return multiPolicy;
     }
 
-    public void setRules(final Map<Resource, Rules> rules) {
-        this.rules = rules;
-    }
-
-    public <T> Rules<T> getResourceRules(final Resource resource) {
-        Objects.requireNonNull(resource);
-        final Rules resourceRules = rules.get(resource);
-        if (null != resourceRules) {
-            return resourceRules;
-        }
-        return new Rules<>();
+    public void setMultiPolicy(final MultiPolicy multiPolicy) {
+        this.multiPolicy = multiPolicy;
     }
 
     public Justification getJustification() {
@@ -106,7 +99,7 @@ public class DataRequestConfig extends Request {
                 .appendSuper(super.equals(o))
                 .append(user, that.user)
                 .append(justification, that.justification)
-                .append(rules, that.rules)
+                .append(multiPolicy, that.multiPolicy)
                 .isEquals();
     }
 
@@ -116,7 +109,7 @@ public class DataRequestConfig extends Request {
                 .appendSuper(super.hashCode())
                 .append(user)
                 .append(justification)
-                .append(rules)
+                .append(multiPolicy)
                 .toHashCode();
     }
 
@@ -126,7 +119,7 @@ public class DataRequestConfig extends Request {
                 .appendSuper(super.toString())
                 .append("user", user)
                 .append("justification", justification)
-                .append("rules", rules)
+                .append("multiPolicy", multiPolicy)
                 .toString();
     }
 }

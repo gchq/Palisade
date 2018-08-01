@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.policy.service;
 
+import uk.gov.gchq.palisade.policy.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
@@ -26,11 +27,9 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * The core API for the policy service.
- *
  * The responsibilities of the policy service is to provide the set of rules
  * (filters or transformations) that need to be applied to each resource that
  * has been requested, based the user and justification.
- *
  * Note that a resource could be a file, stream, directory or even the system
  * resource (policies added to the system resource would be applied globally).
  */
@@ -51,13 +50,13 @@ public interface PolicyService extends Service {
     CompletableFuture<Boolean> canAccess(final CanAccessRequest request);
 
     /**
-     * This method gets the record level {@link Policy}'s that apply to the list
+     * This method gets the record level {@link uk.gov.gchq.palisade.policy.Policy}'s that apply to the list
      * of resources that the user has requested access too.
      *
      * @param request a {@link GetPolicyRequest} containing the user requesting
      *                the data, a justification for why they want the data and a
      *                list of the resources the user wants access too.
-     * @return a {@link MultiPolicy} containing the mapping of resource to {@link Policy}
+     * @return a {@link MultiPolicy} containing the mapping of resource to {@link uk.gov.gchq.palisade.policy.Policy}
      */
     CompletableFuture<MultiPolicy> getPolicy(final GetPolicyRequest request);
 
@@ -65,7 +64,7 @@ public interface PolicyService extends Service {
      * This method allows for the setting of a policy to a resource.
      *
      * @param request a {@link SetPolicyRequest} containing the
-     *                         resource and the policy to set on that resource.
+     *                resource and the policy to set on that resource.
      * @return a {@link CompletableFuture} {@link Boolean} which is true if
      * the policy was successfully set.
      */

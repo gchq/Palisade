@@ -48,12 +48,10 @@ public interface DataReader {
      * @param request {@link DataReaderRequest} containing the resource to be
      *                read, rules to be applied, the user requesting the data
      *                and the justification for accessing the data.
-     * @param <RAW_DATA_TYPE>     Java class that the raw data is read in as and streamed back
-     *                to the client as.
      * @param <RULES_DATA_TYPE>     Java class that the rules expect the data to be in.
      * @return a {@link DataReaderRequest} that contains the stream of data.
      */
-    <RAW_DATA_TYPE, RULES_DATA_TYPE> DataReaderResponse<RAW_DATA_TYPE> read(final DataReaderRequest<RULES_DATA_TYPE> request);
+    <RULES_DATA_TYPE> DataReaderResponse read(final DataReaderRequest<RULES_DATA_TYPE> request);
 
     @JsonGetter("class")
     default String _getClass() {

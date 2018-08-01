@@ -19,8 +19,8 @@ package uk.gov.gchq.palisade.policy.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.policy.service.MultiPolicy;
-import uk.gov.gchq.palisade.policy.service.Policy;
+import uk.gov.gchq.palisade.policy.MultiPolicy;
+import uk.gov.gchq.palisade.policy.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;

@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
+import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.util.concurrent.CompletableFuture;
@@ -46,7 +47,7 @@ public class MockPalisadeService implements PalisadeService {
     }
 
     @Override
-    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final DataRequestResponse request) {
+    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final GetDataRequestConfig request) {
         return mock.getDataRequestConfig(request);
     }
 }

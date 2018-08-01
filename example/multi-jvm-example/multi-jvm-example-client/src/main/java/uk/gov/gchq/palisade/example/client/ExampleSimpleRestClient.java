@@ -24,7 +24,7 @@ import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.function.IsTimestampMoreThan;
 import uk.gov.gchq.palisade.example.function.IsVisible;
-import uk.gov.gchq.palisade.policy.service.Policy;
+import uk.gov.gchq.palisade.policy.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -94,7 +94,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
     }
 
     @Override
-    protected Serialiser<?, ExampleObj> createSerialiser() {
+    protected Serialiser<ExampleObj> createSerialiser() {
         return new ExampleObjSerialiser();
     }
 }

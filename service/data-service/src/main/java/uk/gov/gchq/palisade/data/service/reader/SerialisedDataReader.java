@@ -26,17 +26,18 @@ import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.resource.Resource;
 
-import java.util.HashMap;
+import java.io.InputStream;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * This class is an abstract implementation of the {@link DataReader} which uses
  * serialisers to serialise the data into the for that the rules need to be able
  * to apply those rules and then de-serialise to how the client is expecting the
  * data to be returned.
- * <p>
  * This class means that the only places where the structure of the data needs
  * to be known is in the serialisers, rules and client code. Therefore you only
  * need to implement a {@link uk.gov.gchq.palisade.data.service.DataService} for
@@ -46,20 +47,15 @@ import java.util.stream.Stream;
 public abstract class SerialisedDataReader implements DataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialisedDataReader.class);
 
-    private final Serialiser<?, ?> defaultSerialiser = new NullSerialiser<>();
-    private Map<String, Serialiser<?, ?>> serialisers;
-
-    // no-args constructor required
-    public SerialisedDataReader() {
-        serialisers = new HashMap<>();
-    }
+    private Serialiser<?> defaultSerialiser = new NullSerialiser<>();
+    private Map<String, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
 
     /**
      * @param serialisers a mapping of data type to serialiser
      * @return the {@link SerialisedDataReader}
      */
-    public SerialisedDataReader serialisers(final Map<String, Serialiser<?, ?>> serialisers) {
-        Objects.requireNonNull(serialisers);
+    public SerialisedDataReader serialisers(final Map<String, Serialiser< ?>> serialisers) {
+        requireNonNull(serialisers);
         this.serialisers = serialisers;
         return this;
     }
@@ -72,28 +68,31 @@ public abstract class SerialisedDataReader implements DataReader {
      * @param request           {@link DataReaderRequest} containing the resource to be
      *                          read, rules to be applied, the user requesting the data
      *                          and the justification for accessing the data.
-     * @param <RAW_DATA_TYPE>   The format that the data is expected by the client.
      * @param <RULES_DATA_TYPE> The format that the rules expect the data to be in.
      * @return a {@link DataReaderResponse} containing the stream of data
      * read to be streamed back to the client
      */
     @Override
-    public <RAW_DATA_TYPE, RULES_DATA_TYPE> DataReaderResponse<RAW_DATA_TYPE> read(final DataReaderRequest<RULES_DATA_TYPE> request) {
-        final Serialiser<RAW_DATA_TYPE, RULES_DATA_TYPE> serialiser = getSerialiser(request.getResource());
-        final Stream<RAW_DATA_TYPE> rawStream = (Stream<RAW_DATA_TYPE>) readRaw(request.getResource());
+    public <RULES_DATA_TYPE> DataReaderResponse read(final DataReaderRequest<RULES_DATA_TYPE> request) {
+        requireNonNull(request, "Request is required");
+        requireNonNull(request.getResource(), "Request resource is required");
 
-        final Stream<RAW_DATA_TYPE> data;
+        final Serialiser<RULES_DATA_TYPE> serialiser = getSerialiser(request.getResource());
+        final InputStream rawStream = readRaw(request.getResource());
+
+        final InputStream data;
         if (request.getRules().getRules().isEmpty()) {
             LOGGER.debug("No rules to apply");
             data = rawStream;
         } else {
             LOGGER.debug("Applying rules: {}", request.getRules());
-            data = Util.applyRules(
-                    rawStream.map(serialiser::deserialise),
+            final Stream<RULES_DATA_TYPE> deserialisedData = Util.applyRules(
+                    serialiser.deserialise(rawStream),
                     request.getUser(),
                     request.getJustification(),
                     request.getRules()
-            ).map(serialiser::serialise);
+            );
+            data = serialiser.serialise(deserialisedData);
         }
 
         return new DataReaderResponse().data(data);
@@ -106,28 +105,32 @@ public abstract class SerialisedDataReader implements DataReader {
      * @param resource the resource to be accessed
      * @return a stream of data in the format that the client expects the data to be in.
      */
-    protected abstract Stream<?> readRaw(final Resource resource);
+    protected abstract InputStream readRaw(final Resource resource);
 
-    public <RAW_DATA_TYPE, RULES_DATA_TYPE> Serialiser<RAW_DATA_TYPE, RULES_DATA_TYPE> getSerialiser(final String type) {
-        Serialiser<?, ?> serialiser = serialisers.get(type);
+    public <RULES_DATA_TYPE> Serialiser<RULES_DATA_TYPE> getSerialiser(final String type) {
+        Serialiser<?> serialiser = serialisers.get(type);
         if (null == serialiser) {
             serialiser = defaultSerialiser;
         }
-        return (Serialiser<RAW_DATA_TYPE, RULES_DATA_TYPE>) serialiser;
+        return (Serialiser<RULES_DATA_TYPE>) serialiser;
     }
 
-    public <I, O> Serialiser<I, O> getSerialiser(final Resource resource) {
+    public <I> Serialiser<I> getSerialiser(final Resource resource) {
         return getSerialiser(resource.getType());
     }
 
-    public void addSerialiser(final String type, final Serialiser<?, ?> serialiser) {
-        Objects.requireNonNull(type);
-        Objects.requireNonNull(serialiser);
+    public void addSerialiser(final String type, final Serialiser<?> serialiser) {
+        requireNonNull(type);
+        requireNonNull(serialiser);
         serialisers.put(type, serialiser);
     }
 
-    public void setSerialisers(final Map<String, Serialiser<?, ?>> serialisers) {
-        Objects.requireNonNull(serialisers);
+    public void setSerialisers(final Map<String, Serialiser<?>> serialisers) {
+        requireNonNull(serialisers);
         this.serialisers = serialisers;
+    }
+
+    public void setDefaultSerialiser(final Serialiser<?> defaultSerialiser) {
+        this.defaultSerialiser = defaultSerialiser;
     }
 }

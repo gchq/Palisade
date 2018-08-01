@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.policy.service;
 
+import uk.gov.gchq.palisade.policy.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;

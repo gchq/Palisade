@@ -40,7 +40,7 @@ public class MockDataService implements DataService {
     }
 
     @Override
-    public <T> CompletableFuture<ReadResponse<T>> read(final ReadRequest request) {
+    public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         return mock.read(request);
     }
 }

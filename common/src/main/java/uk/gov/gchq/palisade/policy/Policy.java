@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.policy.service;
+package uk.gov.gchq.palisade.policy;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.policy.PredicateRule;
-import uk.gov.gchq.palisade.policy.Rule;
-import uk.gov.gchq.palisade.policy.Rules;
 
 import java.util.Objects;
 import java.util.function.Function;

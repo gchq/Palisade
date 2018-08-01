@@ -137,10 +137,10 @@ public abstract class ProxyRestService implements Service {
             final Response response = request.post(Entity.json(jsonBody));
             responseObj = handleResponse(response, outputType);
         } catch (final Exception e) {
-            LOGGER.debug("Request to {} with body: \n{}\n failed due to {}\n", url, jsonBody, e.getMessage(), e);
+            LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
             throw e;
         }
-        LOGGER.debug("Request to {} with body: \n{}\n returned: {}\n", url, jsonBody, responseObj);
+        LOGGER.debug("Request to {} was successful", url);
         return responseObj;
     }
 
@@ -152,10 +152,10 @@ public abstract class ProxyRestService implements Service {
             final Response response = request.post(Entity.json(jsonBody));
             responseObj = handleResponse(response, outputType);
         } catch (final Exception e) {
-            LOGGER.debug("Request to {} with body: \n{}\n failed due to {}\n", url, jsonBody, e.getMessage(), e);
+            LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
             throw e;
         }
-        LOGGER.debug("Request to {} with body: \n{}\n returned: {}\n", url, jsonBody, responseObj);
+        LOGGER.debug("Request to {} was successful", url);
         return responseObj;
     }
 
@@ -183,10 +183,10 @@ public abstract class ProxyRestService implements Service {
             response = request.put(Entity.json(jsonBody));
             responseObj = handleResponse(response, outputType);
         } catch (final Exception e) {
-            LOGGER.debug("Request to {} with body: \n{}\n failed", url, jsonBody);
+            LOGGER.debug("Request to {} failed", url);
             throw e;
         }
-        LOGGER.debug("Request to {} with body: \n{}\n returned: {}\n", url, jsonBody, responseObj);
+        LOGGER.debug("Request to {} was successful", url);
         return responseObj;
     }
 
@@ -195,7 +195,11 @@ public abstract class ProxyRestService implements Service {
                 .request();
         if (null != body) {
             request.header("Content", MediaType.APPLICATION_JSON_TYPE);
-            request.build(body);
+            try {
+                request.build(body);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return request;
     }
@@ -212,8 +216,12 @@ public abstract class ProxyRestService implements Service {
     }
 
     protected <O> O handleResponse(final Response response, final Class<O> outputType) {
-        final String outputJson = extractJsonResponse(response);
+        if (Response.class.equals(outputType)) {
+            validate(response);
+            return (O) response;
+        }
 
+        final String outputJson = extractJsonResponse(response);
         O output = null;
         if (null != outputJson) {
             output = deserialise(outputJson, outputType);
@@ -224,6 +232,20 @@ public abstract class ProxyRestService implements Service {
 
     private String extractJsonResponse(final Response response) {
         final String outputJson = response.hasEntity() ? response.readEntity(String.class) : null;
+        validate(response, outputJson);
+        if (null != outputJson) {
+            LOGGER.debug("Request returned json: {}", outputJson);
+        }
+        return outputJson;
+    }
+
+    private void validate(final Response response) {
+        if (Family.SUCCESSFUL != response.getStatusInfo().getFamily()) {
+            validate(response, response.hasEntity() ? response.readEntity(String.class) : null);
+        }
+    }
+
+    private void validate(final Response response, final String outputJson) {
         if (Family.SUCCESSFUL != response.getStatusInfo().getFamily()) {
             final Error error;
             if (null == outputJson) {
@@ -239,10 +261,6 @@ public abstract class ProxyRestService implements Service {
             LOGGER.error("Error: Bad status {}. Detail: {}", response.getStatus(), outputJson);
             throw new PalisadeWrappedErrorRuntimeException(error);
         }
-        if (null != outputJson) {
-            LOGGER.debug("Request returned json: {}", outputJson);
-        }
-        return outputJson;
     }
 
     protected <O> O deserialise(final String jsonString, final TypeReference<O> outputType) {

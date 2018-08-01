@@ -24,6 +24,9 @@ import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
 
+import javax.ws.rs.core.Response;
+
+import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
 public class ProxyRestDataService extends ProxyRestService implements DataService {
@@ -37,10 +40,9 @@ public class ProxyRestDataService extends ProxyRestService implements DataServic
         setBaseUrl(baseUrl);
     }
 
-    @Override
-    public <T> CompletableFuture<ReadResponse<T>> read(final ReadRequest request) {
+    public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         LOGGER.debug("Invoking REST read: " + request);
-        final CompletableFuture<ReadResponse> response = doPostAsync("read", request, ReadResponse.class);
-        return (CompletableFuture) response;
+        final CompletableFuture<Response> futureResponse = doPostAsync("read/chunked", request, Response.class);
+        return futureResponse.thenApply(r -> new ReadResponse().data(r.readEntity(InputStream.class)));
     }
 }

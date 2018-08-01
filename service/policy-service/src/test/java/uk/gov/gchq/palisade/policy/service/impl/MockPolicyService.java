@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.policy.service.impl;
 
 import org.mockito.Mockito;
 
-import uk.gov.gchq.palisade.policy.service.MultiPolicy;
+import uk.gov.gchq.palisade.policy.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;

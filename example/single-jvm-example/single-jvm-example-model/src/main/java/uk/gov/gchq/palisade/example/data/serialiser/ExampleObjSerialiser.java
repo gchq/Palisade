@@ -15,19 +15,39 @@
  */
 package uk.gov.gchq.palisade.example.data.serialiser;
 
-import uk.gov.gchq.palisade.data.serialise.BytesSerialiser;
+import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.example.ExampleObj;
+import uk.gov.gchq.palisade.io.SuppliedInputStream;
 
-public class ExampleObjSerialiser implements BytesSerialiser<ExampleObj> {
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.stream.Stream;
+
+public class ExampleObjSerialiser implements Serialiser<ExampleObj> {
     @Override
-    public byte[] serialise(final ExampleObj object) {
-        return (object.getProperty() + "," + object.getVisibility() + "," + object.getTimestamp()).getBytes();
+    public InputStream serialise(final Stream<ExampleObj> stream) {
+        final Iterator<ExampleObj> itr = stream.iterator();
+        return new SuppliedInputStream(() -> {
+            if (itr.hasNext()) {
+                return serialiseToBytes(itr.next());
+            }
+            return null;
+        });
     }
 
     @Override
-    public ExampleObj deserialise(final byte[] bytes) {
-        final String str = new String(bytes);
-        final String[] parts = str.split(",");
-        return new ExampleObj(parts[0], parts[1], Long.parseLong(parts[2]));
+    public Stream<ExampleObj> deserialise(final InputStream stream) {
+        return new BufferedReader(new InputStreamReader(stream))
+                .lines()
+                .map(line -> {
+                    final String[] parts = line.split(",");
+                    return new ExampleObj(parts[0], parts[1], Long.parseLong(parts[2]));
+                });
+    }
+
+    public byte[] serialiseToBytes(final ExampleObj obj) {
+        return (obj.getProperty() + "," + obj.getVisibility() + "," + obj.getTimestamp() + "\n").getBytes();
     }
 }

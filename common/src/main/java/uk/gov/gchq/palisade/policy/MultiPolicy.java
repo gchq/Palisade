@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.policy.service;
+package uk.gov.gchq.palisade.policy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.policy.Rules;
 import uk.gov.gchq.palisade.resource.Resource;
 
 import java.util.HashMap;
@@ -73,12 +72,22 @@ public class MultiPolicy {
         return new Policy();
     }
 
+    public Rules getRules(final Resource resource) {
+        Objects.requireNonNull(resource);
+        final Policy policy = policies.get(resource);
+        if (null != policy && null != policy.getRules()) {
+            return policy.getRules();
+        }
+
+        return new Rules();
+    }
+
     /**
      * Sets the given {@link Policy} to the given {@link Resource} provided
      * there isn't already a {@link Policy} assigned to that {@link Resource}.
      *
      * @param resource the resource that you want the {@link Policy} for.
-     * @param policy The {@link Policy} for the given {@link Resource}.
+     * @param policy   The {@link Policy} for the given {@link Resource}.
      */
     public void setPolicy(final Resource resource, final Policy policy) {
         Objects.requireNonNull(resource);

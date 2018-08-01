@@ -29,9 +29,9 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.NullCacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
-import uk.gov.gchq.palisade.policy.service.MultiPolicy;
+import uk.gov.gchq.palisade.policy.MultiPolicy;
+import uk.gov.gchq.palisade.policy.Policy;
 import uk.gov.gchq.palisade.policy.service.NullPolicyService;
-import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.resource.Resource;
@@ -42,6 +42,7 @@ import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
+import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.user.service.NullUserService;
 import uk.gov.gchq.palisade.user.service.UserService;
@@ -107,7 +108,7 @@ public class SimplePalisadeService implements PalisadeService {
                     return user;
                 });
 
-        final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResource());
+        final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId());
         LOGGER.debug("Getting resources from resourceService: {}", resourceRequest);
         final CompletableFuture<Map<Resource, ConnectionDetail>> futureResources = resourceService.getResourcesById(resourceRequest)
                 .thenApply(resources -> {
@@ -158,11 +159,10 @@ public class SimplePalisadeService implements PalisadeService {
     private void cache(final RegisterDataRequest request, final User user, final RequestId requestId, final MultiPolicy multiPolicy) {
         final AddCacheRequest cacheRequest = new AddCacheRequest()
                 .requestId(requestId)
-                .dataRequestConfig(
-                        new DataRequestConfig()
+                .dataRequestConfig(new DataRequestConfig()
                                 .user(user)
                                 .justification(request.getJustification())
-                                .rules(multiPolicy.getRuleMap())
+                                .multiPolicy(multiPolicy)
                 );
         LOGGER.debug("Caching: {}", cacheRequest);
         final Boolean success = cacheService.add(cacheRequest).join();
@@ -172,7 +172,7 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     @Override
-    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final DataRequestResponse request) {
+    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final GetDataRequestConfig request) {
         Objects.requireNonNull(request);
         Objects.requireNonNull(request.getRequestId());
         // TODO: need to validate that the user is actually requesting the correct info.

@@ -13,20 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.data.serialise;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.stream.Stream;
+package uk.gov.gchq.palisade.io;
 
-public class NullSerialiser<T> implements Serialiser<T> {
-    @Override
-    public InputStream serialise(final Stream<T> object) {
-        return new ByteArrayInputStream(new byte[0]);
-    }
+public interface Bytes {
+    byte[] getBytes();
 
-    @Override
-    public Stream<T> deserialise(final InputStream stream) {
-        return Stream.empty();
-    }
+    int getCount();
 }

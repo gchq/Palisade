@@ -25,7 +25,7 @@ import uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.function.IsTimestampMoreThan;
 import uk.gov.gchq.palisade.example.function.IsVisible;
-import uk.gov.gchq.palisade.policy.service.Policy;
+import uk.gov.gchq.palisade.policy.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -46,17 +46,19 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest()
                         .user(
-                                new User()
-                                        .userId("Alice")
-                                        .auths("public", "private")
-                                        .roles("user", "admin"))
+                        new User()
+                                .userId("Alice")
+                                .auths("public", "private")
+                                .roles("user", "admin")
+                )
         );
         final CompletableFuture<Boolean> userBobStatus = userService.addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
                                 .auths("public")
-                                .roles("user"))
+                                .roles("user")
+                )
         );
 
         // The policy owner or sys admin needs to add the policies
@@ -66,16 +68,16 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 .id("file1")
                                 .type(RESOURCE_TYPE))
                         .policy(new Policy()
-                                        .message("Age off and visibility filtering")
-                                        .predicateRule(
-                                                "visibility",
-                                                new IsVisible()
-                                        )
-                                        .simplePredicateRule(
-                                                "ageOff",
-                                                new IsTimestampMoreThan(12L)
-                                        )
-                        )
+                                .message("Age off and visibility filtering")
+                                .predicateRule(
+                                        "visibility",
+                                        new IsVisible()
+                                )
+                                .simplePredicateRule(
+                                        "ageOff",
+                                        new IsTimestampMoreThan(12L)
+                                )
+                )
         );
 
         // The sys admin needs to add the resources
@@ -83,7 +85,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                 .parent(new DirectoryResource().id("dir1").type(RESOURCE_TYPE))
                 .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
                 .connectionDetail(new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisadeService).reader(new ExampleSimpleDataReader()))
-                ));
+        ));
 
         // Wait for the users, policies and resources to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();
@@ -94,7 +96,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     }
 
     @Override
-    protected Serialiser<?, ExampleObj> createSerialiser() {
+    protected Serialiser<ExampleObj> createSerialiser() {
         return new ExampleObjSerialiser();
     }
 }

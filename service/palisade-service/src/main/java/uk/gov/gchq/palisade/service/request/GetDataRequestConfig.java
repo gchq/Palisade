@@ -14,61 +14,46 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.policy.service.request;
+package uk.gov.gchq.palisade.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.policy.Policy;
 import uk.gov.gchq.palisade.resource.Resource;
-import uk.gov.gchq.palisade.service.request.Request;
 
 /**
- * This class is used in the request to set a {@link Policy} for a {@link Resource}.
- * That resource may be signifying a file, stream, directory or the system
- * (policy is applied to all requests to the Palisade system).
+ * This class is used to request the {@link DataRequestConfig}.
  */
-public class SetPolicyRequest extends Request {
+public class GetDataRequestConfig extends Request {
+    private RequestId requestId;
     private Resource resource;
-    private Policy policy;
 
-    // no-args constructor
-    public SetPolicyRequest() {
+    public RequestId getRequestId() {
+        return requestId;
     }
 
-    /**
-     * @param resource the {@link Resource} to set the {@link Policy} for
-     * @return the {@link SetPolicyRequest}
-     */
-    public SetPolicyRequest resource(final Resource resource) {
-        this.resource = resource;
+    public GetDataRequestConfig requestId(final RequestId requestId) {
+        this.requestId = requestId;
         return this;
     }
 
-    /**
-     * @param policy the {@link Policy} to set for the {@link Resource}
-     * @return the {@link SetPolicyRequest}
-     */
-    public SetPolicyRequest policy(final Policy policy) {
-        this.policy = policy;
-        return this;
+    public void setRequestId(final RequestId requestId) {
+        this.requestId = requestId;
     }
 
     public Resource getResource() {
         return resource;
     }
 
+    public GetDataRequestConfig resource(final Resource resource) {
+        this.resource = resource;
+        return this;
+    }
+
     public void setResource(final Resource resource) {
         this.resource = resource;
-    }
-
-    public Policy getPolicy() {
-        return policy;
-    }
-
-    public void setPolicy(final Policy policy) {
-        this.policy = policy;
     }
 
     @Override
@@ -81,30 +66,29 @@ public class SetPolicyRequest extends Request {
             return false;
         }
 
-        final SetPolicyRequest that = (SetPolicyRequest) o;
+        final GetDataRequestConfig that = (GetDataRequestConfig) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
+                .append(requestId, that.requestId)
                 .append(resource, that.resource)
-                .append(policy, that.policy)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 29)
+        return new HashCodeBuilder(7, 37)
                 .appendSuper(super.hashCode())
+                .append(requestId)
                 .append(resource)
-                .append(policy)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .appendSuper(super.toString())
+                .append("requestId", requestId)
                 .append("resource", resource)
-                .append("policy", policy)
                 .toString();
     }
 }
