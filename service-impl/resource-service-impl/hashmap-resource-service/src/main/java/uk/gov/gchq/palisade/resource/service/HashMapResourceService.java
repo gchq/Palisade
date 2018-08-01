@@ -18,9 +18,9 @@ package uk.gov.gchq.palisade.resource.service;
 
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 
@@ -51,7 +51,7 @@ public class HashMapResourceService implements ResourceService {
     private final Map<Resource, Map<Resource, ConnectionDetail>> resourceToResources;
     private final Map<String, Map<Resource, ConnectionDetail>> idToResources;
     private final Map<String, Map<Resource, ConnectionDetail>> typeToResources;
-    private final Map<String, Map<Resource, ConnectionDetail>> formatToResources;
+    private final Map<String, Map<Resource, ConnectionDetail>> serialisedFormatToResources;
 
     public HashMapResourceService() {
         this(true);
@@ -62,12 +62,12 @@ public class HashMapResourceService implements ResourceService {
             resourceToResources = RES_TO_RES;
             idToResources = ID_TO_RES;
             typeToResources = TYPE_TO_RES;
-            formatToResources = FORMAT_TO_RES;
+            serialisedFormatToResources = FORMAT_TO_RES;
         } else {
             resourceToResources = new ConcurrentHashMap<>();
             idToResources = new ConcurrentHashMap<>();
             typeToResources = new ConcurrentHashMap<>();
-            formatToResources = new ConcurrentHashMap<>();
+            serialisedFormatToResources = new ConcurrentHashMap<>();
         }
     }
 
@@ -99,9 +99,10 @@ public class HashMapResourceService implements ResourceService {
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(final GetResourcesByFormatRequest request) {
-        Map<Resource, ConnectionDetail> result = formatToResources.get(request.getFormat());
+    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
+        Map<Resource, ConnectionDetail> result = serialisedFormatToResources.get(request.getSerialisedFormat());
         if (null == result) {
+
             result = Collections.emptyMap();
         }
         return CompletableFuture.completedFuture(result);
@@ -112,12 +113,12 @@ public class HashMapResourceService implements ResourceService {
         indexResource(request.getResource(), request.getResource(), request.getConnectionDetail(), resourceToResources);
         indexResource(request.getResource().getId(), request.getResource(), request.getConnectionDetail(), idToResources);
         indexResource(request.getResource().getType(), request.getResource(), request.getConnectionDetail(), typeToResources);
-        indexResource(request.getResource().getFormat(), request.getResource(), request.getConnectionDetail(), formatToResources);
+        indexResource(request.getResource().getSerialisedFormat(), request.getResource(), request.getConnectionDetail(), serialisedFormatToResources);
 
-        indexResource(request.getContainer(), request.getResource(), request.getConnectionDetail(), resourceToResources);
-        indexResource(request.getContainer().getId(), request.getResource(), request.getConnectionDetail(), idToResources);
-        indexResource(request.getContainer().getType(), request.getResource(), request.getConnectionDetail(), typeToResources);
-        indexResource(request.getContainer().getFormat(), request.getResource(), request.getConnectionDetail(), formatToResources);
+        indexResource(request.getParent(), request.getResource(), request.getConnectionDetail(), resourceToResources);
+        indexResource(request.getParent().getId(), request.getResource(), request.getConnectionDetail(), idToResources);
+        indexResource(request.getParent().getType(), request.getResource(), request.getConnectionDetail(), typeToResources);
+        indexResource(request.getParent().getSerialisedFormat(), request.getResource(), request.getConnectionDetail(), serialisedFormatToResources);
         return CompletableFuture.completedFuture(true);
     }
 
@@ -125,7 +126,7 @@ public class HashMapResourceService implements ResourceService {
         resourceToResources.clear();
         idToResources.clear();
         typeToResources.clear();
-        formatToResources.clear();
+        serialisedFormatToResources.clear();
         resources.forEach(this::addResource);
     }
 

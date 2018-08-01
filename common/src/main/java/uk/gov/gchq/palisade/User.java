@@ -16,11 +16,13 @@
 
 package uk.gov.gchq.palisade;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -35,18 +37,10 @@ import java.util.Set;
  * The user auths are used specifically to decide what visibilities users can see.
  * </p>
  */
-public class User {
+public class User implements Cloneable {
     private UserId userId = new UserId();
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
-
-    public Set<String> getAuths() {
-        return auths;
-    }
-
-    public Set<String> getRoles() {
-        return roles;
-    }
 
     /**
      * Sets the userId to a {@link UserId} with the given userId string.
@@ -55,7 +49,7 @@ public class User {
      * @return this User instance.
      */
     public User userId(final String userId) {
-        return userId(new UserId(userId));
+        return userId(new UserId().id(userId));
     }
 
     /**
@@ -76,7 +70,14 @@ public class User {
      * @return this User instance.
      */
     public User auths(final String... auths) {
+        Objects.nonNull(auths);
         Collections.addAll(this.auths, auths);
+        return this;
+    }
+
+    public User auths(final Set<String> auths) {
+        Objects.nonNull(auths);
+        this.auths.addAll(auths);
         return this;
     }
 
@@ -87,8 +88,23 @@ public class User {
      * @return this User instance.
      */
     public User roles(final String... roles) {
+        Objects.nonNull(roles);
         Collections.addAll(this.roles, roles);
         return this;
+    }
+
+    public User roles(final Set<String> roles) {
+        Objects.nonNull(roles);
+        this.roles.addAll(roles);
+        return this;
+    }
+
+    public Set<String> getAuths() {
+        return auths;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
     }
 
     public UserId getUserId() {
@@ -97,6 +113,19 @@ public class User {
 
     public void setUserId(final UserId userId) {
         this.userId = userId;
+    }
+
+    public User clone() {
+        User clone;
+        try {
+            clone = (User) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new User();
+        }
+        clone.userId = userId.clone();
+        clone.roles = Sets.newHashSet(roles);
+        clone.auths = Sets.newHashSet(auths);
+        return clone;
     }
 
     @Override

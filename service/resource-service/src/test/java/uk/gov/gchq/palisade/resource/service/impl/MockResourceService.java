@@ -22,7 +22,7 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByFormatRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
@@ -61,8 +61,8 @@ public class MockResourceService implements ResourceService {
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(final GetResourcesByFormatRequest request) {
-        return mock.getResourcesByFormat(request);
+    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
+        return mock.getResourcesBySerialisedFormat(request);
     }
 
     @Override

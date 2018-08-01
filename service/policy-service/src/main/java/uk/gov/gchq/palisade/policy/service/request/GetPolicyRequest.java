@@ -42,15 +42,30 @@ public class GetPolicyRequest extends Request {
     }
 
     /**
-     *
-     * @param user The {@link User} wanting access to the resource.
-     * @param justification The {@link Justification} of why the user needs
-     * @param resources A collection of {@link Resource}'s to be accessed.
+     * @param user the {@link User} wanting access to the resource
+     * @return the {@link GetPolicyRequest}
      */
-    public GetPolicyRequest(final User user, final Justification justification, final Collection<Resource> resources) {
+    public GetPolicyRequest user(final User user) {
         this.user = user;
+        return this;
+    }
+
+    /**
+     * @param justification the {@link Justification} of why the user needs
+     * @return the {@link GetPolicyRequest}
+     */
+    public GetPolicyRequest justification(final Justification justification) {
         this.justification = justification;
+        return this;
+    }
+
+    /**
+     * @param resources a collection of {@link Resource}'s to be accessed
+     * @return the {@link GetPolicyRequest}
+     */
+    public GetPolicyRequest resources(final Collection<Resource> resources) {
         this.resources = resources;
+        return this;
     }
 
     public User getUser() {
@@ -90,6 +105,7 @@ public class GetPolicyRequest extends Request {
         final GetPolicyRequest that = (GetPolicyRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(user, that.user)
                 .append(justification, that.justification)
                 .append(resources, that.resources)
@@ -99,6 +115,7 @@ public class GetPolicyRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(19, 29)
+                .appendSuper(super.hashCode())
                 .append(user)
                 .append(justification)
                 .append(resources)
@@ -108,6 +125,7 @@ public class GetPolicyRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("user", user)
                 .append("justification", justification)
                 .append("resources", resources)

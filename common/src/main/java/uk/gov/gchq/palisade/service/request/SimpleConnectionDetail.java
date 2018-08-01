@@ -16,32 +16,48 @@
 
 package uk.gov.gchq.palisade.service.request;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.service.NullService;
+import uk.gov.gchq.palisade.service.Service;
 
 /**
- * A simple implementation of the {@link ConnectionDetail}
+ * A simple implementation of the {@link ConnectionDetail} that holds an instance
+ * of {@link Service}
  */
 public class SimpleConnectionDetail implements ConnectionDetail {
-    public static final String DEFAULT_DETAILS = "No details";
-    private String details;
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.CLASS,
+            include = As.PROPERTY,
+            property = "class"
+    )
+    private Service service;
 
     public SimpleConnectionDetail() {
-        this(DEFAULT_DETAILS);
+        service(new NullService());
     }
 
-    public SimpleConnectionDetail(final String details) {
-        this.details = details;
+    public SimpleConnectionDetail service(final Service service) {
+        this.service = service;
+        return this;
     }
 
-    public String getDetails() {
-        return details;
+    public Service getService() {
+        return service;
     }
 
-    public void setDetails(final String details) {
-        this.details = details;
+    public void setService(final Service service) {
+        this.service = service;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <S extends Service> S createService() {
+        return (S) service;
     }
 
     @Override
@@ -62,21 +78,21 @@ public class SimpleConnectionDetail implements ConnectionDetail {
         final SimpleConnectionDetail that = (SimpleConnectionDetail) o;
 
         return new EqualsBuilder()
-                .append(details, that.details)
+                .append(service, that.service)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(29, 31)
-                .append(details)
+        return new HashCodeBuilder(17, 41)
+                .append(service)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("details", details)
+                .append("service", service)
                 .toString();
     }
 }

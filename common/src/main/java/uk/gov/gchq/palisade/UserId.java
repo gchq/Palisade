@@ -23,35 +23,42 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * A {@link UserId} uniquely identifies a {@link User}. By default the ID will
  * be set to "UNKNOWN".
  */
-public class UserId {
+public class UserId implements Cloneable {
     /**
      * The default user ID - "UNKNOWN".
      */
     public static final String UNKNOWN_USER_ID = "UNKNOWN";
-    private final String id;
+    private String id;
 
     /**
      * Constructs a {@link UserId} with the default user ID of "UNKNOWN".
      */
     public UserId() {
-        this(UNKNOWN_USER_ID);
+        id(UNKNOWN_USER_ID);
     }
 
-    /**
-     * Constructs a {@link UserId} with the provided user ID.
-     *
-     * @param id the unique ID of the {@link User}.
-     */
-    public UserId(final String id) {
+    public UserId id(final String id) {
         if (null == id) {
             this.id = UNKNOWN_USER_ID;
         } else {
             this.id = id;
         }
+        return this;
     }
 
     public String getId() {
         return id;
+    }
+
+    public UserId clone() {
+        UserId clone;
+        try {
+            clone = (UserId) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new UserId();
+        }
+        clone.id = id;
+        return clone;
     }
 
     @Override

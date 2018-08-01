@@ -25,36 +25,38 @@ import uk.gov.gchq.palisade.resource.Resource;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
- *  This is the high level API object that is used to pass back to the client the
- *  information it requires to connect to the correct data service implementations
- *  and to decide how best to parallelise their job.
- *
- *  It is also the object that the client then passes to the data service to access
- *  the data. When it is passed to the data service the resources field might have
- *  been changed to be a subset of the resources.
+ * This is the high level API object that is used to pass back to the client the information it requires to connect to
+ * the correct data service implementations and to decide how best to parallelise their job.
+ * <p>
+ * It is also the object that the client then passes to the data service to access the data. When it is passed to the
+ * data service the resources field might have been changed to be a subset of the resources.
  */
 public class DataRequestResponse {
-    public RequestId requestId;
-    public Map<Resource, ConnectionDetail> resources;
+    public RequestId requestId = new RequestId();
+    public Map<Resource, ConnectionDetail> resources = new HashMap<>();
 
-    public DataRequestResponse() {
-        this(new RequestId());
-    }
-
-    public DataRequestResponse(final RequestId requestId) {
-        this(requestId, new HashMap<>());
-    }
-
-    public DataRequestResponse(final RequestId requestId, final Map<Resource, ConnectionDetail> resources) {
+    public DataRequestResponse requestId(final RequestId requestId) {
         this.requestId = requestId;
-        this.resources = resources;
+        return this;
     }
 
-    public DataRequestResponse(final RequestId requestId, final Resource resource, final ConnectionDetail connectionDetail) {
-        this(requestId);
+    public DataRequestResponse resource(final Resource resource, final ConnectionDetail connectionDetail) {
+        Objects.nonNull(resource);
+        Objects.nonNull(connectionDetail);
         resources.put(resource, connectionDetail);
+        return this;
+    }
+
+    public DataRequestResponse resources(final Map<Resource, ConnectionDetail> resources) {
+        this.resources = resources;
+        return this;
+    }
+
+    public DataRequestResponse resources(final DataRequestResponse requestResponse) {
+        return this.requestId(requestResponse.getRequestId()).resources(requestResponse.getResources());
     }
 
     public RequestId getRequestId() {

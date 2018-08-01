@@ -35,25 +35,27 @@ import java.util.stream.Stream;
  * </p>
  */
 public class SimpleDataReader extends SerialisedDataReader {
-    private final Map<Resource, List<?>> data;
+    private Map<Resource, List<?>> data;
 
     public SimpleDataReader() {
-        this(new ConcurrentHashMap<>());
+        this.serialisers(new ConcurrentHashMap<>());
+        this.data(new ConcurrentHashMap<>());
     }
 
-
-    public SimpleDataReader(final Map<String, Serialiser<?, ?>> serialisers) {
-        this(new ConcurrentHashMap<>(), serialisers);
+    public SimpleDataReader serialisers(final Map<String, Serialiser<?, ?>> serialisers) {
+        super.serialisers(serialisers);
+        return this;
     }
 
-    public SimpleDataReader(final Map<Resource, List<?>> data, final Map<String, Serialiser<?, ?>> serialisers) {
-        super(serialisers);
+    public SimpleDataReader data(final Map<Resource, List<?>> data) {
         this.data = data;
+        return this;
     }
 
-    public SimpleDataReader(final String type, final Serialiser<?, ?> serialiser) {
-        this(new ConcurrentHashMap<>());
+    public SimpleDataReader serialiser(final String type, final Serialiser<?, ?> serialiser) {
+        this.serialisers(new ConcurrentHashMap<>());
         addSerialiser(type, serialiser);
+        return this;
     }
 
     @Override
