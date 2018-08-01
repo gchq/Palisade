@@ -36,12 +36,12 @@ public class GetResourcesByIdRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resourceId The unique identifier of the resource that you want to {@code ls}
+     * @param resourceId the unique identifier of the resource that you want to {@code ls}
+     * @return the {@link GetResourcesByIdRequest}
      */
-    public GetResourcesByIdRequest(final String resourceId) {
+    public GetResourcesByIdRequest resourceId(final String resourceId) {
         this.resourceId = resourceId;
+        return this;
     }
 
     public String getResourceId() {

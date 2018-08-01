@@ -38,15 +38,21 @@ public class SetPolicyRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resource The {@link Resource} to set the {@link Policy} for.
-     * @param policy The {@link Policy} to set for the {@link Resource}.
+     * @param resource the {@link Resource} to set the {@link Policy} for
+     * @return the {@link SetPolicyRequest}
      */
-    public SetPolicyRequest(final Resource resource,
-                            final Policy policy) {
+    public SetPolicyRequest resource(final Resource resource) {
         this.resource = resource;
+        return this;
+    }
+
+    /**
+     * @param policy the {@link Policy} to set for the {@link Resource}
+     * @return the {@link SetPolicyRequest}
+     */
+    public SetPolicyRequest policy(final Policy policy) {
         this.policy = policy;
+        return this;
     }
 
     public Resource getResource() {

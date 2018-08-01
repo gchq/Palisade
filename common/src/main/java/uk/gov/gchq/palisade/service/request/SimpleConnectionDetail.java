@@ -38,11 +38,12 @@ public class SimpleConnectionDetail implements ConnectionDetail {
     private Service service;
 
     public SimpleConnectionDetail() {
-        this(new NullService());
+        service(new NullService());
     }
 
-    public SimpleConnectionDetail(final Service service) {
+    public SimpleConnectionDetail service(final Service service) {
         this.service = service;
+        return this;
     }
 
     public Service getService() {
