@@ -27,13 +27,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This is the high level API object that is used to pass back to the client the
- * information it requires to connect to the correct data service implementations
- * and to decide how best to parallelise their job.
+ * This is the high level API object that is used to pass back to the client the information it requires to connect to
+ * the correct data service implementations and to decide how best to parallelise their job.
  * <p>
- * It is also the object that the client then passes to the data service to access
- * the data. When it is passed to the data service the resources field might have
- * been changed to be a subset of the resources.
+ * It is also the object that the client then passes to the data service to access the data. When it is passed to the
+ * data service the resources field might have been changed to be a subset of the resources.
  */
 public class DataRequestResponse {
     public RequestId requestId = new RequestId();
@@ -52,6 +50,10 @@ public class DataRequestResponse {
     public DataRequestResponse resources(final Map<Resource, ConnectionDetail> resources) {
         this.resources = resources;
         return this;
+    }
+
+    public DataRequestResponse resources(final DataRequestResponse requestResponse) {
+        return this.requestId(requestResponse.getRequestId()).resources(requestResponse.getResources());
     }
 
     public RequestId getRequestId() {

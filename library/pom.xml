@@ -24,12 +24,10 @@
         <artifactId>palisade</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>client-impl</artifactId>
+    <artifactId>library</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>simple-client</module>
-        <module>simple-rest-client</module>
-        <!--<module>mapreduce-client</module>-->
+        <module>mapreduce</module>
     </modules>
 </project>
