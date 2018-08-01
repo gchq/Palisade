@@ -34,12 +34,22 @@ public class Context {
     }
 
     @JsonCreator
-    public Context(@JsonProperty("context") final Map<String, Object> context) {
+    public Context(@JsonProperty("context") final HashMap<String, Object> context) {
         this.context = context;
+    }
+
+    public Context context(final Map<String, Object> context) {
+        this.context = context;
+        return this;
     }
 
     public Map<String, Object> getContext() {
         return context;
+    }
+
+    public Context justification(final String justification) {
+        context.put(ContextKeys.JUSTIFICATION, justification);
+        return this;
     }
 
     @Override
@@ -69,12 +79,8 @@ public class Context {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append(context)
+                .append("justification", context)
                 .toString();
     }
 
-    public Context addJustification(final String justification) {
-        context.put(ContextKeys.JUSTIFICATION, justification);
-        return this;
-    }
 }

@@ -22,14 +22,14 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 
 /**
  * <p>
  * A {@code Rule} is the fundamental interface for applying policy criteria.
  * It allows a record to redacted or modified based on a {@link User} and their
- * query {@link Justification}.
+ * query {@link Context}.
  * </p>
  * <p>
  * Please note, the justification is optional and may be null.
@@ -40,7 +40,7 @@ import uk.gov.gchq.palisade.User;
  * </p>
  *
  * @param <T> The type of the record. In normal cases the raw data will be deserialised
- *            by the record reader before being passed to the {@link Rule#apply(Object, User, Justification)}.
+ *            by the record reader before being passed to the {@link Rule#apply(Object, User, Context)}.
  */
 @FunctionalInterface
 @JsonPropertyOrder(value = {"class"}, alphabetic = true)
@@ -55,10 +55,10 @@ public interface Rule<T> {
      *
      * @param record        the record to be checked.
      * @param user          the user
-     * @param justification the query justificaiton
+     * @param context the query justificaiton
      * @return the modified record or null if the record should be fully redacted.
      */
-    T apply(final T record, final User user, final Justification justification);
+    T apply(final T record, final User user, final Context context);
 
     @JsonGetter("class")
     default String _getClass() {
