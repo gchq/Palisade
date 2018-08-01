@@ -51,18 +51,18 @@ public class HierarchicalPolicyServiceTest {
     }
 
     private static SystemResource createTestSystemResource() {
-        return new SystemResource("File");
+        return new SystemResource().id("File");
     }
 
     private static DirectoryResource createTestDirectoryResource() {
-        DirectoryResource directoryResource = new DirectoryResource("File://temp");
+        DirectoryResource directoryResource = new DirectoryResource().id("File://temp");
         directoryResource.setParent(createTestSystemResource());
         return directoryResource;
     }
 
 
     private static FileResource createTestFileResource() {
-        FileResource fileResource = new FileResource("File://temp/TestObj_001.txt", "TestObj", "txt");
+        FileResource fileResource = new FileResource().id("File://temp/TestObj_001.txt").type("TestObj").serialisedFormat("txt");
         fileResource.setParent(createTestDirectoryResource());
         return fileResource;
     }
@@ -119,10 +119,10 @@ public class HierarchicalPolicyServiceTest {
     public void canAccessIsValid() throws InterruptedException, ExecutionException, TimeoutException {
         // given
         User user = new User().userId("testUser").auths("Sensitive");
-        Justification justification = new Justification("testing");
+        Justification justification = new Justification().justification("testing");
         Resource resource = createTestFileResource();
         // try
-        CompletableFuture<CanAccessResponse> future = policyService.canAccess(new CanAccessRequest(Collections.singletonList(resource), user, justification));
+        CompletableFuture<CanAccessResponse> future = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(resource)).user(user).justification(justification));
         CanAccessResponse response = future.get(100, TimeUnit.MILLISECONDS);
         Collection<Resource> resources = response.getCanAccessResources();
         // check
@@ -134,10 +134,10 @@ public class HierarchicalPolicyServiceTest {
     public void getPolicy() throws InterruptedException, ExecutionException, TimeoutException {
         // given
         User user = new User().userId("testUser").auths("Sensitive");
-        Justification justification = new Justification("testing");
+        Justification justification = new Justification().justification("testing");
         Resource resource = createTestFileResource();
         // try
-        CompletableFuture<MultiPolicy> future = policyService.getPolicy(new GetPolicyRequest(user, justification, Collections.singletonList(resource)));
+        CompletableFuture<MultiPolicy> future = policyService.getPolicy(new GetPolicyRequest().user(user).justification(justification).resources(Collections.singletonList(resource)));
         MultiPolicy response = future.get(100, TimeUnit.MILLISECONDS);
         Map<Resource, Rules> ruleMap = response.getRuleMap();
         // check
@@ -149,16 +149,16 @@ public class HierarchicalPolicyServiceTest {
     public void setPolicyForNewResource() throws InterruptedException, ExecutionException, TimeoutException {
         // given
         User testUser = new User().userId("testUser").auths("Sensitive");
-        FileResource newResource = new FileResource("File://temp/TestObj_002.txt", "TestObj", "txt");
+        FileResource newResource = new FileResource().id("File://temp/TestObj_002.txt").type("TestObj").serialisedFormat("txt");
         newResource.setParent(createTestDirectoryResource());
         Policy newPolicy = new Policy().resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
         // try
-        CompletableFuture<Boolean> future = policyService.setPolicy(new SetPolicyRequest(newResource, newPolicy));
+        CompletableFuture<Boolean> future = policyService.setPolicy(new SetPolicyRequest().resource(newResource).policy(newPolicy));
         Boolean result = future.get(100, TimeUnit.MILLISECONDS);
         assertTrue(result);
 
         // try
-        CompletableFuture<CanAccessResponse> future2 = policyService.canAccess(new CanAccessRequest(Collections.singletonList(newResource), testUser, new Justification("fun")));
+        CompletableFuture<CanAccessResponse> future2 = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(newResource)).user(testUser).justification(new Justification().justification("fun")));
         CanAccessResponse response2 = future2.get(100, TimeUnit.MILLISECONDS);
         Collection<Resource> resources2 = response2.getCanAccessResources();
         // check
@@ -169,10 +169,10 @@ public class HierarchicalPolicyServiceTest {
     public void setPolicyForExistingResource() throws InterruptedException, ExecutionException, TimeoutException {
         // given
         User testUser = new User().userId("testUser").auths("Sensitive");
-        Justification testJustification = new Justification("testing");
+        Justification testJustification = new Justification().justification("testing");
         Resource testResource = createTestFileResource();
         // try
-        CompletableFuture<CanAccessResponse> future1 = policyService.canAccess(new CanAccessRequest(Collections.singletonList(testResource), testUser, testJustification));
+        CompletableFuture<CanAccessResponse> future1 = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(testResource)).user(testUser).justification(testJustification));
         CanAccessResponse response = future1.get(100, TimeUnit.MILLISECONDS);
         Collection<Resource> resources = response.getCanAccessResources();
         // check
@@ -182,12 +182,12 @@ public class HierarchicalPolicyServiceTest {
         // given
         Policy newPolicy = new Policy().resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
         // try
-        CompletableFuture<Boolean> future = policyService.setPolicy(new SetPolicyRequest(testResource, newPolicy));
+        CompletableFuture<Boolean> future = policyService.setPolicy(new SetPolicyRequest().resource(testResource).policy(newPolicy));
         Boolean result = future.get(100, TimeUnit.MILLISECONDS);
         assertTrue(result);
 
         // try
-        CompletableFuture<CanAccessResponse> future2 = policyService.canAccess(new CanAccessRequest(Collections.singletonList(testResource), testUser, new Justification("fun")));
+        CompletableFuture<CanAccessResponse> future2 = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(testResource)).user(testUser).justification(new Justification().justification("fun")));
         CanAccessResponse response2 = future2.get(100, TimeUnit.MILLISECONDS);
         Collection<Resource> resources2 = response2.getCanAccessResources();
         // check

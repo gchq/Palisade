@@ -80,8 +80,8 @@ public class CanAccessRequest extends Request {
             final CompletableFuture<? extends Collection<Resource>> futureResources,
             final CompletableFuture<User> futureUser,
             final Justification justification) {
-        return CompletableFuture.allOf(futureResource, futureUser)
-                .thenApply(t -> new CanAccessRequest().resource(futureResources.join()).user(futureUser.join()).justification(justification));
+        return CompletableFuture.allOf(futureResources, futureUser)
+                .thenApply(t -> new CanAccessRequest().resources(futureResources.join()).user(futureUser.join()).justification(justification));
     }
 
     /**

@@ -66,7 +66,6 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 .id("file1")
                                 .type(RESOURCE_TYPE))
                         .policy(new Policy()
-                                        .message("Age off and visibility filtering")
                                         .recordLevelPredicateRule(
                                                 "visibility",
                                                 new IsVisible()

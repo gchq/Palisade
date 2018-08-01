@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.policy.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -46,7 +47,7 @@ public class Policy<RULE_DATA_TYPE> {
 
     // no-args constructor required
     public Policy() {
-        rules(new Rules<>());
+        recordRules(new Rules<>()).resourceRules(new Rules<>()).owner(null);
     }
 
     public Policy<RULE_DATA_TYPE> recordRules(final Rules<RULE_DATA_TYPE> recordRules) {
@@ -62,7 +63,7 @@ public class Policy<RULE_DATA_TYPE> {
     /**
      * Default constructor
      *
-     * @param recordRules the set of rules that need to be applied to the resource at the record level.
+     * @param recordRules   the set of rules that need to be applied to the resource at the record level.
      * @param resourceRules the set of rules that need to be applied to the resource at the resource level.
      */
     public Policy(final Rules<RULE_DATA_TYPE> recordRules, final Rules<Resource> resourceRules) {
@@ -72,6 +73,7 @@ public class Policy<RULE_DATA_TYPE> {
         this.resourceRules = resourceRules;
     }
 
+    @JsonIgnore
     public String getMessage() {
         return resourceRules.getMessage() + ", " + recordRules.getMessage();
     }
@@ -96,7 +98,7 @@ public class Policy<RULE_DATA_TYPE> {
         return UUID.randomUUID().toString();
     }
 
-    private void addMessage(String newMessage, Rules rules) {
+    private void addMessage(final String newMessage, final Rules rules) {
         String currentMessage = rules.getMessage();
         if (currentMessage == null || currentMessage.equals("")) {
             rules.message(newMessage);
@@ -159,6 +161,11 @@ public class Policy<RULE_DATA_TYPE> {
 
     public void setOwner(final User owner) {
         this.owner = owner;
+    }
+
+    public Policy<RULE_DATA_TYPE> owner(final User owner) {
+        this.owner = owner;
+        return this;
     }
 
     @Override

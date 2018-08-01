@@ -65,7 +65,6 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                         new FileResource().id("file1").type(RESOURCE_TYPE))
                         .policy(
                                 new Policy<ExampleObj>()
-                                        .message("Age off and visibility filtering")
                                         .recordLevelPredicateRule(
                                                 "visibility",
                                                 new IsVisible()

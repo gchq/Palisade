@@ -133,7 +133,7 @@ public class HierarchicalPolicyService implements PolicyService {
             Rules rules = getApplicableRules(resource, false, resource.getType());
             map.put(resource, new Policy<>(rules, new Rules<>()));
         });
-        return CompletableFuture.completedFuture(new MultiPolicy(map));
+        return CompletableFuture.completedFuture(new MultiPolicy().policies(map));
     }
 
     @Override
