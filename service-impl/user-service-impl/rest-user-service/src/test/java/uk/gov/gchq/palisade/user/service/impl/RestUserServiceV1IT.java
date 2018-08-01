@@ -62,9 +62,9 @@ public class RestUserServiceV1IT {
         final UserService userService = Mockito.mock(UserService.class);
         MockUserService.setMock(userService);
 
-        final UserId userId = new UserId("user01");
+        final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
-        final AddUserRequest addUserRequest = new AddUserRequest(user);
+        final AddUserRequest addUserRequest = new AddUserRequest().user(user);
 
         given(userService.addUser(addUserRequest)).willReturn(CompletableFuture.completedFuture(true));
 
@@ -82,9 +82,9 @@ public class RestUserServiceV1IT {
         final UserService userService = Mockito.mock(UserService.class);
         MockUserService.setMock(userService);
 
-        final UserId userId = new UserId("user01");
+        final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
-        final GetUserRequest getUserRequest = new GetUserRequest(user.getUserId());
+        final GetUserRequest getUserRequest = new GetUserRequest().userId(user.getUserId());
 
         given(userService.getUser(getUserRequest)).willReturn(CompletableFuture.completedFuture(user));
 

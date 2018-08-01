@@ -18,9 +18,9 @@ package uk.gov.gchq.palisade.resource.service;
 
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
@@ -96,7 +96,7 @@ public interface ResourceService extends Service {
      * @return a {@link CompletableFuture} that upon completion will contain the details on how to retrieve the
      * resources
      */
-    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByFormat(final GetResourcesByFormatRequest request);
+    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request);
 
     /**
      * Informs Palisade about a specific resource that it may return to users. This lets Palisade clients request access
@@ -120,8 +120,8 @@ public interface ResourceService extends Service {
         if (request instanceof GetResourcesByTypeRequest) {
             return getResourcesByType((GetResourcesByTypeRequest) request);
         }
-        if (request instanceof GetResourcesByFormatRequest) {
-            return getResourcesByFormat((GetResourcesByFormatRequest) request);
+        if (request instanceof GetResourcesBySerialisedFormatRequest) {
+            return getResourcesBySerialisedFormat((GetResourcesBySerialisedFormatRequest) request);
         }
         if (request instanceof AddResourceRequest) {
             addResource((AddResourceRequest) request);

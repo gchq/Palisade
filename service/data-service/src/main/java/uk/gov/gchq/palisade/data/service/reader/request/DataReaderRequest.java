@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.data.service.reader.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.policy.Rules;
@@ -35,7 +35,7 @@ import uk.gov.gchq.palisade.service.request.Request;
 public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     private Resource resource;
     private User user;
-    private Justification justification;
+    private Context context;
     private Rules rules;
 
     // no-args constructor required
@@ -43,19 +43,40 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resource The resource to be accessed
-     * @param user The user that requested the data
-     * @param justification The Justification that the user provided for why they want the data
-     * @param rules The list of rules to be applied to the data to ensure policy compliance
-     * @param <RULES_DATA_TYPE> is the Java class that the Rules expect the data to be in the format of.
+     * @param resource the resource to be accessed
+     * @return the {@link DataReaderRequest}
      */
-    public <RULES_DATA_TYPE> DataReaderRequest(final Resource resource, final User user, final Justification justification, final Rules<RULES_DATA_TYPE> rules) {
+    public DataReaderRequest resource(final Resource resource) {
         this.resource = resource;
+        return this;
+    }
+
+    /**
+     * @param user the user that requested the data
+     * @return the {@link DataReaderRequest}
+     */
+    public DataReaderRequest user(final User user) {
         this.user = user;
-        this.justification = justification;
+        return this;
+    }
+
+    /**
+     * @param context the Justification that the user provided for why they want the data
+     * @return the {@link DataReaderRequest}
+     */
+    public DataReaderRequest justification(final Context context) {
+        this.context = context;
+        return this;
+    }
+
+    /**
+     *
+     * @param rules the list of rules to be applied to the data to ensure policy compliance
+     * @return the {@link DataReaderRequest}
+     */
+    public DataReaderRequest rules(final Rules<RULES_DATA_TYPE> rules) {
         this.rules = rules;
+        return this;
     }
 
     public Resource getResource() {
@@ -74,12 +95,12 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
         this.user = user;
     }
 
-    public Justification getJustification() {
-        return justification;
+    public Context getContext() {
+        return context;
     }
 
-    public void setJustification(final Justification justification) {
-        this.justification = justification;
+    public void setContext(final Context context) {
+        this.context = context;
     }
 
 
@@ -104,9 +125,10 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
         final DataReaderRequest<?> that = (DataReaderRequest<?>) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(resource, that.resource)
                 .append(user, that.user)
-                .append(justification, that.justification)
+                .append(context, that.context)
                 .append(rules, that.rules)
                 .isEquals();
     }
@@ -114,9 +136,10 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 73)
+                .appendSuper(super.hashCode())
                 .append(resource)
                 .append(user)
-                .append(justification)
+                .append(context)
                 .append(rules)
                 .toHashCode();
     }
@@ -124,9 +147,10 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("resource", resource)
                 .append("user", user)
-                .append("justification", justification)
+                .append("justification", context)
                 .append("rules", rules)
                 .toString();
     }

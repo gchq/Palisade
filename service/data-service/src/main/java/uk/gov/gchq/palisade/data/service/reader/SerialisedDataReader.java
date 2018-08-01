@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  * serialisers to serialise the data into the for that the rules need to be able
  * to apply those rules and then de-serialise to how the client is expecting the
  * data to be returned.
- *
+ * <p>
  * This class means that the only places where the structure of the data needs
  * to be known is in the serialisers, rules and client code. Therefore you only
  * need to implement a {@link uk.gov.gchq.palisade.data.service.DataService} for
@@ -55,13 +55,13 @@ public abstract class SerialisedDataReader implements DataReader {
     }
 
     /**
-     * Default constructor
-     *
      * @param serialisers a mapping of data type to serialiser
+     * @return the {@link SerialisedDataReader}
      */
-    public SerialisedDataReader(final Map<String, Serialiser<?, ?>> serialisers) {
+    public SerialisedDataReader serialisers(final Map<String, Serialiser<?, ?>> serialisers) {
         Objects.requireNonNull(serialisers);
         this.serialisers = serialisers;
+        return this;
     }
 
     /**
@@ -69,10 +69,10 @@ public abstract class SerialisedDataReader implements DataReader {
      * resource to serialise the raw data and apply the rules to the data and
      * then deserialise it back to the raw format expected by the client.
      *
-     * @param request {@link DataReaderRequest} containing the resource to be
-     *                read, rules to be applied, the user requesting the data
-     *                and the justification for accessing the data.
-     * @param <RAW_DATA_TYPE> The format that the data is expected by the client.
+     * @param request           {@link DataReaderRequest} containing the resource to be
+     *                          read, rules to be applied, the user requesting the data
+     *                          and the justification for accessing the data.
+     * @param <RAW_DATA_TYPE>   The format that the data is expected by the client.
      * @param <RULES_DATA_TYPE> The format that the rules expect the data to be in.
      * @return a {@link DataReaderResponse} containing the stream of data
      * read to be streamed back to the client
@@ -91,12 +91,12 @@ public abstract class SerialisedDataReader implements DataReader {
             data = Util.applyRules(
                     rawStream.map(serialiser::deserialise),
                     request.getUser(),
-                    request.getJustification(),
+                    request.getContext(),
                     request.getRules()
             ).map(serialiser::serialise);
         }
 
-        return new DataReaderResponse<>(data);
+        return new DataReaderResponse().data(data);
     }
 
     /**

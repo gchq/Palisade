@@ -16,21 +16,40 @@
 
 package uk.gov.gchq.palisade;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Justification {
-    private String justification;
+import java.util.HashMap;
+import java.util.Map;
 
-    public Justification() {
+@JsonPropertyOrder(value = {"class", "context"}, alphabetic = true)
+public class Context {
+    private Map<String, Object> context;
+
+    public Context() {
+        this(new HashMap<>());
     }
 
-    public Justification(final String justification) {
-        this.justification = justification;
+    @JsonCreator
+    public Context(@JsonProperty("context") final HashMap<String, Object> context) {
+        this.context = context;
     }
 
-    public String getJustification() {
-        return justification;
+    public Context context(final Map<String, Object> context) {
+        this.context = context;
+        return this;
+    }
+
+    public Map<String, Object> getContext() {
+        return context;
+    }
+
+    public Context justification(final String justification) {
+        context.put(ContextKeys.JUSTIFICATION, justification);
+        return this;
     }
 
     @Override
@@ -43,24 +62,24 @@ public class Justification {
             return false;
         }
 
-        final Justification that = (Justification) o;
+        final Context that = (Context) o;
 
         return new EqualsBuilder()
-                .append(justification, that.justification)
+                .append(context, that.context)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(19, 23)
-                .append(justification)
+                .append(context)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("justification", justification)
+                .append("justification", context)
                 .toString();
     }
 

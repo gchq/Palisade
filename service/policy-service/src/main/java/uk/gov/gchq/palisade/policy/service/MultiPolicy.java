@@ -36,16 +36,16 @@ public class MultiPolicy {
 
     // no-args constructor required
     public MultiPolicy() {
-        this(new HashMap<>());
+        policies(new HashMap<>());
     }
 
     /**
-     * Default constructor
-     *
      * @param policies a mapping of {@link Resource}'s to the applicable {@link Policy}
+     * @return the {@link MultiPolicy}
      */
-    public MultiPolicy(final Map<Resource, Policy> policies) {
+    public MultiPolicy policies(final Map<Resource, Policy> policies) {
         this.policies = policies;
+        return this;
     }
 
     public Map<Resource, Policy> getPolicies() {

@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.policy.Rules;
@@ -35,18 +35,26 @@ import java.util.Objects;
  * respond to requests for access to data.
  */
 public class DataRequestConfig extends Request {
-    private User user;
-    private Justification justification;
-    private Map<Resource, Rules> rules;
+    private User user = new User();
+    private Context context = new Context();
+    private Map<Resource, Rules> rules = new HashMap<>();
 
     public DataRequestConfig() {
-        this(new User(), new Justification(), new HashMap<>());
     }
 
-    public DataRequestConfig(final User user, final Justification justification, final Map<Resource, Rules> rules) {
+    public DataRequestConfig user(final User user) {
         this.user = user;
-        this.justification = justification;
+        return this;
+    }
+
+    public DataRequestConfig justification(final Context context) {
+        this.context = context;
+        return this;
+    }
+
+    public DataRequestConfig rules(final Map<Resource, Rules> rules) {
         this.rules = rules;
+        return this;
     }
 
     public User getUser() {
@@ -74,12 +82,12 @@ public class DataRequestConfig extends Request {
         return new Rules<>();
     }
 
-    public Justification getJustification() {
-        return justification;
+    public Context getContext() {
+        return context;
     }
 
-    public void setJustification(final Justification justification) {
-        this.justification = justification;
+    public void setContext(final Context context) {
+        this.context = context;
     }
 
     @Override
@@ -95,8 +103,9 @@ public class DataRequestConfig extends Request {
         final DataRequestConfig that = (DataRequestConfig) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(user, that.user)
-                .append(justification, that.justification)
+                .append(context, that.context)
                 .append(rules, that.rules)
                 .isEquals();
     }
@@ -104,8 +113,9 @@ public class DataRequestConfig extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(53, 37)
+                .appendSuper(super.hashCode())
                 .append(user)
-                .append(justification)
+                .append(context)
                 .append(rules)
                 .toHashCode();
     }
@@ -113,8 +123,9 @@ public class DataRequestConfig extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("user", user)
-                .append("justification", justification)
+                .append("justification", context)
                 .append("rules", rules)
                 .toString();
     }

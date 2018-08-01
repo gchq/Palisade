@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.UserId;
 
@@ -29,7 +29,7 @@ import uk.gov.gchq.palisade.UserId;
  */
 public class RegisterDataRequest extends Request {
     private UserId userId;
-    private Justification justification;
+    private Context context;
     private String resource;
 
     // no-args constructor required
@@ -37,16 +37,30 @@ public class RegisterDataRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resource An identifier for the resource or data set to access
      * @param userId an identifier for the user requesting the data
-     * @param justification the reason why the user wants access to the data
+     * @return the {@link RegisterDataRequest}
      */
-    public RegisterDataRequest(final String resource, final UserId userId, final Justification justification) {
-        this.resource = resource;
+    public RegisterDataRequest userId(final UserId userId) {
         this.userId = userId;
-        this.justification = justification;
+        return this;
+    }
+
+    /**
+     * @param resource an identifier for the resource or data set to access
+     * @return the {@link RegisterDataRequest}
+     */
+    public RegisterDataRequest resource(final String resource) {
+        this.resource = resource;
+        return this;
+    }
+
+    /**
+     * @param context the reason why the user wants access to the data
+     * @return the {@link RegisterDataRequest}
+     */
+    public RegisterDataRequest justification(final Context context) {
+        this.context = context;
+        return this;
     }
 
     public String getResource() {
@@ -65,12 +79,12 @@ public class RegisterDataRequest extends Request {
         this.userId = userId;
     }
 
-    public Justification getJustification() {
-        return justification;
+    public Context getContext() {
+        return context;
     }
 
-    public void setJustification(final Justification justification) {
-        this.justification = justification;
+    public void setContext(final Context context) {
+        this.context = context;
     }
 
     @Override
@@ -86,8 +100,9 @@ public class RegisterDataRequest extends Request {
         final RegisterDataRequest that = (RegisterDataRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(userId, that.userId)
-                .append(justification, that.justification)
+                .append(context, that.context)
                 .append(resource, that.resource)
                 .isEquals();
     }
@@ -95,8 +110,9 @@ public class RegisterDataRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(59, 67)
+                .appendSuper(super.hashCode())
                 .append(userId)
-                .append(justification)
+                .append(context)
                 .append(resource)
                 .toHashCode();
     }
@@ -104,8 +120,9 @@ public class RegisterDataRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("userId", userId)
-                .append("justification", justification)
+                .append("justification", context)
                 .append("resource", resource)
                 .toString();
     }

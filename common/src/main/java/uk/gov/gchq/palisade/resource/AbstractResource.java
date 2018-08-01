@@ -24,24 +24,24 @@ import uk.gov.gchq.palisade.ToStringBuilder;
 public abstract class AbstractResource implements Resource {
     private String id;
     private String type;
-    private String format;
+    private String serialisedFormat;
 
     public AbstractResource() {
     }
 
-    public AbstractResource(final String id) {
+    public AbstractResource id(final String id) {
         this.id = id;
+        return this;
     }
 
-    public AbstractResource(final String id, final String type) {
-        this.id = id;
+    public AbstractResource type(final String type) {
         this.type = type;
+        return this;
     }
 
-    public AbstractResource(final String id, final String type, final String format) {
-        this.id = id;
-        this.type = type;
-        this.format = format;
+    public AbstractResource serialisedFormat(final String serialisedFormat) {
+        this.serialisedFormat = serialisedFormat;
+        return this;
     }
 
     @Override
@@ -55,8 +55,8 @@ public abstract class AbstractResource implements Resource {
     }
 
     @Override
-    public String getFormat() {
-        return format;
+    public String getSerialisedFormat() {
+        return serialisedFormat;
     }
 
     @Override
@@ -70,8 +70,8 @@ public abstract class AbstractResource implements Resource {
     }
 
     @Override
-    public void setFormat(final String format) {
-        this.format = format;
+    public void setSerialisedFormat(final String serialisedFormat) {
+        this.serialisedFormat = serialisedFormat;
     }
 
     @Override
@@ -89,7 +89,7 @@ public abstract class AbstractResource implements Resource {
         return new EqualsBuilder()
                 .append(id, that.id)
                 .append(type, that.type)
-                .append(format, that.format)
+                .append(serialisedFormat, that.serialisedFormat)
                 .isEquals();
     }
 
@@ -98,7 +98,7 @@ public abstract class AbstractResource implements Resource {
         return new HashCodeBuilder(29, 31)
                 .append(id)
                 .append(type)
-                .append(format)
+                .append(serialisedFormat)
                 .toHashCode();
     }
 
@@ -107,7 +107,7 @@ public abstract class AbstractResource implements Resource {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .append("type", type)
-                .append("format", format)
+                .append("serialisedFormat", serialisedFormat)
                 .toString();
     }
 }

@@ -16,5 +16,11 @@
 
 package uk.gov.gchq.palisade.resource;
 
-public interface ContainerResource extends Resource {
+/**
+ * This interface indicates that a resource has child resources which can be
+ * found by using the resource service to getResourcesByResource passing in the
+ * current resource
+ */
+public interface ParentResource extends Resource {
+
 }

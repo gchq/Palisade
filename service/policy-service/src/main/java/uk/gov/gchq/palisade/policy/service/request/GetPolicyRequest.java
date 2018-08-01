@@ -20,7 +20,7 @@ package uk.gov.gchq.palisade.policy.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.Resource;
@@ -34,7 +34,7 @@ import java.util.Collection;
  */
 public class GetPolicyRequest extends Request {
     private User user;
-    private Justification justification;
+    private Context context;
     private Collection<Resource> resources;
 
     // no-args constructor
@@ -42,15 +42,30 @@ public class GetPolicyRequest extends Request {
     }
 
     /**
-     *
-     * @param user The {@link User} wanting access to the resource.
-     * @param justification The {@link Justification} of why the user needs
-     * @param resources A collection of {@link Resource}'s to be accessed.
+     * @param user the {@link User} wanting access to the resource
+     * @return the {@link GetPolicyRequest}
      */
-    public GetPolicyRequest(final User user, final Justification justification, final Collection<Resource> resources) {
+    public GetPolicyRequest user(final User user) {
         this.user = user;
-        this.justification = justification;
+        return this;
+    }
+
+    /**
+     * @param context the {@link Context} of why the user needs
+     * @return the {@link GetPolicyRequest}
+     */
+    public GetPolicyRequest justification(final Context context) {
+        this.context = context;
+        return this;
+    }
+
+    /**
+     * @param resources a collection of {@link Resource}'s to be accessed
+     * @return the {@link GetPolicyRequest}
+     */
+    public GetPolicyRequest resources(final Collection<Resource> resources) {
         this.resources = resources;
+        return this;
     }
 
     public User getUser() {
@@ -61,12 +76,12 @@ public class GetPolicyRequest extends Request {
         this.user = user;
     }
 
-    public Justification getJustification() {
-        return justification;
+    public Context getContext() {
+        return context;
     }
 
-    public void setJustification(final Justification justification) {
-        this.justification = justification;
+    public void setContext(final Context context) {
+        this.context = context;
     }
 
     public Collection<Resource> getResources() {
@@ -90,8 +105,9 @@ public class GetPolicyRequest extends Request {
         final GetPolicyRequest that = (GetPolicyRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(user, that.user)
-                .append(justification, that.justification)
+                .append(context, that.context)
                 .append(resources, that.resources)
                 .isEquals();
     }
@@ -99,8 +115,9 @@ public class GetPolicyRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(19, 29)
+                .appendSuper(super.hashCode())
                 .append(user)
-                .append(justification)
+                .append(context)
                 .append(resources)
                 .toHashCode();
     }
@@ -108,8 +125,9 @@ public class GetPolicyRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("user", user)
-                .append("justification", justification)
+                .append("justification", context)
                 .append("resources", resources)
                 .toString();
     }
