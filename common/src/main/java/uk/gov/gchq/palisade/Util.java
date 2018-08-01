@@ -36,22 +36,22 @@ public final class Util {
         return map;
     }
 
-    public static <T> Stream<T> applyRules(final Stream<T> records, final User user, final Justification justification, final Rules<T> rules) {
+    public static <T> Stream<T> applyRules(final Stream<T> records, final User user, final Context context, final Rules<T> rules) {
         Objects.requireNonNull(records);
         if (null == rules || rules.getRules().isEmpty()) {
             return records;
         }
 
-        return records.map(record -> applyRules(record, user, justification, rules)).filter(record -> null != record);
+        return records.map(record -> applyRules(record, user, context, rules)).filter(record -> null != record);
     }
 
-    public static <T> T applyRules(final T record, final User user, final Justification justification, final Rules<T> rules) {
+    public static <T> T applyRules(final T record, final User user, final Context context, final Rules<T> rules) {
         if (null == rules || rules.getRules().isEmpty()) {
             return record;
         }
         T updatedRecord = record;
         for (final Rule<T> resourceRule : rules.getRules().values()) {
-            updatedRecord = resourceRule.apply(updatedRecord, user, justification);
+            updatedRecord = resourceRule.apply(updatedRecord, user, context);
             if (null == updatedRecord) {
                 break;
             }

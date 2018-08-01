@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.policy.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.Resource;
@@ -33,7 +33,7 @@ import java.util.concurrent.CompletableFuture;
 public class CanAccessRequest extends Request {
     private User user;
     private Resource resource;
-    private Justification justification;
+    private Context context;
 
     // no-args constructor required
     public CanAccessRequest() {
@@ -58,11 +58,16 @@ public class CanAccessRequest extends Request {
     }
 
     /**
-     * @param justification the {@link Justification} of why the user needs access to the resource
+     * @param justification the {@link Context} of why the user needs access to the resource
      * @return the {@link CanAccessRequest}
      */
-    public CanAccessRequest justification(final Justification justification) {
-        this.justification = justification;
+    public CanAccessRequest justification(final String justification) {
+        this.context.justification(justification);
+        return this;
+    }
+
+    public CanAccessRequest context(final Context context) {
+        this.context = context;
         return this;
     }
 
@@ -78,7 +83,7 @@ public class CanAccessRequest extends Request {
     public static CompletableFuture<CanAccessRequest> create(
             final CompletableFuture<? extends Resource> futureResource,
             final CompletableFuture<User> futureUser,
-            final Justification justification) {
+            final String justification) {
         return CompletableFuture.allOf(futureResource, futureUser)
                 .thenApply(t -> new CanAccessRequest().resource(futureResource.join()).user(futureUser.join()).justification(justification));
     }
@@ -95,7 +100,7 @@ public class CanAccessRequest extends Request {
     public static CompletableFuture<CanAccessRequest> create(
             final Resource resource,
             final CompletableFuture<User> futureUser,
-            final Justification justification) {
+            final String justification) {
         return futureUser.thenApply(auths -> new CanAccessRequest().resource(resource).user(futureUser.join()).justification(justification));
     }
 
@@ -115,12 +120,12 @@ public class CanAccessRequest extends Request {
         this.user = user;
     }
 
-    public Justification getJustification() {
-        return justification;
+    public Context getContext() {
+        return context;
     }
 
-    public void setJustification(final Justification justification) {
-        this.justification = justification;
+    public void setContext(final Context context) {
+        this.context = context;
     }
 
     @Override
@@ -139,7 +144,7 @@ public class CanAccessRequest extends Request {
                 .appendSuper(super.equals(o))
                 .append(user, that.user)
                 .append(resource, that.resource)
-                .append(justification, that.justification)
+                .append(context, that.context)
                 .isEquals();
     }
 
@@ -149,7 +154,7 @@ public class CanAccessRequest extends Request {
                 .appendSuper(super.hashCode())
                 .append(user)
                 .append(resource)
-                .append(justification)
+                .append(context)
                 .toHashCode();
     }
 
@@ -159,7 +164,7 @@ public class CanAccessRequest extends Request {
                 .appendSuper(super.toString())
                 .append("user", user)
                 .append("resource", resource)
-                .append("justification", justification)
+                .append("context", context)
                 .toString();
     }
 }

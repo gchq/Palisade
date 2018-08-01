@@ -25,21 +25,31 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
-@JsonPropertyOrder(value = {"class", "context"}, alphabetic = true)
+@JsonPropertyOrder(value = {"class", "map"}, alphabetic = true)
 public class Context {
-    private Map<String, Object> context;
+    private Map<String, Object> map;
 
     public Context() {
         this(new HashMap<>());
     }
 
     @JsonCreator
-    public Context(@JsonProperty("context") final Map<String, Object> context) {
-        this.context = context;
+    public Context(@JsonProperty("map") final HashMap<String, Object> map) {
+        this.map = map;
     }
 
-    public Map<String, Object> getContext() {
-        return context;
+    public Context map(final Map<String, Object> map) {
+        this.map = map;
+        return this;
+    }
+
+    public Map<String, Object> getMap() {
+        return map;
+    }
+
+    public Context justification(final String justification) {
+        map.put(ContextKeys.JUSTIFICATION, justification);
+        return this;
     }
 
     @Override
@@ -55,26 +65,25 @@ public class Context {
         final Context that = (Context) o;
 
         return new EqualsBuilder()
-                .append(context, that.context)
+                .append(map, that.map)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(19, 23)
-                .append(context)
+                .append(map)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append(context)
+                .append("map", map)
                 .toString();
     }
 
-    public Context addJustification(final String justification) {
-        context.put(ContextKeys.JUSTIFICATION, justification);
-        return this;
+    public Object get(final Object key) {
+        return map.get(key);
     }
 }

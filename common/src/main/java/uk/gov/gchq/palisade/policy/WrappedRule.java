@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 
@@ -37,9 +37,9 @@ import static java.util.Objects.requireNonNull;
 @JsonPropertyOrder(value = {"class", "rule", "function", "predicate"}, alphabetic = true)
 /**
  * A {@link WrappedRule} is helper implementation of {@link Rule}. It is useful
- * when you need to set simple rules that don't require the {@link User} or {@link Justification}.
+ * when you need to set simple rules that don't require the {@link User} or {@link Context}.
  * @param <T> The type of the record. In normal cases the raw data will be deserialised
- *            by the record reader before being passed to the {@link Rule#apply(Object, User, Justification)}.
+ *            by the record reader before being passed to the {@link Rule#apply(Object, User, Context)}.
  */
 public class WrappedRule<T> implements Rule<T> {
     public static final String WRAPPED_RULE_WAS_INITIALISED_WITH_NULL = "WrappedRule was initialised with null ";
@@ -117,10 +117,10 @@ public class WrappedRule<T> implements Rule<T> {
     }
 
     @Override
-    public T apply(final T obj, final User user, final Justification justification) {
+    public T apply(final T obj, final User user, final Context context) {
         final T rtn;
         if (nonNull(rule)) {
-            rtn = rule.apply(obj, user, justification);
+            rtn = rule.apply(obj, user, context);
         } else if (nonNull(function)) {
             rtn = function.apply(obj);
         } else if (nonNull(predicate)) {

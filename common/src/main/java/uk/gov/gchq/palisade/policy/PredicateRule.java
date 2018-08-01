@@ -16,7 +16,7 @@
 
 package uk.gov.gchq.palisade.policy;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 
 /**
@@ -24,7 +24,7 @@ import uk.gov.gchq.palisade.User;
  * tests whether a record should be fully redacted or not.
  *
  * @param <T> The type of the record. In normal cases the raw data will be deserialised
- *            by the record reader before being passed to the {@link PredicateRule#apply(Object, User, Justification)}.
+ *            by the record reader before being passed to the {@link PredicateRule#apply(Object, User, Context)}.
  */
 public interface PredicateRule<T> extends Rule<T> {
     /**
@@ -32,13 +32,13 @@ public interface PredicateRule<T> extends Rule<T> {
      *
      * @param record        the record to be checked.
      * @param user          the user
-     * @param justification the query justificaiton
+     * @param context the query justificaiton
      * @return true if the record should be kept, false if the record should be redacted.
      */
-    boolean test(final T record, final User user, final Justification justification);
+    boolean test(final T record, final User user, final Context context);
 
     @Override
-    default T apply(final T obj, final User user, final Justification justification) {
-        return test(obj, user, justification) ? obj : null;
+    default T apply(final T obj, final User user, final Context context) {
+        return test(obj, user, context) ? obj : null;
     }
 }
