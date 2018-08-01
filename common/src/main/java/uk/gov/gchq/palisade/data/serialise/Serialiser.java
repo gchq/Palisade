@@ -22,15 +22,15 @@ import java.util.stream.Stream;
 public interface Serialiser<I> extends Serializable {
 
     /**
-     * Serialise some object into bytes.
+     * Serialises a {@link Stream} of objects into an {@link InputStream}.
      *
-     * @param object the object to be serialised
-     * @return the serialised bytes
+     * @param objects the stream of objects to be serialised
+     * @return the serialised form
      */
-    InputStream serialise(final Stream<I> object);
+    InputStream serialise(final Stream<I> objects);
 
     /**
-     * Deserialise an input stream into an object.
+     * Deserialise an {@link InputStream} into a {@link Stream} of objects.
      *
      * @param stream the input stream to deserialise
      * @return the deserialised object

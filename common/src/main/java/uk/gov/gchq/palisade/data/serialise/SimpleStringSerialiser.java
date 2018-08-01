@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.example.data.serialiser;
+package uk.gov.gchq.palisade.data.serialise;
 
-import uk.gov.gchq.palisade.data.serialise.LineSerialiser;
-import uk.gov.gchq.palisade.example.ExampleObj;
-
-public class ExampleObjSerialiser extends LineSerialiser<ExampleObj> {
+public class SimpleStringSerialiser extends LineSerialiser<String> {
     @Override
-    public String serialiseLine(final ExampleObj obj) {
-        return obj.getProperty() + "," + obj.getVisibility() + "," + obj.getTimestamp();
+    public String serialiseLine(final String obj) {
+        return obj;
     }
 
     @Override
-    public ExampleObj deserialiseLine(final String line) {
-        final String[] parts = line.split(",");
-        return new ExampleObj(parts[0], parts[1], Long.parseLong(parts[2]));
+    public String deserialiseLine(final String line) {
+        return line;
     }
 }

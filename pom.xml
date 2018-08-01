@@ -30,6 +30,7 @@
         <module>service-impl</module>
         <module>client-impl</module>
         <module>example</module>
+        <module>library</module>
     </modules>
 
     <developers>
@@ -357,6 +358,11 @@
                             <name>apiNote</name>
                             <placement>a</placement>
                             <head>API Note:</head>
+                        </tag>
+                        <tag>
+                            <name>implNote</name>
+                            <placement>a</placement>
+                            <head>Implementation note:</head>
                         </tag>
                     </tags>
                 </configuration>
