@@ -35,12 +35,13 @@ public class GetResourcesBySerialisedFormatRequest extends Request {
     }
 
     /**
-     * Default constructor
      *
-     * @param serialisedFormat The serialisedFormat of the {@link uk.gov.gchq.palisade.resource.Resource}'s that you want to know about.
+     * @param serialisedFormat the serialisedFormat of the {@link uk.gov.gchq.palisade.resource.Resource}'s that you want to know about
+     * @return the {@link GetResourcesBySerialisedFormatRequest}
      */
-    public GetResourcesBySerialisedFormatRequest(final String serialisedFormat) {
+    public GetResourcesBySerialisedFormatRequest serialisedFormat(final String serialisedFormat) {
         this.serialisedFormat = serialisedFormat;
+        return this;
     }
 
     public String getSerialisedFormat() {

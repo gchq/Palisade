@@ -30,6 +30,6 @@ import java.util.stream.Stream;
 public class NullDataService implements DataService {
     @Override
     public <RAW_DATA_TYPE> CompletableFuture<ReadResponse<RAW_DATA_TYPE>> read(final ReadRequest request) {
-        return CompletableFuture.completedFuture(new ReadResponse<>(Stream.<RAW_DATA_TYPE>empty()));
+        return CompletableFuture.completedFuture(new ReadResponse().data(Stream.<RAW_DATA_TYPE>empty()));
     }
 }

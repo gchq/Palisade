@@ -41,27 +41,6 @@ public class User implements Cloneable {
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
 
-    public User clone() {
-        User clone;
-        try {
-            clone = (User) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            clone = new User();
-        }
-        clone.userId = userId.clone();
-        clone.roles = Sets.newHashSet(roles);
-        clone.auths = Sets.newHashSet(auths);
-        return clone;
-    }
-
-    public Set<String> getAuths() {
-        return auths;
-    }
-
-    public Set<String> getRoles() {
-        return roles;
-    }
-
     /**
      * Sets the userId to a {@link UserId} with the given userId string.
      *
@@ -69,7 +48,7 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User userId(final String userId) {
-        return userId(new UserId(userId));
+        return userId(new UserId().id(userId));
     }
 
     /**
@@ -115,12 +94,33 @@ public class User implements Cloneable {
         return this;
     }
 
+    public Set<String> getAuths() {
+        return auths;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
     public UserId getUserId() {
         return userId;
     }
 
     public void setUserId(final UserId userId) {
         this.userId = userId;
+    }
+
+    public User clone() {
+        User clone;
+        try {
+            clone = (User) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new User();
+        }
+        clone.userId = userId.clone();
+        clone.roles = Sets.newHashSet(roles);
+        clone.auths = Sets.newHashSet(auths);
+        return clone;
     }
 
     @Override

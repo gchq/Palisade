@@ -59,7 +59,7 @@ public class AbstractLdapUserServiceTest {
     public void shouldFetchUserDetailsFromLdap() throws NamingException {
         // Given
         final AbstractLdapUserService mock = mock(AbstractLdapUserService.class);
-        final UserId userId = new UserId("user#01");
+        final UserId userId = new UserId().id("user#01");
         final LdapContext context = mock(LdapContext.class);
 
         final String[] attrNames = {"roles", "auths"};
@@ -83,7 +83,7 @@ public class AbstractLdapUserServiceTest {
         service.setMock(mock);
 
         // When
-        final User user = service.getUser(new GetUserRequest(userId)).join();
+        final User user = service.getUser(new GetUserRequest().userId(userId)).join();
 
         // Then
         verify(context, times(1)).getAttributes("user\\#01", attrNames);
@@ -96,7 +96,7 @@ public class AbstractLdapUserServiceTest {
     public void shouldFetchUserDetailsFromCache() throws NamingException {
         // Given
         final AbstractLdapUserService mock = mock(AbstractLdapUserService.class);
-        final UserId userId = new UserId("user01");
+        final UserId userId = new UserId().id("user01");
         final LdapContext context = mock(LdapContext.class);
 
         final String[] attrNames = {"roles", "auths"};
@@ -120,8 +120,8 @@ public class AbstractLdapUserServiceTest {
         service.setMock(mock);
 
         // When
-        final User user1 = service.getUser(new GetUserRequest(userId)).join();
-        final User user2 = service.getUser(new GetUserRequest(userId)).join();
+        final User user1 = service.getUser(new GetUserRequest().userId(userId)).join();
+        final User user2 = service.getUser(new GetUserRequest().userId(userId)).join();
 
         // Then
         assertEquals(userId, user1.getUserId());
@@ -137,7 +137,7 @@ public class AbstractLdapUserServiceTest {
     public void shouldPerformABasicSearch() throws NamingException {
         // Given
         final AbstractLdapUserService mock = mock(AbstractLdapUserService.class);
-        final UserId userId = new UserId("user01");
+        final UserId userId = new UserId().id("user01");
         final LdapContext context = mock(LdapContext.class);
 
         final MockLdapUserService service = new MockLdapUserService(context);

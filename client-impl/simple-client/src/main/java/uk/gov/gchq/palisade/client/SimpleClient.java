@@ -68,7 +68,7 @@ public class SimpleClient<T> {
 
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String justification) {
         Objects.requireNonNull(palisadeService);
-        final RegisterDataRequest dataRequest = new RegisterDataRequest(filename, new UserId(userId), new Justification(justification));
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resource(filename).userId(new UserId().id(userId)).justification(new Justification().justification(justification));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
 
@@ -76,7 +76,7 @@ public class SimpleClient<T> {
         for (final Entry<Resource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
-            final CompletableFuture<ReadResponse<Object>> futureResponse = dataService.read(new ReadRequest(dataRequestResponse));
+            final CompletableFuture<ReadResponse<Object>> futureResponse = dataService.read(new ReadRequest().dataRequestResponse(dataRequestResponse));
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
                     response -> response.getData().map(((Serialiser<Object, T>) serialiser)::deserialise)
             );
