@@ -44,6 +44,11 @@
             <artifactId>mapreduce-example-client</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>mapreduce</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>

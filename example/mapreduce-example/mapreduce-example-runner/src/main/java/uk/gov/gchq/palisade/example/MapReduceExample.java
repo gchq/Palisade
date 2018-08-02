@@ -17,43 +17,138 @@ package uk.gov.gchq.palisade.example;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.example.client.ExampleMapReduceClient;
+import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
+import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
+import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.File;
-import java.util.Iterator;
+import java.io.IOException;
 
 public class MapReduceExample extends Configured implements Tool {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
+    public static final String RESOURCE_TYPE = "exampleObj";
 
-    public static void main(String[] args) throws Exception {
-        Configuration conf = new Configuration();
-        //Set job tracker to local implementation
-        conf.set("mapred.job.tracker", "local");
-        //Set file system to local implementation and set root to current directory
-        conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
-        ToolRunner.run(conf, new MapReduceExample(), args);
+    /**
+     * This simple mapper example just extracts the property field of the example object and emits a count of one.
+     */
+    private static class ExampleMap extends Mapper<Resource, ExampleObj, Text, IntWritable> {
+        private static final IntWritable ONE = new IntWritable(1);
+
+        private Text outputKey = new Text();
+
+        protected void map(final Resource key, final ExampleObj value, final Context context) throws IOException, InterruptedException {
+            String property = value.getProperty();
+            outputKey.set(property);
+            context.write(outputKey, ONE);
+        }
+    }
+
+    /**
+     * This simple reducer example counts up the number of times we have seen each value.
+     */
+    private static class ExampleReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
+        private IntWritable result = new IntWritable();
+
+        public void reduce(final Text key, final Iterable<IntWritable> values, final Context context) throws IOException, InterruptedException {
+            int sum = 0;
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+            result.set(sum);
+            context.write(key, result);
+        }
     }
 
     @Override
-    public int run(String[] strings) throws Exception {
+    public int run(final String[] args) throws Exception {
+        //usage check
+        if (args.length < 1) {
+            System.out.println("Args: " + MapReduceExample.class.getName() + " <output path>");
+            return 1;
+        }
+
+        //get the service we can set on the input format
         final ExampleMapReduceClient client = new ExampleMapReduceClient();
         final PalisadeService palisadeService = client.getPalisadeService();
-        FileSystem fs=FileSystem.get(getConf());
-        System.out.println(fs.getClass());
-        RemoteIterator<LocatedFileStatus> it=fs.listFiles(new Path("."),false);
-        while (it.hasNext()) {
-            System.out.println(it.next());
-        }
-        return 0;
+
+        //create the basic job object and configure it for this example
+        Job job = Job.getInstance(getConf(), "Palisade MapReduce Example");
+        job.setJarByClass(MapReduceExample.class);
+
+        //configure mapper
+        job.setMapperClass(ExampleMap.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(IntWritable.class);
+
+        //configure reducer
+        job.setReducerClass(ExampleReduce.class);
+        job.setNumReduceTasks(1);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+        //set the output format
+        job.setOutputFormatClass(TextOutputFormat.class);
+        FileOutputFormat.setOutputPath(job, new Path(args[0]));
+
+        //configure the Palisade input format
+        job.setInputFormatClass(PalisadeInputFormat.class);
+
+        // Edit the configuration of the Palisade requests below here
+        // ==========================================================
+
+        //tell it which Palisade service to use
+        PalisadeInputFormat.setPalisadeService(job, palisadeService);
+        //set a maximum mapper hint
+        PalisadeInputFormat.setMaxMapTasksHint(job, 2);
+        //configure the serialiser to use
+        PalisadeInputFormat.setSerialiser(job, new ExampleObjSerialiser());
+
+        //next add a resource request to the job
+        addDataRequest(job, "file1", RESOURCE_TYPE, "Alice", "Payroll");
+        addDataRequest(job, "file1", RESOURCE_TYPE, "Bob", "Payroll");
+
+        //launch job
+        boolean success = job.waitForCompletion(true);
+
+        return (success) ? 0 : 1;
+    }
+
+    /**
+     * Utility method to add a read request to a job.
+     *
+     * @param context       the job to add the request to
+     * @param filename      example filename
+     * @param resourceType  the example resource type
+     * @param userId        the example user id
+     * @param justification the example justification
+     */
+    private static void addDataRequest(final JobContext context, final String filename, final String resourceType, final String userId, final String justification) {
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resource(filename).userId(new UserId().id(userId)).justification(new Justification().justification(justification));
+        PalisadeInputFormat.addDataRequest(context, dataRequest);
+    }
+
+    public static void main(final String[] args) throws Exception {
+        Configuration conf = new Configuration();
+        //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
+        conf.set("mapred.job.tracker", "local");
+        //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
+        conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
+        ToolRunner.run(conf, new MapReduceExample(), args);
     }
 }

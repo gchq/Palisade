@@ -276,7 +276,7 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      * @param serialiser the serialiser that can decode the value type this job is processing
      * @param <V>        the output type of the {@link Serialiser}
      */
-    public static <V> void setSerialiser(final JobContext context, final Serialiser<Object, V> serialiser) {
+    public static <V> void setSerialiser(final JobContext context, final Serialiser<?, V> serialiser) {
         Objects.requireNonNull(context, "context");
         Objects.requireNonNull(serialiser, "serialiser");
         setSerialiser(context.getConfiguration(), serialiser);
@@ -290,11 +290,10 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      *
      * @param conf       the job to configure
      * @param serialiser the serialiser that can decode the value type this job is processing
-     * @param <K>        the input type of the {@link Serialiser}
      * @param <V>        the output type of the {@link Serialiser}
      * @throws NullPointerException for null parameters
      */
-    public static <K extends Object, V> void setSerialiser(final Configuration conf, final Serialiser<K, V> serialiser) {
+    public static <V> void setSerialiser(final Configuration conf, final Serialiser<?, V> serialiser) {
         Objects.requireNonNull(conf, "conf");
         Objects.requireNonNull(serialiser, "serialiser");
         conf.set(SERIALISER_CLASSNAME_KEY, serialiser.getClass().getName());
@@ -306,12 +305,13 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      * create the serialiser from data stored.
      *
      * @param context the job
+     * @param <K>     the input type of the serialiser
      * @param <V>     the value type of the serialiser
      * @return the serialiser from this configuration
      * @throws IOException          if de-serialisation could not happen
      * @throws NullPointerException if anything is null
      */
-    public static <V> Serialiser<Object, V> getSerialiser(final JobContext context) throws IOException {
+    public static <K, V> Serialiser<K, V> getSerialiser(final JobContext context) throws IOException {
         Objects.requireNonNull(context, "context");
         return getSerialiser(context.getConfiguration());
     }
@@ -321,13 +321,14 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      * create the serialiser from data stored.
      *
      * @param conf the configuration object for a job
+     * @param <K>  the key type of the serialiser
      * @param <V>  the value type of the serialiser
      * @return the serialiser from this configuration
      * @throws IOException          if de-serialisation could not happen
      * @throws NullPointerException if parameter is null
      */
     @SuppressWarnings("unchecked")
-    public static <V> Serialiser<Object, V> getSerialiser(final Configuration conf) throws IOException {
+    public static <K, V> Serialiser<K, V> getSerialiser(final Configuration conf) throws IOException {
         Objects.requireNonNull(conf, "conf");
         String serialConfig = conf.get(SERLIALISER_CONFIG_KEY);
 
@@ -342,7 +343,7 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
 
         //try to deserialise
         try {
-            return (Serialiser<Object, V>) JSONSerialiser.deserialise(serialConfig, Class.forName(className).asSubclass(Serialiser.class));
+            return (Serialiser<K, V>) JSONSerialiser.deserialise(serialConfig, Class.forName(className).asSubclass(Serialiser.class));
         } catch (Exception e) {
             throw new IOException("Couldn't create serialiser", e);
         }

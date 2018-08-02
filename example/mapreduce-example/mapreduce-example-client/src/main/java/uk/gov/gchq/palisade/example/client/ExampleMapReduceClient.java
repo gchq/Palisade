@@ -34,7 +34,6 @@ import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
