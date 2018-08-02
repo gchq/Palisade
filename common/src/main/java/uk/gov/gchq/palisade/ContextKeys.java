@@ -13,15 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package uk.gov.gchq.palisade;
 
-package uk.gov.gchq.palisade.policy;
-
-import uk.gov.gchq.palisade.Context;
-import uk.gov.gchq.palisade.User;
-
-public class TestRule implements Rule<String> {
-    @Override
-    public String apply(final String item, final User user, final Context context) {
-        return item;
-    }
+public abstract class ContextKeys {
+    public static final String JUSTIFICATION = "justification";
 }

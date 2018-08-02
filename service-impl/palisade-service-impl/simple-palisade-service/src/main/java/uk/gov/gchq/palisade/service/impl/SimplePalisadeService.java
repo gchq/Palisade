@@ -118,7 +118,7 @@ public class SimplePalisadeService implements PalisadeService {
         final RequestId requestId = new RequestId().id(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
 
         final DataRequestConfig config = new DataRequestConfig();
-        config.setJustification(request.getJustification());
+        config.setContext(request.getContext());
 
         return CompletableFuture.allOf(futureUser, futureResources)
                 .thenApply(t -> getPolicy(request, futureUser, futureResources))
@@ -133,7 +133,7 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     private MultiPolicy getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<Resource, ConnectionDetail>> futureResources) {
-        final GetPolicyRequest policyRequest = new GetPolicyRequest().user(futureUser.join()).justification(request.getJustification()).resources(new HashSet<>(futureResources.join().keySet()));
+        final GetPolicyRequest policyRequest = new GetPolicyRequest().user(futureUser.join()).context(request.getContext()).resources(new HashSet<>(futureResources.join().keySet()));
         LOGGER.debug("Getting policy from policyService: {}", policyRequest);
         return policyService.getPolicy(policyRequest)
                 .thenApply(policy -> {
@@ -148,7 +148,7 @@ public class SimplePalisadeService implements PalisadeService {
                     new AuditRequest()
                             .resource(entry.getKey())
                             .user(user)
-                            .justification(request.getJustification())
+                            .justification(request.getContext())
                             .howItWasProcessed(entry.getValue().getMessage());
             LOGGER.debug("Auditing: {}", auditRequest);
             auditService.audit(auditRequest);
@@ -161,7 +161,7 @@ public class SimplePalisadeService implements PalisadeService {
                 .dataRequestConfig(
                         new DataRequestConfig()
                                 .user(user)
-                                .justification(request.getJustification())
+                                .justification(request.getContext())
                                 .rules(multiPolicy.getRuleMap())
                 );
         LOGGER.debug("Caching: {}", cacheRequest);

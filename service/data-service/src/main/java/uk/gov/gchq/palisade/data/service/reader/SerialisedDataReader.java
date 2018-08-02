@@ -91,7 +91,7 @@ public abstract class SerialisedDataReader implements DataReader {
             data = Util.applyRules(
                     rawStream.map(serialiser::deserialise),
                     request.getUser(),
-                    request.getJustification(),
+                    request.getContext(),
                     request.getRules()
             ).map(serialiser::serialise);
         }

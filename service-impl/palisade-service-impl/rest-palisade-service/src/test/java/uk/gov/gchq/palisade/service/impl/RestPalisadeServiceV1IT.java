@@ -21,7 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
@@ -75,8 +75,8 @@ public class RestPalisadeServiceV1IT {
         final FileResource resource1 = new FileResource().id("file1");
         final FileResource resource2 = new FileResource().id("file1");
         final UserId userId = new UserId().id("user01");
-        final Justification justification = new Justification().justification("justification1");
-        final RegisterDataRequest request = new RegisterDataRequest().resource("file1").userId(userId).justification(justification);
+        final Context context = new Context().justification("justification1");
+        final RegisterDataRequest request = new RegisterDataRequest().resource("file1").userId(userId).justification(context);
 
         final Map<Resource, ConnectionDetail> resources = new HashMap<>();
         resources.put(resource1, new SimpleConnectionDetail());
@@ -107,10 +107,10 @@ public class RestPalisadeServiceV1IT {
 
         final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
-        final Justification justification = new Justification().justification("justification1");
+        final Context context = new Context().justification("justification1");
         final Map<Resource, Rules> rules = new HashMap<>();
         rules.put(resource1, new Rules<String>().rule("testRule", new TestRule()));
-        final DataRequestConfig expectedResult = new DataRequestConfig().user(user).justification(justification).rules(rules);
+        final DataRequestConfig expectedResult = new DataRequestConfig().user(user).justification(context).rules(rules);
         given(palisadeService.getDataRequestConfig(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
