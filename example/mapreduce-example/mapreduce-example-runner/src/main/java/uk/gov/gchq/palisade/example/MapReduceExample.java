@@ -41,6 +41,13 @@ import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
+ * exmaple data. The job is then configured to make a request as part of the MapReduce job. The actual MapReduce job is
+ * a simple word count example.
+ *
+ * The word count example is adapted from: https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
+ */
 public class MapReduceExample extends Configured implements Tool {
 
     public static final String RESOURCE_TYPE = "exampleObj";
@@ -71,6 +78,7 @@ public class MapReduceExample extends Configured implements Tool {
             for (IntWritable val : values) {
                 sum += val.get();
             }
+            //output the totalled value
             result.set(sum);
             context.write(key, result);
         }

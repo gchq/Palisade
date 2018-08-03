@@ -24,11 +24,12 @@
         <artifactId>mapreduce-example</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>mapreduce-example-client</artifactId>
+    <artifactId>mapreduce-example-data-service</artifactId>
+
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>simple-client</artifactId>
+            <artifactId>simple-data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -36,10 +37,6 @@
             <artifactId>mapreduce-example-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>mapreduce-example-data-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
     </dependencies>
+
 </project>

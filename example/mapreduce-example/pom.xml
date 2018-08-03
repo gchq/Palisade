@@ -30,6 +30,8 @@
     <modules>
         <module>mapreduce-example-runner</module>
         <module>mapreduce-example-client</module>
+        <module>mapreduce-example-model</module>
+        <module>mapreduce-example-data-service</module>
     </modules>
 
 </project>
