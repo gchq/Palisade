@@ -85,7 +85,7 @@ public class MapReduceExample extends Configured implements Tool {
     }
 
     @Override
-    public int run(final String[] args) throws Exception {
+    public int run(final String... args) throws Exception {
         //usage check
         if (args.length < 1) {
             System.out.println("Args: " + MapReduceExample.class.getName() + " <output directory path to create>");
@@ -151,7 +151,7 @@ public class MapReduceExample extends Configured implements Tool {
         PalisadeInputFormat.addDataRequest(context, dataRequest);
     }
 
-    public static void main(final String[] args) throws Exception {
+    public static void main(final String... args) throws Exception {
         Configuration conf = new Configuration();
         //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
         conf.set("mapred.job.tracker", "local");
