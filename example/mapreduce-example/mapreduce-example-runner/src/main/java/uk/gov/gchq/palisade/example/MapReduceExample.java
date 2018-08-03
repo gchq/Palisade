@@ -88,7 +88,7 @@ public class MapReduceExample extends Configured implements Tool {
     public int run(final String[] args) throws Exception {
         //usage check
         if (args.length < 1) {
-            System.out.println("Args: " + MapReduceExample.class.getName() + " <output path>");
+            System.out.println("Args: " + MapReduceExample.class.getName() + " <output directory path to create>");
             return 1;
         }
 
