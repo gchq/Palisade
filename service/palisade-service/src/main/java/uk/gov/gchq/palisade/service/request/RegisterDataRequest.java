@@ -34,6 +34,11 @@ public class RegisterDataRequest extends Request {
 
     // no-args constructor required
     public RegisterDataRequest() {
+        this(new Context());
+    }
+
+    public RegisterDataRequest(final Context context) {
+        this.context = context;
     }
 
     /**
@@ -55,10 +60,15 @@ public class RegisterDataRequest extends Request {
     }
 
     /**
-     * @param context the reason why the user wants access to the data
+     * @param justification the reason why the user wants access to the data
      * @return the {@link RegisterDataRequest}
      */
-    public RegisterDataRequest justification(final Context context) {
+    public RegisterDataRequest justification(final String justification) {
+        this.context = context.justification(justification);
+        return this;
+    }
+
+    public RegisterDataRequest context(final Context context) {
         this.context = context;
         return this;
     }

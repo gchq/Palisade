@@ -148,7 +148,7 @@ public class SimplePalisadeService implements PalisadeService {
                     new AuditRequest()
                             .resource(entry.getKey())
                             .user(user)
-                            .justification(request.getContext())
+                            .context(request.getContext())
                             .howItWasProcessed(entry.getValue().getMessage());
             LOGGER.debug("Auditing: {}", auditRequest);
             auditService.audit(auditRequest);
@@ -161,7 +161,7 @@ public class SimplePalisadeService implements PalisadeService {
                 .dataRequestConfig(
                         new DataRequestConfig()
                                 .user(user)
-                                .justification(request.getContext())
+                                .context(request.getContext())
                                 .rules(multiPolicy.getRuleMap())
                 );
         LOGGER.debug("Caching: {}", cacheRequest);

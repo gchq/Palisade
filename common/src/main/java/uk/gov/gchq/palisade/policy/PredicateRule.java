@@ -32,7 +32,7 @@ public interface PredicateRule<T> extends Rule<T> {
      *
      * @param record        the record to be checked.
      * @param user          the user
-     * @param context the query justificaiton
+     * @param context the query context
      * @return true if the record should be kept, false if the record should be redacted.
      */
     boolean test(final T record, final User user, final Context context);

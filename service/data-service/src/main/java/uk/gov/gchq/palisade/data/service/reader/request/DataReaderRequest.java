@@ -61,16 +61,15 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     }
 
     /**
-     * @param context the Justification that the user provided for why they want the data
+     * @param context the Context that the user provided for why they want the data
      * @return the {@link DataReaderRequest}
      */
-    public DataReaderRequest justification(final Context context) {
+    public DataReaderRequest context(final Context context) {
         this.context = context;
         return this;
     }
 
     /**
-     *
      * @param rules the list of rules to be applied to the data to ensure policy compliance
      * @return the {@link DataReaderRequest}
      */

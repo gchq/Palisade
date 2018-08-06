@@ -32,7 +32,7 @@ import uk.gov.gchq.palisade.User;
  * query {@link Context}.
  * </p>
  * <p>
- * Please note, the justification is optional and may be null.
+ * Please note, the context is optional and may be null.
  * </p>
  * <p>
  * To work over the REST API implementations should be JSON serialisable.

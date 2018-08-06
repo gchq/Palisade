@@ -17,39 +17,54 @@
 package uk.gov.gchq.palisade;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@JsonPropertyOrder(value = {"class", "map"}, alphabetic = true)
+@JsonPropertyOrder(value = {"class", "contents"}, alphabetic = true)
 public class Context {
-    private Map<String, Object> map;
+
+    private static final String JUSTIFICATION = "justification";
+    private Map<String, Object> contents;
 
     public Context() {
         this(new HashMap<>());
     }
 
     @JsonCreator
-    public Context(@JsonProperty("map") final HashMap<String, Object> map) {
-        this.map = map;
+    public Context(@JsonProperty("contents") final Map<String, Object> contents) {
+        this.contents = contents;
     }
 
-    public Context map(final Map<String, Object> map) {
-        this.map = map;
+    public Context contents(final Map<String, Object> contents) {
+        this.contents = contents;
         return this;
     }
 
-    public Map<String, Object> getMap() {
-        return map;
+    public Map<String, Object> getContents() {
+        return contents;
     }
 
+    @JsonIgnore
+    public Map<String, Object> getContentsCopy() {
+        return ImmutableMap.copyOf(contents);
+    }
+
+    @JsonIgnore
     public Context justification(final String justification) {
-        map.put(ContextKeys.JUSTIFICATION, justification);
+        contents.put(JUSTIFICATION, justification);
         return this;
+    }
+
+    @JsonIgnore
+    public Object getJustification() {
+        return contents.get(JUSTIFICATION);
     }
 
     @Override
@@ -65,25 +80,33 @@ public class Context {
         final Context that = (Context) o;
 
         return new EqualsBuilder()
-                .append(map, that.map)
+                .append(contents, that.contents)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(19, 23)
-                .append(map)
+                .append(contents)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("map", map)
+                .append("contents", contents)
                 .toString();
     }
 
-    public Object get(final Object key) {
-        return map.get(key);
+    public Object get(final String key) {
+        return contents.get(key);
+    }
+
+    public Object put(final String key, final Object value) {
+        return contents.put(key, value);
+    }
+
+    public Object putIfAbsent(final String key, final Object value) {
+        return contents.putIfAbsent(key, value);
     }
 }

@@ -50,7 +50,7 @@ public class AuditRequest extends Request {
      *                      user accessing the resource
      * @return the {@link AuditRequest}
      */
-    public AuditRequest justification(final Context context) {
+    public AuditRequest context(final Context context) {
         this.context = context;
         return this;
     }

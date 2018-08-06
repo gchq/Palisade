@@ -47,7 +47,7 @@ public class DataRequestConfig extends Request {
         return this;
     }
 
-    public DataRequestConfig justification(final Context context) {
+    public DataRequestConfig context(final Context context) {
         this.context = context;
         return this;
     }

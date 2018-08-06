@@ -45,7 +45,7 @@ public class ContextTest {
         final byte[] serialise = JSONSerialiser.serialise(testObject, true);
         Context deserialise = JSONSerialiser.deserialise(
                 "{\n" +
-                "  \"map\" : {\n" +
+                "  \"contents\" : {\n" +
                 "    \"justification\" : \"justification1\"\n" +
                 "  }\n" +
                 "}", Context.class);
