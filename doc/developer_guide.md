@@ -115,10 +115,14 @@ The security boundaries for Palisade are at the point of contacting each of the 
 For most services we would only need to authenticate that the proc user that all the services would be running as are the only ones using the public API's.
 This can be done by packaging a secure key/token/certificate with each of those trusted services and passing that to the other service when making requests, for that service to check that it matches what the service is expecting.
 
-Where this gets trickier is when the user is authenticating with the palisade service and the data service. The main reason this gets tricky is because we expect Palisade to be used to access data in a distributed way over a cluster.
+Where this gets trickier is when the user is authenticating with one of the palisade services or one of the data service. The main reason this gets tricky is because we expect Palisade to be used to access data in a distributed way over a cluster.
 Therefore the client authentication token is only going to be available on the machine that the client is running the client code on and not necessarily available at the point at which the distributed code is requesting the data from the data services.
 That is why we have to register the data request with the palisade service first in a non-distributed way where you can provide a personal token/certificate to be validated to ensure authentication.
-Then the palisade service can then provide a token to be passed to the data service to authenticate that the same already authenticated user is requesting access to the desired resource, which the data service validates with the palisade service and uses to get the required trusted details.
+Then the palisade service can then provide a token to be passed to the data service to authenticate that the same already authenticated user is requesting access to the desired resource.
+The data service validates the token with a palisade service and uses it to get the required trusted details from a cache service that is shared by all instances of the palisade service.
+
+This is to satisfy Hadoop's security architecture. In environments where users run as themselves (as opposed to everybody running as the Hadoop processing user), we can do client-auth at on connection to the PalisadeService and again at the connection to DataService.
+The underlying mechanism still works identically, but we can then also validate that Token A that Alice is passing to the DataService was originally issued to Alice by the PalisadeService. As opposed to Hadoop where we can't really check that Eve hasn't stolen the token.
 
 ## Roadmap for Palisade
 #### Near term
