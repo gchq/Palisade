@@ -40,6 +40,7 @@ public class ProxyRestDataService extends ProxyRestService implements DataServic
         setBaseUrl(baseUrl);
     }
 
+    @Override
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         LOGGER.debug("Invoking REST read: " + request);
         final CompletableFuture<Response> futureResponse = doPostAsync("read/chunked", request, Response.class);

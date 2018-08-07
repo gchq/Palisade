@@ -54,7 +54,7 @@ public abstract class SerialisedDataReader implements DataReader {
      * @param serialisers a mapping of data type to serialiser
      * @return the {@link SerialisedDataReader}
      */
-    public SerialisedDataReader serialisers(final Map<String, Serialiser< ?>> serialisers) {
+    public SerialisedDataReader serialisers(final Map<String, Serialiser<?>> serialisers) {
         requireNonNull(serialisers);
         this.serialisers = serialisers;
         return this;

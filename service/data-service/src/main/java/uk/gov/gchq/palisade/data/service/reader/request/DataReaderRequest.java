@@ -46,7 +46,7 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
      * @param resource the resource to be accessed
      * @return the {@link DataReaderRequest}
      */
-    public DataReaderRequest resource(final Resource resource) {
+    public DataReaderRequest<RULES_DATA_TYPE> resource(final Resource resource) {
         this.resource = resource;
         return this;
     }
@@ -55,7 +55,7 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
      * @param user the user that requested the data
      * @return the {@link DataReaderRequest}
      */
-    public DataReaderRequest user(final User user) {
+    public DataReaderRequest<RULES_DATA_TYPE> user(final User user) {
         this.user = user;
         return this;
     }
@@ -64,17 +64,16 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
      * @param justification the Justification that the user provided for why they want the data
      * @return the {@link DataReaderRequest}
      */
-    public DataReaderRequest justification(final Justification justification) {
+    public DataReaderRequest<RULES_DATA_TYPE> justification(final Justification justification) {
         this.justification = justification;
         return this;
     }
 
     /**
-     *
      * @param rules the list of rules to be applied to the data to ensure policy compliance
      * @return the {@link DataReaderRequest}
      */
-    public DataReaderRequest rules(final Rules<RULES_DATA_TYPE> rules) {
+    public DataReaderRequest<RULES_DATA_TYPE> rules(final Rules<RULES_DATA_TYPE> rules) {
         this.rules = rules;
         return this;
     }
