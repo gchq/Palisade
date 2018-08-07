@@ -14,7 +14,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Starting the multi-jvm-example containerised"
     ./example/multi-jvm-example/scripts/dockerComposeUp.sh
     #Sleep to ensure all containers are up
-    sleep 10
+    sleep 1m
     echo "Running the example application"
     OUTPUT=`./example/multi-jvm-example/scripts/run.sh`
     validate_example_output "$OUTPUT"
@@ -23,7 +23,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     ./example/multi-jvm-example/scripts/dockerComposeDown.sh
     echo "Compiling javadoc"
     mvn -q javadoc:aggregate -P quick
-    
+
 fi
 
 exit $result
