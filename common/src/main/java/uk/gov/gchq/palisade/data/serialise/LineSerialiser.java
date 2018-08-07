@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Iterator;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public abstract class LineSerialiser<T> implements Serialiser<T> {
@@ -45,13 +46,14 @@ public abstract class LineSerialiser<T> implements Serialiser<T> {
         if (null == itr) {
             return new ByteArrayInputStream(new byte[]{0});
         }
-        return new SuppliedInputStream(() -> {
+        final Supplier<byte[]> supplier = () -> {
             if (itr.hasNext()) {
                 final T next = itr.next();
                 return (serialiseLine(next) + LINE_ENDING).getBytes(CHARSET);
             }
             return null;
-        });
+        };
+        return new SuppliedInputStream(supplier);
     }
 
     @Override
