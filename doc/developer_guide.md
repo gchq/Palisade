@@ -112,7 +112,7 @@ This deployment shows that it can still works if you want to have all of your se
 ## Security considerations
 During the architecture of Palisade we spent some time thinking about how we would be able to authenticate who the user is that is requesting access to the data.
 The security boundaries for Palisade are at the point of contacting each of the different services when deployed as micro services (which is the recommended deployment model).
-For most services we would only need to authenticate that the proc user that all the services would be running as are the only ones using the public API's.
+For most services we would only need to authenticate that the processing user that all the services would be running as are the only ones using the public API's.
 This can be done by packaging a secure key/token/certificate with each of those trusted services and passing that to the other service when making requests, for that service to check that it matches what the service is expecting.
 
 Where this gets trickier is when the user is authenticating with one of the palisade services or one of the data service. The main reason this gets tricky is because we expect Palisade to be used to access data in a distributed way over a cluster.
