@@ -195,11 +195,7 @@ public abstract class ProxyRestService implements Service {
                 .request();
         if (null != body) {
             request.header("Content", MediaType.APPLICATION_JSON_TYPE);
-            try {
-                request.build(body);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            request.build(body);
         }
         return request;
     }

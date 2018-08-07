@@ -16,8 +16,14 @@
 
 package uk.gov.gchq.palisade.io;
 
+/**
+ * {@code Bytes} is a simple interface containing a
+ * {@link #getBytes()} method and a {@link #getCount()} method.
+ */
 public interface Bytes {
     byte[] getBytes();
 
-    int getCount();
+    default int getCount() {
+        return getBytes().length;
+    }
 }

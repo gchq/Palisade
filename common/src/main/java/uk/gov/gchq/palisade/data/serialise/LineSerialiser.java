@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.data.serialise;
 import uk.gov.gchq.palisade.io.SuppliedInputStream;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -34,10 +35,16 @@ public abstract class LineSerialiser<T> implements Serialiser<T> {
 
     @Override
     public InputStream serialise(final Stream<T> stream) {
+        if (null == stream) {
+            return new ByteArrayInputStream(new byte[]{0});
+        }
         return serialise(stream.iterator());
     }
 
     public InputStream serialise(final Iterator<T> itr) {
+        if (null == itr) {
+            return new ByteArrayInputStream(new byte[]{0});
+        }
         return new SuppliedInputStream(() -> {
             if (itr.hasNext()) {
                 final T next = itr.next();
@@ -49,6 +56,9 @@ public abstract class LineSerialiser<T> implements Serialiser<T> {
 
     @Override
     public Stream<T> deserialise(final InputStream stream) {
+        if (null == stream) {
+            return Stream.empty();
+        }
         return new BufferedReader(new InputStreamReader(stream))
                 .lines()
                 .map(this::deserialiseLine);

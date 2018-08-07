@@ -18,6 +18,10 @@ package uk.gov.gchq.palisade.io;
 
 import java.io.ByteArrayOutputStream;
 
+/**
+ * A {@code BytesOutputStream} extends {@link ByteArrayOutputStream} and
+ * exposes the buffered bytes and count fields.
+ */
 public class BytesOutputStream extends ByteArrayOutputStream implements Bytes {
     @Override
     public byte[] getBytes() {
@@ -29,6 +33,9 @@ public class BytesOutputStream extends ByteArrayOutputStream implements Bytes {
         return count;
     }
 
+    /**
+     * Resets the byte buffer to a new byte array.
+     */
     public void reset() {
         buf = new byte[32];
         count = 0;
