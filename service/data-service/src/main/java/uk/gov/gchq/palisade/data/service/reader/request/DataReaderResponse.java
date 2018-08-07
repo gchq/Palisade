@@ -28,7 +28,7 @@ import java.util.stream.Stream;
  * format expected by the client, along with any error/info messages for the client.
  *
  * @param <RAW_DATA_TYPE> A Java class that each record of the data is expected to
- *                   be returned to the client as.
+ *                        be returned to the client as.
  */
 public class DataReaderResponse<RAW_DATA_TYPE> {
     private Stream<RAW_DATA_TYPE> data;
@@ -39,23 +39,21 @@ public class DataReaderResponse<RAW_DATA_TYPE> {
     }
 
     /**
-     * Default constructor
-     *
-     * @param data A stream of data in the format expected by the client.
+     * @param data a stream of data in the format expected by the client
+     * @return the {@link DataReaderResponse}
      */
-    public DataReaderResponse(final Stream<RAW_DATA_TYPE> data) {
+    public DataReaderResponse<RAW_DATA_TYPE> data(final Stream<RAW_DATA_TYPE> data) {
         this.data = data;
+        return this;
     }
 
     /**
-     * Default constructor
-     *
-     * @param data A stream of data in the format expected by the client.
-     * @param message an error/info message to be returned to the client.
+     * @param message an error/info message to be returned to the client
+     * @return the {@link DataReaderResponse}
      */
-    public DataReaderResponse(final Stream<RAW_DATA_TYPE> data, final String message) {
-        this.data = data;
+    public DataReaderResponse<RAW_DATA_TYPE> message(final String message) {
         this.message = message;
+        return this;
     }
 
     public Stream<RAW_DATA_TYPE> getData() {

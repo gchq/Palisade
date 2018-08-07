@@ -37,16 +37,30 @@ public class RegisterDataRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resource An identifier for the resource or data set to access
      * @param userId an identifier for the user requesting the data
-     * @param justification the reason why the user wants access to the data
+     * @return the {@link RegisterDataRequest}
      */
-    public RegisterDataRequest(final String resource, final UserId userId, final Justification justification) {
-        this.resource = resource;
+    public RegisterDataRequest userId(final UserId userId) {
         this.userId = userId;
+        return this;
+    }
+
+    /**
+     * @param resource an identifier for the resource or data set to access
+     * @return the {@link RegisterDataRequest}
+     */
+    public RegisterDataRequest resource(final String resource) {
+        this.resource = resource;
+        return this;
+    }
+
+    /**
+     * @param justification the reason why the user wants access to the data
+     * @return the {@link RegisterDataRequest}
+     */
+    public RegisterDataRequest justification(final Justification justification) {
         this.justification = justification;
+        return this;
     }
 
     public String getResource() {
@@ -86,6 +100,7 @@ public class RegisterDataRequest extends Request {
         final RegisterDataRequest that = (RegisterDataRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(userId, that.userId)
                 .append(justification, that.justification)
                 .append(resource, that.resource)
@@ -95,6 +110,7 @@ public class RegisterDataRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(59, 67)
+                .appendSuper(super.hashCode())
                 .append(userId)
                 .append(justification)
                 .append(resource)
@@ -104,6 +120,7 @@ public class RegisterDataRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("userId", userId)
                 .append("justification", justification)
                 .append("resource", resource)
