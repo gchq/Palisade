@@ -17,6 +17,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     sleep 1m
     echo "Running the example application"
     OUTPUT=`./example/multi-jvm-example/scripts/run.sh`
+    echo "Output is: $OUTPUT"
     validate_example_output "$OUTPUT"
     result=$?
     echo "Stopping the multi-jvm-example containers"

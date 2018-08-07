@@ -11,6 +11,7 @@ example_expected_results=(
    )
 
 validate_example_output() {
+   echo "Validating example output"
 
    counter=0;
    for line in $1
