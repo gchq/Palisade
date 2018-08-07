@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-. ./cd/verfiy_example.sh --source-only
+. ./cd/verify_example.sh --source-only
 
 set -e
 
