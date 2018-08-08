@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -39,48 +40,53 @@ import static java.util.Objects.requireNonNull;
  */
 public class SuppliedInputStream extends InputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(SuppliedInputStream.class);
+    private static final int EMPTY_RESPONSE = -1;
 
     private final Supplier<byte[]> supplier;
     private byte[] bytes = null;
     private int bytesCount;
-    private int i = 0;
+    private int pointer = 0;
     private boolean end;
 
     public SuppliedInputStream(final Supplier<byte[]> supplier) {
         requireNonNull(supplier, "supplier is required");
         this.supplier = supplier;
+        getCacheOfBytes();
     }
 
     @Override
     public int read() throws IOException {
-        if (end) {
-            return -1;
-        }
+        return end ? EMPTY_RESPONSE : continueReading();
+    }
 
-        if (null == bytes || i >= bytesCount) {
-            LOGGER.debug("Requesting more bytes");
-            bytes = supplier.get();
-            i = 0;
-            if (null == bytes) {
-                bytesCount = 0;
-            } else {
-                bytesCount = bytes.length;
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Loaded {} bytes {}", bytesCount, new String(Arrays.copyOf(bytes, bytesCount)));
-                }
-            }
+    private int continueReading() {
+        final boolean pointerAtEnd = pointer >= bytesCount;
+        if (pointerAtEnd) {
+            getCacheOfBytes();
         }
-        if (null == bytes || bytesCount == 0) {
-            LOGGER.debug("Reached the end of the buffer");
-            end = true;
-            return -1;
-        }
+        return end ? EMPTY_RESPONSE : getByte() & 0xff;
+    }
 
-        byte b = bytes[i];
-        if (null != bytes && LOGGER.isDebugEnabled()) {
+    private byte getByte() {
+        byte b = bytes[pointer++];
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Reading byte {}", new String(new byte[]{b}));
         }
-        i++;
-        return b & 0xff;
+        return b;
+    }
+
+    private void getCacheOfBytes() {
+        LOGGER.debug("Requesting more bytes");
+        bytes = supplier.get();
+        pointer = 0;
+        bytesCount = isNull(bytes) ? 0 : bytes.length;
+        end = bytesCount <= 0;
+        if (LOGGER.isDebugEnabled()) {
+            if (end) {
+                LOGGER.debug("Reached the end of the buffer");
+            } else {
+                LOGGER.debug("Loaded {} bytes {}", bytesCount, new String(Arrays.copyOf(bytes, bytesCount)));
+            }
+        }
     }
 }
