@@ -48,18 +48,18 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <O> the domain object type
  */
-public class AvroInputStreamSerialiser<O> implements Serialiser<O> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AvroInputStreamSerialiser.class);
+public class AvroSerialiser<O> implements Serialiser<O> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AvroSerialiser.class);
 
     private Schema schema;
     private Class<O> domainClass;
     private DatumWriter<O> datumWriter;
     private DatumReader<O> datumReader;
 
-    public AvroInputStreamSerialiser() {
+    public AvroSerialiser() {
     }
 
-    public AvroInputStreamSerialiser(final Class<O> domainClass) {
+    public AvroSerialiser(final Class<O> domainClass) {
         requireNonNull(domainClass, "domainClass is required");
         this.schema = SpecificData.get().getSchema(domainClass);
         this.domainClass = domainClass;

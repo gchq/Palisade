@@ -26,12 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * <p>
  * An HdfsDataReader is an implementation of {@link SerialisedDataReader} for {@code HDFS}
  * that opens a file and returns a single {@link InputStream} containing all the records.
- * It must be configured with {@link uk.gov.gchq.palisade.data.serialise.Serialiser}s that are capable
- * of handling {@link InputStream}, such as {@link uk.gov.gchq.palisade.data.service.serialiser.AvroInputStreamSerialiser}.
- * </p>
  */
 public class HdfsDataReader extends SerialisedDataReader {
     private final FileSystem fs;

@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
-public class AvroInputStreamSerialiserTest {
+public class AvroSerialiserTest {
 
     public static final int INPUT_SIZE = 100;
     public static final Integer[] INPUT = IntStream.range(0, INPUT_SIZE).mapToObj(Integer::new).toArray((a) -> new Integer[INPUT_SIZE]);
@@ -54,7 +54,7 @@ public class AvroInputStreamSerialiserTest {
     @Test
     public void testPrimitiveSerialise() throws IOException {
         // Given
-        final AvroInputStreamSerialiser<Integer> serialiser = new AvroInputStreamSerialiser<>(Integer.class);
+        final AvroSerialiser<Integer> serialiser = new AvroSerialiser<>(Integer.class);
 
         // When
         final InputStream serialised = serialiser.serialise(Stream.of(INPUT));
@@ -69,7 +69,7 @@ public class AvroInputStreamSerialiserTest {
     @Test
     public void testPrimitiveDeserialise() throws IOException {
         // Given
-        final AvroInputStreamSerialiser<Integer> serialiser = new AvroInputStreamSerialiser<>(Integer.class);
+        final AvroSerialiser<Integer> serialiser = new AvroSerialiser<>(Integer.class);
 
         final Schema schema = SpecificData.get().getSchema(Integer.class);
         final DatumWriter<Integer> datumWriter = new SpecificDatumWriter<>(schema);
@@ -97,7 +97,7 @@ public class AvroInputStreamSerialiserTest {
     @Test
     public void testPrimitiveSerialiseAndDeserialise() throws IOException {
         // Given
-        final AvroInputStreamSerialiser<Integer> serialiser = new AvroInputStreamSerialiser<>(Integer.class);
+        final AvroSerialiser<Integer> serialiser = new AvroSerialiser<>(Integer.class);
 
         // When
         final InputStream serialised = serialiser.serialise(Stream.of(INPUT));
@@ -110,7 +110,7 @@ public class AvroInputStreamSerialiserTest {
     @Test
     public void shouldSerialiseAndDeserialiseWithClass() throws IOException {
         // Given
-        final AvroInputStreamSerialiser<TestObj> serialiser = new AvroInputStreamSerialiser<>(TestObj.class);
+        final AvroSerialiser<TestObj> serialiser = new AvroSerialiser<>(TestObj.class);
 
         final List<TestObj> input = Lists.newArrayList(
                 new TestObj("str1A", 1, null),
