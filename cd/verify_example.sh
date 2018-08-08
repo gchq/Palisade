@@ -12,6 +12,7 @@ example_expected_results=(
 
 validate_example_output() {
    echo "Validating example output"
+   echo $1
 
    counter=0;
    for line in $1
@@ -24,5 +25,7 @@ validate_example_output() {
    if [ "$counter" -eq "${#example_expected_results[@]}" ]; then
       return 0
    fi
+
+   echo "Counter $counter"
    return 1
 }
