@@ -16,14 +16,16 @@
 
 package uk.gov.gchq.palisade.io;
 
+import org.apache.commons.lang3.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.nio.charset.Charset;
 import java.util.function.Supplier;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -39,11 +41,12 @@ import static java.util.Objects.requireNonNull;
  */
 public class SuppliedInputStream extends InputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(SuppliedInputStream.class);
+    private static final int END_MARKER = -1;
 
     private final Supplier<byte[]> supplier;
     private byte[] bytes = null;
     private int bytesCount;
-    private int i = 0;
+    private int pointer;
     private boolean end;
 
     public SuppliedInputStream(final Supplier<byte[]> supplier) {
@@ -53,34 +56,37 @@ public class SuppliedInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        if (end) {
-            return -1;
-        }
+        return end ? END_MARKER : continueReading();
+    }
 
-        if (null == bytes || i >= bytesCount) {
-            LOGGER.debug("Requesting more bytes");
-            bytes = supplier.get();
-            i = 0;
-            if (null == bytes) {
-                bytesCount = 0;
-            } else {
-                bytesCount = bytes.length;
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Loaded {} bytes {}", bytesCount, new String(Arrays.copyOf(bytes, bytesCount)));
-                }
-            }
+    private int continueReading() {
+        final boolean pointerAtEnd = pointer >= bytesCount;
+        if (pointerAtEnd) {
+            loadMoreBytes();
         }
-        if (null == bytes || bytesCount == 0) {
-            LOGGER.debug("Reached the end of the buffer");
-            end = true;
-            return -1;
-        }
+        return end ? END_MARKER : getByte() & 0xff;
+    }
 
-        byte b = bytes[i];
-        if (null != bytes && LOGGER.isDebugEnabled()) {
+    private byte getByte() {
+        byte b = bytes[pointer++];
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Reading byte {}", new String(new byte[]{b}));
         }
-        i++;
-        return b & 0xff;
+        return b;
+    }
+
+    private void loadMoreBytes() {
+        LOGGER.debug("Requesting more bytes");
+        bytes = supplier.get();
+        pointer = 0;
+        bytesCount = isNull(bytes) ? 0 : bytes.length;
+        end = bytesCount <= 0;
+        if (LOGGER.isDebugEnabled()) {
+            if (end) {
+                LOGGER.debug("Reached the end of the buffer");
+            } else {
+                LOGGER.debug("Loaded {} bytes {}", bytesCount, new String(bytes, 0, bytesCount, Charset.forName(CharEncoding.UTF_8)));
+            }
+        }
     }
 }
