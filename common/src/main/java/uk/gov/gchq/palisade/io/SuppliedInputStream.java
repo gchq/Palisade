@@ -16,12 +16,13 @@
 
 package uk.gov.gchq.palisade.io;
 
+import org.apache.commons.lang3.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.nio.charset.Charset;
 import java.util.function.Supplier;
 
 import static java.util.Objects.isNull;
@@ -40,31 +41,30 @@ import static java.util.Objects.requireNonNull;
  */
 public class SuppliedInputStream extends InputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(SuppliedInputStream.class);
-    private static final int EMPTY_RESPONSE = -1;
+    private static final int END_MARKER = -1;
 
     private final Supplier<byte[]> supplier;
     private byte[] bytes = null;
     private int bytesCount;
-    private int pointer = 0;
+    private int pointer;
     private boolean end;
 
     public SuppliedInputStream(final Supplier<byte[]> supplier) {
         requireNonNull(supplier, "supplier is required");
         this.supplier = supplier;
-        getCacheOfBytes();
     }
 
     @Override
     public int read() throws IOException {
-        return end ? EMPTY_RESPONSE : continueReading();
+        return end ? END_MARKER : continueReading();
     }
 
     private int continueReading() {
         final boolean pointerAtEnd = pointer >= bytesCount;
         if (pointerAtEnd) {
-            getCacheOfBytes();
+            loadMoreBytes();
         }
-        return end ? EMPTY_RESPONSE : getByte() & 0xff;
+        return end ? END_MARKER : getByte() & 0xff;
     }
 
     private byte getByte() {
@@ -75,7 +75,7 @@ public class SuppliedInputStream extends InputStream {
         return b;
     }
 
-    private void getCacheOfBytes() {
+    private void loadMoreBytes() {
         LOGGER.debug("Requesting more bytes");
         bytes = supplier.get();
         pointer = 0;
@@ -85,7 +85,7 @@ public class SuppliedInputStream extends InputStream {
             if (end) {
                 LOGGER.debug("Reached the end of the buffer");
             } else {
-                LOGGER.debug("Loaded {} bytes {}", bytesCount, new String(Arrays.copyOf(bytes, bytesCount)));
+                LOGGER.debug("Loaded {} bytes {}", bytesCount, new String(bytes, 0, bytesCount, Charset.forName(CharEncoding.UTF_8)));
             }
         }
     }
