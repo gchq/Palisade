@@ -102,11 +102,13 @@ public class Context {
         return contents.get(key);
     }
 
-    public Object put(final String key, final Object value) {
-        return contents.put(key, value);
+    public Context put(final String key, final Object value) {
+        contents.put(key, value);
+        return this;
     }
 
-    public Object putIfAbsent(final String key, final Object value) {
-        return contents.putIfAbsent(key, value);
+    public Context putIfAbsent(final String key, final Object value) {
+        contents.putIfAbsent(key, value);
+        return this;
     }
 }
