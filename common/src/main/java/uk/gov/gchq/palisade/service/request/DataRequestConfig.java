@@ -35,18 +35,26 @@ import java.util.Objects;
  * respond to requests for access to data.
  */
 public class DataRequestConfig extends Request {
-    private User user;
-    private Justification justification;
-    private Map<Resource, Rules> rules;
+    private User user = new User();
+    private Justification justification = new Justification();
+    private Map<Resource, Rules> rules = new HashMap<>();
 
     public DataRequestConfig() {
-        this(new User(), new Justification(), new HashMap<>());
     }
 
-    public DataRequestConfig(final User user, final Justification justification, final Map<Resource, Rules> rules) {
+    public DataRequestConfig user(final User user) {
         this.user = user;
+        return this;
+    }
+
+    public DataRequestConfig justification(final Justification justification) {
         this.justification = justification;
+        return this;
+    }
+
+    public DataRequestConfig rules(final Map<Resource, Rules> rules) {
         this.rules = rules;
+        return this;
     }
 
     public User getUser() {
@@ -95,6 +103,7 @@ public class DataRequestConfig extends Request {
         final DataRequestConfig that = (DataRequestConfig) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(user, that.user)
                 .append(justification, that.justification)
                 .append(rules, that.rules)
@@ -104,6 +113,7 @@ public class DataRequestConfig extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(53, 37)
+                .appendSuper(super.hashCode())
                 .append(user)
                 .append(justification)
                 .append(rules)
@@ -113,6 +123,7 @@ public class DataRequestConfig extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("user", user)
                 .append("justification", justification)
                 .append("rules", rules)

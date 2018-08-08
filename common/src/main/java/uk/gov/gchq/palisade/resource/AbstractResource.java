@@ -29,19 +29,19 @@ public abstract class AbstractResource implements Resource {
     public AbstractResource() {
     }
 
-    public AbstractResource(final String id) {
+    public AbstractResource id(final String id) {
         this.id = id;
+        return this;
     }
 
-    public AbstractResource(final String id, final String type) {
-        this.id = id;
+    public AbstractResource type(final String type) {
         this.type = type;
+        return this;
     }
 
-    public AbstractResource(final String id, final String type, final String serialisedFormat) {
-        this.id = id;
-        this.type = type;
+    public AbstractResource serialisedFormat(final String serialisedFormat) {
         this.serialisedFormat = serialisedFormat;
+        return this;
     }
 
     @Override

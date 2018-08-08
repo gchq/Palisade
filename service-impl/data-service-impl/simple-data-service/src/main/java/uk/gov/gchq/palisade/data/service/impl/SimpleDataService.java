@@ -58,14 +58,19 @@ public class SimpleDataService implements DataService {
     private DataReader reader;
 
     public SimpleDataService() {
-        this(new NullPalisadeService(), new NullDataReader());
+        this.palisadeService(new NullPalisadeService()).reader(new NullDataReader());
     }
 
-    public SimpleDataService(final PalisadeService palisadeService, final DataReader reader) {
+    public SimpleDataService palisadeService(final PalisadeService palisadeService) {
         Objects.requireNonNull(palisadeService);
-        Objects.requireNonNull(reader);
         this.palisadeService = palisadeService;
+        return this;
+    }
+
+    public SimpleDataService reader(final DataReader reader) {
+        Objects.requireNonNull(reader);
         this.reader = reader;
+        return this;
     }
 
     @Override
@@ -85,12 +90,11 @@ public class SimpleDataService implements DataService {
             for (final Entry<Resource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
                 validate(entry.getValue());
 
-                final DataReaderRequest<T> readerRequest = new DataReaderRequest<>(
-                        entry.getKey(),
-                        config.getUser(),
-                        config.getJustification(),
-                        config.getResourceRules(entry.getKey())
-                );
+                final DataReaderRequest<T> readerRequest = new DataReaderRequest<>()
+                        .resource(entry.getKey())
+                        .user(config.getUser())
+                        .justification(config.getJustification())
+                        .rules(config.getResourceRules(entry.getKey()));
                 LOGGER.debug("Calling reader with: {}", readerRequest);
                 final DataReaderResponse<T> readerResult = reader.read(readerRequest);
                 LOGGER.debug("Reader returned: {}", readerResult);
@@ -101,7 +105,7 @@ public class SimpleDataService implements DataService {
                     );
                 }
             }
-            final ReadResponse<T> response = new ReadResponse<>(allData);
+            final ReadResponse<T> response = new ReadResponse().data(allData);
             LOGGER.debug("Returning from read: {}", response);
             return response;
         });

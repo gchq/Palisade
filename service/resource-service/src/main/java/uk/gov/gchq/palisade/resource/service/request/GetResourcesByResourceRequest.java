@@ -37,12 +37,12 @@ public class GetResourcesByResourceRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resource The {@link Resource} you want to run an {@code ls} on.
+     * @param resource the {@link Resource} you want to run an {@code ls} on
+     * @return the {@link GetResourcesByResourceRequest}
      */
-    public GetResourcesByResourceRequest(final Resource resource) {
+    public GetResourcesByResourceRequest resource(final Resource resource) {
         this.resource = resource;
+        return this;
     }
 
     public Resource getResource() {
@@ -66,6 +66,7 @@ public class GetResourcesByResourceRequest extends Request {
         final GetResourcesByResourceRequest that = (GetResourcesByResourceRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(resource, that.resource)
                 .isEquals();
     }
@@ -73,6 +74,7 @@ public class GetResourcesByResourceRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(11, 37)
+                .appendSuper(super.hashCode())
                 .append(resource)
                 .toHashCode();
     }
@@ -80,6 +82,7 @@ public class GetResourcesByResourceRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("resource", resource)
                 .toString();
     }

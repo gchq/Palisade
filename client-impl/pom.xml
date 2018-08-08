@@ -30,5 +30,6 @@
     <modules>
         <module>simple-client</module>
         <module>simple-rest-client</module>
+        <!--<module>mapreduce-client</module>-->
     </modules>
 </project>
