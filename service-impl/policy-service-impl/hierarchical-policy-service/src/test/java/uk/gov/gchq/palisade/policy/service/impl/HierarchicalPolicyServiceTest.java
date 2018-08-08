@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
@@ -123,7 +122,7 @@ public class HierarchicalPolicyServiceTest {
         Resource resource = createTestFileResource();
         // try
         CompletableFuture<CanAccessResponse> future = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(resource)).user(user).justification(justification));
-        CanAccessResponse response = future.get(100, TimeUnit.MILLISECONDS);
+        CanAccessResponse response = future.get();
         Collection<Resource> resources = response.getCanAccessResources();
         // check
         assertEquals(1, resources.size());
@@ -138,7 +137,7 @@ public class HierarchicalPolicyServiceTest {
         Resource resource = createTestFileResource();
         // try
         CompletableFuture<MultiPolicy> future = policyService.getPolicy(new GetPolicyRequest().user(user).justification(justification).resources(Collections.singletonList(resource)));
-        MultiPolicy response = future.get(100, TimeUnit.MILLISECONDS);
+        MultiPolicy response = future.get();
         Map<Resource, Rules> ruleMap = response.getRuleMap();
         // check
         assertEquals(1, ruleMap.size());
@@ -154,12 +153,12 @@ public class HierarchicalPolicyServiceTest {
         Policy newPolicy = new Policy().resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
         // try
         CompletableFuture<Boolean> future = policyService.setPolicy(new SetPolicyRequest().resource(newResource).policy(newPolicy));
-        Boolean result = future.get(100, TimeUnit.MILLISECONDS);
+        Boolean result = future.get();
         assertTrue(result);
 
         // try
         CompletableFuture<CanAccessResponse> future2 = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(newResource)).user(testUser).justification(new Justification().justification("fun")));
-        CanAccessResponse response2 = future2.get(100, TimeUnit.MILLISECONDS);
+        CanAccessResponse response2 = future2.get();
         Collection<Resource> resources2 = response2.getCanAccessResources();
         // check
         assertEquals(0, resources2.size());
@@ -173,7 +172,7 @@ public class HierarchicalPolicyServiceTest {
         Resource testResource = createTestFileResource();
         // try
         CompletableFuture<CanAccessResponse> future1 = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(testResource)).user(testUser).justification(testJustification));
-        CanAccessResponse response = future1.get(100, TimeUnit.MILLISECONDS);
+        CanAccessResponse response = future1.get();
         Collection<Resource> resources = response.getCanAccessResources();
         // check
         assertEquals(1, resources.size());
@@ -183,12 +182,12 @@ public class HierarchicalPolicyServiceTest {
         Policy newPolicy = new Policy().resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
         // try
         CompletableFuture<Boolean> future = policyService.setPolicy(new SetPolicyRequest().resource(testResource).policy(newPolicy));
-        Boolean result = future.get(100, TimeUnit.MILLISECONDS);
+        Boolean result = future.get();
         assertTrue(result);
 
         // try
         CompletableFuture<CanAccessResponse> future2 = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(testResource)).user(testUser).justification(new Justification().justification("fun")));
-        CanAccessResponse response2 = future2.get(100, TimeUnit.MILLISECONDS);
+        CanAccessResponse response2 = future2.get();
         Collection<Resource> resources2 = response2.getCanAccessResources();
         // check
         assertEquals(0, resources2.size());

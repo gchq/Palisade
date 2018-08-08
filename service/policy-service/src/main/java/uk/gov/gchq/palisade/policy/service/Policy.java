@@ -47,7 +47,7 @@ public class Policy<RULE_DATA_TYPE> {
 
     // no-args constructor required
     public Policy() {
-        recordRules(new Rules<>()).resourceRules(new Rules<>()).owner(null);
+        recordRules(new Rules<>()).resourceRules(new Rules<>());
     }
 
     public Policy<RULE_DATA_TYPE> recordRules(final Rules<RULE_DATA_TYPE> recordRules) {
@@ -83,6 +83,7 @@ public class Policy<RULE_DATA_TYPE> {
     }
 
     public void setRecordRules(final Rules<RULE_DATA_TYPE> recordRules) {
+        Objects.requireNonNull(recordRules);
         this.recordRules = recordRules;
     }
 
@@ -91,16 +92,19 @@ public class Policy<RULE_DATA_TYPE> {
     }
 
     public void setResourceRules(final Rules<Resource> resourceRules) {
+        Objects.requireNonNull(resourceRules);
         this.resourceRules = resourceRules;
     }
 
-    private String generateUUID() {
+    private static String generateUUID() {
         return UUID.randomUUID().toString();
     }
 
     private void addMessage(final String newMessage, final Rules rules) {
+        Objects.requireNonNull(newMessage);
+        Objects.requireNonNull(rules);
         String currentMessage = rules.getMessage();
-        if (currentMessage == null || currentMessage.equals("")) {
+        if (currentMessage == null || currentMessage.isEmpty()) {
             rules.message(newMessage);
         } else {
             rules.message(currentMessage + ", " + newMessage);
@@ -108,48 +112,64 @@ public class Policy<RULE_DATA_TYPE> {
     }
 
     public Policy<RULE_DATA_TYPE> recordLevelRule(final String message, final Rule<RULE_DATA_TYPE> rule) {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(rule);
         recordRules.rule(generateUUID(), rule);
         addMessage(message, recordRules);
         return this;
     }
 
     public Policy<RULE_DATA_TYPE> recordLevelPredicateRule(final String message, final PredicateRule<RULE_DATA_TYPE> rule) {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(rule);
         recordRules.predicateRule(generateUUID(), rule);
         addMessage(message, recordRules);
         return this;
     }
 
     public Policy<RULE_DATA_TYPE> recordLevelSimplePredicateRule(final String message, final Predicate<RULE_DATA_TYPE> rule) {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(rule);
         recordRules.simplePredicateRule(generateUUID(), rule);
         addMessage(message, recordRules);
         return this;
     }
 
     public Policy<RULE_DATA_TYPE> recordLevelSimpleFunctionRule(final String message, final Function<RULE_DATA_TYPE, RULE_DATA_TYPE> rule) {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(rule);
         recordRules.simpleFunctionRule(generateUUID(), rule);
         addMessage(message, recordRules);
         return this;
     }
 
     public Policy<RULE_DATA_TYPE> resourceLevelRule(final String message, final Rule<Resource> rule) {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(rule);
         resourceRules.rule(generateUUID(), rule);
         addMessage(message, resourceRules);
         return this;
     }
 
     public Policy<RULE_DATA_TYPE> resourceLevelPredicateRule(final String message, final PredicateRule<Resource> rule) {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(rule);
         resourceRules.predicateRule(generateUUID(), rule);
         addMessage(message, resourceRules);
         return this;
     }
 
     public Policy<RULE_DATA_TYPE> resourceLevelSimplePredicateRule(final String message, final Predicate<Resource> rule) {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(rule);
         resourceRules.simplePredicateRule(generateUUID(), rule);
         addMessage(message, resourceRules);
         return this;
     }
 
     public Policy<RULE_DATA_TYPE> resourceLevelSimpleFunctionRule(final String message, final Function<Resource, Resource> rule) {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(rule);
         resourceRules.simpleFunctionRule(generateUUID(), rule);
         addMessage(message, resourceRules);
         return this;
@@ -160,11 +180,12 @@ public class Policy<RULE_DATA_TYPE> {
     }
 
     public void setOwner(final User owner) {
+        Objects.requireNonNull(owner);
         this.owner = owner;
     }
 
     public Policy<RULE_DATA_TYPE> owner(final User owner) {
-        this.owner = owner;
+        setOwner(owner);
         return this;
     }
 

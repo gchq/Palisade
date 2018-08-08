@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 /**
  * By having the policies stored in several key value stores we can attach policies
- * at either the resource, data type.
+ * at either the resource or data type level.
  *
  * Each rule needs to be flagged as a resource level filter, or a record level filter/transform.
  *
@@ -63,6 +63,8 @@ public class HierarchicalPolicyService implements PolicyService {
     }
 
     public HierarchicalPolicyService(final HashMap<String, Policy> dataTypePoliciesMap, final HashMap<Resource, Policy> resourcePoliciesMap) {
+        Objects.requireNonNull(dataTypePoliciesMap);
+        Objects.requireNonNull(resourcePoliciesMap);
         this.dataTypePoliciesMap = dataTypePoliciesMap;
         this.resourcePoliciesMap = resourcePoliciesMap;
     }
@@ -86,6 +88,20 @@ public class HierarchicalPolicyService implements PolicyService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * This method is used to recursively go up the resource hierarchy ending with the original
+     * data type to extract and merge the policies at each stage of the hierarchy.
+     *
+     * @param resource          A {@link Resource} to get the applicable rules for.
+     * @param canAccessRequest  A boolean that is true if you want the resource level.
+     *                          rules and therefore this is called from the canAccess method
+     * @param originalDataType  This is the data type that you want to be at the top of the
+     *                          Resource hierarchy tree, which will be the data type of the
+     *                          first resource in the recursive calls to this method.
+     * @param <T>               The type of the returned {@link Rules}.
+     * @return                  A {@link Rules} object of type T, which contains the list of rules
+     *                          that need to be applied to the resource.
+     */
     protected <T> Rules<T> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
 
         Rules<T> inheritedRules;
