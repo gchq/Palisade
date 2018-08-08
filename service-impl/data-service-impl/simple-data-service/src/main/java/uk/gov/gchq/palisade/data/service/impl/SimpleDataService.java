@@ -85,11 +85,11 @@ public class SimpleDataService implements DataService {
             final DataRequestConfig config = palisadeService.getDataRequestConfig(getConfig).join();
             LOGGER.debug("Palisade service returned: {}", config);
 
-            final DataReaderRequest readerRequest = new DataReaderRequest<>()
+            final DataReaderRequest readerRequest = new DataReaderRequest()
                     .resource(request.getResource())
                     .user(config.getUser())
                     .justification(config.getJustification())
-                    .rules(config.getMultiPolicy().getRules(request.getResource()));
+                    .rules(config.getRules().get(request.getResource()));
 
             LOGGER.debug("Calling reader with: {}", readerRequest);
             final DataReaderResponse readerResult = reader.read(readerRequest);

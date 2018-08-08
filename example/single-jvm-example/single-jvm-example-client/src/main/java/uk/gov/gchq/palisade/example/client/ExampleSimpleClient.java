@@ -25,7 +25,7 @@ import uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.function.IsTimestampMoreThan;
 import uk.gov.gchq.palisade.example.function.IsVisible;
-import uk.gov.gchq.palisade.policy.Policy;
+import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;

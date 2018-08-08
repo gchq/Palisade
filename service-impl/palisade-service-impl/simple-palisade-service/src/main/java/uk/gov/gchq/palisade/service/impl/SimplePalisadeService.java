@@ -29,9 +29,9 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.NullCacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
-import uk.gov.gchq.palisade.policy.MultiPolicy;
-import uk.gov.gchq.palisade.policy.Policy;
+import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.NullPolicyService;
+import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.resource.Resource;
@@ -162,7 +162,7 @@ public class SimplePalisadeService implements PalisadeService {
                 .dataRequestConfig(new DataRequestConfig()
                                 .user(user)
                                 .justification(request.getJustification())
-                                .multiPolicy(multiPolicy)
+                                .rules(multiPolicy.getRuleMap())
                 );
         LOGGER.debug("Caching: {}", cacheRequest);
         final Boolean success = cacheService.add(cacheRequest).join();

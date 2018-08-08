@@ -26,7 +26,7 @@ import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
  */
 public class NullDataReader implements DataReader {
     @Override
-    public <RULES_DATA_TYPE> DataReaderResponse read(final DataReaderRequest<RULES_DATA_TYPE> request) {
+    public DataReaderResponse read(final DataReaderRequest request) {
         return new DataReaderResponse();
     }
 }

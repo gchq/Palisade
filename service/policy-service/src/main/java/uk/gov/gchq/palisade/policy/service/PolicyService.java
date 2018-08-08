@@ -16,7 +16,6 @@
 
 package uk.gov.gchq.palisade.policy.service;
 
-import uk.gov.gchq.palisade.policy.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
@@ -50,13 +49,13 @@ public interface PolicyService extends Service {
     CompletableFuture<Boolean> canAccess(final CanAccessRequest request);
 
     /**
-     * This method gets the record level {@link uk.gov.gchq.palisade.policy.Policy}'s that apply to the list
+     * This method gets the record level {@link Policy}'s that apply to the list
      * of resources that the user has requested access too.
      *
      * @param request a {@link GetPolicyRequest} containing the user requesting
      *                the data, a justification for why they want the data and a
      *                list of the resources the user wants access too.
-     * @return a {@link MultiPolicy} containing the mapping of resource to {@link uk.gov.gchq.palisade.policy.Policy}
+     * @return a {@link MultiPolicy} containing the mapping of resource to {@link Policy}
      */
     CompletableFuture<MultiPolicy> getPolicy(final GetPolicyRequest request);
 

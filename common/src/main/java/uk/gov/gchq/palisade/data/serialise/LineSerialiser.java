@@ -18,13 +18,14 @@ package uk.gov.gchq.palisade.data.serialise;
 import uk.gov.gchq.palisade.io.SuppliedInputStream;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import static java.util.Objects.isNull;
 
 public abstract class LineSerialiser<T> implements Serialiser<T> {
     public static final String LINE_ENDING = String.format("%n");
@@ -36,15 +37,15 @@ public abstract class LineSerialiser<T> implements Serialiser<T> {
 
     @Override
     public InputStream serialise(final Stream<T> stream) {
-        if (null == stream) {
-            return new ByteArrayInputStream(new byte[]{0});
+        if (isNull(stream)) {
+            return new EmptyInputStream();
         }
         return serialise(stream.iterator());
     }
 
     public InputStream serialise(final Iterator<T> itr) {
-        if (null == itr) {
-            return new ByteArrayInputStream(new byte[]{0});
+        if (isNull(itr)) {
+            return new EmptyInputStream();
         }
         final Supplier<byte[]> supplier = () -> {
             if (itr.hasNext()) {
@@ -58,11 +59,21 @@ public abstract class LineSerialiser<T> implements Serialiser<T> {
 
     @Override
     public Stream<T> deserialise(final InputStream stream) {
-        if (null == stream) {
+        if (isNull(stream)) {
             return Stream.empty();
         }
         return new BufferedReader(new InputStreamReader(stream))
                 .lines()
                 .map(this::deserialiseLine);
+    }
+
+    private static class EmptyInputStream extends InputStream {
+        public int read() {
+            return -1;
+        }
+
+        public int available() {
+            return 0;
+        }
     }
 }
