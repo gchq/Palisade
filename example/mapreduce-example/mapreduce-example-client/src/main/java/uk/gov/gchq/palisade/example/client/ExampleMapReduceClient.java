@@ -16,8 +16,11 @@
 package uk.gov.gchq.palisade.example.client;
 
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobContext;
 
+import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
@@ -33,6 +36,7 @@ import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
@@ -128,5 +132,19 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
      */
     public PalisadeService getPalisadeService() {
         return palisadeService;
+    }
+
+    /**
+     * Utility method to add a read request to a job.
+     *
+     * @param context       the job to add the request to
+     * @param filename      example filename
+     * @param resourceType  the example resource type
+     * @param userId        the example user id
+     * @param justification the example justification
+     */
+    public static void addDataRequest(final JobContext context, final String filename, final String resourceType, final String userId, final String justification) {
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).justification(new Justification().justification(justification));
+        PalisadeInputFormat.addDataRequest(context, dataRequest);
     }
 }

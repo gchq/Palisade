@@ -21,7 +21,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -29,12 +28,8 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import uk.gov.gchq.palisade.Justification;
-import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.example.client.ExampleMapReduceClient;
-import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.resource.Resource;
-import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,27 +113,13 @@ public class MapReduceExample extends Configured implements Tool {
         ExampleMapReduceClient.initialiseJob(job, client, 2);
 
         //next add a resource request to the job
-        addDataRequest(job, "file1", RESOURCE_TYPE, "Alice", "Payroll");
-        addDataRequest(job, "file1", RESOURCE_TYPE, "Bob", "Payroll");
+        ExampleMapReduceClient.addDataRequest(job, "file1", RESOURCE_TYPE, "Alice", "Payroll");
+        ExampleMapReduceClient.addDataRequest(job, "file1", RESOURCE_TYPE, "Bob", "Payroll");
 
         //launch job
         boolean success = job.waitForCompletion(true);
 
         return (success) ? 0 : 1;
-    }
-
-    /**
-     * Utility method to add a read request to a job.
-     *
-     * @param context       the job to add the request to
-     * @param filename      example filename
-     * @param resourceType  the example resource type
-     * @param userId        the example user id
-     * @param justification the example justification
-     */
-    private static void addDataRequest(final JobContext context, final String filename, final String resourceType, final String userId, final String justification) {
-        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).justification(new Justification().justification(justification));
-        PalisadeInputFormat.addDataRequest(context, dataRequest);
     }
 
     public static void main(final String... args) throws Exception {
