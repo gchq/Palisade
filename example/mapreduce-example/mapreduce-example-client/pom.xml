@@ -21,23 +21,34 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>service-impl</artifactId>
+        <artifactId>mapreduce-example</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>data-service-impl</artifactId>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>simple-data-service</module>
-        <module>rest-data-service</module>
-        <module>proxy-rest-data-service</module>
-        <module>hdfs-data-service</module>
-    </modules>
-
+    <artifactId>mapreduce-example-client</artifactId>
     <dependencies>
         <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+        <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>data-service</artifactId>
+            <artifactId>mapreduce</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>simple-client</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>mapreduce-example-model</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>mapreduce-example-data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

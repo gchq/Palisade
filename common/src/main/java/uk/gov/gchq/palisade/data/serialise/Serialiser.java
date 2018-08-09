@@ -15,10 +15,16 @@
  */
 package uk.gov.gchq.palisade.data.serialise;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.stream.Stream;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = As.EXISTING_PROPERTY, property = "class")
 public interface Serialiser<I> extends Serializable {
 
     /**
@@ -36,4 +42,14 @@ public interface Serialiser<I> extends Serializable {
      * @return the deserialised object
      */
     Stream<I> deserialise(final InputStream stream);
+
+    @JsonGetter("class")
+    default String _getClass() {
+        return getClass().getName();
+    }
+
+    @JsonSetter("class")
+    default void _setClass(final String className) {
+        // do nothing.
+    }
 }

@@ -21,17 +21,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>palisade</artifactId>
+        <artifactId>mapreduce-example</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>example</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>mapreduce-example-data-service</artifactId>
 
-    <modules>
-        <module>example-model</module>
-        <module>example-data-service</module>
-        <module>single-jvm-example</module>
-        <module>multi-jvm-example</module>
-        <module>mapreduce-example</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>simple-data-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>mapreduce-example-model</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>
