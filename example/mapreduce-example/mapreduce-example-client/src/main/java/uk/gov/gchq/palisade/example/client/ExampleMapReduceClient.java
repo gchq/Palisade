@@ -34,7 +34,6 @@ import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
@@ -48,7 +47,7 @@ public class ExampleMapReduceClient {
 
     private final SimpleClient<ExampleObj> exampleClient;
 
-    public ExampleMapReduceClient(SimpleClient<ExampleObj> exampleClient) {
+    public ExampleMapReduceClient(final SimpleClient<ExampleObj> exampleClient) {
         Objects.requireNonNull(exampleClient, "exampleClient");
         this.exampleClient = exampleClient;
         // The user authorisation owner or sys admin needs to add the user
@@ -105,7 +104,7 @@ public class ExampleMapReduceClient {
 
     /**
      * Set up a given MapReduce job to source data from an {@link ExampleMapReduceClient}. This convenience method will
-     * configure the input format, set the {@link PalisadeService} and the serialiser.
+     * configure the input format, set the {@link uk.gov.gchq.palisade.service.PalisadeService} and the serialiser.
      *
      * @param job        the job to configure
      * @param client     the particular client
