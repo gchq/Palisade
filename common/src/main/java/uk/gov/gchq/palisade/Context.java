@@ -27,6 +27,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A structure to store specific information that is required for palisade interactions with resources.
+ * <p>
+ * Interaction with a resource include both reading and writing and will often require
+ * additional information that can be stored and recovered in this structure and passed along with the request/operation.
+ * i.e A users justification for requesting the contents of a file.
+ */
 @JsonPropertyOrder(value = {"class", "contents"}, alphabetic = true)
 public class Context {
 
