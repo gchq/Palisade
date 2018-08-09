@@ -130,7 +130,7 @@ public class Policy<RULE_DATA_TYPE> {
     public Policy<RULE_DATA_TYPE> recordLevelSimplePredicateRule(final String message, final Predicate<RULE_DATA_TYPE> rule) {
         Objects.requireNonNull(message);
         Objects.requireNonNull(rule);
-        recordRules.rule(generateUUID(), rule);
+        recordRules.simplePredicateRule(generateUUID(), rule);
         addMessage(message, recordRules);
         return this;
     }
@@ -138,7 +138,7 @@ public class Policy<RULE_DATA_TYPE> {
     public Policy<RULE_DATA_TYPE> recordLevelSimpleFunctionRule(final String message, final Function<RULE_DATA_TYPE, RULE_DATA_TYPE> rule) {
         Objects.requireNonNull(message);
         Objects.requireNonNull(rule);
-        recordRules.rule(generateUUID(), rule);
+        recordRules.simpleFunctionRule(generateUUID(), rule);
         addMessage(message, recordRules);
         return this;
     }
@@ -162,7 +162,7 @@ public class Policy<RULE_DATA_TYPE> {
     public Policy<RULE_DATA_TYPE> resourceLevelSimplePredicateRule(final String message, final Predicate<Resource> rule) {
         Objects.requireNonNull(message);
         Objects.requireNonNull(rule);
-        resourceRules.rule(generateUUID(), rule);
+        resourceRules.simplePredicateRule(generateUUID(), rule);
         addMessage(message, resourceRules);
         return this;
     }
@@ -170,7 +170,7 @@ public class Policy<RULE_DATA_TYPE> {
     public Policy<RULE_DATA_TYPE> resourceLevelSimpleFunctionRule(final String message, final Function<Resource, Resource> rule) {
         Objects.requireNonNull(message);
         Objects.requireNonNull(rule);
-        resourceRules.rule(generateUUID(), rule);
+        resourceRules.simpleFunctionRule(generateUUID(), rule);
         addMessage(message, resourceRules);
         return this;
     }

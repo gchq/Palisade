@@ -15,6 +15,11 @@
  */
 package uk.gov.gchq.palisade.util;
 
+/**
+ * A {@code FieldSetter} sets a field value on an object.
+ *
+ * @param <T> the type of object
+ */
 @FunctionalInterface
 public interface FieldSetter<T> {
     void accept(T instance, String field, Object value);

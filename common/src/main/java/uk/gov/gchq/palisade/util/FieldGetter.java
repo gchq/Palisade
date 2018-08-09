@@ -19,5 +19,11 @@ package uk.gov.gchq.palisade.util;
 import java.util.function.BiFunction;
 
 
+/**
+ * A {@code FieldGetter} is a {@link BiFunction} that takes an object and a field name
+ * and returns the value of that field.
+ *
+ * @param <T> the type of object
+ */
 public interface FieldGetter<T> extends BiFunction<T, String, Object> {
 }

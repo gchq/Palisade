@@ -116,15 +116,14 @@ public class Rules<T> {
     }
 
     /**
-     * Adds a simple function rule that just takes the record and returns a modified record or null if the record should be fully redacted.
-     * Note - using this means your rule will not be given the User or Justification.
+     * Adds a predicate rule.
      *
      * @param id   the unique rule id
-     * @param rule the simple function rule
+     * @param rule the predicate rule
      * @return this Rules instance
      */
-    public Rules<T> rule(final String id, final Function<T, T> rule) {
-        rules.put(id, new WrappedRule<>(rule));
+    public Rules<T> predicateRule(final String id, final PredicateRule<T> rule) {
+        rules.put(id, rule);
         return this;
     }
 
@@ -136,7 +135,20 @@ public class Rules<T> {
      * @param rule the simple predicate rule
      * @return this Rules instance
      */
-    public Rules<T> rule(final String id, final Predicate<T> rule) {
+    public Rules<T> simplePredicateRule(final String id, final Predicate<T> rule) {
+        rules.put(id, new WrappedRule<>(rule));
+        return this;
+    }
+
+    /**
+     * Adds a simple function rule that just takes the record and returns a modified record or null if the record should be fully redacted.
+     * Note - using this means your rule will not be given the User or Justification.
+     *
+     * @param id   the unique rule id
+     * @param rule the simple function rule
+     * @return this Rules instance
+     */
+    public Rules<T> simpleFunctionRule(final String id, final Function<T, T> rule) {
         rules.put(id, new WrappedRule<>(rule));
         return this;
     }
