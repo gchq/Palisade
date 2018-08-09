@@ -27,8 +27,8 @@ import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.HdfsDataReader;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
-import uk.gov.gchq.palisade.policy.Rules;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.util.TestUtil;
 
 import java.io.BufferedReader;
@@ -59,7 +59,7 @@ public class HdfsDataReaderTest {
         final FileResource resource = new FileResource().id(tmpFile.getAbsolutePath()).type("string");
         final Rules<String> rules = new Rules<>();
 
-        final DataReaderRequest<String> request = new DataReaderRequest<String>()
+        final DataReaderRequest request = new DataReaderRequest()
                 .resource(resource)
                 .user(new User())
                 .justification(new Justification())
@@ -88,7 +88,7 @@ public class HdfsDataReaderTest {
         // Redact any records containing the word 'more'
         final Rules<String> rules = new Rules<String>().predicateRule("1", (r, u, j) -> !r.contains("more"));
 
-        final DataReaderRequest<String> request = new DataReaderRequest<String>()
+        final DataReaderRequest request = new DataReaderRequest()
                 .resource(resource)
                 .user(new User())
                 .justification(new Justification())
