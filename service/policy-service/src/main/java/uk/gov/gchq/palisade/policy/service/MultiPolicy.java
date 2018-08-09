@@ -75,16 +75,6 @@ public class MultiPolicy {
         return new Policy();
     }
 
-    public Rules getRules(final Resource resource) {
-        Objects.requireNonNull(resource);
-        final Policy policy = policies.get(resource);
-        if (nonNull(policy) && nonNull(policy.getRules())) {
-            return policy.getRules();
-        }
-
-        return new Rules();
-    }
-
     /**
      * Sets the given {@link Policy} to the given {@link Resource} provided
      * there isn't already a {@link Policy} assigned to that {@link Resource}.
@@ -105,7 +95,7 @@ public class MultiPolicy {
     /**
      * This extracts the list of rules from the {@link Policy} attached to each {@link Resource}.
      *
-     * @return a mapping of the {@link Resource}'s to the {@link Rules} from the policies.
+     * @return a mapping of the {@link Resource}'s to the record level {@link Rules} from the policies.
      */
     @JsonIgnore
     public Map<Resource, Rules> getRuleMap() {

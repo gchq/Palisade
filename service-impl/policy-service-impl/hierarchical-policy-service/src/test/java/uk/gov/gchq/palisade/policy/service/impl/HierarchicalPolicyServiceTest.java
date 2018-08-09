@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.policy.Rules;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
@@ -16,6 +15,7 @@ import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
+import uk.gov.gchq.palisade.rule.Rules;
 
 import java.util.Collection;
 import java.util.Collections;

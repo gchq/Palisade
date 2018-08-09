@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.Util;
-import uk.gov.gchq.palisade.policy.Rules;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
@@ -32,6 +31,7 @@ import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.rule.Rules;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -82,7 +82,7 @@ public class HierarchicalPolicyService implements PolicyService {
         return resources.stream()
                 .map(resource -> {
                     Rules<Resource> rules = getApplicableRules(resource, true, resource.getType());
-                    return Util.applyRules(resource, user, justification, rules);
+                    return Util.applyRulesToRecord(resource, user, justification, rules);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
