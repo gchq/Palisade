@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade;
+package uk.gov.gchq.palisade.mapreduce;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.mapreduce.InputFormatUtils;
+import uk.gov.gchq.palisade.mapreduce.PalisadeInputSplit;
 import uk.gov.gchq.palisade.resource.StubResource;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
