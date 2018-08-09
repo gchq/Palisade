@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade;
+package uk.gov.gchq.palisade.mapreduce;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.RequestId;
+import uk.gov.gchq.palisade.mapreduce.PalisadeInputSplit;
 import uk.gov.gchq.palisade.resource.StubResource;
-import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
@@ -32,8 +28,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import static org.mockito.Mockito.when;
 
 public class PalisadeInputSplitTest {
 

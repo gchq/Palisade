@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade;
+package uk.gov.gchq.palisade.mapreduce;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
@@ -183,7 +183,7 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     /**
      * {@inheritDoc}
      * <p>
-     * Creates a {@link uk.gov.gchq.palisade.PalisadeRecordReader}.
+     * Creates a {@link uk.gov.gchq.palisade.mapreduce.PalisadeRecordReader}.
      */
     @Override
     public RecordReader<Resource, V> createRecordReader(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
