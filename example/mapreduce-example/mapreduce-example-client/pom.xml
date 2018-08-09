@@ -43,11 +43,6 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>mapreduce-example-model</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
             <artifactId>mapreduce-example-data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

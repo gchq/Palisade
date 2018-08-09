@@ -42,7 +42,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
         super();
 
         // The user authorisation owner or sys admin needs to add the user
-        final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
+        final CompletableFuture<Boolean> userAliceStatus = getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Alice")
@@ -50,7 +50,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                                 .roles("user", "admin")
                 )
         );
-        final CompletableFuture<Boolean> userBobStatus = userService.addUser(
+        final CompletableFuture<Boolean> userBobStatus = getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
@@ -60,7 +60,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
         );
 
         // The policy owner or sys admin needs to add the policies
-        final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
+        final CompletableFuture<Boolean> policyStatus = getPolicyService().setPolicy(
                 new SetPolicyRequest().resource(
                         new FileResource().id("file1").type(RESOURCE_TYPE))
                         .policy(
@@ -77,7 +77,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
         );
 
         // The sys admin needs to add the resources
-        final CompletableFuture<Boolean> resourceStatus = resourceService
+        final CompletableFuture<Boolean> resourceStatus = getResourceService()
                 .addResource(new AddResourceRequest()
                                 .parent(new DirectoryResource().id("dir1").type(RESOURCE_TYPE))
                                 .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
