@@ -16,76 +16,37 @@
 
 package uk.gov.gchq.palisade.data.service.request;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 
-import java.util.stream.Stream;
+import java.io.InputStream;
 
 /**
- * This class is used to return to the client the stream of data in the expected
- * format along with any error/warning/info messages that the client should be aware of.
- *
- * @param <RAW_DATA_TYPE> The Java class that the data is expected to be returned as.
+ * This class is used to return to the client the {@link InputStream} of data
+ * along with any error/warning/info messages that the client should be aware of.
  */
-public class ReadResponse<RAW_DATA_TYPE> {
-    @JsonTypeInfo(
-            use = JsonTypeInfo.Id.CLASS,
-            include = As.WRAPPER_OBJECT,
-            property = "class"
-    )
-    private Stream<RAW_DATA_TYPE> data;
-
+public class ReadResponse {
+    private InputStream data;
     private String message;
 
-    // no-args constructor
-    public ReadResponse() {
-    }
-
-    /**
-     * @param data a stream of data in the expected format
-     * @return the {@link ReadResponse}
-     */
-    public ReadResponse<RAW_DATA_TYPE> data(final Stream<RAW_DATA_TYPE> data) {
+    public ReadResponse data(final InputStream data) {
         this.data = data;
         return this;
     }
 
-    /**
-     * @param message a message for the client
-     * @return the {@link ReadResponse}
-     */
-    public ReadResponse<RAW_DATA_TYPE> message(final String message) {
-        this.message = message;
-        return this;
-    }
-
-    public Stream<RAW_DATA_TYPE> getData() {
+    public InputStream getData() {
         return data;
     }
 
-    public void setData(final Stream<RAW_DATA_TYPE> data) {
+    public void setData(final InputStream data) {
         this.data = data;
     }
 
-    @JsonGetter("data")
-    @JsonTypeInfo(
-            use = JsonTypeInfo.Id.CLASS,
-            include = As.WRAPPER_OBJECT,
-            property = "class"
-    )
-    Object[] getDataArray() {
-        return data.toArray();
-    }
-
-    @JsonSetter("data")
-    void setDataArray(final RAW_DATA_TYPE[] data) {
-        setData(Stream.of(data));
+    public ReadResponse message(final String message) {
+        this.message = message;
+        return this;
     }
 
     public String getMessage() {
@@ -106,7 +67,7 @@ public class ReadResponse<RAW_DATA_TYPE> {
             return false;
         }
 
-        final ReadResponse<?> that = (ReadResponse<?>) o;
+        final ReadResponse that = (ReadResponse) o;
 
         return new EqualsBuilder()
                 .append(data, that.data)

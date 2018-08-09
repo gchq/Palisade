@@ -93,7 +93,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
     }
 
     @Override
-    protected Serialiser<?, ExampleObj> createSerialiser() {
+    protected Serialiser<ExampleObj> createSerialiser() {
         return new ExampleObjSerialiser();
     }
 }

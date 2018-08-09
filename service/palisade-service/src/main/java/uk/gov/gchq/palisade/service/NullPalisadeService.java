@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.service;
 
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
+import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.util.concurrent.CompletableFuture;
@@ -34,7 +35,7 @@ public class NullPalisadeService implements PalisadeService {
     }
 
     @Override
-    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final DataRequestResponse futureRequest) {
+    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final GetDataRequestConfig request) {
         return CompletableFuture.completedFuture(new DataRequestConfig());
     }
 }
