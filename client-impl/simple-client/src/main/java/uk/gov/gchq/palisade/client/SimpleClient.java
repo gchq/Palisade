@@ -48,13 +48,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class SimpleClient<T> {
-    protected final Serialiser<T> serialiser;
-    protected final ResourceService resourceService;
-    protected final AuditService auditService;
-    protected final PolicyService policyService;
-    protected final UserService userService;
-    protected final CacheService cacheService;
-    protected final PalisadeService palisadeService;
+    private final Serialiser<T> serialiser;
+    private final ResourceService resourceService;
+    private final AuditService auditService;
+    private final PolicyService policyService;
+    private final UserService userService;
+    private final CacheService cacheService;
+    private final PalisadeService palisadeService;
 
     public SimpleClient() {
         this.serialiser = createSerialiser();
@@ -67,9 +67,9 @@ public class SimpleClient<T> {
     }
 
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String justification) {
-        Objects.requireNonNull(palisadeService);
+        Objects.requireNonNull(getPalisadeService());
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).justification(new Justification().justification(justification));
-        final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
+        final DataRequestResponse dataRequestResponse = getPalisadeService().registerDataRequest(dataRequest).join();
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
 
         for (final Entry<Resource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
@@ -82,7 +82,7 @@ public class SimpleClient<T> {
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
-                    response -> serialiser.deserialise(response.getData())
+                    response -> getSerialiser().deserialise(response.getData())
             );
 
             futureResults.add(futureResult);
@@ -93,11 +93,11 @@ public class SimpleClient<T> {
 
     protected PalisadeService createPalisadeService() {
         return new SimplePalisadeService(
-                resourceService,
-                auditService,
-                policyService,
-                userService,
-                cacheService
+                getResourceService(),
+                getAuditService(),
+                getPolicyService(),
+                getUserService(),
+                getCacheService()
         );
     }
 
@@ -124,5 +124,33 @@ public class SimpleClient<T> {
 
     protected Serialiser<T> createSerialiser() {
         return new NullSerialiser<>();
+    }
+
+    public Serialiser<T> getSerialiser() {
+        return serialiser;
+    }
+
+    public ResourceService getResourceService() {
+        return resourceService;
+    }
+
+    public AuditService getAuditService() {
+        return auditService;
+    }
+
+    public PolicyService getPolicyService() {
+        return policyService;
+    }
+
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public CacheService getCacheService() {
+        return cacheService;
+    }
+
+    public PalisadeService getPalisadeService() {
+        return palisadeService;
     }
 }

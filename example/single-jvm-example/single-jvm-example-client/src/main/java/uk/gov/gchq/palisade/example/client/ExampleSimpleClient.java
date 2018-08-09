@@ -43,7 +43,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         super();
 
         // The user authorisation owner or sys admin needs to add the user
-        final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
+        final CompletableFuture<Boolean> userAliceStatus = getUserService().addUser(
                 new AddUserRequest()
                         .user(
                                 new User()
@@ -52,7 +52,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                         .roles("user", "admin")
                         )
         );
-        final CompletableFuture<Boolean> userBobStatus = userService.addUser(
+        final CompletableFuture<Boolean> userBobStatus = getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
@@ -62,7 +62,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         );
 
         // The policy owner or sys admin needs to add the policies
-        final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
+        final CompletableFuture<Boolean> policyStatus = getPolicyService().setPolicy(
                 new SetPolicyRequest().resource(
                         new FileResource()
                                 .id("file1")
@@ -80,10 +80,10 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         );
 
         // The sys admin needs to add the resources
-        final CompletableFuture<Boolean> resourceStatus = resourceService.addResource(new AddResourceRequest()
+        final CompletableFuture<Boolean> resourceStatus = getResourceService().addResource(new AddResourceRequest()
                 .parent(new DirectoryResource().id("dir1").type(RESOURCE_TYPE))
                 .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
-                .connectionDetail(new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisadeService).reader(new ExampleSimpleDataReader()))
+                .connectionDetail(new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getPalisadeService()).reader(new ExampleSimpleDataReader()))
                 ));
 
         // Wait for the users, policies and resources to be loaded
