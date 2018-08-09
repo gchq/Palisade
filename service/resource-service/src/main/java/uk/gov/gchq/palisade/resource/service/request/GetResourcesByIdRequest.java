@@ -36,12 +36,12 @@ public class GetResourcesByIdRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resourceId The unique identifier of the resource that you want to {@code ls}
+     * @param resourceId the unique identifier of the resource that you want to {@code ls}
+     * @return the {@link GetResourcesByIdRequest}
      */
-    public GetResourcesByIdRequest(final String resourceId) {
+    public GetResourcesByIdRequest resourceId(final String resourceId) {
         this.resourceId = resourceId;
+        return this;
     }
 
     public String getResourceId() {
@@ -65,6 +65,7 @@ public class GetResourcesByIdRequest extends Request {
         final GetResourcesByIdRequest that = (GetResourcesByIdRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(resourceId, that.resourceId)
                 .isEquals();
     }
@@ -72,6 +73,7 @@ public class GetResourcesByIdRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(13, 37)
+                .appendSuper(super.hashCode())
                 .append(resourceId)
                 .toHashCode();
     }
@@ -79,6 +81,7 @@ public class GetResourcesByIdRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("resourceId", resourceId)
                 .toString();
     }

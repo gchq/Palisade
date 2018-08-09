@@ -28,6 +28,7 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
+import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
@@ -97,14 +98,14 @@ public class RestPalisadeServiceV1 implements PalisadeService {
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
     public DataRequestConfig getDataRequestConfigSync(
-            @ApiParam(value = "The request") final DataRequestResponse request) {
+            @ApiParam(value = "The request") final GetDataRequestConfig request) {
         LOGGER.debug("Invoking getDataRequestConfig: {}", request);
         return getDataRequestConfig(request).join();
     }
 
     @Override
     public CompletableFuture<DataRequestConfig> getDataRequestConfig(
-            @ApiParam(value = "The request") final DataRequestResponse request) {
+            @ApiParam(value = "The request") final GetDataRequestConfig request) {
         return delegate.getDataRequestConfig(request);
     }
 

@@ -31,12 +31,13 @@ import uk.gov.gchq.koryphe.tuple.predicate.TupleAdaptedPredicate;
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.policy.Rule;
+import uk.gov.gchq.palisade.rule.Rule;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static uk.gov.gchq.palisade.Util.arr;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @JsonPropertyOrder(value = {"class", "selection", "function", "predicate", "projection"}, alphabetic = true)
 /**
@@ -50,37 +51,18 @@ import static uk.gov.gchq.palisade.Util.arr;
  *            by the record reader before being passed to the {@link TupleRule#apply(Object, User, Justification)}.
  */
 public class TupleRule<T> implements Rule<T> {
-    private final TupleAdaptedFunction<String, ?, ?> function;
-    private final TupleAdaptedPredicate<String, ?> predicate;
+    private TupleAdaptedFunction<String, ?, ?> function;
+    private TupleAdaptedPredicate<String, ?> predicate;
 
-    public TupleRule(final String selection,
-                     final Function<?, ?> function) {
-        this(arr(selection), function);
-    }
+    private boolean isFunction;
 
-    public TupleRule(final String selection,
-                     final Function<?, ?> function,
-                     final String projection) {
-        this(arr(selection), function, arr(projection));
-    }
+    public TupleRule() {
+        function = new TupleAdaptedFunction<>();
+        function.setSelection(new String[0]);
+        function.setProjection(new String[0]);
 
-    public TupleRule(final String[] selection,
-                     final Function<?, ?> function) {
-        this(selection, function, null, selection);
-    }
-
-    public TupleRule(final String[] selection,
-                     final Function<?, ?> function,
-                     final String[] projection) {
-        this(selection, function, null, projection);
-    }
-
-    public TupleRule(final String selection, final Predicate<?> predicate) {
-        this(arr(selection), predicate);
-    }
-
-    public TupleRule(final String[] selection, final Predicate<?> predicate) {
-        this(selection, null, predicate, null);
+        predicate = new TupleAdaptedPredicate<>();
+        predicate.setSelection(new String[0]);
     }
 
     @JsonCreator
@@ -96,18 +78,51 @@ public class TupleRule<T> implements Rule<T> {
             throw new IllegalArgumentException("Either provide a function or predicate, not both");
         }
 
-        if (null != function) {
+        isFunction = null != function;
+        if (isFunction) {
             this.function = new TupleAdaptedFunction<>(function);
-            this.function.setSelection(null != selection ? selection : new String[0]);
-            this.function.setProjection(null != projection ? projection : new String[0]);
-            this.predicate = null;
+            final String[] tmpSelection = null != selection ? selection : new String[0];
+            this.function.setSelection(tmpSelection);
+            this.function.setProjection(null != projection ? projection : tmpSelection);
+
+            this.predicate = new TupleAdaptedPredicate<>();
+            this.predicate.setSelection(new String[0]);
         } else {
             if (null != projection && projection.length > 0) {
                 throw new IllegalArgumentException("Predicates cannot have a projection");
             }
             this.predicate = new TupleAdaptedPredicate<>(predicate, null != selection ? selection : new String[0]);
-            this.function = null;
+
+            this.function = new TupleAdaptedFunction<>();
+            this.function.setSelection(new String[0]);
+            this.function.setProjection(new String[0]);
         }
+    }
+
+    public TupleRule<T> selection(final String... selection) {
+        this.predicate.setSelection(selection);
+        this.function.setSelection(selection);
+        if (isNull(this.function.getProjection()) || this.function.getProjection().length == 0) {
+            this.function.setProjection(selection);
+        }
+        return this;
+    }
+
+    public TupleRule<T> predicate(final Predicate<?> predicate) {
+        this.predicate.setPredicate((Predicate) predicate);
+        isFunction = isNull(predicate);
+        return this;
+    }
+
+    public TupleRule<T> function(final Function<?, ?> function) {
+        this.function.setFunction((Function) function);
+        isFunction = nonNull(function);
+        return this;
+    }
+
+    public TupleRule<T> projection(final String... projection) {
+        this.function.setProjection(projection);
+        return this;
     }
 
     @Override
@@ -123,7 +138,7 @@ public class TupleRule<T> implements Rule<T> {
         }
 
         final PalisadeTuple palisadeTuple = new PalisadeTuple(recordTuple, user, justification);
-        if (null != function) {
+        if (isFunction) {
             final Object updatedTuple = ((PalisadeTuple) function.apply(palisadeTuple)).getRecord();
             if (!isTupleRecord) {
                 rtn = (T) ((ReflectiveTuple) updatedTuple).getRecord();
@@ -138,20 +153,20 @@ public class TupleRule<T> implements Rule<T> {
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = As.PROPERTY, property = "class")
     public Function<?, ?> getFunction() {
-        return null != function ? function.getFunction() : null;
+        return isFunction ? function.getFunction() : null;
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = As.PROPERTY, property = "class")
     public Predicate<?> getPredicate() {
-        return null != predicate ? predicate.getPredicate() : null;
+        return !isFunction ? predicate.getPredicate() : null;
     }
 
     public String[] getSelection() {
-        return null != function ? function.getSelection() : predicate.getSelection();
+        return isFunction ? function.getSelection() : predicate.getSelection();
     }
 
     public String[] getProjection() {
-        return null != function ? function.getProjection() : null;
+        return isFunction ? function.getProjection() : null;
     }
 
     @Override
@@ -183,10 +198,10 @@ public class TupleRule<T> implements Rule<T> {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("selection", null != function ? function.getSelection() : predicate.getSelection())
+                .append("selection", isFunction ? function.getSelection() : predicate.getSelection())
                 .append("function", function)
                 .append("predicate", predicate)
-                .append("projection", null != function ? function.getProjection() : null)
+                .append("projection", isFunction ? function.getProjection() : null)
                 .toString();
     }
 }

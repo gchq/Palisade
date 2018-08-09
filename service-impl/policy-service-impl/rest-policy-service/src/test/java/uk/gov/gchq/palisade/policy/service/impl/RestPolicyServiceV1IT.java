@@ -30,6 +30,7 @@ import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
@@ -37,6 +38,7 @@ import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -72,19 +74,19 @@ public class RestPolicyServiceV1IT {
         final PolicyService policyService = Mockito.mock(PolicyService.class);
         MockPolicyService.setMock(policyService);
 
-        final FileResource resource = new FileResource("file1");
-        final UserId userId = new UserId("user01");
+        final FileResource resource = new FileResource().id("file1");
+        final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
-        final Justification justification = new Justification("justification1");
-        final CanAccessRequest request = new CanAccessRequest(resource, user, justification);
+        final Justification justification = new Justification().justification("justification1");
+        final CanAccessRequest request = new CanAccessRequest().resources(Collections.singletonList(resource)).user(user).justification(justification);
 
-        given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(true));
+        given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(new CanAccessResponse(Collections.singletonList(resource))));
 
         // When
-        final Boolean result = proxy.canAccess(request).join();
+        final CanAccessResponse result = proxy.canAccess(request).join();
 
         // Then
-        assertTrue(result);
+        assertEquals(result.getCanAccessResources(), Collections.singletonList(resource));
         verify(policyService).canAccess(request);
     }
 
@@ -94,17 +96,17 @@ public class RestPolicyServiceV1IT {
         final PolicyService policyService = Mockito.mock(PolicyService.class);
         MockPolicyService.setMock(policyService);
 
-        final FileResource resource1 = new FileResource("file1");
-        final FileResource resource2 = new FileResource("file2");
-        final UserId userId = new UserId("user01");
+        final FileResource resource1 = new FileResource().id("file1");
+        final FileResource resource2 = new FileResource().id("file2");
+        final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
-        final Justification justification = new Justification("justification1");
-        final GetPolicyRequest request = new GetPolicyRequest(user, justification, Arrays.asList(resource1, resource2));
+        final Justification justification = new Justification().justification("justification1");
+        final GetPolicyRequest request = new GetPolicyRequest().user(user).justification(justification).resources(Arrays.asList(resource1, resource2));
 
         final Map<Resource, Policy> policies = new HashMap<>();
-        policies.put(resource1, new Policy("policy1"));
-        policies.put(resource2, new Policy("policy2"));
-        final MultiPolicy expectedResult = new MultiPolicy(policies);
+        policies.put(resource1, new Policy<>().owner(user));
+        policies.put(resource2, new Policy<>().owner(user));
+        final MultiPolicy expectedResult = new MultiPolicy().policies(policies);
         given(policyService.getPolicy(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
@@ -121,8 +123,8 @@ public class RestPolicyServiceV1IT {
         final PolicyService policyService = Mockito.mock(PolicyService.class);
         MockPolicyService.setMock(policyService);
 
-        final FileResource resource1 = new FileResource("file1");
-        final SetPolicyRequest request = new SetPolicyRequest(resource1, new Policy("policy1"));
+        final FileResource resource1 = new FileResource().id("file1");
+        final SetPolicyRequest request = new SetPolicyRequest().resource(resource1).policy(new Policy<>().owner(new User()));
 
         given(policyService.setPolicy(request)).willReturn(CompletableFuture.completedFuture(true));
 

@@ -25,8 +25,10 @@ import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.Resource;
 
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HashMapPolicyService implements PolicyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HashMapPolicyService.class);
 
-    private static final MultiPolicy POLICY_STORE = new MultiPolicy(new ConcurrentHashMap<>());
+    private static final MultiPolicy POLICY_STORE = new MultiPolicy().policies(new ConcurrentHashMap<>());
     private final MultiPolicy policyStore;
 
     public HashMapPolicyService() {
@@ -49,13 +51,13 @@ public class HashMapPolicyService implements PolicyService {
         if (useStatic) {
             policyStore = POLICY_STORE;
         } else {
-            policyStore = new MultiPolicy(new ConcurrentHashMap<>());
+            policyStore = new MultiPolicy().policies(new ConcurrentHashMap<>());
         }
     }
 
     @Override
-    public CompletableFuture<Boolean> canAccess(final CanAccessRequest request) {
-        return CompletableFuture.completedFuture(true);
+    public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request) {
+        return CompletableFuture.completedFuture(new CanAccessResponse(Collections.emptyList()));
     }
 
     @Override

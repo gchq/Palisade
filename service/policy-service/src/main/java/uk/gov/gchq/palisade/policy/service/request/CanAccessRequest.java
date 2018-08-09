@@ -25,6 +25,7 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -32,7 +33,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class CanAccessRequest extends Request {
     private User user;
-    private Resource resource;
+    private Collection<Resource> resources;
     private Justification justification;
 
     // no-args constructor required
@@ -40,58 +41,71 @@ public class CanAccessRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resource The {@link Resource} to be accessed.
-     * @param user The {@link User} wanting access to the resource.
-     * @param justification The {@link Justification} of why the user needs
-     *                      access to the resource.
+     * @param resources the collection of {@link Resource}'s to be accessed
+     * @return the {@link CanAccessRequest}
      */
-    public CanAccessRequest(final Resource resource, final User user, final Justification justification) {
+    public CanAccessRequest resources(final Collection<Resource> resources) {
+        this.resources = resources;
+        return this;
+    }
+
+    /**
+     * @param user the {@link User} wanting access to the resource
+     * @return the {@link CanAccessRequest}
+     */
+    public CanAccessRequest user(final User user) {
         this.user = user;
-        this.resource = resource;
+        return this;
+    }
+
+    /**
+     * @param justification the {@link Justification} of why the user needs access to the resource
+     * @return the {@link CanAccessRequest}
+     */
+    public CanAccessRequest justification(final Justification justification) {
         this.justification = justification;
+        return this;
     }
 
     /**
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param futureResource a completable future that will return a {@link Resource}.
+     * @param futureResources a completable future that will return a collection of {@link Resource}'s.
      * @param futureUser a completable future that will return a {@link User}.
      * @param justification the justification that the user stated for why they want access to the data.
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
-            final CompletableFuture<? extends Resource> futureResource,
+            final CompletableFuture<? extends Collection<Resource>> futureResources,
             final CompletableFuture<User> futureUser,
             final Justification justification) {
-        return CompletableFuture.allOf(futureResource, futureUser)
-                .thenApply(t -> new CanAccessRequest(futureResource.join(), futureUser.join(), justification));
+        return CompletableFuture.allOf(futureResources, futureUser)
+                .thenApply(t -> new CanAccessRequest().resources(futureResources.join()).user(futureUser.join()).justification(justification));
     }
 
     /**
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param resource a {@link Resource} that the user wants access to.
+     * @param resources a collection of {@link Resource}'s that the user wants access to.
      * @param futureUser a completable future that will return a {@link User}.
      * @param justification the justification that the user stated for why they want access to the data.
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
-            final Resource resource,
+            final Collection<Resource> resources,
             final CompletableFuture<User> futureUser,
             final Justification justification) {
-        return futureUser.thenApply(auths -> new CanAccessRequest(resource, futureUser.join(), justification));
+        return futureUser.thenApply(auths -> new CanAccessRequest().resources(resources).user(futureUser.join()).justification(justification));
     }
 
-    public Resource getResource() {
-        return resource;
+    public Collection<Resource> getResources() {
+        return resources;
     }
 
-    public void setResource(final Resource resource) {
-        this.resource = resource;
+    public void setResource(final Collection<Resource> resources) {
+        this.resources = resources;
     }
 
     public User getUser() {
@@ -123,8 +137,9 @@ public class CanAccessRequest extends Request {
         final CanAccessRequest that = (CanAccessRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(user, that.user)
-                .append(resource, that.resource)
+                .append(resources, that.resources)
                 .append(justification, that.justification)
                 .isEquals();
     }
@@ -132,8 +147,9 @@ public class CanAccessRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(11, 13)
+                .appendSuper(super.hashCode())
                 .append(user)
-                .append(resource)
+                .append(resources)
                 .append(justification)
                 .toHashCode();
     }
@@ -141,8 +157,9 @@ public class CanAccessRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("user", user)
-                .append("resource", resource)
+                .append("resources", resources)
                 .append("justification", justification)
                 .toString();
     }

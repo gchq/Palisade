@@ -20,7 +20,7 @@ package uk.gov.gchq.palisade.example.rule;
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.example.ExampleObj;
-import uk.gov.gchq.palisade.policy.Rule;
+import uk.gov.gchq.palisade.rule.Rule;
 
 public class IsExampleObjRecent implements Rule<ExampleObj> {
     private long threshold;

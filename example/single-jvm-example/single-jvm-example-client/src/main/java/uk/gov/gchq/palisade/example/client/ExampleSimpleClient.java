@@ -38,6 +38,7 @@ import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
@@ -45,8 +46,6 @@ import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
-
-import static uk.gov.gchq.palisade.Util.select;
 
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
@@ -61,16 +60,15 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     }
 
     @Override
-    protected Serialiser<?, ExampleObj> createSerialiser() {
+    protected Serialiser<ExampleObj> createSerialiser() {
         return new ExampleObjSerialiser();
     }
 
     private void initialiseServices() {
+        // The user authorisation owner or sys admin needs to add the user
         final UserService userService = createUserService();
-
-        // The user authorisation owner or sys admin needs to add the users.
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
-                new AddUserRequest(
+                new AddUserRequest().user(
                         new User()
                                 .userId("Alice")
                                 .auths("public", "private")
@@ -78,7 +76,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                 )
         );
         final CompletableFuture<Boolean> userBobStatus = userService.addUser(
-                new AddUserRequest(
+                new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
                                 .auths("public")
@@ -86,9 +84,9 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                 )
         );
 
-        final PolicyService policyService = createPolicyService();
 
         // The policy owner or sys admin needs to add the policies
+        final PolicyService policyService = createPolicyService();
 
         // You can either implement the Rule interface for your Policy rules or
         // you can chain together combinations of Koryphe functions/predicates.
@@ -97,65 +95,61 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         // different types of objects.
 
         // Using Custom Rule implementations - without Koryphe
-        final SetPolicyRequest customPolicies = new SetPolicyRequest(
-                new FileResource("file1", RESOURCE_TYPE),
-                new Policy<ExampleObj>()
-                        .message("Visibility, ageOff and property redaction")
-                        .rule(
-                                "1-visibility",
-                                new IsExampleObjVisible()
-                        )
-                        .rule(
-                                "2-ageOff",
-                                new IsExampleObjRecent(12L)
-                        )
-                        .rule(
-                                "3-redactProperty",
-                                new RedactExampleObjProperty()
-                        )
-        );
+        final SetPolicyRequest customPolicies =
+                new SetPolicyRequest()
+                        .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
+                        .policy(new Policy<ExampleObj>()
+                                        .recordLevelRule(
+                                                "1-visibility",
+                                                new IsExampleObjVisible()
+                                        )
+                                        .recordLevelRule(
+                                                "2-ageOff",
+                                                new IsExampleObjRecent(12L)
+                                        )
+                                        .recordLevelRule(
+                                                "3-redactProperty",
+                                                new RedactExampleObjProperty()
+                                        )
+                        );
 
         // Using Koryphe's functions/predicates
-        final SetPolicyRequest koryphePolicies = new SetPolicyRequest(
-                new FileResource("file1", RESOURCE_TYPE),
-                new Policy<ExampleObj>()
-                        .message("Visibility, ageOff and property redaction")
-                        .rule(
-                                "1-visibility",
-                                new TupleRule<>(
-                                        select("Record.visibility", "User.auths"),
-                                        new IsXInCollectionY()
+        final SetPolicyRequest koryphePolicies = new SetPolicyRequest()
+                .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
+                .policy(new Policy<ExampleObj>()
+                                .recordLevelRule(
+                                        "1-visibility",
+                                        new TupleRule<ExampleObj>()
+                                                .selection("Record.visibility", "User.auths")
+                                                .predicate(new IsXInCollectionY()))
+                                .recordLevelRule(
+                                        "2-ageOff",
+                                        new TupleRule<ExampleObj>()
+                                                .selection("Record.timestamp")
+                                                .predicate(new IsMoreThan(12L))
                                 )
-                        )
-                        .rule(
-                                "2-ageOff",
-                                new TupleRule<>(
-                                        select("Record.timestamp"),
-                                        new IsMoreThan(12L)
+                                .recordLevelRule(
+                                        "3-redactProperty",
+                                        new TupleRule<ExampleObj>()
+                                                .selection("User.roles", "Record.property")
+                                                .function(new If<>()
+                                                        .predicate(0, new Not<>(new CollectionContains("admin")))
+                                                        .then(1, new SetValue("redacted")))
+                                                .projection("User.roles", "Record.property")
                                 )
-                        )
-                        .rule(
-                                "3-redactProperty",
-                                new TupleRule<>(
-                                        select("User.roles", "Record.property"),
-                                        new If<>()
-                                                .predicate(0, new Not<>(new CollectionContains("admin")))
-                                                .then(1, new SetValue("redacted"))
-                                )
-                        )
-        );
+                );
 
-        // The policy owner or sys admin needs to add the policies
         final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
                 koryphePolicies
         );
 
         // The sys admin needs to add the resources
-        final CompletableFuture<Boolean> resourceStatus = resourceService.addResource(new AddResourceRequest(
-                new DirectoryResource("dir1", RESOURCE_TYPE),
-                new FileResource("file1", RESOURCE_TYPE),
-                new SimpleConnectionDetail(new SimpleDataService(palisadeService, new ExampleSimpleDataReader()))
-        ));
+        final ResourceService resourceService = createResourceService();
+        final CompletableFuture<Boolean> resourceStatus = resourceService.addResource(new AddResourceRequest()
+                .parent(new DirectoryResource().id("dir1").type(RESOURCE_TYPE))
+                .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
+                .connectionDetail(new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisadeService).reader(new ExampleSimpleDataReader()))
+                ));
 
         // Wait for the users, policies and resources to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();

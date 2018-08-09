@@ -38,8 +38,9 @@ public class Justification {
     public Justification() {
     }
 
-    public Justification(final String justification) {
+    public Justification justification(final String justification) {
         this.justification = justification;
+        return this;
     }
 
     public Object getField(final String reference) {

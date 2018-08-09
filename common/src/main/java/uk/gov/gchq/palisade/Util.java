@@ -16,8 +16,8 @@
 
 package uk.gov.gchq.palisade;
 
-import uk.gov.gchq.palisade.policy.Rule;
-import uk.gov.gchq.palisade.policy.Rules;
+import uk.gov.gchq.palisade.rule.Rule;
+import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.util.FieldGetter;
 import uk.gov.gchq.palisade.util.FieldSetter;
 
@@ -104,16 +104,16 @@ public final class Util {
         return map;
     }
 
-    public static <T> Stream<T> applyRules(final Stream<T> records, final User user, final Justification justification, final Rules<T> rules) {
+    public static <T> Stream<T> applyRulesToStream(final Stream<T> records, final User user, final Justification justification, final Rules<T> rules) {
         Objects.requireNonNull(records);
         if (null == rules || rules.getRules().isEmpty()) {
             return records;
         }
 
-        return records.map(record -> applyRules(record, user, justification, rules)).filter(record -> null != record);
+        return records.map(record -> applyRulesToRecord(record, user, justification, rules)).filter(record -> null != record);
     }
 
-    public static <T> T applyRules(final T record, final User user, final Justification justification, final Rules<T> rules) {
+    public static <T> T applyRulesToRecord(final T record, final User user, final Justification justification, final Rules<T> rules) {
         if (null == rules || rules.getRules().isEmpty()) {
             return record;
         }

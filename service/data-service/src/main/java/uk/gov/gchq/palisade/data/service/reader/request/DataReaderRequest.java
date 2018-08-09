@@ -22,17 +22,15 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.policy.Rules;
 import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.service.request.Request;
 
 /**
  * This class is used to request that the {@link uk.gov.gchq.palisade.data.service.reader.DataReader}
  * read a resource and apply the necessary rules.
- *
- * @param <RULES_DATA_TYPE> is the Java class that the Rules expect the data to be in the format of.
  */
-public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
+public class DataReaderRequest extends Request {
     private Resource resource;
     private User user;
     private Justification justification;
@@ -43,18 +41,39 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param resource      The resource to be accessed
-     * @param user          The user that requested the data
-     * @param justification The Justification that the user provided for why they want the data
-     * @param rules         The list of rules to be applied to the data to ensure policy compliance
+     * @param resource the resource to be accessed
+     * @return the {@link DataReaderRequest}
      */
-    public DataReaderRequest(final Resource resource, final User user, final Justification justification, final Rules<RULES_DATA_TYPE> rules) {
+    public DataReaderRequest resource(final Resource resource) {
         this.resource = resource;
+        return this;
+    }
+
+    /**
+     * @param user the user that requested the data
+     * @return the {@link DataReaderRequest}
+     */
+    public DataReaderRequest user(final User user) {
         this.user = user;
+        return this;
+    }
+
+    /**
+     * @param justification the Justification that the user provided for why they want the data
+     * @return the {@link DataReaderRequest}
+     */
+    public DataReaderRequest justification(final Justification justification) {
         this.justification = justification;
+        return this;
+    }
+
+    /**
+     * @param rules the list of rules to be applied to the data to ensure policy compliance
+     * @return the {@link DataReaderRequest}
+     */
+    public DataReaderRequest rules(final Rules rules) {
         this.rules = rules;
+        return this;
     }
 
     public Resource getResource() {
@@ -82,11 +101,11 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     }
 
 
-    public Rules<RULES_DATA_TYPE> getRules() {
+    public Rules getRules() {
         return rules;
     }
 
-    public void setRules(final Rules<RULES_DATA_TYPE> rules) {
+    public void setRules(final Rules rules) {
         this.rules = rules;
     }
 
@@ -100,9 +119,10 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
             return false;
         }
 
-        final DataReaderRequest<?> that = (DataReaderRequest<?>) o;
+        final DataReaderRequest that = (DataReaderRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(resource, that.resource)
                 .append(user, that.user)
                 .append(justification, that.justification)
@@ -113,6 +133,7 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 73)
+                .appendSuper(super.hashCode())
                 .append(resource)
                 .append(user)
                 .append(justification)
@@ -123,6 +144,7 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("resource", resource)
                 .append("user", user)
                 .append("justification", justification)

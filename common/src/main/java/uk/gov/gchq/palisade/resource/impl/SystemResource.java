@@ -23,15 +23,18 @@ public class SystemResource extends AbstractResource implements ParentResource {
     public SystemResource() {
     }
 
-    public SystemResource(final String id) {
-        super(id);
+    public SystemResource id(final String id) {
+        super.id(id);
+        return this;
     }
 
-    public SystemResource(final String id, final String type) {
-        super(id, type);
+    public SystemResource type(final String type) {
+        super.type(type);
+        return this;
     }
 
-    public SystemResource(final String id, final String type, final String format) {
-        super(id, type, format);
+    public SystemResource serialisedFormat(final String serialisedFormat) {
+        super.serialisedFormat(serialisedFormat);
+        return this;
     }
 }

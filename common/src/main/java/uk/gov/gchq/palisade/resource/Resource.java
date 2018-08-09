@@ -30,7 +30,7 @@ import uk.gov.gchq.palisade.resource.impl.FileResource;
  * A resource is expected to have a unique identifier, a type and a format. The type is a way of grouping
  * data of the same structure. The format is the format of the file, e.g CSV, Parquet.
  */
-@JsonPropertyOrder(value = {"class", "id", "type", "format"}, alphabetic = true)
+@JsonPropertyOrder(value = {"class", "id", "type", "serialisedFormat"}, alphabetic = true)
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.CLASS,
         include = As.EXISTING_PROPERTY,
@@ -42,13 +42,13 @@ public interface Resource {
 
     String getType();
 
-    String getFormat();
+    String getSerialisedFormat();
 
     void setId(final String id);
 
     void setType(final String type);
 
-    void setFormat(final String format);
+    void setSerialisedFormat(final String serialisedFormat);
 
     @JsonGetter("class")
     default String _getClass() {
