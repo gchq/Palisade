@@ -26,6 +26,10 @@ import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.data.serialise.Serialiser;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.util.JsonAssert;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -128,5 +132,23 @@ public class AvroSerialiserTest {
 
         // Then
         assertEquals(input, deserialised.collect(Collectors.toList()));
+    }
+
+    @Test
+    public void shouldJsonSerialiseAndDeserialise() throws IOException {
+        // Given
+        final AvroSerialiser<Integer> serialiser = new AvroSerialiser<>(Integer.class);
+
+        // When
+        final byte[] json = JSONSerialiser.serialise(serialiser, true);
+        final Serialiser deserialised = JSONSerialiser.deserialise(json, Serialiser.class);
+
+        // Then
+        JsonAssert.assertEquals(String.format("{%n" +
+                "  \"domainClass\" : \"java.lang.Integer\",%n" +
+                "  \"class\" : \"uk.gov.gchq.palisade.data.service.serialiser.AvroSerialiser\"%n" +
+                "}").getBytes(), json);
+        assertEquals(AvroSerialiser.class, deserialised.getClass());
+        assertEquals(serialiser.getDomainClass(), ((AvroSerialiser) deserialised).getDomainClass());
     }
 }

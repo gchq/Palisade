@@ -26,11 +26,6 @@
     </parent>
     <artifactId>hdfs-data-service</artifactId>
 
-    <properties>
-        <hadoop.version>2.6.5</hadoop.version>
-        <avro.version>1.8.2</avro.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.hadoop</groupId>

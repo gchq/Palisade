@@ -16,6 +16,8 @@
 
 package uk.gov.gchq.palisade.data.service.serialiser;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileStream;
 import org.apache.avro.file.DataFileWriter;
@@ -51,18 +53,16 @@ import static java.util.Objects.requireNonNull;
 public class AvroSerialiser<O> implements Serialiser<O> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AvroSerialiser.class);
 
-    private Schema schema;
-    private Class<O> domainClass;
-    private DatumWriter<O> datumWriter;
-    private DatumReader<O> datumReader;
+    private final Class<O> domainClass;
+    private final Schema schema;
+    private final DatumWriter<O> datumWriter;
+    private final DatumReader<O> datumReader;
 
-    public AvroSerialiser() {
-    }
-
-    public AvroSerialiser(final Class<O> domainClass) {
+    @JsonCreator
+    public AvroSerialiser(@JsonProperty("domainClass") final Class<O> domainClass) {
         requireNonNull(domainClass, "domainClass is required");
-        this.schema = SpecificData.get().getSchema(domainClass);
         this.domainClass = domainClass;
+        this.schema = SpecificData.get().getSchema(domainClass);
         datumWriter = new SpecificDatumWriter<>(schema);
         datumReader = new SpecificDatumReader<>(domainClass);
     }
@@ -74,8 +74,6 @@ public class AvroSerialiser<O> implements Serialiser<O> {
 
     @Override
     public Stream<O> deserialise(final InputStream input) {
-        requireNonNull(domainClass, "domainClass is required to be able to deserialise");
-        requireNonNull(datumReader, "datumReader is required to be able to deserialise");
         DataFileStream<O> in = null;
         try {
             in = new DataFileStream<>(input, datumReader);
@@ -85,6 +83,10 @@ public class AvroSerialiser<O> implements Serialiser<O> {
             IOUtils.closeQuietly(in);
             throw new RuntimeException("Unable to deserialise object, failed to read input bytes", e);
         }
+    }
+
+    public Class<O> getDomainClass() {
+        return domainClass;
     }
 
     private static class AvroSupplier<O> implements Supplier<Bytes> {

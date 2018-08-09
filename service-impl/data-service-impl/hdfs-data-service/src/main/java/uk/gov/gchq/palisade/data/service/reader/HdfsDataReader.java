@@ -25,6 +25,8 @@ import uk.gov.gchq.palisade.resource.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * An HdfsDataReader is an implementation of {@link SerialisedDataReader} for {@code HDFS}
  * that opens a file and returns a single {@link InputStream} containing all the records.
@@ -33,23 +35,25 @@ public class HdfsDataReader extends SerialisedDataReader {
     private final FileSystem fs;
 
     public HdfsDataReader(final Configuration conf) throws IOException {
-        this(FileSystem.get(conf));
+        requireNonNull(conf, "conf is required");
+        this.fs = FileSystem.get(conf);
     }
 
     public HdfsDataReader(final FileSystem fs) {
+        requireNonNull(fs, "file system is required");
         this.fs = fs;
     }
 
     @Override
     protected InputStream readRaw(final Resource resource) {
-        final String resourceId = resource.getId();
-        final Path path = new Path(resourceId);
+        requireNonNull(resource, "resource is required");
+        requireNonNull(resource.getId(), "resource ID is required");
 
         final InputStream inputStream;
         try {
-            inputStream = fs.open(path);
+            inputStream = fs.open(new Path(resource.getId()));
         } catch (final IOException e) {
-            throw new RuntimeException("Unable to read resource: " + resourceId, e);
+            throw new RuntimeException("Unable to read resource: " + resource.getId(), e);
         }
 
         return inputStream;
