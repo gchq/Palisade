@@ -24,7 +24,7 @@ import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.function.IsTimestampMoreThan;
 import uk.gov.gchq.palisade.example.function.IsVisible;
-import uk.gov.gchq.palisade.policy.Policy;
+import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -65,12 +65,11 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                         new FileResource().id("file1").type(RESOURCE_TYPE))
                         .policy(
                                 new Policy<ExampleObj>()
-                                        .message("Age off and visibility filtering")
-                                        .predicateRule(
+                                        .recordLevelPredicateRule(
                                                 "visibility",
                                                 new IsVisible()
                                         )
-                                        .simplePredicateRule(
+                                        .recordLevelSimplePredicateRule(
                                                 "ageOff",
                                                 new IsTimestampMoreThan(12L)
                                         )

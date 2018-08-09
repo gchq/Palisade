@@ -19,11 +19,12 @@ package uk.gov.gchq.palisade.policy.service.impl;
 
 import org.mockito.Mockito;
 
-import uk.gov.gchq.palisade.policy.MultiPolicy;
+import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -43,7 +44,7 @@ public class MockPolicyService implements PolicyService {
 
 
     @Override
-    public CompletableFuture<Boolean> canAccess(final CanAccessRequest request) {
+    public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request) {
         return mock.canAccess(request);
     }
 

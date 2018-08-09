@@ -25,7 +25,6 @@ import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.policy.Policy;
 import uk.gov.gchq.palisade.policy.TestRule;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
@@ -101,7 +100,7 @@ public class RestPalisadeServiceV1IT {
         final DataRequestConfig expectedResult = new DataRequestConfig()
                 .user(user)
                 .justification(justification)
-                .policy(resource1, new Policy<String>().rule("testRule", new TestRule()));
+                .rule(resource1, "testRule", new TestRule());
         given(palisadeService.getDataRequestConfig(getDataRequestConfig))
                 .willReturn(CompletableFuture.completedFuture(expectedResult));
 

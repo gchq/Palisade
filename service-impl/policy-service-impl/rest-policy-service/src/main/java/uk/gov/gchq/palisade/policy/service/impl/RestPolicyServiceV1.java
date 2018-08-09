@@ -25,11 +25,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.policy.MultiPolicy;
+import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import javax.ws.rs.Consumes;
@@ -77,14 +78,14 @@ public class RestPolicyServiceV1 implements PolicyService {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    public Boolean canAccessSync(
+    public CanAccessResponse canAccessSync(
             @ApiParam(value = "The request") final CanAccessRequest request) {
         LOGGER.debug("Invoking canAccess: {}", request);
         return canAccess(request).join();
     }
 
     @Override
-    public CompletableFuture<Boolean> canAccess(final CanAccessRequest request) {
+    public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request) {
         return delegate.canAccess(request);
     }
 

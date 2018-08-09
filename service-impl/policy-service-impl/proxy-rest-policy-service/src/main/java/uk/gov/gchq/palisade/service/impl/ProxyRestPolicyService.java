@@ -17,11 +17,12 @@
 package uk.gov.gchq.palisade.service.impl;
 
 
-import uk.gov.gchq.palisade.policy.MultiPolicy;
+import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
 
 import java.util.concurrent.CompletableFuture;
@@ -35,8 +36,8 @@ public class ProxyRestPolicyService extends ProxyRestService implements PolicySe
     }
 
     @Override
-    public CompletableFuture<Boolean> canAccess(final CanAccessRequest request) {
-        return doPostAsync("canAccess", request, Boolean.class);
+    public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request) {
+        return doPostAsync("canAccess", request, CanAccessResponse.class);
     }
 
     @Override

@@ -25,6 +25,7 @@ import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.rule.Rules;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -65,32 +66,32 @@ public abstract class SerialisedDataReader implements DataReader {
      * resource to serialise the raw data and apply the rules to the data and
      * then deserialise it back to the raw format expected by the client.
      *
-     * @param request           {@link DataReaderRequest} containing the resource to be
-     *                          read, rules to be applied, the user requesting the data
-     *                          and the justification for accessing the data.
-     * @param <RULES_DATA_TYPE> The format that the rules expect the data to be in.
+     * @param request {@link DataReaderRequest} containing the resource to be
+     *                read, rules to be applied, the user requesting the data
+     *                and the justification for accessing the data.
      * @return a {@link DataReaderResponse} containing the stream of data
      * read to be streamed back to the client
      */
     @Override
-    public <RULES_DATA_TYPE> DataReaderResponse read(final DataReaderRequest<RULES_DATA_TYPE> request) {
+    public DataReaderResponse read(final DataReaderRequest request) {
         requireNonNull(request, "Request is required");
         requireNonNull(request.getResource(), "Request resource is required");
 
-        final Serialiser<RULES_DATA_TYPE> serialiser = getSerialiser(request.getResource());
+        final Serialiser<Object> serialiser = getSerialiser(request.getResource());
         final InputStream rawStream = readRaw(request.getResource());
 
         final InputStream data;
-        if (request.getRules().getRules().isEmpty()) {
+        final Rules<Object> rules = request.getRules();
+        if (rules.getRules().isEmpty()) {
             LOGGER.debug("No rules to apply");
             data = rawStream;
         } else {
-            LOGGER.debug("Applying rules: {}", request.getRules());
-            final Stream<RULES_DATA_TYPE> deserialisedData = Util.applyRules(
+            LOGGER.debug("Applying rules: {}", rules);
+            final Stream<Object> deserialisedData = Util.applyRulesToStream(
                     serialiser.deserialise(rawStream),
                     request.getUser(),
                     request.getJustification(),
-                    request.getRules()
+                    rules
             );
             data = serialiser.serialise(deserialisedData);
         }

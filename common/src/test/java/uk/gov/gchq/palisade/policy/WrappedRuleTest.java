@@ -18,6 +18,8 @@ package uk.gov.gchq.palisade.policy;
 import org.junit.Assert;
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.rule.WrappedRule;
+
 import static org.junit.Assert.assertEquals;
 
 public class WrappedRuleTest {

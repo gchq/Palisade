@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.policy;
+package uk.gov.gchq.palisade.policy.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -22,10 +22,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.rule.Rules;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import static java.util.Objects.nonNull;
 
 /**
  * This class contains the mapping of {@link Resource}'s to the applicable {@link Policy}
@@ -65,21 +68,11 @@ public class MultiPolicy {
     public Policy getPolicy(final Resource resource) {
         Objects.requireNonNull(resource);
         final Policy policy = policies.get(resource);
-        if (null != policy) {
+        if (nonNull(policy)) {
             return policy;
         }
 
         return new Policy();
-    }
-
-    public Rules getRules(final Resource resource) {
-        Objects.requireNonNull(resource);
-        final Policy policy = policies.get(resource);
-        if (null != policy && null != policy.getRules()) {
-            return policy.getRules();
-        }
-
-        return new Rules();
     }
 
     /**
@@ -102,12 +95,12 @@ public class MultiPolicy {
     /**
      * This extracts the list of rules from the {@link Policy} attached to each {@link Resource}.
      *
-     * @return a mapping of the {@link Resource}'s to the {@link Rules} from the policies.
+     * @return a mapping of the {@link Resource}'s to the record level {@link Rules} from the policies.
      */
     @JsonIgnore
     public Map<Resource, Rules> getRuleMap() {
         final Map<Resource, Rules> rules = new HashMap<>(getPolicies().size());
-        getPolicies().forEach((r, p) -> rules.put(r, p.getRules()));
+        getPolicies().forEach((r, p) -> rules.put(r, p.getRecordRules()));
         return rules;
     }
 

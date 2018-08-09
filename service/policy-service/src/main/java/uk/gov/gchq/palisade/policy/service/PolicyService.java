@@ -16,10 +16,10 @@
 
 package uk.gov.gchq.palisade.policy.service;
 
-import uk.gov.gchq.palisade.policy.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -41,22 +41,21 @@ public interface PolicyService extends Service {
      *
      * @param request a {@link CanAccessRequest} containing the user requesting
      *                the data, the justification of why they want the data and
-     *                resource containing that data.
-     * @return a {@link CompletableFuture} {@link Boolean} which is true if
-     * they are allowed access to the resource.
+     *                collection of resource's containing that data.
+     * @return a {@link CanAccessResponse} which contains a collection of the
+     * resources that the user is allowed access too.
      */
     // TODO: should this return bitmap  = READ, WRITE,EXECUTE ?
-    // TODO could this work on a list of resources the same way as the getPolicy method does?
-    CompletableFuture<Boolean> canAccess(final CanAccessRequest request);
+    CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request);
 
     /**
-     * This method gets the record level {@link uk.gov.gchq.palisade.policy.Policy}'s that apply to the list
+     * This method gets the record level {@link Policy}'s that apply to the list
      * of resources that the user has requested access too.
      *
      * @param request a {@link GetPolicyRequest} containing the user requesting
      *                the data, a justification for why they want the data and a
      *                list of the resources the user wants access too.
-     * @return a {@link MultiPolicy} containing the mapping of resource to {@link uk.gov.gchq.palisade.policy.Policy}
+     * @return a {@link MultiPolicy} containing the mapping of resource to {@link Policy}
      */
     CompletableFuture<MultiPolicy> getPolicy(final GetPolicyRequest request);
 

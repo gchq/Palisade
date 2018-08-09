@@ -8,6 +8,9 @@ jdk:
   - oraclejdk8
 sudo: false
 
+services:
+  - docker
+
 install: travis_wait 45 ./cd/install.sh
 script:
   - travis_wait 45 ./cd/verify.sh

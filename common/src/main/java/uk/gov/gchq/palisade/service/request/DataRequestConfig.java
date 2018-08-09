@@ -22,9 +22,15 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.policy.MultiPolicy;
-import uk.gov.gchq.palisade.policy.Policy;
 import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.rule.Rule;
+import uk.gov.gchq.palisade.rule.Rules;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * This is the high level API for the object that contains all the information
@@ -34,7 +40,7 @@ import uk.gov.gchq.palisade.resource.Resource;
 public class DataRequestConfig extends Request {
     private User user = new User();
     private Justification justification = new Justification();
-    private MultiPolicy multiPolicy = new MultiPolicy();
+    private Map<Resource, Rules> rules = new HashMap<>();
 
     public DataRequestConfig() {
     }
@@ -49,13 +55,36 @@ public class DataRequestConfig extends Request {
         return this;
     }
 
-    public DataRequestConfig multiPolicy(final MultiPolicy multiPolicy) {
-        this.multiPolicy = multiPolicy;
+    public DataRequestConfig rules(final Map<Resource, Rules> rules) {
+        requireNonNull(rules, "rules is required");
+        this.rules = rules;
         return this;
     }
 
-    public DataRequestConfig policy(final Resource resource, final Policy policy) {
-        this.multiPolicy.setPolicy(resource, policy);
+    public DataRequestConfig rules(final Resource resource, final Rules rules) {
+        requireNonNull(resource, "resource is required");
+        requireNonNull(rules, "rules is required");
+        this.rules.put(resource, rules);
+        return this;
+    }
+
+    public DataRequestConfig rule(final Resource resource, final String ruleId, final Rule rule) {
+        return rule(resource, null, ruleId, rule);
+    }
+
+    public DataRequestConfig rule(final Resource resource, final String message, final String ruleId, final Rule rule) {
+        requireNonNull(resource, "resource is required");
+        requireNonNull(ruleId, "ruleId is required");
+        requireNonNull(rule, "rule is required");
+
+        Rules<?> resourceRules = rules.get(resource);
+        if (null == resourceRules) {
+            resourceRules = new Rules();
+        }
+        if (nonNull(message)) {
+            resourceRules.message(message);
+        }
+        resourceRules.rule(ruleId, rule);
         return this;
     }
 
@@ -67,12 +96,13 @@ public class DataRequestConfig extends Request {
         this.user = user;
     }
 
-    public MultiPolicy getMultiPolicy() {
-        return multiPolicy;
+    public Map<Resource, Rules> getRules() {
+        return rules;
     }
 
-    public void setMultiPolicy(final MultiPolicy multiPolicy) {
-        this.multiPolicy = multiPolicy;
+    public DataRequestConfig setRules(final Map<Resource, Rules> rules) {
+        this.rules = rules;
+        return this;
     }
 
     public Justification getJustification() {
@@ -99,7 +129,7 @@ public class DataRequestConfig extends Request {
                 .appendSuper(super.equals(o))
                 .append(user, that.user)
                 .append(justification, that.justification)
-                .append(multiPolicy, that.multiPolicy)
+                .append(rules, that.rules)
                 .isEquals();
     }
 
@@ -109,7 +139,7 @@ public class DataRequestConfig extends Request {
                 .appendSuper(super.hashCode())
                 .append(user)
                 .append(justification)
-                .append(multiPolicy)
+                .append(rules)
                 .toHashCode();
     }
 
@@ -119,7 +149,7 @@ public class DataRequestConfig extends Request {
                 .appendSuper(super.toString())
                 .append("user", user)
                 .append("justification", justification)
-                .append("multiPolicy", multiPolicy)
+                .append("rules", rules)
                 .toString();
     }
 }
