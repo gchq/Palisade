@@ -19,6 +19,9 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
@@ -32,6 +35,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * The main {@link RecordReader} class for Palisade MapReduce clients. This class implements the logic for connecting to
@@ -51,6 +55,13 @@ import java.util.concurrent.CompletableFuture;
  * created by the corresponding ConnectionDetail object.
  */
 public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PalisadeRecordReader.class);
+
+    /**
+     * The task attempt that this record reader is serving.
+     */
+    private TaskAttemptContext context;
+
     /**
      * The request that is being processed in this task.
      */
@@ -87,6 +98,11 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
     private int processed;
 
     /**
+     * Resource that was last attempted before an error occurred.
+     */
+    private Resource errResource;
+
+    /**
      * No-arg constructor.
      */
     public PalisadeRecordReader() {
@@ -111,8 +127,10 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
         resourceDetails = reqDetails;
         resIt = reqDetails.getResources().entrySet().iterator();
         serialiser = PalisadeInputFormat.getSerialiser(taskAttemptContext);
+        context = taskAttemptContext;
         currentKey = null;
         currentValue = null;
+        errResource = null;
         processed = 0;
     }
 
@@ -123,9 +141,26 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
     public boolean nextKeyValue() throws IOException {
         //if we don't have a current item iterator or it's empty...
         while (itemIt == null || !itemIt.hasNext()) {
-            //...try to move to the next one, if we can't then we're done
-            if (!moveToNextResource()) {
-                return false;
+            try {
+                //...try to move to the next one, if we can't then we're done
+                if (!moveToNextResource()) {
+                    return false;
+                }
+            } catch (final CompletionException e) {
+                //something went wrong while fetching the next resource, what we do now depends on the user choice of how
+                //they want to handle errors, either way we need to log the error
+                LOGGER.warn("Failed to connect to resource " + errResource + " due to " + e.getCause());
+                errResource = null;
+                //notify via counter
+                context.getCounter(PalisadeRecordReader.class.getSimpleName(), "Failed resources").increment(1);
+                //decide how to act
+                switch (PalisadeInputFormat.getResourceErrorBehaviour(context)) {
+                    case FAIL_ON_READ_FAILURE:
+                        throw e;
+                    case CONTINUE_ON_READ_FAILURE:
+                    default:
+                        //do nothing
+                }
             }
         }
         //by now we've either got an item iterator with results or returned
@@ -138,6 +173,8 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      * to the next resource.
      *
      * @return true iff we have a successfully moved to a new data stream for the next resource
+     * @throws java.util.concurrent.CompletionException if the next source of data suffered a failure on establishing
+     *                                                  data stream
      */
     private boolean moveToNextResource() {
         //do we have a resource iterator?
@@ -161,20 +198,24 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      * Internal method to move to the next resource in our iterator of resources. This makes the actual call to the data
      * service and waits for the request to complete before extracting the data stream iterator which clients will use.
      * If successful there will be a new item iterator set up and ready to retrieve data.
+     *
+     * @throws java.util.concurrent.CompletionException if the next source of data suffered a failure on establishing
+     *                                                  data stream
      */
     private void setupItemStream() {
         Map.Entry<Resource, ConnectionDetail> entry = resIt.next();
         final Resource resource = entry.getKey();
         final ConnectionDetail conDetails = entry.getValue();
-        //stash the resource
-        currentKey = resource;
         final DataService service = conDetails.createService();
         //lodge request with the data service
         final CompletableFuture<ReadResponse> futureResponse = service.read(new ReadRequest().requestId(resourceDetails.getRequestId()).resource(resource));
+        errResource = resource;
         //when this future completes, we should have an iterator of things once we deserialise
         itemIt = futureResponse.thenApply(response -> serialiser.deserialise(response.getData()).iterator())
                 //force code to block at this point waiting for resource data to become available
                 .join();
+        //stash the resource
+        currentKey = resource;
         processed++;
     }
 
@@ -209,12 +250,14 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      */
     @Override
     public void close() throws IOException {
+        context = null;
         resourceDetails = null;
         currentKey = null;
         currentValue = null;
         resIt = null;
         itemIt = null;
         serialiser = null;
+        errResource = null;
         processed = 0;
     }
 }
