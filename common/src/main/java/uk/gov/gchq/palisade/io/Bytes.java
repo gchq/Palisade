@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.function;
+package uk.gov.gchq.palisade.io;
 
-import uk.gov.gchq.palisade.Justification;
-import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.example.ExampleObj;
-import uk.gov.gchq.palisade.rule.PredicateRule;
+/**
+ * {@code Bytes} is a simple interface containing a
+ * {@link #getBytes()} method and a {@link #getCount()} method.
+ */
+public interface Bytes {
+    byte[] getBytes();
 
-public class IsVisible implements PredicateRule<ExampleObj> {
-    @Override
-    public boolean test(final ExampleObj obj, final User user, final Justification justification) {
-        return user.getAuths().contains(obj.getVisibility());
+    default int getCount() {
+        return getBytes().length;
     }
 }

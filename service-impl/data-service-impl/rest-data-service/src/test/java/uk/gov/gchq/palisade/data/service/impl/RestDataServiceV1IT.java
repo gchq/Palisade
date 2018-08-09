@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,20 +26,15 @@ import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
-import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
-import uk.gov.gchq.palisade.service.request.DataRequestResponse;
-import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -68,25 +64,21 @@ public class RestDataServiceV1IT {
         final DataService dataService = Mockito.mock(DataService.class);
         MockDataService.setMock(dataService);
 
-        final FileResource resource1 = new FileResource().id("file1");
-        final FileResource resource2 = new FileResource().id("file1");
-        final Map<Resource, ConnectionDetail> resources = new HashMap<>();
-        resources.put(resource1, new SimpleConnectionDetail());
-        resources.put(resource2, new SimpleConnectionDetail());
+        final FileResource resource = new FileResource().id("file1");
+        final byte[] data = "value1\nvalue2".getBytes();
+        final InputStream dataStream = new ByteArrayInputStream(data);
+        final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);
 
-        final Stream<String> data = Stream.of("item1", "item2");
-        final ReadRequest request = new ReadRequest().dataRequestResponse(new DataRequestResponse().requestId(new RequestId().id("id1")).resources(resources));
-
-        final ReadResponse<String> expectedResult = new ReadResponse().data(data).message("some message");
+        final ReadResponse expectedResult = new ReadResponse().data(dataStream).message("some message");
         final CompletableFuture futureExpectedResult = CompletableFuture.completedFuture(expectedResult);
         given(dataService.read(request)).willReturn(futureExpectedResult);
 
         // When
-        final CompletableFuture<ReadResponse<String>> futureRead = proxy.read(request);
-        final ReadResponse<String> result = futureRead.join();
+        final CompletableFuture<ReadResponse> futureRead = proxy.read(request);
+        final ReadResponse result = futureRead.join();
 
         // Then
-        assertEquals(expectedResult.getMessage(), result.getMessage());
+        assertArrayEquals(data, IOUtils.toByteArray(result.getData()));
         verify(dataService).read(request);
     }
 }

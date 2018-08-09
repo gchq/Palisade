@@ -22,9 +22,9 @@ import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
+
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
-import uk.gov.gchq.palisade.data.serialise.StubSerialiser;
+import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
@@ -43,10 +43,11 @@ import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -58,14 +59,14 @@ public class PalisadeRecordReaderTest {
     public static void setup() {
         conf = new Configuration();
         //make sure this is available for the tests
-        serialiser = new StubSerialiser("test_serialiser");
+        serialiser = new SimpleStringSerialiser();
         PalisadeInputFormat.setSerialiser(conf, serialiser);
         con = new TaskAttemptContextImpl(conf, new TaskAttemptID());
     }
 
     private static Configuration conf;
     private static TaskAttemptContext con;
-    private static Serialiser<String, String> serialiser;
+    private static Serialiser<String> serialiser;
 
     @Test
     public void shouldReportZeroProgressWhenClose() throws Exception {
@@ -158,17 +159,15 @@ public class PalisadeRecordReaderTest {
      * Creates a DataService that will respond to any request with the given data.
      *
      * @param dataToReturn collection of data that will be streamed back from the data reader
-     * @param <T>          the value type of the items
      * @return a mock data service instance
      */
-    private static <T> DataService createMockDS(Collection<T> dataToReturn) {
+    private static DataService createMockDS(Collection<String> dataToReturn) {
         //create the simulated response
-        ReadResponse<T> readResponse = new ReadResponse<>();
-        readResponse.setData(dataToReturn.stream());
+        ReadResponse readResponse = new ReadResponse();
+        readResponse.setData(serialiser.serialise(dataToReturn.stream()));
         //mock a data service to return it
         DataService mock = mock(DataService.class);
-        Mockito.<CompletableFuture<ReadResponse<T>>>when(mock.read(any(ReadRequest.class)))
-                .thenReturn(CompletableFuture.completedFuture(readResponse));
+        given(mock.read(any(ReadRequest.class))).willReturn(CompletableFuture.completedFuture(readResponse));
         return mock;
     }
 

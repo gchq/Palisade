@@ -25,21 +25,17 @@ import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.policy.Rules;
 import uk.gov.gchq.palisade.policy.TestRule;
-import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
+import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertEquals;
@@ -76,12 +72,9 @@ public class RestPalisadeServiceV1IT {
         final FileResource resource2 = new FileResource().id("file1");
         final UserId userId = new UserId().id("user01");
         final Justification justification = new Justification().justification("justification1");
-        final RegisterDataRequest request = new RegisterDataRequest().resource("file1").userId(userId).justification(justification);
+        final RegisterDataRequest request = new RegisterDataRequest().resourceId("file1").userId(userId).justification(justification);
 
-        final Map<Resource, ConnectionDetail> resources = new HashMap<>();
-        resources.put(resource1, new SimpleConnectionDetail());
-        resources.put(resource2, new SimpleConnectionDetail());
-        final DataRequestResponse expectedResult = new DataRequestResponse().requestId(new RequestId().id("id1")).resources(resources);
+        final DataRequestResponse expectedResult = new DataRequestResponse().requestId(new RequestId().id("id1")).resource(resource1, new SimpleConnectionDetail());
         given(palisadeService.registerDataRequest(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
@@ -99,25 +92,23 @@ public class RestPalisadeServiceV1IT {
         MockPalisadeService.setMock(palisadeService);
 
         final FileResource resource1 = new FileResource().id("file1");
-        final FileResource resource2 = new FileResource().id("file1");
-        final Map<Resource, ConnectionDetail> resources = new HashMap<>();
-        resources.put(resource1, new SimpleConnectionDetail());
-        resources.put(resource2, new SimpleConnectionDetail());
-        final DataRequestResponse request = new DataRequestResponse().requestId(new RequestId().id("id1")).resources(resources);
-
+        final RequestId requestId = new RequestId().id("id1");
+        final GetDataRequestConfig getDataRequestConfig = new GetDataRequestConfig().requestId(requestId).resource(resource1);
         final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
         final Justification justification = new Justification().justification("justification1");
-        final Map<Resource, Rules> rules = new HashMap<>();
-        rules.put(resource1, new Rules<String>().rule("testRule", new TestRule()));
-        final DataRequestConfig expectedResult = new DataRequestConfig().user(user).justification(justification).rules(rules);
-        given(palisadeService.getDataRequestConfig(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
+        final DataRequestConfig expectedResult = new DataRequestConfig()
+                .user(user)
+                .justification(justification)
+                .rule(resource1, "testRule", new TestRule());
+        given(palisadeService.getDataRequestConfig(getDataRequestConfig))
+                .willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
-        final DataRequestConfig result = proxy.getDataRequestConfig(request).join();
+        final DataRequestConfig result = proxy.getDataRequestConfig(getDataRequestConfig).join();
 
         // Then
         assertEquals(expectedResult, result);
-        verify(palisadeService).getDataRequestConfig(request);
+        verify(palisadeService).getDataRequestConfig(getDataRequestConfig);
     }
 }

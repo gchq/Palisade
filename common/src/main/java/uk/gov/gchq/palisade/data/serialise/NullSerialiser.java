@@ -15,14 +15,18 @@
  */
 package uk.gov.gchq.palisade.data.serialise;
 
-public class NullSerialiser<T> implements Serialiser<T, T> {
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.stream.Stream;
+
+public class NullSerialiser<T> implements Serialiser<T> {
     @Override
-    public T serialise(final T value) {
-        return value;
+    public InputStream serialise(final Stream<T> object) {
+        return new ByteArrayInputStream(new byte[0]);
     }
 
     @Override
-    public T deserialise(final T value) {
-        return value;
+    public Stream<T> deserialise(final InputStream stream) {
+        return Stream.empty();
     }
 }

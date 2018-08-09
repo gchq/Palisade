@@ -26,17 +26,14 @@ import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
-import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.NullPalisadeService;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
-import uk.gov.gchq.palisade.service.request.DataRequestResponse;
+import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 
-import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * <p>
@@ -62,57 +59,49 @@ public class SimpleDataService implements DataService {
     }
 
     public SimpleDataService palisadeService(final PalisadeService palisadeService) {
-        Objects.requireNonNull(palisadeService);
+        requireNonNull(palisadeService);
         this.palisadeService = palisadeService;
         return this;
     }
 
     public SimpleDataService reader(final DataReader reader) {
-        Objects.requireNonNull(reader);
+        requireNonNull(reader);
         this.reader = reader;
         return this;
     }
 
     @Override
-    public <T> CompletableFuture<ReadResponse<T>> read(final ReadRequest request) {
-        Objects.requireNonNull(request);
-        Objects.requireNonNull(request.getDataRequestResponse());
-        Objects.requireNonNull(request.getDataRequestResponse().getRequestId());
+    public CompletableFuture<ReadResponse> read(final ReadRequest request) {
+        requireNonNull(request);
+        requireNonNull(request.getRequestId(), "requestId is required");
+        requireNonNull(request.getResource(), "resource is required");
         LOGGER.debug("Creating async read: {}", request);
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Starting to read: {}", request);
-            final DataRequestResponse dataRequestResponse = request.getDataRequestResponse();
-            LOGGER.debug("Calling palisade service with: {}", dataRequestResponse);
-            final DataRequestConfig config = palisadeService.getDataRequestConfig(dataRequestResponse).join();
+            final GetDataRequestConfig getConfig = new GetDataRequestConfig()
+                    .requestId(request.getRequestId())
+                    .resource(request.getResource());
+            LOGGER.debug("Calling palisade service with: {}", getConfig);
+            final DataRequestConfig config = palisadeService.getDataRequestConfig(getConfig).join();
             LOGGER.debug("Palisade service returned: {}", config);
-            Stream<T> allData = Stream.empty();
 
-            for (final Entry<Resource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
-                validate(entry.getValue());
+            final DataReaderRequest readerRequest = new DataReaderRequest()
+                    .resource(request.getResource())
+                    .user(config.getUser())
+                    .justification(config.getJustification())
+                    .rules(config.getRules().get(request.getResource()));
 
-                final DataReaderRequest<T> readerRequest = new DataReaderRequest<>()
-                        .resource(entry.getKey())
-                        .user(config.getUser())
-                        .justification(config.getJustification())
-                        .rules(config.getResourceRules(entry.getKey()));
-                LOGGER.debug("Calling reader with: {}", readerRequest);
-                final DataReaderResponse<T> readerResult = reader.read(readerRequest);
-                LOGGER.debug("Reader returned: {}", readerResult);
-                if (null != readerResult.getData()) {
-                    allData = Stream.concat(
-                            allData,
-                            readerResult.getData()
-                    );
-                }
+            LOGGER.debug("Calling reader with: {}", readerRequest);
+            final DataReaderResponse readerResult = reader.read(readerRequest);
+            LOGGER.debug("Reader returned: {}", readerResult);
+
+            final ReadResponse response = new ReadResponse();
+            if (null != readerResult.getData()) {
+                response.data(readerResult.getData());
             }
-            final ReadResponse<T> response = new ReadResponse().data(allData);
             LOGGER.debug("Returning from read: {}", response);
             return response;
         });
-    }
-
-    private void validate(final ConnectionDetail connectionDetail) {
-        // no validation required for this simple implementation.
     }
 
     public PalisadeService getPalisadeService() {

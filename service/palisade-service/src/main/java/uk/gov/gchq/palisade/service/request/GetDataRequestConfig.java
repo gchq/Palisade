@@ -19,32 +19,41 @@ package uk.gov.gchq.palisade.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
-
-import java.util.UUID;
+import uk.gov.gchq.palisade.resource.Resource;
 
 /**
- * This is the high level API for any request sent to a service.
- * This makes sure each request has a unique identifier.
+ * This class is used to request the {@link DataRequestConfig}.
  */
-public abstract class Request {
-    private String id;
+public class GetDataRequestConfig extends Request {
+    private RequestId requestId;
+    private Resource resource;
 
-    public Request() {
-        id(UUID.randomUUID().toString());
+    public RequestId getRequestId() {
+        return requestId;
     }
 
-    public Request id(final String id) {
-        this.id = id;
+    public GetDataRequestConfig requestId(final RequestId requestId) {
+        this.requestId = requestId;
         return this;
     }
 
-    public void setId(final String id) {
-        this.id = id;
+    public void setRequestId(final RequestId requestId) {
+        this.requestId = requestId;
     }
 
-    public String getId() {
-        return id;
+    public Resource getResource() {
+        return resource;
+    }
+
+    public GetDataRequestConfig resource(final Resource resource) {
+        this.resource = resource;
+        return this;
+    }
+
+    public void setResource(final Resource resource) {
+        this.resource = resource;
     }
 
     @Override
@@ -57,24 +66,29 @@ public abstract class Request {
             return false;
         }
 
-        final Request request = (Request) o;
+        final GetDataRequestConfig that = (GetDataRequestConfig) o;
 
         return new EqualsBuilder()
-                .append(id, request.id)
+                .appendSuper(super.equals(o))
+                .append(requestId, that.requestId)
+                .append(resource, that.resource)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(5, 37)
-                .append(id)
+        return new HashCodeBuilder(7, 37)
+                .appendSuper(super.hashCode())
+                .append(requestId)
+                .append(resource)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("id", id)
+                .append("requestId", requestId)
+                .append("resource", resource)
                 .toString();
     }
 }

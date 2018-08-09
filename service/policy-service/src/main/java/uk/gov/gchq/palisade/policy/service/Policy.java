@@ -20,9 +20,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.policy.PredicateRule;
-import uk.gov.gchq.palisade.policy.Rule;
-import uk.gov.gchq.palisade.policy.Rules;
+import uk.gov.gchq.palisade.rule.PredicateRule;
+import uk.gov.gchq.palisade.rule.Rule;
+import uk.gov.gchq.palisade.rule.Rules;
 
 import java.util.Objects;
 import java.util.function.Function;

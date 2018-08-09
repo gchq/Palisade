@@ -49,14 +49,16 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 new User()
                                         .userId("Alice")
                                         .auths("public", "private")
-                                        .roles("user", "admin"))
+                                        .roles("user", "admin")
+                        )
         );
         final CompletableFuture<Boolean> userBobStatus = userService.addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
                                 .auths("public")
-                                .roles("user"))
+                                .roles("user")
+                )
         );
 
         // The policy owner or sys admin needs to add the policies
@@ -65,7 +67,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                         new FileResource()
                                 .id("file1")
                                 .type(RESOURCE_TYPE))
-                        .policy(new Policy()
+                        .policy(new Policy<ExampleObj>()
                                         .message("Age off and visibility filtering")
                                         .predicateRule(
                                                 "visibility",
@@ -94,7 +96,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     }
 
     @Override
-    protected Serialiser<?, ExampleObj> createSerialiser() {
+    protected Serialiser<ExampleObj> createSerialiser() {
         return new ExampleObjSerialiser();
     }
 }

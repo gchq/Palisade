@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package uk.gov.gchq.palisade.data.serialise;
 
-package uk.gov.gchq.palisade.example.function;
-
-import uk.gov.gchq.palisade.Justification;
-import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.example.ExampleObj;
-import uk.gov.gchq.palisade.rule.PredicateRule;
-
-public class IsVisible implements PredicateRule<ExampleObj> {
+public class SimpleStringSerialiser extends LineSerialiser<String> {
     @Override
-    public boolean test(final ExampleObj obj, final User user, final Justification justification) {
-        return user.getAuths().contains(obj.getVisibility());
+    public String serialiseLine(final String obj) {
+        return obj;
+    }
+
+    @Override
+    public String deserialiseLine(final String line) {
+        return line;
     }
 }

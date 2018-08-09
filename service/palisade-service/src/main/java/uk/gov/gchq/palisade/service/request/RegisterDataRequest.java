@@ -30,7 +30,7 @@ import uk.gov.gchq.palisade.UserId;
 public class RegisterDataRequest extends Request {
     private UserId userId;
     private Justification justification;
-    private String resource;
+    private String resourceId;
 
     // no-args constructor required
     public RegisterDataRequest() {
@@ -46,11 +46,11 @@ public class RegisterDataRequest extends Request {
     }
 
     /**
-     * @param resource an identifier for the resource or data set to access
+     * @param resourceId an identifier for the resource or data set to access
      * @return the {@link RegisterDataRequest}
      */
-    public RegisterDataRequest resource(final String resource) {
-        this.resource = resource;
+    public RegisterDataRequest resourceId(final String resourceId) {
+        this.resourceId = resourceId;
         return this;
     }
 
@@ -63,12 +63,12 @@ public class RegisterDataRequest extends Request {
         return this;
     }
 
-    public String getResource() {
-        return resource;
+    public String getResourceId() {
+        return resourceId;
     }
 
-    public void setResource(final String resource) {
-        this.resource = resource;
+    public void setResourceId(final String resourceId) {
+        this.resourceId = resourceId;
     }
 
     public UserId getUserId() {
@@ -103,7 +103,7 @@ public class RegisterDataRequest extends Request {
                 .appendSuper(super.equals(o))
                 .append(userId, that.userId)
                 .append(justification, that.justification)
-                .append(resource, that.resource)
+                .append(resourceId, that.resourceId)
                 .isEquals();
     }
 
@@ -113,7 +113,7 @@ public class RegisterDataRequest extends Request {
                 .appendSuper(super.hashCode())
                 .append(userId)
                 .append(justification)
-                .append(resource)
+                .append(resourceId)
                 .toHashCode();
     }
 
@@ -123,7 +123,7 @@ public class RegisterDataRequest extends Request {
                 .appendSuper(super.toString())
                 .append("userId", userId)
                 .append("justification", justification)
-                .append("resource", resource)
+                .append("resourceId", resourceId)
                 .toString();
     }
 }

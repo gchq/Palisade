@@ -21,17 +21,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 
-import java.util.stream.Stream;
+import java.io.InputStream;
 
 /**
  * This class is used to pass back to the data service the stream of data in the
  * format expected by the client, along with any error/info messages for the client.
- *
- * @param <RAW_DATA_TYPE> A Java class that each record of the data is expected to
- *                        be returned to the client as.
  */
-public class DataReaderResponse<RAW_DATA_TYPE> {
-    private Stream<RAW_DATA_TYPE> data;
+public class DataReaderResponse {
+    private InputStream data;
     private String message;
 
     // no args constructor required
@@ -39,10 +36,10 @@ public class DataReaderResponse<RAW_DATA_TYPE> {
     }
 
     /**
-     * @param data a stream of data in the format expected by the client
+     * @param data an {@link InputStream} of data.
      * @return the {@link DataReaderResponse}
      */
-    public DataReaderResponse<RAW_DATA_TYPE> data(final Stream<RAW_DATA_TYPE> data) {
+    public DataReaderResponse data(final InputStream data) {
         this.data = data;
         return this;
     }
@@ -51,16 +48,16 @@ public class DataReaderResponse<RAW_DATA_TYPE> {
      * @param message an error/info message to be returned to the client
      * @return the {@link DataReaderResponse}
      */
-    public DataReaderResponse<RAW_DATA_TYPE> message(final String message) {
+    public DataReaderResponse message(final String message) {
         this.message = message;
         return this;
     }
 
-    public Stream<RAW_DATA_TYPE> getData() {
+    public InputStream getData() {
         return data;
     }
 
-    public void setData(final Stream<RAW_DATA_TYPE> data) {
+    public void setData(final InputStream data) {
         this.data = data;
     }
 
@@ -74,7 +71,7 @@ public class DataReaderResponse<RAW_DATA_TYPE> {
             return false;
         }
 
-        final DataReaderResponse<?> that = (DataReaderResponse<?>) o;
+        final DataReaderResponse that = (DataReaderResponse) o;
 
         return new EqualsBuilder()
                 .append(data, that.data)
