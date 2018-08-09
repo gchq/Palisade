@@ -37,9 +37,9 @@ public class TupleRuleTest {
     @Test
     public void shouldSelectAndMatchRecord() throws Exception {
         //given
-        testObject = new TupleRule<>(RECORD_VAR1, (String o) -> {
-            return o.equals(TestObj.VAL_1);
-        });
+        testObject = new TupleRule<TestObj>()
+                .selection(RECORD_VAR1)
+                .predicate((String o) -> o.equals(TestObj.VAL_1));
 
         //when
         final TestObj actual = testObject.apply(record, null, null);
@@ -51,9 +51,9 @@ public class TupleRuleTest {
     @Test
     public void shouldSelectAndNotMatchRecord() throws Exception {
         //given
-        testObject = new TupleRule<>(RECORD_VAR1, (String o) -> {
-            return o.equals(TestObj.VAL_1);
-        });
+        testObject = new TupleRule<TestObj>()
+                .selection(RECORD_VAR1)
+                .predicate((String o) -> o.equals(TestObj.VAL_1));
         record.var1 = NOT_VAL1;
 
         //when
@@ -66,7 +66,10 @@ public class TupleRuleTest {
     @Test
     public void shouldSelectAndProjectRecord() throws Exception {
         //given
-        testObject = new TupleRule<>(RECORD_VAR1, (String s) -> FROM_RULE, RECORD_VAR2);
+        testObject = new TupleRule<TestObj>()
+                .selection(RECORD_VAR1)
+                .function((String s) -> FROM_RULE)
+                .projection(RECORD_VAR2);
         final String varStart = record.var2;
         //when
         final String actual = testObject.apply(record, null, null).getVar2();
@@ -80,9 +83,9 @@ public class TupleRuleTest {
     public void shouldSelectAndMatchUser() throws Exception {
         //given
         final User user = new User().auths(AUTH_1);
-        testObject = new TupleRule<>(USER_AUTHS, (Set<String> o) -> {
-            return o.contains(AUTH_1);
-        });
+        testObject = new TupleRule<TestObj>()
+                .selection(USER_AUTHS)
+                .predicate((Set<String> o) -> o.contains(AUTH_1));
 
         //when
         final TestObj actual = testObject.apply(record, user, null);
@@ -95,9 +98,9 @@ public class TupleRuleTest {
     public void shouldSelectAndNotMatchUser() throws Exception {
         //given
         final User user = new User();
-        testObject = new TupleRule<>(USER_AUTHS, (Set<String> o) -> {
-            return o.contains(AUTH_1);
-        });
+        testObject = new TupleRule<TestObj>()
+                .selection(USER_AUTHS)
+                .predicate((Set<String> o) -> o.contains(AUTH_1));
 
         //when
         final TestObj object = testObject.apply(record, user, null);
@@ -109,7 +112,10 @@ public class TupleRuleTest {
     public void shouldSelectUserAndProjectRecord() throws Exception {
         //given
         final User user = new User().auths(AUTH_1);
-        testObject = new TupleRule<>(USER_AUTHS, (Set<String> o) -> FROM_RULE, RECORD_VAR2);
+        testObject = new TupleRule<TestObj>()
+                .selection(USER_AUTHS)
+                .function((Set<String> o) -> FROM_RULE)
+                .projection(RECORD_VAR2);
         final String var2Start = record.var2;
         //when
         final String actual = testObject.apply(record, user, null).getVar2();
@@ -123,9 +129,9 @@ public class TupleRuleTest {
     public void shouldSelectAndProjectUser() throws Exception {
         //given
         final User user = new User().auths(AUTH_1);
-        testObject = new TupleRule<>(USER_AUTHS, (Set<String> o) -> {
-            return Sets.newHashSet(FROM_RULE);
-        }, USER_AUTHS);
+        testObject = new TupleRule<TestObj>()
+                .selection(USER_AUTHS)
+                .function((Set<String> o) -> Sets.newHashSet(FROM_RULE));
         final Set<String> authsStart = user.getAuths();
         //when
         final TestObj apply = testObject.apply(record, user, null);
@@ -141,10 +147,10 @@ public class TupleRuleTest {
     @Test
     public void shouldSelectAndMatchJust() throws Exception {
         //given
-        final Justification just = new Justification(JUST_1);
-        testObject = new TupleRule<>(JUSTIFICATION_JUSTIFICATION, (String s) -> {
-            return s.equals(JUST_1);
-        });
+        final Justification just = new Justification().justification(JUST_1);
+        testObject = new TupleRule<TestObj>()
+                .selection(JUSTIFICATION_JUSTIFICATION)
+                .predicate((String s) -> s.equals(JUST_1));
 
         //when
         final TestObj actual = testObject.apply(record, null, just);
@@ -155,10 +161,10 @@ public class TupleRuleTest {
     @Test
     public void shouldSelectAndNotMatchJust() throws Exception {
         //given
-        final Justification just = new Justification(JUST_1);
-        testObject = new TupleRule<>(JUSTIFICATION_JUSTIFICATION, (String s) -> {
-            return s.equals(OTHER);
-        });
+        final Justification just = new Justification().justification(JUST_1);
+        testObject = new TupleRule<TestObj>()
+                .selection(JUSTIFICATION_JUSTIFICATION)
+                .predicate((String s) -> s.equals(OTHER));
 
         //when
         final TestObj actual2 = testObject.apply(record, null, just);
@@ -169,8 +175,11 @@ public class TupleRuleTest {
     @Test
     public void shouldSelectAndProjectJust() throws Exception {
         //given
-        final Justification just = new Justification(JUST_1);
-        testObject = new TupleRule<>(JUSTIFICATION_JUSTIFICATION, (String o) -> FROM_RULE, JUSTIFICATION_JUSTIFICATION);
+        final Justification just = new Justification().justification(JUST_1);
+        testObject = new TupleRule<TestObj>()
+                .selection(JUSTIFICATION_JUSTIFICATION)
+                .function((String o) -> FROM_RULE)
+                .projection(JUSTIFICATION_JUSTIFICATION);
         //when
         final TestObj actual = testObject.apply(record, null, just);
         //then

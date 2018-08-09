@@ -35,12 +35,12 @@ public class GetResourcesByTypeRequest extends Request {
     }
 
     /**
-     * Default constructor
-     *
-     * @param type The type of the {@link uk.gov.gchq.palisade.resource.Resource}'s that you want to know about.
+     * @param type the type of the {@link uk.gov.gchq.palisade.resource.Resource}'s that you want to know about
+     * @return the {@link GetResourcesByTypeRequest}
      */
-    public GetResourcesByTypeRequest(final String type) {
+    public GetResourcesByTypeRequest type(final String type) {
         this.type = type;
+        return this;
     }
 
     public String getType() {
@@ -64,6 +64,7 @@ public class GetResourcesByTypeRequest extends Request {
         final GetResourcesByTypeRequest that = (GetResourcesByTypeRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(type, that.type)
                 .isEquals();
     }
@@ -71,6 +72,7 @@ public class GetResourcesByTypeRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 41)
+                .appendSuper(super.hashCode())
                 .append(type)
                 .toHashCode();
     }
@@ -78,6 +80,7 @@ public class GetResourcesByTypeRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("type", type)
                 .toString();
     }

@@ -15,23 +15,25 @@
  */
 package uk.gov.gchq.palisade.data.serialise;
 
+import java.io.InputStream;
 import java.io.Serializable;
+import java.util.stream.Stream;
 
-public interface Serialiser<I, O> extends Serializable {
+public interface Serialiser<I> extends Serializable {
 
     /**
-     * Serialise some object into bytes.
+     * Serialises a {@link Stream} of objects into an {@link InputStream}.
      *
-     * @param object the object to be serialised
-     * @return the serialised bytes
+     * @param objects the stream of objects to be serialised
+     * @return the serialised form
      */
-    I serialise(final O object);
+    InputStream serialise(final Stream<I> objects);
 
     /**
-     * Deserialise some bytes into an object.
+     * Deserialise an {@link InputStream} into a {@link Stream} of objects.
      *
-     * @param bytes the bytes to deserialise
+     * @param stream the input stream to deserialise
      * @return the deserialised object
      */
-    O deserialise(final I bytes);
+    Stream<I> deserialise(final InputStream stream);
 }

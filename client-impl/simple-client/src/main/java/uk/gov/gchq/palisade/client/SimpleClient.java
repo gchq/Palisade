@@ -48,7 +48,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class SimpleClient<T> {
-    protected final Serialiser<?, T> serialiser;
+    protected final Serialiser<T> serialiser;
     protected final ResourceService resourceService;
     protected final AuditService auditService;
     protected final PolicyService policyService;
@@ -68,18 +68,23 @@ public class SimpleClient<T> {
 
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String justification) {
         Objects.requireNonNull(palisadeService);
-        final RegisterDataRequest dataRequest = new RegisterDataRequest(filename, new UserId(userId), new Justification(justification));
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).justification(new Justification().justification(justification));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
 
-        // TODO: this should be optimised so we don't make multiple calls to the same dataService.
         for (final Entry<Resource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
-            final CompletableFuture<ReadResponse<Object>> futureResponse = dataService.read(new ReadRequest(dataRequestResponse));
+
+            final ReadRequest readRequest = new ReadRequest()
+                    .requestId(dataRequestResponse.getRequestId())
+                    .resource(entry.getKey());
+
+            final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
-                    response -> response.getData().map(((Serialiser<Object, T>) serialiser)::deserialise)
+                    response -> serialiser.deserialise(response.getData())
             );
+
             futureResults.add(futureResult);
         }
 
@@ -117,7 +122,7 @@ public class SimpleClient<T> {
         return new HashMapUserService();
     }
 
-    protected Serialiser<?, T> createSerialiser() {
+    protected Serialiser<T> createSerialiser() {
         return new NullSerialiser<>();
     }
 }

@@ -20,7 +20,6 @@ import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 /**
  * A null implementation of the {@link DataService} that prevents hitting
@@ -29,7 +28,7 @@ import java.util.stream.Stream;
  */
 public class NullDataService implements DataService {
     @Override
-    public <RAW_DATA_TYPE> CompletableFuture<ReadResponse<RAW_DATA_TYPE>> read(final ReadRequest request) {
-        return CompletableFuture.completedFuture(new ReadResponse<>(Stream.<RAW_DATA_TYPE>empty()));
+    public  CompletableFuture<ReadResponse> read(final ReadRequest request) {
+        return CompletableFuture.completedFuture(new ReadResponse());
     }
 }

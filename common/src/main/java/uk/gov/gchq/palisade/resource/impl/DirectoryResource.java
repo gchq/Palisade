@@ -27,16 +27,19 @@ public class DirectoryResource extends AbstractResource implements ChildResource
     public DirectoryResource() {
     }
 
-    public DirectoryResource(final String id) {
-        super(id);
+    public DirectoryResource id(final String id) {
+        super.id(id);
+        return this;
     }
 
-    public DirectoryResource(final String id, final String type) {
-        super(id, type);
+    public DirectoryResource type(final String type) {
+        super.type(type);
+        return this;
     }
 
-    public DirectoryResource(final String id, final String type, final String format) {
-        super(id, type, format);
+    public DirectoryResource serialisedFormat(final String serialisedFormat) {
+        super.serialisedFormat(serialisedFormat);
+        return this;
     }
 
     @Override

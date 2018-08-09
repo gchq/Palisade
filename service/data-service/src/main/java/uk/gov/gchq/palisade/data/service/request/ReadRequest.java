@@ -19,63 +19,43 @@ package uk.gov.gchq.palisade.data.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.service.request.DataRequestResponse;
+import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * This class is used to send a request to the
- * {@link uk.gov.gchq.palisade.data.service.DataService} to read a set of resources.
- * This class currently just takes in a {@link DataRequestResponse} that should
- * have been returned when the client registered the data access request with the
- * {@link uk.gov.gchq.palisade.service.PalisadeService}. The
- * {@link DataRequestResponse} can be modified to only contain a subset of the
- * list of resources to be read.
+ * {@link uk.gov.gchq.palisade.data.service.DataService} to read a resource.
  */
 public class ReadRequest extends Request {
-    private DataRequestResponse dataRequestResponse;
+    private RequestId requestId;
+    private Resource resource;
 
-    // no-args constructor required
-    public ReadRequest() {
+    public ReadRequest requestId(final RequestId requestId) {
+        this.requestId = requestId;
+        return this;
     }
 
-    /**
-     * Default constructor
-     *
-     * @param dataRequestResponse {@link DataRequestResponse} that should
-     *                            have been returned when the client registered
-     *                            the data access request with the
-     *                            {@link uk.gov.gchq.palisade.service.PalisadeService}.
-     *                            The {@link DataRequestResponse} can be modified
-     *                            to only contain a subset of the list of resources to be read.
-     */
-    public ReadRequest(final DataRequestResponse dataRequestResponse) {
-        this.dataRequestResponse = dataRequestResponse;
+    public ReadRequest resource(final Resource resource) {
+        this.resource = resource;
+        return this;
     }
 
-    /**
-     * A static method for creating the {@link ReadRequest} based on the
-     * {@link CompletableFuture} {@link DataRequestResponse} to enable the chaining of
-     * asynchronous requests.
-     *
-     * @param futureRequestResponse a CompletableFuture DataRequestResponse
-     *                              returned when the client registers the data
-     *                              access request with the {@link uk.gov.gchq.palisade.service.PalisadeService}.
-     * @return a {@link CompletableFuture} {@link ReadRequest}
-     */
-    public static CompletableFuture<ReadRequest> create(
-            final CompletableFuture<DataRequestResponse> futureRequestResponse) {
-        return futureRequestResponse.thenApply(t -> new ReadRequest(futureRequestResponse.join()));
+    public RequestId getRequestId() {
+        return requestId;
     }
 
-    public DataRequestResponse getDataRequestResponse() {
-        return dataRequestResponse;
+    public void setRequestId(final RequestId requestId) {
+        this.requestId = requestId;
     }
 
-    public void setDataRequestResponse(final DataRequestResponse dataRequestResponse) {
-        this.dataRequestResponse = dataRequestResponse;
+    public Resource getResource() {
+        return resource;
+    }
+
+    public void setResource(final Resource resource) {
+        this.resource = resource;
     }
 
     @Override
@@ -91,21 +71,24 @@ public class ReadRequest extends Request {
         final ReadRequest that = (ReadRequest) o;
 
         return new EqualsBuilder()
-                .append(dataRequestResponse, that.dataRequestResponse)
+                .append(requestId, that.requestId)
+                .append(resource, that.resource)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(47, 37)
-                .append(dataRequestResponse)
+                .append(requestId)
+                .append(resource)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("dataRequestResponse", dataRequestResponse)
+                .append("requestId", requestId)
+                .append("resource", resource)
                 .toString();
     }
 }

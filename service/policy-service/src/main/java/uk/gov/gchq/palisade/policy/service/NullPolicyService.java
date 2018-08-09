@@ -19,7 +19,9 @@ package uk.gov.gchq.palisade.policy.service;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -29,8 +31,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public class NullPolicyService implements PolicyService {
     @Override
-    public CompletableFuture<Boolean> canAccess(final CanAccessRequest futureRequest) {
-        return CompletableFuture.completedFuture(false);
+    public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest futureRequest) {
+        return CompletableFuture.completedFuture(new CanAccessResponse(Collections.emptyList()));
     }
 
     @Override

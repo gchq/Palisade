@@ -34,6 +34,7 @@
         <module>multi-jvm-example-rest-user-service</module>
         <module>multi-jvm-example-rest-data-service</module>
         <module>multi-jvm-example-client</module>
+        <module>multi-jvm-example-docker-services</module>
         <module>multi-jvm-example-runner</module>
     </modules>
 </project>

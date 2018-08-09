@@ -42,6 +42,7 @@ import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
+import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.user.service.NullUserService;
 import uk.gov.gchq.palisade.user.service.UserService;
@@ -99,7 +100,7 @@ public class SimplePalisadeService implements PalisadeService {
     public CompletableFuture<DataRequestResponse> registerDataRequest(final RegisterDataRequest request) {
         LOGGER.debug("Registering data request: {}", request);
 
-        final GetUserRequest userRequest = new GetUserRequest(request.getUserId());
+        final GetUserRequest userRequest = new GetUserRequest().userId(request.getUserId());
         LOGGER.debug("Getting user from userService: {}", userRequest);
         final CompletableFuture<User> futureUser = userService.getUser(userRequest)
                 .thenApply(user -> {
@@ -107,7 +108,7 @@ public class SimplePalisadeService implements PalisadeService {
                     return user;
                 });
 
-        final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest(request.getResource());
+        final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId());
         LOGGER.debug("Getting resources from resourceService: {}", resourceRequest);
         final CompletableFuture<Map<Resource, ConnectionDetail>> futureResources = resourceService.getResourcesById(resourceRequest)
                 .thenApply(resources -> {
@@ -115,7 +116,7 @@ public class SimplePalisadeService implements PalisadeService {
                     return resources;
                 });
 
-        final RequestId requestId = new RequestId(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
+        final RequestId requestId = new RequestId().id(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
 
         final DataRequestConfig config = new DataRequestConfig();
         config.setJustification(request.getJustification());
@@ -126,14 +127,14 @@ public class SimplePalisadeService implements PalisadeService {
                     audit(request, futureUser.join(), multiPolicy);
                     cache(request, futureUser.join(), requestId, multiPolicy);
                 }).thenApply(t -> {
-                    final DataRequestResponse response = new DataRequestResponse(requestId, futureResources.join());
+                    final DataRequestResponse response = new DataRequestResponse().requestId(requestId).resources(futureResources.join());
                     LOGGER.debug("Responding with: {}", response);
                     return response;
                 });
     }
 
     private MultiPolicy getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<Resource, ConnectionDetail>> futureResources) {
-        final GetPolicyRequest policyRequest = new GetPolicyRequest(futureUser.join(), request.getJustification(), new HashSet<>(futureResources.join().keySet()));
+        final GetPolicyRequest policyRequest = new GetPolicyRequest().user(futureUser.join()).justification(request.getJustification()).resources(new HashSet<>(futureResources.join().keySet()));
         LOGGER.debug("Getting policy from policyService: {}", policyRequest);
         return policyService.getPolicy(policyRequest)
                 .thenApply(policy -> {
@@ -144,26 +145,25 @@ public class SimplePalisadeService implements PalisadeService {
 
     private void audit(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy) {
         for (final Entry<Resource, Policy> entry : multiPolicy.getPolicies().entrySet()) {
-            final AuditRequest auditRequest = new AuditRequest(
-                    entry.getKey(),
-                    user,
-                    request.getJustification(),
-                    entry.getValue().getMessage()
-            );
+            final AuditRequest auditRequest =
+                    new AuditRequest()
+                            .resource(entry.getKey())
+                            .user(user)
+                            .justification(request.getJustification())
+                            .howItWasProcessed(entry.getValue().getMessage());
             LOGGER.debug("Auditing: {}", auditRequest);
             auditService.audit(auditRequest);
         }
     }
 
     private void cache(final RegisterDataRequest request, final User user, final RequestId requestId, final MultiPolicy multiPolicy) {
-        final AddCacheRequest cacheRequest = new AddCacheRequest(
-                requestId,
-                new DataRequestConfig(
-                        user,
-                        request.getJustification(),
-                        multiPolicy.getRuleMap()
-                )
-        );
+        final AddCacheRequest cacheRequest = new AddCacheRequest()
+                .requestId(requestId)
+                .dataRequestConfig(new DataRequestConfig()
+                                .user(user)
+                                .justification(request.getJustification())
+                                .rules(multiPolicy.getRuleMap())
+                );
         LOGGER.debug("Caching: {}", cacheRequest);
         final Boolean success = cacheService.add(cacheRequest).join();
         if (null == success || !success) {
@@ -172,12 +172,12 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     @Override
-    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final DataRequestResponse request) {
+    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final GetDataRequestConfig request) {
         Objects.requireNonNull(request);
         Objects.requireNonNull(request.getRequestId());
         // TODO: need to validate that the user is actually requesting the correct info.
         // extract resources from request and check they are a subset of the original RegisterDataRequest resources
-        final GetCacheRequest cacheRequest = new GetCacheRequest(request.getRequestId());
+        final GetCacheRequest cacheRequest = new GetCacheRequest().requestId(request.getRequestId());
         LOGGER.debug("Getting cached data: {}", cacheRequest);
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {

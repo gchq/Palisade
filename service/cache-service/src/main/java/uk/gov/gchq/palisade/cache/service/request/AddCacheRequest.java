@@ -40,27 +40,34 @@ public class AddCacheRequest extends Request {
     /**
      * An empty optional indicates no time to live specified.
      */
-    private Optional<Duration> timeToLive;
+    private Optional<Duration> timeToLive = Optional.empty();
 
     public AddCacheRequest() {
     }
 
-    public AddCacheRequest(final RequestId requestId, final DataRequestConfig dataRequestConfig) {
-        this(requestId, dataRequestConfig, Optional.empty());
-    }
-
-    public AddCacheRequest(final RequestId requestId, final DataRequestConfig dataRequestConfig, final long ttlMillis) {
-        this(requestId, dataRequestConfig, toDuration(ttlMillis));
-    }
-
-    public AddCacheRequest(final RequestId requestId, final DataRequestConfig dataRequestConfig, final Temporal expiryPoint) {
-        this(requestId, dataRequestConfig, until(expiryPoint));
-    }
-
-    public AddCacheRequest(final RequestId requestId, final DataRequestConfig dataRequestConfig, final Optional<Duration> timeToLive) {
+    public AddCacheRequest requestId(final RequestId requestId) {
         this.requestId = requestId;
+        return this;
+    }
+
+    public AddCacheRequest dataRequestConfig(final DataRequestConfig dataRequestConfig) {
         this.dataRequestConfig = dataRequestConfig;
+        return this;
+    }
+
+    public AddCacheRequest timeToLive(final Long ttlMillis) {
+        this.timeToLive = toDuration(ttlMillis);
+        return this;
+    }
+
+    public AddCacheRequest timeToLive(final Temporal expiryPoint) {
+        this.timeToLive = until(expiryPoint);
+        return this;
+    }
+
+    public AddCacheRequest timeToLive(final Optional<Duration> timeToLive) {
         this.timeToLive = timeToLive;
+        return this;
     }
 
     public RequestId getRequestId() {
@@ -136,6 +143,7 @@ public class AddCacheRequest extends Request {
         final AddCacheRequest that = (AddCacheRequest) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(requestId, that.requestId)
                 .append(dataRequestConfig, that.dataRequestConfig)
                 .append(timeToLive, that.timeToLive)
@@ -145,6 +153,7 @@ public class AddCacheRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(23, 37)
+                .appendSuper(super.hashCode())
                 .append(requestId)
                 .append(dataRequestConfig)
                 .append(timeToLive)
@@ -154,6 +163,7 @@ public class AddCacheRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("requestId", requestId)
                 .append("dataRequestConfig", dataRequestConfig)
                 .append("TTL", timeToLive)

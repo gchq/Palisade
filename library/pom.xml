@@ -29,5 +29,6 @@
 
     <modules>
         <module>koryphe-library</module>
+        <module>mapreduce</module>
     </modules>
 </project>

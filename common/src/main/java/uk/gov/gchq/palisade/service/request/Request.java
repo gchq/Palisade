@@ -28,16 +28,24 @@ import java.util.UUID;
  * This makes sure each request has a unique identifier.
  */
 public abstract class Request {
-    private final String id;
+    private String id;
 
     public Request() {
-        id = UUID.randomUUID().toString();
+        id(UUID.randomUUID().toString());
+    }
+
+    public Request id(final String id) {
+        this.id = id;
+        return this;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
     }
 
     public String getId() {
         return id;
     }
-
 
     @Override
     public boolean equals(final Object o) {

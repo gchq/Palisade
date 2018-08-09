@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.util.JsonAssert;
 
 import static org.junit.Assert.assertEquals;

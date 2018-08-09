@@ -31,6 +31,7 @@
         <module>hashmap-resource-service</module>
         <module>rest-resource-service</module>
         <module>proxy-rest-resource-service</module>
+        <module>hdfs-resource-service</module>
     </modules>
 
     <dependencies>
