@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example.client;
 
+import uk.gov.gchq.koryphe.impl.function.If;
 import uk.gov.gchq.koryphe.impl.function.SetValue;
 import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
 import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
@@ -29,7 +30,6 @@ import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
 import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
 import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
-import uk.gov.gchq.palisade.example.rule.function.If;
 import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;

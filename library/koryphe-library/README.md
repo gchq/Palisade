@@ -25,7 +25,7 @@ This library adds Koryphe Functions/Predicates to Palisade.
 [Koryphe](https://github.com/gchq/koryphe) provides several lightweight 
 reusable functions and predicates that can be chained together and applied
 to generic tuple objects. Using this library allows you to define your
-Palisade Policy rules in standard reuseable way without having to
+Palisade Policy rules in standard reusable way without having to
 create lots of similar java classes. It also provides a mechanism
 for extracting fields from objects/tuples and passing them directly to
 functions/predicates.
