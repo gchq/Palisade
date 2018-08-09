@@ -26,10 +26,6 @@
     </parent>
     <artifactId>koryphe-library</artifactId>
 
-    <properties>
-        <koryphe.version>1.5.0-RC2</koryphe.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
