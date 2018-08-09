@@ -32,10 +32,8 @@ import org.apache.hadoop.util.ToolRunner;
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.example.client.ExampleMapReduceClient;
-import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.resource.Resource;
-import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.File;
@@ -45,7 +43,7 @@ import java.io.IOException;
  * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
  * exmaple data. The job is then configured to make a request as part of the MapReduce job. The actual MapReduce job is
  * a simple word count example.
- *
+ * <p>
  * The word count example is adapted from: https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
  */
 public class MapReduceExample extends Configured implements Tool {
@@ -92,9 +90,6 @@ public class MapReduceExample extends Configured implements Tool {
             return 1;
         }
 
-        //get the service we can set on the input format
-        final ExampleMapReduceClient client = new ExampleMapReduceClient();
-        final PalisadeService palisadeService = client.getPalisadeService();
 
         //create the basic job object and configure it for this example
         Job job = Job.getInstance(getConf(), "Palisade MapReduce Example");
@@ -114,18 +109,13 @@ public class MapReduceExample extends Configured implements Tool {
         job.setOutputFormatClass(TextOutputFormat.class);
         FileOutputFormat.setOutputPath(job, new Path(args[0]));
 
-        //configure the Palisade input format
-        job.setInputFormatClass(PalisadeInputFormat.class);
-
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
 
-        //tell it which Palisade service to use
-        PalisadeInputFormat.setPalisadeService(job, palisadeService);
-        //set a maximum mapper hint
-        PalisadeInputFormat.setMaxMapTasksHint(job, 2);
-        //configure the serialiser to use
-        PalisadeInputFormat.setSerialiser(job, new ExampleObjSerialiser());
+        //configure the Palisade input format on an example client
+        final ExampleMapReduceClient client = new ExampleMapReduceClient();
+
+        ExampleMapReduceClient.initialiseJob(job, client, 2);
 
         //next add a resource request to the job
         addDataRequest(job, "file1", RESOURCE_TYPE, "Alice", "Payroll");

@@ -69,6 +69,7 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User auths(final String... auths) {
+
         Collections.addAll(this.auths, auths);
         return this;
     }

@@ -15,6 +15,8 @@
  */
 package uk.gov.gchq.palisade.example.client;
 
+import org.apache.hadoop.mapreduce.Job;
+
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
@@ -24,6 +26,7 @@ import uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.function.IsTimestampMoreThan;
 import uk.gov.gchq.palisade.example.function.IsVisible;
+import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
@@ -86,6 +89,24 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
 
         // Wait for the users, policies and resources to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();
+    }
+
+    /**
+     * Set up a given MapReduce job to source data from an {@link ExampleMapReduceClient}. This convenience method will
+     * configure the input format, set the {@link PalisadeService} and the serialiser.
+     *
+     * @param job        the job to configure
+     * @param client     the particular client
+     * @param maxMapHint maximum mapper hint
+     */
+    public static void initialiseJob(final Job job, final ExampleMapReduceClient client, final int maxMapHint) {
+        job.setInputFormatClass(PalisadeInputFormat.class);
+        //tell it which Palisade service to use
+        PalisadeInputFormat.setPalisadeService(job, client.getPalisadeService());
+        //set a maximum mapper hint
+        PalisadeInputFormat.setMaxMapTasksHint(job, maxMapHint);
+        //configure the serialiser to use
+        PalisadeInputFormat.setSerialiser(job, new ExampleObjSerialiser());
     }
 
     /**

@@ -41,6 +41,9 @@ mvn clean install -Pquick
 
 2. Run the example
 ```bash
- ./example/mapreduce-example/scripts/run.sh
+ ./example/mapreduce-example/scripts/run.sh [output_path]
 ```
+
+The shell script will use a default path under `/tmp` if no path is provided.
+
 This just runs the java class: uk.gov.gchq.palisade.example.MapReduceExample. You can just run this class directly in your IDE.
