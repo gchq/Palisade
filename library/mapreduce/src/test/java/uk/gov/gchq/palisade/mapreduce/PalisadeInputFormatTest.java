@@ -35,6 +35,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class PalisadeInputFormatTest {
@@ -164,30 +166,19 @@ public class PalisadeInputFormatTest {
     }
 
     /**
-     * Simulate a job set up, mock up a job and a palisade service and ask the input format to create splits for it
+     * Simulate a job set up, mock up a job and ask the input format to create splits for it. The given {@link
+     * PalisadeService} will be used to provide data for the requests.
      *
-     * @param maxMapHint maximum mappers to set
-     * @param reqs       the map of requests and responses for a palisade service
+     * @param maxMapHint      maximum mappers to set
+     * @param reqs            the map of requests and responses for a palisade service
+     * @param palisadeService the service to send requests to
      * @return input splits
      * @throws IOException shouldn't happen
      */
-    public List<InputSplit> callGetSplits(int maxMapHint, Map<RegisterDataRequest, DataRequestResponse> reqs) throws IOException {
+    private static List<InputSplit> callGetSplits(int maxMapHint, Map<RegisterDataRequest, DataRequestResponse> reqs, PalisadeService palisadeService) throws IOException {
         Configuration c = new Configuration();
         JobContext mockJob = Mockito.mock(JobContext.class);
         when(mockJob.getConfiguration()).thenReturn(c);
-        //make a mock palisade service that the input format can talk to
-        PalisadeService palisadeService = Mockito.mock(PalisadeService.class);
-        //tell it what to respond with
-        for (Map.Entry<RegisterDataRequest, DataRequestResponse> req : reqs.entrySet()) {
-            when(palisadeService.registerDataRequest(req.getKey())).thenReturn(CompletableFuture.supplyAsync(() -> {
-                //wait random time for the palisade service to process the resource
-                try {
-                    Thread.sleep(ThreadLocalRandom.current().nextInt(0, 500));
-                } catch (InterruptedException ignored) {
-                }
-                return req.getValue();
-            }));
-        }
         //configure the input format as the client would
         PalisadeInputFormat.setMaxMapTasksHint(mockJob, maxMapHint);
         PalisadeInputFormat.setPalisadeService(mockJob, palisadeService);
@@ -199,9 +190,51 @@ public class PalisadeInputFormatTest {
         return pif.getSplits(mockJob);
     }
 
+    /**
+     * Simulate a job set up, mock up a job and a {@link PalisadeService} that responds in a realistic way with the
+     * given map of responses.
+     *
+     * @param maxMapHint maximum mappers to set
+     * @param reqs       the map of requests and responses for a palisade service
+     * @return input splits
+     * @throws IOException shouldn't happen
+     */
+    private static List<InputSplit> callGetSplits(int maxMapHint, Map<RegisterDataRequest, DataRequestResponse> reqs) throws IOException {
+        //make a mock palisade service that the input format can talk to
+        PalisadeService palisadeService = Mockito.mock(PalisadeService.class);
+        //tell it what to respond with
+        for (Map.Entry<RegisterDataRequest, DataRequestResponse> req : reqs.entrySet()) {
+            when(palisadeService.registerDataRequest(req.getKey())).thenReturn(CompletableFuture.supplyAsync(() -> {
+                //wait random time for the palisade service to pretend to process the resource
+                try {
+                    Thread.sleep(ThreadLocalRandom.current().nextInt(0, 500));
+                } catch (InterruptedException ignored) {
+                }
+                return req.getValue();
+            }));
+        }
+        return callGetSplits(maxMapHint, reqs, palisadeService);
+    }
+
     @SuppressWarnings("unchecked")
     private static <R extends InputSplit> List<R> convert(List<InputSplit> list) {
         return (List<R>) list;
+    }
+
+    @Test
+    public void shouldThrowOnSingleFailedRequest() throws IOException {
+        //Given
+        Map<RegisterDataRequest, DataRequestResponse> resources = new HashMap<>();
+        resources.put(request1, req1Response);
+        //make palisade service that throws exceptions
+        PalisadeService mockService = Mockito.mock(PalisadeService.class);
+        when(mockService.registerDataRequest(any(RegisterDataRequest.class))).thenReturn(CompletableFuture.supplyAsync(() -> {
+            throw new IllegalStateException("test exception");
+        }));
+        //When
+        List<PalisadeInputSplit> splits = convert(callGetSplits(1, resources, mockService));
+        //Then
+        checkForExpectedResources(splits,0,0);
     }
 
     @Test
