@@ -183,7 +183,7 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     /**
      * {@inheritDoc}
      * <p>
-     * Creates a {@link uk.gov.gchq.palisade.PalisadeRecordReader}.
+     * Creates a {@link uk.gov.gchq.palisade.mapreduce.PalisadeRecordReader}.
      */
     @Override
     public RecordReader<Resource, V> createRecordReader(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
