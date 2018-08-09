@@ -15,19 +15,18 @@
  */
 package uk.gov.gchq.palisade.example.data.serialiser;
 
-import uk.gov.gchq.palisade.data.serialise.BytesSerialiser;
+import uk.gov.gchq.palisade.data.serialise.LineSerialiser;
 import uk.gov.gchq.palisade.example.ExampleObj;
 
-public class ExampleObjSerialiser implements BytesSerialiser<ExampleObj> {
+public class ExampleObjSerialiser extends LineSerialiser<ExampleObj> {
     @Override
-    public byte[] serialise(final ExampleObj object) {
-        return (object.getProperty() + "," + object.getVisibility() + "," + object.getTimestamp()).getBytes();
+    public String serialiseLine(final ExampleObj obj) {
+        return obj.getProperty() + "," + obj.getVisibility() + "," + obj.getTimestamp();
     }
 
     @Override
-    public ExampleObj deserialise(final byte[] bytes) {
-        final String str = new String(bytes);
-        final String[] parts = str.split(",");
+    public ExampleObj deserialiseLine(final String line) {
+        final String[] parts = line.split(",");
         return new ExampleObj(parts[0], parts[1], Long.parseLong(parts[2]));
     }
 }

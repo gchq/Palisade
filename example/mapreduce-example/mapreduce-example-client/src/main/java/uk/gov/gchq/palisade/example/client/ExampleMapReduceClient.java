@@ -37,6 +37,7 @@ import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
@@ -51,14 +52,16 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
                                 new User()
                                         .userId("Alice")
                                         .auths("public", "private")
-                                        .roles("user", "admin"))
+                                        .roles("user", "admin")
+                        )
         );
         final CompletableFuture<Boolean> userBobStatus = userService.addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
                                 .auths("public")
-                                .roles("user"))
+                                .roles("user")
+                )
         );
 
         // The policy owner or sys admin needs to add the policies
@@ -67,13 +70,12 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
                         new FileResource()
                                 .id("file1")
                                 .type(RESOURCE_TYPE))
-                        .policy(new Policy()
-                                        .message("Age off and visibility filtering")
-                                        .predicateRule(
+                        .policy(new Policy<ExampleObj>()
+                                        .recordLevelPredicateRule(
                                                 "visibility",
                                                 new IsVisible()
                                         )
-                                        .simplePredicateRule(
+                                        .recordLevelSimplePredicateRule(
                                                 "ageOff",
                                                 new IsTimestampMoreThan(12L)
                                         )
@@ -89,6 +91,15 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
 
         // Wait for the users, policies and resources to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();
+    }
+
+    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
+        return super.read(filename, RESOURCE_TYPE, userId, justification);
+    }
+
+    @Override
+    protected Serialiser<ExampleObj> createSerialiser() {
+        return new ExampleObjSerialiser();
     }
 
     /**
@@ -117,10 +128,5 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
      */
     public PalisadeService getPalisadeService() {
         return palisadeService;
-    }
-
-    @Override
-    protected Serialiser<?, ExampleObj> createSerialiser() {
-        return new ExampleObjSerialiser();
     }
 }

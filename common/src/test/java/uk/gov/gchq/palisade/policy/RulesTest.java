@@ -18,6 +18,8 @@ package uk.gov.gchq.palisade.policy;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.rule.Rules;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

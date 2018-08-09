@@ -79,7 +79,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
     /**
      * The Palisade serialiser that will be used to decode each item from the resources being processed.
      */
-    private Serialiser<Object, V> serialiser;
+    private Serialiser<V> serialiser;
 
     /**
      * Count of number of resources already processed, used for Haodop progress monitoring.
@@ -169,14 +169,10 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
         //stash the resource
         currentKey = resource;
         final DataService service = conDetails.createService();
-        //create the singleton resource request for this resource
-        final DataRequestResponse singleResourceRequest = new DataRequestResponse()
-                .requestId(resourceDetails.getRequestId())
-                .resource(resource, conDetails);
         //lodge request with the data service
-        final CompletableFuture<ReadResponse<Object>> futureResponse = service.read(new ReadRequest().dataRequestResponse(singleResourceRequest));
+        final CompletableFuture<ReadResponse> futureResponse = service.read(new ReadRequest().requestId(resourceDetails.getRequestId()).resource(resource));
         //when this future completes, we should have an iterator of things once we deserialise
-        itemIt = futureResponse.thenApply(response -> response.getData().map(serialiser::deserialise).iterator())
+        itemIt = futureResponse.thenApply(response -> serialiser.deserialise(response.getData()).iterator())
                 //force code to block at this point waiting for resource data to become available
                 .join();
         processed++;

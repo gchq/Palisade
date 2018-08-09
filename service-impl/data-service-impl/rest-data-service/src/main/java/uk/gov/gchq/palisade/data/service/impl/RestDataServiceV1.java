@@ -16,14 +16,11 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.glassfish.jersey.server.ChunkedOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +34,14 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.CompletableFuture;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -74,7 +76,7 @@ public class RestDataServiceV1 implements DataService {
     @POST
     @Path("/read")
     @ApiOperation(value = "Reads some data",
-            response = ReadRequest.class)
+            response = ReadResponse.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
@@ -87,40 +89,43 @@ public class RestDataServiceV1 implements DataService {
     @POST
     @Path("/read/chunked")
     @ApiOperation(value = "Reads some data and return it chunked",
-            response = ReadRequest.class)
+            response = InputStream.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    @JsonTypeInfo(
-            use = JsonTypeInfo.Id.CLASS,
-            include = As.WRAPPER_OBJECT,
-            property = "class"
-    )
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @SuppressFBWarnings
-    public ChunkedOutput<byte[]> readSyncChunked(final ReadRequest request) {
-        // Create chunked output instance
-        final ChunkedOutput<byte[]> output = new ChunkedOutput<>(String.class, "\r\n");
-
-        read(request).thenAccept(response -> {
-            // write chunks to the chunked output object
-            response.getData()
-                    .map(JSONSerialiser::serialise)
-                    .forEach((chunk) -> {
-                        try {
-                            output.write(chunk);
-                        } catch (final IOException e) {
-                            throw new RuntimeException("Unable to write chunk to output", e);
-                        }
-                    });
-        });
-
-        return output;
+    public Response readChunked(final ReadRequest request) {
+        return Response.ok(new DataStreamingOutput(read(request)), MediaType.APPLICATION_OCTET_STREAM).build();
     }
 
     @Override
-    public <T> CompletableFuture<ReadResponse<T>> read(final ReadRequest request) {
+    public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         return delegate.read(request);
+    }
+
+    private static class DataStreamingOutput implements StreamingOutput {
+        CompletableFuture<ReadResponse> futureResponse;
+
+        DataStreamingOutput(final CompletableFuture<ReadResponse> futureResponse) {
+            this.futureResponse = futureResponse;
+        }
+
+        @Override
+        public void write(final OutputStream outputStream) throws IOException, WebApplicationException {
+            final ReadResponse response = futureResponse.join();
+            final InputStream stream = response.getData();
+            try {
+                for (int b = stream.read(); b >= 0; b = stream.read()) {
+                    outputStream.write(b);
+                }
+                outputStream.flush();
+            } catch (final IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     protected DataService getDelegate() {

@@ -13,23 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.data.serialise;
 
-public interface BytesSerialiser<T> extends Serialiser<byte[], T> {
+package uk.gov.gchq.palisade.io;
+
+import java.io.ByteArrayOutputStream;
+
+/**
+ * A {@code BytesOutputStream} extends {@link ByteArrayOutputStream} and
+ * exposes the buffered bytes and count fields.
+ */
+public class BytesOutputStream extends ByteArrayOutputStream implements Bytes {
+    @Override
+    public byte[] getBytes() {
+        return buf;
+    }
+
+    @Override
+    public int getCount() {
+        return count;
+    }
 
     /**
-     * Serialise some object into bytes.
-     *
-     * @param object the object to be serialised
-     * @return the serialised bytes
+     * Resets the byte buffer to a new byte array.
      */
-    byte[] serialise(final T object);
-
-    /**
-     * Deserialise some bytes into an object.
-     *
-     * @param bytes the bytes to deserialise
-     * @return the deserialised object
-     */
-    T deserialise(final byte[] bytes);
+    public void reset() {
+        buf = new byte[32];
+        count = 0;
+    }
 }

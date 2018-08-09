@@ -65,12 +65,11 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                         new FileResource().id("file1").type(RESOURCE_TYPE))
                         .policy(
                                 new Policy<ExampleObj>()
-                                        .message("Age off and visibility filtering")
-                                        .predicateRule(
+                                        .recordLevelPredicateRule(
                                                 "visibility",
                                                 new IsVisible()
                                         )
-                                        .simplePredicateRule(
+                                        .recordLevelSimplePredicateRule(
                                                 "ageOff",
                                                 new IsTimestampMoreThan(12L)
                                         )
@@ -94,7 +93,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
     }
 
     @Override
-    protected Serialiser<?, ExampleObj> createSerialiser() {
+    protected Serialiser<ExampleObj> createSerialiser() {
         return new ExampleObjSerialiser();
     }
 }

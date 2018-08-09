@@ -40,6 +40,11 @@ mvn clean install -Pquick
 ```
 
 2. Start the REST services
+
+The services can be started within Docker containers or ran within a local Tomcat.
+
+To run them in them in a local Tomcat:
+
 Either start them all in a single terminal using:
 ```bash
  ./example/multi-jvm-example/scripts/startAllServices.sh
@@ -72,13 +77,47 @@ INFO: Starting ProtocolHandler ["http-bio-8083"]
 INFO: Starting ProtocolHandler ["http-bio-8084"]
 ```
 
+To run them in Docker:
+
+```bash
+  ./example/multi-jvm-example/scripts/dockerComposeUp.sh
+```
+
+You can check the containers are available:
+
+```bash
+   docker ps
+```
+
+You should see 5 containers:
+
+```
+CONTAINER ID        IMAGE                                                COMMAND             CREATED             STATUS              PORTS                    NAMES
+27e121f284c3        multi-jvm-example-docker-services_policy-service     "catalina.sh run"   30 minutes ago      Up 10 seconds       0.0.0.0:8081->8080/tcp   policy-service
+01f13c6350d6        multi-jvm-example-docker-services_data-service       "catalina.sh run"   30 minutes ago      Up 8 seconds        0.0.0.0:8084->8080/tcp   data-service
+f4d7e07b8412        multi-jvm-example-docker-services_palisade-service   "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8080->8080/tcp   palisade-service
+c291ff79eecc        multi-jvm-example-docker-services_resource-service   "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8082->8080/tcp   resource-service
+1c16c50a6e2d        multi-jvm-example-docker-services_user-service       "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8083->8080/tcp   user-service
+```
+
 3. Run the example
+
 ```bash 
  ./example/multi-jvm-example/scripts/run.sh
 ```
+
 This just runs the java class: uk.gov.gchq.palisade.example.MultiJvmExample. You can just run this class directly in your IDE.
 
 4. Stop the REST services
+
+For local Tomcat:
+
 ```bash
  ./example/multi-jvm-example/scripts/stopAllServices.sh
+```
+
+For Docker:
+
+```bash
+ ./example/multi-jvm-example/scripts/dockerComposeDown.sh
 ```

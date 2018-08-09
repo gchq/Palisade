@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.policy;
 
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.rule.Rule;
 
 public class TestRule implements Rule<String> {
     @Override

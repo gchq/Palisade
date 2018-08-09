@@ -47,7 +47,6 @@ public abstract class Request {
         return id;
     }
 
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {

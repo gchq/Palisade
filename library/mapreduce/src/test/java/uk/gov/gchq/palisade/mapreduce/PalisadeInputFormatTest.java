@@ -3,16 +3,14 @@ package uk.gov.gchq.palisade.mapreduce;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.Justification;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
-import uk.gov.gchq.palisade.data.serialise.StubSerialiser;
+import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputSplit;
@@ -44,13 +42,13 @@ public class PalisadeInputFormatTest {
     @Test
     public void shouldSerialiseandDeserialise() throws IOException {
         //Given
-        StubSerialiser serial = new StubSerialiser("nothing");
+        SimpleStringSerialiser serial = new SimpleStringSerialiser();
         Configuration c = new Configuration();
         //When
         PalisadeInputFormat.setSerialiser(c, serial);
-        Serialiser<Object, Object> deserial = PalisadeInputFormat.getSerialiser(c);
+        Serialiser<String> deserial = PalisadeInputFormat.getSerialiser(c);
         //Then
-        assertEquals(serial, deserial);
+        assertEquals(serial.getClass(), deserial.getClass());
     }
 
     @Test
@@ -60,7 +58,7 @@ public class PalisadeInputFormatTest {
         JobContext mockJob = Mockito.mock(JobContext.class);
         when(mockJob.getConfiguration()).thenReturn(c);
 
-        RegisterDataRequest rdr = new RegisterDataRequest().resource("testResource").userId(new UserId().id("user")).justification(new Justification().justification("justification"));
+        RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).justification(new Justification().justification("justification"));
         RegisterDataRequest[] rdrArray = {rdr};
         String json = new String(JSONSerialiser.serialise(rdrArray), PalisadeInputFormat.UTF8);
         //When
@@ -75,7 +73,7 @@ public class PalisadeInputFormatTest {
         Configuration c = new Configuration();
         JobContext mockJob = Mockito.mock(JobContext.class);
         when(mockJob.getConfiguration()).thenReturn(c);
-        RegisterDataRequest rdr = new RegisterDataRequest().resource("testResource").userId(new UserId().id("user")).justification(new Justification().justification("justification"));
+        RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).justification(new Justification().justification("justification"));
         //When
         PalisadeInputFormat.addDataRequest(mockJob, rdr);
         PalisadeInputFormat.addDataRequest(mockJob, rdr);
@@ -119,8 +117,8 @@ public class PalisadeInputFormatTest {
         Configuration c = new Configuration();
         JobContext mockJob = Mockito.mock(JobContext.class);
         when(mockJob.getConfiguration()).thenReturn(c);
-        RegisterDataRequest rdr = new RegisterDataRequest().resource("testResource").userId(new UserId().id("user")).justification(new Justification().justification("justification"));
-        RegisterDataRequest rdr2 = new RegisterDataRequest().resource("testResource2").userId(new UserId().id("user2")).justification(new Justification().justification("justification2"));
+        RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).justification(new Justification().justification("justification"));
+        RegisterDataRequest rdr2 = new RegisterDataRequest().resourceId("testResource2").userId(new UserId().id("user2")).justification(new Justification().justification("justification2"));
         RegisterDataRequest rdr3 = new RegisterDataRequest();
         //When
         PalisadeInputFormat.addDataRequests(mockJob, rdr, rdr2, rdr3);
@@ -151,7 +149,7 @@ public class PalisadeInputFormatTest {
 
     @BeforeClass
     public static void setup() {
-        request1 = new RegisterDataRequest().resource("res1").userId(new UserId().id("user1")).justification(new Justification().justification("just1"));
+        request1 = new RegisterDataRequest().resourceId("res1").userId(new UserId().id("user1")).justification(new Justification().justification("just1"));
         req1Response = new DataRequestResponse();
         req1Response.getResources().put(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"));
         req1Response.getResources().put(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"));
@@ -159,7 +157,7 @@ public class PalisadeInputFormatTest {
         req1Response.getResources().put(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"));
         req1Response.getResources().put(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
 
-        request2 = new RegisterDataRequest().resource("res2").userId(new UserId().id("user2")).justification(new Justification().justification("just2"));
+        request2 = new RegisterDataRequest().resourceId("res2").userId(new UserId().id("user2")).justification(new Justification().justification("just2"));
         req2Response = new DataRequestResponse();
         req2Response.getResources().put(new StubResource("type_a", "id6", "format6"), new StubConnectionDetail("con6"));
         req2Response.getResources().put(new StubResource("type_b", "id7", "format7"), new StubConnectionDetail("con7"));
@@ -185,7 +183,7 @@ public class PalisadeInputFormatTest {
                 //wait random time for the palisade service to process the resource
                 try {
                     Thread.sleep(ThreadLocalRandom.current().nextInt(0, 500));
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
                 return req.getValue();
             }));
