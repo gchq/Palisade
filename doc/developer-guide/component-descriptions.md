@@ -33,7 +33,7 @@ The user service is responsible for retrieving details about the user from an au
 [Check out the user service readme for more details](../../service/user-service/README.md)
 
 ### Policy Service
-The job of the policy service is to provide the set of rules (filters or transformations) that need to be applied to each resource that has been requested, based on the user and justification.
+The job of the policy service is to provide the set of rules (filters or transformations) that need to be applied to each resource that has been requested, based on the user and query context.
 [Check out the policy service readme for more details](../../service/policy-service/README.md)
 
 ### Resource Service
