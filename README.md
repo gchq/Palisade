@@ -68,7 +68,7 @@ These example should provide a good start to understanding how Palisade works.
 
 * To run the REST based example follow this guide: [multi-jvm-example](example/multi-jvm-example/README.md)
 
-For more details about the code structure see the [Developer Guide](doc/developer_guide.md)
+For more details about the code structure see the [Developer Guide](doc/developer-guide/developer_guide.md)
 
 For details about possible use cases, see the [Use Cases](doc/use_cases.md)
 

@@ -2,7 +2,7 @@
 
 * [Introduction](README.md)
 
-* [Developer Guide](doc/developer_guide.md)
+* [Developer Guide](doc/developer-guide/developer_guide.md)
 
 * [Use Cases](doc/use_cases.md)
 
@@ -17,7 +17,8 @@
 
 * [Examples](example/README.md)
   * [Single JVM](example/single-jvm-example/README.md)
-  * [Multi JVM](example/multi-jvm-example/README.md)
+  * [Multi JVM/Docker deployment](example/multi-jvm-example/README.md)
+  * [Map Reduce](example/mapreduce-example/README.md)
 
 * Other
   * [Ways of Working](doc/other/ways_of_working.md) 
