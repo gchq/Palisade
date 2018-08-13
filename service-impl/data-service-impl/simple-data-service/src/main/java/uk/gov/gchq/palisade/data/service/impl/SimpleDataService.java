@@ -88,7 +88,7 @@ public class SimpleDataService implements DataService {
             final DataReaderRequest readerRequest = new DataReaderRequest()
                     .resource(request.getResource())
                     .user(config.getUser())
-                    .justification(config.getJustification())
+                    .context(config.getContext())
                     .rules(config.getRules().get(request.getResource()));
 
             LOGGER.debug("Calling reader with: {}", readerRequest);

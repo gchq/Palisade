@@ -90,7 +90,7 @@ public abstract class SerialisedDataReader implements DataReader {
             final Stream<Object> deserialisedData = Util.applyRulesToStream(
                     serialiser.deserialise(rawStream),
                     request.getUser(),
-                    request.getJustification(),
+                    request.getContext(),
                     rules
             );
             data = serialiser.serialise(deserialisedData);
