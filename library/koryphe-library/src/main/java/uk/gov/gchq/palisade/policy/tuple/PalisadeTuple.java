@@ -17,7 +17,7 @@
 package uk.gov.gchq.palisade.policy.tuple;
 
 import uk.gov.gchq.koryphe.tuple.Tuple;
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.util.FieldGetter;
@@ -29,14 +29,14 @@ import java.util.Map;
 
 /**
  * A {@code PalisadeTuple} is a {@link Tuple} that wraps a record, {@link User}
- * and {@link Justification} in a record and allows users to select fields
+ * and {@link Context} in a record and allows users to select fields
  * based on field names. The field names have namespaces, such as:
- * User.auths, User.userId.id, Justification.justification, Record.timestamp
+ * User.auths, User.userId.id, Context.context, Record.timestamp
  */
 public class PalisadeTuple implements Tuple<String> {
     public static final String RECORD_NAMESPACE = "Record";
     public static final String NAMESPACE_MSG =
-            User.NAMESPACE + ", " + Justification.NAMESPACE + " or " + RECORD_NAMESPACE + ". "
+            User.NAMESPACE + ", " + Context.NAMESPACE + " or " + RECORD_NAMESPACE + ". "
                     + "For example: " + User.NAMESPACE + "." + User.AUTHS;
 
     private static final Map<String, FieldGetter<PalisadeTuple>> FIELD_GETTERS = createFieldGetters();
@@ -44,21 +44,21 @@ public class PalisadeTuple implements Tuple<String> {
 
     private final Tuple<String> record;
     private final User user;
-    private final Justification justification;
+    private final Context context;
 
     /**
-     * Constructs a {@link PalisadeTuple} with a record, user and justification.
+     * Constructs a {@link PalisadeTuple} with a record, user and context.
      *
      * @param record        the record tuple
      * @param user          the user
-     * @param justification the query justification
+     * @param context the query context
      */
     public PalisadeTuple(final Tuple<String> record,
                          final User user,
-                         final Justification justification) {
+                         final Context context) {
         this.record = record;
         this.user = user;
-        this.justification = justification;
+        this.context = context;
     }
 
     @Override
@@ -90,14 +90,14 @@ public class PalisadeTuple implements Tuple<String> {
         return user;
     }
 
-    public Justification getJustification() {
-        return justification;
+    public Context getContext() {
+        return context;
     }
 
     private static Map<String, FieldGetter<PalisadeTuple>> createFieldGetters() {
         Map<String, FieldGetter<PalisadeTuple>> map = new HashMap<>();
         map.put(User.NAMESPACE, (tuple, field) -> tuple.user.getField(field));
-        map.put(Justification.NAMESPACE, (tuple, field) -> tuple.justification.getField(field));
+        map.put(Context.NAMESPACE, (tuple, field) -> tuple.context.get(field));
         map.put(RECORD_NAMESPACE, (tuple, field) -> tuple.record.get(field));
         map.put(null, (tuple, field) -> {
             throw new IllegalArgumentException("Reference must contain a namespace: " + NAMESPACE_MSG);
@@ -108,7 +108,7 @@ public class PalisadeTuple implements Tuple<String> {
     private static Map<String, FieldSetter<PalisadeTuple>> createFieldSetters() {
         Map<String, FieldSetter<PalisadeTuple>> map = new HashMap<>();
         map.put(User.NAMESPACE, (tuple, field, value) -> tuple.user.setField(field, value));
-        map.put(Justification.NAMESPACE, (tuple, field, value) -> tuple.justification.setField(field, value));
+        map.put(Context.NAMESPACE, (tuple, field, value) -> tuple.context.put(field, value));
         map.put(RECORD_NAMESPACE, (tuple, field, value) -> tuple.record.put(field, value));
         map.put(null, (tuple, field, value) -> {
             throw new IllegalArgumentException("Reference must contain a namespace: " + NAMESPACE_MSG);

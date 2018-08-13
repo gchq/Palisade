@@ -28,7 +28,7 @@ import uk.gov.gchq.koryphe.tuple.ReflectiveTuple;
 import uk.gov.gchq.koryphe.tuple.Tuple;
 import uk.gov.gchq.koryphe.tuple.function.TupleAdaptedFunction;
 import uk.gov.gchq.koryphe.tuple.predicate.TupleAdaptedPredicate;
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.rule.Rule;
@@ -126,7 +126,7 @@ public class TupleRule<T> implements Rule<T> {
     }
 
     @Override
-    public T apply(final T record, final User user, final Justification justification) {
+    public T apply(final T record, final User user, final Context context) {
         final T rtn;
 
         final boolean isTupleRecord = record instanceof Tuple;
@@ -137,7 +137,7 @@ public class TupleRule<T> implements Rule<T> {
             recordTuple = new ReflectiveTuple(record);
         }
 
-        final PalisadeTuple palisadeTuple = new PalisadeTuple(recordTuple, user, justification);
+        final PalisadeTuple palisadeTuple = new PalisadeTuple(recordTuple, user, context);
         if (isFunction) {
             final Object updatedTuple = ((PalisadeTuple) function.apply(palisadeTuple)).getRecord();
             if (!isTupleRecord) {

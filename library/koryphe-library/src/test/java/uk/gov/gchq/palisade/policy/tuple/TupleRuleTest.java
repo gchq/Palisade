@@ -5,7 +5,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 
 import java.util.Set;
@@ -20,7 +20,7 @@ public class TupleRuleTest {
     public static final String RECORD_VAR1 = "Record.var1";
     public static final String RECORD_VAR2 = "Record.var2";
     public static final String USER_AUTHS = "User.auths";
-    public static final String JUSTIFICATION_JUSTIFICATION = "Justification.justification";
+    public static final String CONTEXT_JUSTIFICATION = "Context.justification";
     public static final String AUTH_1 = "auth1";
     public static final String JUST_1 = "just1";
     public static final String FROM_RULE = "fromRule";
@@ -147,9 +147,9 @@ public class TupleRuleTest {
     @Test
     public void shouldSelectAndMatchJust() throws Exception {
         //given
-        final Justification just = new Justification().justification(JUST_1);
+        final Context just = new Context().justification(JUST_1);
         testObject = new TupleRule<TestObj>()
-                .selection(JUSTIFICATION_JUSTIFICATION)
+                .selection(CONTEXT_JUSTIFICATION)
                 .predicate((String s) -> s.equals(JUST_1));
 
         //when
@@ -161,9 +161,9 @@ public class TupleRuleTest {
     @Test
     public void shouldSelectAndNotMatchJust() throws Exception {
         //given
-        final Justification just = new Justification().justification(JUST_1);
+        final Context just = new Context().justification(JUST_1);
         testObject = new TupleRule<TestObj>()
-                .selection(JUSTIFICATION_JUSTIFICATION)
+                .selection(CONTEXT_JUSTIFICATION)
                 .predicate((String s) -> s.equals(OTHER));
 
         //when
@@ -175,11 +175,11 @@ public class TupleRuleTest {
     @Test
     public void shouldSelectAndProjectJust() throws Exception {
         //given
-        final Justification just = new Justification().justification(JUST_1);
+        final Context just = new Context().justification(JUST_1);
         testObject = new TupleRule<TestObj>()
-                .selection(JUSTIFICATION_JUSTIFICATION)
+                .selection(CONTEXT_JUSTIFICATION)
                 .function((String o) -> FROM_RULE)
-                .projection(JUSTIFICATION_JUSTIFICATION);
+                .projection(CONTEXT_JUSTIFICATION);
         //when
         final TestObj actual = testObject.apply(record, null, just);
         //then

@@ -17,7 +17,7 @@
 package uk.gov.gchq.palisade.example.rule;
 
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.rule.Rule;
@@ -33,7 +33,7 @@ public class IsExampleObjRecent implements Rule<ExampleObj> {
     }
 
     @Override
-    public ExampleObj apply(final ExampleObj record, final User user, final Justification justification) {
+    public ExampleObj apply(final ExampleObj record, final User user, final Context context) {
         if (null == record) {
             return null;
         }

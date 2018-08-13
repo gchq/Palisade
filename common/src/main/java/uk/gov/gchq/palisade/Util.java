@@ -104,28 +104,27 @@ public final class Util {
         return map;
     }
 
-    public static <T> Stream<T> applyRulesToStream(final Stream<T> records, final User user, final Justification justification, final Rules<T> rules) {
+    public static <T> Stream<T> applyRulesToStream(final Stream<T> records, final User user, final Context context, final Rules<T> rules) {
         Objects.requireNonNull(records);
         if (null == rules || rules.getRules().isEmpty()) {
             return records;
         }
 
-        return records.map(record -> applyRulesToRecord(record, user, justification, rules)).filter(record -> null != record);
+        return records.map(record -> applyRulesToRecord(record, user, context, rules)).filter(record -> null != record);
     }
 
-    public static <T> T applyRulesToRecord(final T record, final User user, final Justification justification, final Rules<T> rules) {
+    public static <T> T applyRulesToRecord(final T record, final User user, final Context context, final Rules<T> rules) {
         if (null == rules || rules.getRules().isEmpty()) {
             return record;
         }
-
-        T outputRecord = record;
-        for (final Rule resourceRule : rules.getRules().values()) {
-            outputRecord = (T) resourceRule.apply(outputRecord, user, justification);
-            if (null == outputRecord) {
+        T updatedRecord = record;
+        for (final Rule<T> resourceRule : rules.getRules().values()) {
+            updatedRecord = resourceRule.apply(updatedRecord, user, context);
+            if (null == updatedRecord) {
                 break;
             }
         }
-        return outputRecord;
+        return updatedRecord;
     }
 
     public static <T> Object getField(

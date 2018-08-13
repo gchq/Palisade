@@ -21,7 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
@@ -77,8 +77,8 @@ public class RestPolicyServiceV1IT {
         final FileResource resource = new FileResource().id("file1");
         final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
-        final Justification justification = new Justification().justification("justification1");
-        final CanAccessRequest request = new CanAccessRequest().resources(Collections.singletonList(resource)).user(user).justification(justification);
+        final Context context = new Context().justification("justification1");
+        final CanAccessRequest request = new CanAccessRequest().resources(Collections.singletonList(resource)).user(user).context(context);
 
         given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(new CanAccessResponse(Collections.singletonList(resource))));
 
@@ -100,8 +100,8 @@ public class RestPolicyServiceV1IT {
         final FileResource resource2 = new FileResource().id("file2");
         final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
-        final Justification justification = new Justification().justification("justification1");
-        final GetPolicyRequest request = new GetPolicyRequest().user(user).justification(justification).resources(Arrays.asList(resource1, resource2));
+        final Context context = new Context().justification("justification1");
+        final GetPolicyRequest request = new GetPolicyRequest().user(user).context(context).resources(Arrays.asList(resource1, resource2));
 
         final Map<Resource, Policy> policies = new HashMap<>();
         policies.put(resource1, new Policy<>().owner(user));

@@ -22,6 +22,9 @@ import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.Resource;
@@ -32,6 +35,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,6 +54,8 @@ import java.util.stream.IntStream;
  * @param <V> The value type for the map task
  */
 public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PalisadeInputFormat.class);
+
     /**
      * Char-set for serialising data.
      */
@@ -79,6 +85,11 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      * Hadoop configuration key for setting the job UUID. Used for setting the {@link PalisadeService} for a job.
      */
     public static final String UUID_KEY = "uk.gov.gchq.palisade.mapreduce.job.uuid";
+
+    /**
+     * Hadoop configuration key for setting how the job will behave upon data service connection failure.
+     */
+    public static final String RESOURCE_ERROR_BEHAVIOUR = "uk.gov.gchq.palisade.mapreduce.error.mode";
 
     /**
      * Default number of mappers to use. Hint only. Zero means unlimited.
@@ -133,13 +144,22 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
         //create a stream for round robining resources
         final CompletableFuture[] futures = new CompletableFuture[reqs.size()];
         int i = 0;
-        for (RegisterDataRequest req : reqs) {
+        for (final RegisterDataRequest req : reqs) {
             //this iterator determines which mapper gets which resource
             final PrimitiveIterator.OfInt indexIt = IntStream.iterate(0, x -> (x + 1) % maxCounter).iterator();
             //send request to the Palisade service
             futures[i] = palService.registerDataRequest(req)
                     //when the response comes back create input splits based on max mapper hint
                     .thenApplyAsync(response -> InputFormatUtils.toInputSplits(response, indexIt))
+                            //handle an exception in the palisade service request
+                    .handle((item, exception) -> {
+                        if (item != null) {
+                            return item;
+                        } else {
+                            LOGGER.warn("Error fetching data request " + req + " due to exception: " + exception);
+                            return Collections.<InputSplit>emptyList();
+                        }
+                    })
                             //then add them to the master list (which is thread safe)
                     .thenAccept(splits::addAll);
             i++;
@@ -313,6 +333,32 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
     public static <V> Serialiser<V> getSerialiser(final JobContext context) throws IOException {
         Objects.requireNonNull(context, "context");
         return getSerialiser(context.getConfiguration());
+    }
+
+    /**
+     * Sets how the job should respond to errors in reading a resource through Palisade.
+     *
+     * @param context the job to configure
+     * @param mode    the desired failure mode
+     * @throws NullPointerException if anything is null
+     * @see ReaderFailureMode
+     */
+    public static void setResourceErrorBehaviour(final JobContext context, final ReaderFailureMode mode) {
+        Objects.requireNonNull(context, "context");
+        context.getConfiguration().setEnum(RESOURCE_ERROR_BEHAVIOUR, mode);
+    }
+
+    /**
+     * Gets how the job has been set to respond to resource connection errors. The default behaviour is {@link
+     * ReaderFailureMode#CONTINUE_ON_READ_FAILURE}.
+     *
+     * @param context the job to query
+     * @return the failure mode
+     * @throws NullPointerException if anything is null
+     */
+    public static ReaderFailureMode getResourceErrorBehaviour(final JobContext context) {
+        Objects.requireNonNull(context, "context");
+        return context.getConfiguration().getEnum(RESOURCE_ERROR_BEHAVIOUR, ReaderFailureMode.CONTINUE_ON_READ_FAILURE);
     }
 
     /**
