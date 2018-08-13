@@ -16,13 +16,13 @@
 
 package uk.gov.gchq.palisade.policy;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.rule.Rule;
 
 public class TestRule implements Rule<String> {
     @Override
-    public String apply(final String item, final User user, final Justification justification) {
+    public String apply(final String item, final User user, final Context context) {
         return item;
     }
 }

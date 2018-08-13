@@ -21,7 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
@@ -71,8 +71,8 @@ public class RestPalisadeServiceV1IT {
         final FileResource resource1 = new FileResource().id("file1");
         final FileResource resource2 = new FileResource().id("file1");
         final UserId userId = new UserId().id("user01");
-        final Justification justification = new Justification().justification("justification1");
-        final RegisterDataRequest request = new RegisterDataRequest().resourceId("file1").userId(userId).justification(justification);
+        final Context context = new Context().justification("justification1");
+        final RegisterDataRequest request = new RegisterDataRequest().resourceId("file1").userId(userId).context(context);
 
         final DataRequestResponse expectedResult = new DataRequestResponse().requestId(new RequestId().id("id1")).resource(resource1, new SimpleConnectionDetail());
         given(palisadeService.registerDataRequest(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
@@ -96,10 +96,10 @@ public class RestPalisadeServiceV1IT {
         final GetDataRequestConfig getDataRequestConfig = new GetDataRequestConfig().requestId(requestId).resource(resource1);
         final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
-        final Justification justification = new Justification().justification("justification1");
+        final Context context = new Context().justification("justification1");
         final DataRequestConfig expectedResult = new DataRequestConfig()
                 .user(user)
-                .justification(justification)
+                .context(context)
                 .rule(resource1, "testRule", new TestRule());
         given(palisadeService.getDataRequestConfig(getDataRequestConfig))
                 .willReturn(CompletableFuture.completedFuture(expectedResult));

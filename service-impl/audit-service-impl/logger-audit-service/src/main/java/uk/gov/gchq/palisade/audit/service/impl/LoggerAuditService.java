@@ -43,7 +43,7 @@ public class LoggerAuditService implements AuditService {
     public void audit(final AuditRequest request) {
         final String msg = "'" + request.getUser().getUserId().getId()
                 + "' accessed '" + request.getResource().getId()
-                + "' for '" + request.getJustification().getJustification()
+                + "' for '" + request.getContext().getJustification()
                 + "' and it was processed using '" + request.getHowItWasProcessed() + "'";
 
         if (null != request.getException()) {
