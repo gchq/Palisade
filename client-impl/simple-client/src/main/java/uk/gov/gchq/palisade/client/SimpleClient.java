@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.client;
 
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
@@ -67,7 +68,7 @@ public class SimpleClient<T> {
 
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String justification) {
         Objects.requireNonNull(palisadeService);
-        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).justification(justification);
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
 

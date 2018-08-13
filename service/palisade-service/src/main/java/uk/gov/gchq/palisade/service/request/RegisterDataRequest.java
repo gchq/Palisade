@@ -60,14 +60,9 @@ public class RegisterDataRequest extends Request {
     }
 
     /**
-     * @param justification the reason why the user wants access to the data
+     * @param context the contextual information required for this request such as the reason why the user wants access to the data
      * @return the {@link RegisterDataRequest}
      */
-    public RegisterDataRequest justification(final String justification) {
-        this.context = context.justification(justification);
-        return this;
-    }
-
     public RegisterDataRequest context(final Context context) {
         this.context = context;
         return this;
