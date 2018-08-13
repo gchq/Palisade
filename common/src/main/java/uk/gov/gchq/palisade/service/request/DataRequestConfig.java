@@ -22,12 +22,15 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.policy.Rules;
 import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.rule.Rule;
+import uk.gov.gchq.palisade.rule.Rules;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * This is the high level API for the object that contains all the information
@@ -53,7 +56,35 @@ public class DataRequestConfig extends Request {
     }
 
     public DataRequestConfig rules(final Map<Resource, Rules> rules) {
+        requireNonNull(rules, "rules is required");
         this.rules = rules;
+        return this;
+    }
+
+    public DataRequestConfig rules(final Resource resource, final Rules rules) {
+        requireNonNull(resource, "resource is required");
+        requireNonNull(rules, "rules is required");
+        this.rules.put(resource, rules);
+        return this;
+    }
+
+    public DataRequestConfig rule(final Resource resource, final String ruleId, final Rule rule) {
+        return rule(resource, null, ruleId, rule);
+    }
+
+    public DataRequestConfig rule(final Resource resource, final String message, final String ruleId, final Rule rule) {
+        requireNonNull(resource, "resource is required");
+        requireNonNull(ruleId, "ruleId is required");
+        requireNonNull(rule, "rule is required");
+
+        Rules<?> resourceRules = rules.get(resource);
+        if (null == resourceRules) {
+            resourceRules = new Rules();
+        }
+        if (nonNull(message)) {
+            resourceRules.message(message);
+        }
+        resourceRules.rule(ruleId, rule);
         return this;
     }
 
@@ -69,17 +100,9 @@ public class DataRequestConfig extends Request {
         return rules;
     }
 
-    public void setRules(final Map<Resource, Rules> rules) {
+    public DataRequestConfig setRules(final Map<Resource, Rules> rules) {
         this.rules = rules;
-    }
-
-    public <T> Rules<T> getResourceRules(final Resource resource) {
-        Objects.requireNonNull(resource);
-        final Rules resourceRules = rules.get(resource);
-        if (null != resourceRules) {
-            return resourceRules;
-        }
-        return new Rules<>();
+        return this;
     }
 
     public Context getContext() {

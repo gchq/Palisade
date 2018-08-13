@@ -25,6 +25,13 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>mapreduce-example</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>mapreduce-example-runner</module>
+        <module>mapreduce-example-client</module>
+        <module>mapreduce-example-model</module>
+        <module>mapreduce-example-data-service</module>
+    </modules>
 
 </project>

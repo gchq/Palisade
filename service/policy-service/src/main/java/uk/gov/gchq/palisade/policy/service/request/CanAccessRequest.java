@@ -25,6 +25,7 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -32,7 +33,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class CanAccessRequest extends Request {
     private User user;
-    private Resource resource;
+    private Collection<Resource> resources;
     private Context context;
 
     // no-args constructor required
@@ -40,11 +41,11 @@ public class CanAccessRequest extends Request {
     }
 
     /**
-     * @param resource the {@link Resource} to be accessed
+     * @param resources the collection of {@link Resource}'s to be accessed
      * @return the {@link CanAccessRequest}
      */
-    public CanAccessRequest resource(final Resource resource) {
-        this.resource = resource;
+    public CanAccessRequest resources(final Collection<Resource> resources) {
+        this.resources = resources;
         return this;
     }
 
@@ -58,14 +59,9 @@ public class CanAccessRequest extends Request {
     }
 
     /**
-     * @param justification the {@link Context} of why the user needs access to the resource
+     * @param context containing contextual information such as justification or enviromental data that can influence policies
      * @return the {@link CanAccessRequest}
      */
-    public CanAccessRequest justification(final String justification) {
-        this.context.justification(justification);
-        return this;
-    }
-
     public CanAccessRequest context(final Context context) {
         this.context = context;
         return this;
@@ -75,41 +71,44 @@ public class CanAccessRequest extends Request {
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param futureResource a completable future that will return a {@link Resource}.
-     * @param futureUser     a completable future that will return a {@link User}.
-     * @param justification  the justification that the user stated for why they want access to the data.
+     * @param futureResources a completable future that will return a collection of {@link Resource}'s.
+     * @param futureUser a completable future that will return a {@link User}.
+     * @param justification the justification that the user stated for why they want access to the data.
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
-            final CompletableFuture<? extends Resource> futureResource,
+            final CompletableFuture<? extends Collection<Resource>> futureResources,
             final CompletableFuture<User> futureUser,
             final String justification) {
         return CompletableFuture.allOf(futureResource, futureUser)
                 .thenApply(t -> new CanAccessRequest().resource(futureResource.join()).user(futureUser.join()).justification(justification));
+            final Justification justification) {
+        return CompletableFuture.allOf(futureResources, futureUser)
+                .thenApply(t -> new CanAccessRequest().resources(futureResources.join()).user(futureUser.join()).justification(justification));
     }
 
     /**
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param resource      a {@link Resource} that the user wants access to.
-     * @param futureUser    a completable future that will return a {@link User}.
+     * @param resources a collection of {@link Resource}'s that the user wants access to.
+     * @param futureUser a completable future that will return a {@link User}.
      * @param justification the justification that the user stated for why they want access to the data.
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
-            final Resource resource,
+            final Collection<Resource> resources,
             final CompletableFuture<User> futureUser,
             final String justification) {
-        return futureUser.thenApply(auths -> new CanAccessRequest().resource(resource).user(futureUser.join()).justification(justification));
+        return futureUser.thenApply(auths -> new CanAccessRequest().resources(resources).user(futureUser.join()).justification(justification));
     }
 
-    public Resource getResource() {
-        return resource;
+    public Collection<Resource> getResources() {
+        return resources;
     }
 
-    public void setResource(final Resource resource) {
-        this.resource = resource;
+    public void setResources(final Collection<Resource> resources) {
+        this.resources = resources;
     }
 
     public User getUser() {
@@ -122,10 +121,6 @@ public class CanAccessRequest extends Request {
 
     public Context getContext() {
         return context;
-    }
-
-    public void setContext(final Context context) {
-        this.context = context;
     }
 
     @Override
@@ -143,7 +138,7 @@ public class CanAccessRequest extends Request {
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(user, that.user)
-                .append(resource, that.resource)
+                .append(resources, that.resources)
                 .append(context, that.context)
                 .isEquals();
     }
@@ -153,7 +148,7 @@ public class CanAccessRequest extends Request {
         return new HashCodeBuilder(11, 13)
                 .appendSuper(super.hashCode())
                 .append(user)
-                .append(resource)
+                .append(resources)
                 .append(context)
                 .toHashCode();
     }
@@ -163,7 +158,7 @@ public class CanAccessRequest extends Request {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("user", user)
-                .append("resource", resource)
+                .append("resources", resources)
                 .append("context", context)
                 .toString();
     }

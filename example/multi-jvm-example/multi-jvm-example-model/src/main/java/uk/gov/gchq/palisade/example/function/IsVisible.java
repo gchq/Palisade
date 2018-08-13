@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.example.function;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.example.ExampleObj;
-import uk.gov.gchq.palisade.policy.PredicateRule;
+import uk.gov.gchq.palisade.rule.PredicateRule;
 
 public class IsVisible implements PredicateRule<ExampleObj> {
     @Override
