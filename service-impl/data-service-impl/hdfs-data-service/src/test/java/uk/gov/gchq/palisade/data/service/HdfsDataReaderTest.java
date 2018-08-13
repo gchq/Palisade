@@ -21,7 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.HdfsDataReader;
@@ -62,7 +62,7 @@ public class HdfsDataReaderTest {
         final DataReaderRequest request = new DataReaderRequest()
                 .resource(resource)
                 .user(new User())
-                .justification(new Justification())
+                .context(new Context())
                 .rules(rules);
 
         // When
@@ -91,7 +91,7 @@ public class HdfsDataReaderTest {
         final DataReaderRequest request = new DataReaderRequest()
                 .resource(resource)
                 .user(new User())
-                .justification(new Justification())
+                .context(new Context())
                 .rules(rules);
 
         // When
