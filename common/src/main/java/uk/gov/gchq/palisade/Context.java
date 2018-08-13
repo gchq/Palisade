@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A structure to store specific information that is required for palisade interactions with resources.
- * <p>
+ * A structure to store contextual information from the client at query time that can be used when interacting with resources.
+ *
  * Interaction with a resource include both reading and writing and will often require
  * additional information that can be stored and recovered in this structure and passed along with the request/operation.
  * i.e A users justification for requesting the contents of a file.
