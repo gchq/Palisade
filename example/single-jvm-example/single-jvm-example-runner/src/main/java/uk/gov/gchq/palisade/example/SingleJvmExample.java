@@ -35,13 +35,13 @@ public class SingleJvmExample {
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");
-        final Stream<ExampleObj> aliceResults = client.read("file1", "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleClient.FILE, "Alice", "Payroll");
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Bob is reading file1...");
-        final Stream<ExampleObj> bobResults = client.read("file1", "Bob", "Payroll");
+        final Stream<ExampleObj> bobResults = client.read(ExampleSimpleClient.FILE, "Bob", "Payroll");
         LOGGER.info("Bob got back: ");
         bobResults.map(Object::toString).forEach(LOGGER::info);
     }

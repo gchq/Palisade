@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A implementation of the ResourceService for HDFS.
@@ -74,12 +75,15 @@ public class HDFSResourceService implements ResourceService {
     public static final String ERROR_OUT_SCOPE = "resource ID is out of scope of the this resource Service. Found: %s expected: %s";
     public static final String ERROR_DETAIL_NOT_FOUND = "Connection detail could not be found for type: %s format: %s";
     public static final String ERROR_RESOLVING_PARENTS = "Error occurred while resolving resourceParents";
+    public static final String HDFS_HOME = "HDFS.HOME";
 
     private final Configuration conf;
     private final FileSystem fileSystem;
-    private final ConnectionDetailStorage connectionDetailStorage;
+    private ConnectionDetailStorage connectionDetailStorage;
 
     public HDFSResourceService(final Configuration conf, final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) throws IOException {
+        requireNonNull(conf);
+        requireNonNull(conf.get(HDFS_HOME), HDFS_HOME + " config has not been set.");
         this.conf = conf;
         this.fileSystem = FileSystem.get(conf);
         this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
@@ -95,6 +99,12 @@ public class HDFSResourceService implements ResourceService {
         }
     }
 
+
+    public HDFSResourceService connectionDetail(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
+        this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
+        return this;
+    }
+
     @Override
     public CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
         return getResourcesById(new GetResourcesByIdRequest().resourceId(request.getResource().getId()));
@@ -103,7 +113,7 @@ public class HDFSResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         final String resourceId = request.getResourceId();
-        if (!resourceId.contains(conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY))) {
+        if (!resourceId.contains(conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY).replace(conf.get(HDFS_HOME), ""))) {
             throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)));
         }
         return getMapCompletableFuture(resourceId, ignore -> true);
@@ -259,7 +269,7 @@ public class HDFSResourceService implements ResourceService {
         private final HashMap<String, ConnectionDetail> dataFormat = new HashMap<>();
         private final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
 
-        ConnectionDetailStorage(final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) {
+        ConnectionDetailStorage(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
             if (nonNull(dataFormat)) {
                 this.dataFormat.putAll(dataFormat);
                 this.dataFormat.values().removeIf(Objects::isNull);
