@@ -78,17 +78,18 @@ For details about possible use cases, see the [Use Cases](doc/use_cases.md)
 Our documentation can be found [here](https://gchq.github.io/Palisade).
 
 
-## Licence
-Palisade is licensed under the Apache 2 license.
+## License
+
+Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) and is covered by [Crown Copyright](https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/).
 
 
 ## Contributing
+We welcome contributions to the project. Detailed information on our ways of working can be found [here](https://gchq.github.io/Palisade/doc/other/ways_of_working.html). In brief:
 
-We welcome contributions to the project. Detailed information on our ways of working can be found [here](doc/other/ways_of_working.md). In brief:
+- Sign the [GCHQ Contributor Licence Agreement](https://cla-assistant.io/gchq/Palisade);
+- Push your changes to a fork;
+- Submit a pull request.
 
-* Sign the [GCHQ Contributor Licence Agreement](https://github.com/gchq/Gaffer/wiki/GCHQ-OSS-Contributor-License-Agreement-V1.0);
-* Push your changes to a fork;
-* Submit a pull request.
 
 ## FAQ
 
