@@ -49,7 +49,7 @@ In particular please ensure you have adhered to the following:
 * Classes and methods should comply with the single responsibility principal.
 * Avoid magic numbers and strings literals.
 * Avoid duplicating code, if necessary refactor the section of code and split it out into a reusable class.
-* Look after you streams - if you open one make sure you close it too. This should apply to all volatile resource usage.
+* Look after your streams - if you open one make sure you close it too. This should apply to all volatile resource usage.
 * Don't swallow exceptions - ensure they are logged or rethrown.
 * Give credit for other peoples work.
 * Update the NOTICES file for changes to the dependencies.

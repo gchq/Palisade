@@ -28,8 +28,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>single-jvm-example-model</module>
-        <module>single-jvm-example-data-service</module>
         <module>single-jvm-example-client</module>
         <module>single-jvm-example-runner</module>
     </modules>
