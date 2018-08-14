@@ -23,6 +23,8 @@ Policy have defined the following rules:
 - Age off - the timestamp must be greater than 12
 
 - Visibility - the user must have the correct level of authorisation to for the visibility label
+
+- Property redaction - if the user does not have the 'admin' role the 'property' field should be redacted
   
 The example will be run with 2 users:
 
@@ -79,6 +81,14 @@ INFO: Starting ProtocolHandler ["http-bio-8084"]
 
 To run them in Docker:
 
+If you have made changes to the code since you last built the docker containers then you will need to run:
+
+*NOTE* This will clean all stopped docker services, requiring them to be rebuilt when you next want to start them up. 
+```bash
+  ./example/multi-jvm-example/scripts/dockerCleanSystem.sh
+```
+
+Then you can start up the docker containers:
 ```bash
   ./example/multi-jvm-example/scripts/dockerComposeUp.sh
 ```
@@ -86,7 +96,7 @@ To run them in Docker:
 You can check the containers are available:
 
 ```bash
-   docker ps
+  docker ps
 ```
 
 You should see 5 containers:

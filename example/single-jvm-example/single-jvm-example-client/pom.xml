@@ -33,12 +33,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>single-jvm-example-model</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>single-jvm-example-data-service</artifactId>
+            <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

@@ -122,7 +122,7 @@ public class Policy<RULE_DATA_TYPE> {
     public Policy<RULE_DATA_TYPE> recordLevelPredicateRule(final String message, final PredicateRule<RULE_DATA_TYPE> rule) {
         Objects.requireNonNull(message);
         Objects.requireNonNull(rule);
-        recordRules.predicateRule(generateUUID(), rule);
+        recordRules.rule(generateUUID(), rule);
         addMessage(message, recordRules);
         return this;
     }
@@ -154,7 +154,7 @@ public class Policy<RULE_DATA_TYPE> {
     public Policy<RULE_DATA_TYPE> resourceLevelPredicateRule(final String message, final PredicateRule<Resource> rule) {
         Objects.requireNonNull(message);
         Objects.requireNonNull(rule);
-        resourceRules.predicateRule(generateUUID(), rule);
+        resourceRules.rule(generateUUID(), rule);
         addMessage(message, resourceRules);
         return this;
     }

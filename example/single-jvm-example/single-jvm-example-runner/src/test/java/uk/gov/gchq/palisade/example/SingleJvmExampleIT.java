@@ -69,8 +69,8 @@ public class SingleJvmExampleIT {
         // Then
         assertEquals(
                 Arrays.asList(
-                        new ExampleObj("item1c", "public", 20L),
-                        new ExampleObj("item2c", "public", 20L)
+                        new ExampleObj("redacted", "public", 20L),
+                        new ExampleObj("redacted", "public", 20L)
                 ),
                 aliceResults.collect(Collectors.toList())
         );
