@@ -19,6 +19,9 @@
   * [Single JVM](example/single-jvm-example/README.md)
   * [Multi JVM](example/multi-jvm-example/README.md)
 
+* Libraries
+  * [Koryphe](library/koryphe-library/README.md)
+  
 * Other
   * [Ways of Working](doc/other/ways_of_working.md) 
 

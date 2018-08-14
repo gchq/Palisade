@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>single-jvm-example-model</artifactId>
+            <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

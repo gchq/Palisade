@@ -1,7 +1,17 @@
 Copyright 2018 Crown Copyright
 
 
+Apache Avro (org.apache.avro:avro:1.8.2):
+
+- Apache License, Version 2.0
+
+
 Apache Commons (org.apache.commons:commons-lang3:3.3.2, org.apache.commons:commons-jcs-core:2.1):
+
+- Apache License, Version 2.0
+
+
+Apache Hadoop (org.apache.hadoop:hadoop-common:2.6.5):
 
 - Apache License, Version 2.0
 
@@ -60,6 +70,11 @@ Javax Servlet (javax.servlet:java.servlet-api:3.1.0)
 Junit (junit:junit:4.12):
 
 - Eclipse Public License 1.0
+
+
+Koryphe (uk.gov.gchq.koryphe:koryphe:1.5.0):
+
+- Apache License, Version 2.0
 
 
 Mockito (org.mockito:mockito-all:1.10.19):
