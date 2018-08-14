@@ -3,6 +3,15 @@
 * [Introduction](README.md)
 
 * [Developer Guide](doc/developer-guide/developer_guide.md)
+  * [Initial Requirements](doc/developer-guide/initial_requirements.md)
+  * [Design Principles](doc/developer-guide/design_principles.md)
+  * [High level architectural diagram](doc/developer-guide/high_level_architecture.md)
+  * [High level architecture using a map reduce client](doc/developer-guide/map_reduce_architecture.md)
+  * [Description of each component](doc/developer-guide/component_descriptions.md)
+  * [Standard flow for a read request through the Palisade system](doc/developer-guide/read_process.md)
+  * [How might the system be deployed?](doc/developer-guide/deployment_ideas.md)
+  * [Security considerations](doc/developer-guide/security_considerations.md)
+  * [Roadmap for Palisade](doc/developer-guide/roadmap.md)
 
 * [Use Cases](doc/use_cases.md)
 

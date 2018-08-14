@@ -4,7 +4,7 @@
 
 * [Design Principles](design_principles.md)
 
-* [High level architectural diagram](high_level_rchitecture.md)
+* [High level architectural diagram](high_level_architecture.md)
 
 * [High level architecture using a map reduce client](map_reduce_architecture.md)
 
