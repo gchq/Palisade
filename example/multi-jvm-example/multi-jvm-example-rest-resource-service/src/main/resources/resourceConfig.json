@@ -1,3 +1,14 @@
 {
-  "class": "uk.gov.gchq.palisade.resource.service.HashMapResourceService"
+  "class": "uk.gov.gchq.palisade.resource.service.HDFSResourceService",
+  "conf": {
+    "HDFS.HOME": "file:///",
+    "fs.defaultFS": "file:///PATH/TO/example/exampleObj_file1.txt"
+  },
+  "dataFormat": {},
+  "dataType": {
+    "exampleObj": {
+      "class": "uk.gov.gchq.palisade.rest.PoxyRestConnectionDetail",
+      "url": "http://localhost:8084/data"
+    }
+  }
 }

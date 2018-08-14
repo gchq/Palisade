@@ -35,7 +35,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hashmap-resource-service</artifactId>
+            <artifactId>hdfs-resource-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
