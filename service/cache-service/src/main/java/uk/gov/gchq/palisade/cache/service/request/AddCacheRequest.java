@@ -27,6 +27,7 @@ import uk.gov.gchq.palisade.service.request.Request;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -56,11 +57,13 @@ public class AddCacheRequest extends Request {
     }
 
     public AddCacheRequest timeToLive(final Long ttlMillis) {
+        Objects.requireNonNull(ttlMillis);
         this.timeToLive = toDuration(ttlMillis);
         return this;
     }
 
     public AddCacheRequest timeToLive(final Temporal expiryPoint) {
+        Objects.requireNonNull(expiryPoint);
         this.timeToLive = until(expiryPoint);
         return this;
     }

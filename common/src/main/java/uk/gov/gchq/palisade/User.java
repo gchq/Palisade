@@ -26,6 +26,7 @@ import uk.gov.gchq.palisade.util.FieldSetter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Map;
 import java.util.Set;
 
@@ -91,20 +92,21 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User auths(final String... auths) {
-
+        Objects.requireNonNull(auths);
         Collections.addAll(this.auths, auths);
         return this;
     }
 
     public User auths(final Set<String> auths) {
+        Objects.requireNonNull(auths);
         this.auths.addAll(auths);
         return this;
     }
 
     public void setAuths(final Set<String> auths) {
+        Objects.requireNonNull(auths);
         this.auths = auths;
     }
-
 
     /**
      * Adds the user roles.
@@ -113,15 +115,18 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User roles(final String... roles) {
+        Objects.requireNonNull(roles);
         Collections.addAll(this.roles, roles);
         return this;
     }
 
     public void setRoles(final Set<String> roles) {
+        Objects.requireNonNull(roles);
         this.roles = roles;
     }
 
     public User roles(final Set<String> roles) {
+        Objects.requireNonNull(roles);
         this.roles.addAll(roles);
         return this;
     }
