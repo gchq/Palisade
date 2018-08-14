@@ -26,10 +26,12 @@ import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 
 /**
  * The core API for the data reader.
+ *
  * The responsibility of the data reader is to connect to the requested resource,
  * apply the rules, then passes back to the data service the stream of data in
  * the expected format.
- * There is a utility method {@link uk.gov.gchq.palisade.Util#applyRulesToStream(java.util.stream.Stream, uk.gov.gchq.palisade.User, uk.gov.gchq.palisade.Justification, uk.gov.gchq.palisade.rule.Rules)}
+ *
+ * There is a utility method {@link uk.gov.gchq.palisade.Util#applyRulesToStream(java.util.stream.Stream, uk.gov.gchq.palisade.User, uk.gov.gchq.palisade.Context, uk.gov.gchq.palisade.rule.Rules)}
  * that does the part of applying the rules provided your input data is in the
  * format that the rules expect.
  */

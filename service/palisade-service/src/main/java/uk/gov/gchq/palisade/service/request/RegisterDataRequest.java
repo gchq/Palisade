@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.UserId;
 
@@ -29,11 +29,16 @@ import uk.gov.gchq.palisade.UserId;
  */
 public class RegisterDataRequest extends Request {
     private UserId userId;
-    private Justification justification;
+    private Context context;
     private String resourceId;
 
     // no-args constructor required
     public RegisterDataRequest() {
+        this(new Context());
+    }
+
+    public RegisterDataRequest(final Context context) {
+        this.context = context;
     }
 
     /**
@@ -55,11 +60,11 @@ public class RegisterDataRequest extends Request {
     }
 
     /**
-     * @param justification the reason why the user wants access to the data
+     * @param context the contextual information required for this request such as the reason why the user wants access to the data
      * @return the {@link RegisterDataRequest}
      */
-    public RegisterDataRequest justification(final Justification justification) {
-        this.justification = justification;
+    public RegisterDataRequest context(final Context context) {
+        this.context = context;
         return this;
     }
 
@@ -79,12 +84,12 @@ public class RegisterDataRequest extends Request {
         this.userId = userId;
     }
 
-    public Justification getJustification() {
-        return justification;
+    public Context getContext() {
+        return context;
     }
 
-    public void setJustification(final Justification justification) {
-        this.justification = justification;
+    public void setContext(final Context context) {
+        this.context = context;
     }
 
     @Override
@@ -102,7 +107,7 @@ public class RegisterDataRequest extends Request {
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(userId, that.userId)
-                .append(justification, that.justification)
+                .append(context, that.context)
                 .append(resourceId, that.resourceId)
                 .isEquals();
     }
@@ -112,7 +117,7 @@ public class RegisterDataRequest extends Request {
         return new HashCodeBuilder(59, 67)
                 .appendSuper(super.hashCode())
                 .append(userId)
-                .append(justification)
+                .append(context)
                 .append(resourceId)
                 .toHashCode();
     }
@@ -122,7 +127,7 @@ public class RegisterDataRequest extends Request {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("userId", userId)
-                .append("justification", justification)
+                .append("justification", context)
                 .append("resourceId", resourceId)
                 .toString();
     }

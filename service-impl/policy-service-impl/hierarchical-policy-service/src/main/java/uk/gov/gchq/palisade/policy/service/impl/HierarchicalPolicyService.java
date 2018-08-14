@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.policy.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
@@ -71,18 +71,18 @@ public class HierarchicalPolicyService implements PolicyService {
 
     @Override
     public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request) {
-            Justification justification = request.getJustification();
+            Context context = request.getContext();
             User user = request.getUser();
             Collection<Resource> resources = request.getResources();
-            CanAccessResponse response = new CanAccessResponse(canAccess(justification, user, resources));
+            CanAccessResponse response = new CanAccessResponse(canAccess(context, user, resources));
         return CompletableFuture.completedFuture(response);
     }
 
-    private Collection<Resource> canAccess(final Justification justification, final User user, final Collection<Resource> resources) {
+    private Collection<Resource> canAccess(final Context context, final User user, final Collection<Resource> resources) {
         return resources.stream()
                 .map(resource -> {
                     Rules<Resource> rules = getApplicableRules(resource, true, resource.getType());
-                    return Util.applyRulesToRecord(resource, user, justification, rules);
+                    return Util.applyRulesToRecord(resource, user, context, rules);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -140,10 +140,10 @@ public class HierarchicalPolicyService implements PolicyService {
 
     @Override
     public CompletableFuture<MultiPolicy> getPolicy(final GetPolicyRequest request) {
-        Justification justification = request.getJustification();
+        Context context = request.getContext();
         User user = request.getUser();
         Collection<Resource> resources = request.getResources();
-        Collection<Resource> canAccessResources = canAccess(justification, user, resources);
+        Collection<Resource> canAccessResources = canAccess(context, user, resources);
         HashMap<Resource, Policy> map = new HashMap<>();
         canAccessResources.forEach(resource -> {
             Rules rules = getApplicableRules(resource, false, resource.getType());

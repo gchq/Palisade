@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.example.client;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.JobContext;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.client.SimpleClient;
@@ -27,8 +27,8 @@ import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
-import uk.gov.gchq.palisade.example.function.IsTimestampMoreThan;
-import uk.gov.gchq.palisade.example.function.IsVisible;
+import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
+import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
@@ -75,13 +75,13 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
                                 .id("file1")
                                 .type(RESOURCE_TYPE))
                         .policy(new Policy<ExampleObj>()
-                                        .recordLevelPredicateRule(
+                                        .recordLevelRule(
                                                 "visibility",
-                                                new IsVisible()
+                                                new IsExampleObjVisible()
                                         )
-                                        .recordLevelSimplePredicateRule(
+                                        .recordLevelRule(
                                                 "ageOff",
-                                                new IsTimestampMoreThan(12L)
+                                                new IsExampleObjRecent(12L)
                                         )
                         )
         );
@@ -144,7 +144,7 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
      * @param justification the example justification
      */
     public static void addDataRequest(final JobContext context, final String filename, final String resourceType, final String userId, final String justification) {
-        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).justification(new Justification().justification(justification));
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
         PalisadeInputFormat.addDataRequest(context, dataRequest);
     }
 }
