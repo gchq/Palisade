@@ -28,7 +28,6 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.example.client.ExampleMapReduceClient;
 import uk.gov.gchq.palisade.resource.Resource;
 
@@ -109,10 +108,8 @@ public class MapReduceExample extends Configured implements Tool {
         // ==========================================================
 
         //configure the Palisade input format on an example client
-        final SimpleClient<ExampleObj> simpleClient = new SimpleClient<>();
-        final ExampleMapReduceClient client = new ExampleMapReduceClient(simpleClient);
-
-        ExampleMapReduceClient.initialiseJob(job, client, 2);
+        ExampleMapReduceClient client = new ExampleMapReduceClient();
+        client.configureJob(job,2);
 
         //next add a resource request to the job
         ExampleMapReduceClient.addDataRequest(job, "file1", RESOURCE_TYPE, "Alice", "Payroll");

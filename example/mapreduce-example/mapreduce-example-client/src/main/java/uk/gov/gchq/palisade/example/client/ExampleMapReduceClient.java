@@ -40,12 +40,15 @@ import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 public class ExampleMapReduceClient {
     public static final String RESOURCE_TYPE = "exampleObj";
 
     private final SimpleClient<ExampleObj> exampleClient;
+
+    public ExampleMapReduceClient() {
+        this(new SimpleClient<>());
+    }
 
     public ExampleMapReduceClient(final SimpleClient<ExampleObj> exampleClient) {
         Objects.requireNonNull(exampleClient, "exampleClient");
@@ -98,26 +101,20 @@ public class ExampleMapReduceClient {
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();
     }
 
-    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return exampleClient.read(filename, RESOURCE_TYPE, userId, justification);
-    }
-
     /**
-     * Set up a given MapReduce job to source data from an {@link ExampleMapReduceClient}. This convenience method will
-     * configure the input format, set the {@link uk.gov.gchq.palisade.service.PalisadeService} and the serialiser.
+     * Configures the given job to use this example client.
      *
      * @param job        the job to configure
-     * @param client     the particular client
-     * @param maxMapHint maximum mapper hint
+     * @param maxMapHint the hint for the maximum number of mappers
      */
-    public static void initialiseJob(final Job job, final ExampleMapReduceClient client, final int maxMapHint) {
+    public void configureJob(final Job job, final int maxMapHint) {
         job.setInputFormatClass(PalisadeInputFormat.class);
         //tell it which Palisade service to use
-        PalisadeInputFormat.setPalisadeService(job, client.exampleClient.getPalisadeService());
-        //set a maximum mapper hint
-        PalisadeInputFormat.setMaxMapTasksHint(job, maxMapHint);
+        PalisadeInputFormat.setPalisadeService(job, exampleClient.getPalisadeService());
         //configure the serialiser to use
         PalisadeInputFormat.setSerialiser(job, new ExampleObjSerialiser());
+        //set the maximum mapper hint
+        PalisadeInputFormat.setMaxMapTasksHint(job, maxMapHint);
     }
 
     /**
