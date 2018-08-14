@@ -25,7 +25,6 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * The core API for the data service.
- *
  * The responsibility of the data service is to take the read request from the
  * client, request the trusted details about the request from the palisade
  * service (what policies to apply, user details, etc). The data service is then
@@ -35,8 +34,6 @@ import java.util.concurrent.CompletableFuture;
  * The {@link uk.gov.gchq.palisade.data.service.reader.DataReader} will then
  * connect to the resource and apply the rules before streaming the data back to
  * the {@link DataService} which forwards the data back to the client.
- *
- *
  */
 public interface DataService extends Service {
 
@@ -44,7 +41,6 @@ public interface DataService extends Service {
      * This method is used by the client code to request the data from the list of
      * resources or a subset of the resources that the palisade service responded
      * with in the {@link uk.gov.gchq.palisade.service.request.DataRequestResponse}.
-     *
      * This method will only work if the client has already registered the data
      * request with the palisade service.
      *
@@ -52,12 +48,11 @@ public interface DataService extends Service {
      *                request with the palisade service. The request can be
      *                altered to contain only a subset of the resources to be
      *                read by this data service instance.
-     * @param <RAW_DATA_TYPE> The Java class of the format the data will be returned as.
-     * @return a {@link CompletableFuture} {@link ReadResponse} containing the stream of data in
-     *         the expected format and/or a message (error/warning/info) to be
-     *         returned to the client.
+     * @return a {@link CompletableFuture} {@link ReadResponse} containing the
+     * {@link java.io.InputStream} of data and/or a message (error/warning/info) to be
+     * returned to the client.
      */
-    <RAW_DATA_TYPE> CompletableFuture<ReadResponse<RAW_DATA_TYPE>> read(final ReadRequest request);
+    CompletableFuture<ReadResponse> read(final ReadRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {

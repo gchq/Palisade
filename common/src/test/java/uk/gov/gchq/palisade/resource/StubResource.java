@@ -17,9 +17,9 @@ package uk.gov.gchq.palisade.resource;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import uk.gov.gchq.palisade.ToStringBuilder;
 
-import javax.rmi.CORBA.Stub;
 import java.util.Comparator;
 
 public class StubResource implements Resource, Comparable<StubResource> {
@@ -109,7 +109,6 @@ public class StubResource implements Resource, Comparable<StubResource> {
 
     /**
      * {@inheritDoc}
-     *
      * Implemented to allow this class to be used in TreeMaps in tests.
      */
     @Override

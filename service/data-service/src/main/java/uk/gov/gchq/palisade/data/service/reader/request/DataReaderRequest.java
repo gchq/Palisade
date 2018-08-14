@@ -19,23 +19,21 @@ package uk.gov.gchq.palisade.data.service.reader.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.policy.Rules;
 import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.service.request.Request;
 
 /**
  * This class is used to request that the {@link uk.gov.gchq.palisade.data.service.reader.DataReader}
  * read a resource and apply the necessary rules.
- *
- * @param <RULES_DATA_TYPE> is the Java class that the Rules expect the data to be in the format of.
  */
-public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
+public class DataReaderRequest extends Request {
     private Resource resource;
     private User user;
-    private Justification justification;
+    private Context context;
     private Rules rules;
 
     // no-args constructor required
@@ -61,20 +59,19 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
     }
 
     /**
-     * @param justification the Justification that the user provided for why they want the data
+     * @param context the Context that the user provided for why they want the data
      * @return the {@link DataReaderRequest}
      */
-    public DataReaderRequest justification(final Justification justification) {
-        this.justification = justification;
+    public DataReaderRequest context(final Context context) {
+        this.context = context;
         return this;
     }
 
     /**
-     *
      * @param rules the list of rules to be applied to the data to ensure policy compliance
      * @return the {@link DataReaderRequest}
      */
-    public DataReaderRequest rules(final Rules<RULES_DATA_TYPE> rules) {
+    public DataReaderRequest rules(final Rules rules) {
         this.rules = rules;
         return this;
     }
@@ -95,20 +92,20 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
         this.user = user;
     }
 
-    public Justification getJustification() {
-        return justification;
+    public Context getContext() {
+        return context;
     }
 
-    public void setJustification(final Justification justification) {
-        this.justification = justification;
+    public void setContext(final Context context) {
+        this.context = context;
     }
 
 
-    public Rules<RULES_DATA_TYPE> getRules() {
+    public Rules getRules() {
         return rules;
     }
 
-    public void setRules(final Rules<RULES_DATA_TYPE> rules) {
+    public void setRules(final Rules rules) {
         this.rules = rules;
     }
 
@@ -122,13 +119,13 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
             return false;
         }
 
-        final DataReaderRequest<?> that = (DataReaderRequest<?>) o;
+        final DataReaderRequest that = (DataReaderRequest) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(resource, that.resource)
                 .append(user, that.user)
-                .append(justification, that.justification)
+                .append(context, that.context)
                 .append(rules, that.rules)
                 .isEquals();
     }
@@ -139,7 +136,7 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
                 .appendSuper(super.hashCode())
                 .append(resource)
                 .append(user)
-                .append(justification)
+                .append(context)
                 .append(rules)
                 .toHashCode();
     }
@@ -150,7 +147,7 @@ public class DataReaderRequest<RULES_DATA_TYPE> extends Request {
                 .appendSuper(super.toString())
                 .append("resource", resource)
                 .append("user", user)
-                .append("justification", justification)
+                .append("justification", context)
                 .append("rules", rules)
                 .toString();
     }

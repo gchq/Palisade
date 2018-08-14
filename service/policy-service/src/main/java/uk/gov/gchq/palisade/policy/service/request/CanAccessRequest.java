@@ -19,12 +19,13 @@ package uk.gov.gchq.palisade.policy.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -32,19 +33,19 @@ import java.util.concurrent.CompletableFuture;
  */
 public class CanAccessRequest extends Request {
     private User user;
-    private Resource resource;
-    private Justification justification;
+    private Collection<Resource> resources;
+    private Context context;
 
     // no-args constructor required
     public CanAccessRequest() {
     }
 
     /**
-     * @param resource the {@link Resource} to be accessed
+     * @param resources the collection of {@link Resource}'s to be accessed
      * @return the {@link CanAccessRequest}
      */
-    public CanAccessRequest resource(final Resource resource) {
-        this.resource = resource;
+    public CanAccessRequest resources(final Collection<Resource> resources) {
+        this.resources = resources;
         return this;
     }
 
@@ -58,11 +59,11 @@ public class CanAccessRequest extends Request {
     }
 
     /**
-     * @param justification the {@link Justification} of why the user needs access to the resource
+     * @param context containing contextual information such as justification or enviromental data that can influence policies
      * @return the {@link CanAccessRequest}
      */
-    public CanAccessRequest justification(final Justification justification) {
-        this.justification = justification;
+    public CanAccessRequest context(final Context context) {
+        this.context = context;
         return this;
     }
 
@@ -70,41 +71,41 @@ public class CanAccessRequest extends Request {
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param futureResource a completable future that will return a {@link Resource}.
-     * @param futureUser     a completable future that will return a {@link User}.
-     * @param justification  the justification that the user stated for why they want access to the data.
+     * @param futureResources a completable future that will return a collection of {@link Resource}'s.
+     * @param futureUser a completable future that will return a {@link User}.
+     * @param justification the justification that the user stated for why they want access to the data.
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
-            final CompletableFuture<? extends Resource> futureResource,
+            final CompletableFuture<? extends Collection<Resource>> futureResources,
             final CompletableFuture<User> futureUser,
-            final Justification justification) {
-        return CompletableFuture.allOf(futureResource, futureUser)
-                .thenApply(t -> new CanAccessRequest().resource(futureResource.join()).user(futureUser.join()).justification(justification));
+            final String justification) {
+        return CompletableFuture.allOf(futureResources, futureUser)
+                .thenApply(t -> new CanAccessRequest().resources(futureResources.join()).user(futureUser.join()).context(new Context().justification(justification)));
     }
 
     /**
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param resource      a {@link Resource} that the user wants access to.
-     * @param futureUser    a completable future that will return a {@link User}.
+     * @param resources a collection of {@link Resource}'s that the user wants access to.
+     * @param futureUser a completable future that will return a {@link User}.
      * @param justification the justification that the user stated for why they want access to the data.
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
-            final Resource resource,
+            final Collection<Resource> resources,
             final CompletableFuture<User> futureUser,
-            final Justification justification) {
-        return futureUser.thenApply(auths -> new CanAccessRequest().resource(resource).user(futureUser.join()).justification(justification));
+            final String justification) {
+        return futureUser.thenApply(auths -> new CanAccessRequest().resources(resources).user(futureUser.join()).context(new Context().justification(justification)));
     }
 
-    public Resource getResource() {
-        return resource;
+    public Collection<Resource> getResources() {
+        return resources;
     }
 
-    public void setResource(final Resource resource) {
-        this.resource = resource;
+    public void setResources(final Collection<Resource> resources) {
+        this.resources = resources;
     }
 
     public User getUser() {
@@ -115,12 +116,8 @@ public class CanAccessRequest extends Request {
         this.user = user;
     }
 
-    public Justification getJustification() {
-        return justification;
-    }
-
-    public void setJustification(final Justification justification) {
-        this.justification = justification;
+    public Context getContext() {
+        return context;
     }
 
     @Override
@@ -138,8 +135,8 @@ public class CanAccessRequest extends Request {
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(user, that.user)
-                .append(resource, that.resource)
-                .append(justification, that.justification)
+                .append(resources, that.resources)
+                .append(context, that.context)
                 .isEquals();
     }
 
@@ -148,8 +145,8 @@ public class CanAccessRequest extends Request {
         return new HashCodeBuilder(11, 13)
                 .appendSuper(super.hashCode())
                 .append(user)
-                .append(resource)
-                .append(justification)
+                .append(resources)
+                .append(context)
                 .toHashCode();
     }
 
@@ -158,8 +155,8 @@ public class CanAccessRequest extends Request {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("user", user)
-                .append("resource", resource)
-                .append("justification", justification)
+                .append("resources", resources)
+                .append("context", context)
                 .toString();
     }
 }

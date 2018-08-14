@@ -20,6 +20,7 @@ import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
+import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.util.concurrent.CompletableFuture;
@@ -39,7 +40,7 @@ public class ProxyRestPalisadeService extends ProxyRestService implements Palisa
     }
 
     @Override
-    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final DataRequestResponse request) {
+    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final GetDataRequestConfig request) {
         return doPostAsync("getDataRequestConfig", request, DataRequestConfig.class);
     }
 }

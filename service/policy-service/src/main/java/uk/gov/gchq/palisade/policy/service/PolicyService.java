@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.policy.service;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -26,11 +27,9 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * The core API for the policy service.
- *
  * The responsibilities of the policy service is to provide the set of rules
  * (filters or transformations) that need to be applied to each resource that
  * has been requested, based the user and justification.
- *
  * Note that a resource could be a file, stream, directory or even the system
  * resource (policies added to the system resource would be applied globally).
  */
@@ -42,13 +41,12 @@ public interface PolicyService extends Service {
      *
      * @param request a {@link CanAccessRequest} containing the user requesting
      *                the data, the justification of why they want the data and
-     *                resource containing that data.
-     * @return a {@link CompletableFuture} {@link Boolean} which is true if
-     * they are allowed access to the resource.
+     *                collection of resource's containing that data.
+     * @return a {@link CanAccessResponse} which contains a collection of the
+     * resources that the user is allowed access too.
      */
     // TODO: should this return bitmap  = READ, WRITE,EXECUTE ?
-    // TODO could this work on a list of resources the same way as the getPolicy method does?
-    CompletableFuture<Boolean> canAccess(final CanAccessRequest request);
+    CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request);
 
     /**
      * This method gets the record level {@link Policy}'s that apply to the list
@@ -65,7 +63,7 @@ public interface PolicyService extends Service {
      * This method allows for the setting of a policy to a resource.
      *
      * @param request a {@link SetPolicyRequest} containing the
-     *                         resource and the policy to set on that resource.
+     *                resource and the policy to set on that resource.
      * @return a {@link CompletableFuture} {@link Boolean} which is true if
      * the policy was successfully set.
      */
