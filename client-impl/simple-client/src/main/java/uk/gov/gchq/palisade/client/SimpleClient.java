@@ -47,7 +47,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-public class SimpleClient<T> {
+public class SimpleClient<T> implements SimpleServices {
     private final Serialiser<T> serialiser;
     private final ResourceService resourceService;
     private final AuditService auditService;
@@ -129,26 +129,32 @@ public class SimpleClient<T> {
         return serialiser;
     }
 
+    @Override
     public ResourceService getResourceService() {
         return resourceService;
     }
 
+    @Override
     public AuditService getAuditService() {
         return auditService;
     }
 
+    @Override
     public PolicyService getPolicyService() {
         return policyService;
     }
 
+    @Override
     public UserService getUserService() {
         return userService;
     }
 
+    @Override
     public CacheService getCacheService() {
         return cacheService;
     }
 
+    @Override
     public PalisadeService getPalisadeService() {
         return palisadeService;
     }

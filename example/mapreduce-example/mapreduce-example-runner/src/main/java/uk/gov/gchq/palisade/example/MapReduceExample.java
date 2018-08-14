@@ -109,7 +109,7 @@ public class MapReduceExample extends Configured implements Tool {
 
         //configure the Palisade input format on an example client
         ExampleMapReduceClient client = new ExampleMapReduceClient();
-        client.configureJob(job,2);
+        client.configureJob(job, 2);
 
         //next add a resource request to the job
         ExampleMapReduceClient.addDataRequest(job, "file1", RESOURCE_TYPE, "Alice", "Payroll");
