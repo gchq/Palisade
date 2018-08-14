@@ -47,7 +47,7 @@ public class IsExampleObjRecent implements Rule<ExampleObj> {
     }
 
     @Override
-    public ExampleObj apply(final ExampleObj record, final User user, final Justification justification) {
+    public ExampleObj apply(final ExampleObj record, final User user, final Context context) {
         if (null == record) {
             return null;
         }
@@ -65,7 +65,7 @@ To implement the same logic against either a different field or object, would re
 The logic of a Koryphe predicate rule is reusable, because only threshold value and the field selection/projections changes.
 
 #### Predicates
-The below example from [ExampleSimpleClient](https://github.com/gchq/Palisade/blob/master/example/single-jvm-example/single-jvm-example-client/src/main/java/uk/gov/gchq/palisade/example/client/ExampleSimpleClient.java "ExampleSimpleClient") shows a rule named "2-ageOff". This rule applies the `IsMoreThan` function with a threshold of 12, against the "timestamp" field within a Record object. To apply the same rule against another field or object only the selection argument needs to be changed.
+The below example from [ExampleSimpleClient](https://github.com/gchq/Palisade/blob/master/example/single-jvm-example/single-jvm-example-client/src/main/java/uk/gov/gchq/palisade/example/client/ExampleSimpleClient.java "ExampleSimpleClient") shows a rule named "ageOff". This rule applies the `IsMoreThan` function with a threshold of 12, against the "timestamp" field within a Record object. To apply the same rule against another field or object only the selection argument needs to be changed.
 ```java
 new TupleRule<ExampleObj>()
     .selection("Record.timestamp")

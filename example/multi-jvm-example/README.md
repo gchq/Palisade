@@ -81,6 +81,14 @@ INFO: Starting ProtocolHandler ["http-bio-8084"]
 
 To run them in Docker:
 
+If you have made changes to the code since you last built the docker containers then you will need to run:
+
+*NOTE* This will clean all stopped docker services, requiring them to be rebuilt when you next want to start them up. 
+```bash
+  ./example/multi-jvm-example/scripts/dockerCleanSystem.sh
+```
+
+Then you can start up the docker containers:
 ```bash
   ./example/multi-jvm-example/scripts/dockerComposeUp.sh
 ```
@@ -88,7 +96,7 @@ To run them in Docker:
 You can check the containers are available:
 
 ```bash
-   docker ps
+  docker ps
 ```
 
 You should see 5 containers:
