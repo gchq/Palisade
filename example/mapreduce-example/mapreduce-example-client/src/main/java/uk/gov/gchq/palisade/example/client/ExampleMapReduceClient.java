@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.example.client;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.JobContext;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.client.SimpleClient;
@@ -130,7 +130,7 @@ public class ExampleMapReduceClient {
      * @param justification the example justification
      */
     public static void addDataRequest(final JobContext context, final String filename, final String resourceType, final String userId, final String justification) {
-        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).justification(new Justification().justification(justification));
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
         PalisadeInputFormat.addDataRequest(context, dataRequest);
     }
 }

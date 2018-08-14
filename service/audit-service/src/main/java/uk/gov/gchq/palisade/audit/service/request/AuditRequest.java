@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.audit.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Justification;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.Resource;
@@ -35,7 +35,7 @@ import uk.gov.gchq.palisade.service.request.Request;
  * the data, and why that was.
  */
 public class AuditRequest extends Request {
-    private Justification justification;
+    private Context context;
     private User user;
     private Resource resource;
     private String howItWasProcessed;
@@ -46,12 +46,12 @@ public class AuditRequest extends Request {
     }
 
     /**
-     * @param justification {@link Justification} is the reason for the
+     * @param context {@link Context} is the reason for the
      *                      user accessing the resource
      * @return the {@link AuditRequest}
      */
-    public AuditRequest justification(final Justification justification) {
-        this.justification = justification;
+    public AuditRequest context(final Context context) {
+        this.context = context;
         return this;
     }
 
@@ -95,12 +95,12 @@ public class AuditRequest extends Request {
         return this;
     }
 
-    public Justification getJustification() {
-        return justification;
+    public Context getContext() {
+        return context;
     }
 
-    public void setJustification(final Justification justification) {
-        this.justification = justification;
+    public void setContext(final Context context) {
+        this.context = context;
     }
 
     public User getUser() {
@@ -149,7 +149,7 @@ public class AuditRequest extends Request {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(justification, that.justification)
+                .append(context, that.context)
                 .append(user, that.user)
                 .append(resource, that.resource)
                 .append(howItWasProcessed, that.howItWasProcessed)
@@ -161,7 +161,7 @@ public class AuditRequest extends Request {
     public int hashCode() {
         return new HashCodeBuilder(19, 37)
                 .appendSuper(super.hashCode())
-                .append(justification)
+                .append(context)
                 .append(user)
                 .append(resource)
                 .append(howItWasProcessed)
@@ -173,7 +173,7 @@ public class AuditRequest extends Request {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("justification", justification)
+                .append("justification", context)
                 .append("user", user)
                 .append("resource", resource)
                 .append("howItWasProcessed", howItWasProcessed)
