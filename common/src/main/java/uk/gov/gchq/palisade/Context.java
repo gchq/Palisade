@@ -29,7 +29,6 @@ import java.util.Map;
 
 /**
  * A structure to store contextual information from the client at query time that can be used when interacting with resources.
- *
  * Interaction with a resource include both reading and writing and will often require
  * additional information that can be stored and recovered in this structure and passed along with the request/operation.
  * i.e A users justification for requesting the contents of a file.
@@ -71,8 +70,12 @@ public class Context {
     }
 
     @JsonIgnore
-    public Object getJustification() {
-        return contents.get(JUSTIFICATION);
+    public String getJustification() {
+        try {
+            return (String) contents.get(JUSTIFICATION);
+        } catch (final ClassCastException e) {
+            throw new RuntimeException("The justification value should be a string");
+        }
     }
 
     @Override
