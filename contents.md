@@ -20,6 +20,9 @@
   * [Multi JVM/Docker deployment](example/multi-jvm-example/README.md)
   * [Map Reduce](example/mapreduce-example/README.md)
 
+* Libraries
+  * [Koryphe](library/koryphe-library/README.md)
+  
 * Other
   * [Ways of Working](doc/other/ways_of_working.md) 
 

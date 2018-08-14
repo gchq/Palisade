@@ -150,7 +150,8 @@ public class HierarchicalPolicyServiceTest {
         User testUser = new User().userId("testUser").auths("Sensitive");
         FileResource newResource = new FileResource().id("File://temp/TestObj_002.txt").type("TestObj").serialisedFormat("txt");
         newResource.setParent(createTestDirectoryResource());
-        Policy newPolicy = new Policy().resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
+        Policy newPolicy = new Policy()
+                .resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
         // try
         CompletableFuture<Boolean> future = policyService.setPolicy(new SetPolicyRequest().resource(newResource).policy(newPolicy));
         Boolean result = future.get();

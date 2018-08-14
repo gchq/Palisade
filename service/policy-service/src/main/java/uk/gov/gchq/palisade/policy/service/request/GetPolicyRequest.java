@@ -27,15 +27,16 @@ import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * This class is used in the request to get the policies that apply to the
  * collection of {@link Resource}'s.
  */
 public class GetPolicyRequest extends Request {
-    private User user;
-    private Context context;
-    private Collection<Resource> resources;
+    private User user = new User();
+    private Context context = new Context();
+    private Collection<Resource> resources = Collections.emptyList();
 
     // no-args constructor
     public GetPolicyRequest() {

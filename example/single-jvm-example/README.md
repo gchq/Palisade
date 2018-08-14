@@ -23,7 +23,9 @@ Policy have defined the following rules:
 - Age off - the timestamp must be greater than 12
 
 - Visibility - the user must have the correct level of authorisation to for the visibility label
-  
+
+- Property redaction - if the user does not have the 'admin' role the 'property' field should be redacted
+
 The example will be run with 2 users:
 
 - Alice is an admin and can see both public and private records
