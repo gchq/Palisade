@@ -23,7 +23,7 @@ import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.user.service.UserService;
 
 /**
- * An interface that other consumers of the simple clients can use to consume the various Palisade services.
+ * An interface that consumers of clients can use to consume the various Palisade services.
  */
 public interface ServicesFactory {
 
