@@ -25,7 +25,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mapreduce</artifactId>
+    <artifactId>map-reduce-client</artifactId>
 
     <dependencies>
         <dependency>

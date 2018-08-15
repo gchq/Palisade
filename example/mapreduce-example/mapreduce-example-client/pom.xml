@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>mapreduce</artifactId>
+            <artifactId>map-reduce-client</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
