@@ -50,7 +50,14 @@ if [ "$TRAVIS_BRANCH" == 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; th
         echo "--------------------------------------"
         echo "Updating doc"
         echo "--------------------------------------"
+        npm install -g gitbook-cli > /dev/null 2>&1
         ./doc/scripts/buildGitbook.sh
+        git checkout gh-pages
+        rm -rf uk
+        mv target/site/apidocs/* .
+        git add .
+        git commit -a -m "Updated javadoc - $RELEASE_VERSION"
+        git checkout master
 
         echo ""
         echo "--------------------------------------"
