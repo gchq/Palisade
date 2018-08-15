@@ -102,7 +102,7 @@ public class MultiJvmExampleIT {
         final ExampleSimpleRestClient client = new ExampleSimpleRestClient();
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read("file1", "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleRestClient.FILE, "Alice", "Payroll");
 
         // Then
         assertEquals(
@@ -122,7 +122,7 @@ public class MultiJvmExampleIT {
         final ExampleSimpleRestClient client = new ExampleSimpleRestClient();
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read("file1", "Bob", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleRestClient.FILE, "Bob", "Payroll");
 
         // Then
         assertEquals(
