@@ -3,7 +3,6 @@ FROM alpine/git as clone
 WORKDIR /app
 RUN git clone https://github.com/gchq/Palisade.git
 WORKDIR /app/Palisade
-RUN git checkout -b gh-10-containerise-multi-jvm-example
 
 FROM maven:3.5-jdk-8-alpine as build
 

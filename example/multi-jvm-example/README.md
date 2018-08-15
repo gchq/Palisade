@@ -112,11 +112,20 @@ c291ff79eecc        multi-jvm-example-docker-services_resource-service   "catali
 
 3. Run the example
 
-```bash 
+For local Tomcat:
+
+```bash
  ./example/multi-jvm-example/scripts/run.sh
 ```
 
-This just runs the java class: uk.gov.gchq.palisade.example.MultiJvmExample. You can just run this class directly in your IDE.
+For Docker:
+
+```bash
+ ./example/multi-jvm-example/scripts/runDocker.sh
+```
+
+
+This just runs the java class: uk.gov.gchq.palisade.example.MultiJvmExample (or uk.gov.gchq.palisade.example.MultiDockerJvmExample). You can just run this class directly in your IDE.
 
 4. Stop the REST services
 

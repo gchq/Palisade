@@ -40,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>simple-data-service</artifactId>
+            <artifactId>hdfs-data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

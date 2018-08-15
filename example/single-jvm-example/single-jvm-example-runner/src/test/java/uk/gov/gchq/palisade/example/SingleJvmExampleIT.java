@@ -44,7 +44,7 @@ public class SingleJvmExampleIT {
         final ExampleSimpleClient client = new ExampleSimpleClient();
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read("file1", "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleClient.FILE, "Alice", "Payroll");
 
         // Then
         assertEquals(
@@ -64,7 +64,7 @@ public class SingleJvmExampleIT {
         final ExampleSimpleClient client = new ExampleSimpleClient();
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read("file1", "Bob", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleClient.FILE, "Bob", "Payroll");
 
         // Then
         assertEquals(

@@ -5,6 +5,11 @@
     "baseUrl": "http://palisade-service:8080/palisade"
   },
   "reader": {
-    "class": "uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader"
+    "class": "uk.gov.gchq.palisade.data.service.reader.HdfsDataReader",
+    "serialisers": {
+      "exampleObj": {
+        "class": "uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser"
+      }
+    }
   }
 }
