@@ -16,8 +16,7 @@
 
 package uk.gov.gchq.palisade.example.client;
 
-import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.conf.Configuration;
 
 import uk.gov.gchq.koryphe.impl.function.If;
 import uk.gov.gchq.koryphe.impl.function.SetValue;
@@ -36,7 +35,6 @@ import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
 import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
 import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
 import uk.gov.gchq.palisade.policy.service.Policy;
-import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -44,7 +42,6 @@ import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
-import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.io.IOException;
@@ -52,12 +49,9 @@ import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import static uk.gov.gchq.palisade.resource.service.HDFSResourceService.HDFS_HOME;
-
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
     public static final String FILE = ExampleSimpleClient.class.getClassLoader().getResource("example/exampleObj_file1.txt").getPath();
-    private JobConf conf;
 
     public ExampleSimpleClient() {
         super();
@@ -75,7 +69,6 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
 
     private void initialiseServices() {
         // The user authorisation owner or sys admin needs to add the user
-        final UserService userService = createUserService();
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest().user(
                         new User()
@@ -93,9 +86,6 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                 )
         );
 
-
-        // The policy owner or sys admin needs to add the policies
-        final PolicyService policyService = createPolicyService();
 
         // You can either implement the Rule interface for your Policy rules or
         // you can chain together combinations of Koryphe functions/predicates.
@@ -156,32 +146,25 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
 
         final HdfsDataReader reader;
         try {
-            reader = new HdfsDataReader(conf);
+            reader = new HdfsDataReader(new Configuration());
             reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
-        dataType.put(RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(createPalisadeService()).reader(reader)));
+        dataType.put(RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisadeService).reader(reader)));
         ((HDFSResourceService) resourceService).connectionDetail(null, dataType);
 
-        // Wait for the users, policies and resources to be loaded
+        // Wait for the users and policies to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
     }
 
     @Override
     protected ResourceService createResourceService() {
-        final String path = this.getClass().getClassLoader().getResource("").getPath();
-        conf = new JobConf();
-        conf.set(HDFS_HOME, CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT);
-        conf.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, conf.get(HDFS_HOME) + path);
-
         try {
-            return new HDFSResourceService(conf, null, null);
+            return new HDFSResourceService(new Configuration(), null, null);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
-
 }

@@ -31,11 +31,9 @@ import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
 import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
 import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
 import uk.gov.gchq.palisade.policy.service.Policy;
-import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
-import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.concurrent.CompletableFuture;
@@ -61,7 +59,6 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
 
     private void initialiseServices() {
         // The user authorisation owner or sys admin needs to add the user
-        final UserService userService = createUserService();
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest().user(
                         new User()
@@ -78,10 +75,6 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                                 .roles("user")
                 )
         );
-
-
-        // The policy owner or sys admin needs to add the policies
-        final PolicyService policyService = createPolicyService();
 
         // You can either implement the Rule interface for your Policy rules or
         // you can chain together combinations of Koryphe functions/predicates.
@@ -138,16 +131,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                 koryphePolicies
         );
 
-        // The sys admin needs to add the resources
-//        final ResourceService resourceService = createResourceService();
-//        final CompletableFuture<Boolean> resourceStatus = resourceService
-//                .addResource(new AddResourceRequest()
-//                                .parent(new DirectoryResource().id("dir1").type(RESOURCE_TYPE))
-//                                .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
-//                                .connectionDetail(new ProxyRestConnectionDetail(ProxyRestDataService.class, "http://localhost:8084/data"))
-//                );
-
-        // Wait for the users, policies and resources to be loaded
-        CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus/*, resourceStatus*/).join();
+        // Wait for the users and policies to be loaded
+        CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
     }
 }

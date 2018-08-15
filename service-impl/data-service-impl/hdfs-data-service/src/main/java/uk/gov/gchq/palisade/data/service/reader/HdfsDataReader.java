@@ -16,15 +16,25 @@
 
 package uk.gov.gchq.palisade.data.service.reader;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.collect.Maps;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
+import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.resource.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -33,6 +43,13 @@ import static java.util.Objects.requireNonNull;
  */
 public class HdfsDataReader extends SerialisedDataReader {
     private final FileSystem fs;
+
+    @JsonCreator
+    public HdfsDataReader(@JsonProperty("conf") final Map<String, String> conf,
+                          @JsonProperty("serialisers") final Map<String, Serialiser<?>> serialisers) throws IOException {
+        this(createConfig(conf));
+        setSerialisers(serialisers);
+    }
 
     public HdfsDataReader(final Configuration conf) throws IOException {
         requireNonNull(conf, "conf is required");
@@ -57,5 +74,41 @@ public class HdfsDataReader extends SerialisedDataReader {
         }
 
         return inputStream;
+    }
+
+    public Configuration getConf() {
+        return fs.getConf();
+    }
+
+    @JsonGetter("conf")
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
+    Map<String, String> getConfMap() {
+        Map<String, String> rtn = Maps.newHashMap();
+        Map<String, String> plainJobConfWithoutResolvingValues = getPlainJobConfWithoutResolvingValues();
+
+        for (Entry<String, String> entry : getConf()) {
+            final String plainValue = plainJobConfWithoutResolvingValues.get(entry.getKey());
+            final String thisValue = entry.getValue();
+            if (isNull(plainValue) || !plainValue.equals(thisValue)) {
+                rtn.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return rtn;
+    }
+
+    private Map<String, String> getPlainJobConfWithoutResolvingValues() {
+        Map<String, String> plainMapWithoutResolvingValues = new HashMap<>();
+        for (Entry<String, String> entry : new Configuration()) {
+            plainMapWithoutResolvingValues.put(entry.getKey(), entry.getValue());
+        }
+        return plainMapWithoutResolvingValues;
+    }
+
+    private static Configuration createConfig(final Map<String, String> conf) {
+        final Configuration config = new Configuration();
+        for (final Entry<String, String> entry : conf.entrySet()) {
+            config.set(entry.getKey(), entry.getValue());
+        }
+        return config;
     }
 }

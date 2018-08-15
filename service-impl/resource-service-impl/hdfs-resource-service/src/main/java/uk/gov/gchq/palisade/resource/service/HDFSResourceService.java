@@ -75,7 +75,6 @@ public class HDFSResourceService implements ResourceService {
     public static final String ERROR_OUT_SCOPE = "resource ID is out of scope of the this resource Service. Found: %s expected: %s";
     public static final String ERROR_DETAIL_NOT_FOUND = "Connection detail could not be found for type: %s format: %s";
     public static final String ERROR_RESOLVING_PARENTS = "Error occurred while resolving resourceParents";
-    public static final String HDFS_HOME = "HDFS.HOME";
 
     private final Configuration conf;
     private final FileSystem fileSystem;
@@ -83,7 +82,6 @@ public class HDFSResourceService implements ResourceService {
 
     public HDFSResourceService(final Configuration conf, final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) throws IOException {
         requireNonNull(conf);
-        requireNonNull(conf.get(HDFS_HOME), HDFS_HOME + " config has not been set.");
         this.conf = conf;
         this.fileSystem = FileSystem.get(conf);
         this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
@@ -93,12 +91,8 @@ public class HDFSResourceService implements ResourceService {
     public HDFSResourceService(@JsonProperty("conf") final Map<String, String> conf,
                                @JsonProperty("dataFormat") final HashMap<String, ConnectionDetail> dataFormat,
                                @JsonProperty("dataType") final HashMap<String, ConnectionDetail> dataType) throws IOException {
-        this(new Configuration(), dataFormat, dataType);
-        for (Entry<String, String> entry : conf.entrySet()) {
-            this.conf.set(entry.getKey(), entry.getValue());
-        }
+        this(createConfig(conf), dataFormat, dataType);
     }
-
 
     public HDFSResourceService connectionDetail(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
         this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
@@ -113,8 +107,9 @@ public class HDFSResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         final String resourceId = request.getResourceId();
-        if (!resourceId.contains(conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY).replace(conf.get(HDFS_HOME), ""))) {
-            throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)));
+        final String path = new Path(conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)).toUri().getPath();
+        if (!resourceId.contains(path)) {
+            throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, path));
         }
         return getMapCompletableFuture(resourceId, ignore -> true);
     }
@@ -324,6 +319,14 @@ public class HDFSResourceService implements ResourceService {
                     .append(dataType)
                     .toHashCode();
         }
+    }
+
+    private static Configuration createConfig(final Map<String, String> conf) {
+        final Configuration config = new Configuration();
+        for (final Entry<String, String> entry : conf.entrySet()) {
+            config.set(entry.getKey(), entry.getValue());
+        }
+        return config;
     }
 }
 
