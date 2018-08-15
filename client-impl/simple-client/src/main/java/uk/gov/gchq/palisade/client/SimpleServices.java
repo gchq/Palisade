@@ -16,56 +16,93 @@
 package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
+import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.impl.HashMapCacheService;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
+import uk.gov.gchq.palisade.policy.service.impl.HashMapPolicyService;
+import uk.gov.gchq.palisade.resource.service.HashMapResourceService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
 import uk.gov.gchq.palisade.user.service.UserService;
+import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 
-/**
- * An interface that other consumers of the simple clients can use to consume the various Palisade services.
- */
-public interface SimpleServices {
+public class SimpleServices implements ServicesFactory {
 
-    /**
-     * Get the Palisade resource service.
-     *
-     * @return an instance of {@link ResourceService}
-     */
-    ResourceService getResourceService();
+    private final ResourceService resourceService;
+    private final AuditService auditService;
+    private final PolicyService policyService;
+    private final UserService userService;
+    private final CacheService cacheService;
+    private final PalisadeService palisadeService;
 
-    /**
-     * Get the Palisade audit service.
-     *
-     * @return an instance of {@link AuditService}
-     */
-    AuditService getAuditService();
+    public SimpleServices() {
+        this.resourceService = createResourceService();
+        this.auditService = createAuditService();
+        this.policyService = createPolicyService();
+        this.userService = createUserService();
+        this.cacheService = createCacheService();
+        this.palisadeService = createPalisadeService();
+    }
 
-    /**
-     * Get the Palisade policy service.
-     *
-     * @return an instance of {@link PolicyService}
-     */
-    PolicyService getPolicyService();
+    @Override
+    public ResourceService getResourceService() {
+        return resourceService;
+    }
 
-    /**
-     * Get the Palisade user service.
-     *
-     * @return an instance of {@link UserService}
-     */
-    UserService getUserService();
+    @Override
+    public AuditService getAuditService() {
+        return auditService;
+    }
 
-    /**
-     * Get the Palisade cache service.
-     *
-     * @return an instance of {@link CacheService}
-     */
-    CacheService getCacheService();
+    @Override
+    public PolicyService getPolicyService() {
+        return policyService;
+    }
 
-    /**
-     * Get the Palisade service itself.
-     *
-     * @return an instance of {@link PalisadeService}
-     */
-    PalisadeService getPalisadeService();
+    @Override
+    public UserService getUserService() {
+        return userService;
+    }
+
+    @Override
+    public CacheService getCacheService() {
+        return cacheService;
+    }
+
+    @Override
+    public PalisadeService getPalisadeService() {
+        return palisadeService;
+    }
+
+    protected CacheService createCacheService() {
+        return new HashMapCacheService();
+    }
+
+    protected ResourceService createResourceService() {
+        return new HashMapResourceService();
+    }
+
+    protected AuditService createAuditService() {
+        return new LoggerAuditService();
+    }
+
+    protected PolicyService createPolicyService() {
+        return new HashMapPolicyService();
+    }
+
+    protected UserService createUserService() {
+        return new HashMapUserService();
+    }
+
+    protected PalisadeService createPalisadeService() {
+        return new SimplePalisadeService(
+                getResourceService(),
+                getAuditService(),
+                getPolicyService(),
+                getUserService(),
+                getCacheService()
+        );
+    }
 }

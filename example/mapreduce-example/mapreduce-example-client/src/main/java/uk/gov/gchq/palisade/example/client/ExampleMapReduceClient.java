@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.JobContext;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.client.SimpleClient;
+import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.client.SimpleServices;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.example.ExampleObj;
@@ -45,13 +45,13 @@ import java.util.concurrent.CompletableFuture;
 public class ExampleMapReduceClient {
     public static final String RESOURCE_TYPE = "exampleObj";
 
-    private final SimpleServices services;
+    private final ServicesFactory services;
 
     public ExampleMapReduceClient() {
-        this(new SimpleClient<>());
+        this(new SimpleServices());
     }
 
-    public ExampleMapReduceClient(final SimpleServices services) {
+    public ExampleMapReduceClient(final ServicesFactory services) {
         Objects.requireNonNull(services, "services");
         this.services = services;
         // The user authorisation owner or sys admin needs to add the user
