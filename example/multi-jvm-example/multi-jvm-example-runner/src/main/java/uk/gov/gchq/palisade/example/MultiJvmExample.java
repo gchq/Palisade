@@ -16,17 +16,22 @@
 
 package uk.gov.gchq.palisade.example;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.example.client.ExampleSimpleRestClient;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 public class MultiJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
-    public static final String FILE = ExampleSimpleRestClient.class.getClassLoader().getResource("example/exampleObj_file1.txt").getPath();
-
+    public static final String FILE = createDataPath();
 
     public static void main(final String[] args) throws Exception {
         new MultiJvmExample().run();
@@ -46,5 +51,18 @@ public class MultiJvmExample {
         final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
         LOGGER.info("Bob got back: ");
         bobResults.map(Object::toString).forEach(LOGGER::info);
+
+        FileUtils.deleteQuietly(new File(FILE));
+    }
+
+    private static String createDataPath() {
+        final File targetFile = new File("data/example/exampleObj_file1.txt");
+        try (final InputStream data = MultiJvmExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
+            requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
+            FileUtils.copyInputStreamToFile(data, targetFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return targetFile.getAbsolutePath();
     }
 }
