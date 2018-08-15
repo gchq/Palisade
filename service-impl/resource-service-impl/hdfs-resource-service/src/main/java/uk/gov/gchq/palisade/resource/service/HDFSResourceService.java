@@ -107,8 +107,8 @@ public class HDFSResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         final String resourceId = request.getResourceId();
-        final String path = new Path(conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)).toUri().getPath();
-        if (!resourceId.contains(path)) {
+        final String path = conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+        if (!resourceId.startsWith(path) && !resourceId.startsWith(new Path(path).toUri().getPath())) {
             throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, path));
         }
         return getMapCompletableFuture(resourceId, ignore -> true);

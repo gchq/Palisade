@@ -114,7 +114,7 @@ public class HDFSFileResourceServiceTest {
 
         //when
         final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final String found = HDFS + id;
+        final String found = HDFS + "/unknownDir/" + id;
         try {
             service.getResourcesById(new GetResourcesByIdRequest().resourceId(found));
             fail("exception expected");
