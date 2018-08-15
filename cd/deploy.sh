@@ -52,11 +52,16 @@ if [ "$TRAVIS_BRANCH" == 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; th
         echo "--------------------------------------"
         npm install -g gitbook-cli > /dev/null 2>&1
         ./doc/scripts/buildGitbook.sh
-        git checkout gh-pages
-        rm -rf uk
-        mv target/site/apidocs/* .
+        git branch -D gh-pages
+        git checkout --orphan gh-pages
+        mkdir toDelete
+        mv * toDelete > /dev/null 2>&1
+        mv toDelete/_book/* .
+        rm -rf toDelete
+        rm -f doc/.gitignore
         git add .
-        git commit -a -m "Updated javadoc - $RELEASE_VERSION"
+        git commit -m "Updated documentation - $RELEASE_VERSION"
+        git push -u origin gh-pages -f
         git checkout master
 
         echo ""
