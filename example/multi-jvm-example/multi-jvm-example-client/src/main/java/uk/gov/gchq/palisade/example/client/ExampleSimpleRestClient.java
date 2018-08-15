@@ -22,7 +22,9 @@ import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
 import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
 import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.client.SimpleRestClient;
+import uk.gov.gchq.palisade.client.ServicesFactory;
+import uk.gov.gchq.palisade.client.SimpleClient;
+import uk.gov.gchq.palisade.client.SimpleRestServices;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 import uk.gov.gchq.palisade.example.ExampleObj;
@@ -32,41 +34,32 @@ import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
 import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
 import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
 import uk.gov.gchq.palisade.policy.service.Policy;
-import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
-import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
-import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
+public class ExampleSimpleRestClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
 
     public ExampleSimpleRestClient() {
-        super();
+        this(new SimpleRestServices());
+    }
+
+    public ExampleSimpleRestClient(final ServicesFactory services) {
+        super(services);
         initialiseServices();
-    }
-
-    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, RESOURCE_TYPE, userId, justification);
-    }
-
-    @Override
-    protected Serialiser<ExampleObj> createSerialiser() {
-        return new ExampleObjSerialiser();
     }
 
     private void initialiseServices() {
         // The user authorisation owner or sys admin needs to add the user
-        final UserService userService = createUserService();
-        final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
+        final CompletableFuture<Boolean> userAliceStatus = getServicesFactory().getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Alice")
@@ -74,7 +67,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                                 .roles("user", "admin")
                 )
         );
-        final CompletableFuture<Boolean> userBobStatus = getUserService().addUser(
+        final CompletableFuture<Boolean> userBobStatus = getServicesFactory().getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
@@ -85,7 +78,6 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
 
 
         // The policy owner or sys admin needs to add the policies
-        final PolicyService policyService = createPolicyService();
 
         // You can either implement the Rule interface for your Policy rules or
         // you can chain together combinations of Koryphe functions/predicates.
@@ -138,13 +130,12 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                                 )
                 );
 
-        final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
+        final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setPolicy(
                 koryphePolicies
         );
 
         // The sys admin needs to add the resources
-        final ResourceService resourceService = createResourceService();
-        final CompletableFuture<Boolean> resourceStatus = resourceService
+        final CompletableFuture<Boolean> resourceStatus = getServicesFactory().getResourceService()
                 .addResource(new AddResourceRequest()
                                 .parent(new DirectoryResource().id("dir1").type(RESOURCE_TYPE))
                                 .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
@@ -153,5 +144,14 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
 
         // Wait for the users, policies and resources to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();
+    }
+
+    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
+        return super.read(filename, RESOURCE_TYPE, userId, justification);
+    }
+
+    @Override
+    protected Serialiser<ExampleObj> createSerialiser() {
+        return new ExampleObjSerialiser();
     }
 }

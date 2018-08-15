@@ -22,7 +22,9 @@ import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
 import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
 import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.client.SimpleClient;
+import uk.gov.gchq.palisade.client.SimpleServices;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.example.ExampleObj;
@@ -33,12 +35,10 @@ import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
 import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
 import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
 import uk.gov.gchq.palisade.policy.service.Policy;
-import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
-import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
@@ -51,22 +51,17 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
 
     public ExampleSimpleClient() {
-        super();
+        this(new SimpleServices());
+    }
+
+    public ExampleSimpleClient(final ServicesFactory services) {
+        super(services);
         initialiseServices();
-    }
-
-    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, RESOURCE_TYPE, userId, justification);
-    }
-
-    @Override
-    protected Serialiser<ExampleObj> createSerialiser() {
-        return new ExampleObjSerialiser();
     }
 
     private void initialiseServices() {
         // The user authorisation owner or sys admin needs to add the user
-        final UserService userService = createUserService();
+        final UserService userService = getServicesFactory().getUserService();
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest().user(
                         new User()
@@ -75,7 +70,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 .roles("user", "admin")
                 )
         );
-        final CompletableFuture<Boolean> userBobStatus = getUserService().addUser(
+        final CompletableFuture<Boolean> userBobStatus = getServicesFactory().getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
@@ -86,7 +81,6 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
 
 
         // The policy owner or sys admin needs to add the policies
-        final PolicyService policyService = createPolicyService();
 
         // You can either implement the Rule interface for your Policy rules or
         // you can chain together combinations of Koryphe functions/predicates.
@@ -139,19 +133,28 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 )
                 );
 
-        final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
+        final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setPolicy(
                 koryphePolicies
         );
 
         // The sys admin needs to add the resources
-        final ResourceService resourceService = createResourceService();
-        final CompletableFuture<Boolean> resourceStatus = resourceService.addResource(new AddResourceRequest()
+        final CompletableFuture<Boolean> resourceStatus = getServicesFactory().getResourceService().addResource(new AddResourceRequest()
                 .parent(new DirectoryResource().id("dir1").type(RESOURCE_TYPE))
                 .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
-                .connectionDetail(new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getPalisadeService()).reader(new ExampleSimpleDataReader()))
+                .connectionDetail(new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService())
+                                .reader(new ExampleSimpleDataReader()))
                 ));
 
         // Wait for the users, policies and resources to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();
+    }
+
+    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
+        return super.read(filename, RESOURCE_TYPE, userId, justification);
+    }
+
+    @Override
+    protected Serialiser<ExampleObj> createSerialiser() {
+        return new ExampleObjSerialiser();
     }
 }

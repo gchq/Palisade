@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 
 public class SimpleClient<T> {
     private final Serialiser<T> serialiser;
+
     private final ServicesFactory services;
 
     public SimpleClient(final ServicesFactory services) {
@@ -75,5 +76,9 @@ public class SimpleClient<T> {
 
     public Serialiser<T> getSerialiser() {
         return serialiser;
+    }
+
+    public ServicesFactory getServicesFactory() {
+        return services;
     }
 }
