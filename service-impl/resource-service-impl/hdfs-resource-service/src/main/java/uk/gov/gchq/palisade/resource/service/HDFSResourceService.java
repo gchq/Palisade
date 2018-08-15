@@ -323,8 +323,10 @@ public class HDFSResourceService implements ResourceService {
 
     private static Configuration createConfig(final Map<String, String> conf) {
         final Configuration config = new Configuration();
-        for (final Entry<String, String> entry : conf.entrySet()) {
-            config.set(entry.getKey(), entry.getValue());
+        if (nonNull(conf)) {
+            for (final Entry<String, String> entry : conf.entrySet()) {
+                config.set(entry.getKey(), entry.getValue());
+            }
         }
         return config;
     }

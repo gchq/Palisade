@@ -46,6 +46,7 @@ import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -151,7 +152,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
+        final Map<String, ConnectionDetail> dataType = new HashMap<>();
         dataType.put(RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisadeService).reader(reader)));
         ((HDFSResourceService) resourceService).connectionDetail(null, dataType);
 

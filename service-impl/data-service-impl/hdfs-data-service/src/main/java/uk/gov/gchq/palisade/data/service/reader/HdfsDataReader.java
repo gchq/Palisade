@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -106,8 +107,10 @@ public class HdfsDataReader extends SerialisedDataReader {
 
     private static Configuration createConfig(final Map<String, String> conf) {
         final Configuration config = new Configuration();
-        for (final Entry<String, String> entry : conf.entrySet()) {
-            config.set(entry.getKey(), entry.getValue());
+        if (nonNull(conf)) {
+            for (final Entry<String, String> entry : conf.entrySet()) {
+                config.set(entry.getKey(), entry.getValue());
+            }
         }
         return config;
     }
