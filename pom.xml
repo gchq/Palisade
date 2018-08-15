@@ -89,7 +89,25 @@
         <!-- Other -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Define SCM properties for use with Release Plugin -->
+        <scm.url>
+            https://github.com/gchq/Palisade
+        </scm.url>
+        <scm.connection>
+            scm:git:https://github.com/gchq/Palisade.git
+        </scm.connection>
+        <scm.developer.connection>
+            scm:git:https://github.com/gchq/Palisade.git
+        </scm.developer.connection>
     </properties>
+
+    <scm>
+        <url>${scm.url}</url>
+        <connection>${scm.connection}</connection>
+        <developerConnection>${scm.developer.connection}</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
     <dependencies>
         <dependency>
