@@ -74,7 +74,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                                 .roles("user", "admin")
                 )
         );
-        final CompletableFuture<Boolean> userBobStatus = userService.addUser(
+        final CompletableFuture<Boolean> userBobStatus = getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
