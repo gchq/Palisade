@@ -23,13 +23,13 @@ import uk.gov.gchq.palisade.example.client.ExampleSimpleRestClient;
 
 import java.util.stream.Stream;
 
-public class MultiJvmExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
-    public static final String FILE = ExampleSimpleRestClient.class.getClassLoader().getResource("example/exampleObj_file1.txt").getPath();
+public class MultiDockerJvmExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MultiDockerJvmExample.class);
+    public static final String FILE = "/data/example/exampleObj_file1.txt";
 
 
     public static void main(final String[] args) throws Exception {
-        new MultiJvmExample().run();
+        new MultiDockerJvmExample().run();
     }
 
     public void run() throws Exception {

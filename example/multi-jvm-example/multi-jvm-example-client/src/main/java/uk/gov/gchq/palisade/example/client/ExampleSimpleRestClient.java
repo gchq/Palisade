@@ -41,10 +41,11 @@ import java.util.stream.Stream;
 
 public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
-    public static final String FILE = ExampleSimpleRestClient.class.getClassLoader().getResource("example/exampleObj_file1.txt").getPath();
+    private final String file;
 
-    public ExampleSimpleRestClient() {
+    public ExampleSimpleRestClient(final String file) {
         super();
+        this.file = file;
         initialiseServices();
     }
 
@@ -85,7 +86,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
         // Using Custom Rule implementations - without Koryphe
         final SetPolicyRequest customPolicies =
                 new SetPolicyRequest()
-                        .resource(new FileResource().id(FILE).type("exampleObj").serialisedFormat("txt"))
+                        .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt"))
                         .policy(new Policy<ExampleObj>()
                                         .recordLevelRule(
                                                 "1-visibility",
@@ -103,7 +104,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
 
         // Using Koryphe's functions/predicates
         final SetPolicyRequest koryphePolicies = new SetPolicyRequest()
-                .resource(new FileResource().id(FILE).type("exampleObj").serialisedFormat("txt"))
+                .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt"))
                 .policy(new Policy<ExampleObj>()
                                 .recordLevelRule(
                                         "1-visibility",

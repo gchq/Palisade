@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 import static org.junit.Assert.assertEquals;
 
 public class MultiJvmExampleIT {
+    public static final String FILE = ExampleSimpleRestClient.class.getClassLoader().getResource("example/exampleObj_file1.txt").getPath();
 
     private static EmbeddedHttpServer palisadeServer;
     private static EmbeddedHttpServer policyServer;
@@ -99,10 +100,10 @@ public class MultiJvmExampleIT {
     @Test
     public void shouldReadAsAlice() throws Exception {
         // Given
-        final ExampleSimpleRestClient client = new ExampleSimpleRestClient();
+        final ExampleSimpleRestClient client = new ExampleSimpleRestClient(FILE);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleRestClient.FILE, "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
 
         // Then
         assertEquals(
@@ -119,10 +120,10 @@ public class MultiJvmExampleIT {
     @Test
     public void shouldReadAsBob() throws Exception {
         // Given
-        final ExampleSimpleRestClient client = new ExampleSimpleRestClient();
+        final ExampleSimpleRestClient client = new ExampleSimpleRestClient(FILE);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleRestClient.FILE, "Bob", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(FILE, "Bob", "Payroll");
 
         // Then
         assertEquals(
