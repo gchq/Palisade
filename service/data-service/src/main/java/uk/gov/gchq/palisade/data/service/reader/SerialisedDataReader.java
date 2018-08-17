@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -82,7 +83,7 @@ public abstract class SerialisedDataReader implements DataReader {
 
         final InputStream data;
         final Rules<Object> rules = request.getRules();
-        if (rules.getRules().isEmpty()) {
+        if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
             LOGGER.debug("No rules to apply");
             data = rawStream;
         } else {

@@ -22,13 +22,12 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>palisade</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <artifactId>library</artifactId>
     <packaging>pom</packaging>
 
     <modules>
         <module>koryphe-library</module>
-        <module>mapreduce</module>
     </modules>
 </project>

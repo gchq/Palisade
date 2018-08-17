@@ -19,29 +19,31 @@ package uk.gov.gchq.palisade.example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.client.ExampleSimpleRestClient;
 
 import java.util.stream.Stream;
 
-public class SingleJvmExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SingleJvmExample.class);
+public class MultiDockerJvmExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MultiDockerJvmExample.class);
+    public static final String FILE = "/data/example/exampleObj_file1.txt";
+
 
     public static void main(final String[] args) throws Exception {
-        new SingleJvmExample().run();
+        new MultiDockerJvmExample().run();
     }
 
     public void run() throws Exception {
-        final ExampleSimpleClient client = new ExampleSimpleClient();
+        final ExampleSimpleRestClient client = new ExampleSimpleRestClient(FILE);
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");
-        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleClient.FILE, "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Bob is reading file1...");
-        final Stream<ExampleObj> bobResults = client.read(ExampleSimpleClient.FILE, "Bob", "Payroll");
+        final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
         LOGGER.info("Bob got back: ");
         bobResults.map(Object::toString).forEach(LOGGER::info);
     }

@@ -21,11 +21,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>library</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <artifactId>client-impl</artifactId>
+        <version>0.2-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mapreduce</artifactId>
+    <artifactId>map-reduce-client</artifactId>
 
     <dependencies>
         <dependency>

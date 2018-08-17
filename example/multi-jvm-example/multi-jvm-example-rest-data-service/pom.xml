@@ -22,7 +22,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>multi-jvm-example</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <artifactId>multi-jvm-example-rest-data-service</artifactId>
     <packaging>war</packaging>
@@ -40,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>simple-data-service</artifactId>
+            <artifactId>hdfs-data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

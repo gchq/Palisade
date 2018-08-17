@@ -22,7 +22,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>single-jvm-example</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <artifactId>single-jvm-example-client</artifactId>
     <dependencies>
@@ -34,6 +34,16 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>example-model</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>hdfs-resource-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>hdfs-data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

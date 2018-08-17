@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A implementation of the ResourceService for HDFS.
@@ -77,9 +78,10 @@ public class HDFSResourceService implements ResourceService {
 
     private final Configuration conf;
     private final FileSystem fileSystem;
-    private final ConnectionDetailStorage connectionDetailStorage;
+    private ConnectionDetailStorage connectionDetailStorage;
 
     public HDFSResourceService(final Configuration conf, final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) throws IOException {
+        requireNonNull(conf);
         this.conf = conf;
         this.fileSystem = FileSystem.get(conf);
         this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
@@ -89,10 +91,12 @@ public class HDFSResourceService implements ResourceService {
     public HDFSResourceService(@JsonProperty("conf") final Map<String, String> conf,
                                @JsonProperty("dataFormat") final HashMap<String, ConnectionDetail> dataFormat,
                                @JsonProperty("dataType") final HashMap<String, ConnectionDetail> dataType) throws IOException {
-        this(new Configuration(), dataFormat, dataType);
-        for (Entry<String, String> entry : conf.entrySet()) {
-            this.conf.set(entry.getKey(), entry.getValue());
-        }
+        this(createConfig(conf), dataFormat, dataType);
+    }
+
+    public HDFSResourceService connectionDetail(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
+        this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
+        return this;
     }
 
     @Override
@@ -103,8 +107,9 @@ public class HDFSResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         final String resourceId = request.getResourceId();
-        if (!resourceId.contains(conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY))) {
-            throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)));
+        final String path = conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+        if (!resourceId.startsWith(path) && !resourceId.startsWith(new Path(path).toUri().getPath())) {
+            throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, path));
         }
         return getMapCompletableFuture(resourceId, ignore -> true);
     }
@@ -259,7 +264,7 @@ public class HDFSResourceService implements ResourceService {
         private final HashMap<String, ConnectionDetail> dataFormat = new HashMap<>();
         private final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
 
-        ConnectionDetailStorage(final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) {
+        ConnectionDetailStorage(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
             if (nonNull(dataFormat)) {
                 this.dataFormat.putAll(dataFormat);
                 this.dataFormat.values().removeIf(Objects::isNull);
@@ -314,6 +319,16 @@ public class HDFSResourceService implements ResourceService {
                     .append(dataType)
                     .toHashCode();
         }
+    }
+
+    private static Configuration createConfig(final Map<String, String> conf) {
+        final Configuration config = new Configuration();
+        if (nonNull(conf)) {
+            for (final Entry<String, String> entry : conf.entrySet()) {
+                config.set(entry.getKey(), entry.getValue());
+            }
+        }
+        return config;
     }
 }
 

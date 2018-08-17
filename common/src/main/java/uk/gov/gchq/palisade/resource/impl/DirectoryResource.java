@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.resource.impl;
 
+import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.AbstractResource;
 import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.ParentResource;
@@ -50,5 +51,13 @@ public class DirectoryResource extends AbstractResource implements ChildResource
     @Override
     public void setParent(final ParentResource parentId) {
         this.parent = parentId;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("parent", parent)
+                .toString();
     }
 }

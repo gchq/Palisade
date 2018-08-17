@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-
-./dockerComposeDown.sh
+set -e
+./example/multi-jvm-example/scripts/dockerComposeDown.sh
 docker system prune -a
