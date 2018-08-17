@@ -21,8 +21,9 @@ import org.apache.hadoop.mapreduce.JobContext;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.client.SimpleClient;
-import uk.gov.gchq.palisade.data.serialise.Serialiser;
+import uk.gov.gchq.palisade.client.SimpleServices;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader;
@@ -35,22 +36,27 @@ import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
 
     public ExampleMapReduceClient() {
-        super();
+        this(new SimpleServices());
+    }
 
+    public ExampleMapReduceClient(final ServicesFactory services) {
+        super(services);
+        initialiseServices();
+    }
+
+    private void initialiseServices() {
         // The user authorisation owner or sys admin needs to add the user
-        final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
+        final CompletableFuture<Boolean> userAliceStatus = getServicesFactory().getUserService().addUser(
                 new AddUserRequest()
                         .user(
                                 new User()
@@ -59,7 +65,7 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
                                         .roles("user", "admin")
                         )
         );
-        final CompletableFuture<Boolean> userBobStatus = userService.addUser(
+        final CompletableFuture<Boolean> userBobStatus = getServicesFactory().getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
@@ -69,7 +75,7 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
         );
 
         // The policy owner or sys admin needs to add the policies
-        final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
+        final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setPolicy(
                 new SetPolicyRequest().resource(
                         new FileResource()
                                 .id("file1")
@@ -87,51 +93,30 @@ public class ExampleMapReduceClient extends SimpleClient<ExampleObj> {
         );
 
         // The sys admin needs to add the resources
-        final CompletableFuture<Boolean> resourceStatus = resourceService.addResource(new AddResourceRequest()
+        final CompletableFuture<Boolean> resourceStatus = getServicesFactory().getResourceService().addResource(new AddResourceRequest()
                 .parent(new DirectoryResource().id("dir1").type(RESOURCE_TYPE))
                 .resource(new FileResource().id("file1").type(RESOURCE_TYPE))
-                .connectionDetail(new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisadeService).reader(new ExampleSimpleDataReader()))
+                .connectionDetail(new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService()).reader(new ExampleSimpleDataReader()))
                 ));
 
         // Wait for the users, policies and resources to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus, resourceStatus).join();
     }
 
-    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, RESOURCE_TYPE, userId, justification);
-    }
-
-    @Override
-    protected Serialiser<ExampleObj> createSerialiser() {
-        return new ExampleObjSerialiser();
-    }
-
     /**
-     * Set up a given MapReduce job to source data from an {@link ExampleMapReduceClient}. This convenience method will
-     * configure the input format, set the {@link PalisadeService} and the serialiser.
+     * Configures the given job to use this example client.
      *
      * @param job        the job to configure
-     * @param client     the particular client
-     * @param maxMapHint maximum mapper hint
+     * @param maxMapHint the hint for the maximum number of mappers
      */
-    public static void initialiseJob(final Job job, final ExampleMapReduceClient client, final int maxMapHint) {
+    public void configureJob(final Job job, final int maxMapHint) {
         job.setInputFormatClass(PalisadeInputFormat.class);
         //tell it which Palisade service to use
-        PalisadeInputFormat.setPalisadeService(job, client.getPalisadeService());
-        //set a maximum mapper hint
-        PalisadeInputFormat.setMaxMapTasksHint(job, maxMapHint);
+        PalisadeInputFormat.setPalisadeService(job, getServicesFactory().getPalisadeService());
         //configure the serialiser to use
         PalisadeInputFormat.setSerialiser(job, new ExampleObjSerialiser());
-    }
-
-    /**
-     * Get the {@link PalisadeService} used by this client. This is exposed here so that we can  pass it to the input
-     * format.
-     *
-     * @return the service
-     */
-    public PalisadeService getPalisadeService() {
-        return palisadeService;
+        //set the maximum mapper hint
+        PalisadeInputFormat.setMaxMapTasksHint(job, maxMapHint);
     }
 
     /**

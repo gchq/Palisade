@@ -24,7 +24,9 @@ import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
 import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
 import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.client.SimpleClient;
+import uk.gov.gchq.palisade.client.SimpleServices;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.reader.HdfsDataReader;
@@ -39,9 +41,9 @@ import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
-import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
+import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.io.IOException;
@@ -55,21 +57,18 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     public static final String FILE = ExampleSimpleClient.class.getClassLoader().getResource("example/exampleObj_file1.txt").getPath();
 
     public ExampleSimpleClient() {
-        super();
+        this(new SimpleServices());
+    }
+
+    public ExampleSimpleClient(final ServicesFactory services) {
+        super(services);
         initialiseServices();
-    }
-
-    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, RESOURCE_TYPE, userId, justification);
-    }
-
-    @Override
-    protected Serialiser<ExampleObj> createSerialiser() {
-        return new ExampleObjSerialiser();
     }
 
     private void initialiseServices() {
         // The user authorisation owner or sys admin needs to add the user
+        final UserService userService = getServicesFactory().getUserService();
+
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest().user(
                         new User()
@@ -78,7 +77,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 .roles("user", "admin")
                 )
         );
-        final CompletableFuture<Boolean> userBobStatus = userService.addUser(
+        final CompletableFuture<Boolean> userBobStatus = getServicesFactory().getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
@@ -86,7 +85,6 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 .roles("user")
                 )
         );
-
 
         // You can either implement the Rule interface for your Policy rules or
         // you can chain together combinations of Koryphe functions/predicates.
@@ -139,7 +137,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                                 )
                 );
 
-        final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
+        final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setPolicy(
                 koryphePolicies
         );
 
@@ -153,19 +151,19 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
             throw new RuntimeException(e);
         }
         final Map<String, ConnectionDetail> dataType = new HashMap<>();
-        dataType.put(RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisadeService).reader(reader)));
-        ((HDFSResourceService) resourceService).connectionDetail(null, dataType);
+        dataType.put(RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService()).reader(reader)));
+        ((HDFSResourceService) getServicesFactory().getResourceService()).connectionDetail(null, dataType);
 
         // Wait for the users and policies to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
     }
 
+    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
+        return super.read(filename, RESOURCE_TYPE, userId, justification);
+    }
+
     @Override
-    protected ResourceService createResourceService() {
-        try {
-            return new HDFSResourceService(new Configuration(), null, null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    protected Serialiser<ExampleObj> createSerialiser() {
+        return new ExampleObjSerialiser();
     }
 }

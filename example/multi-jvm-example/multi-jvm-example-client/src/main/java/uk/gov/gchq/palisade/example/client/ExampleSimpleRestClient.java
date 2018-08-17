@@ -22,7 +22,9 @@ import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
 import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
 import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.client.SimpleRestClient;
+import uk.gov.gchq.palisade.client.ServicesFactory;
+import uk.gov.gchq.palisade.client.SimpleClient;
+import uk.gov.gchq.palisade.client.SimpleRestServices;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
@@ -39,28 +41,23 @@ import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
+public class ExampleSimpleRestClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
     private final String file;
 
     public ExampleSimpleRestClient(final String file) {
-        super();
+        this(new SimpleRestServices(), file);
+    }
+
+    public ExampleSimpleRestClient(final ServicesFactory services, final String file) {
+        super(services);
         this.file = file;
         initialiseServices();
     }
 
-    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, RESOURCE_TYPE, userId, justification);
-    }
-
-    @Override
-    protected Serialiser<ExampleObj> createSerialiser() {
-        return new ExampleObjSerialiser();
-    }
-
     private void initialiseServices() {
         // The user authorisation owner or sys admin needs to add the user
-        final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
+        final CompletableFuture<Boolean> userAliceStatus = getServicesFactory().getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Alice")
@@ -68,7 +65,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                                 .roles("user", "admin")
                 )
         );
-        final CompletableFuture<Boolean> userBobStatus = userService.addUser(
+        final CompletableFuture<Boolean> userBobStatus = getServicesFactory().getUserService().addUser(
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
@@ -128,11 +125,20 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
                                 )
                 );
 
-        final CompletableFuture<Boolean> policyStatus = policyService.setPolicy(
+        final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setPolicy(
                 koryphePolicies
         );
 
         // Wait for the users and policies to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
+    }
+
+    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
+        return super.read(filename, RESOURCE_TYPE, userId, justification);
+    }
+
+    @Override
+    protected Serialiser<ExampleObj> createSerialiser() {
+        return new ExampleObjSerialiser();
     }
 }

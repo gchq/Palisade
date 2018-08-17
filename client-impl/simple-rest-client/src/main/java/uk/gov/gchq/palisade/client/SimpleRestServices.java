@@ -25,7 +25,7 @@ import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
-public class SimpleRestClient<T> extends SimpleClient<T> {
+public class SimpleRestServices extends SimpleServices {
     @Override
     protected PalisadeService createPalisadeService() {
         return new ProxyRestPalisadeService("http://localhost:8080/palisade");
