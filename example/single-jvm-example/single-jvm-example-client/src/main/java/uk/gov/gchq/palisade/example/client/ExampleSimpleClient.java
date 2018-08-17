@@ -41,9 +41,9 @@ import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
-import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
+import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.io.IOException;
@@ -156,15 +156,6 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
 
         // Wait for the users and policies to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
-    }
-
-    @Override
-    protected ResourceService createResourceService() {
-        try {
-            return new HDFSResourceService(new Configuration(), null, null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {

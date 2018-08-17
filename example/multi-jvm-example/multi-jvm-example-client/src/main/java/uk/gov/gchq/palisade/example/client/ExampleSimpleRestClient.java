@@ -36,8 +36,6 @@ import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
-import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.concurrent.CompletableFuture;
@@ -49,10 +47,6 @@ public class ExampleSimpleRestClient extends SimpleClient<ExampleObj> {
 
     public ExampleSimpleRestClient(final String file) {
         this(new SimpleRestServices(), file);
-    }
-
-    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, RESOURCE_TYPE, userId, justification);
     }
 
     public ExampleSimpleRestClient(final ServicesFactory services, final String file) {
