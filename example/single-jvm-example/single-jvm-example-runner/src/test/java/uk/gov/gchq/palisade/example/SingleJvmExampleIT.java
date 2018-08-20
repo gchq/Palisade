@@ -16,17 +16,24 @@
 
 package uk.gov.gchq.palisade.example;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.gchq.palisade.util.JsonAssert.assertEquals;
 
 public class SingleJvmExampleIT {
+    private static final String FILE = createDataPath();
+
     @Test
     public void shouldRunWithoutErrors() throws Exception {
         // Given
@@ -41,10 +48,10 @@ public class SingleJvmExampleIT {
     @Test
     public void shouldReadAsAlice() throws Exception {
         // Given
-        final ExampleSimpleClient client = new ExampleSimpleClient();
+        final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleClient.FILE, "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
 
         // Then
         assertEquals(
@@ -61,10 +68,10 @@ public class SingleJvmExampleIT {
     @Test
     public void shouldReadAsBob() throws Exception {
         // Given
-        final ExampleSimpleClient client = new ExampleSimpleClient();
+        final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleClient.FILE, "Bob", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(FILE, "Bob", "Payroll");
 
         // Then
         assertEquals(
@@ -74,5 +81,16 @@ public class SingleJvmExampleIT {
                 ),
                 aliceResults.collect(Collectors.toList())
         );
+    }
+
+    private static String createDataPath() {
+        final File targetFile = new File("data/example/exampleObj_file1.txt");
+        try (final InputStream data = SingleJvmExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
+            Objects.requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
+            FileUtils.copyInputStreamToFile(data, targetFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return targetFile.getAbsolutePath();
     }
 }
