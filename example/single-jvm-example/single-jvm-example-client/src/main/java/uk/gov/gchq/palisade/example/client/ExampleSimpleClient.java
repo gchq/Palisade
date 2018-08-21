@@ -54,14 +54,15 @@ import java.util.stream.Stream;
 
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     public static final String RESOURCE_TYPE = "exampleObj";
-    public static final String FILE = ExampleSimpleClient.class.getClassLoader().getResource("example/exampleObj_file1.txt").getPath();
+    private final String file;
 
-    public ExampleSimpleClient() {
-        this(new SimpleServices());
+    public ExampleSimpleClient(final String file) {
+        this(new SimpleServices(), file);
     }
 
-    public ExampleSimpleClient(final ServicesFactory services) {
+    public ExampleSimpleClient(final ServicesFactory services, final String file) {
         super(services);
+        this.file = file;
         initialiseServices();
     }
 
@@ -95,7 +96,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         // Using Custom Rule implementations - without Koryphe
         final SetPolicyRequest customPolicies =
                 new SetPolicyRequest()
-                        .resource(new FileResource().id(FILE).type("exampleObj").serialisedFormat("txt"))
+                        .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt"))
                         .policy(new Policy<ExampleObj>()
                                         .recordLevelRule(
                                                 "1-visibility",
@@ -113,7 +114,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
 
         // Using Koryphe's functions/predicates
         final SetPolicyRequest koryphePolicies = new SetPolicyRequest()
-                .resource(new FileResource().id(FILE).type("exampleObj").serialisedFormat("txt"))
+                .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt"))
                 .policy(new Policy<ExampleObj>()
                                 .recordLevelRule(
                                         "1-visibility",
