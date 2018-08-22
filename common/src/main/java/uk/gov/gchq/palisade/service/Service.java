@@ -17,10 +17,13 @@
 package uk.gov.gchq.palisade.service;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -28,9 +31,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * This class defines the top level services API.
- *
- * The only requirement is that there is a process method, used to process all
- * requests that are passed to a service.
+ * <p>
+ * The only requirement is that there is a process method, used to process all requests that are passed to a service.
  */
 @JsonPropertyOrder(value = {"class"}, alphabetic = true)
 @JsonTypeInfo(
@@ -38,6 +40,7 @@ import java.util.concurrent.CompletableFuture;
         include = As.EXISTING_PROPERTY,
         property = "class"
 )
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 public interface Service {
     default CompletableFuture<?> process(final Request request) {
         throw new IllegalArgumentException("Request type was not recognised: " + request.getClass().getName());

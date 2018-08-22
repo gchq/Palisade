@@ -215,6 +215,7 @@ public class HDFSFileResourceServiceTest {
         final byte[] serialise = JSONSerialiser.serialise(service, true);
 
         final String expected = "{\n" +
+                "  \"@id\" : 1,\n" +
                 "  \"class\" : \"uk.gov.gchq.palisade.resource.service.HDFSResourceService\",\n" +
                 "  \"conf\" : {\n" +
                 "  },\n" +
@@ -223,6 +224,7 @@ public class HDFSFileResourceServiceTest {
                 "      \"class\" : \"uk.gov.gchq.palisade.service.request.SimpleConnectionDetail\",\n" +
                 "      \"service\" : {\n" +
                 "        \"class\" : \"uk.gov.gchq.palisade.service.NullService\",\n" +
+                "        \"@id\" : 2,\n" +
                 "        \"class\" : \"uk.gov.gchq.palisade.service.NullService\"\n" +
                 "      }\n" +
                 "    }\n" +

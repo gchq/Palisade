@@ -122,7 +122,7 @@ public class MapReduceExample extends Configured implements Tool {
 
         //next add a resource request to the job
         addDataRequest(job, FILE, RESOURCE_TYPE, "Alice", "Payroll");
-        //addDataRequest(job, FILE, RESOURCE_TYPE, "Bob", "Payroll");
+        addDataRequest(job, FILE, RESOURCE_TYPE, "Bob", "Payroll");
 
         //launch job
         boolean success = job.waitForCompletion(true);
