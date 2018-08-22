@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-client</artifactId>
+            <artifactId>simple-rest-client</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

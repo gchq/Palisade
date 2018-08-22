@@ -19,7 +19,8 @@ package uk.gov.gchq.palisade.example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.example.client.ExampleSimpleRestClient;
+import uk.gov.gchq.palisade.client.SimpleRestServices;
+import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ public class MultiDockerJvmExample {
     }
 
     public void run() throws Exception {
-        final ExampleSimpleRestClient client = new ExampleSimpleRestClient(FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");

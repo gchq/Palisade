@@ -52,10 +52,10 @@ public class MapReduceExampleIT {
             // Then - no exceptions
         } finally {
             //remove temporary output
-            Files.walk(tempDir)
-                    .map(Path::toFile)
-                    .sorted((o1, o2) -> -o1.compareTo(o2))
-                    .forEach(File::delete);
+//            Files.walk(tempDir)
+//                    .map(Path::toFile)
+//                    .sorted((o1, o2) -> -o1.compareTo(o2))
+//                    .forEach(File::delete);
         }
     }
 
@@ -79,10 +79,10 @@ public class MapReduceExampleIT {
             assertEquals(expected, actual);
         } finally {
             //remove temporary output
-            Files.walk(tempDir)
-                    .map(Path::toFile)
-                    .sorted((o1, o2) -> -o1.compareTo(o2))
-                    .forEach(File::delete);
+//            Files.walk(tempDir)
+//                    .map(Path::toFile)
+//                    .sorted((o1, o2) -> -o1.compareTo(o2))
+//                    .forEach(File::delete);
         }
     }
 
