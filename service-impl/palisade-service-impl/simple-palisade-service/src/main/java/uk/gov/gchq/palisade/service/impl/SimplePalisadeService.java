@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.NullAuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
@@ -178,9 +177,7 @@ public class SimplePalisadeService implements PalisadeService {
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {
                     if (null == cache
-                            || null == cache.getUser()
-                            || null == cache.getUser().getUserId()
-                            || UserId.UNKNOWN_USER_ID.equals(cache.getUser().getUserId().getId())) {
+                            || null == cache.getUser()) {
                         throw new RuntimeException("User's request was not in the cache: " + request.getRequestId().getId());
                     }
                     LOGGER.debug("Got cache: {}", cache);

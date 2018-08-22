@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
@@ -71,8 +72,8 @@ public class RestResourceServiceV1IT {
         final ResourceService resourceService = mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
 
-        final ParentResource dir = new DirectoryResource().id("dir1").type("type1").serialisedFormat("format1");
-        final FileResource file = new FileResource().id("file1").type("type1").serialisedFormat("format1");
+        final ParentResource dir = new DirectoryResource().id("dir1").type("type1").serialisedFormat("format1").parent(new SystemResource().id("file"));
+        final FileResource file = new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(dir);
         final AddResourceRequest request = new AddResourceRequest().parent(dir).resource(file).connectionDetail(new SimpleConnectionDetail());
 
         given(resourceService.addResource(request)).willReturn(CompletableFuture.completedFuture(true));
