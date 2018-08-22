@@ -21,6 +21,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 
+import java.util.Objects;
+
 public abstract class AbstractResource implements Resource {
     private String id;
     private String type;
@@ -30,48 +32,54 @@ public abstract class AbstractResource implements Resource {
     }
 
     public AbstractResource id(final String id) {
+        Objects.requireNonNull(id, "The ID of a resource cannot be set to null.");
         this.id = id;
         return this;
     }
 
     public AbstractResource type(final String type) {
+        Objects.requireNonNull(type, "The type of a resource cannot be set to null.");
         this.type = type;
         return this;
     }
 
     public AbstractResource serialisedFormat(final String serialisedFormat) {
+        Objects.requireNonNull(serialisedFormat, "The serialised format of a resource cannot be set to null.");
         this.serialisedFormat = serialisedFormat;
         return this;
     }
 
     @Override
     public String getId() {
+        Objects.requireNonNull(id, "The ID has not been set for this resource.");
         return id;
     }
 
     @Override
     public String getType() {
+        Objects.requireNonNull(type, "The type has not been set for this resource.");
         return type;
     }
 
     @Override
     public String getSerialisedFormat() {
+        Objects.requireNonNull(serialisedFormat, "The serialised format has not been set for this resource.");
         return serialisedFormat;
     }
 
     @Override
     public void setId(final String id) {
-        this.id = id;
+        id(id);
     }
 
     @Override
     public void setType(final String type) {
-        this.type = type;
+        type(type);
     }
 
     @Override
     public void setSerialisedFormat(final String serialisedFormat) {
-        this.serialisedFormat = serialisedFormat;
+        serialisedFormat(serialisedFormat);
     }
 
     @Override

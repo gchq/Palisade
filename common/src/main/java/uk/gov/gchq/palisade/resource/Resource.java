@@ -38,6 +38,13 @@ import uk.gov.gchq.palisade.resource.impl.FileResource;
         defaultImpl = FileResource.class
 )
 public interface Resource {
+
+    Resource id(String id);
+
+    Resource type(final String type);
+
+    Resource serialisedFormat(final String serialisedFormat);
+
     String getId();
 
     String getType();

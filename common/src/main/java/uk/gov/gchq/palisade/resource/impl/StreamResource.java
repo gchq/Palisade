@@ -20,6 +20,8 @@ import uk.gov.gchq.palisade.resource.AbstractResource;
 import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.ParentResource;
 
+import java.util.Objects;
+
 public class StreamResource extends AbstractResource implements ChildResource {
     long start;
     long end;
@@ -43,13 +45,20 @@ public class StreamResource extends AbstractResource implements ChildResource {
         return this;
     }
 
+    public StreamResource parent(final ParentResource parent) {
+        Objects.requireNonNull(parent, "The parent cannot be set to null.");
+        this.parent = parent;
+        return this;
+    }
+
     @Override
     public ParentResource getParent() {
+        Objects.requireNonNull(parent, "The parent has not been set for this resource.");
         return parent;
     }
 
     @Override
     public void setParent(final ParentResource parent) {
-        this.parent = parent;
+        parent(parent);
     }
 }
