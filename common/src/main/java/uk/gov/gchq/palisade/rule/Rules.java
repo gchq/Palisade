@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.rule;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -31,9 +32,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * This class is used to encapsulate the list of {@link Rule}s that apply to a
- * resource and is provided with a user friendly message to explain what the set of
- * rules are.
+ * This class is used to encapsulate the list of {@link Rule}s that apply to a resource and is provided with a user
+ * friendly message to explain what the set of rules are.
  *
  * @param <T> The type of data records that the rules will be applied to.
  */
@@ -52,8 +52,7 @@ public class Rules<T> {
     /**
      * Constructs an instance of {@link Rules} with the provided message.
      *
-     * @param message user friendly message to explain what the set of
-     *                rules are.
+     * @param message user friendly message to explain what the set of rules are.
      */
     public Rules(final String message) {
         this(new LinkedHashMap<>(), message);
@@ -62,8 +61,7 @@ public class Rules<T> {
     /**
      * Constructs an instance of {@link Rules} with the provided message.
      *
-     * @param message user friendly message to explain what the set of
-     *                rules are.
+     * @param message user friendly message to explain what the set of rules are.
      * @param rules   the map of id to rule to apply.
      */
     @JsonCreator
@@ -83,8 +81,7 @@ public class Rules<T> {
     /**
      * Sets a message.
      *
-     * @param message user friendly message to explain what the set of
-     *                rules are.
+     * @param message user friendly message to explain what the set of rules are.
      * @return this Rules instance
      */
     public Rules<T> message(final String message) {
@@ -128,8 +125,8 @@ public class Rules<T> {
     }
 
     /**
-     * Adds a simple predicate rule that just takes the record and returns true or false.
-     * Note - using this means your rule will not be given the User or Justification.
+     * Adds a simple predicate rule that just takes the record and returns true or false. Note - using this means your
+     * rule will not be given the User or Justification.
      *
      * @param id   the unique rule id
      * @param rule the simple predicate rule
@@ -141,8 +138,8 @@ public class Rules<T> {
     }
 
     /**
-     * Adds a simple function rule that just takes the record and returns a modified record or null if the record should be fully redacted.
-     * Note - using this means your rule will not be given the User or Justification.
+     * Adds a simple function rule that just takes the record and returns a modified record or null if the record should
+     * be fully redacted. Note - using this means your rule will not be given the User or Justification.
      *
      * @param id   the unique rule id
      * @param rule the simple function rule
@@ -151,6 +148,15 @@ public class Rules<T> {
     public Rules<T> simpleFunctionRule(final String id, final Function<T, T> rule) {
         rules.put(id, new WrappedRule<>(rule));
         return this;
+    }
+
+    /**
+     * Tests if this rule set if empty.
+     *
+     * @return {@code true} iff this rule set contains at least one rule
+     */
+    public boolean containsRules() {
+        return !rules.isEmpty();
     }
 
     @Override

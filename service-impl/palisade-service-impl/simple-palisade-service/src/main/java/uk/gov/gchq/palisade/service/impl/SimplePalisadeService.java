@@ -57,15 +57,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 /**
- * <p>
- * A simple implementation of a Palisade Service that just connects up the
- * Audit, Cache, User, Policy and Resource services.
- * </p>
- * <p>
- * It currently doesn't validate that the user is actually requesting the correct
- * resources. It should check the resources requested in getDataRequestConfig
- * are the same or a subset of the resources passed in in registerDataRequest.
- * </p>
+ * <p> A simple implementation of a Palisade Service that just connects up the Audit, Cache, User, Policy and Resource
+ * services. </p> <p> It currently doesn't validate that the user is actually requesting the correct resources. It
+ * should check the resources requested in getDataRequestConfig are the same or a subset of the resources passed in in
+ * registerDataRequest. </p>
  */
 public class SimplePalisadeService implements PalisadeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplePalisadeService.class);
@@ -123,6 +118,7 @@ public class SimplePalisadeService implements PalisadeService {
 
         return CompletableFuture.allOf(futureUser, futureResources)
                 .thenApply(t -> getPolicy(request, futureUser, futureResources))
+                .thenApply(multiPolicy -> ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
                 .thenAccept(multiPolicy -> {
                     audit(request, futureUser.join(), multiPolicy);
                     cache(request, futureUser.join(), requestId, multiPolicy);

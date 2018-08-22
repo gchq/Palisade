@@ -23,4 +23,12 @@ public class ForbiddenException extends RuntimeException {
     public ForbiddenException(final String e) {
         super(e);
     }
+
+    public ForbiddenException(final String e, final Throwable t) {
+        super(e, t);
+    }
+
+    public ForbiddenException(final Throwable t) {
+        super(t);
+    }
 }
