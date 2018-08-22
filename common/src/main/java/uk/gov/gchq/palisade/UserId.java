@@ -25,16 +25,13 @@ import uk.gov.gchq.palisade.util.FieldSetter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
- * A {@link UserId} uniquely identifies a {@link User}. By default the ID will
- * be set to "UNKNOWN".
+ * A {@link UserId} uniquely identifies a {@link User}.
  */
 public class UserId implements Cloneable {
-    /**
-     * The default user ID - "UNKNOWN".
-     */
-    public static final String UNKNOWN_USER_ID = "UNKNOWN";
+
     public static final String NAMESPACE = "UserId";
     public static final String ID = "id";
 
@@ -44,32 +41,54 @@ public class UserId implements Cloneable {
     private String id;
 
     /**
-     * Constructs a {@link UserId} with the default user ID of "UNKNOWN".
+     * Constructs an empty {@link UserId}.
      */
     public UserId() {
-        id(UNKNOWN_USER_ID);
     }
 
+    /**
+     * Updates the id of the UserID
+     *
+     * @param id a non null String representing the id of the user
+     * @return the UserId object
+     */
     public UserId id(final String id) {
-        if (null == id) {
-            this.id = UNKNOWN_USER_ID;
-        } else {
-            this.id = id;
-        }
+        Objects.requireNonNull(id, "The UserId id field can not be set null.");
+        this.id = id;
         return this;
     }
 
+    public void setId(final String id) {
+        id(id);
+    }
+
     public String getId() {
+        Objects.requireNonNull(id, "The UserId id field has not been initialised.");
         return id;
     }
 
-
-    public Object getField(final String reference) {
-        return Util.getField(this, FIELD_GETTERS, reference);
+    /**
+     * Adds a key value pair to a map which can then be used within the policy rules to make policy decisions.
+     *
+     * @param reference the key that references the value in the map
+     * @param value the object that you want to store in the map
+     * @return the UserId object
+     */
+    public UserId field(final String reference, final Object value) {
+        Objects.requireNonNull(reference, "The reference parameter cannot be null.");
+        Objects.requireNonNull(value, "The value parameter cannot be null.");
+        Util.setField(this, FIELD_SETTERS, reference, value);
+        return this;
     }
 
     public void setField(final String reference, final Object value) {
-        Util.setField(this, FIELD_SETTERS, reference, value);
+        field(reference, value);
+    }
+
+    public Object getField(final String reference) {
+        Object field = Util.getField(this, FIELD_GETTERS, reference);
+        Objects.requireNonNull(field, "The field for " + reference + " is not set.");
+        return field;
     }
 
     public UserId clone() {
@@ -81,10 +100,6 @@ public class UserId implements Cloneable {
         }
         clone.id = id;
         return clone;
-    }
-
-    public void setId(final String id) {
-        this.id = id;
     }
 
     @Override
