@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package uk.gov.gchq.palisade.service.exception;
 
-package uk.gov.gchq.palisade.exception;
-
-import java.io.IOException;
+import uk.gov.gchq.palisade.exception.PalisadeRuntimeException;
 
 /**
- * An {@code SerialisationException} is thrown when serialisation/deserialisation fails.
+ * An exception thrown when a request is made for a {@link uk.gov.gchq.palisade.resource.Resource} for which there is no
+ * associated policy.
  */
-public class SerialisationException extends IOException {
-    private static final long serialVersionUID = 1624476078972832393L;
+public class NoPolicyException extends PalisadeRuntimeException {
 
-    public SerialisationException(final String message) {
-        super(message);
-    }
-
-    public SerialisationException(final String message, final Throwable e) {
-        super(message, e);
-    }
-
-    public SerialisationException(final Throwable e) {
+    public NoPolicyException(final String e) {
         super(e);
+    }
+
+    public NoPolicyException(final Throwable cause) {
+        super(cause);
+    }
+
+    public NoPolicyException(final String e, final Throwable cause) {
+        super(e, cause);
     }
 }
