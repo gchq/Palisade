@@ -103,11 +103,15 @@ public class Policy<RULE_DATA_TYPE> {
     private void addMessage(final String newMessage, final Rules rules) {
         Objects.requireNonNull(newMessage);
         Objects.requireNonNull(rules);
-        String currentMessage = rules.getMessage();
-        if (currentMessage == null || currentMessage.isEmpty()) {
+        try {
+            String currentMessage = rules.getMessage();
+            if (currentMessage == null || currentMessage.isEmpty()) {
+                rules.message(newMessage);
+            } else {
+                rules.message(currentMessage + ", " + newMessage);
+            }
+        } catch (final NullPointerException e) {
             rules.message(newMessage);
-        } else {
-            rules.message(currentMessage + ", " + newMessage);
         }
     }
 
