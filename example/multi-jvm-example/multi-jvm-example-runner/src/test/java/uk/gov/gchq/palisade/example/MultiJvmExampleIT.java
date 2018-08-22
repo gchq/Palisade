@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,15 +30,18 @@ import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.service.impl.RestPalisadeServiceV1;
 import uk.gov.gchq.palisade.user.service.impl.RestUserServiceV1;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
 public class MultiJvmExampleIT {
-    public static final String FILE = ExampleSimpleClient.class.getClassLoader().getResource("example/exampleObj_file1.txt").getPath();
+    public static final String FILE = createDataPath();
 
     private static EmbeddedHttpServer palisadeServer;
     private static EmbeddedHttpServer policyServer;
@@ -134,5 +138,16 @@ public class MultiJvmExampleIT {
                 ),
                 aliceResults.collect(Collectors.toList())
         );
+    }
+
+    private static String createDataPath() {
+        final File targetFile = new File("data/example/exampleObj_file1.txt");
+        try (final InputStream data = MultiJvmExampleIT.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
+            Objects.requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
+            FileUtils.copyInputStreamToFile(data, targetFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return targetFile.getAbsolutePath();
     }
 }
