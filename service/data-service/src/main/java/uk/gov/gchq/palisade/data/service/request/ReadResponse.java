@@ -23,6 +23,8 @@ import uk.gov.gchq.palisade.ToStringBuilder;
 
 import java.io.InputStream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used to return to the client the {@link InputStream} of data
  * along with any error/warning/info messages that the client should be aware of.
@@ -32,29 +34,33 @@ public class ReadResponse {
     private String message;
 
     public ReadResponse data(final InputStream data) {
+        requireNonNull(data, "The data stream cannot be set to null.");
         this.data = data;
         return this;
     }
 
     public InputStream getData() {
+        requireNonNull(data, "The data stream has not been set.");
         return data;
     }
 
     public void setData(final InputStream data) {
-        this.data = data;
+        data(data);
     }
 
     public ReadResponse message(final String message) {
+        requireNonNull(message, "The message cannot be set to null.");
         this.message = message;
         return this;
     }
 
     public String getMessage() {
+        requireNonNull(message, "The message has not been set.");
         return message;
     }
 
     public void setMessage(final String message) {
-        this.message = message;
+        message(message);
     }
 
     @Override

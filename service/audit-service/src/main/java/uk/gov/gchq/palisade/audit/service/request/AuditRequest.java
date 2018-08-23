@@ -25,6 +25,10 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.util.Collection;
+
+import static java.util.Objects.requireNonNull;
+
 /**
  * This is the object that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
  * to be able to store an audit record. The default information is what resources
@@ -37,7 +41,7 @@ import uk.gov.gchq.palisade.service.request.Request;
 public class AuditRequest extends Request {
     private Context context;
     private User user;
-    private Resource resource;
+    private Collection<Resource> resources;
     private String howItWasProcessed;
     private Exception exception;
 
@@ -51,6 +55,7 @@ public class AuditRequest extends Request {
      * @return the {@link AuditRequest}
      */
     public AuditRequest context(final Context context) {
+        requireNonNull(context, "The context cannot be set to null.");
         this.context = context;
         return this;
     }
@@ -61,17 +66,18 @@ public class AuditRequest extends Request {
      * @return the {@link AuditRequest}
      */
     public AuditRequest user(final User user) {
+        requireNonNull(user, "The user cannot be set to null.");
         this.user = user;
         return this;
     }
 
     /**
-     * @param resource {@link Resource} which contains the relevant
-     *                 details about the resource being accessed
+     * @param resources A collection of {@link Resource}'s which being accessed
      * @return the {@link AuditRequest}
      */
-    public AuditRequest resource(final Resource resource) {
-        this.resource = resource;
+    public AuditRequest resources(final Collection<Resource> resources) {
+        requireNonNull(resources, "The resources cannot be set to null.");
+        this.resources = resources;
         return this;
     }
 
@@ -82,6 +88,7 @@ public class AuditRequest extends Request {
      * @return the {@link AuditRequest}
      */
     public AuditRequest howItWasProcessed(final String howItWasProcessed) {
+        requireNonNull(howItWasProcessed, "The how it was processed message cannot be set to null.");
         this.howItWasProcessed = howItWasProcessed;
         return this;
     }
@@ -91,48 +98,54 @@ public class AuditRequest extends Request {
      * @return the {@link AuditRequest}
      */
     public AuditRequest exception(final Exception exception) {
+        requireNonNull(exception, "The exception can not be set to null.");
         this.exception = exception;
         return this;
     }
 
     public Context getContext() {
+        requireNonNull(context, "The context has not been set.");
         return context;
     }
 
     public void setContext(final Context context) {
-        this.context = context;
+        context(context);
     }
 
     public User getUser() {
+        requireNonNull(user, "The user has not been set.");
         return user;
     }
 
     public void setUser(final User user) {
-        this.user = user;
+        user(user);
     }
 
-    public Resource getResource() {
-        return resource;
+    public Collection<Resource> getResources() {
+        requireNonNull(resources, "The resources have not been set.");
+        return resources;
     }
 
     public String getHowItWasProcessed() {
+        requireNonNull(howItWasProcessed, "The how it was processed message has not been set.");
         return howItWasProcessed;
     }
 
     public Exception getException() {
+        // this is acceptable being null
         return exception;
     }
 
-    public void setResource(final Resource resource) {
-        this.resource = resource;
+    public void setResources(final Collection<Resource> resources) {
+        resources(resources);
     }
 
     public void setHowItWasProcessed(final String howItWasProcessed) {
-        this.howItWasProcessed = howItWasProcessed;
+        howItWasProcessed(howItWasProcessed);
     }
 
     public void setException(final Exception exception) {
-        this.exception = exception;
+        exception(exception);
     }
 
     @Override
@@ -151,7 +164,7 @@ public class AuditRequest extends Request {
                 .appendSuper(super.equals(o))
                 .append(context, that.context)
                 .append(user, that.user)
-                .append(resource, that.resource)
+                .append(resources, that.resources)
                 .append(howItWasProcessed, that.howItWasProcessed)
                 .append(exception, that.exception)
                 .isEquals();
@@ -163,7 +176,7 @@ public class AuditRequest extends Request {
                 .appendSuper(super.hashCode())
                 .append(context)
                 .append(user)
-                .append(resource)
+                .append(resources)
                 .append(howItWasProcessed)
                 .append(exception)
                 .toHashCode();
@@ -175,7 +188,7 @@ public class AuditRequest extends Request {
                 .appendSuper(super.toString())
                 .append("justification", context)
                 .append("user", user)
-                .append("resource", resource)
+                .append("resources", resources)
                 .append("howItWasProcessed", howItWasProcessed)
                 .append("exception", exception)
                 .toString();
