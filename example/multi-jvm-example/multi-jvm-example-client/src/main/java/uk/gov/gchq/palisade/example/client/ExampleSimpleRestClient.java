@@ -34,6 +34,7 @@ import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.util.concurrent.CompletableFuture;
@@ -84,9 +85,10 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
         // different types of objects.
 
         // Using Custom Rule implementations - without Koryphe
+        final SystemResource systemResource = new SystemResource().id("File");
         final SetPolicyRequest customPolicies =
-                new SetPolicyRequest()
-                        .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt"))
+                (new SetPolicyRequest()
+                        .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(systemResource)))
                         .policy(new Policy<ExampleObj>()
                                         .recordLevelRule(
                                                 "1-visibility",
@@ -104,7 +106,7 @@ public class ExampleSimpleRestClient extends SimpleRestClient<ExampleObj> {
 
         // Using Koryphe's functions/predicates
         final SetPolicyRequest koryphePolicies = new SetPolicyRequest()
-                .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt"))
+                .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(systemResource))
                 .policy(new Policy<ExampleObj>()
                                 .recordLevelRule(
                                         "1-visibility",

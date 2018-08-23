@@ -24,9 +24,7 @@ import uk.gov.gchq.palisade.ToStringBuilder;
 import java.util.Objects;
 
 public abstract class AbstractResource implements Resource {
-    private String id;
-    private String type;
-    private String serialisedFormat;
+    protected String id;
 
     public AbstractResource() {
     }
@@ -37,18 +35,6 @@ public abstract class AbstractResource implements Resource {
         return this;
     }
 
-    public AbstractResource type(final String type) {
-        Objects.requireNonNull(type, "The type of a resource cannot be set to null.");
-        this.type = type;
-        return this;
-    }
-
-    public AbstractResource serialisedFormat(final String serialisedFormat) {
-        Objects.requireNonNull(serialisedFormat, "The serialised format of a resource cannot be set to null.");
-        this.serialisedFormat = serialisedFormat;
-        return this;
-    }
-
     @Override
     public String getId() {
         Objects.requireNonNull(id, "The ID has not been set for this resource.");
@@ -56,30 +42,8 @@ public abstract class AbstractResource implements Resource {
     }
 
     @Override
-    public String getType() {
-        Objects.requireNonNull(type, "The type has not been set for this resource.");
-        return type;
-    }
-
-    @Override
-    public String getSerialisedFormat() {
-        Objects.requireNonNull(serialisedFormat, "The serialised format has not been set for this resource.");
-        return serialisedFormat;
-    }
-
-    @Override
     public void setId(final String id) {
         id(id);
-    }
-
-    @Override
-    public void setType(final String type) {
-        type(type);
-    }
-
-    @Override
-    public void setSerialisedFormat(final String serialisedFormat) {
-        serialisedFormat(serialisedFormat);
     }
 
     @Override
@@ -96,8 +60,6 @@ public abstract class AbstractResource implements Resource {
 
         return new EqualsBuilder()
                 .append(id, that.id)
-                .append(type, that.type)
-                .append(serialisedFormat, that.serialisedFormat)
                 .isEquals();
     }
 
@@ -105,8 +67,6 @@ public abstract class AbstractResource implements Resource {
     public int hashCode() {
         return new HashCodeBuilder(29, 31)
                 .append(id)
-                .append(type)
-                .append(serialisedFormat)
                 .toHashCode();
     }
 
@@ -114,8 +74,6 @@ public abstract class AbstractResource implements Resource {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("id", id)
-                .append("type", type)
-                .append("serialisedFormat", serialisedFormat)
                 .toString();
     }
 }

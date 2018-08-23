@@ -17,7 +17,7 @@ package uk.gov.gchq.palisade.resource;
 
 import java.util.Comparator;
 
-public class StubResource extends AbstractResource implements Comparable<StubResource> {
+public class StubResource extends AbstractLeafResource implements Comparable<StubResource> {
 
     public StubResource() {
 

@@ -30,21 +30,6 @@ public class DirectoryResource extends AbstractResource implements ChildResource
     public DirectoryResource() {
     }
 
-    public DirectoryResource id(final String id) {
-        super.id(id);
-        return this;
-    }
-
-    public DirectoryResource type(final String type) {
-        super.type(type);
-        return this;
-    }
-
-    public DirectoryResource serialisedFormat(final String serialisedFormat) {
-        super.serialisedFormat(serialisedFormat);
-        return this;
-    }
-
     public DirectoryResource parent(final ParentResource parent) {
         Objects.requireNonNull(parent, "The parent cannot be set to null");
         this.parent = parent;

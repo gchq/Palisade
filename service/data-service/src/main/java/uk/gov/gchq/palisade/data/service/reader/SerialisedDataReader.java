@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.data.serialise.NullSerialiser;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.rule.Rules;
 
@@ -107,7 +108,7 @@ public abstract class SerialisedDataReader implements DataReader {
      * @param resource the resource to be accessed
      * @return a stream of data in the format that the client expects the data to be in.
      */
-    protected abstract InputStream readRaw(final Resource resource);
+    protected abstract InputStream readRaw(final LeafResource resource);
 
     public <RULES_DATA_TYPE> Serialiser<RULES_DATA_TYPE> getSerialiser(final String type) {
         Serialiser<?> serialiser = serialisers.get(type);
@@ -117,7 +118,7 @@ public abstract class SerialisedDataReader implements DataReader {
         return (Serialiser<RULES_DATA_TYPE>) serialiser;
     }
 
-    public <I> Serialiser<I> getSerialiser(final Resource resource) {
+    public <I> Serialiser<I> getSerialiser(final LeafResource resource) {
         return getSerialiser(resource.getType());
     }
 

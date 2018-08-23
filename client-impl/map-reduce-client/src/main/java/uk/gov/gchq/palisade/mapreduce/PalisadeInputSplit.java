@@ -74,7 +74,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
      */
     public PalisadeInputSplit(final DataRequestResponse requestResponse) {
         Objects.requireNonNull(requestResponse);
-        this.requestResponse = new DataRequestResponse().resources(requestResponse);
+        this.requestResponse = requestResponse;
     }
 
     /**

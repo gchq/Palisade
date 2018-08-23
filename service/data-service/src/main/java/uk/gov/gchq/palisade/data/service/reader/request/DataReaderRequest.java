@@ -22,6 +22,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.service.request.Request;
@@ -31,7 +32,7 @@ import uk.gov.gchq.palisade.service.request.Request;
  * read a resource and apply the necessary rules.
  */
 public class DataReaderRequest extends Request {
-    private Resource resource;
+    private LeafResource resource;
     private User user;
     private Context context;
     private Rules rules;
@@ -44,7 +45,7 @@ public class DataReaderRequest extends Request {
      * @param resource the resource to be accessed
      * @return the {@link DataReaderRequest}
      */
-    public DataReaderRequest resource(final Resource resource) {
+    public DataReaderRequest resource(final LeafResource resource) {
         this.resource = resource;
         return this;
     }

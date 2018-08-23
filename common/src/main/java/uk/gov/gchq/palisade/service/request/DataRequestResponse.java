@@ -21,10 +21,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * This is the high level API object that is used to pass back to the client the information it requires to connect to
@@ -34,42 +36,50 @@ import java.util.Map;
  * data service the resources field might have been changed to be a subset of the resources.
  */
 public class DataRequestResponse {
-    public RequestId requestId = new RequestId();
-    public Map<Resource, ConnectionDetail> resources = new HashMap<>();
+    public RequestId requestId;
+    public Map<LeafResource, ConnectionDetail> resources;
+
+    public DataRequestResponse() {
+    }
 
     public DataRequestResponse requestId(final RequestId requestId) {
+        requireNonNull(requestId, "The request id cannot be null.");
         this.requestId = requestId;
         return this;
     }
 
-    public DataRequestResponse resource(final Resource resource, final ConnectionDetail connectionDetail) {
+    public void setRequestId(final RequestId requestId) {
+        requestId(requestId);
+    }
+
+    public RequestId getRequestId() {
+        requireNonNull(requestId, "The request id has not been set.");
+        return requestId;
+    }
+
+    public DataRequestResponse resource(final LeafResource resource, final ConnectionDetail connectionDetail) {
+        requireNonNull(resource, "The resource cannot be null.");
+        requireNonNull(connectionDetail, "The connection details cannot be null.");
+        if (null == resources) {
+            resources = new TreeMap<>();
+        }
         resources.put(resource, connectionDetail);
         return this;
     }
 
-    public DataRequestResponse resources(final Map<Resource, ConnectionDetail> resources) {
+    public DataRequestResponse resources(final Map<LeafResource, ConnectionDetail> resources) {
+        requireNonNull(resources, "The resources cannot be null.");
         this.resources = resources;
         return this;
     }
 
-    public DataRequestResponse resources(final DataRequestResponse requestResponse) {
-        return this.requestId(requestResponse.getRequestId()).resources(requestResponse.getResources());
+    public void setResources(final Map<LeafResource, ConnectionDetail> resources) {
+        resources(resources);
     }
 
-    public RequestId getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(final RequestId requestId) {
-        this.requestId = requestId;
-    }
-
-    public Map<Resource, ConnectionDetail> getResources() {
+    public Map<LeafResource, ConnectionDetail> getResources() {
+        requireNonNull(resources, "The Resources have not been set.");
         return resources;
-    }
-
-    public void setResources(final Map<Resource, ConnectionDetail> resources) {
-        this.resources = resources;
     }
 
     @Override

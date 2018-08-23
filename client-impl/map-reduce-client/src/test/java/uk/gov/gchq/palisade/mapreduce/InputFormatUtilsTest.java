@@ -18,8 +18,7 @@ package uk.gov.gchq.palisade.mapreduce;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uk.gov.gchq.palisade.mapreduce.InputFormatUtils;
-import uk.gov.gchq.palisade.mapreduce.PalisadeInputSplit;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.resource.StubResource;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
@@ -35,6 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class InputFormatUtilsTest {
 
@@ -42,12 +42,13 @@ public class InputFormatUtilsTest {
 
     @BeforeClass
     public static void setup() {
-        reqResponse = new DataRequestResponse();
-        reqResponse.getResources().put(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"));
-        reqResponse.getResources().put(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"));
-        reqResponse.getResources().put(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"));
-        reqResponse.getResources().put(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"));
-        reqResponse.getResources().put(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
+        reqResponse = new DataRequestResponse()
+                .requestId(new RequestId().id("testID"))
+                .resource(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"))
+                .resource(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"))
+                .resource(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"))
+                .resource(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"))
+                .resource(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
     }
 
     @Test
@@ -85,15 +86,15 @@ public class InputFormatUtilsTest {
         );
     }
 
-    @Test
-    public void shouldReturnEmptySplits() {
+    @Test (expected = NullPointerException.class)
+    public void shouldReturnErrorAsThereAreNoResourcesSet() {
         //Given
         DataRequestResponse req = new DataRequestResponse();
         PrimitiveIterator.OfInt index = IntStream.range(1, 9999).iterator();
         //When
-        List<PalisadeInputSplit> result = InputFormatUtils.toInputSplits(req, index);
+        InputFormatUtils.toInputSplits(req, index);
         //Then
-        assertEquals(Collections.emptyList(), result);
+        fail("Test should have thrown a NullPointerException.");
     }
 
     @Test

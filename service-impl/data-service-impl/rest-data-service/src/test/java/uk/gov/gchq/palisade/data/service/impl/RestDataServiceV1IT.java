@@ -27,6 +27,7 @@ import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 
 import java.io.ByteArrayInputStream;
@@ -64,7 +65,8 @@ public class RestDataServiceV1IT {
         final DataService dataService = Mockito.mock(DataService.class);
         MockDataService.setMock(dataService);
 
-        final FileResource resource = new FileResource().id("file1");
+        final SystemResource sysResource = new SystemResource().id("File");
+        final FileResource resource = new FileResource().id("file1").type("type01").serialisedFormat("format01").parent(sysResource);
         final byte[] data = "value1\nvalue2".getBytes();
         final InputStream dataStream = new ByteArrayInputStream(data);
         final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);

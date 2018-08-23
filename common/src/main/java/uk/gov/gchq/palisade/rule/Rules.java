@@ -37,8 +37,10 @@ import java.util.function.Predicate;
  */
 @JsonPropertyOrder(value = {"message", "rules"}, alphabetic = true)
 public class Rules<T> {
-    public static final String ID_CANNOT_BE_NULL = "The id field can not be null.";
-    public static final String RULE_CANNOT_BE_NULL = "The rule can not be null.";
+    private static final String ID_CANNOT_BE_NULL = "The id field can not be null.";
+    private static final String RULE_CANNOT_BE_NULL = "The rule can not be null.";
+    public static final String NO_RULES_SET = "no rules set";
+
     private String message;
     private LinkedHashMap<String, Rule<T>> rules;
 
@@ -47,6 +49,7 @@ public class Rules<T> {
      */
     public Rules() {
         rules = new LinkedHashMap<>();
+        message = NO_RULES_SET;
     }
 
     /**
@@ -56,7 +59,7 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> rules(final LinkedHashMap<String, Rule<T>> rules) {
-        Objects.requireNonNull(rules);
+        Objects.requireNonNull(rules, "Rules can not be set to null.");
         this.rules = rules;
         return this;
     }
@@ -66,12 +69,12 @@ public class Rules<T> {
     }
 
     public LinkedHashMap<String, Rule<T>> getRules() {
-        Objects.requireNonNull(rules, "No rules have been set.");
+        // no need for a null check as it can not be null
         return rules;
     }
 
     public Rules<T> addRules(final LinkedHashMap<String, Rule<T>> rules) {
-        Objects.requireNonNull(rules);
+        Objects.requireNonNull(rules, "Cannot add null to the existing rules.");
         this.rules.putAll(rules);
         return this;
     }
@@ -93,7 +96,7 @@ public class Rules<T> {
     }
 
     public String getMessage() {
-        Objects.requireNonNull(message, "The message has not been set.");
+        // The message will never be null
         return message;
     }
 

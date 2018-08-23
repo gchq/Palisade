@@ -20,9 +20,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.Resource;
-import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
@@ -51,6 +49,8 @@ public class RestResourceServiceV1IT {
     private static ProxyRestResourceService proxy;
     private static EmbeddedHttpServer server;
 
+    private static final SystemResource sysResource = new SystemResource().id("file");
+
     @BeforeClass
     public static void beforeClass() throws IOException {
         System.setProperty(RestResourceServiceV1.SERVICE_CONFIG, "mockConfig.json");
@@ -72,9 +72,8 @@ public class RestResourceServiceV1IT {
         final ResourceService resourceService = mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
 
-        final ParentResource dir = new DirectoryResource().id("dir1").type("type1").serialisedFormat("format1").parent(new SystemResource().id("file"));
-        final FileResource file = new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(dir);
-        final AddResourceRequest request = new AddResourceRequest().parent(dir).resource(file).connectionDetail(new SimpleConnectionDetail());
+        final FileResource file = new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource);
+        final AddResourceRequest request = new AddResourceRequest().parent(sysResource).resource(file).connectionDetail(new SimpleConnectionDetail());
 
         given(resourceService.addResource(request)).willReturn(CompletableFuture.completedFuture(true));
 
@@ -92,11 +91,11 @@ public class RestResourceServiceV1IT {
         final ResourceService resourceService = mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
 
-        final GetResourcesByResourceRequest request = new GetResourcesByResourceRequest().resource(new DirectoryResource().id("dir1"));
+        final GetResourcesByResourceRequest request = new GetResourcesByResourceRequest().resource(sysResource);
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource().id("file1"), new SimpleConnectionDetail());
-        expectedResult.put(new FileResource().id("file2"), new SimpleConnectionDetail());
+        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new SimpleConnectionDetail());
+        expectedResult.put(new FileResource().id("file2").type("type1").serialisedFormat("format1").parent(sysResource), new SimpleConnectionDetail());
 
         given(resourceService.getResourcesByResource(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
@@ -117,7 +116,7 @@ public class RestResourceServiceV1IT {
         final GetResourcesByIdRequest request = new GetResourcesByIdRequest().resourceId("file1");
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource().id("file1"), new SimpleConnectionDetail());
+        expectedResult.put(new FileResource().id("file1").type("testType").serialisedFormat("testFormat").parent(sysResource), new SimpleConnectionDetail());
 
         given(resourceService.getResourcesById(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
@@ -138,7 +137,7 @@ public class RestResourceServiceV1IT {
         final GetResourcesByTypeRequest request = new GetResourcesByTypeRequest().type("type1");
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1"), new SimpleConnectionDetail());
+        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new SimpleConnectionDetail());
 
         given(resourceService.getResourcesByType(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
@@ -159,7 +158,7 @@ public class RestResourceServiceV1IT {
         final GetResourcesBySerialisedFormatRequest request = new GetResourcesBySerialisedFormatRequest().serialisedFormat("format1");
 
         final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1"), new SimpleConnectionDetail());
+        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new SimpleConnectionDetail());
 
         given(resourceService.getResourcesBySerialisedFormat(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 

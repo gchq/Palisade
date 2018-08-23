@@ -16,49 +16,12 @@
 
 package uk.gov.gchq.palisade.resource.impl;
 
-import uk.gov.gchq.palisade.resource.AbstractResource;
-import uk.gov.gchq.palisade.resource.ChildResource;
-import uk.gov.gchq.palisade.resource.ParentResource;
+import uk.gov.gchq.palisade.resource.AbstractLeafResource;
 
-import java.util.Objects;
-
-public class StreamResource extends AbstractResource implements ChildResource {
+public class StreamResource extends AbstractLeafResource {
     long start;
     long end;
-    private ParentResource parent;
 
     public StreamResource() {
-    }
-
-    public StreamResource id(final String id) {
-        super.id(id);
-        return this;
-    }
-
-    public StreamResource type(final String type) {
-        super.type(type);
-        return this;
-    }
-
-    public StreamResource serialisedFormat(final String serialisedFormat) {
-        super.serialisedFormat(serialisedFormat);
-        return this;
-    }
-
-    public StreamResource parent(final ParentResource parent) {
-        Objects.requireNonNull(parent, "The parent cannot be set to null.");
-        this.parent = parent;
-        return this;
-    }
-
-    @Override
-    public ParentResource getParent() {
-        Objects.requireNonNull(parent, "The parent has not been set for this resource.");
-        return parent;
-    }
-
-    @Override
-    public void setParent(final ParentResource parent) {
-        parent(parent);
     }
 }

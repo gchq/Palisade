@@ -20,7 +20,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
@@ -29,21 +28,11 @@ import uk.gov.gchq.palisade.service.request.Request;
  * This class is used to request that details about a resource is added to the {@link uk.gov.gchq.palisade.resource.service.ResourceService}.
  */
 public class AddResourceRequest extends Request {
-    private ParentResource parent;
     private Resource resource;
     private ConnectionDetail connectionDetail;
 
     // no-args constructor required
     public AddResourceRequest() {
-    }
-
-    /**
-     * @param parent The parent resource, so a {@link uk.gov.gchq.palisade.resource.impl.SystemResource}
-     * @return the {@link AddResourceRequest}
-     */
-    public AddResourceRequest parent(final ParentResource parent) {
-        this.parent = parent;
-        return this;
     }
 
     /**
@@ -62,14 +51,6 @@ public class AddResourceRequest extends Request {
     public AddResourceRequest connectionDetail(final ConnectionDetail connectionDetail) {
         this.connectionDetail = connectionDetail;
         return this;
-    }
-
-    public ParentResource getParent() {
-        return parent;
-    }
-
-    public void setParent(final ParentResource parent) {
-        this.parent = parent;
     }
 
     public Resource getResource() {
@@ -102,7 +83,6 @@ public class AddResourceRequest extends Request {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(parent, that.parent)
                 .append(resource, that.resource)
                 .append(connectionDetail, that.connectionDetail)
                 .isEquals();
@@ -112,7 +92,6 @@ public class AddResourceRequest extends Request {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .appendSuper(super.hashCode())
-                .append(parent)
                 .append(resource)
                 .append(connectionDetail)
                 .toHashCode();
@@ -122,7 +101,6 @@ public class AddResourceRequest extends Request {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("parent", parent)
                 .append("resource", resource)
                 .append("connectionDetail", connectionDetail)
                 .toString();

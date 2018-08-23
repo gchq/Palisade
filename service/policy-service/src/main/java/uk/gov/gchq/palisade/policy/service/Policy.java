@@ -75,7 +75,7 @@ public class Policy<RULE_DATA_TYPE> {
 
     @JsonIgnore
     public String getMessage() {
-        return resourceRules.getMessage() + ", " + recordRules.getMessage();
+        return "Resource level rules: " + resourceRules.getMessage() + ", record level rules: " + recordRules.getMessage();
     }
 
     public Rules<RULE_DATA_TYPE> getRecordRules() {
@@ -103,15 +103,11 @@ public class Policy<RULE_DATA_TYPE> {
     private void addMessage(final String newMessage, final Rules rules) {
         Objects.requireNonNull(newMessage);
         Objects.requireNonNull(rules);
-        try {
-            String currentMessage = rules.getMessage();
-            if (currentMessage == null || currentMessage.isEmpty()) {
-                rules.message(newMessage);
-            } else {
-                rules.message(currentMessage + ", " + newMessage);
-            }
-        } catch (final NullPointerException e) {
+        String currentMessage = rules.getMessage();
+        if (currentMessage.equals(Rules.NO_RULES_SET)) {
             rules.message(newMessage);
+        } else {
+            rules.message(currentMessage + ", " + newMessage);
         }
     }
 

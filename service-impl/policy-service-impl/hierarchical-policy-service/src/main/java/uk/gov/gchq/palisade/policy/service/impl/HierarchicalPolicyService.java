@@ -130,21 +130,11 @@ public class HierarchicalPolicyService implements PolicyService {
     }
 
     private <T> Rules<T> mergeRules(final Rules<T> inheritedRules, final Rules<T> newRules) {
-        String inheritedMessage = "";
-        String newMessage = "";
-        try {
-            inheritedMessage = inheritedRules.getMessage();
-        } catch (final NullPointerException ignored) {
-
-        }
-        try {
-            newMessage = newRules.getMessage();
-        } catch (final NullPointerException ignored) {
-
-        }
-        if (!inheritedMessage.equals("") && !newMessage.equals("")) {
+        String inheritedMessage = inheritedRules.getMessage();
+        String newMessage = newRules.getMessage();
+        if (!inheritedMessage.equals(Rules.NO_RULES_SET) && !newMessage.equals(Rules.NO_RULES_SET)) {
             inheritedRules.message(inheritedMessage + ", " + newMessage);
-        } else if (!newMessage.equals("")) {
+        } else if (!newMessage.equals(Rules.NO_RULES_SET)) {
             inheritedRules.message(newMessage);
         }
         return inheritedRules.addRules(newRules.getRules());
