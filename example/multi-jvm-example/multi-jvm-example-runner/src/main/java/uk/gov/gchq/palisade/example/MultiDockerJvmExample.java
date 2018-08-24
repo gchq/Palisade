@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.example;
 
 import org.apache.commons.io.FileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,11 +33,11 @@ import static java.util.Objects.requireNonNull;
 
 public class MultiDockerJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiDockerJvmExample.class);
-    public static final String FILE = "/data/example/exampleObj_file1.txt";
-
+    public static final String FILE = createDataPath();
 
     public static void main(final String[] args) throws Exception {
         new MultiDockerJvmExample().run();
+        FileUtils.deleteQuietly(new File(FILE));
     }
 
     public void run() throws Exception {
