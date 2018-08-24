@@ -22,4 +22,9 @@ import uk.gov.gchq.palisade.resource.ParentResource;
 public class SystemResource extends AbstractResource implements ParentResource {
     public SystemResource() {
     }
+
+    @Override
+    public SystemResource id(final String id) {
+        return (SystemResource) super.id(id);
+    }
 }

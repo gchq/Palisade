@@ -22,10 +22,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
-
-import java.util.Collection;
 
 import static java.util.Objects.requireNonNull;
 
@@ -41,7 +40,7 @@ import static java.util.Objects.requireNonNull;
 public class AuditRequest extends Request {
     private Context context;
     private User user;
-    private Collection<Resource> resources;
+    private LeafResource resource;
     private String howItWasProcessed;
     private Exception exception;
 
@@ -72,12 +71,13 @@ public class AuditRequest extends Request {
     }
 
     /**
-     * @param resources A collection of {@link Resource}'s which being accessed
+     * @param resource {@link Resource} which contains the relevant
+     *                 details about the resource being accessed
      * @return the {@link AuditRequest}
      */
-    public AuditRequest resources(final Collection<Resource> resources) {
-        requireNonNull(resources, "The resources cannot be set to null.");
-        this.resources = resources;
+    public AuditRequest resource(final LeafResource resource) {
+        requireNonNull(resource, "The resource cannot be set to null.");
+        this.resource = resource;
         return this;
     }
 
@@ -121,9 +121,9 @@ public class AuditRequest extends Request {
         user(user);
     }
 
-    public Collection<Resource> getResources() {
-        requireNonNull(resources, "The resources have not been set.");
-        return resources;
+    public LeafResource getResource() {
+        requireNonNull(resource, "The resource have not been set.");
+        return resource;
     }
 
     public String getHowItWasProcessed() {
@@ -136,8 +136,8 @@ public class AuditRequest extends Request {
         return exception;
     }
 
-    public void setResources(final Collection<Resource> resources) {
-        resources(resources);
+    public void setResources(final LeafResource resource) {
+        resource(resource);
     }
 
     public void setHowItWasProcessed(final String howItWasProcessed) {
@@ -164,7 +164,7 @@ public class AuditRequest extends Request {
                 .appendSuper(super.equals(o))
                 .append(context, that.context)
                 .append(user, that.user)
-                .append(resources, that.resources)
+                .append(resource, that.resource)
                 .append(howItWasProcessed, that.howItWasProcessed)
                 .append(exception, that.exception)
                 .isEquals();
@@ -176,7 +176,7 @@ public class AuditRequest extends Request {
                 .appendSuper(super.hashCode())
                 .append(context)
                 .append(user)
-                .append(resources)
+                .append(resource)
                 .append(howItWasProcessed)
                 .append(exception)
                 .toHashCode();
@@ -188,7 +188,7 @@ public class AuditRequest extends Request {
                 .appendSuper(super.toString())
                 .append("justification", context)
                 .append("user", user)
-                .append("resources", resources)
+                .append("resource", resource)
                 .append("howItWasProcessed", howItWasProcessed)
                 .append("exception", exception)
                 .toString();

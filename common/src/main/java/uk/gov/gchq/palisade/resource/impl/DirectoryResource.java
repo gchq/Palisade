@@ -30,6 +30,11 @@ public class DirectoryResource extends AbstractResource implements ChildResource
     public DirectoryResource() {
     }
 
+    @Override
+    public DirectoryResource id(final String id) {
+        return (DirectoryResource) super.id(id);
+    }
+
     public DirectoryResource parent(final ParentResource parent) {
         Objects.requireNonNull(parent, "The parent cannot be set to null");
         this.parent = parent;

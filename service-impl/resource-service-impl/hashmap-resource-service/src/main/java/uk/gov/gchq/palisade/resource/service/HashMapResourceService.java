@@ -16,6 +16,8 @@
 
 package uk.gov.gchq.palisade.resource.service;
 
+import uk.gov.gchq.palisade.resource.ChildResource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
@@ -31,6 +33,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * <p>
  * A HashMapResourceService is a  simple implementation of a {@link ResourceService}
@@ -43,15 +47,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  */
 public class HashMapResourceService implements ResourceService {
-    private static final Map<Resource, Map<Resource, ConnectionDetail>> RES_TO_RES = new ConcurrentHashMap<>();
-    private static final Map<String, Map<Resource, ConnectionDetail>> ID_TO_RES = new ConcurrentHashMap<>();
-    private static final Map<String, Map<Resource, ConnectionDetail>> TYPE_TO_RES = new ConcurrentHashMap<>();
-    private static final Map<String, Map<Resource, ConnectionDetail>> FORMAT_TO_RES = new ConcurrentHashMap<>();
+    private static final Map<Resource, Map<LeafResource, ConnectionDetail>> RES_TO_RES = new ConcurrentHashMap<>();
+    private static final Map<String, Map<LeafResource, ConnectionDetail>> ID_TO_RES = new ConcurrentHashMap<>();
+    private static final Map<String, Map<LeafResource, ConnectionDetail>> TYPE_TO_RES = new ConcurrentHashMap<>();
+    private static final Map<String, Map<LeafResource, ConnectionDetail>> FORMAT_TO_RES = new ConcurrentHashMap<>();
 
-    private final Map<Resource, Map<Resource, ConnectionDetail>> resourceToResources;
-    private final Map<String, Map<Resource, ConnectionDetail>> idToResources;
-    private final Map<String, Map<Resource, ConnectionDetail>> typeToResources;
-    private final Map<String, Map<Resource, ConnectionDetail>> serialisedFormatToResources;
+    private final Map<Resource, Map<LeafResource, ConnectionDetail>> resourceToResources;
+    private final Map<String, Map<LeafResource, ConnectionDetail>> idToResources;
+    private final Map<String, Map<LeafResource, ConnectionDetail>> typeToResources;
+    private final Map<String, Map<LeafResource, ConnectionDetail>> serialisedFormatToResources;
 
     public HashMapResourceService() {
         this(true);
@@ -72,8 +76,8 @@ public class HashMapResourceService implements ResourceService {
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
-        Map<Resource, ConnectionDetail> result = resourceToResources.get(request.getResource());
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
+        Map<LeafResource, ConnectionDetail> result = resourceToResources.get(request.getResource());
         if (null == result) {
             result = Collections.emptyMap();
         }
@@ -81,8 +85,8 @@ public class HashMapResourceService implements ResourceService {
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
-        Map<Resource, ConnectionDetail> result = idToResources.get(request.getResourceId());
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
+        Map<LeafResource, ConnectionDetail> result = idToResources.get(request.getResourceId());
         if (null == result) {
             result = Collections.emptyMap();
         }
@@ -90,8 +94,8 @@ public class HashMapResourceService implements ResourceService {
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
-        Map<Resource, ConnectionDetail> result = typeToResources.get(request.getType());
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
+        Map<LeafResource, ConnectionDetail> result = typeToResources.get(request.getType());
         if (null == result) {
             result = Collections.emptyMap();
         }
@@ -99,8 +103,8 @@ public class HashMapResourceService implements ResourceService {
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
-        Map<Resource, ConnectionDetail> result = serialisedFormatToResources.get(request.getSerialisedFormat());
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
+        Map<LeafResource, ConnectionDetail> result = serialisedFormatToResources.get(request.getSerialisedFormat());
         if (null == result) {
 
             result = Collections.emptyMap();
@@ -110,33 +114,44 @@ public class HashMapResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
-        indexResource(request.getResource(), request.getResource(), request.getConnectionDetail(), resourceToResources);
-        indexResource(request.getResource().getId(), request.getResource(), request.getConnectionDetail(), idToResources);
-        indexResource(request.getResource().getType(), request.getResource(), request.getConnectionDetail(), typeToResources);
-        indexResource(request.getResource().getSerialisedFormat(), request.getResource(), request.getConnectionDetail(), serialisedFormatToResources);
+        LeafResource resource = request.getResource();
+        ConnectionDetail connectionDetail = request.getConnectionDetail();
 
-        indexResource(request.getParent(), request.getResource(), request.getConnectionDetail(), resourceToResources);
-        indexResource(request.getParent().getId(), request.getResource(), request.getConnectionDetail(), idToResources);
-        indexResource(request.getParent().getType(), request.getResource(), request.getConnectionDetail(), typeToResources);
-        indexResource(request.getParent().getSerialisedFormat(), request.getResource(), request.getConnectionDetail(), serialisedFormatToResources);
+        indexResource(resource, resource, connectionDetail, resourceToResources);
+        indexResource(resource.getId(), resource, connectionDetail, idToResources);
+        indexResource(resource.getType(), resource, connectionDetail, typeToResources);
+        indexResource(resource.getSerialisedFormat(), resource, connectionDetail, serialisedFormatToResources);
+
+        recursiveAddParentResourceToIndex(resource.getParent(), resource, connectionDetail);
+
         return CompletableFuture.completedFuture(true);
     }
 
-    public void setResources(final List<AddResourceRequest> resources) {
+    private void recursiveAddParentResourceToIndex(final Resource parent, final LeafResource resource, final ConnectionDetail connectionDetail) {
+        if (parent instanceof ChildResource) {
+            recursiveAddParentResourceToIndex(((ChildResource) parent).getParent(), resource, connectionDetail);
+        }
+        indexResource(parent, resource, connectionDetail, resourceToResources);
+        indexResource(parent.getId(), resource, connectionDetail, idToResources);
+    }
+
+    public HashMapResourceService resources(final List<AddResourceRequest> resources) {
+        requireNonNull(resources, "The resources cannot be null.");
         resourceToResources.clear();
         idToResources.clear();
         typeToResources.clear();
         serialisedFormatToResources.clear();
         resources.forEach(this::addResource);
+        return this;
     }
 
-    private <T> void indexResource(final T index, final Resource resource, final ConnectionDetail connectionDetail, final Map<T, Map<Resource, ConnectionDetail>> map) {
+    public void setResources(final List<AddResourceRequest> resources) {
+        resources(resources);
+    }
+
+    private <T> void indexResource(final T index, final LeafResource resource, final ConnectionDetail connectionDetail, final Map<T, Map<LeafResource, ConnectionDetail>> map) {
         if (null != index) {
-            Map<Resource, ConnectionDetail> resources = map.get(index);
-            if (null == resources) {
-                resources = new HashMap<>();
-                map.put(index, resources);
-            }
+            Map<LeafResource, ConnectionDetail> resources = map.computeIfAbsent(index, k -> new HashMap<>());
             resources.put(resource, connectionDetail);
         }
     }

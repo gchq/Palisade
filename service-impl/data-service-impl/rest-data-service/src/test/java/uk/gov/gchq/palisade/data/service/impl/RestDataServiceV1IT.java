@@ -66,7 +66,7 @@ public class RestDataServiceV1IT {
         MockDataService.setMock(dataService);
 
         final SystemResource sysResource = new SystemResource().id("File");
-        final FileResource resource = new FileResource().id("file1").type("type01").serialisedFormat("format01").parent(sysResource);
+        final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
         final byte[] data = "value1\nvalue2".getBytes();
         final InputStream dataStream = new ByteArrayInputStream(data);
         final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);

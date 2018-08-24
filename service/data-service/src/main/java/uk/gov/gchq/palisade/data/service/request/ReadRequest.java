@@ -21,7 +21,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import static java.util.Objects.requireNonNull;
@@ -32,7 +32,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class ReadRequest extends Request {
     private RequestId requestId;
-    private Resource resource;
+    private LeafResource resource;
 
     public ReadRequest requestId(final RequestId requestId) {
         requireNonNull(requestId, "The request id cannot be set to null.");
@@ -40,7 +40,7 @@ public class ReadRequest extends Request {
         return this;
     }
 
-    public ReadRequest resource(final Resource resource) {
+    public ReadRequest resource(final LeafResource resource) {
         requireNonNull(resource, "The resource cannot be set to null.");
         this.resource = resource;
         return this;
@@ -55,12 +55,12 @@ public class ReadRequest extends Request {
         requestId(requestId);
     }
 
-    public Resource getResource() {
+    public LeafResource getResource() {
         requireNonNull(resource, "The resource has not been set.");
         return resource;
     }
 
-    public void setResource(final Resource resource) {
+    public void setResource(final LeafResource resource) {
         resource(resource);
     }
 

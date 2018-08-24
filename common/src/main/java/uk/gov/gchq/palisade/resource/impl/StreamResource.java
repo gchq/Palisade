@@ -17,11 +17,32 @@
 package uk.gov.gchq.palisade.resource.impl;
 
 import uk.gov.gchq.palisade.resource.AbstractLeafResource;
+import uk.gov.gchq.palisade.resource.ParentResource;
 
 public class StreamResource extends AbstractLeafResource {
     long start;
     long end;
 
     public StreamResource() {
+    }
+
+    @Override
+    public StreamResource id(final String id) {
+        return (StreamResource) super.id(id);
+    }
+
+    @Override
+    public StreamResource type(final String type) {
+        return (StreamResource) super.type(type);
+    }
+
+    @Override
+    public StreamResource serialisedFormat(final String serialisedFormat) {
+        return (StreamResource) super.serialisedFormat(serialisedFormat);
+    }
+
+    @Override
+    public StreamResource parent(final ParentResource parent) {
+        return (StreamResource) super.parent(parent);
     }
 }

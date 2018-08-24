@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service.reader;
 
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
 
 import java.io.ByteArrayInputStream;
@@ -42,7 +43,7 @@ public class SimpleDataReader extends SerialisedDataReader {
     }
 
     @Override
-    protected InputStream readRaw(final Resource resource) {
+    protected InputStream readRaw(final LeafResource resource) {
         final byte[] requestedData = data.get(resource);
         if (null == requestedData) {
             throw new IllegalArgumentException("Invalid resource. The resource does not exist: " + resource);

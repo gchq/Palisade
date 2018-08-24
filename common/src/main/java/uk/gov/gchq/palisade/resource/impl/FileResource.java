@@ -17,9 +17,30 @@
 package uk.gov.gchq.palisade.resource.impl;
 
 import uk.gov.gchq.palisade.resource.AbstractLeafResource;
+import uk.gov.gchq.palisade.resource.ParentResource;
 
 public class FileResource extends AbstractLeafResource {
 
     public FileResource() {
+    }
+
+    @Override
+    public FileResource id(final String id) {
+        return (FileResource) super.id(id);
+    }
+
+    @Override
+    public FileResource type(final String type) {
+        return (FileResource) super.type(type);
+    }
+
+    @Override
+    public FileResource serialisedFormat(final String serialisedFormat) {
+        return (FileResource) super.serialisedFormat(serialisedFormat);
+    }
+
+    @Override
+    public FileResource parent(final ParentResource parent) {
+        return (FileResource) super.parent(parent);
     }
 }

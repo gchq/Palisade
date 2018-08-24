@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.service;
 
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.service.exception.NoPolicyException;
@@ -83,10 +84,10 @@ public interface PalisadeService extends Service {
      * @return the {@code} policy object
      * @throws NoPolicyException if no record level rules are available for any {@link Resource} in {@code resources}
      */
-    default MultiPolicy ensureRecordRulesAvailableFor(final MultiPolicy policy, final Collection<Resource> resources) {
+    default MultiPolicy ensureRecordRulesAvailableFor(final MultiPolicy policy, final Collection<LeafResource> resources) {
         Objects.requireNonNull(policy, "policy");
         Objects.requireNonNull(resources, "resources");
-        final Map<Resource, Rules> ruleMap = policy.getRuleMap();
+        final Map<LeafResource, Rules> ruleMap = policy.getRuleMap();
         final Rules defaultEmpty = new Rules();
         resources.forEach(resource -> {
             if (!ruleMap.getOrDefault(resource, defaultEmpty).containsRules()) {

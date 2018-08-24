@@ -25,7 +25,7 @@ import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.policy.TestRule;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
@@ -97,7 +97,7 @@ public class RestPalisadeServiceV1IT {
         MockPalisadeService.setMock(palisadeService);
 
         final GetDataRequestConfig getDataRequestConfig = new GetDataRequestConfig().requestId(requestId).resource(fileResource1);
-        final Map<Resource, Rules> rulesMap = new HashMap<>();
+        final Map<LeafResource, Rules> rulesMap = new HashMap<>();
         rulesMap.put(fileResource1, new Rules().rule("testRule", new TestRule()));
         final DataRequestConfig expectedResult = new DataRequestConfig()
                 .user(user)

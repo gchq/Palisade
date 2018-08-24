@@ -20,7 +20,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -30,7 +30,7 @@ import static java.util.Objects.requireNonNull;
  * This class is used to request that details about a resource is added to the {@link uk.gov.gchq.palisade.resource.service.ResourceService}.
  */
 public class AddResourceRequest extends Request {
-    private Resource resource;
+    private LeafResource resource;
     private ConnectionDetail connectionDetail;
 
     // no-args constructor required
@@ -38,10 +38,10 @@ public class AddResourceRequest extends Request {
     }
 
     /**
-     * @param resource The {@link Resource} to be added.
+     * @param resource The {@link LeafResource} to be added.
      * @return the {@link AddResourceRequest}
      */
-    public AddResourceRequest resource(final Resource resource) {
+    public AddResourceRequest resource(final LeafResource resource) {
         requireNonNull(resource, "The resource cannot be set to null.");
         this.resource = resource;
         return this;
@@ -57,12 +57,12 @@ public class AddResourceRequest extends Request {
         return this;
     }
 
-    public Resource getResource() {
+    public LeafResource getResource() {
         requireNonNull(resource, "The resource has not been set.");
         return resource;
     }
 
-    public void setResource(final Resource resource) {
+    public void setResource(final LeafResource resource) {
         resource(resource);
     }
 

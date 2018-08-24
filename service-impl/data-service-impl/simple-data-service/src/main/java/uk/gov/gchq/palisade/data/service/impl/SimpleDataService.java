@@ -21,12 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.reader.DataReader;
-import uk.gov.gchq.palisade.data.service.reader.NullDataReader;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
-import uk.gov.gchq.palisade.service.NullPalisadeService;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
@@ -55,26 +53,23 @@ public class SimpleDataService implements DataService {
     private DataReader reader;
 
     public SimpleDataService() {
-        this.palisadeService(new NullPalisadeService()).reader(new NullDataReader());
     }
 
     public SimpleDataService palisadeService(final PalisadeService palisadeService) {
-        requireNonNull(palisadeService);
+        requireNonNull(palisadeService, "The palisade service cannot be set to null.");
         this.palisadeService = palisadeService;
         return this;
     }
 
     public SimpleDataService reader(final DataReader reader) {
-        requireNonNull(reader);
+        requireNonNull(reader, "The data reader cannot be set to null.");
         this.reader = reader;
         return this;
     }
 
     @Override
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
-        requireNonNull(request);
-        requireNonNull(request.getRequestId(), "requestId is required");
-        requireNonNull(request.getResource(), "resource is required");
+        requireNonNull(request, "The request cannot be null.");
         LOGGER.debug("Creating async read: {}", request);
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Starting to read: {}", request);
@@ -105,18 +100,20 @@ public class SimpleDataService implements DataService {
     }
 
     public PalisadeService getPalisadeService() {
+        requireNonNull(palisadeService, "The palisade service has not been set.");
         return palisadeService;
     }
 
     public void setPalisadeService(final PalisadeService palisadeService) {
-        this.palisadeService = palisadeService;
+        palisadeService(palisadeService);
     }
 
     public DataReader getReader() {
+        requireNonNull(reader, "The data reader has not been set.");
         return reader;
     }
 
     public void setReader(final DataReader reader) {
-        this.reader = reader;
+        reader(reader);
     }
 }
