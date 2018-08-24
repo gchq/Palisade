@@ -1,3 +1,4 @@
 {
-  "class": "uk.gov.gchq.palisade.data.service.NullDataService"
+  "class": "uk.gov.gchq.palisade.data.service.NullDataService",
+  "@id": 1
 }

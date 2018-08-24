@@ -41,12 +41,12 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>mapreduce-example-client</artifactId>
+            <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>map-reduce-client</artifactId>
+            <artifactId>mapreduce-client</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

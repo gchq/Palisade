@@ -1,3 +1,4 @@
 {
-  "class": "uk.gov.gchq.palisade.resource.service.impl.MockResourceService"
+  "class": "uk.gov.gchq.palisade.resource.service.impl.MockResourceService",
+  "@id": 1
 }

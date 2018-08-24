@@ -18,27 +18,15 @@ package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.audit.service.AuditService;
-import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
-import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.cache.service.impl.HashMapCacheService;
 import uk.gov.gchq.palisade.data.serialise.NullSerialiser;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
-import uk.gov.gchq.palisade.policy.service.PolicyService;
-import uk.gov.gchq.palisade.policy.service.impl.HashMapPolicyService;
 import uk.gov.gchq.palisade.resource.Resource;
-import uk.gov.gchq.palisade.resource.service.HashMapResourceService;
-import uk.gov.gchq.palisade.resource.service.ResourceService;
-import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.user.service.UserService;
-import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,28 +36,21 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class SimpleClient<T> {
-    protected final Serialiser<T> serialiser;
-    protected final ResourceService resourceService;
-    protected final AuditService auditService;
-    protected final PolicyService policyService;
-    protected final UserService userService;
-    protected final CacheService cacheService;
-    protected final PalisadeService palisadeService;
+    private final Serialiser<T> serialiser;
 
-    public SimpleClient() {
-        this.serialiser = createSerialiser();
-        this.resourceService = createResourceService();
-        this.auditService = createAuditService();
-        this.policyService = createPolicyService();
-        this.userService = createUserService();
-        this.cacheService = createCacheService();
-        this.palisadeService = createPalisadeService();
+    private final ServicesFactory services;
+
+    public SimpleClient(final ServicesFactory services) {
+        Objects.requireNonNull(services, "services factory must be provided");
+        this.services = services;
+        Serialiser<T> serialiser = createSerialiser();
+        Objects.requireNonNull(serialiser, "serialiser returned from createSerialiser() cannot be null");
+        this.serialiser = serialiser;
     }
 
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String justification) {
-        Objects.requireNonNull(palisadeService);
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
-        final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
+        final DataRequestResponse dataRequestResponse = getServicesFactory().getPalisadeService().registerDataRequest(dataRequest).join();
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
 
         for (final Entry<Resource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
@@ -82,7 +63,7 @@ public class SimpleClient<T> {
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
-                    response -> serialiser.deserialise(response.getData())
+                    response -> getSerialiser().deserialise(response.getData())
             );
             futureResults.add(futureResult);
         }
@@ -90,38 +71,15 @@ public class SimpleClient<T> {
         return futureResults.stream().flatMap(CompletableFuture::join);
     }
 
-    protected PalisadeService createPalisadeService() {
-        return new SimplePalisadeService(
-                resourceService,
-                auditService,
-                policyService,
-                userService,
-                cacheService
-        );
-    }
-
-    protected CacheService createCacheService() {
-        return new HashMapCacheService();
-    }
-
-    protected ResourceService createResourceService() {
-        return new HashMapResourceService();
-    }
-
-    protected AuditService createAuditService() {
-        return new LoggerAuditService();
-    }
-
-    protected PolicyService createPolicyService() {
-        return new HashMapPolicyService();
-    }
-
-
-    protected UserService createUserService() {
-        return new HashMapUserService();
-    }
-
     protected Serialiser<T> createSerialiser() {
         return new NullSerialiser<>();
+    }
+
+    public Serialiser<T> getSerialiser() {
+        return serialiser;
+    }
+
+    public ServicesFactory getServicesFactory() {
+        return services;
     }
 }
