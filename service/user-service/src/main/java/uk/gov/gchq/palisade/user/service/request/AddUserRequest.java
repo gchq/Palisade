@@ -23,6 +23,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * An {@code AddUserRequest} is a {@link Request} that is passed to the {@link uk.gov.gchq.palisade.user.service.UserService}
  * to add a {@link User}.
@@ -37,16 +39,18 @@ public class AddUserRequest extends Request {
     }
 
     public AddUserRequest user(final User user) {
+        requireNonNull(user, "The user cannot be set to null.");
         this.user = user;
         return this;
     }
 
     public User getUser() {
+        requireNonNull(user, "The user has not been set.");
         return user;
     }
 
     public void setUser(final User user) {
-        this.user = user;
+        user(user);
     }
 
     @Override

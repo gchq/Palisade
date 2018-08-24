@@ -28,6 +28,8 @@ import uk.gov.gchq.palisade.service.request.Request;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used to request whether a user can access a resource for a given justification.
  */
@@ -45,6 +47,7 @@ public class CanAccessRequest extends Request {
      * @return the {@link CanAccessRequest}
      */
     public CanAccessRequest resources(final Collection<Resource> resources) {
+        requireNonNull(resources, "The resources cannot be set to null.");
         this.resources = resources;
         return this;
     }
@@ -54,15 +57,17 @@ public class CanAccessRequest extends Request {
      * @return the {@link CanAccessRequest}
      */
     public CanAccessRequest user(final User user) {
+        requireNonNull(user, "The user cannot be set to null.");
         this.user = user;
         return this;
     }
 
     /**
-     * @param context containing contextual information such as justification or enviromental data that can influence policies
+     * @param context containing contextual information such as justification or environmental data that can influence policies
      * @return the {@link CanAccessRequest}
      */
     public CanAccessRequest context(final Context context) {
+        requireNonNull(context, "The context cannot be set to null.");
         this.context = context;
         return this;
     }
@@ -101,22 +106,25 @@ public class CanAccessRequest extends Request {
     }
 
     public Collection<Resource> getResources() {
+        requireNonNull(resources, "The resources have not been set.");
         return resources;
     }
 
     public void setResources(final Collection<Resource> resources) {
-        this.resources = resources;
+        resources(resources);
     }
 
     public User getUser() {
+        requireNonNull(user, "The user has not been set.");
         return user;
     }
 
     public void setUser(final User user) {
-        this.user = user;
+        user(user);
     }
 
     public Context getContext() {
+        requireNonNull(context, "The context has not been set.");
         return context;
     }
 

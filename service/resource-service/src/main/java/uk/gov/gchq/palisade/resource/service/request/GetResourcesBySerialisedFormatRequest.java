@@ -22,6 +22,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used to request a list of {@link uk.gov.gchq.palisade.resource.Resource}'s
  * from the {@link uk.gov.gchq.palisade.resource.service.ResourceService} based on the serialisedFormat of those resources.
@@ -40,16 +42,18 @@ public class GetResourcesBySerialisedFormatRequest extends Request {
      * @return the {@link GetResourcesBySerialisedFormatRequest}
      */
     public GetResourcesBySerialisedFormatRequest serialisedFormat(final String serialisedFormat) {
+        requireNonNull(serialisedFormat, "The serialised format cannot be set to null.");
         this.serialisedFormat = serialisedFormat;
         return this;
     }
 
     public String getSerialisedFormat() {
+        requireNonNull(serialisedFormat, "The serialised format has not been set.");
         return serialisedFormat;
     }
 
     public void setSerialisedFormat(final String serialisedFormat) {
-        this.serialisedFormat = serialisedFormat;
+        serialisedFormat(serialisedFormat);
     }
 
     @Override

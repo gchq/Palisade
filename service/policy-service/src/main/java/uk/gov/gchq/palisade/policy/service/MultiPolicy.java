@@ -26,9 +26,8 @@ import uk.gov.gchq.palisade.rule.Rules;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
-import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * This class contains the mapping of {@link Resource}'s to the applicable {@link Policy}
@@ -38,7 +37,6 @@ public class MultiPolicy {
 
     // no-args constructor required
     public MultiPolicy() {
-        policies(new HashMap<>());
     }
 
     /**
@@ -46,16 +44,18 @@ public class MultiPolicy {
      * @return the {@link MultiPolicy}
      */
     public MultiPolicy policies(final Map<Resource, Policy> policies) {
+        requireNonNull(policies, "The policies cannot be set to null.");
         this.policies = policies;
         return this;
     }
 
     public Map<Resource, Policy> getPolicies() {
+        requireNonNull(policies, "The policies have not been set.");
         return policies;
     }
 
     public void setPolicies(final Map<Resource, Policy> policies) {
-        this.policies = policies;
+        policies(policies);
     }
 
     /**
@@ -66,13 +66,10 @@ public class MultiPolicy {
      * @return The {@link Policy} for the given {@link Resource}.
      */
     public Policy getPolicy(final Resource resource) {
-        Objects.requireNonNull(resource);
-        final Policy policy = policies.get(resource);
-        if (nonNull(policy)) {
-            return policy;
-        }
-
-        return new Policy();
+        requireNonNull(resource, "Cannot search for a policy based on a null resource.");
+        final Policy policy = getPolicies().get(resource);
+        requireNonNull(policy, "There are no policies for this resource.");
+        return policy;
     }
 
     /**
@@ -83,8 +80,9 @@ public class MultiPolicy {
      * @param policy   The {@link Policy} for the given {@link Resource}.
      */
     public void setPolicy(final Resource resource, final Policy policy) {
-        Objects.requireNonNull(resource);
-        Objects.requireNonNull(policy);
+        requireNonNull(resource, "Cannot set a policy to a null resource.");
+        requireNonNull(policy, "Cannot set a null policy to a resource.");
+        Map<Resource, Policy> policies = getPolicies();
         if (policies.containsKey(resource)) {
             throw new IllegalArgumentException("Policy already exists for resource: " + resource);
         }
@@ -99,8 +97,9 @@ public class MultiPolicy {
      */
     @JsonIgnore
     public Map<Resource, Rules> getRuleMap() {
-        final Map<Resource, Rules> rules = new HashMap<>(getPolicies().size());
-        getPolicies().forEach((r, p) -> rules.put(r, p.getRecordRules()));
+        Map<Resource, Policy> policies = getPolicies();
+        final Map<Resource, Rules> rules = new HashMap<>(policies.size());
+        policies.forEach((r, p) -> rules.put(r, p.getRecordRules()));
         return rules;
     }
 

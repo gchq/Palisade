@@ -27,16 +27,17 @@ import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.Collection;
-import java.util.Collections;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * This class is used in the request to get the policies that apply to the
  * collection of {@link Resource}'s.
  */
 public class GetPolicyRequest extends Request {
-    private User user = new User();
-    private Context context = new Context();
-    private Collection<Resource> resources = Collections.emptyList();
+    private User user;
+    private Context context;
+    private Collection<Resource> resources;
 
     // no-args constructor
     public GetPolicyRequest() {
@@ -47,16 +48,8 @@ public class GetPolicyRequest extends Request {
      * @return the {@link GetPolicyRequest}
      */
     public GetPolicyRequest user(final User user) {
+        requireNonNull(user, "The user cannot be set to null.");
         this.user = user;
-        return this;
-    }
-
-    /**
-     * @param justification the {@link Context} of why the user needs
-     * @return the {@link GetPolicyRequest}
-     */
-    public GetPolicyRequest justification(final String justification) {
-        this.context.justification(justification);
         return this;
     }
 
@@ -70,28 +63,32 @@ public class GetPolicyRequest extends Request {
     }
 
     public User getUser() {
+        requireNonNull(user, "The user has not been set.");
         return user;
     }
 
     public void setUser(final User user) {
-        this.user = user;
+        user(user);
     }
 
     public Context getContext() {
+        requireNonNull(context, "The context has not been set.");
         return context;
     }
 
     public GetPolicyRequest context(final Context context) {
+        requireNonNull(context, "The context cannot be set to null.");
         this.context = context;
         return this;
     }
 
     public Collection<Resource> getResources() {
+        requireNonNull(resources, "The resources have not been set.");
         return resources;
     }
 
     public void setResources(final Collection<Resource> resources) {
-        this.resources = resources;
+        resources(resources);
     }
 
     @Override

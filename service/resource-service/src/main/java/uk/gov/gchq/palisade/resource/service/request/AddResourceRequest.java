@@ -24,6 +24,8 @@ import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used to request that details about a resource is added to the {@link uk.gov.gchq.palisade.resource.service.ResourceService}.
  */
@@ -40,6 +42,7 @@ public class AddResourceRequest extends Request {
      * @return the {@link AddResourceRequest}
      */
     public AddResourceRequest resource(final Resource resource) {
+        requireNonNull(resource, "The resource cannot be set to null.");
         this.resource = resource;
         return this;
     }
@@ -49,24 +52,27 @@ public class AddResourceRequest extends Request {
      * @return the {@link AddResourceRequest}
      */
     public AddResourceRequest connectionDetail(final ConnectionDetail connectionDetail) {
+        requireNonNull(connectionDetail, "The connection details cannot be set to null.");
         this.connectionDetail = connectionDetail;
         return this;
     }
 
     public Resource getResource() {
+        requireNonNull(resource, "The resource has not been set.");
         return resource;
     }
 
     public void setResource(final Resource resource) {
-        this.resource = resource;
+        resource(resource);
     }
 
     public ConnectionDetail getConnectionDetail() {
+        requireNonNull(connectionDetail, "The connection details have not been set.");
         return connectionDetail;
     }
 
     public void setConnectionDetail(final ConnectionDetail connectionDetail) {
-        this.connectionDetail = connectionDetail;
+        connectionDetail(connectionDetail);
     }
 
     @Override
