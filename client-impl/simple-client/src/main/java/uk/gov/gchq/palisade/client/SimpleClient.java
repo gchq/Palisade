@@ -41,15 +41,16 @@ public class SimpleClient<T> {
     private final ServicesFactory services;
 
     public SimpleClient(final ServicesFactory services) {
-        Objects.requireNonNull(services);
+        Objects.requireNonNull(services, "services factory must be provided");
         this.services = services;
-        this.serialiser = createSerialiser();
+        Serialiser<T> serialiser = createSerialiser();
+        Objects.requireNonNull(serialiser, "serialiser returned from createSerialiser() cannot be null");
+        this.serialiser = serialiser;
     }
 
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String justification) {
-        Objects.requireNonNull(services.getPalisadeService());
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
-        final DataRequestResponse dataRequestResponse = services.getPalisadeService().registerDataRequest(dataRequest).join();
+        final DataRequestResponse dataRequestResponse = getServicesFactory().getPalisadeService().registerDataRequest(dataRequest).join();
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
 
         for (final Entry<Resource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
