@@ -143,17 +143,19 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         );
 
         // The sys admin needs to configure the resource service
-
-        final HdfsDataReader reader;
-        try {
-            reader = new HdfsDataReader(new Configuration());
-            reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        //if this is running as a multi JVM example, then we will get the ProxyRestResourceService and should not insert this connection detail
+        if (getServicesFactory().getResourceService() instanceof HDFSResourceService) {
+            final HdfsDataReader reader;
+            try {
+                reader = new HdfsDataReader(new Configuration());
+                reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            final Map<String, ConnectionDetail> dataType = new HashMap<>();
+            dataType.put(RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService()).reader(reader)));
+            ((HDFSResourceService) getServicesFactory().getResourceService()).connectionDetail(null, dataType);
         }
-        final Map<String, ConnectionDetail> dataType = new HashMap<>();
-        dataType.put(RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService()).reader(reader)));
-        ((HDFSResourceService) getServicesFactory().getResourceService()).connectionDetail(null, dataType);
 
         // Wait for the users and policies to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
