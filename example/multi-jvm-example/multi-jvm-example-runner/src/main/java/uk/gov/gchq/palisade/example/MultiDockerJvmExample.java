@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.example;
 
 import org.apache.commons.io.FileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,19 +25,16 @@ import uk.gov.gchq.palisade.client.SimpleRestServices;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.stream.Stream;
-
-import static java.util.Objects.requireNonNull;
 
 public class MultiDockerJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiDockerJvmExample.class);
+    //For the Docker build, this will have been created in the container before this executes
     public static final String FILE = "/data/example/exampleObj_file1.txt";
-
 
     public static void main(final String[] args) throws Exception {
         new MultiDockerJvmExample().run();
+        FileUtils.deleteQuietly(new File(FILE));
     }
 
     public void run() throws Exception {
@@ -53,16 +51,5 @@ public class MultiDockerJvmExample {
         final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
         LOGGER.info("Bob got back: ");
         bobResults.map(Object::toString).forEach(LOGGER::info);
-    }
-
-    private static String createDataPath() {
-        final File targetFile = new File("data/example/exampleObj_file1.txt");
-        try (final InputStream data = MultiDockerJvmExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
-            requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
-            FileUtils.copyInputStreamToFile(data, targetFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return targetFile.getAbsolutePath();
     }
 }
