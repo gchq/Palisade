@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.example;
 
 import org.apache.commons.io.FileUtils;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -89,6 +90,8 @@ public class MultiJvmExampleIT {
         if (null != dataServer) {
             dataServer.stopServer();
         }
+
+        FileUtils.deleteQuietly(new File(FILE));
     }
 
     @Test

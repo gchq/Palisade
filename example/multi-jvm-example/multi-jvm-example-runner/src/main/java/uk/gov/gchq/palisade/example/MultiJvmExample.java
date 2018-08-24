@@ -36,6 +36,7 @@ public class MultiJvmExample {
 
     public static void main(final String[] args) throws Exception {
         new MultiJvmExample().run();
+        FileUtils.deleteQuietly(new File(FILE));
     }
 
     public void run() throws Exception {
@@ -52,8 +53,6 @@ public class MultiJvmExample {
         final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
         LOGGER.info("Bob got back: ");
         bobResults.map(Object::toString).forEach(LOGGER::info);
-
-        FileUtils.deleteQuietly(new File(FILE));
     }
 
     private static String createDataPath() {
