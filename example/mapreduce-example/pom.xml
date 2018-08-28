@@ -29,7 +29,6 @@
 
     <modules>
         <module>mapreduce-example-runner</module>
-        <module>mapreduce-example-client</module>
     </modules>
 
 </project>

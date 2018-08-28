@@ -17,10 +17,12 @@
 package uk.gov.gchq.palisade.example;
 
 import org.apache.commons.io.FileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.example.client.ExampleSimpleRestClient;
+import uk.gov.gchq.palisade.client.SimpleRestServices;
+import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,10 +37,11 @@ public class MultiJvmExample {
 
     public static void main(final String[] args) throws Exception {
         new MultiJvmExample().run();
+        FileUtils.deleteQuietly(new File(FILE));
     }
 
     public void run() throws Exception {
-        final ExampleSimpleRestClient client = new ExampleSimpleRestClient(FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");
@@ -51,8 +54,6 @@ public class MultiJvmExample {
         final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
         LOGGER.info("Bob got back: ");
         bobResults.map(Object::toString).forEach(LOGGER::info);
-
-        FileUtils.deleteQuietly(new File(FILE));
     }
 
     private static String createDataPath() {

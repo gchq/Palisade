@@ -118,6 +118,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
         Objects.requireNonNull(dataOutput, "dataOutput");
         //serialise this class to JSON and write out
         byte[] serial = JSONSerialiser.serialise(requestResponse);
+
         dataOutput.writeInt(serial.length);
         dataOutput.write(serial);
     }

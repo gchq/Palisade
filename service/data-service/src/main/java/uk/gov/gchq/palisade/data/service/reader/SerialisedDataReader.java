@@ -16,10 +16,12 @@
 
 package uk.gov.gchq.palisade.data.service.reader;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.Util;
+import uk.gov.gchq.palisade.data.serialise.NullSerialiser;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
@@ -49,7 +51,9 @@ import static java.util.Objects.requireNonNull;
 public abstract class SerialisedDataReader implements DataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialisedDataReader.class);
 
+    @JsonProperty("default")
     private Serialiser<?> defaultSerialiser = new SimpleStringSerialiser();
+    @JsonProperty("serialisers")
     private Map<String, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
 
     /**

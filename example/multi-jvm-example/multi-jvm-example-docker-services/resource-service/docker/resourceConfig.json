@@ -1,5 +1,6 @@
 {
   "class": "uk.gov.gchq.palisade.resource.service.HDFSResourceService",
+  "@id": 1,
   "dataFormat": {},
   "dataType": {
     "exampleObj": {

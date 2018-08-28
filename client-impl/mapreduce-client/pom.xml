@@ -21,30 +21,34 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>single-jvm-example</artifactId>
+        <artifactId>client-impl</artifactId>
         <version>0.2-SNAPSHOT</version>
     </parent>
-    <artifactId>single-jvm-example-client</artifactId>
+
+    <artifactId>mapreduce-client</artifactId>
+
     <dependencies>
         <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+        <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>simple-client</artifactId>
+            <artifactId>palisade-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-model</artifactId>
+            <artifactId>data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hdfs-resource-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hdfs-data-service</artifactId>
-            <version>${project.parent.version}</version>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

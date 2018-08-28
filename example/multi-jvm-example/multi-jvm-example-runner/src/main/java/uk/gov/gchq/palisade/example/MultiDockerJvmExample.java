@@ -16,24 +16,29 @@
 
 package uk.gov.gchq.palisade.example;
 
+import org.apache.commons.io.FileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.example.client.ExampleSimpleRestClient;
+import uk.gov.gchq.palisade.client.SimpleRestServices;
+import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
+import java.io.File;
 import java.util.stream.Stream;
 
 public class MultiDockerJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiDockerJvmExample.class);
+    //For the Docker build, this will have been created in the container before this executes
     public static final String FILE = "/data/example/exampleObj_file1.txt";
-
 
     public static void main(final String[] args) throws Exception {
         new MultiDockerJvmExample().run();
+        FileUtils.deleteQuietly(new File(FILE));
     }
 
     public void run() throws Exception {
-        final ExampleSimpleRestClient client = new ExampleSimpleRestClient(FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");
