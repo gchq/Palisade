@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
-import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheDataRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheDataRequest;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 
 import java.util.concurrent.CompletableFuture;
@@ -59,7 +59,7 @@ public class HashMapCacheService implements CacheService {
     }
 
     @Override
-    public CompletableFuture<Boolean> add(final AddCacheRequest request) {
+    public CompletableFuture<Boolean> add(final AddCacheDataRequest request) {
         LOGGER.debug("Adding to cache: {}", request);
         cache.put(request.getRequestId(), request.getDataRequestConfig());
         /*Here we set up a simple timer to deal with the removal of the item from the cache if a duration is present
@@ -73,7 +73,7 @@ public class HashMapCacheService implements CacheService {
     }
 
     @Override
-    public CompletableFuture<DataRequestConfig> get(final GetCacheRequest request) {
+    public CompletableFuture<DataRequestConfig> get(final GetCacheDataRequest request) {
         LOGGER.debug("Getting from cache: {}", request);
         final DataRequestConfig result = cache.get(request.getRequestId());
         LOGGER.debug("Got from cache: {}", result);

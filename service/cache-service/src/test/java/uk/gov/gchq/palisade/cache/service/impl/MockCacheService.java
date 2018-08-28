@@ -20,8 +20,8 @@ package uk.gov.gchq.palisade.cache.service.impl;
 import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
-import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheDataRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheDataRequest;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 
 import java.util.concurrent.CompletableFuture;
@@ -42,12 +42,12 @@ public class MockCacheService implements CacheService {
 
 
     @Override
-    public CompletableFuture<Boolean> add(final AddCacheRequest request) {
+    public CompletableFuture<Boolean> add(final AddCacheDataRequest request) {
         return mock.add(request);
     }
 
     @Override
-    public CompletableFuture<DataRequestConfig> get(final GetCacheRequest request) {
+    public CompletableFuture<DataRequestConfig> get(final GetCacheDataRequest request) {
         return mock.get(request);
     }
 }

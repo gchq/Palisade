@@ -16,8 +16,8 @@
 
 package uk.gov.gchq.palisade.cache.service;
 
-import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
-import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheDataRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheDataRequest;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 
 import java.util.concurrent.CompletableFuture;
@@ -29,13 +29,13 @@ import java.util.concurrent.CompletableFuture;
  */
 public class NullCacheService implements CacheService {
     @Override
-    public CompletableFuture<Boolean> add(final AddCacheRequest request) {
+    public CompletableFuture<Boolean> add(final AddCacheDataRequest request) {
         // Nothing was cached, so return false.
         return CompletableFuture.completedFuture(false);
     }
 
     @Override
-    public CompletableFuture<DataRequestConfig> get(final GetCacheRequest request) {
+    public CompletableFuture<DataRequestConfig> get(final GetCacheDataRequest request) {
         return CompletableFuture.completedFuture(new DataRequestConfig());
     }
 }

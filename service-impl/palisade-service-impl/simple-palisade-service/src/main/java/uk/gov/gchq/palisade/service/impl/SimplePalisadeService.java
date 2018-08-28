@@ -27,8 +27,8 @@ import uk.gov.gchq.palisade.audit.service.NullAuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.NullCacheService;
-import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
-import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheDataRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheDataRequest;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.NullPolicyService;
 import uk.gov.gchq.palisade.policy.service.Policy;
@@ -153,7 +153,7 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     private void cache(final RegisterDataRequest request, final User user, final RequestId requestId, final MultiPolicy multiPolicy) {
-        final AddCacheRequest cacheRequest = new AddCacheRequest()
+        final AddCacheDataRequest cacheRequest = new AddCacheDataRequest()
                 .requestId(requestId)
                 .dataRequestConfig(new DataRequestConfig()
                                 .user(user)
@@ -173,7 +173,7 @@ public class SimplePalisadeService implements PalisadeService {
         Objects.requireNonNull(request.getRequestId());
         // TODO: need to validate that the user is actually requesting the correct info.
         // extract resources from request and check they are a subset of the original RegisterDataRequest resources
-        final GetCacheRequest cacheRequest = new GetCacheRequest().requestId(request.getRequestId());
+        final GetCacheDataRequest cacheRequest = new GetCacheDataRequest().requestId(request.getRequestId());
         LOGGER.debug("Getting cached data: {}", cacheRequest);
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {
