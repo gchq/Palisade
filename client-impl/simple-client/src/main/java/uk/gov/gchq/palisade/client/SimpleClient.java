@@ -18,12 +18,11 @@ package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.data.serialise.NullSerialiser;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
@@ -40,11 +39,10 @@ public class SimpleClient<T> {
 
     private final ServicesFactory services;
 
-    public SimpleClient(final ServicesFactory services) {
+    public SimpleClient(final ServicesFactory services, final Serialiser<T> serialiser) {
         Objects.requireNonNull(services, "services factory must be provided");
         this.services = services;
-        Serialiser<T> serialiser = createSerialiser();
-        Objects.requireNonNull(serialiser, "serialiser returned from createSerialiser() cannot be null");
+        Objects.requireNonNull(serialiser, "serialiser cannot be null");
         this.serialiser = serialiser;
     }
 
@@ -53,7 +51,7 @@ public class SimpleClient<T> {
         final DataRequestResponse dataRequestResponse = getServicesFactory().getPalisadeService().registerDataRequest(dataRequest).join();
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
 
-        for (final Entry<Resource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
+        for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
 
@@ -69,10 +67,6 @@ public class SimpleClient<T> {
         }
 
         return futureResults.stream().flatMap(CompletableFuture::join);
-    }
-
-    protected Serialiser<T> createSerialiser() {
-        return new NullSerialiser<>();
     }
 
     public Serialiser<T> getSerialiser() {

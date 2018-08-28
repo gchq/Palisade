@@ -30,7 +30,7 @@ import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
@@ -84,7 +84,7 @@ public class RestPolicyServiceV1IT {
         final Context context = new Context().justification("justification1");
         final CanAccessRequest request = new CanAccessRequest().resources(Collections.singletonList(fileResource1)).user(user).context(context);
 
-        given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(new CanAccessResponse(Collections.singletonList(fileResource1))));
+        given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(new CanAccessResponse().canAccessResources(Collections.singletonList(fileResource1))));
 
         // When
         final CanAccessResponse result = proxy.canAccess(request).join();
@@ -103,7 +103,7 @@ public class RestPolicyServiceV1IT {
         final Context context = new Context().justification("justification1");
         final GetPolicyRequest request = new GetPolicyRequest().user(user).context(context).resources(Arrays.asList(fileResource1, fileResource2));
 
-        final Map<Resource, Policy> policies = new HashMap<>();
+        final Map<LeafResource, Policy> policies = new HashMap<>();
         policies.put(fileResource1, new Policy<>().owner(user));
         policies.put(fileResource2, new Policy<>().owner(user));
         final MultiPolicy expectedResult = new MultiPolicy().policies(policies);

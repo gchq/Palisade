@@ -17,7 +17,6 @@
 package uk.gov.gchq.palisade.resource.service;
 
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
@@ -38,7 +37,7 @@ import java.util.concurrent.CompletableFuture;
  * The resource service is the Palisade component that determines what resources are available that meet a specific
  * (type of) request and how they should be accessed. This interface details several methods for obtaining a list of
  * resources, e.g. by type or by data format. The methods of this service all return {@link CompletableFuture}s of
- * {@link Map}s which link a valid {@link Resource} with a {@link ConnectionDetail} object. The ${@code
+ * {@link Map}s which link a valid {@link LeafResource} with a {@link ConnectionDetail} object. The ${@code
  * ConnectionDetail} objects contain information on how to set up a connection to retrieve a particular resource.
  * Implementations of this service do not deal with the filtering or application of security policy to the resources.
  * Therefore, a result returned from a method call on this interface doesn't guarantee that the user will be allowed to

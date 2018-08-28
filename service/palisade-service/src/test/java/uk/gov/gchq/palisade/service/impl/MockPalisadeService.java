@@ -17,8 +17,10 @@
 package uk.gov.gchq.palisade.service.impl;
 
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.mockito.Mockito;
 
+import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
@@ -49,5 +51,30 @@ public class MockPalisadeService implements PalisadeService {
     @Override
     public CompletableFuture<DataRequestConfig> getDataRequestConfig(final GetDataRequestConfig request) {
         return mock.getDataRequestConfig(request);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(43, 47)
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .toString();
     }
 }

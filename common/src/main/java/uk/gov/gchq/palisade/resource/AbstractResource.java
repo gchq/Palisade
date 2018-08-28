@@ -21,6 +21,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 public abstract class AbstractResource implements Resource {
@@ -75,5 +76,12 @@ public abstract class AbstractResource implements Resource {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .toString();
+    }
+
+    private static Comparator<Resource> comp = Comparator.comparing(Resource::getId);
+
+    @Override
+    public int compareTo(final Resource o) {
+        return comp.compare(this, o);
     }
 }

@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
@@ -83,13 +83,13 @@ public class RestResourceServiceV1 implements ResourceService {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    public Map<Resource, ConnectionDetail> getResourcesByResourceSync(
+    public Map<LeafResource, ConnectionDetail> getResourcesByResourceSync(
             @ApiParam(value = "The request") final GetResourcesByResourceRequest request) {
         return getResourcesByResource(request).join();
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByResource(
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByResource(
             final GetResourcesByResourceRequest request) {
         LOGGER.debug("Invoking getResourcesByResource: {}", request);
         return delegate.getResourcesByResource(request);
@@ -103,13 +103,13 @@ public class RestResourceServiceV1 implements ResourceService {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    public Map<Resource, ConnectionDetail> getResourcesByIdSync(
+    public Map<LeafResource, ConnectionDetail> getResourcesByIdSync(
             @ApiParam(value = "The request") final GetResourcesByIdRequest request) {
         return getResourcesById(request).join();
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(
             final GetResourcesByIdRequest request) {
         LOGGER.debug("Invoking getResourcesById: {}", request);
         return delegate.getResourcesById(request);
@@ -123,13 +123,13 @@ public class RestResourceServiceV1 implements ResourceService {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    public Map<Resource, ConnectionDetail> getResourceByTypeSync(
+    public Map<LeafResource, ConnectionDetail> getResourceByTypeSync(
             @ApiParam(value = "The request") final GetResourcesByTypeRequest request) {
         return getResourcesByType(request).join();
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByType(
             final GetResourcesByTypeRequest request) {
         LOGGER.debug("Invoking getResourcesByType: {}", request);
         return delegate.getResourcesByType(request);
@@ -143,13 +143,13 @@ public class RestResourceServiceV1 implements ResourceService {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    public Map<Resource, ConnectionDetail> getResourcesByFormatSync(
+    public Map<LeafResource, ConnectionDetail> getResourcesByFormatSync(
             @ApiParam(value = "The request") final GetResourcesBySerialisedFormatRequest request) {
         return getResourcesBySerialisedFormat(request).join();
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesBySerialisedFormat(
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(
             final GetResourcesBySerialisedFormatRequest request) {
         LOGGER.debug("Invoking getResourcesBySerialisedFormat: {}", request);
         return delegate.getResourcesBySerialisedFormat(request);

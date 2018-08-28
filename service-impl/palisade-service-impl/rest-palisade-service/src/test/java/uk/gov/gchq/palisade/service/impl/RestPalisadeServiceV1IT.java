@@ -79,7 +79,7 @@ public class RestPalisadeServiceV1IT {
 
         final RegisterDataRequest request = new RegisterDataRequest().resourceId("file1").userId(user.getUserId()).context(context);
 
-        final DataRequestResponse expectedResult = new DataRequestResponse().requestId(requestId).resource(fileResource1, new SimpleConnectionDetail());
+        final DataRequestResponse expectedResult = new DataRequestResponse().requestId(requestId).resource(fileResource1, new SimpleConnectionDetail().service(new MockPalisadeService()));
         given(palisadeService.registerDataRequest(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When

@@ -21,9 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
-import uk.gov.gchq.palisade.resource.Resource;
-
-import java.util.stream.Collectors;
 
 /**
  * A LoggerAuditService is a simple implementation of an {@link AuditService}
@@ -45,7 +42,7 @@ public class LoggerAuditService implements AuditService {
     @Override
     public void audit(final AuditRequest request) {
         final String msg = "'" + request.getUser().getUserId().getId()
-                + "' accessed '" + request.getResources().stream().map(Resource::getId).collect(Collectors.toSet())
+                + "' accessed '" + request.getResource().getId()
                 + "' for '" + request.getContext().getJustification()
                 + "' and it was processed using '" + request.getHowItWasProcessed() + "'";
 

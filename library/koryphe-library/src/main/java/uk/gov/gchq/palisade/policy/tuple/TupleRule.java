@@ -137,7 +137,7 @@ public class TupleRule<T> implements Rule<T> {
             recordTuple = new ReflectiveTuple(record);
         }
 
-        final PalisadeTuple palisadeTuple = new PalisadeTuple(recordTuple, user, context);
+        final PalisadeTuple palisadeTuple = new PalisadeTuple().record(recordTuple).user(user).context(context);
         if (isFunction) {
             final Object updatedTuple = ((PalisadeTuple) function.apply(palisadeTuple)).getRecord();
             if (!isTupleRecord) {

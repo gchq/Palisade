@@ -21,13 +21,12 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
@@ -53,7 +52,7 @@ import java.util.stream.IntStream;
  *
  * @param <V> The value type for the map task
  */
-public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
+public class PalisadeInputFormat<V> extends InputFormat<LeafResource, V> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PalisadeInputFormat.class);
 
     /**
@@ -206,7 +205,7 @@ public class PalisadeInputFormat<V> extends InputFormat<Resource, V> {
      * Creates a {@link uk.gov.gchq.palisade.mapreduce.PalisadeRecordReader}.
      */
     @Override
-    public RecordReader<Resource, V> createRecordReader(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
+    public RecordReader<LeafResource, V> createRecordReader(final InputSplit inputSplit, final TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
         return new PalisadeRecordReader<>();
     }
 

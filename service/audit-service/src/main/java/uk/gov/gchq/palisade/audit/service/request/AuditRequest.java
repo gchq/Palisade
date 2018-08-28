@@ -23,7 +23,6 @@ import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import static java.util.Objects.requireNonNull;
@@ -71,7 +70,7 @@ public class AuditRequest extends Request {
     }
 
     /**
-     * @param resource {@link Resource} which contains the relevant
+     * @param resource {@link LeafResource} which contains the relevant
      *                 details about the resource being accessed
      * @return the {@link AuditRequest}
      */

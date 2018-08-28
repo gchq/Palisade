@@ -83,19 +83,17 @@ public class PalisadeInputFormatTest {
         assertEquals(json, c.get(PalisadeInputFormat.REGISTER_REQUESTS_KEY));
     }
 
-    @Test
-    public void shouldAddEmptyRequest() {
+    @Test (expected = RuntimeException.class)
+    public void shouldErrorWhenAddingEmptyRequest() {
         //Given
         Configuration c = new Configuration();
         JobContext mockJob = Mockito.mock(JobContext.class);
         when(mockJob.getConfiguration()).thenReturn(c);
         RegisterDataRequest rdr = new RegisterDataRequest();
-        RegisterDataRequest[] rdrArray = {rdr};
-        String json = new String(JSONSerialiser.serialise(rdrArray), PalisadeInputFormat.UTF8);
         //When
         PalisadeInputFormat.addDataRequest(mockJob, rdr);
         //Then
-        assertEquals(json, c.get(PalisadeInputFormat.REGISTER_REQUESTS_KEY));
+        fail();
     }
 
     @Test
@@ -119,10 +117,9 @@ public class PalisadeInputFormatTest {
         when(mockJob.getConfiguration()).thenReturn(c);
         RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).context(new Context().justification("justification"));
         RegisterDataRequest rdr2 = new RegisterDataRequest().resourceId("testResource2").userId(new UserId().id("user2")).context(new Context().justification("justification2"));
-        RegisterDataRequest rdr3 = new RegisterDataRequest();
         //When
-        PalisadeInputFormat.addDataRequests(mockJob, rdr, rdr2, rdr3);
-        List<RegisterDataRequest> expected = Stream.of(rdr, rdr2, rdr3).collect(Collectors.toList());
+        PalisadeInputFormat.addDataRequests(mockJob, rdr, rdr2);
+        List<RegisterDataRequest> expected = Stream.of(rdr, rdr2).collect(Collectors.toList());
         //Then
         assertEquals(expected, PalisadeInputFormat.getDataRequests(mockJob));
     }

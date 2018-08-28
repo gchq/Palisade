@@ -15,9 +15,13 @@
  */
 package uk.gov.gchq.palisade.resource;
 
+import uk.gov.gchq.palisade.resource.impl.SystemResource;
+
 import java.util.Comparator;
 
-public class StubResource extends AbstractLeafResource implements Comparable<StubResource> {
+public class StubResource extends AbstractLeafResource {
+
+    private static SystemResource PARENT = new SystemResource().id("file");
 
     public StubResource() {
 
@@ -27,6 +31,7 @@ public class StubResource extends AbstractLeafResource implements Comparable<Stu
         id(id);
         type(type);
         serialisedFormat(format);
+        parent(PARENT);
     }
 
     private static Comparator<StubResource> comp = Comparator.comparing(StubResource::getSerialisedFormat).thenComparing(StubResource::getType).thenComparing(StubResource::getId);
@@ -36,8 +41,8 @@ public class StubResource extends AbstractLeafResource implements Comparable<Stu
      * Implemented to allow this class to be used in TreeMaps in tests.
      */
     @Override
-    public int compareTo(StubResource o) {
-        return comp.compare(this, o);
+    public int compareTo(Resource o) {
+        return comp.compare(this, (StubResource) o);
     }
 }
 

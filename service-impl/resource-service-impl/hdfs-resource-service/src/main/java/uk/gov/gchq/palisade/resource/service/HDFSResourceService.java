@@ -319,6 +319,14 @@ public class HDFSResourceService implements ResourceService {
                     .append(dataType)
                     .toHashCode();
         }
+//
+//        @Override
+//        public String toString() {
+//            return new ToStringBuilder(this)
+//                    .append("dataFormat", dataFormat)
+//                    .append("dataType", dataType)
+//                    .toString();
+//        }
     }
 
     private static Configuration createConfig(final Map<String, String> conf) {

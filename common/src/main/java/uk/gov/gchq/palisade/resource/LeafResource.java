@@ -23,6 +23,7 @@ package uk.gov.gchq.palisade.resource;
  * A LeafResource is expected to have a type and a serialised format. The type is a way of grouping
  * data of the same structure. The serialised format is the format of the file, e.g CSV, Parquet.
  */
+
 public interface LeafResource extends ChildResource {
 
     LeafResource type(final String type);
@@ -36,5 +37,4 @@ public interface LeafResource extends ChildResource {
     void setType(final String type);
 
     void setSerialisedFormat(final String serialisedFormat);
-
 }

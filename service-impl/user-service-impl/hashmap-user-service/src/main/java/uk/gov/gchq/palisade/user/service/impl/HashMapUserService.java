@@ -52,8 +52,6 @@ public class HashMapUserService implements UserService {
     @Override
     public CompletableFuture<User> getUser(final GetUserRequest request) {
         Objects.requireNonNull(request);
-        Objects.requireNonNull(request.getUserId());
-        Objects.requireNonNull(request.getUserId().getId());
         User user = users.get(request.getUserId());
 
         CompletableFuture<User> userCompletion = CompletableFuture.completedFuture(user);

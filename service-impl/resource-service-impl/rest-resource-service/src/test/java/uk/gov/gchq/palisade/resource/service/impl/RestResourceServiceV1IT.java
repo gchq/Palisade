@@ -20,7 +20,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.data.service.impl.MockDataService;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
@@ -31,7 +32,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFor
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
-import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
+import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -73,7 +74,7 @@ public class RestResourceServiceV1IT {
         MockResourceService.setMock(resourceService);
 
         final FileResource file = new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource);
-        final AddResourceRequest request = new AddResourceRequest().parent(sysResource).resource(file).connectionDetail(new SimpleConnectionDetail());
+        final AddResourceRequest request = new AddResourceRequest().resource(file).connectionDetail(new StubConnectionDetail().setServiceToCreate(new MockDataService()));
 
         given(resourceService.addResource(request)).willReturn(CompletableFuture.completedFuture(true));
 
@@ -93,14 +94,14 @@ public class RestResourceServiceV1IT {
 
         final GetResourcesByResourceRequest request = new GetResourcesByResourceRequest().resource(sysResource);
 
-        final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new SimpleConnectionDetail());
-        expectedResult.put(new FileResource().id("file2").type("type1").serialisedFormat("format1").parent(sysResource), new SimpleConnectionDetail());
+        final Map<LeafResource, ConnectionDetail> expectedResult = new HashMap<>();
+        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new StubConnectionDetail().setServiceToCreate(new MockDataService()));
+        expectedResult.put(new FileResource().id("file2").type("type1").serialisedFormat("format1").parent(sysResource), new StubConnectionDetail().setServiceToCreate(new MockDataService()));
 
         given(resourceService.getResourcesByResource(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
-        final Map<Resource, ConnectionDetail> result = proxy.getResourcesByResource(request).join();
+        final Map<LeafResource, ConnectionDetail> result = proxy.getResourcesByResource(request).join();
 
         // Then
         assertEquals(expectedResult, result);
@@ -115,13 +116,13 @@ public class RestResourceServiceV1IT {
 
         final GetResourcesByIdRequest request = new GetResourcesByIdRequest().resourceId("file1");
 
-        final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource().id("file1").type("testType").serialisedFormat("testFormat").parent(sysResource), new SimpleConnectionDetail());
+        final Map<LeafResource, ConnectionDetail> expectedResult = new HashMap<>();
+        expectedResult.put(new FileResource().id("file1").type("testType").serialisedFormat("testFormat").parent(sysResource), new StubConnectionDetail().setServiceToCreate(new MockDataService()));
 
         given(resourceService.getResourcesById(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
-        final Map<Resource, ConnectionDetail> result = proxy.getResourcesById(request).join();
+        final Map<LeafResource, ConnectionDetail> result = proxy.getResourcesById(request).join();
 
         // Then
         assertEquals(expectedResult, result);
@@ -136,13 +137,13 @@ public class RestResourceServiceV1IT {
 
         final GetResourcesByTypeRequest request = new GetResourcesByTypeRequest().type("type1");
 
-        final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new SimpleConnectionDetail());
+        final Map<LeafResource, ConnectionDetail> expectedResult = new HashMap<>();
+        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new StubConnectionDetail().setServiceToCreate(new MockDataService()));
 
         given(resourceService.getResourcesByType(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
-        final Map<Resource, ConnectionDetail> result = proxy.getResourcesByType(request).join();
+        final Map<LeafResource, ConnectionDetail> result = proxy.getResourcesByType(request).join();
 
         // Then
         assertEquals(expectedResult, result);
@@ -157,13 +158,13 @@ public class RestResourceServiceV1IT {
 
         final GetResourcesBySerialisedFormatRequest request = new GetResourcesBySerialisedFormatRequest().serialisedFormat("format1");
 
-        final Map<Resource, ConnectionDetail> expectedResult = new HashMap<>();
-        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new SimpleConnectionDetail());
+        final Map<LeafResource, ConnectionDetail> expectedResult = new HashMap<>();
+        expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new StubConnectionDetail().setServiceToCreate(new MockDataService()));
 
         given(resourceService.getResourcesBySerialisedFormat(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
-        final Map<Resource, ConnectionDetail> result = proxy.getResourcesBySerialisedFormat(request).join();
+        final Map<LeafResource, ConnectionDetail> result = proxy.getResourcesBySerialisedFormat(request).join();
 
         // Then
         assertEquals(expectedResult, result);

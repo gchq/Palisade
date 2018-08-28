@@ -36,7 +36,7 @@ import uk.gov.gchq.palisade.resource.impl.FileResource;
         property = "class",
         defaultImpl = FileResource.class
 )
-public interface Resource {
+public interface Resource extends Comparable<Resource> {
 
     Resource id(String id);
 

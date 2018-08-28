@@ -105,12 +105,11 @@ public class SimpleServices implements ServicesFactory {
     }
 
     protected PalisadeService createPalisadeService() {
-        return new SimplePalisadeService(
-                getResourceService(),
-                getAuditService(),
-                getPolicyService(),
-                getUserService(),
-                getCacheService()
-        );
+        return new SimplePalisadeService()
+                .resourceService(getResourceService())
+                .auditService(getAuditService())
+                .policyService(getPolicyService())
+                .userService(getUserService())
+                .cacheService(getCacheService());
     }
 }

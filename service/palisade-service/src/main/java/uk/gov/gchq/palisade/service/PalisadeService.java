@@ -18,7 +18,6 @@ package uk.gov.gchq.palisade.service;
 
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.service.exception.NoPolicyException;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
@@ -76,13 +75,13 @@ public interface PalisadeService extends Service {
     }
 
     /**
-     * Checks that each {@link Resource} in a request has record level policy associated with it in the {@link
+     * Checks that each {@link LeafResource} in a request has record level policy associated with it in the {@link
      * MultiPolicy}.
      *
      * @param policy    policy being applied to a request
      * @param resources the list of resources being processed
      * @return the {@code} policy object
-     * @throws NoPolicyException if no record level rules are available for any {@link Resource} in {@code resources}
+     * @throws NoPolicyException if no record level rules are available for any {@link LeafResource} in {@code resources}
      */
     default MultiPolicy ensureRecordRulesAvailableFor(final MultiPolicy policy, final Collection<LeafResource> resources) {
         Objects.requireNonNull(policy, "policy");

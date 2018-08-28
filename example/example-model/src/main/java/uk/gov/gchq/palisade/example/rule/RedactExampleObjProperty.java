@@ -30,7 +30,7 @@ public class RedactExampleObjProperty implements Rule<ExampleObj> {
         }
 
         final boolean isAdmin = user.getRoles().contains("admin");
-        if (isAdmin) {
+        if (!isAdmin) {
             record.setProperty("redacted");
         }
         return record;
