@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.cache.service;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheDataRequest;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheDataRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.Request;
@@ -49,7 +50,7 @@ public interface CacheService extends Service {
      * @return a {@link CompletableFuture} which would be true once the
      * information has been cached.
      */
-    CompletableFuture<Boolean> add(final AddCacheDataRequest request);
+    CompletableFuture<Boolean> add(final AddCacheRequest request);
 
     /**
      * Pull out of the cache the information related to the unique requestId
@@ -63,7 +64,9 @@ public interface CacheService extends Service {
      * @return The {@link DataRequestConfig} relating to the unique requestId
      * that is stored in the cache.
      */
-    CompletableFuture<DataRequestConfig> get(final GetCacheDataRequest request);
+    CompletableFuture<DataRequestConfig> get(final GetCacheRequest request);
+
+    CompletableFuture<???????> getAll(final GetAllCacheRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {

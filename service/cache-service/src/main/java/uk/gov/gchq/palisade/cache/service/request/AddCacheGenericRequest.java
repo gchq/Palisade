@@ -20,7 +20,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 
-
 import java.util.Objects;
 
 public class AddCacheGenericRequest<T> extends AddCacheRequest {
