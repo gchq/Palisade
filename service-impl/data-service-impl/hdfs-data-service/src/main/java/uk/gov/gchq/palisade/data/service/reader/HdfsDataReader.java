@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.data.service.reader;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Maps;
@@ -71,6 +72,7 @@ public class HdfsDataReader extends SerialisedDataReader {
         return this;
     }
 
+    @JsonIgnore
     public void setFs(final FileSystem fs) {
         fs(fs);
     }
