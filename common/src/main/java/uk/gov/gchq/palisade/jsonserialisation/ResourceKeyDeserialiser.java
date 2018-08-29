@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.jsonserialisation;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 
 import java.io.IOException;
 
@@ -27,6 +27,6 @@ class ResourceKeyDeserialiser extends KeyDeserializer {
     @Override
     public Object deserializeKey(final String key, final DeserializationContext ctxt)
             throws IOException {
-        return JSONSerialiser.deserialise(key, Resource.class);
+        return JSONSerialiser.deserialise(key, LeafResource.class);
     }
 }

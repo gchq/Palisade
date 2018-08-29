@@ -12,6 +12,8 @@
       "exampleObj": {
         "class": "uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser"
       }
+    },
+    "conf": {
     }
   }
 }

@@ -17,7 +17,6 @@ package uk.gov.gchq.palisade.mapreduce;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.util.StringUtils;
@@ -25,7 +24,7 @@ import org.apache.hadoop.util.StringUtils;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 
@@ -60,7 +59,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
      * @param resources the resources to be processed by this split
      * @throws NullPointerException if anything is null
      */
-    public PalisadeInputSplit(final RequestId requestId, final Map<Resource, ConnectionDetail> resources) {
+    public PalisadeInputSplit(final RequestId requestId, final Map<LeafResource, ConnectionDetail> resources) {
         Objects.requireNonNull(requestId, "requestId");
         Objects.requireNonNull(resources, "resources");
         requestResponse = new DataRequestResponse().requestId(requestId).resources(resources);
@@ -74,7 +73,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
      */
     public PalisadeInputSplit(final DataRequestResponse requestResponse) {
         Objects.requireNonNull(requestResponse);
-        this.requestResponse = new DataRequestResponse().resources(requestResponse);
+        this.requestResponse = requestResponse;
     }
 
     /**

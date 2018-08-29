@@ -54,9 +54,9 @@ public class HdfsDataReaderTest {
         FileUtils.write(tmpFile, "some data\nsome more data");
 
         final Configuration conf = new Configuration();
-        final HdfsDataReader reader = new HdfsDataReader(conf);
+        final HdfsDataReader reader = new HdfsDataReader().conf(conf);
 
-        final FileResource resource = new FileResource().id(tmpFile.getAbsolutePath()).type("string");
+        final FileResource resource = (FileResource) new FileResource().type("string").id(tmpFile.getAbsolutePath());
         final Rules<String> rules = new Rules<>();
 
         final DataReaderRequest request = new DataReaderRequest()
@@ -81,7 +81,7 @@ public class HdfsDataReaderTest {
         FileUtils.write(tmpFile, "some data\nsome more data");
 
         final Configuration conf = new Configuration();
-        final HdfsDataReader reader = new HdfsDataReader(conf);
+        final HdfsDataReader reader = new HdfsDataReader().conf(conf);
         reader.addSerialiser("string", new SimpleStringSerialiser());
 
         final FileResource resource = new FileResource().id(tmpFile.getAbsolutePath()).type("string");

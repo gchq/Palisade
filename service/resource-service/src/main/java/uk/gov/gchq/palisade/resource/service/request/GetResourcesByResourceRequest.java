@@ -23,6 +23,8 @@ import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used to request a list of {@link uk.gov.gchq.palisade.resource.Resource}'s
  * from the {@link uk.gov.gchq.palisade.resource.service.ResourceService} based on a {@link uk.gov.gchq.palisade.resource.Resource}.
@@ -41,16 +43,18 @@ public class GetResourcesByResourceRequest extends Request {
      * @return the {@link GetResourcesByResourceRequest}
      */
     public GetResourcesByResourceRequest resource(final Resource resource) {
+        requireNonNull(resource, "The resource cannot be set to null.");
         this.resource = resource;
         return this;
     }
 
     public Resource getResource() {
+        requireNonNull(resource, "The resource has not been set.");
         return resource;
     }
 
     public void setResource(final Resource resource) {
-        this.resource = resource;
+        resource(resource);
     }
 
     @Override

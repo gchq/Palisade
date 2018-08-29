@@ -27,7 +27,6 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.client.SimpleServices;
-import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.reader.HdfsDataReader;
 import uk.gov.gchq.palisade.example.ExampleObj;
@@ -39,7 +38,10 @@ import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
+import uk.gov.gchq.palisade.resource.ParentResource;
+import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
@@ -47,7 +49,10 @@ import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -61,7 +66,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     }
 
     public ExampleSimpleClient(final ServicesFactory services, final String file) {
-        super(services);
+        super(services, new ExampleObjSerialiser());
         this.file = file;
         initialiseServices();
     }
@@ -70,13 +75,13 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         // The user authorisation owner or sys admin needs to add the user
         final UserService userService = getServicesFactory().getUserService();
 
+        final User alice = new User()
+                .userId("Alice")
+                .auths("public", "private")
+                .roles("user", "admin");
+
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
-                new AddUserRequest().user(
-                        new User()
-                                .userId("Alice")
-                                .auths("public", "private")
-                                .roles("user", "admin")
-                )
+                new AddUserRequest().user(alice)
         );
         final CompletableFuture<Boolean> userBobStatus = getServicesFactory().getUserService().addUser(
                 new AddUserRequest().user(
@@ -96,46 +101,48 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         // Using Custom Rule implementations - without Koryphe
         final SetPolicyRequest customPolicies =
                 new SetPolicyRequest()
-                        .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt"))
+                        .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                         .policy(new Policy<ExampleObj>()
-                                        .recordLevelRule(
-                                                "1-visibility",
-                                                new IsExampleObjVisible()
-                                        )
-                                        .recordLevelRule(
-                                                "2-ageOff",
-                                                new IsExampleObjRecent(12L)
-                                        )
-                                        .recordLevelRule(
-                                                "3-redactProperty",
-                                                new RedactExampleObjProperty()
-                                        )
+                                .owner(alice)
+                                .recordLevelRule(
+                                        "1-visibility",
+                                        new IsExampleObjVisible()
+                                )
+                                .recordLevelRule(
+                                        "2-ageOff",
+                                        new IsExampleObjRecent(12L)
+                                )
+                                .recordLevelRule(
+                                        "3-redactProperty",
+                                        new RedactExampleObjProperty()
+                                )
                         );
 
         // Using Koryphe's functions/predicates
         final SetPolicyRequest koryphePolicies = new SetPolicyRequest()
-                .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt"))
+                .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                 .policy(new Policy<ExampleObj>()
-                                .recordLevelRule(
-                                        "1-visibility",
-                                        new TupleRule<ExampleObj>()
-                                                .selection("Record.visibility", "User.auths")
-                                                .predicate(new IsXInCollectionY()))
-                                .recordLevelRule(
-                                        "2-ageOff",
-                                        new TupleRule<ExampleObj>()
-                                                .selection("Record.timestamp")
-                                                .predicate(new IsMoreThan(12L))
-                                )
-                                .recordLevelRule(
-                                        "3-redactProperty",
-                                        new TupleRule<ExampleObj>()
-                                                .selection("User.roles", "Record.property")
-                                                .function(new If<>()
-                                                        .predicate(0, new Not<>(new CollectionContains("admin")))
-                                                        .then(1, new SetValue("redacted")))
-                                                .projection("User.roles", "Record.property")
-                                )
+                        .owner(alice)
+                        .recordLevelRule(
+                                "1-visibility",
+                                new TupleRule<ExampleObj>()
+                                        .selection("Record.visibility", "User.auths")
+                                        .predicate(new IsXInCollectionY()))
+                        .recordLevelRule(
+                                "2-ageOff",
+                                new TupleRule<ExampleObj>()
+                                        .selection("Record.timestamp")
+                                        .predicate(new IsMoreThan(12L))
+                        )
+                        .recordLevelRule(
+                                "3-redactProperty",
+                                new TupleRule<ExampleObj>()
+                                        .selection("User.roles", "Record.property")
+                                        .function(new If<>()
+                                                .predicate(0, new Not<>(new CollectionContains("admin")))
+                                                .then(1, new SetValue("redacted")))
+                                        .projection("User.roles", "Record.property")
+                        )
                 );
 
         final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setPolicy(
@@ -147,7 +154,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         if (getServicesFactory().getResourceService() instanceof HDFSResourceService) {
             final HdfsDataReader reader;
             try {
-                reader = new HdfsDataReader(new Configuration());
+                reader = new HdfsDataReader().conf(new Configuration());
                 reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -165,8 +172,16 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         return super.read(filename, RESOURCE_TYPE, userId, justification);
     }
 
-    @Override
-    protected Serialiser<ExampleObj> createSerialiser() {
-        return new ExampleObjSerialiser();
+    private ParentResource getParent(final String fileURL) {
+        if (fileURL.isEmpty()) {
+            Iterator<Path> rootDirectories = FileSystems.getDefault().getRootDirectories().iterator();
+            String root = "/";
+            if (rootDirectories.hasNext()) {
+                root = rootDirectories.next().toAbsolutePath().toString();
+            }
+            return new SystemResource().id(root);
+        }
+        String parentURL = fileURL.substring(0, fileURL.lastIndexOf(FileSystems.getDefault().getSeparator()));
+        return new DirectoryResource().id(parentURL).parent(getParent(parentURL));
     }
 }

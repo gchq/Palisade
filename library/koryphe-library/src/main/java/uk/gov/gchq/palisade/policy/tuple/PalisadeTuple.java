@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A {@code PalisadeTuple} is a {@link Tuple} that wraps a record, {@link User}
  * and {@link Context} in a record and allows users to select fields
@@ -42,23 +44,29 @@ public class PalisadeTuple implements Tuple<String> {
     private static final Map<String, FieldGetter<PalisadeTuple>> FIELD_GETTERS = createFieldGetters();
     private static final Map<String, FieldSetter<PalisadeTuple>> FIELD_SETTERS = createFieldSetters();
 
-    private final Tuple<String> record;
-    private final User user;
-    private final Context context;
+    private Tuple<String> record;
+    private User user;
+    private Context context;
 
-    /**
-     * Constructs a {@link PalisadeTuple} with a record, user and context.
-     *
-     * @param record        the record tuple
-     * @param user          the user
-     * @param context the query context
-     */
-    public PalisadeTuple(final Tuple<String> record,
-                         final User user,
-                         final Context context) {
+    public PalisadeTuple() {
+    }
+
+    public PalisadeTuple record(final Tuple<String> record) {
+        requireNonNull(record, "The record cannot be set to null.");
         this.record = record;
+        return this;
+    }
+
+    public PalisadeTuple user(final User user) {
+        requireNonNull(user, "The user cannot be set to null.");
         this.user = user;
+        return this;
+    }
+
+    public PalisadeTuple context(final Context context) {
+        requireNonNull(context, "The context cannot be set to null.");
         this.context = context;
+        return this;
     }
 
     @Override
@@ -83,22 +91,37 @@ public class PalisadeTuple implements Tuple<String> {
     }
 
     public Tuple<String> getRecord() {
+        requireNonNull(record, "The record has not been set.");
         return record;
     }
 
     public User getUser() {
+        requireNonNull(user, "The user has not been set.");
         return user;
     }
 
     public Context getContext() {
+        requireNonNull(context, "The context has not been set.");
         return context;
+    }
+
+    public void setRecord(final Tuple<String> record) {
+        record(record);
+    }
+
+    public void setUser(final User user) {
+        user(user);
+    }
+
+    public void setContext(final Context context) {
+        context(context);
     }
 
     private static Map<String, FieldGetter<PalisadeTuple>> createFieldGetters() {
         Map<String, FieldGetter<PalisadeTuple>> map = new HashMap<>();
-        map.put(User.NAMESPACE, (tuple, field) -> tuple.user.getField(field));
-        map.put(Context.NAMESPACE, (tuple, field) -> tuple.context.get(field));
-        map.put(RECORD_NAMESPACE, (tuple, field) -> tuple.record.get(field));
+        map.put(User.NAMESPACE, (tuple, field) -> tuple.getUser().getField(field));
+        map.put(Context.NAMESPACE, (tuple, field) -> tuple.getContext().get(field));
+        map.put(RECORD_NAMESPACE, (tuple, field) -> tuple.getRecord().get(field));
         map.put(null, (tuple, field) -> {
             throw new IllegalArgumentException("Reference must contain a namespace: " + NAMESPACE_MSG);
         });
@@ -107,9 +130,9 @@ public class PalisadeTuple implements Tuple<String> {
 
     private static Map<String, FieldSetter<PalisadeTuple>> createFieldSetters() {
         Map<String, FieldSetter<PalisadeTuple>> map = new HashMap<>();
-        map.put(User.NAMESPACE, (tuple, field, value) -> tuple.user.setField(field, value));
-        map.put(Context.NAMESPACE, (tuple, field, value) -> tuple.context.put(field, value));
-        map.put(RECORD_NAMESPACE, (tuple, field, value) -> tuple.record.put(field, value));
+        map.put(User.NAMESPACE, (tuple, field, value) -> tuple.getUser().setField(field, value));
+        map.put(Context.NAMESPACE, (tuple, field, value) -> tuple.getContext().put(field, value));
+        map.put(RECORD_NAMESPACE, (tuple, field, value) -> tuple.getRecord().put(field, value));
         map.put(null, (tuple, field, value) -> {
             throw new IllegalArgumentException("Reference must contain a namespace: " + NAMESPACE_MSG);
         });

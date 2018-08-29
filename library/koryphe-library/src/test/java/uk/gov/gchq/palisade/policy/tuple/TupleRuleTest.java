@@ -20,12 +20,17 @@ public class TupleRuleTest {
     public static final String RECORD_VAR1 = "Record.var1";
     public static final String RECORD_VAR2 = "Record.var2";
     public static final String USER_AUTHS = "User.auths";
+    public static final String USER_ROLES = "User.roles";
     public static final String CONTEXT_JUSTIFICATION = "Context.justification";
     public static final String AUTH_1 = "auth1";
     public static final String JUST_1 = "just1";
     public static final String FROM_RULE = "fromRule";
     public static final String NOT_VAL1 = "notVal1";
     public static final String OTHER = "other";
+    public static final String ROLE_1 = "role1";
+    private static final User NULL_USER = new User().userId("user1");
+    private static final Context NULL_CONTEXT = new Context().justification("testing");
+
     private TupleRule<TestObj> testObject;
     private TestObj record;
 
@@ -42,7 +47,7 @@ public class TupleRuleTest {
                 .predicate((String o) -> o.equals(TestObj.VAL_1));
 
         //when
-        final TestObj actual = testObject.apply(record, null, null);
+        final TestObj actual = testObject.apply(record, NULL_USER, NULL_CONTEXT);
 
         //then
         assertEquals(record, actual);
@@ -57,7 +62,7 @@ public class TupleRuleTest {
         record.var1 = NOT_VAL1;
 
         //when
-        final TestObj object = testObject.apply(record, null, null);
+        final TestObj object = testObject.apply(record, NULL_USER, NULL_CONTEXT);
 
         //then
         Assert.assertNull(object);
@@ -72,7 +77,7 @@ public class TupleRuleTest {
                 .projection(RECORD_VAR2);
         final String varStart = record.var2;
         //when
-        final String actual = testObject.apply(record, null, null).getVar2();
+        final String actual = testObject.apply(record, NULL_USER, NULL_CONTEXT).getVar2();
         //then
         assertNull(varStart);
         assertEquals(FROM_RULE, actual);
@@ -88,7 +93,7 @@ public class TupleRuleTest {
                 .predicate((Set<String> o) -> o.contains(AUTH_1));
 
         //when
-        final TestObj actual = testObject.apply(record, user, null);
+        final TestObj actual = testObject.apply(record, user, NULL_CONTEXT);
 
         //then
         assertEquals(record, actual);
@@ -103,7 +108,7 @@ public class TupleRuleTest {
                 .predicate((Set<String> o) -> o.contains(AUTH_1));
 
         //when
-        final TestObj object = testObject.apply(record, user, null);
+        final TestObj object = testObject.apply(record, user, NULL_CONTEXT);
         //then
         assertNull(object);
     }
@@ -118,7 +123,7 @@ public class TupleRuleTest {
                 .projection(RECORD_VAR2);
         final String var2Start = record.var2;
         //when
-        final String actual = testObject.apply(record, user, null).getVar2();
+        final String actual = testObject.apply(record, user, NULL_CONTEXT).getVar2();
         //then
         assertNull(var2Start);
         assertEquals(FROM_RULE, actual);
@@ -134,7 +139,7 @@ public class TupleRuleTest {
                 .function((Set<String> o) -> Sets.newHashSet(FROM_RULE));
         final Set<String> authsStart = user.getAuths();
         //when
-        final TestObj apply = testObject.apply(record, user, null);
+        final TestObj apply = testObject.apply(record, user, NULL_CONTEXT);
 
         //then
         assertEquals(record, apply);
@@ -142,6 +147,25 @@ public class TupleRuleTest {
         assertFalse(user.getAuths().contains(AUTH_1));
         assertTrue(user.getAuths().contains(FROM_RULE));
         assertFalse(authsStart.contains(FROM_RULE));
+    }
+
+    @Test
+    public void shouldSelectAndProjectUserRoles() throws Exception {
+        //given
+        final User user = new User().roles(ROLE_1);
+        testObject = new TupleRule<TestObj>()
+                .selection(USER_ROLES)
+                .function((Set<String> o) -> Sets.newHashSet(FROM_RULE));
+        final Set<String> rolesStart = user.getRoles();
+        //when
+        final TestObj apply = testObject.apply(record, user, NULL_CONTEXT);
+
+        //then
+        assertEquals(record, apply);
+        assertEquals(1, user.getRoles().size());
+        assertFalse(user.getRoles().contains(ROLE_1));
+        assertTrue(user.getRoles().contains(FROM_RULE));
+        assertFalse(rolesStart.contains(FROM_RULE));
     }
 
     @Test
@@ -153,7 +177,7 @@ public class TupleRuleTest {
                 .predicate((String s) -> s.equals(JUST_1));
 
         //when
-        final TestObj actual = testObject.apply(record, null, just);
+        final TestObj actual = testObject.apply(record, NULL_USER, just);
         //then
         assertEquals(record, actual);
     }
@@ -167,7 +191,7 @@ public class TupleRuleTest {
                 .predicate((String s) -> s.equals(OTHER));
 
         //when
-        final TestObj actual2 = testObject.apply(record, null, just);
+        final TestObj actual2 = testObject.apply(record, NULL_USER, just);
         //then
         assertEquals(null, actual2);
     }
@@ -181,7 +205,7 @@ public class TupleRuleTest {
                 .function((String o) -> FROM_RULE)
                 .projection(CONTEXT_JUSTIFICATION);
         //when
-        final TestObj actual = testObject.apply(record, null, just);
+        final TestObj actual = testObject.apply(record, NULL_USER, just);
         //then
         assertEquals(record, actual);
         assertEquals(FROM_RULE, just.getJustification());

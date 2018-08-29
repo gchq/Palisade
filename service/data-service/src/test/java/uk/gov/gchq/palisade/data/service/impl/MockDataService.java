@@ -17,8 +17,10 @@
 package uk.gov.gchq.palisade.data.service.impl;
 
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.mockito.Mockito;
 
+import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
@@ -42,5 +44,30 @@ public class MockDataService implements DataService {
     @Override
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         return mock.read(request);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(7, 11)
+                .toHashCode();
     }
 }

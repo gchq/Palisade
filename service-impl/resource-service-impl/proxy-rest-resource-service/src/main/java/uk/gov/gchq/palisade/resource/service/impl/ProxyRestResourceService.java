@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.resource.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
@@ -43,22 +43,22 @@ public class ProxyRestResourceService extends ProxyRestService implements Resour
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
         return doPostAsync("getResourcesByResource", request, OUTPUT_TYPE);
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         return doPostAsync("getResourcesById", request, OUTPUT_TYPE);
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
         return doPostAsync("getResourcesByType", request, OUTPUT_TYPE);
     }
 
     @Override
-    public CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
         return doPostAsync("getResourcesBySerialisedFormat", request, OUTPUT_TYPE);
     }
 
@@ -67,6 +67,6 @@ public class ProxyRestResourceService extends ProxyRestService implements Resour
         return doPutAsync("", request, Boolean.class);
     }
 
-    private static class ResultType extends TypeReference<Map<Resource, ConnectionDetail>> {
+    private static class ResultType extends TypeReference<Map<LeafResource, ConnectionDetail>> {
     }
 }

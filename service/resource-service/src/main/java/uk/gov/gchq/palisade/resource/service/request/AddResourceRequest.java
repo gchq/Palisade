@@ -20,17 +20,17 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.resource.ParentResource;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * This class is used to request that details about a resource is added to the {@link uk.gov.gchq.palisade.resource.service.ResourceService}.
  */
 public class AddResourceRequest extends Request {
-    private ParentResource parent;
-    private Resource resource;
+    private LeafResource resource;
     private ConnectionDetail connectionDetail;
 
     // no-args constructor required
@@ -38,19 +38,11 @@ public class AddResourceRequest extends Request {
     }
 
     /**
-     * @param parent The parent resource, so a {@link uk.gov.gchq.palisade.resource.impl.SystemResource}
+     * @param resource The {@link LeafResource} to be added.
      * @return the {@link AddResourceRequest}
      */
-    public AddResourceRequest parent(final ParentResource parent) {
-        this.parent = parent;
-        return this;
-    }
-
-    /**
-     * @param resource The {@link Resource} to be added.
-     * @return the {@link AddResourceRequest}
-     */
-    public AddResourceRequest resource(final Resource resource) {
+    public AddResourceRequest resource(final LeafResource resource) {
+        requireNonNull(resource, "The resource cannot be set to null.");
         this.resource = resource;
         return this;
     }
@@ -60,32 +52,27 @@ public class AddResourceRequest extends Request {
      * @return the {@link AddResourceRequest}
      */
     public AddResourceRequest connectionDetail(final ConnectionDetail connectionDetail) {
+        requireNonNull(connectionDetail, "The connection details cannot be set to null.");
         this.connectionDetail = connectionDetail;
         return this;
     }
 
-    public ParentResource getParent() {
-        return parent;
-    }
-
-    public void setParent(final ParentResource parent) {
-        this.parent = parent;
-    }
-
-    public Resource getResource() {
+    public LeafResource getResource() {
+        requireNonNull(resource, "The resource has not been set.");
         return resource;
     }
 
-    public void setResource(final Resource resource) {
-        this.resource = resource;
+    public void setResource(final LeafResource resource) {
+        resource(resource);
     }
 
     public ConnectionDetail getConnectionDetail() {
+        requireNonNull(connectionDetail, "The connection details have not been set.");
         return connectionDetail;
     }
 
     public void setConnectionDetail(final ConnectionDetail connectionDetail) {
-        this.connectionDetail = connectionDetail;
+        connectionDetail(connectionDetail);
     }
 
     @Override
@@ -102,7 +89,6 @@ public class AddResourceRequest extends Request {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(parent, that.parent)
                 .append(resource, that.resource)
                 .append(connectionDetail, that.connectionDetail)
                 .isEquals();
@@ -112,7 +98,6 @@ public class AddResourceRequest extends Request {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .appendSuper(super.hashCode())
-                .append(parent)
                 .append(resource)
                 .append(connectionDetail)
                 .toHashCode();
@@ -122,7 +107,6 @@ public class AddResourceRequest extends Request {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("parent", parent)
                 .append("resource", resource)
                 .append("connectionDetail", connectionDetail)
                 .toString();

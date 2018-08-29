@@ -27,6 +27,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A structure to store contextual information from the client at query time that can be used when interacting with resources.
  * Interaction with a resource include both reading and writing and will often require
@@ -46,15 +48,22 @@ public class Context {
 
     @JsonCreator
     public Context(@JsonProperty("contents") final Map<String, Object> contents) {
+        requireNonNull(contents, "The contents cannot be set to null.");
         this.contents = contents;
     }
 
     public Context contents(final Map<String, Object> contents) {
+        requireNonNull(contents, "The contents cannot be set to null.");
         this.contents = contents;
         return this;
     }
 
+    public void setContents(final Map<String, Object> contents) {
+        contents(contents);
+    }
+
     public Map<String, Object> getContents() {
+        // contents will never be null
         return contents;
     }
 
@@ -65,6 +74,7 @@ public class Context {
 
     @JsonIgnore
     public Context justification(final String justification) {
+        requireNonNull(justification, "The justification cannot be set to null");
         contents.put(JUSTIFICATION, justification);
         return this;
     }
@@ -114,11 +124,15 @@ public class Context {
     }
 
     public Context put(final String key, final Object value) {
+        requireNonNull(key, "The key cannot be null.");
+        requireNonNull(value, "The value cannot be null.");
         contents.put(key, value);
         return this;
     }
 
     public Context putIfAbsent(final String key, final Object value) {
+        requireNonNull(key, "The key cannot be null.");
+        requireNonNull(value, "The value cannot be null.");
         contents.putIfAbsent(key, value);
         return this;
     }

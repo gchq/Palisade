@@ -23,8 +23,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.service.NullService;
 import uk.gov.gchq.palisade.service.Service;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A simple implementation of the {@link ConnectionDetail} that holds an instance
@@ -39,20 +40,21 @@ public class SimpleConnectionDetail implements ConnectionDetail {
     private Service service;
 
     public SimpleConnectionDetail() {
-        service(new NullService());
     }
 
     public SimpleConnectionDetail service(final Service service) {
+        requireNonNull(service, "The service can not be set to null");
         this.service = service;
         return this;
     }
 
     public Service getService() {
+        requireNonNull(service, "The service has not been set.");
         return service;
     }
 
     public void setService(final Service service) {
-        this.service = service;
+        service(service);
     }
 
     @SuppressWarnings("unchecked")

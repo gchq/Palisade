@@ -18,7 +18,6 @@ package uk.gov.gchq.palisade.mapreduce;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,7 @@ import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 
@@ -54,7 +53,7 @@ import java.util.concurrent.CompletionException;
  * @implNote In order to do this, we create a DataRequestResponse for each Resource and send it to the data service
  * created by the corresponding ConnectionDetail object.
  */
-public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
+public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PalisadeRecordReader.class);
 
     /**
@@ -70,7 +69,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
     /**
      * Iterates through the resources to be processed.
      */
-    private Iterator<Map.Entry<Resource, ConnectionDetail>> resIt;
+    private Iterator<Map.Entry<LeafResource, ConnectionDetail>> resIt;
 
     /**
      * Value supplier.
@@ -80,7 +79,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
     /**
      * The current Palisade resource being processed.
      */
-    private Resource currentKey;
+    private LeafResource currentKey;
 
     /**
      * The current value in a resource.
@@ -100,7 +99,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
     /**
      * Resource that was last attempted before an error occurred.
      */
-    private Resource errResource;
+    private LeafResource errResource;
 
     /**
      * No-arg constructor.
@@ -203,8 +202,8 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      *                                                  data stream
      */
     private void setupItemStream() {
-        Map.Entry<Resource, ConnectionDetail> entry = resIt.next();
-        final Resource resource = entry.getKey();
+        Map.Entry<LeafResource, ConnectionDetail> entry = resIt.next();
+        final LeafResource resource = entry.getKey();
         final ConnectionDetail conDetails = entry.getValue();
         final DataService service = conDetails.createService();
         //lodge request with the data service
@@ -223,7 +222,7 @@ public class PalisadeRecordReader<V> extends RecordReader<Resource, V> {
      * {@inheritDoc}
      */
     @Override
-    public Resource getCurrentKey() throws IOException {
+    public LeafResource getCurrentKey() throws IOException {
         return currentKey;
     }
 

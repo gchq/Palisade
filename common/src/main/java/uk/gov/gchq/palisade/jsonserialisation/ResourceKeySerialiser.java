@@ -21,15 +21,15 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdKeySerializer;
 
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 
 import java.io.IOException;
 
 class ResourceKeySerialiser extends StdKeySerializer {
     public static SimpleModule getModule() {
         final SimpleModule module = new SimpleModule();
-        module.addKeyDeserializer(Resource.class, new ResourceKeyDeserialiser());
-        module.addKeySerializer(Resource.class, new ResourceKeySerialiser());
+        module.addKeyDeserializer(LeafResource.class, new ResourceKeyDeserialiser());
+        module.addKeySerializer(LeafResource.class, new ResourceKeySerialiser());
         return module;
     }
 
