@@ -13,15 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.gov.gchq.palisade.cache.service.request;
 
-import uk.gov.gchq.palisade.RequestId;
-
-/**
- * This class is used for sending a request to get the {@link uk.gov.gchq.palisade.service.request.DataRequestConfig}
- * out of the cache for the given {@link RequestId}.
- */
-public class GetCacheDataRequest extends GetCacheRequest<RequestId> {
-    //TODO fix this class
+public class ListCacheRequest extends CacheRequest {
 }

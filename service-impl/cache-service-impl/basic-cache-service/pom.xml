@@ -21,22 +21,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>service-impl</artifactId>
+        <artifactId>cache-service-impl</artifactId>
         <version>0.2-SNAPSHOT</version>
     </parent>
-    <artifactId>cache-service-impl</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>basic-cache-service</artifactId>
 
-    <modules>
-        <module>hashmap-cache-service</module>
-        <module>basic-cache-service</module>
-    </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>cache-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-    </dependencies>
 </project>

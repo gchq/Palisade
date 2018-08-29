@@ -15,8 +15,59 @@
  */
 package uk.gov.gchq.palisade.cache.service.request;
 
-public abstract class GetCacheRequest extends CacheRequest {
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import uk.gov.gchq.palisade.ToStringBuilder;
+
+import java.util.Objects;
+
+public class GetCacheRequest<T> extends CacheRequest {
+    private T key;
 
     public GetCacheRequest() {
+    }
+
+    public GetCacheRequest key(final T key) {
+        Objects.requireNonNull(key, "key");
+        this.key = key;
+        return this;
+    }
+
+    public void setKey(final T key) {
+        key(key);
+    }
+
+    public T getKey() {
+        return key;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GetCacheRequest that = (GetCacheRequest) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(getKey(), that.getKey())
+                .isEquals();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("key", key)
+                .toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(3, 11)
+                .appendSuper(super.hashCode())
+                .append(getKey())
+                .toHashCode();
     }
 }

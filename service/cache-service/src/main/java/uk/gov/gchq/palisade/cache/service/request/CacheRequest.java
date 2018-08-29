@@ -38,6 +38,7 @@ public abstract class CacheRequest extends Request {
     }
 
     public Class<? extends Service> getService() {
+        Objects.requireNonNull(service, "service cannot be left null");
         return service;
     }
 

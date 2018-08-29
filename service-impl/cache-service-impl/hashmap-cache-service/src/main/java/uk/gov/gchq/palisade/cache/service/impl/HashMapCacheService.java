@@ -22,9 +22,13 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheDataRequest;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheDataRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -58,25 +62,41 @@ public class HashMapCacheService implements CacheService {
         }
     }
 
-    @Override
+
     public CompletableFuture<Boolean> add(final AddCacheDataRequest request) {
         LOGGER.debug("Adding to cache: {}", request);
-        cache.put(request.getRequestId(), request.getDataRequestConfig());
-        /*Here we set up a simple timer to deal with the removal of the item from the cache if a duration is present
-         *This uses a single timer to remove elements, this is fine for this example, but in production we would want
-         *something more performant.
-         */
-        request.getTimeToLive().ifPresent(duration -> {
-            REMOVAL_TIMER.schedule(() -> cache.remove(request.getRequestId()), duration.toMillis(), TimeUnit.MILLISECONDS);
-        });
+//        cache.put(request.getRequestId(), request.getDataRequestConfig());
+//        /*Here we set up a simple timer to deal with the removal of the item from the cache if a duration is present
+//         *This uses a single timer to remove elements, this is fine for this example, but in production we would want
+//         *something more performant.
+//         */
+//        request.getTimeToLive().ifPresent(duration -> {
+//            REMOVAL_TIMER.schedule(() -> cache.remove(request.getRequestId()), duration.toMillis(), TimeUnit.MILLISECONDS);
+//        });
         return CompletableFuture.completedFuture(true);
     }
 
-    @Override
+
     public CompletableFuture<DataRequestConfig> get(final GetCacheDataRequest request) {
         LOGGER.debug("Getting from cache: {}", request);
-        final DataRequestConfig result = cache.get(request.getRequestId());
-        LOGGER.debug("Got from cache: {}", result);
-        return CompletableFuture.completedFuture(result);
+//        final DataRequestConfig result = cache.get(request.getRequestId());
+//        LOGGER.debug("Got from cache: {}", result);
+//        return CompletableFuture.completedFuture(result);
+        return null;
+    }
+
+    @Override
+    public <K, V> CompletableFuture<Boolean> add(AddCacheRequest<K, V> request) {
+        return null;
+    }
+
+    @Override
+    public <V> CompletableFuture<V> get(GetCacheRequest<V> request) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Collection<?>> list(ListCacheRequest request) {
+        return null;
     }
 }

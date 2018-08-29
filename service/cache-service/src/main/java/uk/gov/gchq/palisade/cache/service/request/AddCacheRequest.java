@@ -22,45 +22,84 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
+import java.util.Objects;
 import java.util.Optional;
 
-public abstract class AddCacheRequest extends CacheRequest {
+public class AddCacheRequest<K, V> extends CacheRequest {
 
     /**
      * An empty optional indicates no time to live specified.
      */
     private Optional<Duration> timeToLive = Optional.empty();
 
+    private K key;
+
+    private V value;
+
     public AddCacheRequest() {
     }
 
-    public AddCacheRequest timeToLive(final Long ttlMillis) {
+    public AddCacheRequest timeToLive(final long ttlMillis) {
         this.timeToLive = toDuration(ttlMillis);
         return this;
     }
 
     public AddCacheRequest timeToLive(final Temporal expiryPoint) {
+        Objects.requireNonNull(expiryPoint, "expiryPoint");
         this.timeToLive = until(expiryPoint);
         return this;
     }
 
     public AddCacheRequest timeToLive(final Optional<Duration> timeToLive) {
+        Objects.requireNonNull(timeToLive, "timeToLive");
         this.timeToLive = timeToLive;
         return this;
     }
 
     public Optional<Duration> getTimeToLive() {
+        // can never be null
         return timeToLive;
     }
 
+    public AddCacheRequest key(final K key) {
+        Objects.requireNonNull(key, "key");
+        this.key = key;
+        return this;
+    }
+
+    public void setKey(final K key) {
+        key(key);
+    }
+
+    public K getKey() {
+        Objects.requireNonNull(key, "key cannot be null");
+        return key;
+    }
+
+    public AddCacheRequest value(final V value) {
+        Objects.requireNonNull(value, "value");
+        this.value = value;
+        return this;
+    }
+
+    public void setValue(final V value) {
+        value(value);
+    }
+
+    public V getValue() {
+        Objects.requireNonNull(value, "value cannot be null");
+        return value;
+    }
+
     /**
-     * Sets the time to live for this cache entry. If the given ${@code Optional} is empty, then no time to live is
+     * Sets the time to live for this cache entry. If the given {@code Optional} is empty, then no time to live is
      * assumed.
      *
      * @param timeToLive the TTL for this cache entry
      * @throws IllegalArgumentException if the duration is negative
      */
     public void setTimeToLive(final Optional<Duration> timeToLive) {
+        Objects.requireNonNull(timeToLive, "timeToLive");
         timeToLive.ifPresent(x -> {
             if (x.isNegative()) {
                 throw new IllegalArgumentException("negative time to live specified!");
@@ -98,6 +137,8 @@ public abstract class AddCacheRequest extends CacheRequest {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("timeToLive", timeToLive)
+                .append("key",key)
+                .append("value", value)
                 .toString();
     }
 
@@ -111,7 +152,9 @@ public abstract class AddCacheRequest extends CacheRequest {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(getTimeToLive(), that.getTimeToLive())
+                .append(timeToLive, that.timeToLive)
+                .append(key,that.key)
+                .append(value,that.value)
                 .isEquals();
     }
 
@@ -119,7 +162,9 @@ public abstract class AddCacheRequest extends CacheRequest {
     public int hashCode() {
         return new HashCodeBuilder(11, 47)
                 .appendSuper(super.hashCode())
-                .append(getTimeToLive())
+                .append(timeToLive)
+                .append(key)
+                .append(value)
                 .toHashCode();
     }
 }

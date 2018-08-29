@@ -13,29 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package uk.gov.gchq.palisade.cache.service.impl;
 
-package uk.gov.gchq.palisade.cache.service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
-import uk.gov.gchq.palisade.service.request.DataRequestConfig;
+import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * A null implementation of the {@link CacheService} that prevents hitting
- * {@link NullPointerException}s if your deployment does not require a
- * {@link CacheService}, but one is expected.
- */
-public class NullCacheService implements CacheService {
+public class BasicCacheService implements CacheService {
+    Logger LOGGER = LoggerFactory.getLogger(BasicCacheService.class);
+
+    private 
+
     @Override
-    public CompletableFuture<Boolean> add(final AddCacheRequest request) {
-        // Nothing was cached, so return false.
-        return CompletableFuture.completedFuture(false);
+    public <K, V> CompletableFuture<Boolean> add(final AddCacheRequest<K, V> request) {
+        return null;
     }
 
     @Override
-    public CompletableFuture<DataRequestConfig> get(final GetCacheRequest request) {
-        return CompletableFuture.completedFuture(new DataRequestConfig());
+    public <V> CompletableFuture<V> get(final GetCacheRequest<V> request) {
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Collection<?>> list(final ListCacheRequest request) {
+        return null;
     }
 }

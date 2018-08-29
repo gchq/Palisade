@@ -23,78 +23,13 @@ import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 
+import java.util.Objects;
+
 /**
  * This class is used to request that a {@link DataRequestConfig} relating to a
  * unique {@link RequestId}, that is set when the client registers there request
  * for data, is added to the cache in the cache service.
  */
-public class AddCacheDataRequest extends AddCacheRequest {
-    private RequestId requestId;
-    private DataRequestConfig dataRequestConfig;
-
-    public AddCacheDataRequest() {
-    }
-
-    public AddCacheDataRequest requestId(final RequestId requestId) {
-        this.requestId = requestId;
-        return this;
-    }
-
-    public AddCacheDataRequest dataRequestConfig(final DataRequestConfig dataRequestConfig) {
-        this.dataRequestConfig = dataRequestConfig;
-        return this;
-    }
-
-    public RequestId getRequestId() {
-        return requestId;
-    }
-
-    public DataRequestConfig getDataRequestConfig() {
-        return dataRequestConfig;
-    }
-
-    public void setRequestId(final RequestId requestId) {
-        this.requestId = requestId;
-    }
-
-    public void setDataRequestConfig(final DataRequestConfig dataRequestConfig) {
-        this.dataRequestConfig = dataRequestConfig;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        final AddCacheDataRequest that = (AddCacheDataRequest) o;
-
-        return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(requestId, that.requestId)
-                .append(dataRequestConfig, that.dataRequestConfig)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(23, 37)
-                .appendSuper(super.hashCode())
-                .append(requestId)
-                .append(dataRequestConfig)
-                .toHashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .appendSuper(super.toString())
-                .append("requestId", requestId)
-                .append("dataRequestConfig", dataRequestConfig)
-                .toString();
-    }
+public class AddCacheDataRequest extends AddCacheRequest<RequestId,DataRequestConfig> {
+   //Todo fix this class
 }
