@@ -17,6 +17,9 @@ package uk.gov.gchq.palisade.example;
 
 import org.junit.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +30,7 @@ import java.util.Scanner;
 import static org.junit.Assert.assertEquals;
 
 public class MapReduceExampleIT {
+    Logger LOGGER = LoggerFactory.getLogger(MapReduceExampleIT.class);
 
     @Test
     public void shouldExitWithOneWithNoArgs() throws Exception {
@@ -51,10 +55,14 @@ public class MapReduceExampleIT {
             // Then - no exceptions
         } finally {
             //remove temporary output
-            Files.walk(tempDir)
-                    .map(Path::toFile)
-                    .sorted((o1, o2) -> -o1.compareTo(o2))
-                    .forEach(File::delete);
+            if (Files.isDirectory(tempDir)) {
+                Files.walk(tempDir)
+                        .map(Path::toFile)
+                        .sorted((o1, o2) -> -o1.compareTo(o2))
+                        .forEach(File::delete);
+            } else {
+                LOGGER.warn("Couldn't find " + tempDir + "to remove!");
+            }
         }
     }
 
@@ -78,10 +86,14 @@ public class MapReduceExampleIT {
             assertEquals(expected, actual);
         } finally {
             //remove temporary output
-            Files.walk(tempDir)
-                    .map(Path::toFile)
-                    .sorted((o1, o2) -> -o1.compareTo(o2))
-                    .forEach(File::delete);
+            if (Files.isDirectory(tempDir)) {
+                Files.walk(tempDir)
+                        .map(Path::toFile)
+                        .sorted((o1, o2) -> -o1.compareTo(o2))
+                        .forEach(File::delete);
+            } else {
+                LOGGER.warn("Couldn't find " + tempDir + "to remove!");
+            }
         }
     }
 
