@@ -33,6 +33,7 @@ import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -100,12 +101,12 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @Override
-    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
+    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.LeafResource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
         return getResourcesById(new GetResourcesByIdRequest().resourceId(request.getResource().getId()));
     }
 
     @Override
-    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
+    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         final String resourceId = request.getResourceId();
         final String path = conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
         if (!resourceId.startsWith(path) && !resourceId.startsWith(new Path(path).toUri().getPath())) {
@@ -114,7 +115,7 @@ public class HDFSResourceService implements ResourceService {
         return getMapCompletableFuture(resourceId, ignore -> true);
     }
 
-    private CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getMapCompletableFuture(final String pathString, final Predicate<HDFSResourceDetails> predicate) {
+    private CompletableFuture<Map<uk.gov.gchq.palisade.resource.LeafResource, ConnectionDetail>> getMapCompletableFuture(final String pathString, final Predicate<HDFSResourceDetails> predicate) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 final RemoteIterator<LocatedFileStatus> remoteIterator = this.fileSystem.listFiles(new Path(pathString), true);
@@ -159,14 +160,14 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @Override
-    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
+    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.LeafResource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
         final String pathString = conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
         final Predicate<HDFSResourceDetails> predicate = detail -> request.getType().equals(detail.getType());
         return getMapCompletableFuture(pathString, predicate);
     }
 
     @Override
-    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
+    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
         final String pathString = conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
         final Predicate<HDFSResourceDetails> predicate = detail -> request.getSerialisedFormat().equals(detail.getFormat());
         return getMapCompletableFuture(pathString, predicate);
@@ -319,6 +320,14 @@ public class HDFSResourceService implements ResourceService {
                     .append(dataType)
                     .toHashCode();
         }
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this)
+                    .append("dataFormat", dataFormat)
+                    .append("dataType", dataType)
+                    .toString();
+        }
     }
 
     private static Configuration createConfig(final Map<String, String> conf) {
@@ -331,4 +340,3 @@ public class HDFSResourceService implements ResourceService {
         return config;
     }
 }
-

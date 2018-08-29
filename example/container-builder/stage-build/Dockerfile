@@ -10,10 +10,10 @@ WORKDIR /app
 COPY --from=clone /app/Palisade /app
 RUN mvn clean install -Pquick;
 
-ENTRYPOINT cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-data-service/target/multi-jvm-example-rest-data-service-0.0.1-SNAPSHOT/* /data-vol/bin/rest-data-service/; \
-           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-palisade-service/target/multi-jvm-example-rest-palisade-service-0.0.1-SNAPSHOT/* /palisade-vol/bin/rest-palisade-service/; \
-           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-policy-service/target/multi-jvm-example-rest-policy-service-0.0.1-SNAPSHOT/* /policy-vol/bin/rest-policy-service/; \
-           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-resource-service/target/multi-jvm-example-rest-resource-service-0.0.1-SNAPSHOT/* /resource-vol/bin/rest-resource-service/; \
-           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-user-service/target/multi-jvm-example-rest-user-service-0.0.1-SNAPSHOT/* /user-vol/bin/rest-user-service/
+ENTRYPOINT cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-data-service/target/multi-jvm-example-rest-data-service-*/* /data-vol/bin/rest-data-service/; \
+           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-palisade-service/target/multi-jvm-example-rest-palisade-service-*/* /palisade-vol/bin/rest-palisade-service/; \
+           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-policy-service/target/multi-jvm-example-rest-policy-service-*/* /policy-vol/bin/rest-policy-service/; \
+           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-resource-service/target/multi-jvm-example-rest-resource-service-*/* /resource-vol/bin/rest-resource-service/; \
+           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-user-service/target/multi-jvm-example-rest-user-service-*/* /user-vol/bin/rest-user-service/
 
 

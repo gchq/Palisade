@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
@@ -82,19 +83,17 @@ public class PalisadeInputFormatTest {
         assertEquals(json, c.get(PalisadeInputFormat.REGISTER_REQUESTS_KEY));
     }
 
-    @Test
-    public void shouldAddEmptyRequest() {
+    @Test (expected = RuntimeException.class)
+    public void shouldErrorWhenAddingEmptyRequest() {
         //Given
         Configuration c = new Configuration();
         JobContext mockJob = Mockito.mock(JobContext.class);
         when(mockJob.getConfiguration()).thenReturn(c);
         RegisterDataRequest rdr = new RegisterDataRequest();
-        RegisterDataRequest[] rdrArray = {rdr};
-        String json = new String(JSONSerialiser.serialise(rdrArray), PalisadeInputFormat.UTF8);
         //When
         PalisadeInputFormat.addDataRequest(mockJob, rdr);
         //Then
-        assertEquals(json, c.get(PalisadeInputFormat.REGISTER_REQUESTS_KEY));
+        fail();
     }
 
     @Test
@@ -118,10 +117,9 @@ public class PalisadeInputFormatTest {
         when(mockJob.getConfiguration()).thenReturn(c);
         RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).context(new Context().justification("justification"));
         RegisterDataRequest rdr2 = new RegisterDataRequest().resourceId("testResource2").userId(new UserId().id("user2")).context(new Context().justification("justification2"));
-        RegisterDataRequest rdr3 = new RegisterDataRequest();
         //When
-        PalisadeInputFormat.addDataRequests(mockJob, rdr, rdr2, rdr3);
-        List<RegisterDataRequest> expected = Stream.of(rdr, rdr2, rdr3).collect(Collectors.toList());
+        PalisadeInputFormat.addDataRequests(mockJob, rdr, rdr2);
+        List<RegisterDataRequest> expected = Stream.of(rdr, rdr2).collect(Collectors.toList());
         //Then
         assertEquals(expected, PalisadeInputFormat.getDataRequests(mockJob));
     }
@@ -149,17 +147,17 @@ public class PalisadeInputFormatTest {
     @BeforeClass
     public static void setup() {
         request1 = new RegisterDataRequest().resourceId("res1").userId(new UserId().id("user1")).context(new Context().justification("just1"));
-        req1Response = new DataRequestResponse();
-        req1Response.getResources().put(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"));
-        req1Response.getResources().put(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"));
-        req1Response.getResources().put(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"));
-        req1Response.getResources().put(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"));
-        req1Response.getResources().put(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
+        req1Response = new DataRequestResponse().requestId(new RequestId().id("request1"))
+                .resource(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"))
+                .resource(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"))
+                .resource(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"))
+                .resource(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"))
+                .resource(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
 
         request2 = new RegisterDataRequest().resourceId("res2").userId(new UserId().id("user2")).context(new Context().justification("just2"));
-        req2Response = new DataRequestResponse();
-        req2Response.getResources().put(new StubResource("type_a", "id6", "format6"), new StubConnectionDetail("con6"));
-        req2Response.getResources().put(new StubResource("type_b", "id7", "format7"), new StubConnectionDetail("con7"));
+        req2Response = new DataRequestResponse().requestId(new RequestId().id("request2"))
+                .resource(new StubResource("type_a", "id6", "format6"), new StubConnectionDetail("con6"))
+                .resource(new StubResource("type_b", "id7", "format7"), new StubConnectionDetail("con7"));
     }
 
     /**

@@ -42,7 +42,7 @@ import static java.util.Objects.requireNonNull;
  *            by the record reader before being passed to the {@link Rule#apply(Object, User, Context)}.
  */
 public class WrappedRule<T> implements Rule<T> {
-    public static final String WRAPPED_RULE_WAS_INITIALISED_WITH_NULL = "WrappedRule was initialised with null ";
+    public static final String WRAPPED_RULE_WAS_INITIALISED_WITH_NULL = "WrappedRule was initialised with null.";
     public static final String RULE = "rule";
     public static final String FUNCTION = "function";
     public static final String PREDICATE = "predicate";

@@ -21,8 +21,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.Request;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * This class is used to send a request to the
@@ -30,32 +32,36 @@ import uk.gov.gchq.palisade.service.request.Request;
  */
 public class ReadRequest extends Request {
     private RequestId requestId;
-    private Resource resource;
+    private LeafResource resource;
 
     public ReadRequest requestId(final RequestId requestId) {
+        requireNonNull(requestId, "The request id cannot be set to null.");
         this.requestId = requestId;
         return this;
     }
 
-    public ReadRequest resource(final Resource resource) {
+    public ReadRequest resource(final LeafResource resource) {
+        requireNonNull(resource, "The resource cannot be set to null.");
         this.resource = resource;
         return this;
     }
 
     public RequestId getRequestId() {
+        requireNonNull(requestId, "The request id has not been set.");
         return requestId;
     }
 
     public void setRequestId(final RequestId requestId) {
-        this.requestId = requestId;
+        requestId(requestId);
     }
 
-    public Resource getResource() {
+    public LeafResource getResource() {
+        requireNonNull(resource, "The resource has not been set.");
         return resource;
     }
 
-    public void setResource(final Resource resource) {
-        this.resource = resource;
+    public void setResource(final LeafResource resource) {
+        resource(resource);
     }
 
     @Override

@@ -19,27 +19,26 @@ package uk.gov.gchq.palisade;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class contains the information that makes a request unique.
  */
 public class RequestId {
-    public static final String UNKNOWN_REQUEST_ID = "UNKNOWN_REQUEST";
+
     private String id;
 
     public RequestId() {
-        id(UNKNOWN_REQUEST_ID);
     }
 
     public RequestId id(final String id) {
-        if (null == id) {
-            this.id = UNKNOWN_REQUEST_ID;
-        } else {
-            this.id = id;
-        }
+        requireNonNull(id, "The id cannot be set to null.");
+        this.id = id;
         return this;
     }
 
     public String getId() {
+        requireNonNull(id, "The id has not been set.");
         return id;
     }
 

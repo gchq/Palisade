@@ -21,11 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.Util;
-import uk.gov.gchq.palisade.data.serialise.NullSerialiser;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
+import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.rule.Rules;
 
 import java.io.InputStream;
@@ -51,7 +51,7 @@ public abstract class SerialisedDataReader implements DataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialisedDataReader.class);
 
     @JsonProperty("default")
-    private Serialiser<?> defaultSerialiser = new NullSerialiser<>();
+    private Serialiser<?> defaultSerialiser = new SimpleStringSerialiser();
     @JsonProperty("serialisers")
     private Map<String, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
 
@@ -60,8 +60,14 @@ public abstract class SerialisedDataReader implements DataReader {
      * @return the {@link SerialisedDataReader}
      */
     public SerialisedDataReader serialisers(final Map<String, Serialiser<?>> serialisers) {
-        requireNonNull(serialisers);
+        requireNonNull(serialisers, "The serialisers cannot be set to null.");
         this.serialisers = serialisers;
+        return this;
+    }
+
+    public SerialisedDataReader defaultSerialiser(final Serialiser<?> serialiser) {
+        requireNonNull(serialiser, "The default serialiser cannot be set to null.");
+        this.defaultSerialiser = serialiser;
         return this;
     }
 
@@ -78,8 +84,7 @@ public abstract class SerialisedDataReader implements DataReader {
      */
     @Override
     public DataReaderResponse read(final DataReaderRequest request) {
-        requireNonNull(request, "Request is required");
-        requireNonNull(request.getResource(), "Request resource is required");
+        requireNonNull(request, "The request cannot be null.");
 
         final Serialiser<Object> serialiser = getSerialiser(request.getResource());
         final InputStream rawStream = readRaw(request.getResource());
@@ -110,9 +115,10 @@ public abstract class SerialisedDataReader implements DataReader {
      * @param resource the resource to be accessed
      * @return a stream of data in the format that the client expects the data to be in.
      */
-    protected abstract InputStream readRaw(final Resource resource);
+    protected abstract InputStream readRaw(final LeafResource resource);
 
     public <RULES_DATA_TYPE> Serialiser<RULES_DATA_TYPE> getSerialiser(final String type) {
+        requireNonNull(type, "The type cannot be null.");
         Serialiser<?> serialiser = serialisers.get(type);
         if (null == serialiser) {
             serialiser = defaultSerialiser;
@@ -120,22 +126,22 @@ public abstract class SerialisedDataReader implements DataReader {
         return (Serialiser<RULES_DATA_TYPE>) serialiser;
     }
 
-    public <I> Serialiser<I> getSerialiser(final Resource resource) {
+    public <I> Serialiser<I> getSerialiser(final LeafResource resource) {
+        requireNonNull(resource, "The resource cannot be null.");
         return getSerialiser(resource.getType());
     }
 
     public void addSerialiser(final String type, final Serialiser<?> serialiser) {
-        requireNonNull(type);
-        requireNonNull(serialiser);
+        requireNonNull(type, "The type cannot be null.");
+        requireNonNull(serialiser, "The serialiser cannot be null.");
         serialisers.put(type, serialiser);
     }
 
     public void setSerialisers(final Map<String, Serialiser<?>> serialisers) {
-        requireNonNull(serialisers);
-        this.serialisers = serialisers;
+        serialisers(serialisers);
     }
 
     public void setDefaultSerialiser(final Serialiser<?> defaultSerialiser) {
-        this.defaultSerialiser = defaultSerialiser;
+        defaultSerialiser(defaultSerialiser);
     }
 }

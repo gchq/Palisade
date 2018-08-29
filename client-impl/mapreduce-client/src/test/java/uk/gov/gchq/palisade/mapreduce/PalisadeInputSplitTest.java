@@ -17,8 +17,8 @@ package uk.gov.gchq.palisade.mapreduce;
 
 import org.junit.Assert;
 import org.junit.Test;
+
 import uk.gov.gchq.palisade.RequestId;
-import uk.gov.gchq.palisade.mapreduce.PalisadeInputSplit;
 import uk.gov.gchq.palisade.resource.StubResource;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
@@ -52,9 +52,9 @@ public class PalisadeInputSplitTest {
     @Test
     public void shouldSerialiseToEqualObject() throws IOException {
         //Given
-        DataRequestResponse drr = new DataRequestResponse();
-        drr.setRequestId(new RequestId().id("test string"));
-        drr.getResources().put(stubResource, stubConnectionDetail);
+        DataRequestResponse drr = new DataRequestResponse()
+                .requestId(new RequestId().id("test string"))
+                .resource(stubResource, stubConnectionDetail);
         PalisadeInputSplit test = new PalisadeInputSplit(drr);
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();

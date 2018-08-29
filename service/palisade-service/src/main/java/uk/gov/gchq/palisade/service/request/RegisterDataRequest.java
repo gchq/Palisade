@@ -23,6 +23,8 @@ import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.UserId;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used to wrap all the information that the user needs to supply
  * to the palisade service to register the data access request.
@@ -34,11 +36,6 @@ public class RegisterDataRequest extends Request {
 
     // no-args constructor required
     public RegisterDataRequest() {
-        this(new Context());
-    }
-
-    public RegisterDataRequest(final Context context) {
-        this.context = context;
     }
 
     /**
@@ -46,6 +43,7 @@ public class RegisterDataRequest extends Request {
      * @return the {@link RegisterDataRequest}
      */
     public RegisterDataRequest userId(final UserId userId) {
+        requireNonNull(userId, "The user id cannot be set to null.");
         this.userId = userId;
         return this;
     }
@@ -55,6 +53,7 @@ public class RegisterDataRequest extends Request {
      * @return the {@link RegisterDataRequest}
      */
     public RegisterDataRequest resourceId(final String resourceId) {
+        requireNonNull(resourceId, "The resource id cannot be set to null.");
         this.resourceId = resourceId;
         return this;
     }
@@ -64,32 +63,36 @@ public class RegisterDataRequest extends Request {
      * @return the {@link RegisterDataRequest}
      */
     public RegisterDataRequest context(final Context context) {
+        requireNonNull(context, "The context cannot be set to null.");
         this.context = context;
         return this;
     }
 
     public String getResourceId() {
+        requireNonNull(resourceId, "The resource id has not been set.");
         return resourceId;
     }
 
     public void setResourceId(final String resourceId) {
-        this.resourceId = resourceId;
+        resourceId(resourceId);
     }
 
     public UserId getUserId() {
+        requireNonNull(userId, "The user id has not been set.");
         return userId;
     }
 
     public void setUserId(final UserId userId) {
-        this.userId = userId;
+        userId(userId);
     }
 
     public Context getContext() {
+        requireNonNull(context, "The context has not been set");
         return context;
     }
 
     public void setContext(final Context context) {
-        this.context = context;
+        context(context);
     }
 
     @Override

@@ -14,46 +14,73 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.resource.service.request;
+package uk.gov.gchq.palisade.resource;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.service.request.Request;
 
-import static java.util.Objects.requireNonNull;
+import java.util.Objects;
 
-/**
- * This class is used to request a list of {@link uk.gov.gchq.palisade.resource.Resource}'s
- * from the {@link uk.gov.gchq.palisade.resource.service.ResourceService} based on the serialisedFormat of those resources.
- * For example getting a list of all {@link uk.gov.gchq.palisade.resource.Resource}'s where the serialisedFormat is CSV.
- */
-public class GetResourcesBySerialisedFormatRequest extends Request {
+public abstract class AbstractLeafResource extends AbstractResource implements LeafResource {
+
+    private String type;
     private String serialisedFormat;
+    private ParentResource parent;
 
-    // no-args constructor required
-    public GetResourcesBySerialisedFormatRequest() {
+    public AbstractLeafResource() {
     }
 
-    /**
-     *
-     * @param serialisedFormat the serialisedFormat of the {@link uk.gov.gchq.palisade.resource.Resource}'s that you want to know about
-     * @return the {@link GetResourcesBySerialisedFormatRequest}
-     */
-    public GetResourcesBySerialisedFormatRequest serialisedFormat(final String serialisedFormat) {
-        requireNonNull(serialisedFormat, "The serialised format cannot be set to null.");
+    public AbstractLeafResource type(final String type) {
+        Objects.requireNonNull(type, "The type of a resource cannot be set to null.");
+        this.type = type;
+        return this;
+    }
+
+    public AbstractLeafResource serialisedFormat(final String serialisedFormat) {
+        Objects.requireNonNull(serialisedFormat, "The serialised format of a resource cannot be set to null.");
         this.serialisedFormat = serialisedFormat;
         return this;
     }
 
+    @Override
+    public String getType() {
+        Objects.requireNonNull(type, "The type has not been set for this resource.");
+        return type;
+    }
+
+    @Override
     public String getSerialisedFormat() {
-        requireNonNull(serialisedFormat, "The serialised format has not been set.");
+        Objects.requireNonNull(serialisedFormat, "The serialised format has not been set for this resource.");
         return serialisedFormat;
     }
 
+    @Override
+    public void setType(final String type) {
+        type(type);
+    }
+
+    @Override
     public void setSerialisedFormat(final String serialisedFormat) {
         serialisedFormat(serialisedFormat);
+    }
+
+    public AbstractLeafResource parent(final ParentResource parent) {
+        Objects.requireNonNull(parent, "The parent cannot be set to null.");
+        this.parent = parent;
+        return this;
+    }
+
+    @Override
+    public ParentResource getParent() {
+        Objects.requireNonNull(parent, "The parent has not been set for this resource.");
+        return parent;
+    }
+
+    @Override
+    public void setParent(final ParentResource parent) {
+        parent(parent);
     }
 
     @Override
@@ -66,19 +93,23 @@ public class GetResourcesBySerialisedFormatRequest extends Request {
             return false;
         }
 
-        final GetResourcesBySerialisedFormatRequest that = (GetResourcesBySerialisedFormatRequest) o;
+        final AbstractLeafResource that = (AbstractLeafResource) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
+                .append(type, that.type)
                 .append(serialisedFormat, that.serialisedFormat)
+                .append(parent, that.parent)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 31)
+        return new HashCodeBuilder(29, 31)
                 .appendSuper(super.hashCode())
+                .append(type)
                 .append(serialisedFormat)
+                .append(parent)
                 .toHashCode();
     }
 
@@ -86,7 +117,9 @@ public class GetResourcesBySerialisedFormatRequest extends Request {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
+                .append("type", type)
                 .append("serialisedFormat", serialisedFormat)
+                .append("parent", parent)
                 .toString();
     }
 }

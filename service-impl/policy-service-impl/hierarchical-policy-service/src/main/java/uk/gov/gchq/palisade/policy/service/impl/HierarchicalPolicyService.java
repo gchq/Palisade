@@ -30,6 +30,7 @@ import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.ChildResource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.rule.Rules;
 
@@ -73,15 +74,15 @@ public class HierarchicalPolicyService implements PolicyService {
     public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request) {
             Context context = request.getContext();
             User user = request.getUser();
-            Collection<Resource> resources = request.getResources();
-            CanAccessResponse response = new CanAccessResponse(canAccess(context, user, resources));
+            Collection<LeafResource> resources = request.getResources();
+            CanAccessResponse response = new CanAccessResponse().canAccessResources(canAccess(context, user, resources));
         return CompletableFuture.completedFuture(response);
     }
 
-    private Collection<Resource> canAccess(final Context context, final User user, final Collection<Resource> resources) {
+    private Collection<LeafResource> canAccess(final Context context, final User user, final Collection<LeafResource> resources) {
         return resources.stream()
                 .map(resource -> {
-                    Rules<Resource> rules = getApplicableRules(resource, true, resource.getType());
+                    Rules<LeafResource> rules = getApplicableRules(resource, true, resource.getType());
                     return Util.applyRulesToRecord(resource, user, context, rules);
                 })
                 .filter(Objects::nonNull)
@@ -130,24 +131,26 @@ public class HierarchicalPolicyService implements PolicyService {
     }
 
     private <T> Rules<T> mergeRules(final Rules<T> inheritedRules, final Rules<T> newRules) {
-        if (!inheritedRules.getMessage().equals("") && !newRules.getMessage().equals("")) {
-            inheritedRules.message(inheritedRules.getMessage() + ", " + newRules.getMessage());
-        } else if (!newRules.getMessage().equals("")) {
-            inheritedRules.message(newRules.getMessage());
+        String inheritedMessage = inheritedRules.getMessage();
+        String newMessage = newRules.getMessage();
+        if (!inheritedMessage.equals(Rules.NO_RULES_SET) && !newMessage.equals(Rules.NO_RULES_SET)) {
+            inheritedRules.message(inheritedMessage + ", " + newMessage);
+        } else if (!newMessage.equals(Rules.NO_RULES_SET)) {
+            inheritedRules.message(newMessage);
         }
-        return inheritedRules.rules(newRules.getRules());
+        return inheritedRules.addRules(newRules.getRules());
     }
 
     @Override
     public CompletableFuture<MultiPolicy> getPolicy(final GetPolicyRequest request) {
         Context context = request.getContext();
         User user = request.getUser();
-        Collection<Resource> resources = request.getResources();
-        Collection<Resource> canAccessResources = canAccess(context, user, resources);
-        HashMap<Resource, Policy> map = new HashMap<>();
+        Collection<LeafResource> resources = request.getResources();
+        Collection<LeafResource> canAccessResources = canAccess(context, user, resources);
+        HashMap<LeafResource, Policy> map = new HashMap<>();
         canAccessResources.forEach(resource -> {
             Rules rules = getApplicableRules(resource, false, resource.getType());
-            map.put(resource, new Policy<>(rules, new Rules<>()));
+            map.put(resource, new Policy<>().recordRules(rules));
         });
         return CompletableFuture.completedFuture(new MultiPolicy().policies(map));
     }
@@ -159,9 +162,9 @@ public class HierarchicalPolicyService implements PolicyService {
         Objects.requireNonNull(request.getResource());
         Resource resource = request.getResource();
         if (resource.getId() == null) {
-            if (resource.getType() != null) {
-                dataTypePoliciesMap.put(resource.getType(), request.getPolicy());
-                LOGGER.debug("Set %s to data type %s", request.getPolicy(), resource.getType());
+            if (resource instanceof LeafResource) {
+                dataTypePoliciesMap.put(((LeafResource) resource).getType(), request.getPolicy());
+                LOGGER.debug("Set %s to data type %s", request.getPolicy(), ((LeafResource) resource).getType());
             } else {
                 LOGGER.debug("The resource provided does not have the id or type field populated. Therefore the policy can not be added: %s", resource);
                 final CompletableFuture<Boolean> future = new CompletableFuture<>();

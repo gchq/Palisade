@@ -34,19 +34,6 @@ public class ProxyRestConnectionDetail implements ConnectionDetail {
     private String url;
 
     public ProxyRestConnectionDetail() {
-        this(NullProxyRestService.class, "");
-    }
-
-    /**
-     * Constructs a {@link ProxyRestConnectionDetail} with the Class of the {@link ProxyRestService}
-     * to use and a url String.
-     *
-     * @param serviceClass the Class of the {@link ProxyRestService} to use
-     * @param url          the url String.
-     */
-    public ProxyRestConnectionDetail(final Class<? extends ProxyRestService> serviceClass, final String url) {
-        this.serviceClass = serviceClass;
-        this.url = url;
     }
 
     @SuppressWarnings("unchecked")
@@ -63,20 +50,34 @@ public class ProxyRestConnectionDetail implements ConnectionDetail {
         return (S) service;
     }
 
+    public ProxyRestConnectionDetail serviceClass(final Class<? extends ProxyRestService> serviceClass) {
+        requireNonNull(serviceClass, "The service class cannot be set to null.");
+        this.serviceClass = serviceClass;
+        return this;
+    }
+
+    public ProxyRestConnectionDetail url(final String url) {
+        requireNonNull(url, "The url cannot be set to null.");
+        this.url = url;
+        return this;
+    }
+
     public Class<? extends ProxyRestService> getServiceClass() {
+        requireNonNull(serviceClass, "The service class has not been set.");
         return serviceClass;
     }
 
     public void setServiceClass(final Class<? extends ProxyRestService> serviceClass) {
-        this.serviceClass = serviceClass;
+        serviceClass(serviceClass);
     }
 
     public String getUrl() {
+        requireNonNull(url, "The url has not been set.");
         return url;
     }
 
     public void setUrl(final String url) {
-        this.url = url;
+        url(url);
     }
 
     @Override

@@ -22,6 +22,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used to request a list of {@link uk.gov.gchq.palisade.resource.Resource}'s
  * from the {@link uk.gov.gchq.palisade.resource.service.ResourceService} based on the identifier of a {@link uk.gov.gchq.palisade.resource.Resource}.
@@ -40,16 +42,18 @@ public class GetResourcesByIdRequest extends Request {
      * @return the {@link GetResourcesByIdRequest}
      */
     public GetResourcesByIdRequest resourceId(final String resourceId) {
+        requireNonNull(resourceId, "The resource id cannot be set to null.");
         this.resourceId = resourceId;
         return this;
     }
 
     public String getResourceId() {
+        requireNonNull(resourceId, "The resource id has not been set.");
         return resourceId;
     }
 
     public void setResourceId(final String resourceId) {
-        this.resourceId = resourceId;
+        resourceId(resourceId);
     }
 
     @Override

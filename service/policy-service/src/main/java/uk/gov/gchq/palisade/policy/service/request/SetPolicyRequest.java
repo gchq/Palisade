@@ -24,6 +24,8 @@ import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used in the request to set a {@link Policy} for a {@link Resource}.
  * That resource may be signifying a file, stream, directory or the system
@@ -42,6 +44,7 @@ public class SetPolicyRequest extends Request {
      * @return the {@link SetPolicyRequest}
      */
     public SetPolicyRequest resource(final Resource resource) {
+        requireNonNull(resource, "The resource cannot be set to null.");
         this.resource = resource;
         return this;
     }
@@ -51,24 +54,27 @@ public class SetPolicyRequest extends Request {
      * @return the {@link SetPolicyRequest}
      */
     public SetPolicyRequest policy(final Policy policy) {
+        requireNonNull(policy, "The policy cannot be set to null.");
         this.policy = policy;
         return this;
     }
 
     public Resource getResource() {
+        requireNonNull(resource, "The resource has not been set.");
         return resource;
     }
 
     public void setResource(final Resource resource) {
-        this.resource = resource;
+        resource(resource);
     }
 
     public Policy getPolicy() {
+        requireNonNull(policy, "The policy has not been set.");
         return policy;
     }
 
     public void setPolicy(final Policy policy) {
-        this.policy = policy;
+        policy(policy);
     }
 
     @Override

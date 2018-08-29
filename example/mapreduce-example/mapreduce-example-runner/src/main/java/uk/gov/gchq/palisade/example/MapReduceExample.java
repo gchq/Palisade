@@ -36,7 +36,7 @@ import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.File;
@@ -58,12 +58,12 @@ public class MapReduceExample extends Configured implements Tool {
     /**
      * This simple mapper example just extracts the property field of the example object and emits a count of one.
      */
-    private static class ExampleMap extends Mapper<Resource, ExampleObj, Text, IntWritable> {
+    private static class ExampleMap extends Mapper<LeafResource, ExampleObj, Text, IntWritable> {
         private static final IntWritable ONE = new IntWritable(1);
 
         private Text outputKey = new Text();
 
-        protected void map(final Resource key, final ExampleObj value, final Context context) throws IOException, InterruptedException {
+        protected void map(final LeafResource key, final ExampleObj value, final Context context) throws IOException, InterruptedException {
             String property = value.getProperty();
             outputKey.set(property);
             context.write(outputKey, ONE);

@@ -16,10 +16,7 @@
 
 package uk.gov.gchq.palisade.rule;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -28,6 +25,7 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -39,43 +37,46 @@ import java.util.function.Predicate;
  */
 @JsonPropertyOrder(value = {"message", "rules"}, alphabetic = true)
 public class Rules<T> {
+    private static final String ID_CANNOT_BE_NULL = "The id field can not be null.";
+    private static final String RULE_CANNOT_BE_NULL = "The rule can not be null.";
+    public static final String NO_RULES_SET = "no rules set";
+
     private String message;
     private LinkedHashMap<String, Rule<T>> rules;
 
     /**
-     * Constructs an instance of {@link Rules} with the message set to and empty string.
+     * Constructs an empty instance of {@link Rules}.
      */
     public Rules() {
-        this("");
+        rules = new LinkedHashMap<>();
+        message = NO_RULES_SET;
     }
 
     /**
-     * Constructs an instance of {@link Rules} with the provided message.
+     * Overrides the rules with these new rules
      *
-     * @param message user friendly message to explain what the set of rules are.
+     * @param rules the rules to set
+     * @return this Rules instance
      */
-    public Rules(final String message) {
-        this(new LinkedHashMap<>(), message);
-    }
-
-    /**
-     * Constructs an instance of {@link Rules} with the provided message.
-     *
-     * @param message user friendly message to explain what the set of rules are.
-     * @param rules   the map of id to rule to apply.
-     */
-    @JsonCreator
-    public Rules(@JsonProperty("rules") final LinkedHashMap<String, Rule<T>> rules, @JsonProperty("message") final String message) {
+    public Rules<T> rules(final LinkedHashMap<String, Rule<T>> rules) {
+        Objects.requireNonNull(rules, "Rules can not be set to null.");
         this.rules = rules;
-        this.message = message;
+        return this;
+    }
+
+    public void setRules(final LinkedHashMap<String, Rule<T>> rules) {
+        rules(rules);
     }
 
     public LinkedHashMap<String, Rule<T>> getRules() {
+        // no need for a null check as it can not be null
         return rules;
     }
 
-    public String getMessage() {
-        return message;
+    public Rules<T> addRules(final LinkedHashMap<String, Rule<T>> rules) {
+        Objects.requireNonNull(rules, "Cannot add null to the existing rules.");
+        this.rules.putAll(rules);
+        return this;
     }
 
     /**
@@ -85,19 +86,18 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> message(final String message) {
+        Objects.requireNonNull(message, "The message can not be set to null.");
         this.message = message;
         return this;
     }
 
-    /**
-     * Adds a map of rules
-     *
-     * @param rules the rules to add
-     * @return this Rules instance
-     */
-    public Rules<T> rules(final LinkedHashMap<String, Rule<T>> rules) {
-        this.rules.putAll(rules);
-        return this;
+    public void setMessage(final String message) {
+        message(message);
+    }
+
+    public String getMessage() {
+        // The message will never be null
+        return message;
     }
 
     /**
@@ -108,6 +108,8 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> rule(final String id, final Rule<T> rule) {
+        Objects.requireNonNull(id, ID_CANNOT_BE_NULL);
+        Objects.requireNonNull(rule, RULE_CANNOT_BE_NULL);
         rules.put(id, rule);
         return this;
     }
@@ -120,6 +122,8 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> predicateRule(final String id, final PredicateRule<T> rule) {
+        Objects.requireNonNull(id, ID_CANNOT_BE_NULL);
+        Objects.requireNonNull(rule, RULE_CANNOT_BE_NULL);
         rules.put(id, rule);
         return this;
     }
@@ -133,6 +137,8 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> simplePredicateRule(final String id, final Predicate<T> rule) {
+        Objects.requireNonNull(id, ID_CANNOT_BE_NULL);
+        Objects.requireNonNull(rule, RULE_CANNOT_BE_NULL);
         rules.put(id, new WrappedRule<>(rule));
         return this;
     }
@@ -146,6 +152,8 @@ public class Rules<T> {
      * @return this Rules instance
      */
     public Rules<T> simpleFunctionRule(final String id, final Function<T, T> rule) {
+        Objects.requireNonNull(id, ID_CANNOT_BE_NULL);
+        Objects.requireNonNull(rule, RULE_CANNOT_BE_NULL);
         rules.put(id, new WrappedRule<>(rule));
         return this;
     }
@@ -153,7 +161,7 @@ public class Rules<T> {
     /**
      * Tests if this rule set if empty.
      *
-     * @return {@code true} iff this rule set contains at least one rule
+     * @return {@code true} if this rule set contains at least one rule
      */
     public boolean containsRules() {
         return !rules.isEmpty();

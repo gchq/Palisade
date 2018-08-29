@@ -40,8 +40,9 @@ import javax.ws.rs.core.Response.Status.Family;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class ProxyRestService implements Service {
     public static final String CHARSET = "UTF8";
@@ -55,14 +56,10 @@ public abstract class ProxyRestService implements Service {
         this.client = createClient();
     }
 
-    public String getBaseUrl() {
-        return baseUrl;
-    }
-
-    public void setBaseUrl(final String baseUrl) {
-        if (null == baseUrl || baseUrl.isEmpty()) {
-            this.baseUrl = null;
-            this.baseUrlWithVersion = null;
+    public ProxyRestService baseUrl(final String baseUrl) {
+        requireNonNull(baseUrl, "The base url cannot be set to null.");
+        if (baseUrl.isEmpty()) {
+            throw new NullPointerException("The base url cannot be empty.");
         } else {
             this.baseUrl = baseUrl;
             if (baseUrl.endsWith(VERSION + "/")) {
@@ -75,9 +72,20 @@ public abstract class ProxyRestService implements Service {
                 this.baseUrlWithVersion = baseUrl + "/" + VERSION + "/";
             }
         }
+        return this;
+    }
+
+    public String getBaseUrl() {
+        requireNonNull(baseUrl, "The base url has not been set.");
+        return baseUrl;
+    }
+
+    public void setBaseUrl(final String baseUrl) {
+        baseUrl(baseUrl);
     }
 
     public String getBaseUrlWithVersion() {
+        requireNonNull(baseUrlWithVersion, "The base url with version has not been set.");
         return baseUrlWithVersion;
     }
 
@@ -94,8 +102,7 @@ public abstract class ProxyRestService implements Service {
     }
 
     protected String getStringUrl() {
-        Objects.requireNonNull(baseUrlWithVersion);
-        return baseUrlWithVersion;
+        return getBaseUrlWithVersion();
     }
 
     protected <O> CompletableFuture<O> doPostAsync(final String endpoint, final Object body, final TypeReference<O> outputType) {
