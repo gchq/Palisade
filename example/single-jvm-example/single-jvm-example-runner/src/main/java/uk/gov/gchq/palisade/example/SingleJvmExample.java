@@ -30,38 +30,40 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class SingleJvmExample {
-    private static final String FILE = createDataPath();
+    protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleJvmExample.class);
 
     public static void main(final String[] args) throws Exception {
         new SingleJvmExample().run();
-        FileUtils.deleteQuietly(new File(FILE));
     }
 
     public void run() throws Exception {
-        final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
+        createDataPath();
+        try {
+            final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
 
-        LOGGER.info("");
-        LOGGER.info("Alice is reading file1...");
-        final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
-        LOGGER.info("Alice got back: ");
-        aliceResults.map(Object::toString).forEach(LOGGER::info);
+            LOGGER.info("");
+            LOGGER.info("Alice is reading file1...");
+            final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
+            LOGGER.info("Alice got back: ");
+            aliceResults.map(Object::toString).forEach(LOGGER::info);
 
-        LOGGER.info("");
-        LOGGER.info("Bob is reading file1...");
-        final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
-        LOGGER.info("Bob got back: ");
-        bobResults.map(Object::toString).forEach(LOGGER::info);
+            LOGGER.info("");
+            LOGGER.info("Bob is reading file1...");
+            final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
+            LOGGER.info("Bob got back: ");
+            bobResults.map(Object::toString).forEach(LOGGER::info);
+        } finally {
+            FileUtils.deleteQuietly(new File(FILE));
+        }
     }
 
-    private static String createDataPath() {
-        final File targetFile = new File("data/example/exampleObj_file1.txt");
+    static void createDataPath() {
         try (final InputStream data = SingleJvmExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
             Objects.requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
-            FileUtils.copyInputStreamToFile(data, targetFile);
+            FileUtils.copyInputStreamToFile(data, new File(FILE));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return targetFile.getAbsolutePath();
     }
 }

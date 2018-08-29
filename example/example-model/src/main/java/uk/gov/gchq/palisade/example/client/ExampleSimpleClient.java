@@ -58,7 +58,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
-    public static final String RESOURCE_TYPE = "exampleObj";
+    private static final String RESOURCE_TYPE = "exampleObj";
     private final String file;
 
     public ExampleSimpleClient(final String file) {

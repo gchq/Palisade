@@ -15,8 +15,8 @@
  */
 package uk.gov.gchq.palisade.example;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +24,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Scanner;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.gchq.palisade.example.MapReduceExample.OUTPUT_DIR;
 
 public class MapReduceExampleIT {
     Logger LOGGER = LoggerFactory.getLogger(MapReduceExampleIT.class);
@@ -45,53 +46,29 @@ public class MapReduceExampleIT {
     @Test
     public void shouldRunWithoutErrors() throws Exception {
         // Given
-        final Path tempDir = Files.createTempDirectory("mapreduce-example");
-        //remove this as it needs to be not present when the job runs
-        Files.deleteIfExists(tempDir);
+        // When
         try {
-            // When
-            MapReduceExample.main(tempDir.toAbsolutePath().toString());
-            // Then - no exceptions
+            MapReduceExample.main();
         } finally {
-            //remove temporary output
-            if (Files.isDirectory(tempDir)) {
-                Files.walk(tempDir)
-                        .map(Path::toFile)
-                        .sorted((o1, o2) -> -o1.compareTo(o2))
-                        .forEach(File::delete);
-            } else {
-                LOGGER.warn("Couldn't find " + tempDir + "to remove!");
-            }
+            // Then - no exceptions
+            FileUtils.deleteDirectory(new File(OUTPUT_DIR));
         }
     }
 
     @Test
     public void shouldProduceKnownResults() throws Exception {
-        //Given
-        final Path tempDir = Files.createTempDirectory("mapreduce-example");
-        //remove this as it needs to be not present when the job runs
-        Files.deleteIfExists(tempDir);
-        //read the expected results
-        String expected = slurpStream(MapReduceExampleIT.class.getResourceAsStream("/expected_results.txt"));
-
         try {
-            // When
-            MapReduceExample.main(tempDir.toAbsolutePath().toString());
-            //read actual results
-            String actual = slurpStream(Files.newInputStream(tempDir.resolve("part-r-00000")));
-
-            //Then
-            assertEquals(expected, actual);
+        //Given
+        String expected = slurpStream(MapReduceExampleIT.class.getResourceAsStream("/expected_results.txt"));
+        // When
+        MapReduceExample.main();
+        //read actual results
+        requireNonNull(OUTPUT_DIR, "The temp directory cannot be null.");
+        String actual = slurpStream(Files.newInputStream(new File(OUTPUT_DIR).toPath().resolve("part-r-00000")));
+        //Then
+        assertEquals(expected, actual);
         } finally {
-            //remove temporary output
-            if (Files.isDirectory(tempDir)) {
-                Files.walk(tempDir)
-                        .map(Path::toFile)
-                        .sorted((o1, o2) -> -o1.compareTo(o2))
-                        .forEach(File::delete);
-            } else {
-                LOGGER.warn("Couldn't find " + tempDir + "to remove!");
-            }
+            FileUtils.deleteDirectory(new File(OUTPUT_DIR));
         }
     }
 
