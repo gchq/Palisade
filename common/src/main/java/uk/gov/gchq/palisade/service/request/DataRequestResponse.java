@@ -36,8 +36,8 @@ import static java.util.Objects.requireNonNull;
  * data service the resources field might have been changed to be a subset of the resources.
  */
 public class DataRequestResponse {
-    public RequestId requestId;
-    public Map<LeafResource, ConnectionDetail> resources;
+    private RequestId requestId;
+    private Map<LeafResource, ConnectionDetail> resources;
 
     public DataRequestResponse() {
     }

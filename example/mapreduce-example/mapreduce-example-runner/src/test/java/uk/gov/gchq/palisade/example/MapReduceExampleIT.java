@@ -41,13 +41,12 @@ public class MapReduceExampleIT {
     @Test
     public void shouldRunWithoutErrors() throws Exception {
         // Given
-        final MapReduceExample example = new MapReduceExample();
         final Path tempDir = Files.createTempDirectory("mapreduce-example");
         //remove this as it needs to be not present when the job runs
         Files.deleteIfExists(tempDir);
         try {
             // When
-            example.main(tempDir.toAbsolutePath().toString());
+            MapReduceExample.main(tempDir.toAbsolutePath().toString());
             // Then - no exceptions
         } finally {
             //remove temporary output
@@ -61,7 +60,6 @@ public class MapReduceExampleIT {
     @Test
     public void shouldProduceKnownResults() throws Exception {
         //Given
-        final MapReduceExample example = new MapReduceExample();
         final Path tempDir = Files.createTempDirectory("mapreduce-example");
         //remove this as it needs to be not present when the job runs
         Files.deleteIfExists(tempDir);
@@ -70,7 +68,7 @@ public class MapReduceExampleIT {
 
         try {
             // When
-            example.main(tempDir.toAbsolutePath().toString());
+            MapReduceExample.main(tempDir.toAbsolutePath().toString());
             //read actual results
             String actual = slurpStream(Files.newInputStream(tempDir.resolve("part-r-00000")));
 

@@ -24,12 +24,12 @@ package uk.gov.gchq.palisade.mapreduce;
  */
 public enum ReaderFailureMode {
     /**
-     * Cause the entire task to fail when a {@link uk.gov.gchq.palisade.resource.Resource} cannot be retrieved from a
+     * Cause the entire task to fail when a {@link uk.gov.gchq.palisade.resource.LeafResource} cannot be retrieved from a
      * {@link uk.gov.gchq.palisade.data.service.DataService}.
      */
     FAIL_ON_READ_FAILURE,
     /**
-     * Allow the task to continue when a {@link uk.gov.gchq.palisade.resource.Resource} cannot be retrieved.
+     * Allow the task to continue when a {@link uk.gov.gchq.palisade.resource.LeafResource} cannot be retrieved.
      */
     CONTINUE_ON_READ_FAILURE,
 }

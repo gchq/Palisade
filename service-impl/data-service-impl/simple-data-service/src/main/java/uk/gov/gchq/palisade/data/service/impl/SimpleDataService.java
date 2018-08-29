@@ -105,6 +105,7 @@ public class SimpleDataService implements DataService {
     }
 
     public void setPalisadeService(final PalisadeService palisadeService) {
+        requireNonNull(palisadeService, "The palisade service cannot be set to null.");
         palisadeService(palisadeService);
     }
 
@@ -114,6 +115,7 @@ public class SimpleDataService implements DataService {
     }
 
     public void setReader(final DataReader reader) {
+        requireNonNull(reader, "The reader cannot be set to null.");
         reader(reader);
     }
 }
