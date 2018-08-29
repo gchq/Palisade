@@ -33,6 +33,7 @@ import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -319,14 +320,14 @@ public class HDFSResourceService implements ResourceService {
                     .append(dataType)
                     .toHashCode();
         }
-//
-//        @Override
-//        public String toString() {
-//            return new ToStringBuilder(this)
-//                    .append("dataFormat", dataFormat)
-//                    .append("dataType", dataType)
-//                    .toString();
-//        }
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this)
+                    .append("dataFormat", dataFormat)
+                    .append("dataType", dataType)
+                    .toString();
+        }
     }
 
     private static Configuration createConfig(final Map<String, String> conf) {
