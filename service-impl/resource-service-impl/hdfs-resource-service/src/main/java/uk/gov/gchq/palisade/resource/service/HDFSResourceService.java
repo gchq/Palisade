@@ -339,4 +339,3 @@ public class HDFSResourceService implements ResourceService {
         return config;
     }
 }
-

@@ -49,7 +49,10 @@ import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -171,9 +174,14 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
 
     private ParentResource getParent(final String fileURL) {
         if (fileURL.isEmpty()) {
-            return new SystemResource().id("/");
+            Iterator<Path> rootDirectories = FileSystems.getDefault().getRootDirectories().iterator();
+            String root = "/";
+            if (rootDirectories.hasNext()) {
+                root = rootDirectories.next().toAbsolutePath().toString();
+            }
+            return new SystemResource().id(root);
         }
-        String parentURL = fileURL.substring(0, fileURL.lastIndexOf("/"));
+        String parentURL = fileURL.substring(0, fileURL.lastIndexOf(FileSystems.getDefault().getSeparator()));
         return new DirectoryResource().id(parentURL).parent(getParent(parentURL));
     }
 }

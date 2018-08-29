@@ -44,6 +44,7 @@ import static java.util.Objects.requireNonNull;
  * that opens a file and returns a single {@link InputStream} containing all the records.
  */
 public class HdfsDataReader extends SerialisedDataReader {
+    @JsonIgnore
     private FileSystem fs;
 
     public HdfsDataReader() {
@@ -72,7 +73,6 @@ public class HdfsDataReader extends SerialisedDataReader {
         return this;
     }
 
-    @JsonIgnore
     public void setFs(final FileSystem fs) {
         fs(fs);
     }
