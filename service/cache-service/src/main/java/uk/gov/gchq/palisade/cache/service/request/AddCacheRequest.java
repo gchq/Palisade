@@ -19,20 +19,21 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
-public class AddCacheRequest<K, V> extends CacheRequest {
+public class AddCacheRequest<K, V> extends CacheRequest<K> {
 
     /**
      * An empty optional indicates no time to live specified.
      */
     private Optional<Duration> timeToLive = Optional.empty();
-
-    private K key;
 
     private V value;
 
@@ -59,21 +60,6 @@ public class AddCacheRequest<K, V> extends CacheRequest {
     public Optional<Duration> getTimeToLive() {
         // can never be null
         return timeToLive;
-    }
-
-    public AddCacheRequest key(final K key) {
-        Objects.requireNonNull(key, "key");
-        this.key = key;
-        return this;
-    }
-
-    public void setKey(final K key) {
-        key(key);
-    }
-
-    public K getKey() {
-        Objects.requireNonNull(key, "key cannot be null");
-        return key;
     }
 
     public AddCacheRequest value(final V value) {
@@ -120,6 +106,10 @@ public class AddCacheRequest<K, V> extends CacheRequest {
         this.timeToLive = Optional.empty();
     }
 
+    public Function<V, byte[]> getValueEncoder() {
+        return x -> JSONSerialiser.serialise(x);
+    }
+
     private static Optional<Duration> until(final Temporal pointInTime) {
         Duration ttl = Duration.between(LocalDateTime.now(), pointInTime);
         return Optional.of(ttl);
@@ -137,7 +127,6 @@ public class AddCacheRequest<K, V> extends CacheRequest {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("timeToLive", timeToLive)
-                .append("key",key)
                 .append("value", value)
                 .toString();
     }
@@ -153,8 +142,7 @@ public class AddCacheRequest<K, V> extends CacheRequest {
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(timeToLive, that.timeToLive)
-                .append(key,that.key)
-                .append(value,that.value)
+                .append(value, that.value)
                 .isEquals();
     }
 
@@ -163,7 +151,6 @@ public class AddCacheRequest<K, V> extends CacheRequest {
         return new HashCodeBuilder(11, 47)
                 .appendSuper(super.hashCode())
                 .append(timeToLive)
-                .append(key)
                 .append(value)
                 .toHashCode();
     }

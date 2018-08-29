@@ -19,14 +19,20 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import sun.misc.Cache;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.Objects;
+import java.util.function.Function;
 
-public abstract class CacheRequest extends Request {
+public abstract class CacheRequest<K> extends Request {
+
+    private K key;
 
     private Class<? extends Service> service;
+
+    public static final String SEPARATOR = ":";
 
     public CacheRequest() {
     }
@@ -46,11 +52,35 @@ public abstract class CacheRequest extends Request {
         service(service);
     }
 
+    public CacheRequest key(final K key) {
+        Objects.requireNonNull(key, "key");
+        this.key = key;
+        return this;
+    }
+
+    public void setKey(final K key) {
+        key(key);
+    }
+
+    public K getKey() {
+        Objects.requireNonNull(key, "key cannot be null");
+        return key;
+    }
+
+    public Function<K, String> getKeyEncoder() {
+        return x -> x.toString();
+    }
+
+    public String makeBaseName() {
+        return getService().getCanonicalName() + SEPARATOR + getKeyEncoder().apply(getKey());
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("service", service)
+                .append("key", key)
                 .toString();
     }
 
@@ -64,7 +94,8 @@ public abstract class CacheRequest extends Request {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(getService(), that.getService())
+                .append(service, that.service)
+                .append(key, that.key)
                 .isEquals();
     }
 
@@ -72,7 +103,8 @@ public abstract class CacheRequest extends Request {
     public int hashCode() {
         return new HashCodeBuilder(23, 41)
                 .appendSuper(super.hashCode())
-                .append(getService())
+                .append(service)
+                .append(key)
                 .toHashCode();
     }
 }

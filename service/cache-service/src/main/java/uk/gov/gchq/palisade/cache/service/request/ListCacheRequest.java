@@ -15,5 +15,15 @@
  */
 package uk.gov.gchq.palisade.cache.service.request;
 
-public class ListCacheRequest extends CacheRequest {
+public class ListCacheRequest<K> extends CacheRequest<K> {
+
+    @Override
+    public CacheRequest key(K key) {
+        throw new UnsupportedOperationException("cannot set key on list request");
+    }
+
+    @Override
+    public void setKey(K key) {
+        throw new UnsupportedOperationException("cannot set key on list request");
+    }
 }

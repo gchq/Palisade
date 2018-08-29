@@ -24,4 +24,6 @@ public interface BackingStore {
     byte[] retrieve(final String key);
 
     Collection<String> list(final String prefix);
+
+    boolean supportsTimeToLive();
 }

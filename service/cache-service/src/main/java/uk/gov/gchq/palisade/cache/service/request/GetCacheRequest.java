@@ -18,27 +18,35 @@ package uk.gov.gchq.palisade.cache.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
 import java.util.Objects;
+import java.util.function.Function;
 
-public class GetCacheRequest<T> extends CacheRequest {
-    private T key;
+public class GetCacheRequest<K> extends CacheRequest<K> {
+
+    private Class<?> expectedClass;
 
     public GetCacheRequest() {
     }
 
-    public GetCacheRequest key(final T key) {
-        Objects.requireNonNull(key, "key");
-        this.key = key;
+    public GetCacheRequest expectedClass(final Class<?> expectedClass) {
+        Objects.requireNonNull(expectedClass, "expectedClass");
+        this.expectedClass = expectedClass;
         return this;
     }
 
-    public void setKey(final T key) {
-        key(key);
+    public void setExpectedClass(final Class<?> key) {
+        expectedClass(expectedClass);
     }
 
-    public T getKey() {
-        return key;
+    public Class<?> getExpectedClass() {
+        Objects.requireNonNull(expectedClass, "expected class must be specified");
+        return expectedClass;
+    }
+
+    public Function<byte[], Object> getValueDecoder() {
+        return x -> JSONSerialiser.deserialise(x, getExpectedClass());
     }
 
     @Override
@@ -51,7 +59,7 @@ public class GetCacheRequest<T> extends CacheRequest {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(getKey(), that.getKey())
+                .append(expectedClass, that.expectedClass)
                 .isEquals();
     }
 
@@ -59,7 +67,7 @@ public class GetCacheRequest<T> extends CacheRequest {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("key", key)
+                .append("expectedClass", expectedClass)
                 .toString();
     }
 
@@ -67,7 +75,7 @@ public class GetCacheRequest<T> extends CacheRequest {
     public int hashCode() {
         return new HashCodeBuilder(3, 11)
                 .appendSuper(super.hashCode())
-                .append(getKey())
+                .append(expectedClass)
                 .toHashCode();
     }
 }
