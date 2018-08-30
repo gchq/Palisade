@@ -23,5 +23,4 @@ import uk.gov.gchq.palisade.service.request.DataRequestConfig;
  * out of the cache for the given request ID.
  */
 public class GetCacheDataRequest extends GetCacheRequest<DataRequestConfig> {
-    //TODO fix this class
 }

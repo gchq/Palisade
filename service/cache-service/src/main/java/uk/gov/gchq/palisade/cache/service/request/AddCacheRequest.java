@@ -29,6 +29,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * This class represents requests for things to be added to the cache.
+ * <p>
+ * All methods in this class throw {@link NullPointerException} if parameters are unset.
+ *
+ * @param <V> the type of object being cached
+ */
 public class AddCacheRequest<V> extends CacheRequest {
 
     /**
@@ -36,66 +43,50 @@ public class AddCacheRequest<V> extends CacheRequest {
      */
     private Optional<Duration> timeToLive = Optional.empty();
 
+    /**
+     * The object to cache.
+     */
     private V value;
 
     public AddCacheRequest() {
     }
 
+    /**
+     * Set the time to live for this cache entry in milliseconds. If the cache supports time to live, it will be
+     * automatically expired after this amount of time.
+     *
+     * @param ttlMillis milliseconds for this entry to stay in the cache
+     * @return this object
+     * @throws IllegalArgumentException if <code>ttlMillis</code> is negative
+     */
     public AddCacheRequest timeToLive(final long ttlMillis) {
         this.timeToLive = toDuration(ttlMillis);
         return this;
     }
 
+    /**
+     * Set the time to live for this cache entry. If the cache supports time to live, it will be automatically expired
+     * after this point in time.
+     *
+     * @param expiryPoint the time point after which this entry should expire
+     * @return this object
+     * @throws IllegalArgumentException if the expiry point is before now
+     */
     public AddCacheRequest timeToLive(final Temporal expiryPoint) {
         Objects.requireNonNull(expiryPoint, "expiryPoint");
         this.timeToLive = until(expiryPoint);
         return this;
     }
 
-    public AddCacheRequest timeToLive(final Optional<Duration> timeToLive) {
-        Objects.requireNonNull(timeToLive, "timeToLive");
-        this.timeToLive = timeToLive;
-        return this;
-    }
-
-    public Optional<Duration> getTimeToLive() {
-        // can never be null
-        return timeToLive;
-    }
-
-    public AddCacheRequest value(final V value) {
-        Objects.requireNonNull(value, "value");
-        this.value = value;
-        return this;
-    }
-
-    public void setValue(final V value) {
-        value(value);
-    }
-
-    public V getValue() {
-        Objects.requireNonNull(value, "value cannot be null");
-        return value;
-    }
-
-    public AddCacheRequest key(final String key) {
-        super.key(key);
-        return this;
-    }
-
-    public AddCacheRequest service(final Service service) {
-        super.service(service);
-        return this;
-    }
-
     /**
-     * Sets the time to live for this cache entry. If the given {@code Optional} is empty, then no time to live is
-     * assumed.
+     * Set the time to live for this cache entry. If the cache supports time to live, it will be automatically expired
+     * after this amount of time. An empty {@link Optional} means the time to live is infinite.
      *
-     * @param timeToLive the TTL for this cache entry
-     * @throws IllegalArgumentException if the duration is negative
+     * @param timeToLive the duration this should be alive in the cache
+     * @return this object
+     * @throws IllegalArgumentException if a negative duration is specified
      */
-    public void setTimeToLive(final Optional<Duration> timeToLive) {
+    public AddCacheRequest timeToLive(final Optional<Duration> timeToLive) {
         Objects.requireNonNull(timeToLive, "timeToLive");
         timeToLive.ifPresent(x -> {
             if (x.isNegative()) {
@@ -103,34 +94,151 @@ public class AddCacheRequest<V> extends CacheRequest {
             }
         });
         this.timeToLive = timeToLive;
+        return this;
     }
 
+    /**
+     * Get the length of time this entry should be alive in the cache.
+     *
+     * @return the time to live
+     */
+    public Optional<Duration> getTimeToLive() {
+        // can never be null
+        return timeToLive;
+    }
+
+    /**
+     * Set the value to be cached.
+     *
+     * @param value object to be cached
+     * @return this object
+     */
+    public AddCacheRequest value(final V value) {
+        Objects.requireNonNull(value, "value");
+        this.value = value;
+        return this;
+    }
+
+    /**
+     * Set value to be cached.
+     *
+     * @param value object to be cached
+     */
+    public void setValue(final V value) {
+        value(value);
+    }
+
+    /**
+     * Get the cached object.
+     *
+     * @return the object
+     */
+    public V getValue() {
+        Objects.requireNonNull(value, "value cannot be null");
+        return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AddCacheRequest key(final String key) {
+        super.key(key);
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AddCacheRequest service(final Class<? extends Service> service) {
+        super.service(service);
+        return this;
+    }
+
+    /**
+     * Set the time to live for this cache entry. If the cache supports time to live, it will be automatically expired
+     * after this amount of time. An empty {@link Optional} means the time to live is infinite.
+     *
+     * @param timeToLive the duration this should be alive in the cache
+     * @throws IllegalArgumentException if a negative duration is specified
+     */
+    public void setTimeToLive(final Optional<Duration> timeToLive) {
+        timeToLive(timeToLive);
+    }
+
+    /**
+     * Set the time to live for this cache entry in milliseconds. If the cache supports time to live, it will be
+     * automatically expired after this amount of time.
+     *
+     * @param ttlMillis milliseconds for this entry to stay in the cache
+     * @throws IllegalArgumentException if <code>ttlMillis</code> is negative
+     */
     public void setTimeToLive(final long ttlMillis) {
-        setTimeToLive(toDuration(ttlMillis));
+        timeToLive(ttlMillis);
     }
 
+    /**
+     * Set the time to live for this cache entry. If the cache supports time to live, it will be automatically expired
+     * after this point in time.
+     *
+     * @param expiryPoint the time point after which this entry should expire
+     * @return this object
+     * @throws IllegalArgumentException if the expiry point is before now
+     */
     public void setTimeToLive(final Temporal expiryPoint) {
-        setTimeToLive(until(expiryPoint));
+        timeToLive(expiryPoint);
     }
 
-    public void cancelTimeToLive() {
-        this.timeToLive = Optional.empty();
-    }
-
-    public Function<V, byte[]> getValueEncoder() {
-        return x -> JSONSerialiser.serialise(x);
-    }
-
+    /**
+     * Converts a {@link Temporal} point to a {@link Duration}.
+     *
+     * @param pointInTime the point in time
+     * @return the duration from now
+     * @throws IllegalArgumentException if the resulting duration is negative
+     */
     private static Optional<Duration> until(final Temporal pointInTime) {
         Duration ttl = Duration.between(LocalDateTime.now(), pointInTime);
+        if (ttl.isNegative()) {
+            throw new IllegalArgumentException("negative time to live specified!");
+        }
         return Optional.of(ttl);
     }
 
+    /**
+     * Converts the given milliseconds into a {@link Duration}.
+     *
+     * @param ttlMillis the milliseconds to convert
+     * @return a {@link Duration}
+     * @throws IllegalArgumentException if <code>ttlMillis</code> is negative
+     */
     private static Optional<Duration> toDuration(final long ttlMillis) {
         if (ttlMillis < 0) {
             throw new IllegalArgumentException("negative time to live specified!");
         }
         return Optional.of(Duration.ofMillis(ttlMillis));
+    }
+
+    /**
+     * Cancels any time to live set on this cache request.
+     */
+    public void cancelTimeToLive() {
+        this.timeToLive = Optional.empty();
+    }
+
+    /**
+     * Get a function that can encode the contained value into a byte array. This can be used by the caching service to
+     * convert a given object into a byte array that can be stored.
+     * <p>
+     * The default version of this method uses JSON serialisation.
+     * <p>
+     * Subclasses are encouraged to override this method where necessary to provide a more efficient implementation.
+     *
+     * @return a function that encodes an object of type <code>V</code> to a byte array.
+     * @see GetCacheRequest#getValueDecoder()
+     */
+    public Function<V, byte[]> getValueEncoder() {
+        return x -> JSONSerialiser.serialise(x);
     }
 
     @Override

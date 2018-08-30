@@ -15,23 +15,53 @@
  */
 package uk.gov.gchq.palisade.cache.service.request;
 
+/**
+ * This class is used to request the cache service return a list of known cache entries. The <code>key</code> methods
+ * are overridden to throw UnsupportedOperationException. Clients must use the <code>prefix</code> methods instead.
+ */
 public class ListCacheRequest extends CacheRequest {
 
+    /**
+     * Overriden to throw UnsupportedOperationException.
+     *
+     * @param key the cache key
+     * @return this object
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public ListCacheRequest key(final String key) {
         throw new UnsupportedOperationException("cannot set key on list request, do you mean prefix()?");
     }
 
+    /**
+     * Overriden to throw UnsupportedOperationException.
+     *
+     * @param key the cache key
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public void setKey(final String key) {
         throw new UnsupportedOperationException("cannot set key on list request, do you mean setPrefix()");
     }
 
+    /**
+     * Set the prefix for the cache list request. This will be used to filter the entries that are returned from the
+     * cache.
+     *
+     * @param prefix the prefix to use for filtering
+     * @return this object
+     */
     public ListCacheRequest prefix(final String prefix) {
         super.key(prefix);
         return this;
     }
 
+    /**
+     * Set the prefix for the cache list request. This will be used to filter the entries that are returned from the
+     * cache.
+     *
+     * @param prefix the prefix to use for filtering
+     */
     public void setPrefix(final String prefix) {
         super.setKey(prefix);
     }

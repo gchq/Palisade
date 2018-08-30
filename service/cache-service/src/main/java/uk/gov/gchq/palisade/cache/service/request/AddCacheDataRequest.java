@@ -19,8 +19,8 @@ package uk.gov.gchq.palisade.cache.service.request;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 
 /**
- * This class is used to request that a {@link DataRequestConfig} relating to a unique request ID, that is set
- * when the client registers there request for data, is added to the cache in the cache service.
+ * This class is used to request that a {@link DataRequestConfig} relating to a unique request ID that is set when the
+ * client registers there request for data is added to the cache in the cache service.
  */
 public class AddCacheDataRequest extends AddCacheRequest<DataRequestConfig> {
 }

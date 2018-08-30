@@ -24,21 +24,42 @@ import uk.gov.gchq.palisade.service.Service;
 
 import java.util.function.BiFunction;
 
+/**
+ * This class is the type of request for retrieving an object from the cache service. The parameter type on this class
+ * is used to specify the type of the cache retrieval.
+ *
+ * @param <V> the type of object that is expected to be in the cache
+ */
 public class GetCacheRequest<V> extends CacheRequest {
 
     public GetCacheRequest() {
     }
 
+    /**
+     * Gets a function that can convert a byte array into an instance of the given  type. This must be the mirror
+     * function to {@link AddCacheRequest#getValueEncoder()}. The default version uses JSON deserialisation.
+     * <p>
+     * Subclasses are encouraged to override this function with a more efficient implementation.
+     *
+     * @return the conversion function
+     * @see AddCacheRequest#getValueEncoder()
+     */
     public BiFunction<byte[], Class<V>, V> getValueDecoder() {
         return (ob, expectedClass) -> JSONSerialiser.deserialise(ob, expectedClass);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public GetCacheRequest key(final String key) {
         super.key(key);
         return this;
     }
 
-    public GetCacheRequest service(final Service service) {
+    /**
+     * {@inheritDoc}
+     */
+    public GetCacheRequest service(final Class<? extends Service> service) {
         super.service(service);
         return this;
     }
