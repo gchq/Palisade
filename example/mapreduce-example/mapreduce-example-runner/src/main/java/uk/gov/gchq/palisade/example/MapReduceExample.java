@@ -29,6 +29,8 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
@@ -42,18 +44,22 @@ import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Objects;
 
 /**
  * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
- * exmaple data. The job is then configured to make a request as part of the MapReduce job. The actual MapReduce job is
+ * example data. The job is then configured to make a request as part of the MapReduce job. The actual MapReduce job is
  * a simple word count example.
  * <p>
  * The word count example is adapted from: https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
  */
 public class MapReduceExample extends Configured implements Tool {
-    private static final String FILE = createDataPath();
-    public static final String RESOURCE_TYPE = "exampleObj";
+    private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
+
+    protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
+    protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
+    private static final String RESOURCE_TYPE = "exampleObj";
 
     /**
      * This simple mapper example just extracts the property field of the example object and emits a count of one.
@@ -127,6 +133,8 @@ public class MapReduceExample extends Configured implements Tool {
         //launch job
         boolean success = job.waitForCompletion(true);
 
+        FileUtils.deleteQuietly(new File(FILE));
+
         return (success) ? 0 : 1;
     }
 
@@ -162,22 +170,44 @@ public class MapReduceExample extends Configured implements Tool {
     }
 
     public static void main(final String... args) throws Exception {
-        Configuration conf = new Configuration();
-        //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
-        conf.set("mapred.job.tracker", "local");
-        //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
-        conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
-        ToolRunner.run(conf, new MapReduceExample(), args);
+        final String outputDir;
+        if (args.length < 1) {
+            outputDir = DEFAULT_OUTPUT_DIR;
+        } else {
+            outputDir = args[0];
+        }
+        // create the data in the correct place
+        createDataPath();
+        //remove this as it needs to be not present when the job runs
+        FileUtils.deleteDirectory(new File(outputDir));
+        try {
+            Configuration conf = new Configuration();
+            //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
+            conf.set("mapred.job.tracker", "local");
+            //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
+            conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
+            ToolRunner.run(conf, new MapReduceExample(), new String[]{outputDir});
+        } finally {
+            // clean up
+            Files.deleteIfExists(new File(FILE).toPath());
+        }
     }
 
-    private static String createDataPath() {
-        final File targetFile = new File("data/example/exampleObj_file1.txt");
+    private static String createOutputDir() {
+        try {
+            return Files.createTempDirectory("mapreduce-example-").toAbsolutePath().toString();
+        } catch (IOException e) {
+            LOGGER.error("Failed to create an output directory.");
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void createDataPath() {
         try (final InputStream data = MapReduceExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
             Objects.requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
-            FileUtils.copyInputStreamToFile(data, targetFile);
+            FileUtils.copyInputStreamToFile(data, new File(FILE));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return targetFile.getAbsolutePath();
     }
 }

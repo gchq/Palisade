@@ -30,5 +30,3 @@ bin/
 *.DS_Store
 _book
 node_modules
-data/example/exampleObj_file1.txt
-example/mapreduce-example/mapreduce-example-runner/data

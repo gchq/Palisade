@@ -11,7 +11,9 @@ java -cp example/mapreduce-example/mapreduce-example-runner/target/mapreduce-exa
 
 if [[ $? -eq 0 ]]
 then
-    echo -e "\nLook for results in directory \"$OUT_PATH\""
+    echo -e "\nYou can find the results in directory \"$OUT_PATH\""
+    echo -e "\nThe results are:\n"
+    cat ${OUT_PATH}/part-r-00000
 else
     echo -e "\nSomething went wrong\n"
 fi
