@@ -17,36 +17,19 @@ package uk.gov.gchq.palisade.cache.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
-import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public class GetCacheRequest<K> extends CacheRequest<K> {
-
-    private Class<?> expectedClass;
 
     public GetCacheRequest() {
     }
 
-    public GetCacheRequest expectedClass(final Class<?> expectedClass) {
-        Objects.requireNonNull(expectedClass, "expectedClass");
-        this.expectedClass = expectedClass;
-        return this;
-    }
-
-    public void setExpectedClass(final Class<?> key) {
-        expectedClass(expectedClass);
-    }
-
-    public Class<?> getExpectedClass() {
-        Objects.requireNonNull(expectedClass, "expected class must be specified");
-        return expectedClass;
-    }
-
-    public Function<byte[], Object> getValueDecoder() {
-        return x -> JSONSerialiser.deserialise(x, getExpectedClass());
+    public <T> BiFunction<byte[], Class<T>, T> getValueDecoder() {
+        return (ob, expectedClass) -> JSONSerialiser.deserialise(ob, expectedClass);
     }
 
     @Override
@@ -59,7 +42,6 @@ public class GetCacheRequest<K> extends CacheRequest<K> {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(expectedClass, that.expectedClass)
                 .isEquals();
     }
 
@@ -67,7 +49,6 @@ public class GetCacheRequest<K> extends CacheRequest<K> {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("expectedClass", expectedClass)
                 .toString();
     }
 
@@ -75,7 +56,6 @@ public class GetCacheRequest<K> extends CacheRequest<K> {
     public int hashCode() {
         return new HashCodeBuilder(3, 11)
                 .appendSuper(super.hashCode())
-                .append(expectedClass)
                 .toHashCode();
     }
 }

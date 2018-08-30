@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
 public class BasicCacheService implements CacheService {
 
@@ -63,6 +64,7 @@ public class BasicCacheService implements CacheService {
         LOGGER.debug("Got request to store item in cache key " + baseKey);
 
         V value = request.getValue();
+        Class<? extends Object> valueClass = request.getValue().getClass();
         Optional<Duration> timeToLive = request.getTimeToLive();
         //TODO implement TTL handling
 
@@ -72,7 +74,7 @@ public class BasicCacheService implements CacheService {
         //send to store
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Requesting backing store to store " + baseKey);
-            boolean result = store.store(baseKey, encodedValue);
+            boolean result = getBackingStore().store(baseKey, valueClass, encodedValue, timeToLive);
             LOGGER.debug("Backing store has stored " + baseKey + " with result " + result);
             return result;
         });
@@ -83,16 +85,22 @@ public class BasicCacheService implements CacheService {
         Objects.requireNonNull(request, "request");
         //make final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Got request to retrieve item "+baseKey);
+        LOGGER.debug("Got request to retrieve item " + baseKey);
 
         //get from store
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Requesting backing store to retrieve "+baseKey);
-            Optional<byte[]> result= store.retrieve(baseKey);
-            result.ifPresent(item -> {
-                LOGGER.debug("Backing store successfully retrieved "+baseKey);
-            })
-            return result;
+            LOGGER.debug("Requesting backing store to retrieve " + baseKey);
+            BasicCacheObject<byte[], V> result = getBackingStore().retrieve(baseKey);
+            if (result.getValue().isPresent()) {
+                LOGGER.debug("Backing store successfully retrieved " + baseKey);
+            } else {
+                LOGGER.debug("Backing store failed to retrieve " + baseKey);
+            }
+
+            //assign so Javac can infer the generic type
+            BiFunction<byte[], Class<V>, V> decode = request.getValueDecoder();
+
+            return result.getValue().map(x -> decode.apply(x, result.getValueClass()));
         });
     }
 
