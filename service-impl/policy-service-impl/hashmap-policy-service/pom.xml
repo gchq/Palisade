@@ -22,7 +22,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>policy-service-impl</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.1.1</version>
     </parent>
     <artifactId>hashmap-policy-service</artifactId>
 </project>
