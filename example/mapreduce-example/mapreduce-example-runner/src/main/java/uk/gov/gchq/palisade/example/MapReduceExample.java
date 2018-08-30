@@ -55,7 +55,7 @@ import java.util.Objects;
  * The word count example is adapted from: https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
  */
 public class MapReduceExample extends Configured implements Tool {
-    private static Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
 
     protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
     protected static final String OUTPUT_DIR = createOutputDir();

@@ -17,8 +17,6 @@ package uk.gov.gchq.palisade.example;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +29,6 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.gchq.palisade.example.MapReduceExample.OUTPUT_DIR;
 
 public class MapReduceExampleIT {
-    Logger LOGGER = LoggerFactory.getLogger(MapReduceExampleIT.class);
 
     @Test
     public void shouldExitWithOneWithNoArgs() throws Exception {
