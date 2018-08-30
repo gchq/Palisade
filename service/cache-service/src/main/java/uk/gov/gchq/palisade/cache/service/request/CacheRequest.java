@@ -23,11 +23,10 @@ import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.Objects;
-import java.util.function.Function;
 
-public abstract class CacheRequest<K> extends Request {
+public abstract class CacheRequest extends Request {
 
-    private K key;
+    private String key;
 
     private Class<? extends Service> service;
 
@@ -51,27 +50,23 @@ public abstract class CacheRequest<K> extends Request {
         service(service);
     }
 
-    public CacheRequest key(final K key) {
+    public CacheRequest key(final String key) {
         Objects.requireNonNull(key, "key");
         this.key = key;
         return this;
     }
 
-    public void setKey(final K key) {
+    public void setKey(final String key) {
         key(key);
     }
 
-    public K getKey() {
+    public String getKey() {
         Objects.requireNonNull(key, "key cannot be null");
         return key;
     }
 
-    public Function<K, String> getKeyEncoder() {
-        return x -> x.toString();
-    }
-
     public String makeBaseName() {
-        return getService().getCanonicalName() + SEPARATOR + getKeyEncoder().apply(getKey());
+        return getService().getCanonicalName() + SEPARATOR + getKey();
     }
 
     @Override

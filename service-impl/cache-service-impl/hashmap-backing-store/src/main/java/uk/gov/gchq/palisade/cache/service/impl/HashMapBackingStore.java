@@ -67,7 +67,7 @@ public class HashMapBackingStore implements BackingStore {
 
     @Override
     public boolean store(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
-        LOGGER.debug("Adding to cache: {}", new String(value));
+        LOGGER.debug("Adding to cache: {} of class {}", new String(value), valueClass);
         cache.put(key, new CachedPair(value, valueClass));
         /*Here we set up a simple timer to deal with the removal of the item from the cache if a duration is present
          *This uses a single timer to remove elements, this is fine for this example, but in production we would want
@@ -82,9 +82,8 @@ public class HashMapBackingStore implements BackingStore {
     @Override
     public BasicCacheObject retrieve(final String key) {
         LOGGER.debug("Getting from cache: {}", key);
-        final CachedPair result = cache.getOrDefault(key, new CachedPair(null, null));
+        final CachedPair result = cache.getOrDefault(key, new CachedPair(null, Object.class));
 
-        LOGGER.debug("Got from cache: {}", result.value);
         return new BasicCacheObject(result.clazz, Optional.ofNullable(result.value));
     }
 

@@ -55,11 +55,11 @@ public class BasicCacheService implements CacheService {
     }
 
     @Override
-    public <K, V> CompletableFuture<Boolean> add(final AddCacheRequest<K, V> request) {
+    public <V> CompletableFuture<Boolean> add(final AddCacheRequest<V> request) {
         Objects.requireNonNull(request, "request");
         //make the final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Got request to store item with key " + baseKey);
+        LOGGER.debug("Got request to store item with key {}", baseKey);
 
         V value = request.getValue();
         Class<? extends Object> valueClass = request.getValue().getClass();
@@ -74,28 +74,28 @@ public class BasicCacheService implements CacheService {
 
         //send to store
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Requesting backing store to store " + baseKey);
+            LOGGER.debug("Requesting backing store to store {}", baseKey);
             boolean result = getBackingStore().store(baseKey, valueClass, encodedValue, timeToLive);
-            LOGGER.debug("Backing store has stored " + baseKey + " with result " + result);
+            LOGGER.debug("Backing store has stored {} with result {}", baseKey, result);
             return result;
         });
     }
 
     @Override
-    public <K, V> CompletableFuture<Optional<V>> get(final GetCacheRequest<K, V> request) {
+    public <V> CompletableFuture<Optional<V>> get(final GetCacheRequest<V> request) {
         Objects.requireNonNull(request, "request");
         //make final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Got request to retrieve item " + baseKey);
+        LOGGER.debug("Got request to retrieve item {}", baseKey);
 
         //get from store
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Requesting backing store to retrieve " + baseKey);
+            LOGGER.debug("Requesting backing store to retrieve {}", baseKey);
             BasicCacheObject<byte[], V> result = getBackingStore().retrieve(baseKey);
             if (result.getValue().isPresent()) {
-                LOGGER.debug("Backing store successfully retrieved " + baseKey);
+                LOGGER.debug("Backing store successfully retrieved {}", baseKey);
             } else {
-                LOGGER.debug("Backing store failed to retrieve " + baseKey);
+                LOGGER.debug("Backing store failed to retrieve {}", baseKey);
             }
 
             //assign so Javac can infer the generic type
@@ -106,18 +106,18 @@ public class BasicCacheService implements CacheService {
     }
 
     @Override
-    public <K> CompletableFuture<Collection<String>> list(final ListCacheRequest<K> request) {
+    public CompletableFuture<Collection<String>> list(final ListCacheRequest request) {
         Objects.requireNonNull(request, "request");
 
         //make final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Got request to list items with prefix  " + baseKey);
+        LOGGER.debug("Got request to list items with prefix {} ", baseKey);
 
         //retrieve from store
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Sending list request to store " + baseKey);
+            LOGGER.debug("Sending list request to store {}", baseKey);
             Collection<String> ret = getBackingStore().list(baseKey);
-            LOGGER.debug("Store list returned for " + baseKey);
+            LOGGER.debug("Store list returned for {}", baseKey);
             return ret;
         });
     }

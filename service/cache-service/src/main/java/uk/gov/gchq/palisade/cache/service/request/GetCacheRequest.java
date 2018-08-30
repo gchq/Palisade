@@ -24,7 +24,7 @@ import uk.gov.gchq.palisade.service.Service;
 
 import java.util.function.BiFunction;
 
-public class GetCacheRequest<K, V> extends CacheRequest<K> {
+public class GetCacheRequest<V> extends CacheRequest {
 
     public GetCacheRequest() {
     }
@@ -33,7 +33,7 @@ public class GetCacheRequest<K, V> extends CacheRequest<K> {
         return (ob, expectedClass) -> JSONSerialiser.deserialise(ob, expectedClass);
     }
 
-    public GetCacheRequest key(final K key) {
+    public GetCacheRequest key(final String key) {
         super.key(key);
         return this;
     }

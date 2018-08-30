@@ -46,17 +46,17 @@ public class MockCacheService implements CacheService {
     }
 
     @Override
-    public <K, V> CompletableFuture<Boolean> add(AddCacheRequest<K, V> request) {
-       return mock.add(request);
+    public <V> CompletableFuture<Boolean> add(AddCacheRequest<V> request) {
+        return mock.add(request);
     }
 
     @Override
-    public <K, V> CompletableFuture<Optional<V>> get(GetCacheRequest<K, V> request) {
-     return mock.get(request);
+    public <V> CompletableFuture<Optional<V>> get(GetCacheRequest<V> request) {
+        return mock.get(request);
     }
 
     @Override
-    public <K> CompletableFuture<Collection<String>> list(ListCacheRequest<K> request) {
+    public CompletableFuture<Collection<String>> list(ListCacheRequest request) {
         return mock.list(request);
     }
 }

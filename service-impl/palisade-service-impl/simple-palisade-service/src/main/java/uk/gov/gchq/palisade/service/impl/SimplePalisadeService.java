@@ -162,7 +162,7 @@ public class SimplePalisadeService implements PalisadeService {
 
     private void cache(final RegisterDataRequest request, final User user, final RequestId requestId, final MultiPolicy multiPolicy) {
         final AddCacheDataRequest cacheRequest = (AddCacheDataRequest) new AddCacheDataRequest()
-                .key(requestId)
+                .key(requestId.getId())
                 .value(new DataRequestConfig()
                                 .user(user)
                                 .context(request.getContext())
@@ -182,7 +182,7 @@ public class SimplePalisadeService implements PalisadeService {
         requireNonNull(request.getRequestId());
         // TODO: need to validate that the user is actually requesting the correct info.
         // extract resources from request and check they are a subset of the original RegisterDataRequest resources
-        final GetCacheDataRequest cacheRequest = (GetCacheDataRequest) new GetCacheDataRequest().key(request.getRequestId()).service(this);
+        final GetCacheDataRequest cacheRequest = (GetCacheDataRequest) new GetCacheDataRequest().key(request.getRequestId().getId()).service(this);
         LOGGER.debug("Getting cached data: {}", cacheRequest);
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {

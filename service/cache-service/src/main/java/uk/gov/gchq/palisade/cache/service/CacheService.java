@@ -42,11 +42,10 @@ public interface CacheService extends Service {
      *
      * @param request {@link uk.gov.gchq.palisade.cache.service.request.AddCacheRequest} containing a unique requestId
      *                and the information to be cached.
-     * @param <K>     the key type being added to the cache
      * @param <V>     the value type being added to the cache
      * @return a {@link CompletableFuture} which would be true once the information has been cached.
      */
-    <K, V> CompletableFuture<Boolean> add(final AddCacheRequest<K, V> request);
+    <V> CompletableFuture<Boolean> add(final AddCacheRequest<V> request);
 
     /**
      * Retrieve an item from the cache. The <code>request</code> should be parameterized according to the expected type
@@ -54,21 +53,19 @@ public interface CacheService extends Service {
      * returned will be empty.
      *
      * @param request {@link uk.gov.gchq.palisade.cache.service.request.GetCacheRequest} containing the key.
-     * @param <K>     the key type being retrieved
      * @param <V>     the value type being retrieved
      * @return a {@link CompletableFuture} that contains an {@link Optional} for the cached key
      */
-    <K, V> CompletableFuture<Optional<V>> get(final GetCacheRequest<K, V> request);
+    <V> CompletableFuture<Optional<V>> get(final GetCacheRequest<V> request);
 
     /**
      * Returns a list of all cache entries available that match the given prefix. The cache will look in the namespace
      * for the service named in <code>request</code> and return all key names that start with the given prefix.
      *
      * @param request the request configured with a prefix
-     * @param <K>     the key type for the cache request
      * @return a list of strings that are cache keys
      */
-    <K> CompletableFuture<Collection<String>> list(final ListCacheRequest<K> request);
+    CompletableFuture<Collection<String>> list(final ListCacheRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {

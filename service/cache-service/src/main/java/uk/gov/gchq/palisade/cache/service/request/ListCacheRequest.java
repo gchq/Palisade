@@ -15,24 +15,24 @@
  */
 package uk.gov.gchq.palisade.cache.service.request;
 
-public class ListCacheRequest<K> extends CacheRequest<K> {
+public class ListCacheRequest extends CacheRequest {
 
     @Override
-    public ListCacheRequest key(final K key) {
+    public ListCacheRequest key(final String key) {
         throw new UnsupportedOperationException("cannot set key on list request, do you mean prefix()?");
     }
 
     @Override
-    public void setKey(final K key) {
+    public void setKey(final String key) {
         throw new UnsupportedOperationException("cannot set key on list request, do you mean setPrefix()");
     }
 
-    public ListCacheRequest prefix(final K prefix) {
+    public ListCacheRequest prefix(final String prefix) {
         super.key(prefix);
         return this;
     }
 
-    public void setPrefix(final K prefix) {
+    public void setPrefix(final String prefix) {
         super.setKey(prefix);
     }
 }

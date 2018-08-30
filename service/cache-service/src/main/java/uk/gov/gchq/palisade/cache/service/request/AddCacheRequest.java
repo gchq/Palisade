@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class AddCacheRequest<K, V> extends CacheRequest<K> {
+public class AddCacheRequest<V> extends CacheRequest {
 
     /**
      * An empty optional indicates no time to live specified.
@@ -78,7 +78,7 @@ public class AddCacheRequest<K, V> extends CacheRequest<K> {
         return value;
     }
 
-    public AddCacheRequest key(final K key) {
+    public AddCacheRequest key(final String key) {
         super.key(key);
         return this;
     }
