@@ -24,6 +24,14 @@
         <artifactId>cache-service-impl</artifactId>
         <version>0.2-SNAPSHOT</version>
     </parent>
-    <artifactId>hashmap-cache-service</artifactId>
+    <artifactId>hashmap-backing-store</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>basic-cache-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>

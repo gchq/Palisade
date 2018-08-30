@@ -17,11 +17,12 @@
 package uk.gov.gchq.palisade.cache.service.request;
 
 import uk.gov.gchq.palisade.RequestId;
+import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 
 /**
  * This class is used for sending a request to get the {@link uk.gov.gchq.palisade.service.request.DataRequestConfig}
  * out of the cache for the given {@link RequestId}.
  */
-public class GetCacheDataRequest extends GetCacheRequest<RequestId> {
+public class GetCacheDataRequest extends GetCacheRequest<RequestId, DataRequestConfig> {
     //TODO fix this class
 }

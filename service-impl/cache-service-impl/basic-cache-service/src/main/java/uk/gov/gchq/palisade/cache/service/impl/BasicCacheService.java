@@ -61,12 +61,15 @@ public class BasicCacheService implements CacheService {
         Objects.requireNonNull(request, "request");
         //make the final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Got request to store item in cache key " + baseKey);
+        LOGGER.debug("Got request to store item with key " + baseKey);
 
         V value = request.getValue();
         Class<? extends Object> valueClass = request.getValue().getClass();
         Optional<Duration> timeToLive = request.getTimeToLive();
-        //TODO implement TTL handling
+
+        if (timeToLive.isPresent() && !getBackingStore().supportsTimeToLive()) {
+            throw new UnsupportedOperationException("Cache backing store doesn't support time to live");
+        }
 
         //encode value
         byte[] encodedValue = request.getValueEncoder().apply(value);
@@ -81,7 +84,7 @@ public class BasicCacheService implements CacheService {
     }
 
     @Override
-    public <V> CompletableFuture<Optional<V>> get(final GetCacheRequest<V> request) {
+    public <K,V> CompletableFuture<Optional<V>> get(final GetCacheRequest<K,V> request) {
         Objects.requireNonNull(request, "request");
         //make final key name
         String baseKey = request.makeBaseName();
@@ -105,7 +108,19 @@ public class BasicCacheService implements CacheService {
     }
 
     @Override
-    public CompletableFuture<Collection<?>> list(final ListCacheRequest request) {
-        return null;
+    public <K> CompletableFuture<Collection<String>> list(final ListCacheRequest<K> request) {
+        Objects.requireNonNull(request, "request");
+
+        //make final key name
+        String baseKey = request.makeBaseName();
+        LOGGER.debug("Got request to list items with prefix  " + baseKey);
+
+        //retrieve from store
+        return CompletableFuture.supplyAsync(() -> {
+            LOGGER.debug("Sending list request to store " + baseKey);
+            Collection<String> ret = getBackingStore().list(baseKey);
+            LOGGER.debug("Store list returned for " + baseKey);
+            return ret;
+        });
     }
 }

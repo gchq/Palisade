@@ -25,6 +25,7 @@ import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheDataRequest;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheDataRequest;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
@@ -161,13 +162,14 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     private void cache(final RegisterDataRequest request, final User user, final RequestId requestId, final MultiPolicy multiPolicy) {
-        final AddCacheDataRequest cacheRequest = new AddCacheDataRequest()
-                .requestId(requestId)
-                .dataRequestConfig(new DataRequestConfig()
+        final AddCacheDataRequest cacheRequest = (AddCacheDataRequest) new AddCacheDataRequest()
+                .key(requestId)
+                .value(new DataRequestConfig()
                                 .user(user)
                                 .context(request.getContext())
                                 .rules(multiPolicy.getRuleMap())
-                );
+                )
+                .service(this);
         LOGGER.debug("Caching: {}", cacheRequest);
         final Boolean success = cacheService.add(cacheRequest).join();
         if (null == success || !success) {
@@ -181,17 +183,21 @@ public class SimplePalisadeService implements PalisadeService {
         requireNonNull(request.getRequestId());
         // TODO: need to validate that the user is actually requesting the correct info.
         // extract resources from request and check they are a subset of the original RegisterDataRequest resources
-        final GetCacheDataRequest cacheRequest = new GetCacheDataRequest().requestId(request.getRequestId());
+        final GetCacheDataRequest cacheRequest = (GetCacheDataRequest) new GetCacheDataRequest().key(request.getRequestId());
         LOGGER.debug("Getting cached data: {}", cacheRequest);
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {
-                    if (null == cache
-                            || null == cache.getUser()) {
-                        throw new RuntimeException("User's request was not in the cache: " + request.getRequestId().getId());
+                    DataRequestConfig value = cache.orElseThrow(() -> createCacheException(request.getRequestId().getId()));
+                    if (null == value.getUser()) {
+                        throw createCacheException(request.getRequestId().getId());
                     }
-                    LOGGER.debug("Got cache: {}", cache);
-                    return cache;
+                    LOGGER.debug("Got cache: {}", value);
+                    return value;
                 });
+    }
+
+    private RuntimeException createCacheException(final String id) {
+        return new RuntimeException("User's request was not in the cache: " + id);
     }
 
     public AuditService getAuditService() {

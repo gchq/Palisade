@@ -58,9 +58,9 @@ public interface CacheService extends Service {
      * @param request {@link GetCacheDataRequest} containing the unique requestId.
      * @return The {@link DataRequestConfig} relating to the unique requestId that is stored in the cache.
      */
-    <V> CompletableFuture<Optional<V>> get(final GetCacheRequest<V> request);
+    <K, V> CompletableFuture<Optional<V>> get(final GetCacheRequest<K, V> request);
 
-    CompletableFuture<Collection<?>> list(final ListCacheRequest request);
+    <K> CompletableFuture<Collection<String>> list(final ListCacheRequest<K> request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {

@@ -28,7 +28,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>hashmap-cache-service</module>
+        <module>hashmap-backing-store</module>
         <module>basic-cache-service</module>
     </modules>
 

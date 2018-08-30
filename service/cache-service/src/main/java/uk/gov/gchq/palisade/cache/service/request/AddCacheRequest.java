@@ -20,6 +20,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.service.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -77,6 +78,16 @@ public class AddCacheRequest<K, V> extends CacheRequest<K> {
         return value;
     }
 
+    public AddCacheRequest key(final K key) {
+        super.key(key);
+        return this;
+    }
+
+    public AddCacheRequest service(final Service service) {
+        super.service(service);
+        return this;
+    }
+
     /**
      * Sets the time to live for this cache entry. If the given {@code Optional} is empty, then no time to live is
      * assumed.
@@ -132,7 +143,7 @@ public class AddCacheRequest<K, V> extends CacheRequest<K> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
 
         if (o == null || getClass() != o.getClass()) return false;

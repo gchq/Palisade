@@ -20,20 +20,31 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.service.Service;
 
 import java.util.function.BiFunction;
 
-public class GetCacheRequest<K> extends CacheRequest<K> {
+public class GetCacheRequest<K,V> extends CacheRequest<K> {
 
     public GetCacheRequest() {
     }
 
-    public <T> BiFunction<byte[], Class<T>, T> getValueDecoder() {
+    public BiFunction<byte[], Class<V>, V> getValueDecoder() {
         return (ob, expectedClass) -> JSONSerialiser.deserialise(ob, expectedClass);
     }
 
+    public GetCacheRequest key(final K key) {
+        super.key(key);
+        return this;
+    }
+
+    public GetCacheRequest service(final Service service) {
+        super.service(service);
+        return this;
+    }
+
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
 
         if (o == null || getClass() != o.getClass()) return false;
