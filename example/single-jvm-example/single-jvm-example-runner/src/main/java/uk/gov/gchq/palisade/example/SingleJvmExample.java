@@ -16,14 +16,21 @@
 
 package uk.gov.gchq.palisade.example;
 
+import org.apache.commons.io.FileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class SingleJvmExample {
+    protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleJvmExample.class);
 
     public static void main(final String[] args) throws Exception {
@@ -31,18 +38,32 @@ public class SingleJvmExample {
     }
 
     public void run() throws Exception {
-        final ExampleSimpleClient client = new ExampleSimpleClient();
+        createDataPath();
+        try {
+            final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
 
-        LOGGER.info("");
-        LOGGER.info("Alice is reading file1...");
-        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleClient.FILE, "Alice", "Payroll");
-        LOGGER.info("Alice got back: ");
-        aliceResults.map(Object::toString).forEach(LOGGER::info);
+            LOGGER.info("");
+            LOGGER.info("Alice is reading file1...");
+            final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
+            LOGGER.info("Alice got back: ");
+            aliceResults.map(Object::toString).forEach(LOGGER::info);
 
-        LOGGER.info("");
-        LOGGER.info("Bob is reading file1...");
-        final Stream<ExampleObj> bobResults = client.read(ExampleSimpleClient.FILE, "Bob", "Payroll");
-        LOGGER.info("Bob got back: ");
-        bobResults.map(Object::toString).forEach(LOGGER::info);
+            LOGGER.info("");
+            LOGGER.info("Bob is reading file1...");
+            final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
+            LOGGER.info("Bob got back: ");
+            bobResults.map(Object::toString).forEach(LOGGER::info);
+        } finally {
+            FileUtils.deleteQuietly(new File(FILE));
+        }
+    }
+
+    static void createDataPath() {
+        try (final InputStream data = SingleJvmExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
+            Objects.requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
+            FileUtils.copyInputStreamToFile(data, new File(FILE));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

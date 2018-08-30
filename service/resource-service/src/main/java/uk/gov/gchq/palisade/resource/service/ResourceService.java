@@ -16,7 +16,7 @@
 
 package uk.gov.gchq.palisade.resource.service;
 
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
@@ -37,7 +37,7 @@ import java.util.concurrent.CompletableFuture;
  * The resource service is the Palisade component that determines what resources are available that meet a specific
  * (type of) request and how they should be accessed. This interface details several methods for obtaining a list of
  * resources, e.g. by type or by data format. The methods of this service all return {@link CompletableFuture}s of
- * {@link Map}s which link a valid {@link Resource} with a {@link ConnectionDetail} object. The ${@code
+ * {@link Map}s which link a valid {@link LeafResource} with a {@link ConnectionDetail} object. The ${@code
  * ConnectionDetail} objects contain information on how to set up a connection to retrieve a particular resource.
  * Implementations of this service do not deal with the filtering or application of security policy to the resources.
  * Therefore, a result returned from a method call on this interface doesn't guarantee that the user will be allowed to
@@ -62,7 +62,7 @@ public interface ResourceService extends Service {
      * @return a {@link CompletableFuture} that upon completion will contain a map of how to retrieve the available
      * resources
      */
-    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request);
+    CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request);
 
     /**
      * Retrieve resource and connection details by resource ID. The request object allows the client to specify the
@@ -72,7 +72,7 @@ public interface ResourceService extends Service {
      * @return a {@link CompletableFuture} that upon completion will contain details on how to retrieve the requested
      * resource.
      */
-    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request);
+    CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request);
 
     /**
      * Obtain a list of resources that match a specifc resource type. This method allows a client to obtain potentially
@@ -84,7 +84,7 @@ public interface ResourceService extends Service {
      * @return {@link CompletableFuture} that upon completion will contain the connection details for all resources
      * matching a type
      */
-    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request);
+    CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request);
 
     /**
      * Find all resources that match a particular data format. Resources of a particular data format may not share a
@@ -96,7 +96,7 @@ public interface ResourceService extends Service {
      * @return a {@link CompletableFuture} that upon completion will contain the details on how to retrieve the
      * resources
      */
-    CompletableFuture<Map<Resource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request);
+    CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request);
 
     /**
      * Informs Palisade about a specific resource that it may return to users. This lets Palisade clients request access

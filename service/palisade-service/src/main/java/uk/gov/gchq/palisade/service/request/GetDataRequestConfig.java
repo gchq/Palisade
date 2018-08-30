@@ -23,6 +23,8 @@ import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.Resource;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used to request the {@link DataRequestConfig}.
  */
@@ -31,29 +33,33 @@ public class GetDataRequestConfig extends Request {
     private Resource resource;
 
     public RequestId getRequestId() {
+        requireNonNull(requestId, "The request id has not been set.");
         return requestId;
     }
 
     public GetDataRequestConfig requestId(final RequestId requestId) {
+        requireNonNull(requestId, "The request id cannot be set to null.");
         this.requestId = requestId;
         return this;
     }
 
     public void setRequestId(final RequestId requestId) {
-        this.requestId = requestId;
+        requestId(requestId);
     }
 
     public Resource getResource() {
+        requireNonNull(resource, "The resource has not been set.");
         return resource;
     }
 
     public GetDataRequestConfig resource(final Resource resource) {
+        requireNonNull(resource, "The resource cannot be set to null.");
         this.resource = resource;
         return this;
     }
 
     public void setResource(final Resource resource) {
-        this.resource = resource;
+        resource(resource);
     }
 
     @Override

@@ -22,14 +22,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.resource.Resource;
-import uk.gov.gchq.palisade.rule.Rule;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.rule.Rules;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -38,79 +35,56 @@ import static java.util.Objects.requireNonNull;
  * respond to requests for access to data.
  */
 public class DataRequestConfig extends Request {
-    private User user = new User();
-    private Context context = new Context();
-    private Map<Resource, Rules> rules = new HashMap<>();
+    private User user;
+    private Context context;
+    private Map<LeafResource, Rules> rules;
 
     public DataRequestConfig() {
     }
 
     public DataRequestConfig user(final User user) {
+        requireNonNull(user, "User cannot be set to null.");
         this.user = user;
         return this;
-    }
-
-    public DataRequestConfig context(final Context context) {
-        this.context = context;
-        return this;
-    }
-
-    public DataRequestConfig rules(final Map<Resource, Rules> rules) {
-        requireNonNull(rules, "rules is required");
-        this.rules = rules;
-        return this;
-    }
-
-    public DataRequestConfig rules(final Resource resource, final Rules rules) {
-        requireNonNull(resource, "resource is required");
-        requireNonNull(rules, "rules is required");
-        this.rules.put(resource, rules);
-        return this;
-    }
-
-    public DataRequestConfig rule(final Resource resource, final String ruleId, final Rule rule) {
-        return rule(resource, null, ruleId, rule);
-    }
-
-    public DataRequestConfig rule(final Resource resource, final String message, final String ruleId, final Rule rule) {
-        requireNonNull(resource, "resource is required");
-        requireNonNull(ruleId, "ruleId is required");
-        requireNonNull(rule, "rule is required");
-
-        Rules<?> resourceRules = rules.get(resource);
-        if (null == resourceRules) {
-            resourceRules = new Rules();
-        }
-        if (nonNull(message)) {
-            resourceRules.message(message);
-        }
-        resourceRules.rule(ruleId, rule);
-        return this;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     public void setUser(final User user) {
-        this.user = user;
+        user(user);
     }
 
-    public Map<Resource, Rules> getRules() {
-        return rules;
+    public User getUser() {
+        requireNonNull(user, "The user has not been set.");
+        return user;
     }
 
-    public DataRequestConfig setRules(final Map<Resource, Rules> rules) {
+    public DataRequestConfig context(final Context context) {
+        requireNonNull(context, "Context cannot be set to null.");
+        this.context = context;
+        return this;
+    }
+
+    public void setContext(final Context context) {
+        context(context);
+    }
+
+    public Context getContext() {
+        requireNonNull(context, "The context has not been set.");
+        return context;
+    }
+
+    public DataRequestConfig rules(final Map<LeafResource, Rules> rules) {
+        requireNonNull(rules, "The rules are required.");
         this.rules = rules;
         return this;
     }
 
-    public Context getContext() {
-        return context;
+    public void setRules(final Map<LeafResource, Rules> rules) {
+        rules(rules);
     }
 
-    public void setContext(final Context context) {
-        this.context = context;
+    public Map<LeafResource, Rules> getRules() {
+        requireNonNull(rules, "The Rules have not been set.");
+        return rules;
     }
 
     @Override

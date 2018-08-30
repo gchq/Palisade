@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.data.service.reader;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Maps;
@@ -26,7 +27,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,29 +44,47 @@ import static java.util.Objects.requireNonNull;
  * that opens a file and returns a single {@link InputStream} containing all the records.
  */
 public class HdfsDataReader extends SerialisedDataReader {
-    private final FileSystem fs;
+    @JsonIgnore
+    private FileSystem fs;
+
+    public HdfsDataReader() {
+    }
 
     @JsonCreator
     public HdfsDataReader(@JsonProperty("conf") final Map<String, String> conf,
                           @JsonProperty("serialisers") final Map<String, Serialiser<?>> serialisers) throws IOException {
-        this(createConfig(conf));
-        setSerialisers(serialisers);
+        conf(conf);
+        serialisers(serialisers);
     }
 
-    public HdfsDataReader(final Configuration conf) throws IOException {
-        requireNonNull(conf, "conf is required");
-        this.fs = FileSystem.get(conf);
+    public HdfsDataReader conf(final Map<String, String> conf) throws IOException {
+        requireNonNull(conf, "The conf cannot be null.");
+        return conf(createConfig(conf));
     }
 
-    public HdfsDataReader(final FileSystem fs) {
-        requireNonNull(fs, "file system is required");
+    public HdfsDataReader conf(final Configuration conf) throws IOException {
+        requireNonNull(conf, "The conf cannot be null.");
+        return fs(FileSystem.get(conf));
+    }
+
+    public HdfsDataReader fs(final FileSystem fs) {
+        requireNonNull(fs, "The file system cannot be set to null.");
         this.fs = fs;
+        return this;
+    }
+
+    public void setFs(final FileSystem fs) {
+        fs(fs);
+    }
+
+    public FileSystem getFs() {
+        requireNonNull(fs, "The file system has not been set.");
+        return fs;
     }
 
     @Override
-    protected InputStream readRaw(final Resource resource) {
+    protected InputStream readRaw(final LeafResource resource) {
         requireNonNull(resource, "resource is required");
-        requireNonNull(resource.getId(), "resource ID is required");
 
         final InputStream inputStream;
         try {
@@ -78,7 +97,7 @@ public class HdfsDataReader extends SerialisedDataReader {
     }
 
     public Configuration getConf() {
-        return fs.getConf();
+        return getFs().getConf();
     }
 
     @JsonGetter("conf")

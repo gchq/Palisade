@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * <p>
  * A {@link User} contains the details about a user of Palisade. It contains
@@ -50,7 +52,7 @@ public class User implements Cloneable {
     private static final Map<String, FieldGetter<User>> FIELD_GETTERS = createFieldGetters();
     private static final Map<String, FieldSetter<User>> FIELD_SETTERS = createFieldSetters();
 
-    private UserId userId = new UserId();
+    private UserId userId;
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
 
@@ -62,7 +64,6 @@ public class User implements Cloneable {
         Util.setField(this, FIELD_SETTERS, reference, value);
     }
 
-
     /**
      * Sets the userId to a {@link UserId} with the given userId string.
      *
@@ -70,6 +71,7 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User userId(final String userId) {
+        requireNonNull(userId, "The user id cannot be set to null.");
         return userId(new UserId().id(userId));
     }
 
@@ -80,8 +82,18 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User userId(final UserId userId) {
+        requireNonNull(userId, "The user id cannot be set to null.");
         this.userId = userId;
         return this;
+    }
+
+    public UserId getUserId() {
+        requireNonNull(userId, "The user id has not been set.");
+        return userId;
+    }
+
+    public void setUserId(final UserId userId) {
+        userId(userId);
     }
 
     /**
@@ -91,20 +103,32 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User auths(final String... auths) {
-
+        requireNonNull(auths, "Cannot add null auths.");
+        this.auths = new HashSet<>();
         Collections.addAll(this.auths, auths);
         return this;
     }
 
     public User auths(final Set<String> auths) {
-        this.auths.addAll(auths);
+        requireNonNull(auths, "Cannot add null auths.");
+        this.auths = auths;
         return this;
     }
 
     public void setAuths(final Set<String> auths) {
-        this.auths = auths;
+        auths(auths);
     }
 
+    public Set<String> getAuths() {
+        // auths cannot be null
+        return auths;
+    }
+
+    public User addAuths(final Set<String> auths) {
+        requireNonNull(auths, "Cannot add null auths.");
+        this.auths.addAll(auths);
+        return this;
+    }
 
     /**
      * Adds the user roles.
@@ -113,33 +137,31 @@ public class User implements Cloneable {
      * @return this User instance.
      */
     public User roles(final String... roles) {
+        requireNonNull(roles, "Cannot add null roles.");
+        this.roles = new HashSet<>();
         Collections.addAll(this.roles, roles);
         return this;
     }
 
     public void setRoles(final Set<String> roles) {
-        this.roles = roles;
+        roles(roles);
     }
 
     public User roles(final Set<String> roles) {
-        this.roles.addAll(roles);
+        requireNonNull(roles, "Cannot add null roles.");
+        this.roles = roles;
         return this;
     }
 
-    public Set<String> getAuths() {
-        return auths;
-    }
-
     public Set<String> getRoles() {
+        // roles cannot be null
         return roles;
     }
 
-    public UserId getUserId() {
-        return userId;
-    }
-
-    public void setUserId(final UserId userId) {
-        this.userId = userId;
+    public User addRoles(final Set<String> roles) {
+        requireNonNull(roles, "Cannot add null roles.");
+        this.roles.addAll(roles);
+        return this;
     }
 
     public User clone() {
@@ -149,9 +171,9 @@ public class User implements Cloneable {
         } catch (final CloneNotSupportedException e) {
             clone = new User();
         }
-        clone.userId = userId.clone();
-        clone.roles = Sets.newHashSet(roles);
-        clone.auths = Sets.newHashSet(auths);
+        clone.userId(getUserId().clone());
+        clone.roles(Sets.newHashSet(getRoles()));
+        clone.auths(Sets.newHashSet(getAuths()));
         return clone;
     }
 
@@ -194,7 +216,7 @@ public class User implements Cloneable {
 
     private static Map<String, FieldGetter<User>> createFieldGetters() {
         Map<String, FieldGetter<User>> map = new HashMap<>();
-        map.put(USER_ID, (user, subfield) -> user.userId.getField(subfield));
+        map.put(USER_ID, (user, subfield) -> user.getUserId().getField(subfield));
         map.put(ROLES, (user, subfield) -> user.getRoles());
         map.put(AUTHS, (user, subfield) -> user.getAuths());
         return Collections.unmodifiableMap(map);
@@ -202,9 +224,9 @@ public class User implements Cloneable {
 
     private static Map<String, FieldSetter<User>> createFieldSetters() {
         Map<String, FieldSetter<User>> map = new HashMap<>();
-        map.put(USER_ID, (user, subfield, value) -> user.userId.setField(subfield, value));
-        map.put(ROLES, (user, subfield, value) -> user.setRoles(((Set<String>) value)));
-        map.put(AUTHS, (user, subfield, value) -> user.setAuths(((Set<String>) value)));
+        map.put(USER_ID, (user, subfield, value) -> user.getUserId().setField(subfield, value));
+        map.put(ROLES, (user, subfield, value) -> user.roles(((Set<String>) value)));
+        map.put(AUTHS, (user, subfield, value) -> user.auths(((Set<String>) value)));
         return Collections.unmodifiableMap(map);
     }
 }

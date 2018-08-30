@@ -22,6 +22,8 @@ package uk.gov.gchq.palisade.resource;
  */
 public interface ChildResource extends Resource {
 
+    ChildResource parent(ParentResource parent);
+
     ParentResource getParent();
 
     void setParent(final ParentResource parent);

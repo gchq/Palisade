@@ -22,7 +22,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>mapreduce-example</artifactId>
-        <version>0.1</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <artifactId>mapreduce-example-runner</artifactId>
 
@@ -41,12 +41,12 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>mapreduce-example-client</artifactId>
+            <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>map-reduce-client</artifactId>
+            <artifactId>mapreduce-client</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

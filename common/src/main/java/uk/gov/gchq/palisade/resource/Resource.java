@@ -27,28 +27,22 @@ import uk.gov.gchq.palisade.resource.impl.FileResource;
 /**
  * A high level API to define a resource, where a resource could be a system, directory, file, stream, etc.
  *
- * A resource is expected to have a unique identifier, a type and a format. The type is a way of grouping
- * data of the same structure. The format is the format of the file, e.g CSV, Parquet.
+ * A resource is expected to have a unique identifier.
  */
-@JsonPropertyOrder(value = {"class", "id", "type", "serialisedFormat"}, alphabetic = true)
+@JsonPropertyOrder(value = {"class", "id"}, alphabetic = true)
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.CLASS,
         include = As.EXISTING_PROPERTY,
         property = "class",
         defaultImpl = FileResource.class
 )
-public interface Resource {
+public interface Resource extends Comparable<Resource> {
+
+    Resource id(String id);
+
     String getId();
 
-    String getType();
-
-    String getSerialisedFormat();
-
     void setId(final String id);
-
-    void setType(final String type);
-
-    void setSerialisedFormat(final String serialisedFormat);
 
     @JsonGetter("class")
     default String _getClass() {

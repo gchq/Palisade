@@ -22,14 +22,13 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>example</artifactId>
-        <version>0.1</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <artifactId>mapreduce-example</artifactId>
     <packaging>pom</packaging>
 
     <modules>
         <module>mapreduce-example-runner</module>
-        <module>mapreduce-example-client</module>
     </modules>
 
 </project>

@@ -21,21 +21,16 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.audit.service.AuditService;
-import uk.gov.gchq.palisade.audit.service.NullAuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.cache.service.NullCacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
-import uk.gov.gchq.palisade.policy.service.NullPolicyService;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
-import uk.gov.gchq.palisade.resource.Resource;
-import uk.gov.gchq.palisade.resource.service.NullResourceService;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.service.PalisadeService;
@@ -44,28 +39,23 @@ import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.user.service.NullUserService;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import static java.util.Objects.requireNonNull;
+
 /**
- * <p>
- * A simple implementation of a Palisade Service that just connects up the
- * Audit, Cache, User, Policy and Resource services.
- * </p>
- * <p>
- * It currently doesn't validate that the user is actually requesting the correct
- * resources. It should check the resources requested in getDataRequestConfig
- * are the same or a subset of the resources passed in in registerDataRequest.
- * </p>
+ * <p> A simple implementation of a Palisade Service that just connects up the Audit, Cache, User, Policy and Resource
+ * services. </p> <p> It currently doesn't validate that the user is actually requesting the correct resources. It
+ * should check the resources requested in getDataRequestConfig are the same or a subset of the resources passed in in
+ * registerDataRequest. </p>
  */
 public class SimplePalisadeService implements PalisadeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplePalisadeService.class);
@@ -77,23 +67,36 @@ public class SimplePalisadeService implements PalisadeService {
     private CacheService cacheService;
 
     public SimplePalisadeService() {
-        this(new NullResourceService(),
-                new NullAuditService(),
-                new NullPolicyService(),
-                new NullUserService(),
-                new NullCacheService());
     }
 
-    public SimplePalisadeService(final ResourceService resourceService,
-                                 final AuditService auditService,
-                                 final PolicyService policyService,
-                                 final UserService userService,
-                                 final CacheService cacheService) {
+    public SimplePalisadeService resourceService(final ResourceService resourceService) {
+        requireNonNull(resourceService, "The resource service cannot be set to null.");
         this.resourceService = resourceService;
+        return this;
+    }
+
+    public SimplePalisadeService auditService(final AuditService auditService) {
+        requireNonNull(auditService, "The audit service cannot be set to null.");
         this.auditService = auditService;
+        return this;
+    }
+
+    public SimplePalisadeService policyService(final PolicyService policyService) {
+        requireNonNull(policyService, "The policy service cannot be set to null.");
         this.policyService = policyService;
+        return this;
+    }
+
+    public SimplePalisadeService userService(final UserService userService) {
+        requireNonNull(userService, "The user service cannot be set to null.");
         this.userService = userService;
+        return this;
+    }
+
+    public SimplePalisadeService cacheService(final CacheService cacheService) {
+        requireNonNull(cacheService, "The cache service cannot be set to null.");
         this.cacheService = cacheService;
+        return this;
     }
 
     @Override
@@ -110,7 +113,7 @@ public class SimplePalisadeService implements PalisadeService {
 
         final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId());
         LOGGER.debug("Getting resources from resourceService: {}", resourceRequest);
-        final CompletableFuture<Map<Resource, ConnectionDetail>> futureResources = resourceService.getResourcesById(resourceRequest)
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources = resourceService.getResourcesById(resourceRequest)
                 .thenApply(resources -> {
                     LOGGER.debug("Got resources: {}", resources);
                     return resources;
@@ -123,6 +126,7 @@ public class SimplePalisadeService implements PalisadeService {
 
         return CompletableFuture.allOf(futureUser, futureResources)
                 .thenApply(t -> getPolicy(request, futureUser, futureResources))
+                .thenApply(multiPolicy -> ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
                 .thenAccept(multiPolicy -> {
                     audit(request, futureUser.join(), multiPolicy);
                     cache(request, futureUser.join(), requestId, multiPolicy);
@@ -133,7 +137,7 @@ public class SimplePalisadeService implements PalisadeService {
                 });
     }
 
-    private MultiPolicy getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<Resource, ConnectionDetail>> futureResources) {
+    private MultiPolicy getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources) {
         final GetPolicyRequest policyRequest = new GetPolicyRequest().user(futureUser.join()).context(request.getContext()).resources(new HashSet<>(futureResources.join().keySet()));
         LOGGER.debug("Getting policy from policyService: {}", policyRequest);
         return policyService.getPolicy(policyRequest)
@@ -144,7 +148,7 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     private void audit(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy) {
-        for (final Entry<Resource, Policy> entry : multiPolicy.getPolicies().entrySet()) {
+        for (final Entry<LeafResource, Policy> entry : multiPolicy.getPolicies().entrySet()) {
             final AuditRequest auditRequest =
                     new AuditRequest()
                             .resource(entry.getKey())
@@ -173,8 +177,8 @@ public class SimplePalisadeService implements PalisadeService {
 
     @Override
     public CompletableFuture<DataRequestConfig> getDataRequestConfig(final GetDataRequestConfig request) {
-        Objects.requireNonNull(request);
-        Objects.requireNonNull(request.getRequestId());
+        requireNonNull(request);
+        requireNonNull(request.getRequestId());
         // TODO: need to validate that the user is actually requesting the correct info.
         // extract resources from request and check they are a subset of the original RegisterDataRequest resources
         final GetCacheRequest cacheRequest = new GetCacheRequest().requestId(request.getRequestId());
@@ -182,9 +186,7 @@ public class SimplePalisadeService implements PalisadeService {
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {
                     if (null == cache
-                            || null == cache.getUser()
-                            || null == cache.getUser().getUserId()
-                            || UserId.UNKNOWN_USER_ID.equals(cache.getUser().getUserId().getId())) {
+                            || null == cache.getUser()) {
                         throw new RuntimeException("User's request was not in the cache: " + request.getRequestId().getId());
                     }
                     LOGGER.debug("Got cache: {}", cache);
@@ -193,47 +195,47 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     public AuditService getAuditService() {
+        requireNonNull(auditService, "The audit service has not been set.");
         return auditService;
     }
 
     public void setAuditService(final AuditService auditService) {
-        Objects.requireNonNull(auditService);
-        this.auditService = auditService;
+        auditService(auditService);
     }
 
     public PolicyService getPolicyService() {
+        requireNonNull(policyService, "The policy service has not been set.");
         return policyService;
     }
 
     public void setPolicyService(final PolicyService policyService) {
-        Objects.requireNonNull(policyService);
-        this.policyService = policyService;
+        policyService(policyService);
     }
 
     public UserService getUserService() {
+        requireNonNull(userService, "The user service has not been set.");
         return userService;
     }
 
     public void setUserService(final UserService userService) {
-        Objects.requireNonNull(userService);
-        this.userService = userService;
+        userService(userService);
     }
 
     public ResourceService getResourceService() {
+        requireNonNull(resourceService, "The resource service has not been set.");
         return resourceService;
     }
 
     public void setResourceService(final ResourceService resourceService) {
-        Objects.requireNonNull(resourceService);
-        this.resourceService = resourceService;
+        resourceService(resourceService);
     }
 
     public CacheService getCacheService() {
+        requireNonNull(cacheService, "The cache service has not been set.");
         return cacheService;
     }
 
     public void setCacheService(final CacheService cacheService) {
-        Objects.requireNonNull(cacheService);
-        this.cacheService = cacheService;
+        cacheService(cacheService);
     }
 }

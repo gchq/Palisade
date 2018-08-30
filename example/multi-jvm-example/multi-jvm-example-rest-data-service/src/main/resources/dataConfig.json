@@ -1,7 +1,9 @@
 {
   "class": "uk.gov.gchq.palisade.data.service.impl.SimpleDataService",
+  "@id": 1,
   "palisadeService": {
     "class": "uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService",
+    "@id": 2,
     "baseUrl": "http://localhost:8080/palisade"
   },
   "reader": {
@@ -10,6 +12,8 @@
       "exampleObj": {
         "class": "uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser"
       }
+    },
+    "conf": {
     }
   }
 }

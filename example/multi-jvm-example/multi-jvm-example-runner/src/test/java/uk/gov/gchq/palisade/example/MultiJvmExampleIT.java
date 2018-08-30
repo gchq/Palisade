@@ -16,27 +16,32 @@
 
 package uk.gov.gchq.palisade.example;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.client.SimpleRestServices;
 import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
-import uk.gov.gchq.palisade.example.client.ExampleSimpleRestClient;
+import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.policy.service.impl.RestPolicyServiceV1;
 import uk.gov.gchq.palisade.resource.service.impl.RestResourceServiceV1;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.service.impl.RestPalisadeServiceV1;
 import uk.gov.gchq.palisade.user.service.impl.RestUserServiceV1;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static uk.gov.gchq.palisade.example.MultiJvmExample.FILE;
 
 public class MultiJvmExampleIT {
-    public static final String FILE = ExampleSimpleRestClient.class.getClassLoader().getResource("example/exampleObj_file1.txt").getPath();
 
     private static EmbeddedHttpServer palisadeServer;
     private static EmbeddedHttpServer policyServer;
@@ -86,6 +91,16 @@ public class MultiJvmExampleIT {
         }
     }
 
+    @Before
+    public void before() {
+        MultiJvmExample.createDataPath();
+    }
+
+    @After
+    public void after() {
+        FileUtils.deleteQuietly(new File(FILE));
+    }
+
     @Test
     public void shouldRunWithoutErrors() throws Exception {
         // Given
@@ -100,7 +115,7 @@ public class MultiJvmExampleIT {
     @Test
     public void shouldReadAsAlice() throws Exception {
         // Given
-        final ExampleSimpleRestClient client = new ExampleSimpleRestClient(FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
 
         // When
         final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
@@ -120,7 +135,7 @@ public class MultiJvmExampleIT {
     @Test
     public void shouldReadAsBob() throws Exception {
         // Given
-        final ExampleSimpleRestClient client = new ExampleSimpleRestClient(FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
 
         // When
         final Stream<ExampleObj> aliceResults = client.read(FILE, "Bob", "Payroll");

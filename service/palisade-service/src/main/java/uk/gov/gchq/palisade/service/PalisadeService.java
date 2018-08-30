@@ -16,53 +16,51 @@
 
 package uk.gov.gchq.palisade.service;
 
+import uk.gov.gchq.palisade.policy.service.MultiPolicy;
+import uk.gov.gchq.palisade.resource.LeafResource;
+import uk.gov.gchq.palisade.rule.Rules;
+import uk.gov.gchq.palisade.service.exception.NoPolicyException;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The core API for the palisade service.
- * The responsibility of the palisade service is to send off the required auditing
- * records and collate all the relevant information about a request for data
- * (using the other services) and to provide the Data service with the information
- * it requires to enforce the policy and apply any user filters.
- * In order to have multiple Palisade services, the data that the data server
- * will require, needs to be stored in a shared cache (Cache service).
+ * The core API for the palisade service. The responsibility of the palisade service is to send off the required
+ * auditing records and collate all the relevant information about a request for data (using the other services) and to
+ * provide the Data service with the information it requires to enforce the policy and apply any user filters. In order
+ * to have multiple Palisade services, the data that the data server will require, needs to be stored in a shared cache
+ * (Cache service).
  */
 public interface PalisadeService extends Service {
 
     /**
-     * This method is used by the client code to register that they want to read
-     * a resource or data set. This method will check that the user can have
-     * access to the resource and pass back details of all the resources linked
-     * to the initial request (if they asked for a data set) and how to connect
-     * to the relevant data service to get that data.
-     * Then behind the scenes this will have triggered more services to be called
-     * to collate the data required by the getDataRequestConfig() method so the
-     * data service can apply the relevant policies.
+     * This method is used by the client code to register that they want to read a resource or data set. This method
+     * will check that the user can have access to the resource and pass back details of all the resources linked to the
+     * initial request (if they asked for a data set) and how to connect to the relevant data service to get that data.
+     * Then behind the scenes this will have triggered more services to be called to collate the data required by the
+     * getDataRequestConfig() method so the data service can apply the relevant policies.
      *
-     * @param request a {@link RegisterDataRequest} that contains the details
-     *                the client needs to provide the palisade service for it to
-     *                register the data request
-     * @return details of all the resources linked to the initial request (if
-     * they asked for a data set) and how to connect to the relevant data service
-     * to get that data.
+     * @param request a {@link RegisterDataRequest} that contains the details the client needs to provide the palisade
+     *                service for it to register the data request
+     * @return details of all the resources linked to the initial request (if they asked for a data set) and how to
+     * connect to the relevant data service to get that data.
      */
     CompletableFuture<DataRequestResponse> registerDataRequest(final RegisterDataRequest request);
 
     /**
-     * This method is used by the data service's to request the trusted details
-     * that it requires to apply the necessary data access controls.
+     * This method is used by the data service's to request the trusted details that it requires to apply the necessary
+     * data access controls.
      *
-     * @param request This is the {@link GetDataRequestConfig} that the client
-     *                passed to the data service.
-     * @return a {@link DataRequestConfig} containing the information that the
-     * data service requires to apply the necessary filtering/transformations to
-     * the data.
+     * @param request This is the {@link GetDataRequestConfig} that the client passed to the data service.
+     * @return a {@link DataRequestConfig} containing the information that the data service requires to apply the
+     * necessary filtering/transformations to the data.
      */
     CompletableFuture<DataRequestConfig> getDataRequestConfig(final GetDataRequestConfig request);
 
@@ -74,5 +72,27 @@ public interface PalisadeService extends Service {
             return registerDataRequest((RegisterDataRequest) request);
         }
         return Service.super.process(request);
+    }
+
+    /**
+     * Checks that each {@link LeafResource} in a request has record level policy associated with it in the {@link
+     * MultiPolicy}.
+     *
+     * @param policy    policy being applied to a request
+     * @param resources the list of resources being processed
+     * @return the {@code} policy object
+     * @throws NoPolicyException if no record level rules are available for any {@link LeafResource} in {@code resources}
+     */
+    default MultiPolicy ensureRecordRulesAvailableFor(final MultiPolicy policy, final Collection<LeafResource> resources) {
+        Objects.requireNonNull(policy, "policy");
+        Objects.requireNonNull(resources, "resources");
+        final Map<LeafResource, Rules> ruleMap = policy.getRuleMap();
+        final Rules defaultEmpty = new Rules();
+        resources.forEach(resource -> {
+            if (!ruleMap.getOrDefault(resource, defaultEmpty).containsRules()) {
+                throw new NoPolicyException("No policy rules available for " + resource);
+            }
+        });
+        return policy;
     }
 }

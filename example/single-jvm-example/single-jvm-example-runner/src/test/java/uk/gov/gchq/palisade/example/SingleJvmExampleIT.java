@@ -16,17 +16,33 @@
 
 package uk.gov.gchq.palisade.example;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.gov.gchq.palisade.example.SingleJvmExample.FILE;
+import static uk.gov.gchq.palisade.example.SingleJvmExample.createDataPath;
 import static uk.gov.gchq.palisade.util.JsonAssert.assertEquals;
 
 public class SingleJvmExampleIT {
+    @AfterClass
+    public static void deleteFile() {
+        FileUtils.deleteQuietly(new File(FILE));
+    }
+
+    @Before
+    public void before() {
+        createDataPath();
+    }
+
     @Test
     public void shouldRunWithoutErrors() throws Exception {
         // Given
@@ -41,10 +57,10 @@ public class SingleJvmExampleIT {
     @Test
     public void shouldReadAsAlice() throws Exception {
         // Given
-        final ExampleSimpleClient client = new ExampleSimpleClient();
+        final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleClient.FILE, "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
 
         // Then
         assertEquals(
@@ -61,10 +77,10 @@ public class SingleJvmExampleIT {
     @Test
     public void shouldReadAsBob() throws Exception {
         // Given
-        final ExampleSimpleClient client = new ExampleSimpleClient();
+        final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(ExampleSimpleClient.FILE, "Bob", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(FILE, "Bob", "Payroll");
 
         // Then
         assertEquals(

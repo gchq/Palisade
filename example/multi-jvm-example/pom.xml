@@ -22,7 +22,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>example</artifactId>
-        <version>0.1</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <artifactId>multi-jvm-example</artifactId>
     <packaging>pom</packaging>
@@ -33,7 +33,6 @@
         <module>multi-jvm-example-rest-resource-service</module>
         <module>multi-jvm-example-rest-user-service</module>
         <module>multi-jvm-example-rest-data-service</module>
-        <module>multi-jvm-example-client</module>
         <module>multi-jvm-example-docker-services</module>
         <module>multi-jvm-example-runner</module>
     </modules>

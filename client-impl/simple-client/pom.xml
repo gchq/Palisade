@@ -22,7 +22,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>client-impl</artifactId>
-        <version>0.1</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <artifactId>simple-client</artifactId>
 
@@ -54,12 +54,17 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>simple-data-service</artifactId>
+            <artifactId>hashmap-cache-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hashmap-cache-service</artifactId>
+            <artifactId>hdfs-resource-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>hdfs-data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

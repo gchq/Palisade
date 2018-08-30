@@ -23,6 +23,8 @@ import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used for sending a request to get the
  * {@link uk.gov.gchq.palisade.service.request.DataRequestConfig} out of the
@@ -35,16 +37,18 @@ public class GetCacheRequest extends Request {
     }
 
     public GetCacheRequest requestId(final RequestId requestId) {
+        requireNonNull(requestId, "The request id cannot be set to null.");
         this.requestId = requestId;
         return this;
     }
 
     public RequestId getRequestId() {
+        requireNonNull(requestId, "The request id has not been set.");
         return requestId;
     }
 
     public void setRequestId(final RequestId requestId) {
-        this.requestId = requestId;
+        requestId(requestId);
     }
 
     @Override

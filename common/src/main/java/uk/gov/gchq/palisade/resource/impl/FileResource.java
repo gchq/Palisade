@@ -16,53 +16,31 @@
 
 package uk.gov.gchq.palisade.resource.impl;
 
-import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.resource.AbstractResource;
-import uk.gov.gchq.palisade.resource.ChildResource;
+import uk.gov.gchq.palisade.resource.AbstractLeafResource;
 import uk.gov.gchq.palisade.resource.ParentResource;
 
-public class FileResource extends AbstractResource implements ChildResource {
-
-    private ParentResource parent;
+public class FileResource extends AbstractLeafResource {
 
     public FileResource() {
     }
 
+    @Override
     public FileResource id(final String id) {
-        super.id(id);
-        return this;
+        return (FileResource) super.id(id);
     }
 
+    @Override
     public FileResource type(final String type) {
-        super.type(type);
-        return this;
+        return (FileResource) super.type(type);
     }
 
+    @Override
     public FileResource serialisedFormat(final String serialisedFormat) {
-        super.serialisedFormat(serialisedFormat);
-        return this;
+        return (FileResource) super.serialisedFormat(serialisedFormat);
     }
 
     @Override
-    public ParentResource getParent() {
-        return parent;
-    }
-
-    @Override
-    public void setParent(final ParentResource parentId) {
-        this.parent = parentId;
-    }
-
-    @Override
-    public String _getClass() {
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .appendSuper(super.toString())
-                .append("parent", parent)
-                .toString();
+    public FileResource parent(final ParentResource parent) {
+        return (FileResource) super.parent(parent);
     }
 }

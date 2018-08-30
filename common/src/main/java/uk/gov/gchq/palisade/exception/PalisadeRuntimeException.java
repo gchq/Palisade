@@ -18,8 +18,8 @@ package uk.gov.gchq.palisade.exception;
 import static uk.gov.gchq.palisade.exception.Status.INTERNAL_SERVER_ERROR;
 
 /**
- * Subtype of {@link RuntimeException} with additional constructors to support the
- * inclusion of a HTTP error message along with the other exception details.
+ * Subtype of {@link RuntimeException} with additional constructors to support the inclusion of a HTTP error message
+ * along with the other exception details.
  */
 public class PalisadeRuntimeException extends RuntimeException {
 
@@ -29,12 +29,21 @@ public class PalisadeRuntimeException extends RuntimeException {
         super(message);
     }
 
+    public PalisadeRuntimeException(final Throwable cause) {
+        super(cause);
+    }
+
     public PalisadeRuntimeException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
     public PalisadeRuntimeException(final String message, final Status status) {
         super(message);
+        this.status = status;
+    }
+
+    public PalisadeRuntimeException(final Throwable cause, final Status status) {
+        super(cause);
         this.status = status;
     }
 

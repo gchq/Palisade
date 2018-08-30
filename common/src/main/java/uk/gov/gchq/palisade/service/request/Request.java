@@ -23,6 +23,8 @@ import uk.gov.gchq.palisade.ToStringBuilder;
 
 import java.util.UUID;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This is the high level API for any request sent to a service.
  * This makes sure each request has a unique identifier.
@@ -35,15 +37,17 @@ public abstract class Request {
     }
 
     public Request id(final String id) {
+        requireNonNull(id, "The id cannot be set to null.");
         this.id = id;
         return this;
     }
 
     public void setId(final String id) {
-        this.id = id;
+        id(id);
     }
 
     public String getId() {
+        // id will never be null
         return id;
     }
 

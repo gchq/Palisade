@@ -22,18 +22,20 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * This class is used to request whether a user can access a resource for a given justification.
  */
 public class CanAccessRequest extends Request {
     private User user;
-    private Collection<Resource> resources;
+    private Collection<LeafResource> resources;
     private Context context;
 
     // no-args constructor required
@@ -41,10 +43,11 @@ public class CanAccessRequest extends Request {
     }
 
     /**
-     * @param resources the collection of {@link Resource}'s to be accessed
+     * @param resources the collection of {@link LeafResource}'s to be accessed
      * @return the {@link CanAccessRequest}
      */
-    public CanAccessRequest resources(final Collection<Resource> resources) {
+    public CanAccessRequest resources(final Collection<LeafResource> resources) {
+        requireNonNull(resources, "The resources cannot be set to null.");
         this.resources = resources;
         return this;
     }
@@ -54,15 +57,17 @@ public class CanAccessRequest extends Request {
      * @return the {@link CanAccessRequest}
      */
     public CanAccessRequest user(final User user) {
+        requireNonNull(user, "The user cannot be set to null.");
         this.user = user;
         return this;
     }
 
     /**
-     * @param context containing contextual information such as justification or enviromental data that can influence policies
+     * @param context containing contextual information such as justification or environmental data that can influence policies
      * @return the {@link CanAccessRequest}
      */
     public CanAccessRequest context(final Context context) {
+        requireNonNull(context, "The context cannot be set to null.");
         this.context = context;
         return this;
     }
@@ -71,13 +76,13 @@ public class CanAccessRequest extends Request {
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param futureResources a completable future that will return a collection of {@link Resource}'s.
+     * @param futureResources a completable future that will return a collection of {@link LeafResource}'s.
      * @param futureUser a completable future that will return a {@link User}.
      * @param justification the justification that the user stated for why they want access to the data.
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
-            final CompletableFuture<? extends Collection<Resource>> futureResources,
+            final CompletableFuture<? extends Collection<LeafResource>> futureResources,
             final CompletableFuture<User> futureUser,
             final String justification) {
         return CompletableFuture.allOf(futureResources, futureUser)
@@ -88,35 +93,38 @@ public class CanAccessRequest extends Request {
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param resources a collection of {@link Resource}'s that the user wants access to.
+     * @param resources a collection of {@link LeafResource}'s that the user wants access to.
      * @param futureUser a completable future that will return a {@link User}.
      * @param justification the justification that the user stated for why they want access to the data.
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
-            final Collection<Resource> resources,
+            final Collection<LeafResource> resources,
             final CompletableFuture<User> futureUser,
             final String justification) {
         return futureUser.thenApply(auths -> new CanAccessRequest().resources(resources).user(futureUser.join()).context(new Context().justification(justification)));
     }
 
-    public Collection<Resource> getResources() {
+    public Collection<LeafResource> getResources() {
+        requireNonNull(resources, "The resources have not been set.");
         return resources;
     }
 
-    public void setResources(final Collection<Resource> resources) {
-        this.resources = resources;
+    public void setResources(final Collection<LeafResource> resources) {
+        resources(resources);
     }
 
     public User getUser() {
+        requireNonNull(user, "The user has not been set.");
         return user;
     }
 
     public void setUser(final User user) {
-        this.user = user;
+        user(user);
     }
 
     public Context getContext() {
+        requireNonNull(context, "The context has not been set.");
         return context;
     }
 

@@ -6,14 +6,14 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>resource-service-impl</artifactId>
-        <version>0.1</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>hdfs-resource-service</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>uk.gov.gchq.palisade</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>resource-service</artifactId>
             <version>${project.parent.version}</version>
             <type>test-jar</type>
@@ -112,6 +112,12 @@
                     <artifactId>netty</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>data-service</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

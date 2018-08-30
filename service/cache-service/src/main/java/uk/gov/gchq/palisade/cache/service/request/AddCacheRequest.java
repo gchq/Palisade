@@ -29,6 +29,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.util.Optional;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used to request that a {@link DataRequestConfig} relating to a
  * unique {@link RequestId}, that is set when the client registers there request
@@ -46,48 +48,60 @@ public class AddCacheRequest extends Request {
     }
 
     public AddCacheRequest requestId(final RequestId requestId) {
+        requireNonNull(requestId, "The request id cannot be set to null.");
         this.requestId = requestId;
         return this;
     }
 
     public AddCacheRequest dataRequestConfig(final DataRequestConfig dataRequestConfig) {
+        requireNonNull(dataRequestConfig, "The data request config cannot be set to null.");
         this.dataRequestConfig = dataRequestConfig;
         return this;
     }
 
-    public AddCacheRequest timeToLive(final Long ttlMillis) {
+    public AddCacheRequest timeToLive(final long ttlMillis) {
         this.timeToLive = toDuration(ttlMillis);
         return this;
     }
 
     public AddCacheRequest timeToLive(final Temporal expiryPoint) {
+        requireNonNull(expiryPoint, "The expiry point cannot be set to null.");
         this.timeToLive = until(expiryPoint);
         return this;
     }
 
     public AddCacheRequest timeToLive(final Optional<Duration> timeToLive) {
+        requireNonNull(timeToLive, "The time to live cannot be set to null.");
+        timeToLive.ifPresent(x -> {
+            if (x.isNegative()) {
+                throw new IllegalArgumentException("negative time to live specified!");
+            }
+        });
         this.timeToLive = timeToLive;
         return this;
     }
 
     public RequestId getRequestId() {
+        requireNonNull(requestId, "The request id has not been set.");
         return requestId;
     }
 
     public DataRequestConfig getDataRequestConfig() {
+        requireNonNull(dataRequestConfig, "The data request config has not been set.");
         return dataRequestConfig;
     }
 
     public Optional<Duration> getTimeToLive() {
+        // this will never be null
         return timeToLive;
     }
 
     public void setRequestId(final RequestId requestId) {
-        this.requestId = requestId;
+        requestId(requestId);
     }
 
     public void setDataRequestConfig(final DataRequestConfig dataRequestConfig) {
-        this.dataRequestConfig = dataRequestConfig;
+        dataRequestConfig(dataRequestConfig);
     }
 
     /**
@@ -98,20 +112,15 @@ public class AddCacheRequest extends Request {
      * @throws IllegalArgumentException if the duration is negative
      */
     public void setTimeToLive(final Optional<Duration> timeToLive) {
-        timeToLive.ifPresent(x -> {
-            if (x.isNegative()) {
-                throw new IllegalArgumentException("negative time to live specified!");
-            }
-        });
-        this.timeToLive = timeToLive;
+        timeToLive(timeToLive);
     }
 
     public void setTimeToLive(final long ttlMillis) {
-        setTimeToLive(toDuration(ttlMillis));
+        timeToLive(ttlMillis);
     }
 
     public void setTimeToLive(final Temporal expiryPoint) {
-        setTimeToLive(until(expiryPoint));
+       timeToLive(expiryPoint);
     }
 
     public void cancelTimeToLive() {

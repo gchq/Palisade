@@ -22,6 +22,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * This class is used to request a list of {@link uk.gov.gchq.palisade.resource.Resource}'s
  * from the {@link uk.gov.gchq.palisade.resource.service.ResourceService} based on the type of a {@link uk.gov.gchq.palisade.resource.Resource}.
@@ -39,16 +41,18 @@ public class GetResourcesByTypeRequest extends Request {
      * @return the {@link GetResourcesByTypeRequest}
      */
     public GetResourcesByTypeRequest type(final String type) {
+        requireNonNull(type, "The resource type cannot be set to null.");
         this.type = type;
         return this;
     }
 
     public String getType() {
+        requireNonNull(type, "The resource type has not been set.");
         return type;
     }
 
     public void setType(final String type) {
-        this.type = type;
+        type(type);
     }
 
     @Override

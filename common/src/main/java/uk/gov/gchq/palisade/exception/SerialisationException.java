@@ -31,4 +31,8 @@ public class SerialisationException extends IOException {
     public SerialisationException(final String message, final Throwable e) {
         super(message, e);
     }
+
+    public SerialisationException(final Throwable e) {
+        super(e);
+    }
 }

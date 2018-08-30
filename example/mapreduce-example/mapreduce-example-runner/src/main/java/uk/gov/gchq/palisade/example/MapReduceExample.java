@@ -15,45 +15,61 @@
  */
 package uk.gov.gchq.palisade.example;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.example.client.ExampleMapReduceClient;
-import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.client.ServicesFactory;
+import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
+import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
+import uk.gov.gchq.palisade.resource.LeafResource;
+import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.Objects;
 
 /**
  * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
- * exmaple data. The job is then configured to make a request as part of the MapReduce job. The actual MapReduce job is
+ * example data. The job is then configured to make a request as part of the MapReduce job. The actual MapReduce job is
  * a simple word count example.
  * <p>
  * The word count example is adapted from: https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
  */
 public class MapReduceExample extends Configured implements Tool {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
 
-    public static final String RESOURCE_TYPE = "exampleObj";
+    protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
+    protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
+    private static final String RESOURCE_TYPE = "exampleObj";
 
     /**
      * This simple mapper example just extracts the property field of the example object and emits a count of one.
      */
-    private static class ExampleMap extends Mapper<Resource, ExampleObj, Text, IntWritable> {
+    private static class ExampleMap extends Mapper<LeafResource, ExampleObj, Text, IntWritable> {
         private static final IntWritable ONE = new IntWritable(1);
 
         private Text outputKey = new Text();
 
-        protected void map(final Resource key, final ExampleObj value, final Context context) throws IOException, InterruptedException {
+        protected void map(final LeafResource key, final ExampleObj value, final Context context) throws IOException, InterruptedException {
             String property = value.getProperty();
             outputKey.set(property);
             context.write(outputKey, ONE);
@@ -85,7 +101,6 @@ public class MapReduceExample extends Configured implements Tool {
             return 1;
         }
 
-
         //create the basic job object and configure it for this example
         Job job = Job.getInstance(getConf(), "Palisade MapReduce Example");
         job.setJarByClass(MapReduceExample.class);
@@ -108,26 +123,91 @@ public class MapReduceExample extends Configured implements Tool {
         // ==========================================================
 
         //configure the Palisade input format on an example client
-        final ExampleMapReduceClient client = new ExampleMapReduceClient();
-
-        ExampleMapReduceClient.initialiseJob(job, client, 2);
+        ExampleSimpleClient client = new ExampleSimpleClient(FILE);
+        configureJob(job, client.getServicesFactory(), 2);
 
         //next add a resource request to the job
-        ExampleMapReduceClient.addDataRequest(job, "file1", RESOURCE_TYPE, "Alice", "Payroll");
-        ExampleMapReduceClient.addDataRequest(job, "file1", RESOURCE_TYPE, "Bob", "Payroll");
+        addDataRequest(job, FILE, RESOURCE_TYPE, "Alice", "Payroll");
+        addDataRequest(job, FILE, RESOURCE_TYPE, "Bob", "Payroll");
 
         //launch job
         boolean success = job.waitForCompletion(true);
 
+        FileUtils.deleteQuietly(new File(FILE));
+
         return (success) ? 0 : 1;
     }
 
+    /**
+     * Configures the given job to use this example client.
+     *
+     * @param job        the job to configure
+     * @param services   the Palisade services factory
+     * @param maxMapHint the hint for the maximum number of mappers
+     */
+    public static void configureJob(final Job job, final ServicesFactory services, final int maxMapHint) {
+        job.setInputFormatClass(PalisadeInputFormat.class);
+        //tell it which Palisade service to use
+        PalisadeInputFormat.setPalisadeService(job, services.getPalisadeService());
+        //configure the serialiser to use
+        PalisadeInputFormat.setSerialiser(job, new ExampleObjSerialiser());
+        //set the maximum mapper hint
+        PalisadeInputFormat.setMaxMapTasksHint(job, maxMapHint);
+    }
+
+    /**
+     * Utility method to add a read request to a job.
+     *
+     * @param context       the job to add the request to
+     * @param filename      example filename
+     * @param resourceType  the example resource type
+     * @param userId        the example user id
+     * @param justification the example justification
+     */
+    public static void addDataRequest(final JobContext context, final String filename, final String resourceType, final String userId, final String justification) {
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
+        PalisadeInputFormat.addDataRequest(context, dataRequest);
+    }
+
     public static void main(final String... args) throws Exception {
-        Configuration conf = new Configuration();
-        //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
-        conf.set("mapred.job.tracker", "local");
-        //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
-        conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
-        ToolRunner.run(conf, new MapReduceExample(), args);
+        final String outputDir;
+        if (args.length < 1) {
+            outputDir = DEFAULT_OUTPUT_DIR;
+        } else {
+            outputDir = args[0];
+        }
+        // create the data in the correct place
+        createDataPath();
+        //remove this as it needs to be not present when the job runs
+        FileUtils.deleteDirectory(new File(outputDir));
+        try {
+            Configuration conf = new Configuration();
+            //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
+            conf.set("mapred.job.tracker", "local");
+            //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
+            conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
+            ToolRunner.run(conf, new MapReduceExample(), new String[]{outputDir});
+        } finally {
+            // clean up
+            Files.deleteIfExists(new File(FILE).toPath());
+        }
+    }
+
+    private static String createOutputDir() {
+        try {
+            return Files.createTempDirectory("mapreduce-example-").toAbsolutePath().toString();
+        } catch (IOException e) {
+            LOGGER.error("Failed to create an output directory.");
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void createDataPath() {
+        try (final InputStream data = MapReduceExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
+            Objects.requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
+            FileUtils.copyInputStreamToFile(data, new File(FILE));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
