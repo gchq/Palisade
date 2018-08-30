@@ -65,7 +65,12 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hashmap-cache-service</artifactId>
+            <artifactId>hashmap-backing-store</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>basic-cache-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

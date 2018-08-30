@@ -15,10 +15,21 @@
  */
 package uk.gov.gchq.palisade.cache.service.impl;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Optional;
 
+@JsonPropertyOrder(value = {"class"}, alphabetic = true)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "class"
+)
 public interface BackingStore {
 
     boolean store(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive);
@@ -28,4 +39,14 @@ public interface BackingStore {
     Collection<String> list(final String prefix);
 
     boolean supportsTimeToLive();
+
+    @JsonGetter("class")
+    default String _getClass() {
+        return getClass().getName();
+    }
+
+    @JsonSetter("class")
+    default void _setClass(final String className) {
+        // do nothing.
+    }
 }
