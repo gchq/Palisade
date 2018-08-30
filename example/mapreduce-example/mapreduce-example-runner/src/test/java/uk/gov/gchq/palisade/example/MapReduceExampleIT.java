@@ -26,7 +26,7 @@ import java.util.Scanner;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
-import static uk.gov.gchq.palisade.example.MapReduceExample.OUTPUT_DIR;
+import static uk.gov.gchq.palisade.example.MapReduceExample.DEFAULT_OUTPUT_DIR;
 
 public class MapReduceExampleIT {
 
@@ -48,7 +48,7 @@ public class MapReduceExampleIT {
             MapReduceExample.main();
         } finally {
             // Then - no exceptions
-            FileUtils.deleteDirectory(new File(OUTPUT_DIR));
+            FileUtils.deleteDirectory(new File(DEFAULT_OUTPUT_DIR));
         }
     }
 
@@ -60,12 +60,12 @@ public class MapReduceExampleIT {
         // When
         MapReduceExample.main();
         //read actual results
-        requireNonNull(OUTPUT_DIR, "The temp directory cannot be null.");
-        String actual = slurpStream(Files.newInputStream(new File(OUTPUT_DIR).toPath().resolve("part-r-00000")));
+        requireNonNull(DEFAULT_OUTPUT_DIR, "The temp directory cannot be null.");
+        String actual = slurpStream(Files.newInputStream(new File(DEFAULT_OUTPUT_DIR).toPath().resolve("part-r-00000")));
         //Then
         assertEquals(expected, actual);
         } finally {
-            FileUtils.deleteDirectory(new File(OUTPUT_DIR));
+            FileUtils.deleteDirectory(new File(DEFAULT_OUTPUT_DIR));
         }
     }
 
