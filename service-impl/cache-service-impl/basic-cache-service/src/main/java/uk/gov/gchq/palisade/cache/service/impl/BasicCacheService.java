@@ -79,7 +79,7 @@ public class BasicCacheService implements CacheService {
     }
 
     @Override
-    public <V> CompletableFuture<V> get(final GetCacheRequest<V> request) {
+    public <V> CompletableFuture<Optional<V>> get(final GetCacheRequest<V> request) {
         Objects.requireNonNull(request, "request");
         //make final key name
         String baseKey = request.makeBaseName();
@@ -88,7 +88,11 @@ public class BasicCacheService implements CacheService {
         //get from store
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Requesting backing store to retrieve "+baseKey);
-            
+            Optional<byte[]> result= store.retrieve(baseKey);
+            result.ifPresent(item -> {
+                LOGGER.debug("Backing store successfully retrieved "+baseKey);
+            })
+            return result;
         });
     }
 

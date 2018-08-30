@@ -16,12 +16,13 @@
 package uk.gov.gchq.palisade.cache.service.impl;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface BackingStore {
 
     boolean store(final String key,final byte[] value);
 
-    byte[] retrieve(final String key);
+    Optional<byte[]> retrieve(final String key);
 
     Collection<String> list(final String prefix);
 

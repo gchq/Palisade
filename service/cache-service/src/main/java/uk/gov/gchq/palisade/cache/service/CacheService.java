@@ -27,6 +27,7 @@ import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -57,7 +58,7 @@ public interface CacheService extends Service {
      * @param request {@link GetCacheDataRequest} containing the unique requestId.
      * @return The {@link DataRequestConfig} relating to the unique requestId that is stored in the cache.
      */
-    <V> CompletableFuture<V> get(final GetCacheRequest<V> request);
+    <V> CompletableFuture<Optional<V>> get(final GetCacheRequest<V> request);
 
     CompletableFuture<Collection<?>> list(final ListCacheRequest request);
 
