@@ -24,7 +24,7 @@ import uk.gov.gchq.palisade.service.Service;
 
 import java.util.function.BiFunction;
 
-public class GetCacheRequest<K,V> extends CacheRequest<K> {
+public class GetCacheRequest<K, V> extends CacheRequest<K> {
 
     public GetCacheRequest() {
     }
@@ -45,9 +45,13 @@ public class GetCacheRequest<K,V> extends CacheRequest<K> {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         GetCacheRequest that = (GetCacheRequest) o;
 

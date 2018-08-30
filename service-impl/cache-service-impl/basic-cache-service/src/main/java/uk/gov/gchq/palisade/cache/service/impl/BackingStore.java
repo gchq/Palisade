@@ -17,12 +17,11 @@ package uk.gov.gchq.palisade.cache.service.impl;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public interface BackingStore {
 
-    boolean store(final String key, final Class<?> valueClass,final byte[] value,final Optional<Duration> timeToLive);
+    boolean store(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive);
 
     BasicCacheObject retrieve(final String key);
 

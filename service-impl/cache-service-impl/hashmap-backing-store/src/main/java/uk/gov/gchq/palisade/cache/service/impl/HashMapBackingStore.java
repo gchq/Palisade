@@ -19,8 +19,6 @@ package uk.gov.gchq.palisade.cache.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.cache.service.CacheService;
-
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Optional;
@@ -44,7 +42,7 @@ public class HashMapBackingStore implements BackingStore {
         public final byte[] value;
         public final Class<?> clazz;
 
-        public CachedPair(final byte[] value, final Class<?> clazz) {
+        CachedPair(final byte[] value, final Class<?> clazz) {
             this.value = value;
             this.clazz = clazz;
         }

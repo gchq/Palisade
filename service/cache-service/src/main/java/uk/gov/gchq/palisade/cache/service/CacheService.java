@@ -16,50 +16,58 @@
 
 package uk.gov.gchq.palisade.cache.service;
 
-import uk.gov.gchq.palisade.cache.service.request.AddCacheDataRequest;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
-import uk.gov.gchq.palisade.cache.service.request.GetCacheDataRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The core API for the cache service. The purpose of the cache service is to store the information that the data
- * service will require based on a <code>registerDataRequest</code> made to the palisade service. The reason this is
- * required is because you might have multiple instances of the palisade service running and the registration request
- * might go to a different palisade service to the getDataRequestConfig. The data in the cache should be maintained by a
- * time to live value rather than removing after the get request as any scalable deployment would likely make multiple
- * requests to the cache due to many data services working on a subset of the list of resources in parallel.
+ * The core API for the cache service. The purpose of the cache service is to store the information that the various
+ * services will require. For exaple, you might have multiple instances of the palisade service running and the
+ * registration request (from <code>registerDataRequest</code>) might go to a different palisade service to the
+ * getDataRequestConfig() call. The data in the cache should be maintained by a time to live value rather than removing
+ * after the get request as any scalable deployment would likely make multiple requests to the cache due to many data
+ * services working on a subset of the list of resources in parallel.
+ * <p>
+ * The cache service will namespace items according to the {@link Service} that puts things in the cache.
  */
 public interface CacheService extends Service {
     /**
-     * Adds a record to the cache according to the contents of the {@link AddCacheDataRequest} parameter. The
-     * AddCacheDataRequest will contain a identifier that is unique per client request for data and therefore it is a
-     * good candidate for a lookup key.
+     * Adds a record to the cache according to the contents of the {@link AddCacheRequest} parameter.
      *
-     * @param request {@link AddCacheDataRequest} containing a unique requestId and the information to be cached.
+     * @param request {@link uk.gov.gchq.palisade.cache.service.request.AddCacheRequest} containing a unique requestId
+     *                and the information to be cached.
+     * @param <K>     the key type being added to the cache
+     * @param <V>     the value type being added to the cache
      * @return a {@link CompletableFuture} which would be true once the information has been cached.
      */
     <K, V> CompletableFuture<Boolean> add(final AddCacheRequest<K, V> request);
 
     /**
-     * Pull out of the cache the information related to the unique requestId contained in the {@link
-     * GetCacheDataRequest} parameter. This method should not remove the item from cache just because it has been
-     * retrieved once. There may be many requests to get the cached data instigated my the many data services that are
-     * accessing subsets of the list of resource stemming from the single registered data request.
+     * Retrieve an item from the cache. The <code>request</code> should be parameterized according to the expected type
+     * of object to be retrieved. If the cache couldn't find an entry for the requested key, then the {@link Optional}
+     * returned will be empty.
      *
-     * @param request {@link GetCacheDataRequest} containing the unique requestId.
-     * @return The {@link DataRequestConfig} relating to the unique requestId that is stored in the cache.
+     * @param request {@link uk.gov.gchq.palisade.cache.service.request.GetCacheRequest} containing the key.
+     * @param <K>     the key type being retrieved
+     * @param <V>     the value type being retrieved
+     * @return a {@link CompletableFuture} that contains an {@link Optional} for the cached key
      */
     <K, V> CompletableFuture<Optional<V>> get(final GetCacheRequest<K, V> request);
 
+    /**
+     * Returns a list of all cache entries available that match the given prefix. The cache will look in the namespace
+     * for the service named in <code>request</code> and return all key names that start with the given prefix.
+     *
+     * @param request the request configured with a prefix
+     * @param <K>     the key type for the cache request
+     * @return a list of strings that are cache keys
+     */
     <K> CompletableFuture<Collection<String>> list(final ListCacheRequest<K> request);
 
     @Override

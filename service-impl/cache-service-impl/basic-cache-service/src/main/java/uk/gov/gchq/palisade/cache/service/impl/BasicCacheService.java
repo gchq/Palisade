@@ -20,10 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
-import uk.gov.gchq.palisade.cache.service.request.CacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
-import uk.gov.gchq.palisade.service.Service;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -34,7 +32,7 @@ import java.util.function.BiFunction;
 
 public class BasicCacheService implements CacheService {
 
-    Logger LOGGER = LoggerFactory.getLogger(BasicCacheService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasicCacheService.class);
 
     private BackingStore store;
 
@@ -84,7 +82,7 @@ public class BasicCacheService implements CacheService {
     }
 
     @Override
-    public <K,V> CompletableFuture<Optional<V>> get(final GetCacheRequest<K,V> request) {
+    public <K, V> CompletableFuture<Optional<V>> get(final GetCacheRequest<K, V> request) {
         Objects.requireNonNull(request, "request");
         //make final key name
         String baseKey = request.makeBaseName();
