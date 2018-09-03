@@ -22,9 +22,9 @@ import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 /**
  * The core API for the cache service. The purpose of the cache service is to store the information that the various
@@ -65,7 +65,7 @@ public interface CacheService extends Service {
      * @param request the request configured with a prefix
      * @return a list of strings that are cache keys
      */
-    CompletableFuture<Collection<String>> list(final ListCacheRequest request);
+    CompletableFuture<Stream<String>> list(final ListCacheRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {

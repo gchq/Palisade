@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.time.Duration;
-import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 
 /**
@@ -86,14 +86,14 @@ public interface BackingStore {
     BasicCacheObject retrieve(final String key);
 
     /**
-     * List all keys with a given prefix. This method acts as a way to query the backing store to find which keys it
-     * has. The returned list will have all the keys that start with the given string in it.
+     * Get a stream of all keys with a given prefix. This method acts as a way to query the backing store to find which
+     * keys it has. The returned list will have all the keys that start with the given string in it.
      *
      * @param prefix the prefix to look for
-     * @return a list of valid keys
+     * @return a stream of valid keys
      * @throws IllegalArgumentException if <code>key</code> is empty (once whitespace is trimmed)
      */
-    Collection<String> list(final String prefix);
+    Stream<String> list(final String prefix);
 
     /**
      * Check the provided key is not empty.

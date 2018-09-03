@@ -119,7 +119,16 @@ public abstract class CacheRequest extends Request {
      * @return a unique key for this request
      */
     public String makeBaseName() {
-        return getService().getCanonicalName() + SEPARATOR + getKey();
+        return getServiceStringForm() + SEPARATOR + getKey();
+    }
+
+    /**
+     * Get the string form of the {@link Service}.
+     *
+     * @return typically this is the class name of the {@link Service} instance
+     */
+    public String getServiceStringForm() {
+        return getService().getCanonicalName();
     }
 
     @Override

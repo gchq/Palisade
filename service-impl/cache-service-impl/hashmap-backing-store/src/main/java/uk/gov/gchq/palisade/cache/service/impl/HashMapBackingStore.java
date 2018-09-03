@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A HashMapBackingStore is a simple implementation of a {@link BackingStore} that simply caches the objects in a
@@ -126,12 +127,11 @@ public class HashMapBackingStore implements BackingStore {
 
 
     @Override
-    public Collection<String> list(final String prefix) {
+    public Stream<String> list(final String prefix) {
         return cache.keySet()
                 .stream()
                 .filter(x -> x.startsWith(
                                 BackingStore.keyCheck(prefix))
-                )
-                .collect(Collectors.toSet());
+                );
     }
 }

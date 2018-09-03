@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 /**
  * The implemention for a {@link CacheService} that can persist various object types to arbitrary backing stores.
@@ -135,17 +136,22 @@ public class BasicCacheService implements CacheService {
     }
 
     @Override
-    public CompletableFuture<Collection<String>> list(final ListCacheRequest request) {
+    public CompletableFuture<Stream<String>> list(final ListCacheRequest request) {
         Objects.requireNonNull(request, "request");
 
         //make final key name
         String baseKey = request.makeBaseName();
         LOGGER.debug("Got request to list items with prefix {} ", baseKey);
 
+        int len = request.getServiceStringForm().length();
+
         //retrieve from store
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Sending list request to store {}", baseKey);
-            Collection<String> ret = getBackingStore().list(baseKey);
+
+            //remove the service name from the list of keys
+            Stream<String> ret = getBackingStore().list(baseKey).map(x -> x.substring(len));
+
             LOGGER.debug("Store list returned for {}", baseKey);
             return ret;
         });
