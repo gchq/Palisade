@@ -31,7 +31,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 /**
- * The implemention for a {@link CacheService} that can persist various object types to arbitrary backing stores.
+ * The implementation for a {@link CacheService} that can persist various object types to arbitrary backing stores.
  * Instances of this class primarily store an instance of {@link BackingStore} to which the work of persistence is
  * delegated. This class is responsible for managing data into and out of any backing store so clients have a
  * transparent interface to a backing store and the actual backing store implementation is abstracted away.
