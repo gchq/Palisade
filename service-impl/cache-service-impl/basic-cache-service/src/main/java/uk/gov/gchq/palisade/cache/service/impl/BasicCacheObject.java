@@ -22,22 +22,52 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.util.Objects;
 import java.util.Optional;
 
-public class BasicCacheObject<T, V> {
+/**
+ * Represents the basic cache entry that will be stored and retrieved from the backing store. If a store is unable to
+ * retrieve a given key then it will return an instance of this class with an empty value. No entries in this class may
+ * be <code>null</code>.
+ *
+ * @param <T> the type of the object being stored in this entry
+ */
+public class BasicCacheObject<T> {
 
-    private final Class<V> valueClass;
+    /**
+     * The class of the object being stored in the cache. This should a @{link Class} for the standard form of
+     * <code>value</code>.
+     */
+    private final Class<?> valueClass;
+    /**
+     * The holder for the object being cached. This may be empty on retrieve requests where they key couldn't be found.
+     */
     private final Optional<T> value;
 
-    public BasicCacheObject(final Class<V> valueClass, final Optional<T> value) {
+    /**
+     * Create a cache object.
+     *
+     * @param valueClass the type of the value being cached
+     * @param value      the optional cache value, may be empty if no valid entry is present
+     */
+    public BasicCacheObject(final Class<T> valueClass, final Optional<T> value) {
         Objects.requireNonNull(valueClass, "valueClass");
         Objects.requireNonNull(value, "value");
         this.valueClass = valueClass;
         this.value = value;
     }
 
-    public Class<V> getValueClass() {
+    /**
+     * Get the class of the object being cached.
+     *
+     * @return the {@link Class} instance of the cached entry
+     */
+    public Class<?> getValueClass() {
         return valueClass;
     }
 
+    /**
+     * Get the cached value.
+     *
+     * @return cached value or an empty {@link Optional}
+     */
     public Optional<T> getValue() {
         return value;
     }
@@ -61,7 +91,7 @@ public class BasicCacheObject<T, V> {
             return false;
         }
 
-        BasicCacheObject<T, V> that = (BasicCacheObject<T, V>) o;
+        BasicCacheObject<T> that = (BasicCacheObject<T>) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))

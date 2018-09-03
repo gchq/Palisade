@@ -95,6 +95,20 @@ public interface BackingStore {
      */
     Collection<String> list(final String prefix);
 
+    /**
+     * Check the provided key is not empty.
+     *
+     * @param key the backing store key
+     * @return the key
+     * @throws IllegalArgumentException if the given key is <code>null<code> once whitespace is trimmed
+     */
+    static String keyCheck(final String key) {
+        if (key == null || key.trim().isEmpty()) {
+            throw new IllegalArgumentException("key cannot be empty");
+        }
+        return key;
+    }
+
     @JsonGetter("class")
     default String _getClass() {
         return getClass().getName();

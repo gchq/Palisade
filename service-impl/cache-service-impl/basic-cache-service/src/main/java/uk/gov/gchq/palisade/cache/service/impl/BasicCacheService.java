@@ -30,25 +30,57 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
+/**
+ * The implemention for a {@link CacheService} that can persist various object types to arbitrary backing stores.
+ * Instances of this class primarily store an instance of {@link BackingStore} to which the work of persistence is
+ * delegated. This class is responsible for managing data into and out of any backing store so clients have a
+ * transparent interface to a backing store and the actual backing store implementation is abstracted away.
+ *
+ * @apiNote no parameters may be <code>null</code>.
+ */
 public class BasicCacheService implements CacheService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BasicCacheService.class);
 
+    /**
+     * The store for our data.
+     */
     private BackingStore store;
 
+    /**
+     * Create and empty backing store. Note that this is for use by serialisation mechanisms and any attempt to use an
+     * instance of this class without first initialising a backing store will result in exceptions being thrown.
+     */
     public BasicCacheService() {
     }
 
+    /**
+     * Set the backing store for this instance.
+     *
+     * @param store the backing store instance
+     * @return this object
+     */
     public BasicCacheService backingStore(final BackingStore store) {
         Objects.requireNonNull(store, "store");
         this.store = store;
         return this;
     }
 
+
+    /**
+     * Set the backing store for this instance.
+     *
+     * @param store the backing store instance
+     */
     public void setBackingStore(final BackingStore store) {
         backingStore(store);
     }
 
+    /**
+     * Get the backing store for this instance.
+     *
+     * @return the backing store
+     */
     public BackingStore getBackingStore() {
         Objects.requireNonNull(store, "store must be initialised");
         return store;
@@ -78,6 +110,7 @@ public class BasicCacheService implements CacheService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <V> CompletableFuture<Optional<V>> get(final GetCacheRequest<V> request) {
         Objects.requireNonNull(request, "request");
         //make final key name
@@ -87,7 +120,7 @@ public class BasicCacheService implements CacheService {
         //get from store
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Requesting backing store to retrieve {}", baseKey);
-            BasicCacheObject<byte[], V> result = getBackingStore().retrieve(baseKey);
+            BasicCacheObject<byte[]> result = getBackingStore().retrieve(baseKey);
             if (result.getValue().isPresent()) {
                 LOGGER.debug("Backing store successfully retrieved {}", baseKey);
             } else {
@@ -97,7 +130,7 @@ public class BasicCacheService implements CacheService {
             //assign so Javac can infer the generic type
             BiFunction<byte[], Class<V>, V> decode = request.getValueDecoder();
 
-            return result.getValue().map(x -> decode.apply(x, result.getValueClass()));
+            return result.getValue().map(x -> decode.apply(x, (Class<V>) result.getValueClass()));
         });
     }
 
