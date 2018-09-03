@@ -24,7 +24,6 @@ import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 
 import java.time.Duration;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -121,7 +120,7 @@ public class BasicCacheService implements CacheService {
         //get from store
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Requesting backing store to retrieve {}", baseKey);
-            BasicCacheObject<byte[]> result = getBackingStore().retrieve(baseKey);
+            BasicCacheObject result = getBackingStore().retrieve(baseKey);
             if (result.getValue().isPresent()) {
                 LOGGER.debug("Backing store successfully retrieved {}", baseKey);
             } else {

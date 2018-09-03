@@ -77,7 +77,8 @@ public interface BackingStore {
     /**
      * Attempt to retrieve the given key from the backing store. Looks up the given key and attempts to retrieve it. If
      * the requested key couldn't be found then the value of the returned {@link BasicCacheObject} will be empty. A new
-     * cache object should be returned for each call to this method.
+     * cache object should be returned for each call to this method. If the key can't be found, then the expected class
+     * should be <code>Object.class</code> inside the returned object.
      *
      * @param key the key to lookup
      * @return a new cache object
@@ -100,7 +101,7 @@ public interface BackingStore {
      *
      * @param key the backing store key
      * @return the key
-     * @throws IllegalArgumentException if the given key is <code>null<code> once whitespace is trimmed
+     * @throws IllegalArgumentException if the given key is <code>null</code> once whitespace is trimmed
      */
     static String keyCheck(final String key) {
         if (key == null || key.trim().isEmpty()) {

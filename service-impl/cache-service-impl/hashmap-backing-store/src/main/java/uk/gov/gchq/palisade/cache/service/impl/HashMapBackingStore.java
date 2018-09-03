@@ -20,14 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -103,6 +101,11 @@ public class HashMapBackingStore implements BackingStore {
         Objects.requireNonNull(valueClass, "valueClass");
         Objects.requireNonNull(value, "value");
         Objects.requireNonNull(timeToLive, "timeToLive");
+        timeToLive.ifPresent(x -> {
+            if (x.isNegative()) {
+                throw new IllegalArgumentException("time to live cannot be negative");
+            }
+        });
         LOGGER.debug("Adding to cache: {} of class {}", new String(value), valueClass);
         cache.put(cacheKey, new CachedPair(value, valueClass));
         /*Here we set up a simple timer to deal with the removal of the item from the cache if a duration is present
@@ -115,23 +118,21 @@ public class HashMapBackingStore implements BackingStore {
         return true;
     }
 
-
     @Override
     public BasicCacheObject retrieve(final String key) {
         String cacheKey = BackingStore.keyCheck(key);
         LOGGER.debug("Getting from cache: {}", cacheKey);
         final CachedPair result = cache.getOrDefault(cacheKey, new CachedPair(null, Object.class));
-
         return new BasicCacheObject(result.clazz, Optional.ofNullable(result.value));
     }
 
-
     @Override
     public Stream<String> list(final String prefix) {
+        String checkedKey = BackingStore.keyCheck(prefix);
         return cache.keySet()
                 .stream()
                 .filter(x -> x.startsWith(
-                                BackingStore.keyCheck(prefix))
+                                checkedKey)
                 );
     }
 }

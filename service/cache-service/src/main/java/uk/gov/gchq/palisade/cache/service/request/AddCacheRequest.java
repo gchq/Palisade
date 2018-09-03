@@ -183,7 +183,6 @@ public class AddCacheRequest<V> extends CacheRequest {
      * after this point in time.
      *
      * @param expiryPoint the time point after which this entry should expire
-     * @return this object
      * @throws IllegalArgumentException if the expiry point is before now
      */
     public void setTimeToLive(final Temporal expiryPoint) {

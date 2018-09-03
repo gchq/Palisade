@@ -27,9 +27,8 @@ import java.util.Optional;
  * retrieve a given key then it will return an instance of this class with an empty value. No entries in this class may
  * be <code>null</code>.
  *
- * @param <T> the type of the object being stored in this entry
  */
-public class BasicCacheObject<T> {
+public class BasicCacheObject {
 
     /**
      * The class of the object being stored in the cache. This should a @{link Class} for the standard form of
@@ -39,7 +38,7 @@ public class BasicCacheObject<T> {
     /**
      * The holder for the object being cached. This may be empty on retrieve requests where they key couldn't be found.
      */
-    private final Optional<T> value;
+    private final Optional<byte[]> value;
 
     /**
      * Create a cache object.
@@ -47,7 +46,7 @@ public class BasicCacheObject<T> {
      * @param valueClass the type of the value being cached
      * @param value      the optional cache value, may be empty if no valid entry is present
      */
-    public BasicCacheObject(final Class<T> valueClass, final Optional<T> value) {
+    public BasicCacheObject(final Class<?> valueClass, final Optional<byte[]> value) {
         Objects.requireNonNull(valueClass, "valueClass");
         Objects.requireNonNull(value, "value");
         this.valueClass = valueClass;
@@ -68,7 +67,7 @@ public class BasicCacheObject<T> {
      *
      * @return cached value or an empty {@link Optional}
      */
-    public Optional<T> getValue() {
+    public Optional<byte[]> getValue() {
         return value;
     }
 
@@ -91,7 +90,7 @@ public class BasicCacheObject<T> {
             return false;
         }
 
-        BasicCacheObject<T> that = (BasicCacheObject<T>) o;
+        BasicCacheObject that = (BasicCacheObject) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
