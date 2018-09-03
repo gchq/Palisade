@@ -94,9 +94,4 @@ public class HashMapBackingStore implements BackingStore {
                 .filter(x -> x.startsWith(prefix))
                 .collect(Collectors.toSet());
     }
-
-    @Override
-    public boolean supportsTimeToLive() {
-        return true;
-    }
 }

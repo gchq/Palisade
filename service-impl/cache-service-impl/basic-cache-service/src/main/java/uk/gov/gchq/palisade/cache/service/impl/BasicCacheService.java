@@ -65,10 +65,6 @@ public class BasicCacheService implements CacheService {
         Class<? extends Object> valueClass = request.getValue().getClass();
         Optional<Duration> timeToLive = request.getTimeToLive();
 
-        if (timeToLive.isPresent() && !getBackingStore().supportsTimeToLive()) {
-            throw new UnsupportedOperationException("Cache backing store doesn't support time to live");
-        }
-
         //encode value
         byte[] encodedValue = request.getValueEncoder().apply(value);
 
