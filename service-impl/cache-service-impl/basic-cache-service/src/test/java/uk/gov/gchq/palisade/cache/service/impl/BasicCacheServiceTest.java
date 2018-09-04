@@ -18,8 +18,6 @@ package uk.gov.gchq.palisade.cache.service.impl;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.AdditionalMatchers;
-import org.mockito.Mock;
 
 import org.mockito.Mockito;
 import uk.gov.gchq.palisade.cache.service.CacheService;
@@ -28,8 +26,6 @@ import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -41,7 +37,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.matchers.Equality.areEqual;
 
 public class BasicCacheServiceTest {
     private BasicCacheService service;
@@ -142,7 +137,7 @@ public class BasicCacheServiceTest {
         Stream<String> actual = getFuture.join();
 
         //Then
-        assertTrue(StreamUtil.areEqual(Stream.empty(), actual));
+        assertTrue(StreamUtil.streamEqual(Stream.empty(), actual));
     }
 
     @Test
@@ -162,7 +157,7 @@ public class BasicCacheServiceTest {
         assertTrue(result);
         assertTrue(result2);
         Stream<String> expected = Stream.of(BASE_KEY_1, BASE_KEY_2);
-        assertTrue(StreamUtil.areEqual(expected, actual));
+        assertTrue(StreamUtil.streamEqual(expected, actual));
     }
 
     @Test

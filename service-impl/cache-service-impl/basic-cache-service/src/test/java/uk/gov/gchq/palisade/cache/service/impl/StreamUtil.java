@@ -29,7 +29,7 @@ public class StreamUtil {
      * @param <T>      type of list element
      * @return true if streams are equal
      */
-    public static <T> boolean areEqual(final Stream<? extends T> expected, final Stream<? extends T> actual) {
+    public static <T> boolean streamEqual(final Stream<? extends T> expected, final Stream<? extends T> actual) {
         Stream<? extends T> sort_expected = expected.sorted();
         Stream<? extends T> sort_actual = actual.sorted();
         List<? extends T> lhs = sort_expected.collect(Collectors.toList());

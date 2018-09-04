@@ -20,16 +20,15 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.internal.matchers.Equality.areEqual;
+
+import static uk.gov.gchq.palisade.cache.service.impl.StreamUtil.streamEqual;
 
 public abstract class AbstractBackingStoreTest {
 
@@ -50,7 +49,7 @@ public abstract class AbstractBackingStoreTest {
         //When
         Stream<String> ret = impl.list("anything");
         //Then
-        assertTrue(areEqual(Stream.empty(), ret));
+        assertTrue(streamEqual(Stream.empty(), ret));
     }
 
     @Test
@@ -63,7 +62,7 @@ public abstract class AbstractBackingStoreTest {
         //When
         Stream<String> ret = impl.list("test");
         //Then
-        assertTrue(areEqual(Stream.of("test_key1", "test_key2"), ret));
+        assertTrue(streamEqual(Stream.of("test_key1", "test_key2"), ret));
     }
 
     @Test
@@ -77,8 +76,8 @@ public abstract class AbstractBackingStoreTest {
         Stream<String> ret = impl.list("foo");
         Stream<String> ret2 = impl.list("bar");
         //Then
-        assertTrue(areEqual(Stream.of("foo_key1"), ret));
-        assertTrue(areEqual(Stream.of("bar_key2"), ret2));
+        assertTrue(streamEqual(Stream.of("foo_key1"), ret));
+        assertTrue(streamEqual(Stream.of("bar_key2"), ret2));
     }
 
     @Test
@@ -91,7 +90,7 @@ public abstract class AbstractBackingStoreTest {
         //When
         Stream<String> ret = impl.list("not_there");
         //Then
-        assertTrue(areEqual(Stream.empty(), ret));
+        assertTrue(streamEqual(Stream.empty(), ret));
     }
 
     //Error tests
@@ -150,29 +149,11 @@ public abstract class AbstractBackingStoreTest {
         fail("exception expected");
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void throwOnEmptyKeyList() {
-        //Given - nothing
-        //When
-        impl.list("");
-        //Then
-        fail("exception expected");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void throwOnNullKeyList() {
         //Given - nothing
         //When
         impl.list(null);
-        //Then
-        fail("exception expected");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void throwOnWhitespaceKeyList() {
-        //Given - nothing
-        //When
-        impl.list("  ");
         //Then
         fail("exception expected");
     }
