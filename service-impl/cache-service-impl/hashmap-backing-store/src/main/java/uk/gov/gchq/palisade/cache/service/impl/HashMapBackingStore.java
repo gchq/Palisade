@@ -128,11 +128,11 @@ public class HashMapBackingStore implements BackingStore {
 
     @Override
     public Stream<String> list(final String prefix) {
-        String checkedKey = BackingStore.keyCheck(prefix);
+        Objects.requireNonNull(prefix, "prefix");
         return cache.keySet()
                 .stream()
                 .filter(x -> x.startsWith(
-                                checkedKey)
+                                prefix)
                 );
     }
 }

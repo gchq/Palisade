@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.internal.matchers.Equality.areEqual;
 
 public abstract class AbstractBackingStoreTest {
 
@@ -39,23 +40,6 @@ public abstract class AbstractBackingStoreTest {
     @Before
     public void initEmptyStore() {
         impl = createBackingStore();
-    }
-
-    /**
-     * Compare two streams for equality. Each stream must be of the same length and contain the same elements (by
-     * value). The streams are sorted beforehand. Therefore T must be naturally comparable.
-     *
-     * @param expected first stream
-     * @param actual   second stream
-     * @param <T>      type of list element
-     * @return true if streams are equal
-     */
-    private static <T> boolean areEqual(final Stream<? extends T> expected, final Stream<? extends T> actual) {
-        Stream<? extends T> sort_expected = expected.sorted();
-        Stream<? extends T> sort_actual = actual.sorted();
-        List<? extends T> lhs = sort_expected.collect(Collectors.toList());
-        List<? extends T> rhs = sort_actual.collect(Collectors.toList());
-        return lhs.equals(rhs);
     }
 
     //List tests

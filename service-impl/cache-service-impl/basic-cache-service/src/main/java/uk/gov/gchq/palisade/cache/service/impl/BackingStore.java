@@ -92,7 +92,6 @@ public interface BackingStore {
      *
      * @param prefix the prefix to look for
      * @return a stream of valid keys
-     * @throws IllegalArgumentException if <code>key</code> is empty (once whitespace is trimmed)
      */
     Stream<String> list(final String prefix);
 

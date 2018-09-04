@@ -82,7 +82,7 @@ public abstract class CacheRequest extends Request {
     }
 
     /**
-     * Set the key for cache insertion.
+     * Set the key for cache insertion. This key should not be <code>null</code> or empty.
      *
      * @param key the cache key
      * @return this object
@@ -94,7 +94,7 @@ public abstract class CacheRequest extends Request {
     }
 
     /**
-     * Set the key for cache interaction.
+     * Set the key for cache interaction. This key should not be <code>null</code> or empty.
      *
      * @param key the cache key
      */

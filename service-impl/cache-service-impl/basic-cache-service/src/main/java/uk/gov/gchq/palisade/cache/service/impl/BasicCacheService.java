@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -98,7 +99,6 @@ public class BasicCacheService implements CacheService {
 
         //encode value
         byte[] encodedValue = request.getValueEncoder().apply(value);
-
         //send to store
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Requesting backing store to store {}", baseKey);
@@ -148,9 +148,9 @@ public class BasicCacheService implements CacheService {
             LOGGER.debug("Sending list request to store {}", baseKey);
 
             //remove the service name from the list of keys
-            Stream<String> ret = getBackingStore().list(baseKey).map(x -> x.substring(len));
-
+            Stream<String> ret = getBackingStore().list(baseKey).map(x -> x.substring(len + 1));
             LOGGER.debug("Store list returned for {}", baseKey);
+
             return ret;
         });
     }
