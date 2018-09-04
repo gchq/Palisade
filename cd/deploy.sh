@@ -52,7 +52,6 @@ if [ "$TRAVIS_BRANCH" == 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; th
         echo "--------------------------------------"
         npm install -g gitbook-cli > /dev/null 2>&1
         ./doc/scripts/buildGitbook.sh
-        git branch -D gh-pages
         git checkout --orphan gh-pages
         mkdir toDelete
         mv * toDelete > /dev/null 2>&1
