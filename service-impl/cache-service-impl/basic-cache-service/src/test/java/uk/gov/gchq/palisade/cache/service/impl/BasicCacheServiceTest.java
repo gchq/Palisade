@@ -90,6 +90,8 @@ public class BasicCacheServiceTest {
                 .key(NOTHING)
                 .makeBaseName();
 
+        when(store.retrieve(any())).thenReturn(new BasicCacheObject(Object.class, Optional.empty()));
+
         //configure backing store to act with test data
         byte[] encoded = JSONSerialiser.serialise(VALUE_1);
         when(store.store(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
@@ -134,10 +136,9 @@ public class BasicCacheServiceTest {
         //When
         CompletableFuture<Stream<String>> getFuture = service.list(((ListCacheRequest) new ListCacheRequest()
                 .service(MockCacheService.class)).prefix(NOTHING));
-        Stream<String> actual = getFuture.join();
 
         //Then
-        assertTrue(StreamUtil.streamEqual(Stream.empty(), actual));
+        assertTrue(StreamUtil.streamEqual(Stream.empty(), getFuture.join()));
     }
 
     @Test
@@ -145,19 +146,15 @@ public class BasicCacheServiceTest {
         //Given
         AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1).value(VALUE_1);
         CompletableFuture<Boolean> future = service.add(req);
-        boolean result = future.join();
+        assertTrue(future.join());
         AddCacheRequest<String> req2 = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_2).value(VALUE_2);
         CompletableFuture<Boolean> future2 = service.add(req2);
-        boolean result2 = future2.join();
+        assertTrue(future2.join());
         //When
         CompletableFuture<Stream<String>> getFuture = service.list(((ListCacheRequest) new ListCacheRequest().service(MockCacheService.class))
                 .prefix(""));
-        Stream<String> actual = getFuture.join();
         //Then
-        assertTrue(result);
-        assertTrue(result2);
-        Stream<String> expected = Stream.of(BASE_KEY_1, BASE_KEY_2);
-        assertTrue(StreamUtil.streamEqual(expected, actual));
+        assertTrue(StreamUtil.streamEqual(Stream.of(BASE_KEY_1, BASE_KEY_2), getFuture.join()));
     }
 
     @Test
@@ -165,13 +162,14 @@ public class BasicCacheServiceTest {
         //Given
         AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1).value(VALUE_1);
         CompletableFuture<Boolean> future = service.add(req);
-        boolean result = future.join();
+        assertTrue(future.join());
+        AddCacheRequest<String> req2 = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_2).value(VALUE_2);
+        CompletableFuture<Boolean> future2 = service.add(req2);
+        assertTrue(future2.join());
         //When
         CompletableFuture<Optional<String>> getFuture = service.get(new GetCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1));
-        Optional<String> actual = getFuture.join();
         //Then
-        assertTrue(result);
-        assertEquals(VALUE_1, actual.get());
+        assertEquals(VALUE_1, getFuture.join().get());
     }
 
     @Test
@@ -179,21 +177,17 @@ public class BasicCacheServiceTest {
         //Given
         AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1).value(VALUE_1);
         CompletableFuture<Boolean> future = service.add(req);
-        boolean result = future.join();
+        assertTrue(future.join());
         AddCacheRequest<String> req2 = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_2).value(VALUE_2);
         CompletableFuture<Boolean> future2 = service.add(req2);
-        boolean result2 = future2.join();
+        assertTrue(future2.join());
         //When
         CompletableFuture<Optional<String>> getFuture = service.get(new GetCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1));
-        Optional<String> actual = getFuture.join();
         CompletableFuture<Optional<String>> getFuture2 = service.get(new GetCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_2));
-        Optional<String> actual2 = getFuture2.join();
 
         //Then
-        assertTrue(result);
-        assertTrue(result2);
-        assertEquals(VALUE_1, actual.get());
-        assertEquals(VALUE_2, actual2.get());
+        assertEquals(VALUE_1, getFuture.join().get());
+        assertEquals(VALUE_2, getFuture2.join().get());
     }
 
     @Test
@@ -201,10 +195,10 @@ public class BasicCacheServiceTest {
         //Given
         AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1).value(VALUE_1);
         CompletableFuture<Boolean> future = service.add(req);
-        boolean result = future.join();
+        assertTrue(future.join());
         AddCacheRequest<String> req2 = new AddCacheRequest<String>().service(fakeService.getClass()).key(BASE_KEY_1).value(VALUE_3);
         CompletableFuture<Boolean> future2 = service.add(req2);
-        boolean result2 = future2.join();
+        assertTrue(future2.join());
         //When
         CompletableFuture<Optional<String>> getFuture = service.get(new GetCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1));
         Optional<String> actual = getFuture.join();
@@ -212,32 +206,38 @@ public class BasicCacheServiceTest {
         Optional<String> actual2 = getFuture2.join();
 
         //Then
-        assertTrue(result);
-        assertTrue(result2);
         assertEquals(VALUE_1, actual.get());
         assertEquals(VALUE_3, actual2.get());
     }
 
     @Test
     public void shouldNotShareKeysAcrossServices() {
-        //Given
-        AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1).value(VALUE_1);
-        CompletableFuture<Boolean> future = service.add(req);
-        boolean result = future.join();
-        AddCacheRequest<String> req2 = new AddCacheRequest<String>().service(fakeService.getClass()).key(BASE_KEY_2).value(VALUE_4);
-        CompletableFuture<Boolean> future2 = service.add(req2);
-        boolean result2 = future2.join();
-        //When
-        CompletableFuture<Optional<String>> getFuture = service.get(new GetCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1));
-        Optional<String> actual = getFuture.join();
-        CompletableFuture<Optional<String>> getFuture2 = service.get(new GetCacheRequest<String>().service(fakeService.getClass()).key(BASE_KEY_2));
-        Optional<String> actual2 = getFuture2.join();
+        //Given - configure a separate backing store for this test
+        BackingStore uniqueStore = Mockito.mock(BackingStore.class);
+        when(uniqueStore.retrieve(any())).thenReturn(new BasicCacheObject(Object.class, Optional.empty()));
+        byte[] encoded = JSONSerialiser.serialise(VALUE_1);
+        when(uniqueStore.store(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
+        when(uniqueStore.retrieve(KEY_1)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded)));
 
-        //Then
-        assertTrue(result);
-        assertTrue(result2);
-        assertEquals(VALUE_1, actual.get());
-        assertEquals(VALUE_4, actual2.get());
+        byte[] encoded4 = JSONSerialiser.serialise(VALUE_4);
+        when(uniqueStore.store(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
+        when(uniqueStore.retrieve(KEY_4)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded4)));
+
+        try {
+            service.backingStore(uniqueStore);
+            AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1).value(VALUE_1);
+            CompletableFuture<Boolean> future = service.add(req);
+            assertTrue(future.join());
+            AddCacheRequest<String> req2 = new AddCacheRequest<String>().service(fakeService.getClass()).key(BASE_KEY_2).value(VALUE_4);
+            CompletableFuture<Boolean> future2 = service.add(req2);
+            assertTrue(future2.join());
+            //When
+            CompletableFuture<Optional<String>> getFuture = service.get(new GetCacheRequest<String>().service(fakeService.getClass()).key(BASE_KEY_1));
+            //Then
+            assertFalse(getFuture.join().isPresent());
+        } finally {
+            service.backingStore(store);
+        }
     }
 
     @Test
@@ -245,9 +245,8 @@ public class BasicCacheServiceTest {
         //Given - nothing
         //When
         CompletableFuture<Optional<String>> result = service.get(new GetCacheRequest<String>().service(MockCacheService.class).key(NOTHING));
-        Optional<String> actual = result.join();
         //Then
-        assertFalse(actual.isPresent());
+        assertFalse(result.join().isPresent());
     }
 
     @Test(expected = NullPointerException.class)

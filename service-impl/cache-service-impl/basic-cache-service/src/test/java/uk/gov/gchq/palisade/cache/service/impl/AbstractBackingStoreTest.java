@@ -289,10 +289,10 @@ public abstract class AbstractBackingStoreTest {
         impl.store("test", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
         //When
         BasicCacheObject present = impl.retrieve("test");
+        assertTrue(present.getValue().isPresent());
+        //Then
         delay(1200);
         BasicCacheObject empty = impl.retrieve("test");
-        //Then
-        assertTrue(present.getValue().isPresent());
         assertFalse(empty.getValue().isPresent());
     }
 

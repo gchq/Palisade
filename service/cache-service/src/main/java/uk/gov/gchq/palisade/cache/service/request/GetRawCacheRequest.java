@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.cache.service.request;
 import java.util.function.BiFunction;
 
 /**
- * An get cache request class that allows retrieving of raw byte[] arrays into a cache service.
+ * A get cache request class that allows retrieving of raw byte[] arrays into a cache service.
  */
 public class GetRawCacheRequest extends GetCacheRequest<byte[]> {
 
