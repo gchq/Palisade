@@ -28,6 +28,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A HashMapBackingStore is a simple implementation of a {@link BackingStore} that simply caches the objects in a
  * ConcurrentHashMap. By default the cache is static so it will be shared across the same JVM. This is designed to be
@@ -98,9 +100,9 @@ public class HashMapBackingStore implements BackingStore {
     @Override
     public boolean store(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
         String cacheKey = BackingStore.keyCheck(key);
-        Objects.requireNonNull(valueClass, "valueClass");
-        Objects.requireNonNull(value, "value");
-        Objects.requireNonNull(timeToLive, "timeToLive");
+        requireNonNull(valueClass, "valueClass");
+        requireNonNull(value, "value");
+        requireNonNull(timeToLive, "timeToLive");
         timeToLive.ifPresent(x -> {
             if (x.isNegative()) {
                 throw new IllegalArgumentException("time to live cannot be negative");
@@ -128,7 +130,7 @@ public class HashMapBackingStore implements BackingStore {
 
     @Override
     public Stream<String> list(final String prefix) {
-        Objects.requireNonNull(prefix, "prefix");
+        requireNonNull(prefix, "prefix");
         return cache.keySet()
                 .stream()
                 .filter(x -> x.startsWith(
