@@ -18,16 +18,16 @@ package uk.gov.gchq.palisade.cache.service.impl;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import org.mockito.Mockito;
+
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
@@ -62,6 +62,8 @@ public class BasicCacheServiceTest {
 
     private static String NO_KEY;
 
+    private static Function<String, byte[]> encoder;
+
     @BeforeClass
     public static void setup() {
         store = Mockito.mock(BackingStore.class);
@@ -92,22 +94,25 @@ public class BasicCacheServiceTest {
 
         when(store.retrieve(any())).thenReturn(new BasicCacheObject(Object.class, Optional.empty()));
 
+        //get the string encoder
+        encoder = new BasicCacheService().getCodecs().getValueEncoder(String.class);
+
         //configure backing store to act with test data
-        byte[] encoded = JSONSerialiser.serialise(VALUE_1);
+        byte[] encoded = encoder.apply(VALUE_1);
         when(store.store(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
         when(store.retrieve(KEY_1)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded)));
 
-        byte[] encoded2 = JSONSerialiser.serialise(VALUE_2);
+        byte[] encoded2 = encoder.apply(VALUE_2);
         when(store.store(eq(KEY_2), eq(String.class), eq(encoded2), any())).thenReturn(Boolean.TRUE);
         when(store.retrieve(KEY_2)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded2)));
 
         //set an entry in a different Service
 
-        byte[] encoded3 = JSONSerialiser.serialise(VALUE_3);
+        byte[] encoded3 = encoder.apply(VALUE_3);
         when(store.store(eq(KEY_3), eq(String.class), eq(encoded3), any())).thenReturn(Boolean.TRUE);
         when(store.retrieve(KEY_3)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded3)));
 
-        byte[] encoded4 = JSONSerialiser.serialise(VALUE_4);
+        byte[] encoded4 = encoder.apply(VALUE_4);
         when(store.store(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
         when(store.retrieve(KEY_4)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded4)));
 
@@ -215,11 +220,11 @@ public class BasicCacheServiceTest {
         //Given - configure a separate backing store for this test
         BackingStore uniqueStore = Mockito.mock(BackingStore.class);
         when(uniqueStore.retrieve(any())).thenReturn(new BasicCacheObject(Object.class, Optional.empty()));
-        byte[] encoded = JSONSerialiser.serialise(VALUE_1);
+        byte[] encoded = encoder.apply(VALUE_1);
         when(uniqueStore.store(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
         when(uniqueStore.retrieve(KEY_1)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded)));
 
-        byte[] encoded4 = JSONSerialiser.serialise(VALUE_4);
+        byte[] encoded4 = encoder.apply(VALUE_4);
         when(uniqueStore.store(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
         when(uniqueStore.retrieve(KEY_4)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded4)));
 

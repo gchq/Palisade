@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -41,6 +42,11 @@ import java.util.stream.Stream;
 public class BasicCacheService implements CacheService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BasicCacheService.class);
+
+    /**
+     * The codec registry that knows how to encode objects.
+     */
+    private final CacheCodecRegistry codecs = new CacheCodecRegistry();
 
     /**
      * The store for our data.
@@ -76,6 +82,15 @@ public class BasicCacheService implements CacheService {
     }
 
     /**
+     * Get the codec registry.
+     *
+     * @return codec registry
+     */
+    public CacheCodecRegistry getCodecs() {
+        return codecs;
+    }
+
+    /**
      * Get the backing store for this instance.
      *
      * @return the backing store
@@ -86,6 +101,7 @@ public class BasicCacheService implements CacheService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <V> CompletableFuture<Boolean> add(final AddCacheRequest<V> request) {
         Objects.requireNonNull(request, "request");
         //make the final key name
@@ -93,11 +109,13 @@ public class BasicCacheService implements CacheService {
         LOGGER.debug("Got request to store item with key {}", baseKey);
 
         V value = request.getValue();
-        Class<? extends Object> valueClass = request.getValue().getClass();
+        Class<V> valueClass = (Class<V>) request.getValue().getClass();
         Optional<Duration> timeToLive = request.getTimeToLive();
 
+        //find encoder function
+        Function<V, byte[]> encoder = codecs.getValueEncoder(valueClass);
         //encode value
-        byte[] encodedValue = request.getValueEncoder().apply(value);
+        byte[] encodedValue = encoder.apply(value);
         //send to store
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Requesting backing store to store {}", baseKey);
@@ -126,7 +144,7 @@ public class BasicCacheService implements CacheService {
             }
 
             //assign so Javac can infer the generic type
-            BiFunction<byte[], Class<V>, V> decode = request.getValueDecoder();
+            BiFunction<byte[], Class<V>, V> decode = codecs.getValueDecoder((Class<V>) result.getValueClass());
 
             return result.getValue().map(x -> decode.apply(x, (Class<V>) result.getValueClass()));
         });

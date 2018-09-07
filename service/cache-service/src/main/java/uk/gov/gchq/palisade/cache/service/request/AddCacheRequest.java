@@ -19,7 +19,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
 
 import java.time.Duration;
@@ -27,7 +26,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * This class represents requests for things to be added to the cache.
@@ -223,21 +221,6 @@ public class AddCacheRequest<V> extends CacheRequest {
      */
     public void cancelTimeToLive() {
         this.timeToLive = Optional.empty();
-    }
-
-    /**
-     * Get a function that can encode the contained value into a byte array. This can be used by the caching service to
-     * convert a given object into a byte array that can be stored.
-     * <p>
-     * The default version of this method uses JSON serialisation.
-     * <p>
-     * Subclasses are encouraged to override this method where necessary to provide a more efficient implementation.
-     *
-     * @return a function that encodes an object of type <code>V</code> to a byte array.
-     * @see GetCacheRequest#getValueDecoder()
-     */
-    public Function<V, byte[]> getValueEncoder() {
-        return x -> JSONSerialiser.serialise(x);
     }
 
     @Override

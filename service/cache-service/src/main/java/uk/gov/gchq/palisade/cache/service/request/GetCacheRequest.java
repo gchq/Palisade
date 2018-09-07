@@ -19,10 +19,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
-
-import java.util.function.BiFunction;
 
 /**
  * This class is the type of request for retrieving an object from the cache service. The parameter type on this class
@@ -33,19 +30,6 @@ import java.util.function.BiFunction;
 public class GetCacheRequest<V> extends CacheRequest {
 
     public GetCacheRequest() {
-    }
-
-    /**
-     * Gets a function that can convert a byte array into an instance of the given  type. This must be the mirror
-     * function to {@link AddCacheRequest#getValueEncoder()}. The default version uses JSON deserialisation.
-     * <p>
-     * Subclasses are encouraged to override this function with a more efficient implementation.
-     *
-     * @return the conversion function
-     * @see AddCacheRequest#getValueEncoder()
-     */
-    public BiFunction<byte[], Class<V>, V> getValueDecoder() {
-        return (ob, expectedClass) -> JSONSerialiser.deserialise(ob, expectedClass);
     }
 
     /**
