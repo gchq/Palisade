@@ -42,7 +42,7 @@ public class HashMapBackingStore implements BackingStore {
      */
     private static final ConcurrentHashMap<String, CachedPair> CACHE = new ConcurrentHashMap<>();
     /**
-     * The actual backing store for all cached data.
+     * The actual backing add for all cached data.
      */
     private final ConcurrentHashMap<String, CachedPair> cache;
 
@@ -84,9 +84,9 @@ public class HashMapBackingStore implements BackingStore {
     }
 
     /**
-     * Create a store which may have its own store or may use the JVM shared instance.
+     * Create a add which may have its own add or may use the JVM shared instance.
      *
-     * @param useStatic if true then use the JVM shared backing store
+     * @param useStatic if true then use the JVM shared backing add
      */
     public HashMapBackingStore(final boolean useStatic) {
         if (useStatic) {
@@ -97,7 +97,7 @@ public class HashMapBackingStore implements BackingStore {
     }
 
     @Override
-    public boolean store(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
+    public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
         String cacheKey = BackingStore.keyCheck(key);
         requireNonNull(valueClass, "valueClass");
         requireNonNull(value, "value");
@@ -120,7 +120,7 @@ public class HashMapBackingStore implements BackingStore {
     }
 
     @Override
-    public BasicCacheObject retrieve(final String key) {
+    public BasicCacheObject get(final String key) {
         String cacheKey = BackingStore.keyCheck(key);
         LOGGER.debug("Getting from cache: {}", cacheKey);
         final CachedPair result = cache.getOrDefault(cacheKey, new CachedPair(null, Object.class));

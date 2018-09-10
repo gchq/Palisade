@@ -23,8 +23,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Represents the basic cache entry that will be stored and retrieved from the backing store. If a store is unable to
- * retrieve a given key then it will return an instance of this class with an empty value. No entries in this class may
+ * Represents the basic cache entry that will be stored and retrieved from the backing add. If a add is unable to
+ * get a given key then it will return an instance of this class with an empty value. No entries in this class may
  * be <code>null</code>.
  *
  */
@@ -36,7 +36,7 @@ public class BasicCacheObject {
      */
     private final Class<?> valueClass;
     /**
-     * The holder for the object being cached. This may be empty on retrieve requests where they key couldn't be found.
+     * The holder for the object being cached. This may be empty on get requests where they key couldn't be found.
      */
     private final Optional<byte[]> value;
 

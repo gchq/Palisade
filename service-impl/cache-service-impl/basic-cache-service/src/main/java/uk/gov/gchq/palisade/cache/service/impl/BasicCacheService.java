@@ -24,18 +24,19 @@ import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 
 import java.time.Duration;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * The implementation for a {@link CacheService} that can persist various object types to arbitrary backing stores.
- * Instances of this class primarily store an instance of {@link BackingStore} to which the work of persistence is
- * delegated. This class is responsible for managing data into and out of any backing store so clients have a
- * transparent interface to a backing store and the actual backing store implementation is abstracted away.
+ * Instances of this class primarily add an instance of {@link BackingStore} to which the work of persistence is
+ * delegated. This class is responsible for managing data into and out of any backing add so clients have a
+ * transparent interface to a backing add and the actual backing add implementation is abstracted away.
  *
  * @apiNote no parameters may be <code>null</code>.
  */
@@ -49,33 +50,33 @@ public class BasicCacheService implements CacheService {
     private final CacheCodecRegistry codecs = new CacheCodecRegistry();
 
     /**
-     * The store for our data.
+     * The add for our data.
      */
     private BackingStore store;
 
     /**
-     * Create and empty backing store. Note that this is for use by serialisation mechanisms and any attempt to use an
-     * instance of this class without first initialising a backing store will result in exceptions being thrown.
+     * Create and empty backing add. Note that this is for use by serialisation mechanisms and any attempt to use an
+     * instance of this class without first initialising a backing add will result in exceptions being thrown.
      */
     public BasicCacheService() {
     }
 
     /**
-     * Set the backing store for this instance.
+     * Set the backing add for this instance.
      *
-     * @param store the backing store instance
+     * @param store the backing add instance
      * @return this object
      */
     public BasicCacheService backingStore(final BackingStore store) {
-        Objects.requireNonNull(store, "store");
+        requireNonNull(store, "add");
         this.store = store;
         return this;
     }
 
     /**
-     * Set the backing store for this instance.
+     * Set the backing add for this instance.
      *
-     * @param store the backing store instance
+     * @param store the backing add instance
      */
     public void setBackingStore(final BackingStore store) {
         backingStore(store);
@@ -91,22 +92,22 @@ public class BasicCacheService implements CacheService {
     }
 
     /**
-     * Get the backing store for this instance.
+     * Get the backing add for this instance.
      *
-     * @return the backing store
+     * @return the backing add
      */
     public BackingStore getBackingStore() {
-        Objects.requireNonNull(store, "store must be initialised");
+        requireNonNull(store, "add must be initialised");
         return store;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <V> CompletableFuture<Boolean> add(final AddCacheRequest<V> request) {
-        Objects.requireNonNull(request, "request");
+        requireNonNull(request, "request");
         //make the final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Got request to store item with key {}", baseKey);
+        LOGGER.debug("Got request to add item with key {}", baseKey);
 
         V value = request.getValue();
         Class<V> valueClass = (Class<V>) request.getValue().getClass();
@@ -116,11 +117,11 @@ public class BasicCacheService implements CacheService {
         Function<V, byte[]> encoder = codecs.getValueEncoder(valueClass);
         //encode value
         byte[] encodedValue = encoder.apply(value);
-        //send to store
+        //send to add
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Requesting backing store to store {}", baseKey);
-            boolean result = getBackingStore().store(baseKey, valueClass, encodedValue, timeToLive);
-            LOGGER.debug("Backing store has stored {} with result {}", baseKey, result);
+            LOGGER.debug("Requesting backing add to add {}", baseKey);
+            boolean result = getBackingStore().add(baseKey, valueClass, encodedValue, timeToLive);
+            LOGGER.debug("Backing add has stored {} with result {}", baseKey, result);
             return result;
         });
     }
@@ -128,19 +129,19 @@ public class BasicCacheService implements CacheService {
     @Override
     @SuppressWarnings("unchecked")
     public <V> CompletableFuture<Optional<V>> get(final GetCacheRequest<V> request) {
-        Objects.requireNonNull(request, "request");
+        requireNonNull(request, "request");
         //make final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Got request to retrieve item {}", baseKey);
+        LOGGER.debug("Got request to get item {}", baseKey);
 
-        //get from store
+        //get from add
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Requesting backing store to retrieve {}", baseKey);
-            BasicCacheObject result = getBackingStore().retrieve(baseKey);
+            LOGGER.debug("Requesting backing add to get {}", baseKey);
+            BasicCacheObject result = getBackingStore().get(baseKey);
             if (result.getValue().isPresent()) {
-                LOGGER.debug("Backing store successfully retrieved {}", baseKey);
+                LOGGER.debug("Backing add successfully retrieved {}", baseKey);
             } else {
-                LOGGER.debug("Backing store failed to retrieve {}", baseKey);
+                LOGGER.debug("Backing add failed to get {}", baseKey);
             }
 
             //assign so Javac can infer the generic type
@@ -152,7 +153,7 @@ public class BasicCacheService implements CacheService {
 
     @Override
     public CompletableFuture<Stream<String>> list(final ListCacheRequest request) {
-        Objects.requireNonNull(request, "request");
+        requireNonNull(request, "request");
 
         //make final key name
         String baseKey = request.makeBaseName();
@@ -160,9 +161,9 @@ public class BasicCacheService implements CacheService {
 
         int len = request.getServiceStringForm().length();
 
-        //retrieve from store
+        //get from add
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Sending list request to store {}", baseKey);
+            LOGGER.debug("Sending list request to add {}", baseKey);
 
             //remove the service name from the list of keys
             Stream<String> ret = getBackingStore().list(baseKey).map(x -> x.substring(len + 1));

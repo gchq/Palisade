@@ -92,29 +92,29 @@ public class BasicCacheServiceTest {
                 .key(NOTHING)
                 .makeBaseName();
 
-        when(store.retrieve(any())).thenReturn(new BasicCacheObject(Object.class, Optional.empty()));
+        when(store.get(any())).thenReturn(new BasicCacheObject(Object.class, Optional.empty()));
 
         //get the string encoder
         encoder = new BasicCacheService().getCodecs().getValueEncoder(String.class);
 
-        //configure backing store to act with test data
+        //configure backing add to act with test data
         byte[] encoded = encoder.apply(VALUE_1);
-        when(store.store(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
-        when(store.retrieve(KEY_1)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded)));
+        when(store.add(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_1)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded)));
 
         byte[] encoded2 = encoder.apply(VALUE_2);
-        when(store.store(eq(KEY_2), eq(String.class), eq(encoded2), any())).thenReturn(Boolean.TRUE);
-        when(store.retrieve(KEY_2)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded2)));
+        when(store.add(eq(KEY_2), eq(String.class), eq(encoded2), any())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_2)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded2)));
 
         //set an entry in a different Service
 
         byte[] encoded3 = encoder.apply(VALUE_3);
-        when(store.store(eq(KEY_3), eq(String.class), eq(encoded3), any())).thenReturn(Boolean.TRUE);
-        when(store.retrieve(KEY_3)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded3)));
+        when(store.add(eq(KEY_3), eq(String.class), eq(encoded3), any())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_3)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded3)));
 
         byte[] encoded4 = encoder.apply(VALUE_4);
-        when(store.store(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
-        when(store.retrieve(KEY_4)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded4)));
+        when(store.add(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_4)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded4)));
 
         //set up the lists
         when(store.list(eq(((ListCacheRequest) new ListCacheRequest().service(MockCacheService.class)).prefix("").makeBaseName())))
@@ -127,7 +127,7 @@ public class BasicCacheServiceTest {
                 .thenReturn(Stream.empty());
 
         //set up a return of an empty object
-        when(store.retrieve(eq(NO_KEY))).thenReturn(new BasicCacheObject(Object.class, Optional.empty()));
+        when(store.get(eq(NO_KEY))).thenReturn(new BasicCacheObject(Object.class, Optional.empty()));
     }
 
     @Before
@@ -217,16 +217,16 @@ public class BasicCacheServiceTest {
 
     @Test
     public void shouldNotShareKeysAcrossServices() {
-        //Given - configure a separate backing store for this test
+        //Given - configure a separate backing add for this test
         BackingStore uniqueStore = Mockito.mock(BackingStore.class);
-        when(uniqueStore.retrieve(any())).thenReturn(new BasicCacheObject(Object.class, Optional.empty()));
+        when(uniqueStore.get(any())).thenReturn(new BasicCacheObject(Object.class, Optional.empty()));
         byte[] encoded = encoder.apply(VALUE_1);
-        when(uniqueStore.store(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
-        when(uniqueStore.retrieve(KEY_1)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded)));
+        when(uniqueStore.add(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
+        when(uniqueStore.get(KEY_1)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded)));
 
         byte[] encoded4 = encoder.apply(VALUE_4);
-        when(uniqueStore.store(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
-        when(uniqueStore.retrieve(KEY_4)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded4)));
+        when(uniqueStore.add(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
+        when(uniqueStore.get(KEY_4)).thenReturn(new BasicCacheObject(String.class, Optional.of(encoded4)));
 
         try {
             service.backingStore(uniqueStore);

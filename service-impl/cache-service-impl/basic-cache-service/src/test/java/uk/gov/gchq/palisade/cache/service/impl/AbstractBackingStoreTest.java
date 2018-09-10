@@ -57,8 +57,8 @@ public abstract class AbstractBackingStoreTest {
         //Given - two keys
         byte[] b1 = new byte[10];
         byte[] b2 = new byte[10];
-        impl.store("test_key1", Object.class, b1);
-        impl.store("test_key2", Object.class, b2);
+        impl.add("test_key1", Object.class, b1);
+        impl.add("test_key2", Object.class, b2);
         //When
         Stream<String> ret = impl.list("test");
         //Then
@@ -70,8 +70,8 @@ public abstract class AbstractBackingStoreTest {
         //Given - two keys
         byte[] b1 = new byte[10];
         byte[] b2 = new byte[10];
-        impl.store("foo_key1", Object.class, b1);
-        impl.store("bar_key2", Object.class, b2);
+        impl.add("foo_key1", Object.class, b1);
+        impl.add("bar_key2", Object.class, b2);
         //When
         Stream<String> ret = impl.list("foo");
         Stream<String> ret2 = impl.list("bar");
@@ -85,8 +85,8 @@ public abstract class AbstractBackingStoreTest {
         //Given - two keys
         byte[] b1 = new byte[10];
         byte[] b2 = new byte[10];
-        impl.store("foo_key1", Object.class, b1);
-        impl.store("bar_key2", Object.class, b2);
+        impl.add("foo_key1", Object.class, b1);
+        impl.add("bar_key2", Object.class, b2);
         //When
         Stream<String> ret = impl.list("not_there");
         //Then
@@ -99,7 +99,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnEmptyKeyStore() {
         //Given - nothing
         //When
-        impl.store("", Object.class, new byte[0]);
+        impl.add("", Object.class, new byte[0]);
         //Then
         fail("exception expected");
     }
@@ -108,7 +108,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnNullKeyStore() {
         //Given - nothing
         //When
-        impl.store(null, Object.class, new byte[0]);
+        impl.add(null, Object.class, new byte[0]);
         //Then
         fail("exception expected");
     }
@@ -117,7 +117,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnWhitespaceKeyStore() {
         //Given - nothing
         //When
-        impl.store("  ", Object.class, new byte[0]);
+        impl.add("  ", Object.class, new byte[0]);
         //Then
         fail("exception expected");
     }
@@ -126,7 +126,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnEmptyKeyRetrieve() {
         //Given - nothing
         //When
-        impl.retrieve("");
+        impl.get("");
         //Then
         fail("exception expected");
     }
@@ -135,7 +135,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnNullKeyRetrieve() {
         //Given - nothing
         //When
-        impl.retrieve(null);
+        impl.get(null);
         //Then
         fail("exception expected");
     }
@@ -144,7 +144,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnWhitespaceKeyRetrieve() {
         //Given - nothing
         //When
-        impl.retrieve("  ");
+        impl.get("  ");
         //Then
         fail("exception expected");
     }
@@ -162,7 +162,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnNegativeDuration() {
         //Given - nothing
         //When
-        impl.store("test", Object.class, new byte[0], Optional.of(Duration.of(-10, ChronoUnit.SECONDS)));
+        impl.add("test", Object.class, new byte[0], Optional.of(Duration.of(-10, ChronoUnit.SECONDS)));
         //Then
         fail("exception expected");
     }
@@ -171,7 +171,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnNullClass() {
         //Given - nothing
         //When
-        impl.store("test", null, new byte[0]);
+        impl.add("test", null, new byte[0]);
         //Then
         fail("exception expected");
     }
@@ -180,7 +180,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnNullValue() {
         //Given - nothing
         //When
-        impl.store("test", Object.class, null);
+        impl.add("test", Object.class, null);
         //Then
         fail("exception expected");
     }
@@ -190,7 +190,7 @@ public abstract class AbstractBackingStoreTest {
     public void shouldReturnEmptyCacheObject() {
         //Given - nothing
         //When
-        BasicCacheObject ob = impl.retrieve("nothing");
+        BasicCacheObject ob = impl.get("nothing");
         //Then
         assertFalse(ob.getValue().isPresent());
     }
@@ -202,8 +202,8 @@ public abstract class AbstractBackingStoreTest {
         //Given
         byte[] expected = new byte[]{1, 2, 3, 4};
         //When
-        impl.store("test", Integer.class, expected);
-        BasicCacheObject actual = impl.retrieve("test");
+        impl.add("test", Integer.class, expected);
+        BasicCacheObject actual = impl.get("test");
         //Then
         assertEquals(expected, actual.getValue().get());
         assertEquals(Integer.class, actual.getValueClass());
@@ -215,10 +215,10 @@ public abstract class AbstractBackingStoreTest {
         byte[] expected = new byte[]{1, 2, 3, 4};
         byte[] expected2 = new byte[]{5, 6, 7, 8};
         //When
-        impl.store("test", Integer.class, expected);
-        impl.store("test2", String.class, expected2);
-        BasicCacheObject actual = impl.retrieve("test");
-        BasicCacheObject actual2 = impl.retrieve("test2");
+        impl.add("test", Integer.class, expected);
+        impl.add("test2", String.class, expected2);
+        BasicCacheObject actual = impl.get("test");
+        BasicCacheObject actual2 = impl.get("test2");
 
         //Then
         assertEquals(expected, actual.getValue().get());
@@ -233,9 +233,9 @@ public abstract class AbstractBackingStoreTest {
         byte[] expected = new byte[]{1, 2, 3, 4};
         byte[] expected2 = new byte[]{5, 6, 7, 8};
         //When
-        impl.store("test", Integer.class, expected);
-        impl.store("test2", String.class, expected2);
-        BasicCacheObject actual = impl.retrieve("not_there");
+        impl.add("test", Integer.class, expected);
+        impl.add("test2", String.class, expected2);
+        BasicCacheObject actual = impl.get("not_there");
         //Then
         assertFalse(actual.getValue().isPresent());
         assertEquals(Object.class, actual.getValueClass());
@@ -247,11 +247,11 @@ public abstract class AbstractBackingStoreTest {
         byte[] expected = new byte[]{1, 2, 3, 4};
         byte[] expected2 = new byte[]{5, 6, 7, 8};
         //When
-        impl.store("test", Integer.class, expected);
-        BasicCacheObject actual = impl.retrieve("test");
+        impl.add("test", Integer.class, expected);
+        BasicCacheObject actual = impl.get("test");
         //overwrite it
-        impl.store("test", String.class, expected2);
-        BasicCacheObject overwrite = impl.retrieve("test");
+        impl.add("test", String.class, expected2);
+        BasicCacheObject overwrite = impl.get("test");
         //Then
         assertEquals(Integer.class, actual.getValueClass());
         assertEquals(expected, actual.getValue().get());
@@ -274,10 +274,10 @@ public abstract class AbstractBackingStoreTest {
     public void shouldRemoveZeroDurationObject() {
         //Given
         byte[] expected = new byte[]{1, 2, 3, 4};
-        impl.store("test", Object.class, expected, Optional.of(Duration.of(0, ChronoUnit.SECONDS)));
+        impl.add("test", Object.class, expected, Optional.of(Duration.of(0, ChronoUnit.SECONDS)));
         //When
         delay(100);
-        BasicCacheObject empty = impl.retrieve("test");
+        BasicCacheObject empty = impl.get("test");
         //Then
         assertFalse(empty.getValue().isPresent());
     }
@@ -297,7 +297,7 @@ public abstract class AbstractBackingStoreTest {
      */
     private TestResult timedRetrieve(String key, long safeDelay) {
         long time = System.currentTimeMillis();
-        BasicCacheObject result = impl.retrieve(key);
+        BasicCacheObject result = impl.get(key);
         time = System.currentTimeMillis() - time;
         return new TestResult((time > safeDelay), result);
     }
@@ -306,17 +306,17 @@ public abstract class AbstractBackingStoreTest {
     public void shouldRemoveAfterDelay() {
         //Given
         byte[] expected = new byte[]{1, 2, 3, 4};
-        impl.store("test", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
+        impl.add("test", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
         //When
-        //we avoid this first test to protect against the corner case where the backing store takes longer than the delay
-        //respond and ages off the store before we check it the first time which would cause the test case to fail
+        //we avoid this first test to protect against the corner case where the backing add takes longer than the delay
+        //respond and ages off the add before we check it the first time which would cause the test case to fail
         TestResult present = timedRetrieve("test", 1000);
         if (present.completedInTime) {
             assertTrue(present.result.getValue().isPresent());
         }
         //Then
         delay(1200);
-        BasicCacheObject empty = impl.retrieve("test");
+        BasicCacheObject empty = impl.get("test");
         assertFalse(empty.getValue().isPresent());
     }
 
@@ -326,9 +326,9 @@ public abstract class AbstractBackingStoreTest {
         byte[] expected = new byte[]{1, 2, 3, 4};
         byte[] expected2 = new byte[]{5, 6, 7, 8};
         byte[] expected3 = new byte[]{9, 10, 11, 12};
-        impl.store("test", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
-        impl.store("test2", Object.class, expected2, Optional.of(Duration.of(2, ChronoUnit.SECONDS)));
-        impl.store("test3", Object.class, expected3, Optional.empty());
+        impl.add("test", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
+        impl.add("test2", Object.class, expected2, Optional.of(Duration.of(2, ChronoUnit.SECONDS)));
+        impl.add("test3", Object.class, expected3, Optional.empty());
         //When
         TestResult zeroSeconds1 = timedRetrieve("test", 333);
         TestResult zeroSeconds2 = timedRetrieve("test2", 333);
