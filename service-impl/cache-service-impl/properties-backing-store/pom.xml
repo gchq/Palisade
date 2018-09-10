@@ -20,11 +20,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>${project.parent.groupId}</groupId>
-        <artifactId>properties-backing-store</artifactId>
-        <version>${project.parent.version}</version>
+        <groupId>uk.gov.gchq.palisade</groupId>
+        <artifactId>cache-service-impl</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
     </parent>
-    <artifactId>hashmap-backing-store</artifactId>
+    <artifactId>properties-backing-store</artifactId>
 
     <dependencies>
         <dependency>

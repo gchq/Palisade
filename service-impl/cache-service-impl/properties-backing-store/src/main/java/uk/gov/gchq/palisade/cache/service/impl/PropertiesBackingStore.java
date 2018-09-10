@@ -26,7 +26,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
@@ -99,7 +101,7 @@ public class PropertiesBackingStore implements BackingStore {
         requireNonNull(valueClass, "valueClass");
         requireNonNull(value, "value");
         BackingStore.durationCheck(timeToLive);
-        LOGGER.debug("Adding cache key {} of class {}", cacheKey, valueClass);
+        LOGGER.debug("Adding cache key {} of {}", cacheKey, valueClass);
         //this isn't meant to be thread safe, but we can at least make the cache add atomic
         synchronized (this) {
             props.setProperty(cacheKey, B64_ENCODER.encodeToString(value));
@@ -143,13 +145,17 @@ public class PropertiesBackingStore implements BackingStore {
      */
     private void load() throws IOException {
         props.load(Files.newInputStream(Paths.get(location)));
+        LOGGER.debug("Loaded from {}", location);
     }
 
     /**
      * Saves the properties to the backing file.
+     *
+     * @throws IOException if anything failed during save
      */
     private void persist() throws IOException {
         props.store(Files.newOutputStream(Paths.get(location)), "Palisade cache service store.");
+        LOGGER.debug("Persisted to {}", location);
     }
 
     /**
@@ -157,6 +163,8 @@ public class PropertiesBackingStore implements BackingStore {
      */
     private void doKeyExpiry() {
         final LocalDateTime now = LocalDateTime.now();
+        //to avoid mid stream modifications we make a list of things to remove
+        List<String> toRemove = new ArrayList<>();
         props.keySet().stream()
                 .filter(String.class::isInstance)
                 .map(String.class::cast)
@@ -168,12 +176,14 @@ public class PropertiesBackingStore implements BackingStore {
                         LocalDateTime expiry = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                         //if this is before now, then remove it
                         if (expiry.isBefore(now)) {
-                            removeKey(deriveBaseFromDateKey(key));
+                            toRemove.add(deriveBaseFromDateKey(key));
                         }
                     } catch (DateTimeParseException e) {
                         LOGGER.error("Invalid expiry for key {}", key, e);
                     }
                 });
+        //remove
+        toRemove.forEach(this::removeKey);
     }
 
     /**
@@ -184,9 +194,11 @@ public class PropertiesBackingStore implements BackingStore {
     private void removeKey(final String key) {
         requireNonNull(key, "key");
         LOGGER.debug("Removing key {}", key);
-        props.remove(key);
-        props.remove(makeDateKey(key));
-        props.remove(makeClassKey(key));
+        synchronized (this) {
+            props.remove(key);
+            props.remove(makeDateKey(key));
+            props.remove(makeClassKey(key));
+        }
     }
 
     /**
@@ -257,6 +269,8 @@ public class PropertiesBackingStore implements BackingStore {
                 .filter(String.class::isInstance)
                         //perform cast now we know it's safe
                 .map(String.class::cast)
+                .filter(x -> !x.endsWith(EXPIRY_SUFFIX))
+                .filter(x -> !x.endsWith(CLASS_SUFFIX))
                 .filter(x -> x.startsWith(
                                 prefix)
                 );
