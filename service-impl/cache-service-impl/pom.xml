@@ -29,7 +29,7 @@
         <module>hashmap-backing-store</module>
         <module>basic-cache-service</module>
         <module>properties-backing-store</module>
-        <module>etc-backing-store</module>
+        <module>etcd-backing-store</module>
     </modules>
 
     <dependencies>
