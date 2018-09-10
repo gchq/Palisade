@@ -101,7 +101,7 @@ public class BasicCacheObject {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(13, 27)
+        return new HashCodeBuilder(13, 29)
                 .appendSuper(super.hashCode())
                 .append(valueClass)
                 .append(value)
