@@ -19,8 +19,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 public class PropertiesBackingStoreTest extends AbstractBackingStoreTest {
 
@@ -38,6 +41,15 @@ public class PropertiesBackingStoreTest extends AbstractBackingStoreTest {
 
     @Override
     public BackingStore createBackingStore() {
+        try {
+            removeTestStore();
+            //write empty file
+            try (OutputStream o = Files.newOutputStream(testFile,
+                    StandardOpenOption.CREATE_NEW)) {
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return new PropertiesBackingStore(testFile.toAbsolutePath().toString());
     }
 }
