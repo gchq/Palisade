@@ -18,9 +18,9 @@ package uk.gov.gchq.palisade.cache.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -84,7 +84,7 @@ public class PropertiesBackingStore implements BackingStore {
         this.location = propertiesPath;
         try {
             load();
-        } catch (FileNotFoundException e) {
+        } catch (NoSuchFileException e) {
             LOGGER.warn("Can't find specified properties file {}, defaulting to empty file.", propertiesPath);
         } catch (IOException e) {
             LOGGER.error("Couldn't load properties file {}", propertiesPath, e);

@@ -21,7 +21,6 @@ import org.junit.BeforeClass;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
@@ -45,7 +44,7 @@ public class PropertiesBackingStoreTest extends AbstractBackingStoreTest {
             removeTestStore();
             //write empty file
             try (OutputStream o = Files.newOutputStream(testFile,
-                    StandardOpenOption.CREATE_NEW)) {
+                    StandardOpenOption.CREATE)) {
             }
         } catch (IOException e) {
             e.printStackTrace();
