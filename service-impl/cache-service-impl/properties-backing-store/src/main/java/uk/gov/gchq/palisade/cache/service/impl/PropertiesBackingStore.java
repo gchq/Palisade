@@ -95,7 +95,7 @@ public class PropertiesBackingStore implements BackingStore {
      * {@inheritDoc}
      */
     @Override
-    public boolean store(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
+    public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
         //error checks
         String cacheKey = BackingStore.keyCheck(key);
         requireNonNull(valueClass, "valueClass");
@@ -235,7 +235,7 @@ public class PropertiesBackingStore implements BackingStore {
      * {@inheritDoc}
      */
     @Override
-    public BasicCacheObject retrieve(final String key) {
+    public BasicCacheObject get(final String key) {
         String cacheKey = BackingStore.keyCheck(key);
         //enforce and any expiries and persist
         update();

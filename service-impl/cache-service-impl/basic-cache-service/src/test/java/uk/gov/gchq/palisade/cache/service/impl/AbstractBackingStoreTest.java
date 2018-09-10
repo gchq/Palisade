@@ -163,7 +163,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnNullDuration() {
         //Given - nothing
         //When
-        impl.store("test", Object.class, new byte[]{1}, null);
+        impl.add("test", Object.class, new byte[]{1}, null);
         //Then
         fail("exception expected");
     }

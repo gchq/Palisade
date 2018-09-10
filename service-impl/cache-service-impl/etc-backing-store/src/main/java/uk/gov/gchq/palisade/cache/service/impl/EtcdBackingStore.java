@@ -23,7 +23,7 @@ import static java.util.Objects.requireNonNull;
 
 public class EtcdBackingStore implements BackingStore {
     @Override
-    public boolean store(String key, Class<?> valueClass, byte[] value, Optional<Duration> timeToLive) {
+    public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
         String cachedKey = BackingStore.keyCheck(key);
         requireNonNull(valueClass, "valueClass");
         requireNonNull(value, "value");
@@ -33,13 +33,13 @@ public class EtcdBackingStore implements BackingStore {
     }
 
     @Override
-    public BasicCacheObject retrieve(String key) {
+    public BasicCacheObject get(final String key) {
         String cachedKey = BackingStore.keyCheck(key);
         return null;
     }
 
     @Override
-    public Stream<String> list(String prefix) {
+    public Stream<String> list(final String prefix) {
         requireNonNull(prefix, "prefix");
         return null;
     }
