@@ -158,6 +158,15 @@ public abstract class AbstractBackingStoreTest {
         fail("exception expected");
     }
 
+    @Test(expected = NullPointerException.class)
+    public void throwOnNullDuration() {
+        //Given - nothing
+        //When
+        impl.store("test", Object.class, new byte[]{1}, null);
+        //Then
+        fail("exception expected");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void throwOnNegativeDuration() {
         //Given - nothing

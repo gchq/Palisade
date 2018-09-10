@@ -15,27 +15,30 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>service-impl</artifactId>
-        <version>0.1.2-SNAPSHOT</version>
+        <groupId>${project.parent.groupId}</groupId>
+        <artifactId>properties-backing-store</artifactId>
+        <version>${project.parent.version}</version>
     </parent>
-    <artifactId>cache-service-impl</artifactId>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>hashmap-backing-store</module>
-        <module>basic-cache-service</module>
-        <module>properties-backing-store</module>
-    </modules>
+    <artifactId>hashmap-backing-store</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>cache-service</artifactId>
+            <artifactId>basic-cache-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>basic-cache-service</artifactId>
+            <version>${project.parent.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
 </project>

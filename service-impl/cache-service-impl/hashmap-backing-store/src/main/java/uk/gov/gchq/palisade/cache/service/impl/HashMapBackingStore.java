@@ -102,12 +102,8 @@ public class HashMapBackingStore implements BackingStore {
         requireNonNull(valueClass, "valueClass");
         requireNonNull(value, "value");
         requireNonNull(timeToLive, "timeToLive");
-        timeToLive.ifPresent(x -> {
-            if (x.isNegative()) {
-                throw new IllegalArgumentException("time to live cannot be negative");
-            }
-        });
-        LOGGER.debug("Adding to cache: {} of class {}", new String(value), valueClass);
+        BackingStore.durationCheck(timeToLive);
+        LOGGER.debug("Adding to cache key {} of class {}", key, valueClass);
         cache.put(cacheKey, new CachedPair(value, valueClass));
         /*Here we set up a simple timer to deal with the removal of the item from the cache if a duration is present
          *This uses a single timer to remove elements, this is fine for this example, but in production we would want
