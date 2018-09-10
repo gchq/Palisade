@@ -46,8 +46,8 @@ import static java.util.Objects.requireNonNull;
 public interface BackingStore {
 
     /**
-     * Store the given data in the backing add. The byte array <code>value</code> is assumed to encode an object of
-     * the type represented by the class <code>valueClass</code>. The <code>key</code> must not be empty or
+     * Store the given data in the backing add. The byte array <code>value</code> is assumed to encode an object of the
+     * type represented by the class <code>valueClass</code>. The <code>key</code> must not be empty or
      * <code>null</code>. If a time to live duration is required on this entry, then the optional specified should not
      * be empty. Durations must not be negative.
      * <p>
@@ -81,8 +81,8 @@ public interface BackingStore {
     }
 
     /**
-     * Attempt to get the given key from the backing add. Looks up the given key and attempts to get it. If
-     * the requested key couldn't be found then the value of the returned {@link BasicCacheObject} will be empty. A new
+     * Attempt to get the given key from the backing add. Looks up the given key and attempts to get it. If the
+     * requested key couldn't be found then the value of the returned {@link BasicCacheObject} will be empty. A new
      * cache object should be returned for each call to this method. If the key can't be found, then the expected class
      * should be <code>Object.class</code> inside the returned object.
      *
@@ -130,6 +130,27 @@ public interface BackingStore {
                 throw new IllegalArgumentException("time to live cannot be negative");
             }
         });
+    }
+
+    /**
+     * Convenience method to validate the parameters to an <code>add</code> call.
+     *
+     * @param key        the key to add
+     * @param valueClass the type of the value
+     * @param value      the encoded value
+     * @param timeToLive optional time to live
+     * @return the key
+     * @throws NullPointerException     if anything is <code>null</code>
+     * @throws IllegalArgumentException if the duration is negative, or the trimmed key is empty
+     * @see BackingStore#durationCheck(Optional)
+     * @see BackingStore#keyCheck(String)
+     */
+    static String validateAddParameters(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
+        String cacheKey = BackingStore.keyCheck(key);
+        requireNonNull(valueClass, "valueClass");
+        requireNonNull(value, "value");
+        BackingStore.durationCheck(timeToLive);
+        return cacheKey;
     }
 
     @JsonGetter("class")

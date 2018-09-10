@@ -97,10 +97,7 @@ public class PropertiesBackingStore implements BackingStore {
     @Override
     public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
         //error checks
-        String cacheKey = BackingStore.keyCheck(key);
-        requireNonNull(valueClass, "valueClass");
-        requireNonNull(value, "value");
-        BackingStore.durationCheck(timeToLive);
+        String cacheKey = BackingStore.validateAddParameters(key, valueClass, value, timeToLive);
         LOGGER.debug("Adding cache key {} of {}", cacheKey, valueClass);
         //this isn't meant to be thread safe, but we can at least make the cache add atomic
         synchronized (this) {

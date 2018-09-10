@@ -24,11 +24,7 @@ import static java.util.Objects.requireNonNull;
 public class EtcdBackingStore implements BackingStore {
     @Override
     public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
-        String cachedKey = BackingStore.keyCheck(key);
-        requireNonNull(valueClass, "valueClass");
-        requireNonNull(value, "value");
-        BackingStore.durationCheck(timeToLive);
-
+        String cachedKey = BackingStore.validateAddParameters(key,valueClass,value,timeToLive);
         return false;
     }
 

@@ -98,11 +98,7 @@ public class HashMapBackingStore implements BackingStore {
 
     @Override
     public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
-        String cacheKey = BackingStore.keyCheck(key);
-        requireNonNull(valueClass, "valueClass");
-        requireNonNull(value, "value");
-        requireNonNull(timeToLive, "timeToLive");
-        BackingStore.durationCheck(timeToLive);
+        String cacheKey = BackingStore.validateAddParameters(key, valueClass, value, timeToLive);
         LOGGER.debug("Adding to cache key {} of class {}", key, valueClass);
         cache.put(cacheKey, new CachedPair(value, valueClass));
         /*Here we set up a simple timer to deal with the removal of the item from the cache if a duration is present
