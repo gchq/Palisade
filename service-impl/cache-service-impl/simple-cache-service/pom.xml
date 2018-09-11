@@ -19,22 +19,19 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>service-impl</artifactId>
+        <artifactId>cache-service-impl</artifactId>
         <version>0.1.2-SNAPSHOT</version>
     </parent>
-    <artifactId>cache-service-impl</artifactId>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>hashmap-backing-store</module>
-        <module>simple-cache-service</module>
-    </modules>
+    <artifactId>simple-cache-service</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>cache-service</artifactId>
             <version>${project.parent.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
 </project>
