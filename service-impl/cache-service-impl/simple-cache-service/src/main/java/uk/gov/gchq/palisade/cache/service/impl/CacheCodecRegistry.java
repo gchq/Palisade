@@ -24,7 +24,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Maintains a registry of encoder and decoder function pairs (codecs) for various object types in to byte arrays. This
- * is so that the cache can encode the various values into a backing add. Clients may add extra specialisations if they
+ * is so that the cache can encode the various values into a backing store. Clients may add extra specialisations if they
  * wish via {@link CacheCodecRegistry#registerFunctionPair(Class, Function, BiFunction)}. JSON serialisation is used as
  * the default codec.
  */

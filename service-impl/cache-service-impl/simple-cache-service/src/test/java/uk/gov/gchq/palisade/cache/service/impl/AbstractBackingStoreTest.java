@@ -190,7 +190,7 @@ public abstract class AbstractBackingStoreTest {
     public void shouldReturnEmptyCacheObject() {
         //Given - nothing
         //When
-        BasicCacheObject ob = impl.get("nothing");
+        SimpleCacheObject ob = impl.get("nothing");
         //Then
         assertFalse(ob.getValue().isPresent());
     }
@@ -203,7 +203,7 @@ public abstract class AbstractBackingStoreTest {
         byte[] expected = new byte[]{1, 2, 3, 4};
         //When
         impl.add("test", Integer.class, expected);
-        BasicCacheObject actual = impl.get("test");
+        SimpleCacheObject actual = impl.get("test");
         //Then
         assertEquals(expected, actual.getValue().get());
         assertEquals(Integer.class, actual.getValueClass());
@@ -217,8 +217,8 @@ public abstract class AbstractBackingStoreTest {
         //When
         impl.add("test", Integer.class, expected);
         impl.add("test2", String.class, expected2);
-        BasicCacheObject actual = impl.get("test");
-        BasicCacheObject actual2 = impl.get("test2");
+        SimpleCacheObject actual = impl.get("test");
+        SimpleCacheObject actual2 = impl.get("test2");
 
         //Then
         assertEquals(expected, actual.getValue().get());
@@ -235,7 +235,7 @@ public abstract class AbstractBackingStoreTest {
         //When
         impl.add("test", Integer.class, expected);
         impl.add("test2", String.class, expected2);
-        BasicCacheObject actual = impl.get("not_there");
+        SimpleCacheObject actual = impl.get("not_there");
         //Then
         assertFalse(actual.getValue().isPresent());
         assertEquals(Object.class, actual.getValueClass());
@@ -248,10 +248,10 @@ public abstract class AbstractBackingStoreTest {
         byte[] expected2 = new byte[]{5, 6, 7, 8};
         //When
         impl.add("test", Integer.class, expected);
-        BasicCacheObject actual = impl.get("test");
+        SimpleCacheObject actual = impl.get("test");
         //overwrite it
         impl.add("test", String.class, expected2);
-        BasicCacheObject overwrite = impl.get("test");
+        SimpleCacheObject overwrite = impl.get("test");
         //Then
         assertEquals(Integer.class, actual.getValueClass());
         assertEquals(expected, actual.getValue().get());
@@ -277,16 +277,16 @@ public abstract class AbstractBackingStoreTest {
         impl.add("test", Object.class, expected, Optional.of(Duration.of(0, ChronoUnit.SECONDS)));
         //When
         delay(100);
-        BasicCacheObject empty = impl.get("test");
+        SimpleCacheObject empty = impl.get("test");
         //Then
         assertFalse(empty.getValue().isPresent());
     }
 
     static class TestResult {
         boolean completedInTime;
-        BasicCacheObject result;
+        SimpleCacheObject result;
 
-        public TestResult(final boolean completedInTime, final BasicCacheObject result) {
+        public TestResult(final boolean completedInTime, final SimpleCacheObject result) {
             this.completedInTime = completedInTime;
             this.result = result;
         }
@@ -297,7 +297,7 @@ public abstract class AbstractBackingStoreTest {
      */
     private TestResult timedRetrieve(String key, long safeDelay) {
         long time = System.currentTimeMillis();
-        BasicCacheObject result = impl.get(key);
+        SimpleCacheObject result = impl.get(key);
         time = System.currentTimeMillis() - time;
         return new TestResult((time > safeDelay), result);
     }
@@ -316,7 +316,7 @@ public abstract class AbstractBackingStoreTest {
         }
         //Then
         delay(1200);
-        BasicCacheObject empty = impl.get("test");
+        SimpleCacheObject empty = impl.get("test");
         assertFalse(empty.getValue().isPresent());
     }
 

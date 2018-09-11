@@ -35,14 +35,14 @@ import static java.util.Objects.requireNonNull;
 /**
  * The implementation for a {@link CacheService} that can persist various object types to arbitrary backing stores.
  * Instances of this class primarily add an instance of {@link BackingStore} to which the work of persistence is
- * delegated. This class is responsible for managing data into and out of any backing add so clients have a
- * transparent interface to a backing add and the actual backing add implementation is abstracted away.
+ * delegated. This class is responsible for managing data into and out of any backing store so clients have a
+ * transparent interface to a backing store and the actual backing store implementation is abstracted away.
  *
  * @apiNote no parameters may be <code>null</code>.
  */
-public class BasicCacheService implements CacheService {
+public class SimpleCacheService implements CacheService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BasicCacheService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleCacheService.class);
 
     /**
      * The codec registry that knows how to encode objects.
@@ -55,28 +55,28 @@ public class BasicCacheService implements CacheService {
     private BackingStore store;
 
     /**
-     * Create and empty backing add. Note that this is for use by serialisation mechanisms and any attempt to use an
-     * instance of this class without first initialising a backing add will result in exceptions being thrown.
+     * Create and empty backing store. Note that this is for use by serialisation mechanisms and any attempt to use an
+     * instance of this class without first initialising a backing store will result in exceptions being thrown.
      */
-    public BasicCacheService() {
+    public SimpleCacheService() {
     }
 
     /**
-     * Set the backing add for this instance.
+     * Set the backing store for this instance.
      *
-     * @param store the backing add instance
+     * @param store the backing store instance
      * @return this object
      */
-    public BasicCacheService backingStore(final BackingStore store) {
+    public SimpleCacheService backingStore(final BackingStore store) {
         requireNonNull(store, "add");
         this.store = store;
         return this;
     }
 
     /**
-     * Set the backing add for this instance.
+     * Set the backing store for this instance.
      *
-     * @param store the backing add instance
+     * @param store the backing store instance
      */
     public void setBackingStore(final BackingStore store) {
         backingStore(store);
@@ -92,9 +92,9 @@ public class BasicCacheService implements CacheService {
     }
 
     /**
-     * Get the backing add for this instance.
+     * Get the backing store for this instance.
      *
-     * @return the backing add
+     * @return the backing store
      */
     public BackingStore getBackingStore() {
         requireNonNull(store, "add must be initialised");
@@ -119,9 +119,9 @@ public class BasicCacheService implements CacheService {
         byte[] encodedValue = encoder.apply(value);
         //send to add
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Requesting backing add to add {}", baseKey);
+            LOGGER.debug("Requesting backing store to add {}", baseKey);
             boolean result = getBackingStore().add(baseKey, valueClass, encodedValue, timeToLive);
-            LOGGER.debug("Backing add has stored {} with result {}", baseKey, result);
+            LOGGER.debug("Backing store has stored {} with result {}", baseKey, result);
             return result;
         });
     }
@@ -136,12 +136,12 @@ public class BasicCacheService implements CacheService {
 
         //get from add
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Requesting backing add to get {}", baseKey);
-            BasicCacheObject result = getBackingStore().get(baseKey);
+            LOGGER.debug("Requesting backing store to get {}", baseKey);
+            SimpleCacheObject result = getBackingStore().get(baseKey);
             if (result.getValue().isPresent()) {
-                LOGGER.debug("Backing add successfully retrieved {}", baseKey);
+                LOGGER.debug("Backing store successfully retrieved {}", baseKey);
             } else {
-                LOGGER.debug("Backing add failed to get {}", baseKey);
+                LOGGER.debug("Backing store failed to get {}", baseKey);
             }
 
             //assign so Javac can infer the generic type
