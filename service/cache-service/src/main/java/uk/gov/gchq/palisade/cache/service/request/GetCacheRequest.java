@@ -13,42 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.gov.gchq.palisade.cache.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.service.request.Request;
-
-import static java.util.Objects.requireNonNull;
+import uk.gov.gchq.palisade.service.Service;
 
 /**
- * This class is used for sending a request to get the
- * {@link uk.gov.gchq.palisade.service.request.DataRequestConfig} out of the
- * cache for the given {@link RequestId}.
+ * This class is the type of request for retrieving an object from the cache service. The parameter type on this class
+ * is used to specify the type of the cache retrieval.
+ *
+ * @param <V> the type of object that is expected to be in the cache
  */
-public class GetCacheRequest extends Request {
-    private RequestId requestId;
+public class GetCacheRequest<V> extends CacheRequest {
 
     public GetCacheRequest() {
     }
 
-    public GetCacheRequest requestId(final RequestId requestId) {
-        requireNonNull(requestId, "The request id cannot be set to null.");
-        this.requestId = requestId;
+    /**
+     * {@inheritDoc}
+     */
+    public GetCacheRequest key(final String key) {
+        super.key(key);
         return this;
     }
 
-    public RequestId getRequestId() {
-        requireNonNull(requestId, "The request id has not been set.");
-        return requestId;
-    }
-
-    public void setRequestId(final RequestId requestId) {
-        requestId(requestId);
+    /**
+     * {@inheritDoc}
+     */
+    public GetCacheRequest service(final Class<? extends Service> service) {
+        super.service(service);
+        return this;
     }
 
     @Override
@@ -61,27 +58,24 @@ public class GetCacheRequest extends Request {
             return false;
         }
 
-        final GetCacheRequest that = (GetCacheRequest) o;
+        GetCacheRequest that = (GetCacheRequest) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(requestId, that.requestId)
                 .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(19, 29)
-                .appendSuper(super.hashCode())
-                .append(requestId)
-                .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("requestId", requestId)
                 .toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(3, 11)
+                .appendSuper(super.hashCode())
+                .toHashCode();
     }
 }
