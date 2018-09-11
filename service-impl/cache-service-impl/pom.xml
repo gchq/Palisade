@@ -27,9 +27,9 @@
 
     <modules>
         <module>hashmap-backing-store</module>
-        <module>basic-cache-service</module>
         <module>properties-backing-store</module>
         <module>etcd-backing-store</module>
+        <module>simple-cache-service</module>
     </modules>
 
     <dependencies>

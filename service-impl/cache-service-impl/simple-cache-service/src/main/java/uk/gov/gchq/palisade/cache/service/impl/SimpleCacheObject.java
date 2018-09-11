@@ -23,12 +23,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Represents the basic cache entry that will be stored and retrieved from the backing add. If a add is unable to
+ * Represents the basic cache entry that will be stored and retrieved from the backing store. If a store is unable to
  * get a given key then it will return an instance of this class with an empty value. No entries in this class may
  * be <code>null</code>.
  *
  */
-public class BasicCacheObject {
+public class SimpleCacheObject {
 
     /**
      * The class of the object being stored in the cache. This should a @{link Class} for the standard form of
@@ -46,7 +46,7 @@ public class BasicCacheObject {
      * @param valueClass the type of the value being cached
      * @param value      the optional cache value, may be empty if no valid entry is present
      */
-    public BasicCacheObject(final Class<?> valueClass, final Optional<byte[]> value) {
+    public SimpleCacheObject(final Class<?> valueClass, final Optional<byte[]> value) {
         Objects.requireNonNull(valueClass, "valueClass");
         Objects.requireNonNull(value, "value");
         this.valueClass = valueClass;
@@ -90,7 +90,7 @@ public class BasicCacheObject {
             return false;
         }
 
-        BasicCacheObject that = (BasicCacheObject) o;
+        SimpleCacheObject that = (SimpleCacheObject) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))

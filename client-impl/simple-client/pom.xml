@@ -67,7 +67,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>basic-cache-service</artifactId>
+            <artifactId>simple-cache-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

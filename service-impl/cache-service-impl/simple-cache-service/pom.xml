@@ -22,7 +22,7 @@
         <artifactId>cache-service-impl</artifactId>
         <version>0.1.2-SNAPSHOT</version>
     </parent>
-    <artifactId>basic-cache-service</artifactId>
+    <artifactId>simple-cache-service</artifactId>
 
     <dependencies>
         <dependency>
