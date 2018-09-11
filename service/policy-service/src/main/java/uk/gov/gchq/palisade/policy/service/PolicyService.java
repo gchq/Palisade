@@ -18,7 +18,8 @@ package uk.gov.gchq.palisade.policy.service;
 
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
-import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
@@ -62,12 +63,22 @@ public interface PolicyService extends Service {
     /**
      * This method allows for the setting of a policy to a resource.
      *
-     * @param request a {@link SetPolicyRequest} containing the
+     * @param request a {@link SetResourcePolicyRequest} containing the
      *                resource and the policy to set on that resource.
      * @return a {@link CompletableFuture} {@link Boolean} which is true if
      * the policy was successfully set.
      */
-    CompletableFuture<Boolean> setPolicy(final SetPolicyRequest request);
+    CompletableFuture<Boolean> setResourcePolicy(final SetResourcePolicyRequest request);
+
+    /**
+     * This method allows for the setting of a policy to a resource type.
+     *
+     * @param request a {@link SetTypePolicyRequest} containing the
+     *                resource type and the policy to set on that resource.
+     * @return a {@link CompletableFuture} {@link Boolean} which is true if
+     * the policy was successfully set.
+     */
+    CompletableFuture<Boolean> setTypePolicy(final SetTypePolicyRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {
@@ -77,9 +88,11 @@ public interface PolicyService extends Service {
         if (request instanceof GetPolicyRequest) {
             return getPolicy((GetPolicyRequest) request);
         }
-        if (request instanceof SetPolicyRequest) {
-            setPolicy((SetPolicyRequest) request);
-            return null;
+        if (request instanceof SetResourcePolicyRequest) {
+            return setResourcePolicy((SetResourcePolicyRequest) request);
+        }
+        if (request instanceof SetTypePolicyRequest) {
+            return setTypePolicy((SetTypePolicyRequest) request);
         }
         return Service.super.process(request);
     }

@@ -36,7 +36,7 @@ import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
 import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
 import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
 import uk.gov.gchq.palisade.policy.service.Policy;
-import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
@@ -99,8 +99,8 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         // different types of objects.
 
         // Using Custom Rule implementations - without Koryphe
-        final SetPolicyRequest customPolicies =
-                new SetPolicyRequest()
+        final SetResourcePolicyRequest customPolicies =
+                new SetResourcePolicyRequest()
                         .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                         .policy(new Policy<ExampleObj>()
                                 .owner(alice)
@@ -119,7 +119,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                         );
 
         // Using Koryphe's functions/predicates
-        final SetPolicyRequest koryphePolicies = new SetPolicyRequest()
+        final SetResourcePolicyRequest koryphePolicies = new SetResourcePolicyRequest()
                 .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                 .policy(new Policy<ExampleObj>()
                         .owner(alice)
@@ -145,7 +145,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                         )
                 );
 
-        final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setPolicy(
+        final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setResourcePolicy(
                 koryphePolicies
         );
 

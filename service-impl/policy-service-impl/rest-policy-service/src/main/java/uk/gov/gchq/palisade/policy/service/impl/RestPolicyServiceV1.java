@@ -29,7 +29,8 @@ import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
-import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
@@ -115,28 +116,48 @@ public class RestPolicyServiceV1 implements PolicyService {
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
     public Boolean setPolicySync(
-            @ApiParam(value = "The request") final SetPolicyRequest request) {
-        return setPolicy(request).join();
+            @ApiParam(value = "The request") final SetResourcePolicyRequest request) {
+        return setResourcePolicy(request).join();
     }
 
     @PUT
     @Path("async")
-    @ApiOperation(value = "Sets the policy asynchronously",
+    @ApiOperation(value = "Sets the resource policy asynchronously",
             response = Boolean.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    public void setPolicyAsync(
-            @ApiParam(value = "The request") final SetPolicyRequest request) {
-        setPolicy(request);
+    public void setResourcePolicyAsync(
+            @ApiParam(value = "The request") final SetResourcePolicyRequest request) {
+        setResourcePolicy(request);
     }
 
     @Override
-    public CompletableFuture<Boolean> setPolicy(
-            @ApiParam(value = "The request") final SetPolicyRequest request) {
-        LOGGER.debug("Invoking setPolicy: {}", request);
-        return delegate.setPolicy(request);
+    public CompletableFuture<Boolean> setResourcePolicy(
+            @ApiParam(value = "The request") final SetResourcePolicyRequest request) {
+        LOGGER.debug("Invoking setResourcePolicy: {}", request);
+        return delegate.setResourcePolicy(request);
+    }
+
+    @PUT
+    @Path("async")
+    @ApiOperation(value = "Sets the resource type policy asynchronously",
+            response = Boolean.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Something went wrong in the server")
+    })
+    public void setTypePolicyAsync(
+            @ApiParam(value = "The request") final SetTypePolicyRequest request) {
+        setTypePolicy(request);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setTypePolicy(
+            @ApiParam(value = "The request") final SetTypePolicyRequest request) {
+        LOGGER.debug("Invoking setTypePolicy: {}", request);
+        return delegate.setTypePolicy(request);
     }
 
     protected PolicyService getDelegate() {

@@ -9,7 +9,7 @@ import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
-import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
@@ -160,7 +160,7 @@ public class HierarchicalPolicyServiceTest {
                 .owner(testUser)
                 .resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
         // try
-        CompletableFuture<Boolean> future = policyService.setPolicy(new SetPolicyRequest().resource(newResource).policy(newPolicy));
+        CompletableFuture<Boolean> future = policyService.setResourcePolicy(new SetResourcePolicyRequest().resource(newResource).policy(newPolicy));
         Boolean result = future.get();
         assertTrue(result);
 
@@ -189,7 +189,7 @@ public class HierarchicalPolicyServiceTest {
         // given
         Policy newPolicy = new Policy().owner(testUser).resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
         // try
-        CompletableFuture<Boolean> future = policyService.setPolicy(new SetPolicyRequest().resource(testResource).policy(newPolicy));
+        CompletableFuture<Boolean> future = policyService.setResourcePolicy(new SetResourcePolicyRequest().resource(testResource).policy(newPolicy));
         Boolean result = future.get();
         assertTrue(result);
 

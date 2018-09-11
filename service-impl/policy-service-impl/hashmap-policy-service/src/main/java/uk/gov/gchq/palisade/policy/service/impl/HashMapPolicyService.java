@@ -24,7 +24,7 @@ import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
-import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
 
@@ -72,7 +72,7 @@ public class HashMapPolicyService implements PolicyService {
     }
 
     @Override
-    public CompletableFuture<Boolean> setPolicy(final SetPolicyRequest request) {
+    public CompletableFuture<Boolean> setPolicy(final SetResourcePolicyRequest request) {
         LOGGER.debug("Setting policy {} for resource {}", request.getPolicy(), request.getResource());
         policyStore.getPolicies().remove(request.getResource());
         policyStore.setPolicy((LeafResource) request.getResource(), request.getPolicy());
