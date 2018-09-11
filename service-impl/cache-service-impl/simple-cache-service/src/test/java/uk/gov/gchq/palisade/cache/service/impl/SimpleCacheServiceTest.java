@@ -38,7 +38,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
-public class BasicCacheServiceTest {
+public class SimpleCacheServiceTest {
     private SimpleCacheService service;
 
     private static BackingStore store;

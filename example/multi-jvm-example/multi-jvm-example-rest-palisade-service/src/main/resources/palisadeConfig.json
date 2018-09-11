@@ -17,7 +17,7 @@
     "baseUrl": "http://localhost:8083/user"
   },
   "cacheService": {
-    "class" : "uk.gov.gchq.palisade.cache.service.impl.BasicCacheService",
+    "class" : "uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService",
     "backingStore" : {
       "class" : "uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore"
     },
