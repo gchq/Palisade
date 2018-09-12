@@ -19,21 +19,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>palisade</artifactId>
+        <artifactId>service</artifactId>
         <version>0.1.2-SNAPSHOT</version>
     </parent>
-    <artifactId>service</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>config-service</artifactId>
 
-    <modules>
-        <module>user-service</module>
-        <module>audit-service</module>
-        <module>policy-service</module>
-        <module>data-service</module>
-        <module>resource-service</module>
-        <module>palisade-service</module>
-        <module>cache-service</module>
-        <module>rest-service</module>
-        <module>config-service</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
 </project>
