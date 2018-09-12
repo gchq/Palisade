@@ -26,14 +26,14 @@
     <packaging>war</packaging>
 
     <properties>
-        <standalone-path />
+        <standalone-path/>
         <standalone-port>8080</standalone-port>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hashmap-policy-service</artifactId>
+            <artifactId>hierarchical-policy-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

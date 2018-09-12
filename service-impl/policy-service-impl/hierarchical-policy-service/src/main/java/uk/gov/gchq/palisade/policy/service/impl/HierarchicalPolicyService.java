@@ -37,16 +37,16 @@ import uk.gov.gchq.palisade.rule.Rules;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
  * By having the policies stored in several key value stores we can attach policies
  * at either the resource or data type level.
- *
  * Each rule needs to be flagged as a resource level filter, or a record level filter/transform.
- *
  * To get the rules for a file/stream resource, you need to get the rules for the given resource
  * followed by the rules of all its parents. Then you get the rules of the given resources data type.
  * If there are any negation rules then all rules inherited from up the
@@ -55,15 +55,27 @@ import java.util.stream.Collectors;
 public class HierarchicalPolicyService implements PolicyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HierarchicalPolicyService.class);
 
-    private HashMap<String, Policy> dataTypePoliciesMap;
-    private HashMap<Resource, Policy> resourcePoliciesMap;
+    private static final Map<String, Policy> DATA_TYPE_POLICIES_MAP = new ConcurrentHashMap<>();
+    private static final Map<Resource, Policy> RESOURCE_POLICIES_MAP = new ConcurrentHashMap<>();
+
+    private Map<String, Policy> dataTypePoliciesMap;
+    private Map<Resource, Policy> resourcePoliciesMap;
 
     public HierarchicalPolicyService() {
-        this.dataTypePoliciesMap = new HashMap<>();
-        this.resourcePoliciesMap = new HashMap<>();
+        this(true);
     }
 
-    public HierarchicalPolicyService(final HashMap<String, Policy> dataTypePoliciesMap, final HashMap<Resource, Policy> resourcePoliciesMap) {
+    public HierarchicalPolicyService(final boolean useStatic) {
+        if (useStatic) {
+            this.dataTypePoliciesMap = DATA_TYPE_POLICIES_MAP;
+            this.resourcePoliciesMap = RESOURCE_POLICIES_MAP;
+        } else {
+            this.dataTypePoliciesMap = new ConcurrentHashMap<>();
+            this.resourcePoliciesMap = new ConcurrentHashMap<>();
+        }
+    }
+
+    public HierarchicalPolicyService(final Map<String, Policy> dataTypePoliciesMap, final Map<Resource, Policy> resourcePoliciesMap) {
         Objects.requireNonNull(dataTypePoliciesMap);
         Objects.requireNonNull(resourcePoliciesMap);
         this.dataTypePoliciesMap = dataTypePoliciesMap;
@@ -72,10 +84,10 @@ public class HierarchicalPolicyService implements PolicyService {
 
     @Override
     public CompletableFuture<CanAccessResponse> canAccess(final CanAccessRequest request) {
-            Context context = request.getContext();
-            User user = request.getUser();
-            Collection<LeafResource> resources = request.getResources();
-            CanAccessResponse response = new CanAccessResponse().canAccessResources(canAccess(context, user, resources));
+        Context context = request.getContext();
+        User user = request.getUser();
+        Collection<LeafResource> resources = request.getResources();
+        CanAccessResponse response = new CanAccessResponse().canAccessResources(canAccess(context, user, resources));
         return CompletableFuture.completedFuture(response);
     }
 
@@ -93,15 +105,15 @@ public class HierarchicalPolicyService implements PolicyService {
      * This method is used to recursively go up the resource hierarchy ending with the original
      * data type to extract and merge the policies at each stage of the hierarchy.
      *
-     * @param resource          A {@link Resource} to get the applicable rules for.
-     * @param canAccessRequest  A boolean that is true if you want the resource level.
-     *                          rules and therefore this is called from the canAccess method
-     * @param originalDataType  This is the data type that you want to be at the top of the
-     *                          Resource hierarchy tree, which will be the data type of the
-     *                          first resource in the recursive calls to this method.
-     * @param <T>               The type of the returned {@link Rules}.
-     * @return                  A {@link Rules} object of type T, which contains the list of rules
-     *                          that need to be applied to the resource.
+     * @param resource         A {@link Resource} to get the applicable rules for.
+     * @param canAccessRequest A boolean that is true if you want the resource level.
+     *                         rules and therefore this is called from the canAccess method
+     * @param originalDataType This is the data type that you want to be at the top of the
+     *                         Resource hierarchy tree, which will be the data type of the
+     *                         first resource in the recursive calls to this method.
+     * @param <T>              The type of the returned {@link Rules}.
+     * @return A {@link Rules} object of type T, which contains the list of rules
+     * that need to be applied to the resource.
      */
     protected <T> Rules<T> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
 
