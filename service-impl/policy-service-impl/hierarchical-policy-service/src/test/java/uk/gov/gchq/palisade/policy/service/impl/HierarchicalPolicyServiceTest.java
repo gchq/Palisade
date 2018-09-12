@@ -1,5 +1,6 @@
 package uk.gov.gchq.palisade.policy.service.impl;
 
+import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,6 +11,7 @@ import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
@@ -18,16 +20,19 @@ import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rule.Rules;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -37,19 +42,56 @@ public class HierarchicalPolicyServiceTest {
 
     private HierarchicalPolicyService policyService;
     private static final User testUser = new User().userId("testUser");
+    private final SystemResource systemResource = createTestSystemResource();
+    private final DirectoryResource directoryResource = createTestDirectoryResource();
+    private final FileResource fileResource1 = createTestFileResource(1);
+    private final FileResource fileResource2 = createTestFileResource(2);
 
     @Before
     public void setup() {
-        policyService = new HierarchicalPolicyService(createDataTypePolicyStore(), createResourcePolicyStore());
-    }
+        policyService = new HierarchicalPolicyService();
 
-    private static HashMap<String, Policy> createDataTypePolicyStore() {
-        HashMap<String, Policy> store = new HashMap<>();
-        Policy policy = new Policy<>()
-                .owner(testUser)
-                .resourceLevelSimplePredicateRule("Input is not null", Objects::nonNull);
-        store.put("TestObj", policy);
-        return store;
+        policyService.setResourcePolicy(new SetResourcePolicyRequest()
+                        .resource(fileResource1)
+                        .policy(new Policy<>()
+                                .owner(testUser)
+                                .resourceLevelSimplePredicateRule("Input is not null", Objects::nonNull)
+                                .recordLevelRule("Check user has 'Sensitive' auth", (record, user, justification) -> {
+                                    if (user.getAuths().contains("Sensitive")) {
+                                        return record;
+                                    } else {
+                                        return null;
+                                    }
+                                }))
+        );
+
+        policyService.setResourcePolicy(new SetResourcePolicyRequest()
+                        .resource(fileResource2)
+                        .policy(new Policy<>()
+                                .owner(testUser)
+                                .resourceLevelSimplePredicateRule("Input is not null", Objects::nonNull)
+                                .recordLevelRule("Check user has 'Sensitive' auth", (record, user, justification) -> {
+                                    if (user.getAuths().contains("Sensitive")) {
+                                        return record;
+                                    } else {
+                                        return null;
+                                    }
+                                }))
+        );
+
+        policyService.setResourcePolicy(new SetResourcePolicyRequest()
+                        .resource(directoryResource)
+                        .policy(new Policy<>()
+                                .owner(testUser)
+                                .recordLevelSimpleFunctionRule("Does nothing", a -> a))
+        );
+
+        policyService.setResourcePolicy(new SetResourcePolicyRequest()
+                        .resource(systemResource)
+                        .policy(new Policy<>()
+                                .owner(testUser)
+                                .resourceLevelSimplePredicateRule("Resource serialised format is txt", resource -> ((LeafResource) resource).getSerialisedFormat().equalsIgnoreCase("txt")))
+        );
     }
 
     private static SystemResource createTestSystemResource() {
@@ -62,59 +104,25 @@ public class HierarchicalPolicyServiceTest {
         return directoryResource;
     }
 
-
-    private static FileResource createTestFileResource() {
-        FileResource fileResource = new FileResource().id("File://temp/TestObj_001.txt").type("TestObj").serialisedFormat("txt");
+    private static FileResource createTestFileResource(final int i) {
+        FileResource fileResource = new FileResource().id("File://temp/TestObj_00" + i + ".txt").type("TestObj" + i).serialisedFormat("txt");
         fileResource.setParent(createTestDirectoryResource());
         return fileResource;
     }
 
-    private static HashMap<Resource, Policy> createResourcePolicyStore() {
-        HashMap<Resource, Policy> store = new HashMap<>();
-
-        // system level policy
-        Policy systemPolicy = new Policy<>()
-                .owner(testUser)
-                .resourceLevelSimplePredicateRule("Resource type is TestObj", resource -> ((LeafResource) resource).getType().equalsIgnoreCase("testobj"));
-        store.put(createTestSystemResource(), systemPolicy);
-
-        // directory level policy
-        Policy directoryPolicy = new Policy<>()
-                .owner(testUser)
-                .recordLevelSimpleFunctionRule("Does nothing", a -> a);
-        store.put(createTestDirectoryResource(), directoryPolicy);
-
-        // file level policy
-        Policy filePolicy = new Policy<>()
-                .owner(testUser)
-                .recordLevelRule("Check user has 'Sensitive' auth", (record, user, justification) -> {
-                    if (user.getAuths().contains("Sensitive")) {
-                        return record;
-                    } else {
-                        return null;
-                    }
-                });
-        store.put(createTestFileResource(), filePolicy);
-        return store;
-    }
-
     @Test
     public void getApplicableResourceLevelRules() {
-        // given
-        FileResource testResource = createTestFileResource();
         // try
-        Rules<Resource> result = policyService.getApplicableRules(testResource, true, testResource.getType());
+        Rules<Resource> result = policyService.getApplicableRules(fileResource1, true, fileResource1.getType());
         // check
-        assertEquals("Input is not null, Resource type is TestObj", result.getMessage());
+        assertEquals("Resource serialised format is txt, Input is not null", result.getMessage());
         assertEquals(2, result.getRules().keySet().size());
     }
 
     @Test
     public void getApplicableRecordLevelRules() {
-        // given
-        FileResource testResource = createTestFileResource();
         // try
-        Rules<Resource> result = policyService.getApplicableRules(testResource, false, testResource.getType());
+        Rules<Resource> result = policyService.getApplicableRules(fileResource1, false, fileResource1.getType());
         // check
         assertEquals("Does nothing, Check user has 'Sensitive' auth", result.getMessage());
         assertEquals(2, result.getRules().keySet().size());
@@ -125,14 +133,19 @@ public class HierarchicalPolicyServiceTest {
         // given
         User user = new User().userId("testUser").auths("Sensitive");
         Context context = new Context().justification("testing");
-        LeafResource resource = createTestFileResource();
+
         // try
-        CompletableFuture<CanAccessResponse> future = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(resource)).user(user).context(context));
+        CompletableFuture<CanAccessResponse> future = policyService.canAccess(
+                new CanAccessRequest()
+                        .resources(Collections.singletonList(fileResource1))
+                        .user(user)
+                        .context(context));
+
         CanAccessResponse response = future.get();
         Collection<LeafResource> resources = response.getCanAccessResources();
         // check
         assertEquals(1, resources.size());
-        assertEquals(resource, resources.iterator().next());
+        assertEquals(fileResource1, resources.iterator().next());
     }
 
     @Test
@@ -140,14 +153,13 @@ public class HierarchicalPolicyServiceTest {
         // given
         User user = new User().userId("testUser").auths("Sensitive");
         Context context = new Context().justification("testing");
-        LeafResource resource = createTestFileResource();
         // try
-        CompletableFuture<MultiPolicy> future = policyService.getPolicy(new GetPolicyRequest().user(user).context(context).resources(Collections.singletonList(resource)));
+        CompletableFuture<MultiPolicy> future = policyService.getPolicy(new GetPolicyRequest().user(user).context(context).resources(Collections.singletonList(fileResource1)));
         MultiPolicy response = future.get();
         Map<LeafResource, Rules> ruleMap = response.getRuleMap();
         // check
         assertEquals(1, ruleMap.size());
-        assertEquals("Does nothing, Check user has 'Sensitive' auth", ruleMap.get(resource).getMessage());
+        assertEquals("Does nothing, Check user has 'Sensitive' auth", ruleMap.get(fileResource1).getMessage());
     }
 
     @Test
@@ -177,27 +189,66 @@ public class HierarchicalPolicyServiceTest {
         // given
         User testUser = new User().userId("testUser").auths("Sensitive");
         Context testContext = new Context().justification("testing");
-        LeafResource testResource = createTestFileResource();
         // try
-        CompletableFuture<CanAccessResponse> future1 = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(testResource)).user(testUser).context(testContext));
+        CompletableFuture<CanAccessResponse> future1 = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(fileResource1)).user(testUser).context(testContext));
         CanAccessResponse response = future1.get();
         Collection<LeafResource> resources = response.getCanAccessResources();
         // check
         assertEquals(1, resources.size());
-        assertEquals(testResource, resources.iterator().next());
+        assertEquals(fileResource1, resources.iterator().next());
 
         // given
         Policy newPolicy = new Policy().owner(testUser).resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
         // try
-        CompletableFuture<Boolean> future = policyService.setResourcePolicy(new SetResourcePolicyRequest().resource(testResource).policy(newPolicy));
+        CompletableFuture<Boolean> future = policyService.setResourcePolicy(new SetResourcePolicyRequest().resource(fileResource1).policy(newPolicy));
         Boolean result = future.get();
         assertTrue(result);
 
         // try
-        CompletableFuture<CanAccessResponse> future2 = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(testResource)).user(testUser).context(new Context().justification("fun")));
+        CompletableFuture<CanAccessResponse> future2 = policyService.canAccess(new CanAccessRequest().resources(Collections.singletonList(fileResource1)).user(testUser).context(new Context().justification("fun")));
         CanAccessResponse response2 = future2.get();
         Collection<LeafResource> resources2 = response2.getCanAccessResources();
         // check
         assertEquals(0, resources2.size());
+    }
+
+    @Test
+    public void setTypePolicy() throws InterruptedException, ExecutionException, TimeoutException {
+        // Given
+        final User testUser = new User().userId("testUser").auths("Sensitive");
+
+        // Check before policy added
+        final CompletableFuture<CanAccessResponse> canAccessBeforeResult = policyService.canAccess(
+                new CanAccessRequest()
+                        .resources(Arrays.asList(fileResource1, fileResource2))
+                        .user(testUser)
+                        .context(new Context().justification("fun"))
+        );
+        final Set<String> types = canAccessBeforeResult.get().getCanAccessResources().stream().map(LeafResource::getType).collect(Collectors.toSet());
+        assertEquals(Sets.newHashSet("TestObj1", "TestObj2"), types);
+        assertEquals(2, canAccessBeforeResult.get().getCanAccessResources().size());
+
+
+        final Policy newPolicy = new Policy()
+                .owner(testUser)
+                .resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
+
+        // When
+        final CompletableFuture<Boolean> setPolicyResult = policyService.setTypePolicy(
+                new SetTypePolicyRequest()
+                        .type("TestObj2")
+                        .policy(newPolicy)
+        );
+
+        // Then
+        assertTrue(setPolicyResult.get());
+        final CompletableFuture<CanAccessResponse> canAccessAfterResult = policyService.canAccess(
+                new CanAccessRequest()
+                        .resources(Collections.singletonList(fileResource1))
+                        .user(testUser)
+                        .context(new Context().justification("fun"))
+        );
+        assertEquals(1, canAccessAfterResult.get().getCanAccessResources().size());
+        assertNotEquals("TestObj2", canAccessAfterResult.get().getCanAccessResources().iterator().next().getType());
     }
 }
