@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.policy.service;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -187,6 +188,11 @@ public class Policy<RULE_DATA_TYPE> {
         requireNonNull(owner, "The owner cannot be set to null.");
         this.owner = owner;
         return this;
+    }
+
+    @JsonGetter("owner")
+    User getNullableOwner() {
+        return owner;
     }
 
     @Override

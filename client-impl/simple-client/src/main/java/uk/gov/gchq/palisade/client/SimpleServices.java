@@ -23,7 +23,7 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
-import uk.gov.gchq.palisade.policy.service.impl.HashMapPolicyService;
+import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
 import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
@@ -90,7 +90,7 @@ public class SimpleServices implements ServicesFactory {
     }
 
     protected PolicyService createPolicyService() {
-        return new HashMapPolicyService();
+        return new HierarchicalPolicyService();
     }
 
     protected ResourceService createResourceService() {

@@ -26,7 +26,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>hashmap-policy-service</module>
         <module>rest-policy-service</module>
         <module>proxy-rest-policy-service</module>
         <module>hierarchical-policy-service</module>
