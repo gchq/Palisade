@@ -29,7 +29,7 @@ public class EtcdBackingStore implements BackingStore {
     }
 
     @Override
-    public BasicCacheObject get(final String key) {
+    public SimpleCacheObject get(final String key) {
         String cachedKey = BackingStore.keyCheck(key);
         return null;
     }

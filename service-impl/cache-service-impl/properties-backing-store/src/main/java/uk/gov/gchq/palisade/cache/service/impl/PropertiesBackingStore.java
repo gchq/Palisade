@@ -232,7 +232,7 @@ public class PropertiesBackingStore implements BackingStore {
      * {@inheritDoc}
      */
     @Override
-    public BasicCacheObject get(final String key) {
+    public SimpleCacheObject get(final String key) {
         String cacheKey = BackingStore.keyCheck(key);
         //enforce and any expiries and persist
         update();
@@ -243,14 +243,14 @@ public class PropertiesBackingStore implements BackingStore {
             try {
                 byte[] value = B64_DECODER.decode(b64Value);
                 Class<?> valueClass = Class.forName(props.getProperty(makeClassKey(cacheKey)));
-                return new BasicCacheObject(valueClass, Optional.of(value));
+                return new SimpleCacheObject(valueClass, Optional.of(value));
             } catch (Exception e) {
                 LOGGER.warn("Couldn't retrieve key {}", key, e);
-                return new BasicCacheObject(Object.class, Optional.empty());
+                return new SimpleCacheObject(Object.class, Optional.empty());
             }
         } else {
             //key not found
-            return new BasicCacheObject(Object.class, Optional.empty());
+            return new SimpleCacheObject(Object.class, Optional.empty());
         }
     }
 
