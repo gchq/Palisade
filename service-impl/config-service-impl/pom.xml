@@ -15,34 +15,26 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>palisade</artifactId>
+        <artifactId>service-impl</artifactId>
         <version>0.1.2-SNAPSHOT</version>
     </parent>
-    <artifactId>service-impl</artifactId>
+    <artifactId>config-service-impl</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>resource-service-impl</module>
-        <module>user-service-impl</module>
-        <module>audit-service-impl</module>
-        <module>policy-service-impl</module>
-        <module>data-service-impl</module>
-        <module>cache-service-impl</module>
-        <module>palisade-service-impl</module>
-        <module>config-service-impl</module>
+        <module>simple-config-service</module>
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>config-service</artifactId>
             <version>${project.parent.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
