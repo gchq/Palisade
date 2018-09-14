@@ -22,7 +22,7 @@ import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface ConfigurationService extends Service {
+public interface InitialConfigurationService extends Service {
 
     CompletableFuture<ServicesConfig> get(final GetConfigRequest request);
 

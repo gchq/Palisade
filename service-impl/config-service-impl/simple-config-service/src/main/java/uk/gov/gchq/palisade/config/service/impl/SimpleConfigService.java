@@ -15,9 +15,8 @@
  */
 package uk.gov.gchq.palisade.config.service.impl;
 
-import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.config.service.ConfigurationService;
+import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ServicesConfig;
@@ -26,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static java.util.Objects.requireNonNull;
 
-public class SimpleConfigService implements ConfigurationService {
+public class SimpleConfigService implements InitialConfigurationService {
 
     private CacheService cache;
 
@@ -55,18 +54,12 @@ public class SimpleConfigService implements ConfigurationService {
         requireNonNull(request, "request");
         if (request.getService().isPresent()) { //has a Service requested some config?
             return CompletableFuture.completedFuture(request.getService().map(this::getServiceConfig).get());
-        } else if (request.getUser().isPresent()) { //has a user requested config?
-            return CompletableFuture.completedFuture(request.getUser().map(this::getUserConfig).get());
         } else { //grab the anonymous client config
             return CompletableFuture.completedFuture(getAnonymousConfig());
         }
     }
 
     private ServicesConfig getAnonymousConfig() {
-        return null; //TODO implement
-    }
-
-    private ServicesConfig getUserConfig(final User user) {
         return null; //TODO implement
     }
 
