@@ -20,16 +20,16 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.ServicesConfig;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.user.service.UserService;
 
 import static java.util.Objects.requireNonNull;
 
 public class ConfiguredServices implements ServicesFactory {
 
-    private final ServicesConfig config;
+    private final InitialConfig config;
 
-    public ConfiguredServices(final ServicesConfig config) {
+    public ConfiguredServices(final InitialConfig config) {
         requireNonNull(config, "config");
         this.config = config;
     }

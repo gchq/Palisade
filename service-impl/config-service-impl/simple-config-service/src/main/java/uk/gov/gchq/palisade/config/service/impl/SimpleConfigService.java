@@ -19,7 +19,7 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ServicesConfig;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -50,7 +50,7 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     @Override
-    public CompletableFuture<ServicesConfig> get(final GetConfigRequest request) {
+    public CompletableFuture<InitialConfig> get(final GetConfigRequest request) {
         requireNonNull(request, "request");
         if (request.getService().isPresent()) { //has a Service requested some config?
             return CompletableFuture.completedFuture(request.getService().map(this::getServiceConfig).get());
@@ -59,11 +59,11 @@ public class SimpleConfigService implements InitialConfigurationService {
         }
     }
 
-    private ServicesConfig getAnonymousConfig() {
+    private InitialConfig getAnonymousConfig() {
         return null; //TODO implement
     }
 
-    private ServicesConfig getServiceConfig(final Class<? extends Service> clazz) {
+    private InitialConfig getServiceConfig(final Class<? extends Service> clazz) {
         return null; //TODO implement
     }
 }

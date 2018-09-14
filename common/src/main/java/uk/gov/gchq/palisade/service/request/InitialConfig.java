@@ -23,11 +23,11 @@ import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
-public class ServicesConfig {
+public class InitialConfig {
 
     private Map<String,String> configMap;
 
-    public ServicesConfig() {}
+    public InitialConfig() {}
 
     public Map<String,String> getConfig() {
         requireNonNull(configMap,"The config has not been set");
@@ -38,7 +38,7 @@ public class ServicesConfig {
         config(map);
     }
 
-    public ServicesConfig config(final Map<String,String> map) {
+    public InitialConfig config(final Map<String,String> map) {
         requireNonNull(map,"map");
         this.configMap=map;
         return this;
@@ -50,7 +50,7 @@ public class ServicesConfig {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        ServicesConfig that = (ServicesConfig) o;
+        InitialConfig that = (InitialConfig) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))

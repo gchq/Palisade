@@ -16,7 +16,7 @@
 package uk.gov.gchq.palisade.config.service;
 
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
-import uk.gov.gchq.palisade.service.request.ServicesConfig;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface InitialConfigurationService extends Service {
 
-    CompletableFuture<ServicesConfig> get(final GetConfigRequest request);
+    CompletableFuture<InitialConfig> get(final GetConfigRequest request);
 
     @Override
     default CompletableFuture<?> process(final Request request) {
