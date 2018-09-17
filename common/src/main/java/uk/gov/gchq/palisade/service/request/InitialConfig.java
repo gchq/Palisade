@@ -19,29 +19,51 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static java.util.Objects.requireNonNull;
 
 public class InitialConfig {
 
-    private Map<String,String> configMap;
+    private final Map<String, String> configMap = new HashMap<>();
 
-    public InitialConfig() {}
-
-    public Map<String,String> getConfig() {
-        requireNonNull(configMap,"The config has not been set");
-        return configMap;
+    public InitialConfig() {
     }
 
-    public void setConfig(final Map<String,String> map) {
-        config(map);
+    public Map<String, String> getConfig() {
+        //never null
+        return Collections.unmodifiableMap(configMap);
     }
 
-    public InitialConfig config(final Map<String,String> map) {
-        requireNonNull(map,"map");
-        this.configMap=map;
+    public InitialConfig putAll(final Map<String, String> map) {
+        requireNonNull(map, "map");
+        configMap.putAll(map);
         return this;
+    }
+
+    public InitialConfig put(final String key, final String value) {
+        requireNonNull(key, "key");
+        requireNonNull(value, "value");
+        configMap.put(key, value);
+        return this;
+    }
+
+    public String get(final String key) {
+        requireNonNull(key, "key");
+        String value = configMap.get(key);
+        if (value == null) {
+            throw new NoSuchElementException("no such key " + key);
+        } else {
+            return value;
+        }
+    }
+
+    public String getOrDefault(final String key, final String defaultValue) {
+        requireNonNull(key, "key");
+        return configMap.getOrDefault(key, defaultValue);
     }
 
     @Override

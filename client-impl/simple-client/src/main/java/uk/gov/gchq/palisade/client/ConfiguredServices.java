@@ -20,6 +20,7 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.user.service.UserService;
 
@@ -36,31 +37,51 @@ public class ConfiguredServices implements ServicesFactory {
 
     @Override
     public ResourceService getResourceService() {
-        return null; //TODO
+        String implClass = config.get(ResourceService.class.getCanonicalName());
+        return createAndConfigure(implClass);
     }
 
     @Override
     public AuditService getAuditService() {
-        return null; //TODO
+        String implClass = config.get(AuditService.class.getCanonicalName());
+        return createAndConfigure(implClass);
     }
 
     @Override
     public PolicyService getPolicyService() {
-        return null; //TODO
+        String implClass = config.get(PolicyService.class.getCanonicalName());
+        return createAndConfigure(implClass);
     }
 
     @Override
     public UserService getUserService() {
-        return null; //TODO
+        String implClass = config.get(UserService.class.getCanonicalName());
+        return createAndConfigure(implClass);
     }
 
     @Override
     public CacheService getCacheService() {
-        return null; //TODO
+        String implClass = config.get(CacheService.class.getCanonicalName());
+        return createAndConfigure(implClass);
     }
 
     @Override
     public PalisadeService getPalisadeService() {
-        return null; //TODO
+        String implClass = config.get(PalisadeService.class.getCanonicalName());
+        return createAndConfigure(implClass);
+    }
+
+    protected <S extends Service> S createAndConfigure(final String serviceClass) {
+        requireNonNull(serviceClass, "serviceClass");
+        try {
+            //try to create an instance
+            Class<S> classImpl = (Class<S>) Class.forName(serviceClass).asSubclass(Service.class);
+            S instance = classImpl.newInstance();
+            //configure it
+            instance.configure(config);
+            return instance;
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+            throw new IllegalStateException("couldn't create service class " + serviceClass, e);
+        }
     }
 }

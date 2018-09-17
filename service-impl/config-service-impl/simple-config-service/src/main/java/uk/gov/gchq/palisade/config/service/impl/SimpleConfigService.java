@@ -16,16 +16,20 @@
 package uk.gov.gchq.palisade.config.service.impl;
 
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static java.util.Objects.requireNonNull;
 
 public class SimpleConfigService implements InitialConfigurationService {
+
+    public static final String ANONYMOUS_CONFIG_KEY = "simple.config.anonymous";
 
     private CacheService cache;
 
@@ -60,7 +64,10 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     private InitialConfig getAnonymousConfig() {
-        return null; //TODO implement
+        CompletableFuture<Optional<InitialConfig>> cachedObject = cache.get(new GetCacheRequest<InitialConfig>()
+                .service(InitialConfigurationService.class)
+                .key(ANONYMOUS_CONFIG_KEY));
+        return cachedObject.join().orElse(new InitialConfig());
     }
 
     private InitialConfig getServiceConfig(final Class<? extends Service> clazz) {
