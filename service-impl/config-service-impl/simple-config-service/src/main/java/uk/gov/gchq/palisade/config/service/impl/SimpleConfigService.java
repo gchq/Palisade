@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.config.service.impl;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.exception.NoConfigException;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -54,7 +55,7 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     @Override
-    public CompletableFuture<InitialConfig> get(final GetConfigRequest request) {
+    public CompletableFuture<InitialConfig> get(final GetConfigRequest request) throws NoConfigException {
         requireNonNull(request, "request");
         if (request.getService().isPresent()) { //has a Service requested some config?
             return CompletableFuture.completedFuture(request.getService().map(this::getServiceConfig).get());
@@ -67,7 +68,7 @@ public class SimpleConfigService implements InitialConfigurationService {
         CompletableFuture<Optional<InitialConfig>> cachedObject = cache.get(new GetCacheRequest<InitialConfig>()
                 .service(InitialConfigurationService.class)
                 .key(ANONYMOUS_CONFIG_KEY));
-        return cachedObject.join().orElse(new InitialConfig());
+        return cachedObject.join().orElseThrow(() -> new NoConfigException("no initial configuration could be found"));
     }
 
     private InitialConfig getServiceConfig(final Class<? extends Service> clazz) {
