@@ -15,6 +15,9 @@
  */
 package uk.gov.gchq.palisade.service.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -28,11 +31,13 @@ import static java.util.Objects.requireNonNull;
 
 public class InitialConfig {
 
+    @JsonProperty("config")
     private final Map<String, String> configMap = new HashMap<>();
 
     public InitialConfig() {
     }
 
+    @JsonIgnore
     public Map<String, String> getConfig() {
         //never null
         return Collections.unmodifiableMap(configMap);

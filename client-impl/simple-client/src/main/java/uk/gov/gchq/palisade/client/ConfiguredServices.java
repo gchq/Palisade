@@ -17,6 +17,7 @@ package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
@@ -28,59 +29,98 @@ import static java.util.Objects.requireNonNull;
 
 public class ConfiguredServices implements ServicesFactory {
 
+    public static final String STATE = ".state";
+
     private final InitialConfig config;
+
+    private final ResourceService resourceService;
+    private final AuditService auditService;
+    private final PolicyService policyService;
+    private final UserService userService;
+    private final CacheService cacheService;
+    private final PalisadeService palisadeService;
 
     public ConfiguredServices(final InitialConfig config) {
         requireNonNull(config, "config");
         this.config = config;
+        this.resourceService = createResourceService();
+        this.auditService = createAuditService();
+        this.policyService = createPolicyService();
+        this.userService = createUserService();
+        this.cacheService = createCacheService();
+        this.palisadeService = createPalisadeService();
     }
 
     @Override
     public ResourceService getResourceService() {
-        String implClass = config.get(ResourceService.class.getCanonicalName());
-        return createAndConfigure(implClass);
+        return resourceService;
     }
 
     @Override
     public AuditService getAuditService() {
-        String implClass = config.get(AuditService.class.getCanonicalName());
-        return createAndConfigure(implClass);
+        return auditService;
     }
 
     @Override
     public PolicyService getPolicyService() {
-        String implClass = config.get(PolicyService.class.getCanonicalName());
-        return createAndConfigure(implClass);
+        return policyService;
     }
 
     @Override
     public UserService getUserService() {
-        String implClass = config.get(UserService.class.getCanonicalName());
-        return createAndConfigure(implClass);
+        return userService;
     }
 
     @Override
     public CacheService getCacheService() {
-        String implClass = config.get(CacheService.class.getCanonicalName());
-        return createAndConfigure(implClass);
+        return cacheService;
     }
 
     @Override
     public PalisadeService getPalisadeService() {
-        String implClass = config.get(PalisadeService.class.getCanonicalName());
-        return createAndConfigure(implClass);
+        return palisadeService;
     }
 
-    protected <S extends Service> S createAndConfigure(final String serviceClass) {
+    public ResourceService createResourceService() {
+        return createAndConfigure(ResourceService.class);
+    }
+
+    public AuditService createAuditService() {
+        return createAndConfigure(AuditService.class);
+    }
+
+    public PolicyService createPolicyService() {
+        return createAndConfigure(PolicyService.class);
+    }
+
+    public UserService createUserService() {
+        return createAndConfigure(UserService.class);
+    }
+
+    public CacheService createCacheService() {
+        return createAndConfigure(CacheService.class);
+    }
+
+    public PalisadeService createPalisadeService() {
+        return createAndConfigure(PalisadeService.class);
+    }
+
+    protected <S extends Service> S createAndConfigure(final Class<? extends Service> serviceClass) {
         requireNonNull(serviceClass, "serviceClass");
         try {
-            //try to create an instance
-            Class<S> classImpl = (Class<S>) Class.forName(serviceClass).asSubclass(Service.class);
-            S instance = classImpl.newInstance();
+            String servClass = config.get(serviceClass.getCanonicalName());
+            String jsonState = config.get(serviceClass.getCanonicalName() + STATE);
+
+            //try to create class type
+            Class<S> classImpl = (Class<S>) Class.forName(servClass).asSubclass(Service.class);
+
+            //create it
+            S instance = JSONSerialiser.deserialise(jsonState, classImpl);
+
             //configure it
             instance.configure(config);
             return instance;
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+        } catch (ClassNotFoundException e) {
             throw new IllegalStateException("couldn't create service class " + serviceClass, e);
         }
     }

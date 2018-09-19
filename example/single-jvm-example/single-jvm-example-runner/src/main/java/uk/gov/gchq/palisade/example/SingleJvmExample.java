@@ -21,12 +21,36 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.audit.service.AuditService;
+import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
+import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
+import uk.gov.gchq.palisade.client.ConfiguredServices;
+import uk.gov.gchq.palisade.client.SimpleServices;
+import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
+import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
+import uk.gov.gchq.palisade.example.client.ExampleConfigCreator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.policy.service.PolicyService;
+import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
+import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
+import uk.gov.gchq.palisade.resource.service.ResourceService;
+import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.Service;
+import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.user.service.UserService;
+import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class SingleJvmExample {
@@ -40,7 +64,13 @@ public class SingleJvmExample {
     public void run() throws Exception {
         createDataPath();
         try {
-            final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
+            final InitialConfigurationService ics = ExampleConfigCreator.setupSingleJVMConfigurationService();
+            final InitialConfig config = ics.get(new GetConfigRequest()
+                    .service(Optional.empty()))
+                    .join();
+
+            final ConfiguredServices cs = new ConfiguredServices(config);
+            final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
             LOGGER.info("");
             LOGGER.info("Alice is reading file1...");

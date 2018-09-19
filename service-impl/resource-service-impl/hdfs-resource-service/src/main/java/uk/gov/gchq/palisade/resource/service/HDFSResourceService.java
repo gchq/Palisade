@@ -20,10 +20,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileSystem;
@@ -33,7 +36,6 @@ import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -64,8 +66,8 @@ import static java.util.Objects.requireNonNull;
 /**
  * A implementation of the ResourceService for HDFS.
  * <p>
- * This service is for the retrieval of Resources only. Resources cannot be added via this service,
- * they should be added through the actual real HDFS.
+ * This service is for the retrieval of Resources only. Resources cannot be added via this service, they should be added
+ * through the actual real HDFS.
  *
  * @see ResourceService
  */
@@ -79,13 +81,31 @@ public class HDFSResourceService implements ResourceService {
 
     private final Configuration conf;
     private final FileSystem fileSystem;
+
     private ConnectionDetailStorage connectionDetailStorage;
+
+    //===== REMOVE ONCE Issue gh-108 IS RESOLVED ============
+    private boolean useSharedConnectionDetails = false;
+
+    private static ConnectionDetailStorage SHARED_CONNECTION_DETAILS;
+
+    private ConnectionDetailStorage retrieveConnectionDetailStorage() {
+        return (useSharedConnectionDetails) ? SHARED_CONNECTION_DETAILS : connectionDetailStorage;
+    }
+
+    private void updateSharedConnectionDetails() {
+        if (useSharedConnectionDetails) {
+            SHARED_CONNECTION_DETAILS = this.connectionDetailStorage;
+        }
+    }
+    //=====================
 
     public HDFSResourceService(final Configuration conf, final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) throws IOException {
         requireNonNull(conf);
         this.conf = conf;
         this.fileSystem = FileSystem.get(conf);
         this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
+        updateSharedConnectionDetails();
     }
 
     @JsonCreator
@@ -97,6 +117,21 @@ public class HDFSResourceService implements ResourceService {
 
     public HDFSResourceService connectionDetail(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
         this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
+        updateSharedConnectionDetails();
+        return this;
+    }
+
+    public boolean getUseSharedConnectionDetails() {
+        return useSharedConnectionDetails;
+    }
+
+    public void setUseSharedConnectionDetails(final boolean useSharedConnectionDetails) {
+        useSharedConnectionDetails(useSharedConnectionDetails);
+    }
+
+    public HDFSResourceService useSharedConnectionDetails(final boolean useSharedConnectionDetails) {
+        this.useSharedConnectionDetails = useSharedConnectionDetails;
+        updateSharedConnectionDetails();
         return this;
     }
 
@@ -130,7 +165,7 @@ public class HDFSResourceService implements ResourceService {
                                     resolveParents(fileFileResource, conf);
                                     return fileFileResource;
                                 },
-                                resourceDetails -> connectionDetailStorage.get(resourceDetails.getType(), resourceDetails.getFormat())
+                                resourceDetails -> retrieveConnectionDetailStorage().get(resourceDetails.getType(), resourceDetails.getFormat())
                         ));
             } catch (RuntimeException e) {
                 throw e;
@@ -190,12 +225,12 @@ public class HDFSResourceService implements ResourceService {
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
     public HashMap<String, ConnectionDetail> getDataType() {
-        return connectionDetailStorage.getDataType();
+        return retrieveConnectionDetailStorage().getDataType();
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
     public HashMap<String, ConnectionDetail> getDataFormat() {
-        return connectionDetailStorage.getDataFormat();
+        return retrieveConnectionDetailStorage().getDataFormat();
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
@@ -235,7 +270,7 @@ public class HDFSResourceService implements ResourceService {
 
         final EqualsBuilder builder = new EqualsBuilder()
                 .append(this.fileSystem, that.fileSystem)
-                .append(this.connectionDetailStorage, that.connectionDetailStorage);
+                .append(this.retrieveConnectionDetailStorage(), that.retrieveConnectionDetailStorage());
 
         if (builder.isEquals()) {
             builder.append(this.conf.size(), that.conf.size());
@@ -253,11 +288,21 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("conf", conf)
+                .append("fileSystem", fileSystem)
+                .append("connectionDetailStorage", retrieveConnectionDetailStorage())
+                .toString();
+    }
+
+    @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(conf)
                 .append(fileSystem)
-                .append(connectionDetailStorage)
+                .append(retrieveConnectionDetailStorage())
                 .toHashCode();
     }
 
@@ -324,6 +369,7 @@ public class HDFSResourceService implements ResourceService {
         @Override
         public String toString() {
             return new ToStringBuilder(this)
+                    .appendSuper(super.toString())
                     .append("dataFormat", dataFormat)
                     .append("dataType", dataType)
                     .toString();
