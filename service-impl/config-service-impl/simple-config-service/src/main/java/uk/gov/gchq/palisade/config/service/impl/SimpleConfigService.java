@@ -15,6 +15,9 @@
  */
 package uk.gov.gchq.palisade.config.service.impl;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
@@ -34,7 +37,8 @@ public class SimpleConfigService implements InitialConfigurationService {
 
     private CacheService cache;
 
-    public SimpleConfigService(final CacheService cache) {
+    @JsonCreator
+    public SimpleConfigService(@JsonProperty("cache") final CacheService cache) {
         requireNonNull(cache, "cache");
         this.cache = cache;
     }

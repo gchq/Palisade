@@ -38,6 +38,7 @@ import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 /**
  * Convenience class for the examples to configure the config creation service.
