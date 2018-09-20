@@ -143,7 +143,7 @@ public final class Error {
         if (null != simpleMessage) {
             try {
                 final Constructor<? extends RuntimeException> constructor = exceptionClass.getConstructor(String.class);
-                return constructor.newInstance(simpleMessage + "\n" + detailMessage);
+                return constructor.newInstance(simpleMessage);
             } catch (final Exception e) {
                 LOGGER.error("Unable to recreate exception with message for error {}", this, e);
             }

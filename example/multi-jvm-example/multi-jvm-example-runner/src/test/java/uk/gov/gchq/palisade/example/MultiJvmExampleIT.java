@@ -163,7 +163,8 @@ public class MultiJvmExampleIT {
             client.read("unknown file", "Bob", "Payroll");
             fail("Exception expected");
         } catch (final CompletionException e) {
-            assertTrue("CompletionException cause should be an UnsupportedOperationException", e.getCause() instanceof UnsupportedOperationException);
+            assertTrue("CompletionException cause should be an UnsupportedOperationException",
+                    e.getCause() instanceof UnsupportedOperationException);
             assertTrue(e.getCause().getMessage(), e.getCause().getMessage().contains("resource ID is out of scope"));
         } catch (final UnsupportedOperationException e) {
             assertTrue(e.getMessage(), e.getMessage().contains("resource ID is out of scope"));
