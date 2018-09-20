@@ -17,7 +17,7 @@
 
 <web-app metadata-complete="false" version="3.1">
 
-    <display-name>Data REST</display-name>
+    <display-name>Initial Configuration REST</display-name>
 
     <servlet>
         <servlet-name>REST v1</servlet-name>
@@ -25,7 +25,7 @@
         </servlet-class>
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
-            <param-value>uk.gov.gchq.palisade.data.service.ApplicationConfigV1</param-value>
+            <param-value>uk.gov.gchq.palisade.config.service.impl.ApplicationConfigV1</param-value>
         </init-param>
         <init-param>
             <param-name>swagger.scanner.id</param-name>
