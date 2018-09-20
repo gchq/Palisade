@@ -87,15 +87,15 @@ public class HDFSResourceService implements ResourceService {
     //===== REMOVE ONCE Issue gh-108 IS RESOLVED ============
     private boolean useSharedConnectionDetails = false;
 
-    private static ConnectionDetailStorage SHARED_CONNECTION_DETAILS;
+    private static ConnectionDetailStorage sharedConnectionStorage;
 
     private ConnectionDetailStorage retrieveConnectionDetailStorage() {
-        return (useSharedConnectionDetails) ? SHARED_CONNECTION_DETAILS : connectionDetailStorage;
+        return (useSharedConnectionDetails) ? sharedConnectionStorage : connectionDetailStorage;
     }
 
     private void updateSharedConnectionDetails() {
         if (useSharedConnectionDetails) {
-            SHARED_CONNECTION_DETAILS = this.connectionDetailStorage;
+            sharedConnectionStorage = this.connectionDetailStorage;
         }
     }
     //=====================

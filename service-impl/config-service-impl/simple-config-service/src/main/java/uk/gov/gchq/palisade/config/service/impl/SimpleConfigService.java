@@ -76,7 +76,10 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     private InitialConfig getServiceConfig(final Class<? extends Service> clazz) {
-       throw new NoConfigException("not implemented yet");
+        if (clazz.equals(InitialConfigurationService.class)) {
+            return new InitialConfig().put("test", "value");
+        }
+        throw new NoConfigException("not implemented yet");
         //TODO implement
     }
 }

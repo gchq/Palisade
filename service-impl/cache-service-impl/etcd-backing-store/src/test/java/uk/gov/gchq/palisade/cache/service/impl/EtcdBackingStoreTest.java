@@ -15,6 +15,9 @@
  */
 package uk.gov.gchq.palisade.cache.service.impl;
 
+import org.junit.Ignore;
+
+@Ignore
 public class EtcdBackingStoreTest extends AbstractBackingStoreTest {
 
     @Override

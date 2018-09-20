@@ -26,7 +26,6 @@ import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.File;
@@ -47,6 +46,10 @@ public class MultiJvmExample {
     }
 
     public void run() throws Exception {
+        InitialConfigurationService conf = new ProxyRestConfigService("http://localhost:8085/config");
+        GetConfigRequest req = new GetConfigRequest().service(Optional.of(InitialConfigurationService.class));
+        CompletableFuture<InitialConfig> t = conf.get(req);
+        System.out.println(t.join());
         createDataPath();
         try {
             final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
