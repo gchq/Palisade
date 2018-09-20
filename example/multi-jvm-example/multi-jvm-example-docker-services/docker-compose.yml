@@ -31,3 +31,8 @@ services:
       container_name: palisade-service
       ports:
          - 8080:8080
+   config-service:
+      build: config-service
+      container_name: config-service
+      ports:
+         - 8085:8080

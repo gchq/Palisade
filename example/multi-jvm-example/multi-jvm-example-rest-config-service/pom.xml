@@ -120,9 +120,9 @@
                                 <palisade.rest.basePath>
                                     ${standalone-path}
                                 </palisade.rest.basePath>
-                                <palisade.rest.data.service.config.path>
+                                <palisade.rest.config.service.config.path>
                                     ${project.build.outputDirectory}/configserviceConfig.json
-                                </palisade.rest.data.service.config.path>
+                                </palisade.rest.config.service.config.path>
                                 <palisade.error-mode.debug>
                                     true
                                 </palisade.error-mode.debug>

@@ -76,6 +76,7 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     private InitialConfig getServiceConfig(final Class<? extends Service> clazz) {
-        return null; //TODO implement
+       throw new NoConfigException("not implemented yet");
+        //TODO implement
     }
 }

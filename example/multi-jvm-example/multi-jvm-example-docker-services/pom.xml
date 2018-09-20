@@ -122,6 +122,27 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>unpack-config-service-war</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.parent.groupId}</groupId>
+                                    <artifactId>multi-jvm-example-rest-config-service</artifactId>
+                                    <version>${project.parent.version}</version>
+                                    <type>war</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>
+                                        ./config-service/docker/bin/rest-config-service
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
                 </executions>
 
             </plugin>
@@ -160,6 +181,13 @@
                         </fileset>
                         <fileset>
                             <directory>./data-service/docker/bin/rest-data-service</directory>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>./data-service/docker/bin/rest-config-service</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
