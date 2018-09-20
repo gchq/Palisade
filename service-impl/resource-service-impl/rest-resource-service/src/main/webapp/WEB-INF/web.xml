@@ -26,7 +26,7 @@
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
             <param-value>
-                uk.gov.gchq.palisade.resource.service.ApplicationConfigV1
+                uk.gov.gchq.palisade.resource.service.impl.ApplicationConfigV1
             </param-value>
         </init-param>
         <init-param>

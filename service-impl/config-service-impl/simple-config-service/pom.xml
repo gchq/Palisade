@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>cache-service-impl</artifactId>
+        <artifactId>config-service-impl</artifactId>
         <version>0.1.2-SNAPSHOT</version>
     </parent>
     <artifactId>simple-config-service</artifactId>
@@ -30,7 +30,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>config-service</artifactId>
+            <artifactId>cache-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
