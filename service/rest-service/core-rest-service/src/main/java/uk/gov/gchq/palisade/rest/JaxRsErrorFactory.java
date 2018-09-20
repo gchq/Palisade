@@ -46,6 +46,7 @@ public final class JaxRsErrorFactory {
         return new ErrorBuilder().statusCode(ex.getResponse().getStatus())
                 .simpleMessage(ex.getMessage())
                 .detailMessage(ExceptionUtils.getStackTrace(ex))
+                .exceptionClass(ex)
                 .build();
     }
 }

@@ -19,9 +19,15 @@ package uk.gov.gchq.palisade.exception;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.util.DebugUtil;
+
+import java.lang.reflect.Constructor;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Simple serialisable POJO for containing details of errors.
@@ -30,10 +36,13 @@ import uk.gov.gchq.palisade.util.DebugUtil;
  * manually.
  */
 public final class Error {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Error.class);
+
     private int statusCode;
     private Status status;
     private String simpleMessage;
     private String detailMessage;
+    private Class<? extends RuntimeException> exceptionClass;
 
     public Error() {
     }
@@ -43,6 +52,7 @@ public final class Error {
         this.status = builder.status;
         this.simpleMessage = builder.simpleMessage;
         this.detailMessage = builder.detailMessage;
+        this.exceptionClass = builder.exceptionClass;
     }
 
     public int getStatusCode() {
@@ -75,6 +85,14 @@ public final class Error {
 
     public void setDetailMessage(final String detailMessage) {
         this.detailMessage = detailMessage;
+    }
+
+    public Class<? extends RuntimeException> getExceptionClass() {
+        return exceptionClass;
+    }
+
+    public void setExceptionClass(final Class<? extends RuntimeException> exceptionClass) {
+        this.exceptionClass = exceptionClass;
     }
 
     @Override
@@ -117,12 +135,37 @@ public final class Error {
                 .toString();
     }
 
+    public RuntimeException createException() {
+        if (null == exceptionClass) {
+            return new PalisadeWrappedErrorRuntimeException(this);
+        }
+
+        if (null != simpleMessage) {
+            try {
+                final Constructor<? extends RuntimeException> constructor = exceptionClass.getConstructor(String.class);
+                return constructor.newInstance(simpleMessage + "\n" + detailMessage);
+            } catch (final Exception e) {
+                LOGGER.error("Unable to recreate exception with message for error {}", this, e);
+            }
+        }
+
+        try {
+            return exceptionClass.newInstance();
+        } catch (final Exception e) {
+            // ignore
+        }
+
+        return new PalisadeWrappedErrorRuntimeException(this);
+
+    }
+
 
     public static final class ErrorBuilder {
         private int statusCode;
         private Status status;
         private String simpleMessage;
         private String detailMessage;
+        private Class<? extends RuntimeException> exceptionClass;
 
         public ErrorBuilder() {
             // Empty
@@ -147,6 +190,32 @@ public final class Error {
 
         public ErrorBuilder detailMessage(final String detailMessage) {
             this.detailMessage = detailMessage;
+            return this;
+        }
+
+        public ErrorBuilder exceptionClass(final RuntimeException exception) {
+            requireNonNull(exception, "exception is required");
+            this.exceptionClass = exception.getClass();
+            return this;
+        }
+
+        public ErrorBuilder exceptionClass(final Exception exception) {
+            requireNonNull(exception, "exception is required");
+            if (exception instanceof RuntimeException) {
+                this.exceptionClass = exception.getClass().asSubclass(RuntimeException.class);
+            } else {
+                this.exceptionClass = PalisadeRuntimeException.class;
+            }
+            return this;
+        }
+
+        public ErrorBuilder exceptionClass(final Class<? extends Exception> exceptionClass) {
+            requireNonNull(exceptionClass, "exceptionClass is required");
+            if (RuntimeException.class.isAssignableFrom(exceptionClass)) {
+                this.exceptionClass = exceptionClass.asSubclass(RuntimeException.class);
+            } else {
+                this.exceptionClass = PalisadeRuntimeException.class;
+            }
             return this;
         }
 
