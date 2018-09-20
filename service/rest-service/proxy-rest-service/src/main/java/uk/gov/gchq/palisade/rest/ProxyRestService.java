@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.exception.Error;
 import uk.gov.gchq.palisade.exception.PalisadeRuntimeException;
-import uk.gov.gchq.palisade.exception.PalisadeWrappedErrorRuntimeException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
 
@@ -257,12 +256,12 @@ public abstract class ProxyRestService implements Service {
                 try {
                     error = JSONSerialiser.deserialise(outputJson.getBytes(CHARSET), Error.class);
                 } catch (final Exception e) {
-                    LOGGER.error("Bad status {}. Detail: {}", response.getStatus(), outputJson);
+                    LOGGER.error("Unable to recreate error object. Bad status {}. Detail: {}", response.getStatus(), outputJson);
                     throw new PalisadeRuntimeException("Returned status: " + response.getStatus() + ". Response content was: " + outputJson, e);
                 }
             }
-            LOGGER.error("Error: Bad status {}. Detail: {}", response.getStatus(), outputJson);
-            throw new PalisadeWrappedErrorRuntimeException(error);
+            LOGGER.error("Bad status {}. Detail: {}", response.getStatus(), outputJson);
+            throw error.createException();
         }
     }
 
