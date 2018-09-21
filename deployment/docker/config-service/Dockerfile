@@ -1,5 +1,5 @@
-From tomcat:8.0-jre8-alpine as data-service
+From tomcat:8.0-jre8-alpine as config-service
 
-ADD bin/rest-config-service/ /usr/local/tomcat/webapps/data
-ADD conf/configserviceConfig.json /usr/local/tomcat/webapps/data/WEB-INF/
-ENV JAVA_OPTS="-Dpalisade.rest.basePath=config-service -Dpalisade.properties.app.title=rest-config-service -Dpalisade.rest.config.service.config.path=/usr/local/tomcat/webapps/data/WEB-INF/configserviceConfig.json"
+ADD bin/rest-config-service/ /usr/local/tomcat/webapps/config
+ADD conf/configserviceConfig.json /usr/local/tomcat/webapps/config/WEB-INF/
+ENV JAVA_OPTS="-Dpalisade.rest.basePath=config-service -Dpalisade.properties.app.title=rest-config-service -Dpalisade.rest.config.service.config.path=/usr/local/tomcat/webapps/config/WEB-INF/configserviceConfig.json"
