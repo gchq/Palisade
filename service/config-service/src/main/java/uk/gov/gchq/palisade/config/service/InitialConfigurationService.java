@@ -15,6 +15,7 @@
  */
 package uk.gov.gchq.palisade.config.service;
 
+import uk.gov.gchq.palisade.config.service.exception.NoConfigException;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -22,10 +23,34 @@ import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * This is the service that provides other parts of Palisade and clients with their initial configuration necessary to
+ * initialise themselves. For example, this could include the URLs for where other Palisade services are, or credentials
+ * for various external services.
+ * <p>
+ * Clients should request their initial configuration by creating a {@link GetConfigRequest} with an empty {@code
+ * service} field. This will cause the configuration service to respond with the configuration for a generic client.
+ * <p>
+ * Implementations of this interface should ensure that only the necessary configuration is provided for a request;
+ * sensitive information could be leaked otherwise.
+ * <p>
+ * All methods in this class throw {@link NullPointerException} unless otherwise stated for <code>null</code>
+ * parameters.
+ */
 public interface InitialConfigurationService extends Service {
 
-    CompletableFuture<InitialConfig> get(final GetConfigRequest request);
+    /**
+     * Get the initial configuration from Palisade. This is the entry method into the Palisade system.
+     *
+     * @param request the request that specifies what part of the system to request configuration for
+     * @return the configuration object
+     * @throws NoConfigException if no configuration for the given request code be found
+     */
+    CompletableFuture<InitialConfig> get(final GetConfigRequest request) throws NoConfigException;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     default CompletableFuture<?> process(final Request request) {
         if (request instanceof GetConfigRequest) {

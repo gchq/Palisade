@@ -31,33 +31,68 @@ import java.util.concurrent.CompletableFuture;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * An implementation of {@link InitialConfigurationService} that uses the {@link CacheService} to provide all of its
+ * storage.
+ * <p>
+ * All methods throw {@link NullPointerException} for any {@code null} parameters.
+ */
 public class SimpleConfigService implements InitialConfigurationService {
-
+    /**
+     * Key used to specify the "client" configuration.
+     */
     public static final String ANONYMOUS_CONFIG_KEY = "simple.config.anonymous";
 
+    /**
+     * The storage service for all data.
+     */
     private CacheService cache;
 
+    /**
+     * Create a configuration service.
+     *
+     * @param cache the storage service
+     */
     @JsonCreator
     public SimpleConfigService(@JsonProperty("cache") final CacheService cache) {
         requireNonNull(cache, "cache");
         this.cache = cache;
     }
 
+    /**
+     * Get the cache service being used.
+     *
+     * @return the cache
+     */
     public CacheService getCache() {
         //never null
         return cache;
     }
 
+    /**
+     * Set the cache service to use.
+     *
+     * @param cache the caching provider
+     */
     public void setCache(final CacheService cache) {
         cache(cache);
     }
 
+    /**
+     * Set the cache service to use.
+     *
+     * @param cache the caching provider
+     * @return this object
+     */
     public SimpleConfigService cache(final CacheService cache) {
         requireNonNull(cache, "cache");
         this.cache = cache;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CompletableFuture<InitialConfig> get(final GetConfigRequest request) throws NoConfigException {
         requireNonNull(request, "request");
@@ -68,6 +103,12 @@ public class SimpleConfigService implements InitialConfigurationService {
         }
     }
 
+    /**
+     * Creates the anonymous configuration that can be provided to clients. This only needs to contain the details for
+     * the minimum necessary to interact with Palisade.
+     *
+     * @return the client configuration
+     */
     private InitialConfig getAnonymousConfig() {
         CompletableFuture<Optional<InitialConfig>> cachedObject = cache.get(new GetCacheRequest<InitialConfig>()
                 .service(InitialConfigurationService.class)
@@ -75,6 +116,13 @@ public class SimpleConfigService implements InitialConfigurationService {
         return cachedObject.join().orElseThrow(() -> new NoConfigException("no initial configuration could be found"));
     }
 
+    /**
+     * Creates the configuration for the given service class. This should not be given to clients and may provide
+     * different configurations to different services.
+     *
+     * @param clazz the service class type
+     * @return the service configuration
+     */
     private InitialConfig getServiceConfig(final Class<? extends Service> clazz) {
         //TODO implement
         return null;

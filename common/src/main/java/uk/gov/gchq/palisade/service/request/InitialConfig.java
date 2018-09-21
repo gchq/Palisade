@@ -29,26 +29,57 @@ import java.util.NoSuchElementException;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * This is the configuration class that clients and services can use to initialise themselves. Instances of this class
+ * can be obtained from the configuration service.
+ * <p>
+ * All methods in this class throw {@link NullPointerException} unless otherwise stated for <code>null</code>
+ * parameters.
+ */
 public class InitialConfig {
 
+    /**
+     * The map of configuration data.
+     */
     @JsonProperty("config")
     private final Map<String, String> configMap = new HashMap<>();
 
+    /**
+     * Create empty configuration.
+     */
     public InitialConfig() {
     }
 
+    /**
+     * Gets an unmodifiable copy of the configuration.
+     *
+     * @return an unmodifiable map
+     */
     @JsonIgnore
     public Map<String, String> getConfig() {
         //never null
         return Collections.unmodifiableMap(configMap);
     }
 
+    /**
+     * Copies all of the entries in the given map into this configuration object.
+     *
+     * @param map the map to copy
+     * @return this object
+     */
     public InitialConfig putAll(final Map<String, String> map) {
         requireNonNull(map, "map");
         configMap.putAll(map);
         return this;
     }
 
+    /**
+     * Enters the given key and value pair into the configuration.
+     *
+     * @param key   the configuration key
+     * @param value the configuration value
+     * @return this object
+     */
     public InitialConfig put(final String key, final String value) {
         requireNonNull(key, "key");
         requireNonNull(value, "value");
@@ -56,7 +87,14 @@ public class InitialConfig {
         return this;
     }
 
-    public String get(final String key) {
+    /**
+     * Gets a specific configuration value.
+     *
+     * @param key the key to lookup
+     * @return the value associated with {@code key}
+     * @throws NoSuchElementException if {@ocode key} couldn't be found
+     */
+    public String get(final String key) throws NoSuchElementException {
         requireNonNull(key, "key");
         String value = configMap.get(key);
         if (value == null) {
@@ -66,6 +104,13 @@ public class InitialConfig {
         }
     }
 
+    /**
+     * Gets a specific configuration value or returns the default provided
+     *
+     * @param key          the key to lookup
+     * @param defaultValue the default value. May be {@code null}
+     * @return the value if present or {@code defaultValue}
+     */
     public String getOrDefault(final String key, final String defaultValue) {
         requireNonNull(key, "key");
         return configMap.getOrDefault(key, defaultValue);

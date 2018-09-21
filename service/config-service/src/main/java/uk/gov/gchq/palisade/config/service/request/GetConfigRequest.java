@@ -26,23 +26,53 @@ import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * A request class that is sent by services and clients wanting their initial configuration data. The class has an
+ *
+ * @{link Optional} service field that is used to specify which {@link Service} to request the configuration for. If
+ * this is left empty, then the Palisade client configuration is requested, i.e. the "anonymous" configuration. Note
+ * that there may be additional authentication/authorisation constraints placed upon requestees. This means that for
+ * example, a client may not be able to request configuration details for a particular service.
+ */
 public class GetConfigRequest extends Request {
 
+    /**
+     * The service for the configuration being requested.
+     */
     private Optional<Class<? extends Service>> service;
 
+    /**
+     * Create an empty request.
+     */
     public GetConfigRequest() {
         service = Optional.empty();
     }
 
+    /**
+     * Get the service requesting configuration.
+     *
+     * @return the optional service
+     */
     public Optional<Class<? extends Service>> getService() {
         //never null
         return service;
     }
 
+    /**
+     * Set the {@link Service} that is requesting configuration.
+     *
+     * @param service an optional {@link Service}
+     */
     public void setService(final Optional<Class<? extends Service>> service) {
         service(service);
     }
 
+    /**
+     * Set the {@link Service} that is requesting configuration.
+     *
+     * @param service an optional {@link Service}
+     * @return this object
+     */
     public GetConfigRequest service(final Optional<Class<? extends Service>> service) {
         requireNonNull(service, "service");
         this.service = service;
