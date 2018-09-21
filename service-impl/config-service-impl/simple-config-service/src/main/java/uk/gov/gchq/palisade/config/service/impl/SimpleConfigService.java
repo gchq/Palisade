@@ -108,8 +108,9 @@ public class SimpleConfigService implements InitialConfigurationService {
      * the minimum necessary to interact with Palisade.
      *
      * @return the client configuration
+     * @throws NoConfigException if no client configuration could be found
      */
-    private InitialConfig getAnonymousConfig() {
+    private InitialConfig getAnonymousConfig() throws NoConfigException {
         CompletableFuture<Optional<InitialConfig>> cachedObject = cache.get(new GetCacheRequest<InitialConfig>()
                 .service(InitialConfigurationService.class)
                 .key(ANONYMOUS_CONFIG_KEY));
@@ -118,13 +119,34 @@ public class SimpleConfigService implements InitialConfigurationService {
 
     /**
      * Creates the configuration for the given service class. This should not be given to clients and may provide
-     * different configurations to different services.
+     * different configurations to different services. This will first try to find the configuration for the given
+     * service class and if that fails it looks for generic "service" configuration. If that fails an exception is
+     * thrown.
      *
      * @param clazz the service class type
      * @return the service configuration
+     * @throws NoConfigException if no configuration could be found
      */
-    private InitialConfig getServiceConfig(final Class<? extends Service> clazz) {
-        //TODO implement
-        return null;
+    private InitialConfig getServiceConfig(final Class<? extends Service> clazz) throws NoConfigException {
+        requireNonNull(clazz, "clazz");
+        //first can we find anything for this class specifically?
+        final GetCacheRequest<InitialConfig> serviceRequest = new GetCacheRequest<>()
+                .service(InitialConfigurationService.class)
+                .key(clazz.getCanonicalName());
+        Optional<InitialConfig> result = cache.get(serviceRequest).join();
+        //if we get an object back, then return it
+        if (result.isPresent()) {
+            return result.get();
+        }
+        //make a call for the generic object
+        final GetCacheRequest<InitialConfig> genericRequest = new GetCacheRequest<>()
+                .service(InitialConfigurationService.class)
+                .key(Service.class.getCanonicalName());
+        Optional<InitialConfig> genericResult = cache.get(genericRequest).join();
+        if (genericResult.isPresent()) {
+            return genericResult.get();
+        } else {
+            throw new NoConfigException("no service configuration could bd found");
+        }
     }
 }
