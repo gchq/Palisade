@@ -49,6 +49,7 @@ public class WebApplicationExceptionMapper implements ExceptionMapper<WebApplica
                 .statusCode(ex.getResponse().getStatus())
                 .simpleMessage(ex.getMessage())
                 .detailMessage(Arrays.asList(ex.getStackTrace()).stream().map(StackTraceElement::toString).collect(Collectors.joining("\n")))
+                .exceptionClass(ex)
                 .build();
 
         return Response.status(ex.getResponse().getStatus())

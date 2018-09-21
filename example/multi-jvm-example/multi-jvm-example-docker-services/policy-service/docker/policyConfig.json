@@ -1,4 +1,4 @@
 {
-  "class": "uk.gov.gchq.palisade.policy.service.impl.HashMapPolicyService",
+  "class": "uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService",
   "@id": 1
 }
