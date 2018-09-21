@@ -19,16 +19,15 @@ package uk.gov.gchq.palisade.example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.client.SimpleRestServices;
+import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
-import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
+import uk.gov.gchq.palisade.example.client.ExampleConfigCreator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class MultiDockerJvmExample {
@@ -41,12 +40,14 @@ public class MultiDockerJvmExample {
     }
 
     public void run() throws Exception {
-        InitialConfigurationService conf = new ProxyRestConfigService("http://localhost:8085/config");
-        GetConfigRequest req = new GetConfigRequest().service(Optional.of(InitialConfigurationService.class));
-        CompletableFuture<InitialConfig> t = conf.get(req);
-        System.out.println(t.join());
+        final InitialConfigurationService ics = ExampleConfigCreator.setupMultiJVMConfigurationService();
+        //request the client configuration by not specifiying a service
+        final InitialConfig config = ics.get(new GetConfigRequest()
+                .service(Optional.empty()))
+                .join();
 
-        final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
+        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");

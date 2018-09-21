@@ -47,6 +47,7 @@ public class SingleJvmExample {
         createDataPath();
         try {
             final InitialConfigurationService ics = ExampleConfigCreator.setupSingleJVMConfigurationService();
+            //request the client configuration by not specifiying a service
             final InitialConfig config = ics.get(new GetConfigRequest()
                     .service(Optional.empty()))
                     .join();
