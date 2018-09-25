@@ -36,10 +36,13 @@ import uk.gov.gchq.palisade.user.service.impl.RestUserServiceV1;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static uk.gov.gchq.palisade.example.MultiJvmExample.FILE;
 
 public class MultiJvmExampleIT {
@@ -157,5 +160,23 @@ public class MultiJvmExampleIT {
                 ),
                 aliceResults.collect(Collectors.toList())
         );
+    }
+
+    @Test
+    public void proxyServiceShouldReturnActualExceptionThrownByUnderlyingService() throws Exception {
+        // Given
+        final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
+
+        // When / Then
+        try {
+            client.read("unknown file", "Bob", "Payroll");
+            fail("Exception expected");
+        } catch (final CompletionException e) {
+            assertTrue("CompletionException cause should be an UnsupportedOperationException",
+                    e.getCause() instanceof UnsupportedOperationException);
+            assertTrue(e.getCause().getMessage(), e.getCause().getMessage().contains("resource ID is out of scope"));
+        } catch (final UnsupportedOperationException e) {
+            assertTrue(e.getMessage(), e.getMessage().contains("resource ID is out of scope"));
+        }
     }
 }
