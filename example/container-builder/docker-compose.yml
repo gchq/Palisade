@@ -11,6 +11,7 @@ services:
         - "./policy-service/:/policy-vol"
         - "./resource-service/:/resource-vol"
         - "./user-service/:/user-vol"
+        - "./config-service/:/config-vol"
    data-service:
      build:
        context: data-service
@@ -20,6 +21,15 @@ services:
         - 8084:8080
      depends_on:
         - stage-build
+   config-service:
+        build:
+          context: config-service
+          dockerfile: ../../../deployment/docker/config-service/Dockerfile
+        container_name: config-service
+        ports:
+           - 8085:8080
+        depends_on:
+           - stage-build
    user-service:
      build:
        context: user-service
@@ -60,3 +70,4 @@ services:
         - resource-service
         - user-service
         - data-service
+        - config-service

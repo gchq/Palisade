@@ -267,7 +267,8 @@ public class HDFSFileResourceServiceTest {
                 "      }\n" +
                 "    }\n" +
                 "  },\n" +
-                "  \"dataType\" : { }\n" +
+                "  \"dataType\" : { },\n" +
+                "  \"useSharedConnectionDetails\" : false\n" +
                 "}\n";
 
         final String StringOfSerialised = new String(serialise);

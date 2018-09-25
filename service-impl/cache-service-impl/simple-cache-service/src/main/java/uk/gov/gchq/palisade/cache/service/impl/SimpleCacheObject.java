@@ -93,7 +93,6 @@ public class SimpleCacheObject {
         SimpleCacheObject that = (SimpleCacheObject) o;
 
         return new EqualsBuilder()
-                .appendSuper(super.equals(o))
                 .append(valueClass, that.valueClass)
                 .append(value, that.value)
                 .isEquals();

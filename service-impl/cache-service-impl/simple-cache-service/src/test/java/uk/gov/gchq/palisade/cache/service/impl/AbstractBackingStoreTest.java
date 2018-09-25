@@ -23,6 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -158,6 +159,15 @@ public abstract class AbstractBackingStoreTest {
         fail("exception expected");
     }
 
+    @Test(expected = NullPointerException.class)
+    public void throwOnNullDuration() {
+        //Given - nothing
+        //When
+        impl.add("test", Object.class, new byte[]{1}, null);
+        //Then
+        fail("exception expected");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void throwOnNegativeDuration() {
         //Given - nothing
@@ -205,7 +215,7 @@ public abstract class AbstractBackingStoreTest {
         impl.add("test", Integer.class, expected);
         SimpleCacheObject actual = impl.get("test");
         //Then
-        assertEquals(expected, actual.getValue().get());
+        assertArrayEquals(expected, actual.getValue().get());
         assertEquals(Integer.class, actual.getValueClass());
     }
 
@@ -221,9 +231,9 @@ public abstract class AbstractBackingStoreTest {
         SimpleCacheObject actual2 = impl.get("test2");
 
         //Then
-        assertEquals(expected, actual.getValue().get());
+        assertArrayEquals(expected, actual.getValue().get());
         assertEquals(Integer.class, actual.getValueClass());
-        assertEquals(expected2, actual2.getValue().get());
+        assertArrayEquals(expected2, actual2.getValue().get());
         assertEquals(String.class, actual2.getValueClass());
     }
 
@@ -254,10 +264,10 @@ public abstract class AbstractBackingStoreTest {
         SimpleCacheObject overwrite = impl.get("test");
         //Then
         assertEquals(Integer.class, actual.getValueClass());
-        assertEquals(expected, actual.getValue().get());
+        assertArrayEquals(expected, actual.getValue().get());
         //check overwrite
         assertEquals(String.class, overwrite.getValueClass());
-        assertEquals(expected2, overwrite.getValue().get());
+        assertArrayEquals(expected2, overwrite.getValue().get());
     }
 
     //Time to live tests
