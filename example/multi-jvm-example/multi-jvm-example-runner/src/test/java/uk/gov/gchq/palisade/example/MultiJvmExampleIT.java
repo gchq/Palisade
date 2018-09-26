@@ -17,25 +17,31 @@
 package uk.gov.gchq.palisade.example;
 
 import org.apache.commons.io.FileUtils;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uk.gov.gchq.palisade.client.SimpleRestServices;
+import uk.gov.gchq.palisade.client.ConfiguredServices;
+import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
+import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
+import uk.gov.gchq.palisade.example.client.ExampleConfigCreator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.policy.service.impl.RestPolicyServiceV1;
 import uk.gov.gchq.palisade.resource.service.impl.RestResourceServiceV1;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.service.impl.RestPalisadeServiceV1;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.user.service.impl.RestUserServiceV1;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,6 +59,16 @@ public class MultiJvmExampleIT {
     private static EmbeddedHttpServer userServer;
     private static EmbeddedHttpServer dataServer;
     private static EmbeddedHttpServer configServer;
+    private static InitialConfig config;
+
+    @BeforeClass
+    public static void createConfig() {
+        final InitialConfigurationService ics = ExampleConfigCreator.setupMultiJVMConfigurationService();
+        //request the client configuration by not specifiying a service
+        config = ics.get(new GetConfigRequest()
+                .service(Optional.empty()))
+                .join();
+    }
 
     @BeforeClass
     public static void beforeClass() throws IOException {
@@ -127,7 +143,8 @@ public class MultiJvmExampleIT {
     @Test
     public void shouldReadAsAlice() throws Exception {
         // Given
-        final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
+        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // When
         final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
@@ -147,7 +164,8 @@ public class MultiJvmExampleIT {
     @Test
     public void shouldReadAsBob() throws Exception {
         // Given
-        final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
+        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // When
         final Stream<ExampleObj> aliceResults = client.read(FILE, "Bob", "Payroll");
@@ -165,7 +183,8 @@ public class MultiJvmExampleIT {
     @Test
     public void proxyServiceShouldReturnActualExceptionThrownByUnderlyingService() throws Exception {
         // Given
-        final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
+        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // When / Then
         try {
