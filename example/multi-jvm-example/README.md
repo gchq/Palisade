@@ -4,7 +4,7 @@ This example demonstrates 2 different users querying a database over a REST api.
 
 The database has been hardcoded in class: uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader and has been loaded with the following records:
 
-| Value         | Visibility           | Timestamp  |
+| Property      | Visibility           | Timestamp  |
 | ------------- | -------------------- | ---------- |
 |  item1a       |   public             | 1          |
 |  item1b       |   public             | 10         |
