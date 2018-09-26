@@ -7,3 +7,4 @@ example/multi-jvm-example/scripts/startPalisadeService.sh &
 example/multi-jvm-example/scripts/startPolicyService.sh &
 example/multi-jvm-example/scripts/startResourceService.sh &
 example/multi-jvm-example/scripts/startUserService.sh &
+example/multi-jvm-example/scripts/startConfigService.sh &

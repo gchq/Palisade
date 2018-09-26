@@ -21,12 +21,17 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.client.SimpleRestServices;
+import uk.gov.gchq.palisade.client.ConfiguredServices;
+import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
+import uk.gov.gchq.palisade.example.client.ExampleConfigCreator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -40,9 +45,17 @@ public class MultiJvmExample {
     }
 
     public void run() throws Exception {
+        final InitialConfigurationService ics = ExampleConfigCreator.setupMultiJVMConfigurationService();
+        //request the client configuration by not specifiying a service
+        final InitialConfig config = ics.get(new GetConfigRequest()
+                .service(Optional.empty()))
+                .join();
+
+        final ConfiguredServices cs = new ConfiguredServices(config);
+
         createDataPath();
         try {
-            final ExampleSimpleClient client = new ExampleSimpleClient(new SimpleRestServices(), FILE);
+            final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
             LOGGER.info("");
             LOGGER.info("Alice is reading file1...");

@@ -4,7 +4,7 @@ This example demonstrates 2 different users querying a database over a REST api.
 
 The database has been hardcoded in class: uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader and has been loaded with the following records:
 
-| Value         | Visibility           | Timestamp  |
+| Property      | Visibility           | Timestamp  |
 | ------------- | -------------------- | ---------- |
 |  item1a       |   public             | 1          |
 |  item1b       |   public             | 10         |
@@ -52,7 +52,7 @@ Either start them all in a single terminal using:
  ./example/multi-jvm-example/scripts/startAllServices.sh
 ```
  Or for better logging and understanding of what is going on you can 
- run REST service in 5 separate terminals. This way the logs for each 
+ run REST service in 6 separate terminals. This way the logs for each
  service are split up.
 ```bash
   ./example/multi-jvm-example/scripts/startResourceService.sh
@@ -69,14 +69,18 @@ Either start them all in a single terminal using:
 ```bash
   ./example/multi-jvm-example/scripts/startDataService.sh
 ```
+```bash
+  ./example/multi-jvm-example/scripts/startConfigService.sh
+```
 You will need to wait until all the REST services have successfully started in tomcat. 
-You should see 5 messages like:
+You should see 6 messages like:
 ```
 INFO: Starting ProtocolHandler ["http-bio-8080"]
 INFO: Starting ProtocolHandler ["http-bio-8081"]
 INFO: Starting ProtocolHandler ["http-bio-8082"]
 INFO: Starting ProtocolHandler ["http-bio-8083"]
 INFO: Starting ProtocolHandler ["http-bio-8084"]
+INFO: Starting ProtocolHandler ["http-bio-8085"]
 ```
 
 To run them in Docker:
@@ -99,7 +103,7 @@ You can check the containers are available:
   docker ps
 ```
 
-You should see 5 containers:
+You should see 6 containers:
 
 ```
 CONTAINER ID        IMAGE                                                COMMAND             CREATED             STATUS              PORTS                    NAMES
@@ -108,6 +112,7 @@ CONTAINER ID        IMAGE                                                COMMAND
 f4d7e07b8412        multi-jvm-example-docker-services_palisade-service   "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8080->8080/tcp   palisade-service
 c291ff79eecc        multi-jvm-example-docker-services_resource-service   "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8082->8080/tcp   resource-service
 1c16c50a6e2d        multi-jvm-example-docker-services_user-service       "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8083->8080/tcp   user-service
+831f5b3a86a3        multi-jvm-example-docker-services_config-service     "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8085->8080/tcp   config-service
 ```
 
 3. Run the example

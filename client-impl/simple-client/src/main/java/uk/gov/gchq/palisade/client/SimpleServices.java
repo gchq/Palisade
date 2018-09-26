@@ -95,7 +95,7 @@ public class SimpleServices implements ServicesFactory {
 
     protected ResourceService createResourceService() {
         try {
-            return new HDFSResourceService(new Configuration(), null, null);
+            return new HDFSResourceService(new Configuration(), null, null).useSharedConnectionDetails(true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -34,5 +34,6 @@
         <module>palisade-service</module>
         <module>cache-service</module>
         <module>rest-service</module>
+        <module>config-service</module>
     </modules>
 </project>

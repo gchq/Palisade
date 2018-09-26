@@ -33,6 +33,7 @@
         <module>data-service-impl</module>
         <module>cache-service-impl</module>
         <module>palisade-service-impl</module>
+        <module>config-service-impl</module>
     </modules>
 
     <dependencies>
