@@ -70,7 +70,7 @@ public class RestConfigServiceV1IT {
         }
     }
 
-    @Test(expected = PalisadeWrappedErrorRuntimeException.class)
+    @Test(expected = NoConfigException.class)
     public void throwWhenNoConfig() throws Throwable {
         // Given
         final InitialConfigurationService configService = Mockito.mock(InitialConfigurationService.class);
