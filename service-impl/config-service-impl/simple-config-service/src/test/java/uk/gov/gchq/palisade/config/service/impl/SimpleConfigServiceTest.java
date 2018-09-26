@@ -61,6 +61,9 @@ public class SimpleConfigServiceTest {
     static class NotInCache implements Service {
     }
 
+    static class CacheAddTest implements Service {
+    }
+
     @BeforeClass
     public static void createConfig() {
         scs = new SimpleConfigService(
@@ -141,5 +144,20 @@ public class SimpleConfigServiceTest {
         InitialConfig actual = scs.get(req).join();
         //Then
         assertEquals(genericService, actual);
+    }
+
+    @Test
+    public void shouldPutAndRetrieveConfig() {
+        //Given
+        InitialConfig expected = serviceClass2;
+        PutConfigRequest request = (PutConfigRequest) new PutConfigRequest()
+                .config(expected)
+                .service(Optional.of(CacheAddTest.class));
+        scs.put(request);
+        //When
+        GetConfigRequest req = new GetConfigRequest().service(Optional.of(CacheAddTest.class));
+        InitialConfig actual = scs.get(req).join();
+        //Then
+        assertEquals(expected, actual);
     }
 }

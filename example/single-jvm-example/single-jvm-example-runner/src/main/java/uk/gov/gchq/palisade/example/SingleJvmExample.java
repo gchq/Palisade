@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
-import uk.gov.gchq.palisade.example.client.ExampleConfigCreator;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
@@ -46,7 +46,7 @@ public class SingleJvmExample {
     public void run() throws Exception {
         createDataPath();
         try {
-            final InitialConfigurationService ics = ExampleConfigCreator.setupSingleJVMConfigurationService();
+            final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
             //request the client configuration by not specifiying a service
             final InitialConfig config = ics.get(new GetConfigRequest()
                     .service(Optional.empty()))

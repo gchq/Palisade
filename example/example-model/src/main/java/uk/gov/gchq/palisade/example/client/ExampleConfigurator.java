@@ -47,22 +47,12 @@ import java.io.IOException;
  * Convenience class for the examples to configure the config creation service.
  */
 
-/*
-* Note: This class is only necessary because without a proper backing store, we can't set up the config store/cache service
-* with pre-configured information necessary to retrieve things from the cache. Once issue gh-28 has been resolved to the point
-* where we have a properties backing store, we can set one of those up to provide the example configuration data exactly
-* as would happen in a deployed environment. For now, we create a configuration service backed by a pre-configured hash map
-* backing store.
-*
-* WHEN WE REACH THAT POINT, THIS CLASS SHOULD BE REMOVED.
- */
-
-public final class ExampleConfigCreator {
-    private ExampleConfigCreator() {
+public final class ExampleConfigurator {
+    private ExampleConfigurator() {
     }
 
     /**
-     * Allows the bootstrapping of some configuration data for the single JVM example.
+     * Allows the creation of some configuration data for the single JVM example.
      *
      * @return the config. provider
      */

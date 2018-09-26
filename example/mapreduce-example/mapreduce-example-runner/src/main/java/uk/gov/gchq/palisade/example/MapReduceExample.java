@@ -39,7 +39,7 @@ import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
-import uk.gov.gchq.palisade.example.client.ExampleConfigCreator;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
@@ -130,7 +130,7 @@ public class MapReduceExample extends Configured implements Tool {
         // ==========================================================
 
         //configure the Palisade input format on an example client
-        final InitialConfigurationService ics = ExampleConfigCreator.setupSingleJVMConfigurationService();
+        final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
         //request the client configuration by not specifiying a service
         final InitialConfig config = ics.get(new GetConfigRequest()
                 .service(Optional.empty()))
