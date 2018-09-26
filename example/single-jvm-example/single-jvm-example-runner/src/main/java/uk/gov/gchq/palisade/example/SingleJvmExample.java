@@ -31,12 +31,15 @@ import uk.gov.gchq.palisade.service.request.InitialConfig;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public class SingleJvmExample {
     protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
+    protected static final String CACHE_FILE = new File("example_config.txt").getAbsolutePath();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleJvmExample.class);
 
     public static void main(final String[] args) throws Exception {
@@ -46,7 +49,8 @@ public class SingleJvmExample {
     public void run() throws Exception {
         createDataPath();
         try {
-            final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
+            ExampleConfigurator.setupSingleJVMConfigurationService(Paths.get(CACHE_FILE));
+            final InitialConfigurationService ics = ExampleConfigurator.createConfigService(Paths.get(CACHE_FILE));
             //request the client configuration by not specifiying a service
             final InitialConfig config = ics.get(new GetConfigRequest()
                     .service(Optional.empty()))
@@ -68,6 +72,7 @@ public class SingleJvmExample {
             bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {
             FileUtils.deleteQuietly(new File(FILE));
+            FileUtils.deleteQuietly(new File(CACHE_FILE));
         }
     }
 

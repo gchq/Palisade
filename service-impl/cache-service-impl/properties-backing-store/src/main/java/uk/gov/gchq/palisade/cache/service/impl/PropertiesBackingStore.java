@@ -15,6 +15,8 @@
  */
 package uk.gov.gchq.palisade.cache.service.impl;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +104,8 @@ public class PropertiesBackingStore implements BackingStore {
      *
      * @param propertiesPath path to load properties from
      */
-    public PropertiesBackingStore(final String propertiesPath) {
+    @JsonCreator
+    public PropertiesBackingStore(@JsonProperty("location") final String propertiesPath) {
         requireNonNull(propertiesPath, "propertiesPath");
         this.location = propertiesPath;
         try {

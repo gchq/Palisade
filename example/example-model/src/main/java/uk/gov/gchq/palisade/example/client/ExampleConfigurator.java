@@ -21,10 +21,12 @@ import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.PropertiesBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.impl.PutConfigRequest;
 import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
@@ -42,6 +44,8 @@ import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * Convenience class for the examples to configure the config creation service.
@@ -52,12 +56,25 @@ public final class ExampleConfigurator {
     }
 
     /**
+     * Create a properties backed config service for examples.
+     *
+     * @param backingStorePath the path to keep config in
+     * @return the config service
+     */
+    public static SimpleConfigService createConfigService(final Path backingStorePath) {
+        CacheService cache = new SimpleCacheService().backingStore(new PropertiesBackingStore(backingStorePath.toString()));
+        SimpleConfigService configService = new SimpleConfigService(cache);
+        return configService;
+    }
+
+    /**
      * Allows the creation of some configuration data for the single JVM example.
      *
-     * @return the config. provider
+     * @param backingStorePath the file path for where the properties backing store is
      */
-    public static InitialConfigurationService setupSingleJVMConfigurationService() {
-        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+    public static void setupSingleJVMConfigurationService(final Path backingStorePath) {
+        SimpleConfigService configService = createConfigService(backingStorePath);
+        CacheService cache = configService.getCache();
         //configure the single JVM settings
         AuditService audit = new LoggerAuditService();
         PolicyService policy = new HierarchicalPolicyService();
@@ -74,7 +91,7 @@ public final class ExampleConfigurator {
                 .policyService(policy)
                 .userService(user)
                 .cacheService(cache);
-
+        //build a config for client
         InitialConfig singleJVMconfig = new InitialConfig()
                 .put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName())
                 .put(ResourceService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(resource)))
@@ -94,13 +111,9 @@ public final class ExampleConfigurator {
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
                 .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)));
         //insert this into the cache manually so it can be created later
-        cache.add(new AddCacheRequest<InitialConfig>()
-                .service(InitialConfigurationService.class)
-                .key(SimpleConfigService.ANONYMOUS_CONFIG_KEY)
-                .value(singleJVMconfig))
-                .join();
-
-        return new SimpleConfigService(cache);
+        configService.put((PutConfigRequest) new PutConfigRequest()
+                .config(singleJVMconfig)
+                .service(Optional.empty())).join();
     }
 
     /**
