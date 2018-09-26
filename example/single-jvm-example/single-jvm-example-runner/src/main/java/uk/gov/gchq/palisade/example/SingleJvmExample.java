@@ -73,6 +73,7 @@ public class SingleJvmExample {
         } finally {
             FileUtils.deleteQuietly(new File(FILE));
             FileUtils.deleteQuietly(new File(CACHE_FILE));
+            //TODO: Stop properties store from watching the file multiple times
         }
     }
 
