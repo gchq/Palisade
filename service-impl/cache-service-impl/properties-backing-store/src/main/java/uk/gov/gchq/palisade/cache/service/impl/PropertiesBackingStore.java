@@ -153,11 +153,10 @@ public class PropertiesBackingStore implements BackingStore {
      */
     private synchronized void load() throws IOException {
         Path configPath = Paths.get(location);
-        //set up watch to allow us to detect outside changes to file
-        createWatch(configPath);
-        props.clear();
         props.load(Files.newInputStream(configPath));
         LOGGER.debug("Loaded from {}", location);
+        //set up watch to allow us to detect outside changes to file
+        createWatch(configPath);
     }
 
     /**
@@ -175,9 +174,7 @@ public class PropertiesBackingStore implements BackingStore {
             }
             watcher = configPath.getFileSystem().newWatchService();
             //register this
-            watched = configPath.getParent().register(watcher,
-                    StandardWatchEventKinds.ENTRY_MODIFY,
-                    StandardWatchEventKinds.ENTRY_CREATE);
+            watched = configPath.getParent().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE);
             //set up a thread to watch this
             final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
             ThreadFactory daemonise = runnable -> {
@@ -187,7 +184,6 @@ public class PropertiesBackingStore implements BackingStore {
             };
             ExecutorService singleThread = Executors.newSingleThreadExecutor(daemonise);
             singleThread.submit(this::watchLoop);
-            LOGGER.debug("Watching for changes on {}", location);
         } catch (IOException e) {
             LOGGER.warn("Can't create watch on {}. Can't monitor properties backing file for changes", location, e);
             watcher = null;
