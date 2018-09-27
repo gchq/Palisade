@@ -27,6 +27,7 @@
 
     <modules>
         <module>hashmap-backing-store</module>
+        <module>properties-backing-store</module>
         <module>simple-cache-service</module>
     </modules>
 

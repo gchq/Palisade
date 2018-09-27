@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
@@ -206,6 +207,9 @@ public class JSONSerialiser {
 
         // Using the deprecated version for compatibility with older versions of jackson
         mapper.registerModule(new JSR310Module());
+
+        // Add JDK8 module for Optional
+        mapper.registerModule(new Jdk8Module());
 
         mapper.registerModule(ResourceKeySerialiser.getModule());
 

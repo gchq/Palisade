@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.exception.Error.ErrorBuilder;
 
 import java.util.Arrays;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +52,7 @@ public final class ErrorFactory {
                 .status(gex.getStatus())
                 .simpleMessage(gex.getMessage())
                 .detailMessage(Arrays.asList(gex.getStackTrace()).stream().map(StackTraceElement::toString).collect(Collectors.joining("\n")))
+                .exceptionClass(gex)
                 .build();
     }
 
@@ -67,6 +69,7 @@ public final class ErrorFactory {
                 .status(gex.getStatus())
                 .simpleMessage(gex.getMessage())
                 .detailMessage(Arrays.asList(gex.getStackTrace()).stream().map(StackTraceElement::toString).collect(Collectors.joining("\n")))
+                .exceptionClass(gex)
                 .build();
     }
 
@@ -90,11 +93,22 @@ public final class ErrorFactory {
      * @return a newly constructed {@link uk.gov.gchq.palisade.exception.Error}
      */
     public static Error from(final Exception ex) {
+        final Exception unwrappedEx = unwrapCompletionException(ex);
         LOGGER.error("Error: {}", ex.getMessage(), ex);
         return new ErrorBuilder()
                 .status(Status.INTERNAL_SERVER_ERROR)
-                .simpleMessage(ex.getMessage())
-                .detailMessage(Arrays.asList(ex.getStackTrace()).stream().map(StackTraceElement::toString).collect(Collectors.joining("\n")))
+                .simpleMessage(unwrappedEx.getMessage())
+                .detailMessage(Arrays.asList(unwrappedEx.getStackTrace()).stream().map(StackTraceElement::toString).collect(Collectors.joining("\n")))
+                .exceptionClass(unwrappedEx)
                 .build();
+    }
+
+    private static Exception unwrapCompletionException(final Exception ex) {
+        Exception unwrappedEx = ex;
+        while (unwrappedEx instanceof CompletionException && unwrappedEx.getCause() instanceof Exception) {
+            unwrappedEx = (Exception) ex.getCause();
+        }
+
+        return unwrappedEx;
     }
 }

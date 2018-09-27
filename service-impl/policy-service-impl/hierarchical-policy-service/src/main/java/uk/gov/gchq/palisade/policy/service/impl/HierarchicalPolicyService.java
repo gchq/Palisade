@@ -38,8 +38,10 @@ import uk.gov.gchq.palisade.rule.Rules;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -56,15 +58,27 @@ import static java.util.Objects.requireNonNull;
 public class HierarchicalPolicyService implements PolicyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HierarchicalPolicyService.class);
 
-    private HashMap<String, Policy> dataTypePoliciesMap;
-    private HashMap<Resource, Policy> resourcePoliciesMap;
+    private static final Map<String, Policy> DATA_TYPE_POLICIES_MAP = new ConcurrentHashMap<>();
+    private static final Map<Resource, Policy> RESOURCE_POLICIES_MAP = new ConcurrentHashMap<>();
+
+    private Map<String, Policy> dataTypePoliciesMap;
+    private Map<Resource, Policy> resourcePoliciesMap;
 
     public HierarchicalPolicyService() {
-        this.dataTypePoliciesMap = new HashMap<>();
-        this.resourcePoliciesMap = new HashMap<>();
+        this(true);
     }
 
-    public HierarchicalPolicyService(final HashMap<String, Policy> dataTypePoliciesMap, final HashMap<Resource, Policy> resourcePoliciesMap) {
+    public HierarchicalPolicyService(final boolean useStatic) {
+        if (useStatic) {
+            this.dataTypePoliciesMap = DATA_TYPE_POLICIES_MAP;
+            this.resourcePoliciesMap = RESOURCE_POLICIES_MAP;
+        } else {
+            this.dataTypePoliciesMap = new ConcurrentHashMap<>();
+            this.resourcePoliciesMap = new ConcurrentHashMap<>();
+        }
+    }
+
+    public HierarchicalPolicyService(final Map<String, Policy> dataTypePoliciesMap, final Map<Resource, Policy> resourcePoliciesMap) {
         requireNonNull(dataTypePoliciesMap);
         requireNonNull(resourcePoliciesMap);
         this.dataTypePoliciesMap = dataTypePoliciesMap;

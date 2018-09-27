@@ -163,7 +163,6 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
             dataType.put(RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService()).reader(reader)));
             ((HDFSResourceService) getServicesFactory().getResourceService()).connectionDetail(null, dataType);
         }
-
         // Wait for the users and policies to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
     }

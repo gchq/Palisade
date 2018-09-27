@@ -59,6 +59,11 @@
             <artifactId>proxy-rest-policy-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>proxy-rest-config-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
         <!-- Test dependencies -->
 
@@ -79,6 +84,13 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>multi-jvm-example-rest-policy-service</artifactId>
+            <version>${project.parent.version}</version>
+            <classifier>classes</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>multi-jvm-example-rest-config-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
@@ -129,6 +141,13 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>rest-resource-service</artifactId>
+            <version>${project.parent.version}</version>
+            <classifier>classes</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>rest-config-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
