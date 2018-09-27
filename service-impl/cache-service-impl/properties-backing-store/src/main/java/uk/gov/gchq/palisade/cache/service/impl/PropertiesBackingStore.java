@@ -17,10 +17,13 @@ package uk.gov.gchq.palisade.cache.service.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -35,12 +38,16 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
@@ -86,15 +93,6 @@ public class PropertiesBackingStore implements BackingStore {
     private final String location;
 
     /**
-     * The watcher for file system events.
-     */
-    private WatchService watcher;
-    /**
-     * The key for the file being watched.
-     */
-    private WatchKey watched;
-
-    /**
      * Flag to stop modifications triggering the watcher mechanism.
      */
     private AtomicBoolean beingPersisted = new AtomicBoolean(false);
@@ -108,6 +106,8 @@ public class PropertiesBackingStore implements BackingStore {
     public PropertiesBackingStore(@JsonProperty("location") final String propertiesPath) {
         requireNonNull(propertiesPath, "propertiesPath");
         this.location = propertiesPath;
+        //set up watch to allow us to detect outside changes to file
+        createWatch(Paths.get(location));
         try {
             load();
         } catch (NoSuchFileException e) {
@@ -115,6 +115,208 @@ public class PropertiesBackingStore implements BackingStore {
         } catch (IOException e) {
             LOGGER.error("Couldn't load properties file {}", propertiesPath, e);
         }
+    }
+
+    /**
+     * The file path to where this backing store is storing the cache.
+     *
+     * @return the file path
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * Load the properties to the backing file.
+     *
+     * @throws IOException if anything failed during the load
+     */
+    private synchronized void load() throws IOException {
+        if (beingPersisted.get()) {
+            LOGGER.debug("File change notification triggered by property change, ignoring it.");
+            return;
+        }
+        Path configPath = Paths.get(location);
+        props.clear();
+        props.load(Files.newInputStream(configPath));
+        LOGGER.debug("Loaded from {}", location);
+    }
+
+    /**
+     * Static class that performs a watch on a file and then performs some action when that file changes. We use a
+     * {@link WeakReference} to maintain a link to prevent the outer object being garbage collected. That way, if the
+     * caller no longer exists, we can clean up quickly.
+     */
+    private static class WatchFile implements Callable<Object> {
+
+        private final WeakReference<Runnable> action;
+        private final Path watchPath;
+
+        WatchFile(final Runnable action, final Path watchPath) {
+            requireNonNull(action, "action");
+            requireNonNull(watchPath, "watchPath");
+            this.action = new WeakReference<Runnable>(action);
+            this.watchPath = watchPath;
+        }
+
+        @Override
+        public Object call() throws Exception {
+            WatchKey watched = null;
+            try (final WatchService watcher = watchPath.getFileSystem().newWatchService()) {
+                //register this
+                watched = watchPath.getParent().register(watcher,
+                        StandardWatchEventKinds.ENTRY_MODIFY,
+                        StandardWatchEventKinds.ENTRY_CREATE);
+                LOGGER.debug("Watching for changes on {} from me {}", watchPath, Integer.toHexString(System.identityHashCode(this)));
+
+                while (true) {
+                    //check exit condition
+                    if (action.get() == null) {
+                        //reference is collected, exit loop
+                        break;
+                    }
+                    WatchKey key = watcher.poll(2, TimeUnit.SECONDS);
+                    //did anything get returned
+                    if (key == null) {
+                        continue;
+                    }
+                    if (!(key.watchable() instanceof Path)) {
+                        continue;
+                    }
+                    Path eventPath = (Path) key.watchable();
+                    // process events
+                    for (WatchEvent<?> event : key.pollEvents()) {
+                        final Path changed = (Path) event.context();
+                        //recompute complete path
+                        final Path completePath = eventPath.resolve(changed);
+                        //see if the file we care about changed
+                        if (completePath.equals(watchPath)) {
+                            LOGGER.info("Properties backing file changed {}", watchPath);
+                            //trigger the action, might have been gc'd since the first check
+                            Runnable r = action.get();
+                            if (r != null) {
+                                r.run();
+                            }
+                            break;
+                        }
+                    }
+
+                    //notify event handled
+                    if (!key.reset()) {
+                        break;
+                    }
+                }
+            } catch (ClosedWatchServiceException | IOException | InterruptedException e) {
+                LOGGER.error("Error while watching {}", watchPath, e);
+            } finally {
+                if (watched != null) {
+                    watched.cancel();
+                }
+            }
+            LOGGER.debug("No longer watching {}", watchPath);
+            return null;
+        }
+    }
+
+    /**
+     * Sets up a watch on the named file. This is used to watch the property backing store for changes from external
+     * sources.
+     *
+     * @param configPath the path to watch
+     */
+    private void createWatch(final Path configPath) {
+        requireNonNull(configPath, "configPath");
+        //set up a thread to watch this
+        final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
+        //ensure thread is daemon
+        ThreadFactory daemonise = runnable -> {
+            Thread t = defaultFactory.newThread(runnable);
+            t.setDaemon(true);
+            return t;
+        };
+        ExecutorService singleThread = Executors.newSingleThreadExecutor(daemonise);
+        singleThread.submit(new WatchFile(() -> {
+            try {
+                load();
+            } catch (IOException e) {
+                LOGGER.error("Couldn't complete load of properties {}", configPath, e);
+            }
+        }, configPath));
+    }
+
+    /**
+     * Performs a purge of expired keys and persists the properties to a file.
+     *
+     * @param forcePersist if true then data will be persisted to disk, otherwise persistence will only be done if a key
+     *                     expires
+     */
+    private synchronized void update(final boolean forcePersist) {
+        boolean keyRemoved = doKeyExpiry();
+        try {
+            if (forcePersist || keyRemoved) {
+                persist();
+            }
+        } catch (IOException e) {
+            LOGGER.error("Couldn't save properties file {}", location, e);
+        }
+    }
+
+    /**
+     * Saves the properties to the backing file.
+     *
+     * @throws IOException if anything failed during save
+     */
+    private void persist() throws IOException {
+        beingPersisted.set(true);
+        props.store(Files.newOutputStream(Paths.get(location)), "Palisade cache service store.");
+        LOGGER.debug("Persisted to {}", location);
+        beingPersisted.set(false);
+    }
+
+    /**
+     * Iterates through the entries in the backing store and removes entries that should have expired.
+     *
+     * @return true if any key was removed
+     */
+    private boolean doKeyExpiry() {
+        final LocalDateTime now = LocalDateTime.now();
+        //to avoid mid stream modifications we make a list of things to remove
+        List<String> toRemove = new ArrayList<>();
+        AtomicBoolean keyRemoved = new AtomicBoolean(false);
+        props.keySet().stream()
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .filter(key -> key.endsWith(EXPIRY_SUFFIX))
+                .forEach(key -> {
+                    try {
+                        String time = props.getProperty(key);
+                        //calculate the time
+                        LocalDateTime expiry = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                        //if this is before now, then remove it
+                        if (expiry.isBefore(now)) {
+                            toRemove.add(deriveBaseFromDateKey(key));
+                            keyRemoved.set(true);
+                        }
+                    } catch (DateTimeParseException e) {
+                        LOGGER.error("Invalid expiry for key {}", key, e);
+                    }
+                });
+        //remove
+        toRemove.forEach(this::removeKey);
+        return keyRemoved.get();
+    }
+
+    /**
+     * Remove the given key and associated class and expiry times from the properties.
+     *
+     * @param key the base key to remove
+     */
+    private void removeKey(final String key) {
+        requireNonNull(key, "key");
+        LOGGER.debug("Removing expired key {}", key);
+        props.remove(key);
+        props.remove(makeDateKey(key));
+        props.remove(makeClassKey(key));
     }
 
     /**
@@ -136,202 +338,60 @@ public class PropertiesBackingStore implements BackingStore {
             });
         }
         //run cleanup and sync
-        update();
+        update(true);
         return true;
     }
 
     /**
-     * The file path to where this backing store is storing the cache.
-     *
-     * @return the file path
+     * {@inheritDoc}
      */
-    public String getLocation() {
-        return location;
-    }
-
-    /**
-     * Load the properties to the backing file.
-     *
-     * @throws IOException if anything failed during the load
-     */
-    private synchronized void load() throws IOException {
-        Path configPath = Paths.get(location);
-        //set up watch to allow us to detect outside changes to file
-        createWatch(configPath);
-        props.clear();
-        props.load(Files.newInputStream(configPath));
-        LOGGER.debug("Loaded from {}", location);
-    }
-
-    /**
-     * Sets up a watch on the named file. This is used to watch the property backing store for changes from external
-     * sources.
-     *
-     * @param configPath the path to watch
-     */
-    private synchronized void createWatch(final Path configPath) {
-        requireNonNull(configPath, "configPath");
-        try {
-            //check if watcher already active
-            if (watcher != null) {
-                return;
-            }
-            watcher = configPath.getFileSystem().newWatchService();
-            //register this
-            watched = configPath.getParent().register(watcher,
-                    StandardWatchEventKinds.ENTRY_MODIFY,
-                    StandardWatchEventKinds.ENTRY_CREATE);
-            //set up a thread to watch this
-            final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
-            ThreadFactory daemonise = runnable -> {
-                Thread t = defaultFactory.newThread(runnable);
-                t.setDaemon(true);
-                return t;
-            };
-            ExecutorService singleThread = Executors.newSingleThreadExecutor(daemonise);
-            singleThread.submit(this::watchLoop);
-            LOGGER.debug("Watching for changes on {}", location);
-        } catch (IOException e) {
-            LOGGER.warn("Can't create watch on {}. Can't monitor properties backing file for changes", location, e);
-            watcher = null;
-            watched = null;
-            return;
-        }
-    }
-
-    /**
-     * Implements the main watch loop that looks for property backing file changes and triggers a reload when it
-     * happens.
-     *
-     * @return <code>null</code>
-     * @throws IOException if the watch service cannot be closed in event of an error
-     */
-    private Object watchLoop() throws IOException {
-        try {
-            while (true) {
-                WatchKey key = watcher.take();
-                if (!(key.watchable() instanceof Path)) {
-                    continue;
-                }
-                Path watchedPath = (Path) key.watchable();
-                // process events
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    final Path changed = (Path) event.context();
-                    //recompute complete path
-                    final Path completePath = watchedPath.resolve(changed);
-                    //see if the file we care about changed
-                    if (completePath.equals(Paths.get(location))) {
-                        if (beingPersisted.get()) {
-                            LOGGER.debug("File change notification triggered by property change, ignoring it.");
-                            break;
-                        }
-                        LOGGER.info("Properties backing file changed {}", location);
-                        load();
-                        break;
-                    }
-                }
-
-                //notify event handled
-                boolean valid = key.reset();
-                if (!valid) {
-                    LOGGER.debug("No longer watching {}", location);
-                    break;
-                }
-            }
-        } catch (IOException | InterruptedException e) {
-            LOGGER.error("Error while watching {}", location, e);
-        } finally {
-            closeWatchServiceSafely();
-        }
-        //only returns on an exception
-        return null;
-    }
-
-    /**
-     * Safely closes the watch services catching exceptions where necessary.
-     */
-    private synchronized void closeWatchServiceSafely() {
-        WatchKey localKey = watched;
-        WatchService localService = watcher;
-        if (localKey != null) {
-            localKey.cancel();
-            watched = null;
-        }
-        if (localService != null) {
-            try {
-                localService.close();
-            } catch (IOException ignored) {
-                //do nothing
-            }
-            watcher = null;
-        }
-    }
-
-    /**
-     * Performs a purge of expired keys and persists the properties to a file.
-     */
-    private synchronized void update() {
-        doKeyExpiry();
-        try {
-            persist();
-        } catch (IOException e) {
-            LOGGER.error("Couldn't save properties file {}", location, e);
-        }
-    }
-
-    /**
-     * Saves the properties to the backing file.
-     *
-     * @throws IOException if anything failed during save
-     */
-    private void persist() throws IOException {
-        beingPersisted.set(true);
-        props.store(Files.newOutputStream(Paths.get(location)), "Palisade cache service store.");
-        LOGGER.debug("Persisted to {}", location);
-        beingPersisted.set(false);
-    }
-
-    /**
-     * Iterates through the entries in the backing store and removes entries that should have expired.
-     */
-    private void doKeyExpiry() {
-        final LocalDateTime now = LocalDateTime.now();
-        //to avoid mid stream modifications we make a list of things to remove
-        List<String> toRemove = new ArrayList<>();
-        props.keySet().stream()
-                .filter(String.class::isInstance)
-                .map(String.class::cast)
-                .filter(key -> key.endsWith(EXPIRY_SUFFIX))
-                .forEach(key -> {
-                    try {
-                        String time = props.getProperty(key);
-                        //calculate the time
-                        LocalDateTime expiry = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                        //if this is before now, then remove it
-                        if (expiry.isBefore(now)) {
-                            toRemove.add(deriveBaseFromDateKey(key));
-                        }
-                    } catch (DateTimeParseException e) {
-                        LOGGER.error("Invalid expiry for key {}", key, e);
-                    }
-                });
-        //remove
-        toRemove.forEach(this::removeKey);
-    }
-
-    /**
-     * Remove the given key and associated class and expiry times from the properties.
-     *
-     * @param key the base key to remove
-     */
-    private void removeKey(final String key) {
-        requireNonNull(key, "key");
-        LOGGER.debug("Removing expired key {}", key);
+    @Override
+    public SimpleCacheObject get(final String key) {
+        String cacheKey = BackingStore.keyCheck(key);
+        //enforce and any expiries and persist
+        update(false);
         synchronized (this) {
-            props.remove(key);
-            props.remove(makeDateKey(key));
-            props.remove(makeClassKey(key));
+            String b64Value = props.getProperty(cacheKey);
+            LOGGER.debug("Looking up key {} from cache", cacheKey);
+            if (b64Value != null) {
+                //key found
+                try {
+                    byte[] value = B64_DECODER.decode(b64Value);
+                    Class<?> valueClass = Class.forName(props.getProperty(makeClassKey(cacheKey)));
+                    return new SimpleCacheObject(valueClass, Optional.of(value));
+                } catch (Exception e) {
+                    LOGGER.warn("Couldn't retrieve key {}", key, e);
+                    return new SimpleCacheObject(Object.class, Optional.empty());
+                }
+            } else {
+                //key not found
+                return new SimpleCacheObject(Object.class, Optional.empty());
+            }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Stream<String> list(final String prefix) {
+        requireNonNull(prefix, "prefix");
+        update(false);
+        Set<?> clonedSet;
+        synchronized (this) {
+            clonedSet = new HashSet<>(props.keySet());
+        }
+        return clonedSet
+                .stream()
+                        //filter any non string properties
+                .filter(String.class::isInstance)
+                        //perform cast now we know it's safe
+                .map(String.class::cast)
+                .filter(x -> !x.endsWith(EXPIRY_SUFFIX))
+                .filter(x -> !x.endsWith(CLASS_SUFFIX))
+                .filter(x -> x.startsWith(
+                                prefix)
+                );
     }
 
     /**
@@ -362,50 +422,5 @@ public class PropertiesBackingStore implements BackingStore {
      */
     private static String deriveBaseFromDateKey(final String key) {
         return key.substring(0, key.length() - EXPIRY_SUFFIX.length());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public SimpleCacheObject get(final String key) {
-        String cacheKey = BackingStore.keyCheck(key);
-        //enforce and any expiries and persist
-        update();
-        String b64Value = props.getProperty(cacheKey);
-        LOGGER.debug("Looking up key {} from cache", cacheKey);
-        if (b64Value != null) {
-            //key found
-            try {
-                byte[] value = B64_DECODER.decode(b64Value);
-                Class<?> valueClass = Class.forName(props.getProperty(makeClassKey(cacheKey)));
-                return new SimpleCacheObject(valueClass, Optional.of(value));
-            } catch (Exception e) {
-                LOGGER.warn("Couldn't retrieve key {}", key, e);
-                return new SimpleCacheObject(Object.class, Optional.empty());
-            }
-        } else {
-            //key not found
-            return new SimpleCacheObject(Object.class, Optional.empty());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Stream<String> list(final String prefix) {
-        requireNonNull(prefix, "prefix");
-        return props.keySet()
-                .stream()
-                        //filter any non string properties
-                .filter(String.class::isInstance)
-                        //perform cast now we know it's safe
-                .map(String.class::cast)
-                .filter(x -> !x.endsWith(EXPIRY_SUFFIX))
-                .filter(x -> !x.endsWith(CLASS_SUFFIX))
-                .filter(x -> x.startsWith(
-                                prefix)
-                );
     }
 }

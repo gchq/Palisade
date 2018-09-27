@@ -63,8 +63,7 @@ public final class ExampleConfigurator {
      */
     public static SimpleConfigService createConfigService(final Path backingStorePath) {
         CacheService cache = new SimpleCacheService().backingStore(new PropertiesBackingStore(backingStorePath.toString()));
-        SimpleConfigService configService = new SimpleConfigService(cache);
-        return configService;
+        return new SimpleConfigService(cache);
     }
 
     /**
