@@ -17,6 +17,7 @@ package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
@@ -39,6 +40,7 @@ public class ConfiguredServices implements ServicesFactory {
     private final UserService userService;
     private final CacheService cacheService;
     private final PalisadeService palisadeService;
+    private final InitialConfigurationService configService;
 
     public ConfiguredServices(final InitialConfig config) {
         requireNonNull(config, "config");
@@ -49,6 +51,7 @@ public class ConfiguredServices implements ServicesFactory {
         this.userService = createUserService();
         this.cacheService = createCacheService();
         this.palisadeService = createPalisadeService();
+        this.configService = createConfigService();
     }
 
     @Override
@@ -81,6 +84,11 @@ public class ConfiguredServices implements ServicesFactory {
         return palisadeService;
     }
 
+    @Override
+    public InitialConfigurationService getConfigService() {
+        return configService;
+    }
+
     public ResourceService createResourceService() {
         return createAndConfigure(ResourceService.class);
     }
@@ -99,6 +107,10 @@ public class ConfiguredServices implements ServicesFactory {
 
     public CacheService createCacheService() {
         return createAndConfigure(CacheService.class);
+    }
+
+    public InitialConfigurationService createConfigService() {
+        return createAndConfigure(InitialConfigurationService.class);
     }
 
     public PalisadeService createPalisadeService() {

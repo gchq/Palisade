@@ -40,8 +40,11 @@ public class MultiDockerJvmExample {
     }
 
     public void run() throws Exception {
-        final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
+        //TODO: fix this class to use new configuration service
+        ExampleConfigurator.setupMultiJVMConfigurationService(null);
+        //TODO: this is broken, this is a temporary fix to make it compile
         //request the client configuration by not specifiying a service
+        InitialConfigurationService ics=null;
         final InitialConfig config = ics.get(new GetConfigRequest()
                 .service(Optional.empty()))
                 .join();

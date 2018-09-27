@@ -55,7 +55,6 @@ public class SingleJvmExample {
             final InitialConfig config = ics.get(new GetConfigRequest()
                     .service(Optional.empty()))
                     .join();
-
             final ConfiguredServices cs = new ConfiguredServices(config);
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 

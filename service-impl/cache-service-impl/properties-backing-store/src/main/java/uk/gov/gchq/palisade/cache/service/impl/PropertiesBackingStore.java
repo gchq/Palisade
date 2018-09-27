@@ -129,6 +129,7 @@ public class PropertiesBackingStore implements BackingStore {
     /**
      * Load the properties to the backing file.
      *
+     * @return always returns {@code null}
      * @throws IOException if anything failed during the load
      */
     private synchronized void load() throws IOException {
@@ -148,14 +149,13 @@ public class PropertiesBackingStore implements BackingStore {
      * caller no longer exists, we can clean up quickly.
      */
     private static class WatchFile implements Callable<Object> {
-
-        private final WeakReference<Runnable> action;
+        private final WeakReference<PropertiesBackingStore> action;
         private final Path watchPath;
 
-        WatchFile(final Runnable action, final Path watchPath) {
+        WatchFile(final PropertiesBackingStore action, final Path watchPath) {
             requireNonNull(action, "action");
             requireNonNull(watchPath, "watchPath");
-            this.action = new WeakReference<Runnable>(action);
+            this.action = new WeakReference<PropertiesBackingStore>(action);
             this.watchPath = watchPath;
         }
 
@@ -167,7 +167,7 @@ public class PropertiesBackingStore implements BackingStore {
                 watched = watchPath.getParent().register(watcher,
                         StandardWatchEventKinds.ENTRY_MODIFY,
                         StandardWatchEventKinds.ENTRY_CREATE);
-                LOGGER.debug("Watching for changes on {} from me {}", watchPath, Integer.toHexString(System.identityHashCode(this)));
+                LOGGER.debug("Watching for changes on {}", watchPath);
 
                 while (true) {
                     //check exit condition
@@ -175,7 +175,7 @@ public class PropertiesBackingStore implements BackingStore {
                         //reference is collected, exit loop
                         break;
                     }
-                    WatchKey key = watcher.poll(2, TimeUnit.SECONDS);
+                    WatchKey key = watcher.poll(10, TimeUnit.SECONDS);
                     //did anything get returned
                     if (key == null) {
                         continue;
@@ -193,9 +193,9 @@ public class PropertiesBackingStore implements BackingStore {
                         if (completePath.equals(watchPath)) {
                             LOGGER.info("Properties backing file changed {}", watchPath);
                             //trigger the action, might have been gc'd since the first check
-                            Runnable r = action.get();
-                            if (r != null) {
-                                r.run();
+                            PropertiesBackingStore store = action.get();
+                            if (store != null) {
+                                store.load();
                             }
                             break;
                         }
@@ -235,13 +235,7 @@ public class PropertiesBackingStore implements BackingStore {
             return t;
         };
         ExecutorService singleThread = Executors.newSingleThreadExecutor(daemonise);
-        singleThread.submit(new WatchFile(() -> {
-            try {
-                load();
-            } catch (IOException e) {
-                LOGGER.error("Couldn't complete load of properties {}", configPath, e);
-            }
-        }, configPath));
+        singleThread.submit(new WatchFile(this, configPath));
     }
 
     /**

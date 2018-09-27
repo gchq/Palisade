@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
@@ -31,6 +32,7 @@ import uk.gov.gchq.palisade.service.request.InitialConfig;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -39,22 +41,26 @@ import static java.util.Objects.requireNonNull;
 public class MultiJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
     protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
+    protected static final String CACHE_FILE = new File("example_config.txt").getAbsolutePath();
 
     public static void main(final String[] args) throws Exception {
         new MultiJvmExample().run();
     }
 
     public void run() throws Exception {
-        final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
-        //request the client configuration by not specifiying a service
-        final InitialConfig config = ics.get(new GetConfigRequest()
-                .service(Optional.empty()))
-                .join();
-
-        final ConfiguredServices cs = new ConfiguredServices(config);
-
         createDataPath();
         try {
+            ExampleConfigurator.setupMultiJVMConfigurationService(Paths.get(CACHE_FILE));
+            //request the client configuration by not specifiying a service
+            final InitialConfigurationService ics = new ProxyRestConfigService("http://localhost:8085/config");
+            final InitialConfig config = ics.get(new GetConfigRequest()
+                    .service(Optional.empty()))
+                    .join();
+
+            System.err.println(config);
+
+            final ConfiguredServices cs = new ConfiguredServices(config);
+
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
             LOGGER.info("");
@@ -70,6 +76,7 @@ public class MultiJvmExample {
             bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {
             FileUtils.deleteQuietly(new File(FILE));
+            FileUtils.deleteQuietly(new File(CACHE_FILE));
         }
     }
 

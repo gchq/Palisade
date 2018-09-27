@@ -22,6 +22,8 @@ import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
+import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
 import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
@@ -41,6 +43,7 @@ public class SimpleServices implements ServicesFactory {
     private final UserService userService;
     private final CacheService cacheService;
     private final PalisadeService palisadeService;
+    private final InitialConfigurationService configurationService;
 
     public SimpleServices() {
         this.resourceService = createResourceService();
@@ -49,6 +52,7 @@ public class SimpleServices implements ServicesFactory {
         this.userService = createUserService();
         this.cacheService = createCacheService();
         this.palisadeService = createPalisadeService();
+        this.configurationService = createConfigService();
     }
 
     @Override
@@ -81,6 +85,11 @@ public class SimpleServices implements ServicesFactory {
         return palisadeService;
     }
 
+    @Override
+    public InitialConfigurationService getConfigService() {
+        return configurationService;
+    }
+
     protected CacheService createCacheService() {
         return new SimpleCacheService().backingStore(new HashMapBackingStore());
     }
@@ -103,6 +112,10 @@ public class SimpleServices implements ServicesFactory {
 
     protected UserService createUserService() {
         return new HashMapUserService();
+    }
+
+    private InitialConfigurationService createConfigService() {
+        return new SimpleConfigService(getCacheService());
     }
 
     protected PalisadeService createPalisadeService() {

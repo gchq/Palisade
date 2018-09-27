@@ -26,6 +26,7 @@ import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.impl.PutConfigRequest;
 import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
@@ -117,17 +118,20 @@ public final class ExampleConfigurator {
 
     /**
      * Allows the bootstrapping of some configuration data for the multi-JVM example.
+     * <p>
      *
-     * @return the config. provider
+     * @param backingStorePath the file path for where the properties backing store is
      */
-    public static InitialConfigurationService setupMultiJVMConfigurationService() {
-        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+    public static void setupMultiJVMConfigurationService(final Path backingStorePath) {
+        SimpleConfigService configService = createConfigService(backingStorePath);
+        CacheService cache = configService.getCache();
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
         ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
         UserService user = new ProxyRestUserService("http://localhost:8083/user");
+        InitialConfigurationService config = new ProxyRestConfigService("http://localhost:8085/config");
 
         InitialConfig multiJVMConfig = new InitialConfig()
                 .put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName())
@@ -146,14 +150,13 @@ public final class ExampleConfigurator {
                 .put(CacheService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(cache)))
 
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
-                .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)));
-        //insert this into the cache manually so it can be created later
-        cache.add(new AddCacheRequest<InitialConfig>()
-                .service(InitialConfigurationService.class)
-                .key(SimpleConfigService.ANONYMOUS_CONFIG_KEY)
-                .value(multiJVMConfig))
-                .join();
+                .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)))
 
-        return new SimpleConfigService(cache);
+                .put(InitialConfigurationService.class.getCanonicalName(), config.getClass().getCanonicalName())
+                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(config)));
+        //insert this into the cache manually so it can be created later
+        configService.put((PutConfigRequest) new PutConfigRequest()
+                .config(multiJVMConfig)
+                .service(Optional.empty())).join();
     }
 }
