@@ -92,7 +92,7 @@ public class InitialConfig {
      *
      * @param key the key to lookup
      * @return the value associated with {@code key}
-     * @throws NoSuchElementException if {@ocode key} couldn't be found
+     * @throws NoSuchElementException if {@code key} couldn't be found
      */
     public String get(final String key) throws NoSuchElementException {
         requireNonNull(key, "key");
