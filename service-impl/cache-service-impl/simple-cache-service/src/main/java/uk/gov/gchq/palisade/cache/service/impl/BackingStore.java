@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
 
 /**
  * This class defines the basic operations that any backing store to the cache service must define. This allows for many
@@ -48,6 +49,10 @@ public interface BackingStore {
      * the type represented by the class <code>valueClass</code>. The <code>key</code> must not be empty or
      * <code>null</code>. If a time to live duration is required on this entry, then the optional specified should not
      * be empty. Durations must not be negative.
+     * <p>
+     * It is the responsibility of the backing store to ensure that the <code>valueClass</code> is stored along with the
+     * object byte array. The standard way to do this is to store the canonical name of the class. See {@link
+     * Class#getCanonicalName()}.
      *
      * @param key        the cache key
      * @param valueClass the object type represented in the byte array
@@ -107,6 +112,44 @@ public interface BackingStore {
             throw new IllegalArgumentException("key cannot be empty");
         }
         return key;
+    }
+
+    /**
+     * Check the provided duration. If the <code>duration</code> is  <code>null</code> or negative an exception is
+     * thrown.
+     *
+     * @param duration duration to check
+     * @throws NullPointerException     if <code>duration</code> is <code>null</code>
+     * @throws IllegalArgumentException if the duration is negative
+     */
+    static void durationCheck(final Optional<Duration> duration) {
+        requireNonNull(duration, "timeToLive");
+        duration.ifPresent(x -> {
+            if (x.isNegative()) {
+                throw new IllegalArgumentException("time to live cannot be negative");
+            }
+        });
+    }
+
+    /**
+     * Convenience method to validate the parameters to an <code>add</code> call.
+     *
+     * @param key        the key to add
+     * @param valueClass the type of the value
+     * @param value      the encoded value
+     * @param timeToLive optional time to live
+     * @return the key
+     * @throws NullPointerException     if anything is <code>null</code>
+     * @throws IllegalArgumentException if the duration is negative, or the trimmed key is empty
+     * @see BackingStore#durationCheck(Optional)
+     * @see BackingStore#keyCheck(String)
+     */
+    static String validateAddParameters(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
+        String cacheKey = BackingStore.keyCheck(key);
+        requireNonNull(valueClass, "valueClass");
+        requireNonNull(value, "value");
+        BackingStore.durationCheck(timeToLive);
+        return cacheKey;
     }
 
     @JsonGetter("class")

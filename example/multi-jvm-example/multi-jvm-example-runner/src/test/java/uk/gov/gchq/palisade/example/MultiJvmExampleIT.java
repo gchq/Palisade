@@ -24,6 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.client.SimpleRestServices;
+import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
 import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.policy.service.impl.RestPolicyServiceV1;
@@ -51,6 +52,7 @@ public class MultiJvmExampleIT {
     private static EmbeddedHttpServer resourceServer;
     private static EmbeddedHttpServer userServer;
     private static EmbeddedHttpServer dataServer;
+    private static EmbeddedHttpServer configServer;
 
     @BeforeClass
     public static void beforeClass() throws IOException {
@@ -73,6 +75,10 @@ public class MultiJvmExampleIT {
         System.setProperty(RestDataServiceV1.SERVICE_CONFIG, "dataConfig.json");
         dataServer = new EmbeddedHttpServer("http://localhost:8084/data/v1", new uk.gov.gchq.palisade.data.service.impl.ApplicationConfigV1());
         dataServer.startServer();
+
+        System.setProperty(RestConfigServiceV1.SERVICE_CONFIG, "configserviceConfig.json");
+        configServer = new EmbeddedHttpServer("http://localhost:8085/config/v1", new uk.gov.gchq.palisade.config.service.impl.ApplicationConfigV1());
+        configServer.startServer();
     }
 
     @AfterClass
@@ -91,6 +97,9 @@ public class MultiJvmExampleIT {
         }
         if (null != dataServer) {
             dataServer.stopServer();
+        }
+        if (null != dataServer) {
+            configServer.stopServer();
         }
     }
 

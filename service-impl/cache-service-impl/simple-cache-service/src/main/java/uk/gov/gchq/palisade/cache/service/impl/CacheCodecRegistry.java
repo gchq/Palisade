@@ -15,6 +15,8 @@
  */
 package uk.gov.gchq.palisade.cache.service.impl;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -24,20 +26,22 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Maintains a registry of encoder and decoder function pairs (codecs) for various object types in to byte arrays. This
- * is so that the cache can encode the various values into a backing store. Clients may add extra specialisations if they
- * wish via {@link CacheCodecRegistry#registerFunctionPair(Class, Function, BiFunction)}. JSON serialisation is used as
- * the default codec.
+ * is so that the cache can encode the various values into a backing store. Clients may add extra specialisations if
+ * they wish via {@link CacheCodecRegistry#registerFunctionPair(Class, Function, BiFunction)}. JSON serialisation is
+ * used as the default codec.
  */
 public final class CacheCodecRegistry {
 
     /**
      * Map of encoder functions.
      */
+    @JsonIgnore
     private final Map<Class<?>, Function<?, byte[]>> addMap = new HashMap<>();
 
     /**
      * Map of decoder functions.
      */
+    @JsonIgnore
     private final Map<Class<?>, BiFunction<byte[], ? extends Class<?>, ?>> getMap = new HashMap<>();
 
     /**
