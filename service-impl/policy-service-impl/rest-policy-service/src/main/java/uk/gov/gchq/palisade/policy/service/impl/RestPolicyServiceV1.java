@@ -121,7 +121,7 @@ public class RestPolicyServiceV1 implements PolicyService {
     }
 
     @PUT
-    @Path("async")
+    @Path("/setResourcePolicyAsync")
     @ApiOperation(value = "Sets the resource policy asynchronously",
             response = Boolean.class)
     @ApiResponses(value = {
@@ -141,7 +141,7 @@ public class RestPolicyServiceV1 implements PolicyService {
     }
 
     @PUT
-    @Path("async")
+    @Path("/setTypePolicyAsync")
     @ApiOperation(value = "Sets the resource type policy asynchronously",
             response = Boolean.class)
     @ApiResponses(value = {
