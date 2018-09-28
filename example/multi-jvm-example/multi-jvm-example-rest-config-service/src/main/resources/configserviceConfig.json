@@ -5,7 +5,8 @@
     "@id" : 2,
     "class" : "uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService",
     "backingStore" : {
-      "class" : "uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore"
+      "class" : "uk.gov.gchq.palisade.cache.service.impl.PropertiesBackingStore",
+      "location" : "./example_config.txt"
     },
     "codecs" : { }
   }

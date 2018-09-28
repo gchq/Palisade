@@ -50,14 +50,14 @@ public class MultiJvmExample {
     public void run() throws Exception {
         createDataPath();
         try {
+            //this will write the backing file that the config service in a different process will pick up automatically.
+            //In a true deployment, this would be unnecessary since the config service would already be deployed
             ExampleConfigurator.setupMultiJVMConfigurationService(Paths.get(CACHE_FILE));
             //request the client configuration by not specifiying a service
             final InitialConfigurationService ics = new ProxyRestConfigService("http://localhost:8085/config");
             final InitialConfig config = ics.get(new GetConfigRequest()
                     .service(Optional.empty()))
                     .join();
-
-            System.err.println(config);
 
             final ConfiguredServices cs = new ConfiguredServices(config);
 

@@ -130,7 +130,8 @@ public class MapReduceExample extends Configured implements Tool {
         // ==========================================================
 
         //configure the Palisade input format on an example client
-        final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
+        //TODO: FIX ME
+        final InitialConfigurationService ics = null;
         //request the client configuration by not specifiying a service
         final InitialConfig config = ics.get(new GetConfigRequest()
                 .service(Optional.empty()))
