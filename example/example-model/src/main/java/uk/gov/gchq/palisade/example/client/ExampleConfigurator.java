@@ -73,8 +73,8 @@ public final class ExampleConfigurator {
      * @param backingStorePath the file path for where the properties backing store is
      */
     public static void setupSingleJVMConfigurationService(final Path backingStorePath) {
-        SimpleConfigService configService = createConfigService(backingStorePath);
-        CacheService cache = configService.getCache();
+        SimpleConfigService localConfigService = createConfigService(backingStorePath);
+        CacheService cache = localConfigService.getCache();
         //configure the single JVM settings
         AuditService audit = new LoggerAuditService();
         PolicyService policy = new HierarchicalPolicyService();
@@ -109,9 +109,12 @@ public final class ExampleConfigurator {
                 .put(CacheService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(cache)))
 
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
-                .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)));
+                .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)))
+
+                .put(InitialConfigurationService.class.getCanonicalName(), localConfigService.getClass().getCanonicalName())
+                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(localConfigService)));
         //insert this into the cache manually so it can be created later
-        configService.put((PutConfigRequest) new PutConfigRequest()
+        localConfigService.put((PutConfigRequest) new PutConfigRequest()
                 .config(singleJVMconfig)
                 .service(Optional.empty())).join();
     }
@@ -123,8 +126,8 @@ public final class ExampleConfigurator {
      * @param backingStorePath the file path for where the properties backing store is
      */
     public static void setupMultiJVMConfigurationService(final Path backingStorePath) {
-        SimpleConfigService configService = createConfigService(backingStorePath);
-        CacheService cache = configService.getCache();
+        SimpleConfigService localConfigService = createConfigService(backingStorePath);
+        CacheService cache = localConfigService.getCache();
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
@@ -155,7 +158,7 @@ public final class ExampleConfigurator {
                 .put(InitialConfigurationService.class.getCanonicalName(), config.getClass().getCanonicalName())
                 .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(config)));
         //insert this into the cache manually so it can be created later
-        configService.put((PutConfigRequest) new PutConfigRequest()
+        localConfigService.put((PutConfigRequest) new PutConfigRequest()
                 .config(multiJVMConfig)
                 .service(Optional.empty())).join();
     }
