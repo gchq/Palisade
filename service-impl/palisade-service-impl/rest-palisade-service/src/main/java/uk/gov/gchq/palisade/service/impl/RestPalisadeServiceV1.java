@@ -52,6 +52,8 @@ public class RestPalisadeServiceV1 implements PalisadeService {
 
     private final PalisadeService delegate;
 
+    private static PalisadeService palisadeService;
+
     public RestPalisadeServiceV1() {
         this(System.getProperty(SERVICE_CONFIG));
     }
@@ -64,9 +66,16 @@ public class RestPalisadeServiceV1 implements PalisadeService {
         this.delegate = delegate;
     }
 
-    private static PalisadeService createService(final String serviceConfigPath) {
-        final InputStream stream = StreamUtil.openStream(RestPalisadeServiceV1.class, serviceConfigPath);
-        return JSONSerialiser.deserialise(stream, PalisadeService.class);
+    private static synchronized PalisadeService createService(final String serviceConfigPath) {
+        PalisadeService ret;
+        if (palisadeService == null) {
+            final InputStream stream = StreamUtil.openStream(RestPalisadeServiceV1.class, serviceConfigPath);
+            palisadeService = JSONSerialiser.deserialise(stream, PalisadeService.class);
+            ret = palisadeService;
+        } else {
+            ret = palisadeService;
+        }
+        return ret;
     }
 
     @POST
