@@ -31,19 +31,19 @@ import static java.util.Objects.requireNonNull;
  * That resource may be signifying a file, stream, directory or the system
  * (policy is applied to all requests to the Palisade system).
  */
-public class SetPolicyRequest extends Request {
+public class SetResourcePolicyRequest extends Request {
     private Resource resource;
     private Policy policy;
 
     // no-args constructor
-    public SetPolicyRequest() {
+    public SetResourcePolicyRequest() {
     }
 
     /**
      * @param resource the {@link Resource} to set the {@link Policy} for
-     * @return the {@link SetPolicyRequest}
+     * @return the {@link SetResourcePolicyRequest}
      */
-    public SetPolicyRequest resource(final Resource resource) {
+    public SetResourcePolicyRequest resource(final Resource resource) {
         requireNonNull(resource, "The resource cannot be set to null.");
         this.resource = resource;
         return this;
@@ -51,9 +51,9 @@ public class SetPolicyRequest extends Request {
 
     /**
      * @param policy the {@link Policy} to set for the {@link Resource}
-     * @return the {@link SetPolicyRequest}
+     * @return the {@link SetResourcePolicyRequest}
      */
-    public SetPolicyRequest policy(final Policy policy) {
+    public SetResourcePolicyRequest policy(final Policy policy) {
         requireNonNull(policy, "The policy cannot be set to null.");
         this.policy = policy;
         return this;
@@ -87,7 +87,7 @@ public class SetPolicyRequest extends Request {
             return false;
         }
 
-        final SetPolicyRequest that = (SetPolicyRequest) o;
+        final SetResourcePolicyRequest that = (SetResourcePolicyRequest) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))

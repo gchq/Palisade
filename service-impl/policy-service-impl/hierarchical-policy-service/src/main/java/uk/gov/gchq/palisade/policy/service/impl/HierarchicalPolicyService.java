@@ -27,7 +27,8 @@ import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
-import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -42,6 +43,8 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * By having the policies stored in several key value stores we can attach policies
@@ -76,8 +79,8 @@ public class HierarchicalPolicyService implements PolicyService {
     }
 
     public HierarchicalPolicyService(final Map<String, Policy> dataTypePoliciesMap, final Map<Resource, Policy> resourcePoliciesMap) {
-        Objects.requireNonNull(dataTypePoliciesMap);
-        Objects.requireNonNull(resourcePoliciesMap);
+        requireNonNull(dataTypePoliciesMap);
+        requireNonNull(resourcePoliciesMap);
         this.dataTypePoliciesMap = dataTypePoliciesMap;
         this.resourcePoliciesMap = resourcePoliciesMap;
     }
@@ -168,10 +171,10 @@ public class HierarchicalPolicyService implements PolicyService {
     }
 
     @Override
-    public CompletableFuture<Boolean> setPolicy(final SetPolicyRequest request) {
-        Objects.requireNonNull(request);
-        Objects.requireNonNull(request.getPolicy());
-        Objects.requireNonNull(request.getResource());
+    public CompletableFuture<Boolean> setResourcePolicy(final SetResourcePolicyRequest request) {
+        requireNonNull(request);
+        requireNonNull(request.getPolicy());
+        requireNonNull(request.getResource());
         Resource resource = request.getResource();
         if (resource.getId() == null) {
             if (resource instanceof LeafResource) {
@@ -187,6 +190,16 @@ public class HierarchicalPolicyService implements PolicyService {
             resourcePoliciesMap.put(resource, request.getPolicy());
             LOGGER.debug("Set %s to %s", request.getPolicy(), resource);
         }
+        return CompletableFuture.completedFuture(Boolean.TRUE);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setTypePolicy(final SetTypePolicyRequest request) {
+        requireNonNull(request);
+        requireNonNull(request.getPolicy());
+        final String type = request.getType();
+        dataTypePoliciesMap.put(type, request.getPolicy());
+        LOGGER.debug("Set %s to data type %s", request.getPolicy(), type);
         return CompletableFuture.completedFuture(Boolean.TRUE);
     }
 }

@@ -24,10 +24,15 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+<<<<<<< HEAD
 import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
+=======
+import uk.gov.gchq.palisade.client.SimpleRestServices;
+import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
+>>>>>>> develop
 import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
 import uk.gov.gchq.palisade.example.client.ExampleConfigCreator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
@@ -59,6 +64,7 @@ public class MultiJvmExampleIT {
     private static EmbeddedHttpServer userServer;
     private static EmbeddedHttpServer dataServer;
     private static EmbeddedHttpServer configServer;
+    
     private static InitialConfig config;
 
     @BeforeClass
