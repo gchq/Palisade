@@ -23,7 +23,8 @@ import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
-import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 
 import java.util.concurrent.CompletableFuture;
@@ -54,7 +55,12 @@ public class MockPolicyService implements PolicyService {
     }
 
     @Override
-    public CompletableFuture<Boolean> setPolicy(final SetPolicyRequest request) {
-        return mock.setPolicy(request);
+    public CompletableFuture<Boolean> setResourcePolicy(final SetResourcePolicyRequest request) {
+        return mock.setResourcePolicy(request);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setTypePolicy(final SetTypePolicyRequest request) {
+        return mock.setTypePolicy(request);
     }
 }
