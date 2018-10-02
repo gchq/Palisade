@@ -51,6 +51,8 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
 
     private final InitialConfigurationService delegate;
 
+    private static InitialConfigurationService configService;
+
     public RestConfigServiceV1() {
         this(System.getProperty(SERVICE_CONFIG));
     }
@@ -63,9 +65,16 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
         this.delegate = delegate;
     }
 
-    private static InitialConfigurationService createService(final String serviceConfigPath) {
-        final InputStream stream = StreamUtil.openStream(RestConfigServiceV1.class, serviceConfigPath);
-        return JSONSerialiser.deserialise(stream, InitialConfigurationService.class);
+    private static synchronized InitialConfigurationService createService(final String serviceConfigPath) {
+        InitialConfigurationService ret;
+        if (configService == null) {
+            final InputStream stream = StreamUtil.openStream(RestConfigServiceV1.class, serviceConfigPath);
+            configService = JSONSerialiser.deserialise(stream, InitialConfigurationService.class);
+            ret = configService;
+        } else {
+            ret = configService;
+        }
+        return ret;
     }
 
     @POST
