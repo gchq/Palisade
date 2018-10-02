@@ -31,11 +31,6 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>simple-rest-client</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
             <artifactId>proxy-rest-palisade-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

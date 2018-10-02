@@ -26,7 +26,6 @@ import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.client.SimpleClient;
-import uk.gov.gchq.palisade.client.SimpleServices;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.reader.HdfsDataReader;
 import uk.gov.gchq.palisade.example.ExampleObj;
@@ -60,10 +59,6 @@ import java.util.stream.Stream;
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     private static final String RESOURCE_TYPE = "exampleObj";
     private final String file;
-
-    public ExampleSimpleClient(final String file) {
-        this(new SimpleServices(), file);
-    }
 
     public ExampleSimpleClient(final ServicesFactory services, final String file) {
         super(services, new ExampleObjSerialiser());
