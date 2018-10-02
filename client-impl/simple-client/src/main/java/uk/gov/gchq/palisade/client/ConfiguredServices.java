@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.client;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
@@ -40,7 +41,7 @@ public class ConfiguredServices implements ServicesFactory {
     private final UserService userService;
     private final CacheService cacheService;
     private final PalisadeService palisadeService;
-    private final InitialConfigurationService configService;
+    private final InitialConfigurationService configurationService;
 
     public ConfiguredServices(final InitialConfig config) {
         requireNonNull(config, "config");
@@ -51,7 +52,7 @@ public class ConfiguredServices implements ServicesFactory {
         this.userService = createUserService();
         this.cacheService = createCacheService();
         this.palisadeService = createPalisadeService();
-        this.configService = createConfigService();
+        this.configurationService = createConfigService();
     }
 
     @Override
@@ -86,7 +87,11 @@ public class ConfiguredServices implements ServicesFactory {
 
     @Override
     public InitialConfigurationService getConfigService() {
-        return configService;
+        return configurationService;
+    }
+
+    protected CacheService createCacheService() {
+        return createAndConfigure(CacheService.class);
     }
 
     public ResourceService createResourceService() {
@@ -105,16 +110,12 @@ public class ConfiguredServices implements ServicesFactory {
         return createAndConfigure(UserService.class);
     }
 
-    public CacheService createCacheService() {
-        return createAndConfigure(CacheService.class);
-    }
-
-    public InitialConfigurationService createConfigService() {
-        return createAndConfigure(InitialConfigurationService.class);
-    }
-
     public PalisadeService createPalisadeService() {
         return createAndConfigure(PalisadeService.class);
+    }
+
+    private InitialConfigurationService createConfigService() {
+        return new SimpleConfigService(getCacheService());
     }
 
     protected <S extends Service> S createAndConfigure(final Class<? extends Service> serviceClass) {

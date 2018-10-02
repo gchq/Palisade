@@ -26,7 +26,6 @@ import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.client.SimpleClient;
-import uk.gov.gchq.palisade.client.SimpleServices;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.reader.HdfsDataReader;
 import uk.gov.gchq.palisade.example.ExampleObj;
@@ -36,7 +35,7 @@ import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
 import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
 import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
 import uk.gov.gchq.palisade.policy.service.Policy;
-import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
@@ -60,10 +59,6 @@ import java.util.stream.Stream;
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     private static final String RESOURCE_TYPE = "exampleObj";
     private final String file;
-
-    public ExampleSimpleClient(final String file) {
-        this(new SimpleServices(), file);
-    }
 
     public ExampleSimpleClient(final ServicesFactory services, final String file) {
         super(services, new ExampleObjSerialiser());
@@ -99,8 +94,8 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         // different types of objects.
 
         // Using Custom Rule implementations - without Koryphe
-        final SetPolicyRequest customPolicies =
-                new SetPolicyRequest()
+        final SetResourcePolicyRequest customPolicies =
+                new SetResourcePolicyRequest()
                         .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                         .policy(new Policy<ExampleObj>()
                                 .owner(alice)
@@ -119,7 +114,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                         );
 
         // Using Koryphe's functions/predicates
-        final SetPolicyRequest koryphePolicies = new SetPolicyRequest()
+        final SetResourcePolicyRequest koryphePolicies = new SetResourcePolicyRequest()
                 .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                 .policy(new Policy<ExampleObj>()
                         .owner(alice)
@@ -145,7 +140,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                         )
                 );
 
-        final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setPolicy(
+        final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setResourcePolicy(
                 koryphePolicies
         );
 

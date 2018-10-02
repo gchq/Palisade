@@ -60,7 +60,6 @@ public class MultiJvmExample {
                     .join();
 
             final ConfiguredServices cs = new ConfiguredServices(config);
-
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
             LOGGER.info("");

@@ -105,6 +105,7 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     /**
+<<<<<<< HEAD
      * Allows new configuration data to be added to the cache.
      *
      * @param request the request to put in the cache
@@ -127,6 +128,8 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     /**
+=======
+>>>>>>> develop
      * Creates the anonymous configuration that can be provided to clients. This only needs to contain the details for
      * the minimum necessary to interact with Palisade.
      *

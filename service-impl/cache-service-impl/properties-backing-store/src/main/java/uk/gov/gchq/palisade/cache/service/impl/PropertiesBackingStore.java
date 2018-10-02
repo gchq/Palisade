@@ -118,15 +118,6 @@ public class PropertiesBackingStore implements BackingStore {
     }
 
     /**
-     * The file path to where this backing store is storing the cache.
-     *
-     * @return the file path
-     */
-    public String getLocation() {
-        return location;
-    }
-
-    /**
      * Load the properties to the backing file.
      *
      * @return always returns {@code null}
@@ -238,6 +229,17 @@ public class PropertiesBackingStore implements BackingStore {
         singleThread.submit(new WatchFile(this, configPath));
     }
 
+
+
+    /**
+     * The file path to where this backing store is storing the cache.
+     *
+     * @return the file path
+     */
+    public String getLocation() {
+        return location;
+    }
+
     /**
      * Performs a purge of expired keys and persists the properties to a file.
      *
@@ -273,10 +275,10 @@ public class PropertiesBackingStore implements BackingStore {
      * @return true if any key was removed
      */
     private boolean doKeyExpiry() {
+        AtomicBoolean keyRemoved=new AtomicBoolean(false);
         final LocalDateTime now = LocalDateTime.now();
         //to avoid mid stream modifications we make a list of things to remove
         List<String> toRemove = new ArrayList<>();
-        AtomicBoolean keyRemoved = new AtomicBoolean(false);
         props.keySet().stream()
                 .filter(String.class::isInstance)
                 .map(String.class::cast)
