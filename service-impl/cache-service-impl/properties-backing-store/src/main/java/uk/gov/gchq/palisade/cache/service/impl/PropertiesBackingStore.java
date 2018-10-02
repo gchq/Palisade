@@ -120,7 +120,6 @@ public class PropertiesBackingStore implements BackingStore {
     /**
      * Load the properties to the backing file.
      *
-     * @return always returns {@code null}
      * @throws IOException if anything failed during the load
      */
     private synchronized void load() throws IOException {
@@ -230,7 +229,6 @@ public class PropertiesBackingStore implements BackingStore {
     }
 
 
-
     /**
      * The file path to where this backing store is storing the cache.
      *
@@ -275,7 +273,7 @@ public class PropertiesBackingStore implements BackingStore {
      * @return true if any key was removed
      */
     private boolean doKeyExpiry() {
-        AtomicBoolean keyRemoved=new AtomicBoolean(false);
+        AtomicBoolean keyRemoved = new AtomicBoolean(false);
         final LocalDateTime now = LocalDateTime.now();
         //to avoid mid stream modifications we make a list of things to remove
         List<String> toRemove = new ArrayList<>();
