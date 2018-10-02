@@ -56,6 +56,8 @@ public class RestDataServiceV1 implements DataService {
     public static final String SERVICE_CONFIG = "palisade.rest.data.service.config.path";
     private final DataService delegate;
 
+    private static DataService dataService;
+
     public RestDataServiceV1() {
         this(System.getProperty(SERVICE_CONFIG));
     }
@@ -68,9 +70,16 @@ public class RestDataServiceV1 implements DataService {
         this.delegate = delegate;
     }
 
-    private static DataService createService(final String serviceConfigPath) {
-        final InputStream stream = StreamUtil.openStream(RestDataServiceV1.class, serviceConfigPath);
-        return JSONSerialiser.deserialise(stream, DataService.class);
+    private static synchronized DataService createService(final String serviceConfigPath) {
+        DataService ret;
+        if (dataService == null) {
+            final InputStream stream = StreamUtil.openStream(RestDataServiceV1.class, serviceConfigPath);
+            dataService = JSONSerialiser.deserialise(stream, DataService.class);
+            ret = dataService;
+        } else {
+            ret = dataService;
+        }
+        return ret;
     }
 
     @POST

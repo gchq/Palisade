@@ -51,6 +51,8 @@ public class RestUserServiceV1 implements UserService {
 
     private final UserService delegate;
 
+    private static UserService userService;
+
     public RestUserServiceV1() {
         this(System.getProperty(SERVICE_CONFIG));
     }
@@ -63,9 +65,16 @@ public class RestUserServiceV1 implements UserService {
         this.delegate = delegate;
     }
 
-    private static UserService createService(final String serviceConfigPath) {
-        final InputStream stream = StreamUtil.openStream(RestUserServiceV1.class, serviceConfigPath);
-        return JSONSerialiser.deserialise(stream, UserService.class);
+    private static synchronized UserService createService(final String serviceConfigPath) {
+        UserService ret;
+        if (userService == null) {
+            final InputStream stream = StreamUtil.openStream(RestUserServiceV1.class, serviceConfigPath);
+            userService = JSONSerialiser.deserialise(stream, UserService.class);
+            ret = userService;
+        } else {
+            ret = userService;
+        }
+        return ret;
     }
 
     @POST

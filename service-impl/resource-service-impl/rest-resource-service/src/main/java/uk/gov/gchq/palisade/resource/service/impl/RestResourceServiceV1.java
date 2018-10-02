@@ -58,6 +58,8 @@ public class RestResourceServiceV1 implements ResourceService {
 
     private final ResourceService delegate;
 
+    private static ResourceService resourceService;
+
     public RestResourceServiceV1() {
         this(System.getProperty(SERVICE_CONFIG));
     }
@@ -70,9 +72,16 @@ public class RestResourceServiceV1 implements ResourceService {
         this.delegate = delegate;
     }
 
-    private static ResourceService createService(final String serviceConfigPath) {
-        final InputStream stream = StreamUtil.openStream(RestResourceServiceV1.class, serviceConfigPath);
-        return JSONSerialiser.deserialise(stream, ResourceService.class);
+    private static synchronized ResourceService createService(final String serviceConfigPath) {
+        ResourceService ret;
+        if (resourceService == null) {
+            final InputStream stream = StreamUtil.openStream(RestResourceServiceV1.class, serviceConfigPath);
+            resourceService = JSONSerialiser.deserialise(stream, ResourceService.class);
+            ret = resourceService;
+        } else {
+            ret = resourceService;
+        }
+        return ret;
     }
 
     @POST
