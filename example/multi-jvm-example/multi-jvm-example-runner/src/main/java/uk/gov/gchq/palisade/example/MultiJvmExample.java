@@ -47,8 +47,7 @@ public class MultiJvmExample {
     public void run() throws Exception {
         createDataPath();
         try {
-            //this will write the backing file that the config service in a different process will pick up automatically.
-            //In a true deployment, this would be unnecessary since the config service would already be deployed
+            //this will write an initial configuration
             final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
             //request the client configuration by not specifiying a service
             final InitialConfig config = ics.get(new GetConfigRequest()
