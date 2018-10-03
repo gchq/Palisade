@@ -21,16 +21,23 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.client.ConfiguredServices;
+import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class SingleJvmExample {
     protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleJvmExample.class);
 
     public static void main(final String[] args) throws Exception {
@@ -40,7 +47,13 @@ public class SingleJvmExample {
     public void run() throws Exception {
         createDataPath();
         try {
-            final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
+            final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
+            //request the client configuration by not specifying a service
+            final InitialConfig config = ics.get(new GetConfigRequest()
+                    .service(Optional.empty()))
+                    .join();
+            final ConfiguredServices cs = new ConfiguredServices(config);
+            final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
             LOGGER.info("");
             LOGGER.info("Alice is reading file1...");

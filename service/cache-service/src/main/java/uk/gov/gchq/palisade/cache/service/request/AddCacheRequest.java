@@ -13,65 +13,79 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.gov.gchq.palisade.cache.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import uk.gov.gchq.palisade.RequestId;
-import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.service.request.DataRequestConfig;
-import uk.gov.gchq.palisade.service.request.Request;
+import uk.gov.gchq.palisade.service.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
+import java.util.Objects;
 import java.util.Optional;
 
-import static java.util.Objects.requireNonNull;
-
 /**
- * This class is used to request that a {@link DataRequestConfig} relating to a
- * unique {@link RequestId}, that is set when the client registers there request
- * for data, is added to the cache in the cache service.
+ * This class represents requests for things to be added to the cache.
+ * <p>
+ * All methods in this class throw {@link NullPointerException} if parameters are unset.
+ *
+ * @param <V> the type of object being cached
  */
-public class AddCacheRequest extends Request {
-    private RequestId requestId;
-    private DataRequestConfig dataRequestConfig;
+public class AddCacheRequest<V> extends CacheRequest {
+
     /**
      * An empty optional indicates no time to live specified.
      */
     private Optional<Duration> timeToLive = Optional.empty();
 
+    /**
+     * The object to cache.
+     */
+    private V value;
+
     public AddCacheRequest() {
     }
 
-    public AddCacheRequest requestId(final RequestId requestId) {
-        requireNonNull(requestId, "The request id cannot be set to null.");
-        this.requestId = requestId;
-        return this;
-    }
-
-    public AddCacheRequest dataRequestConfig(final DataRequestConfig dataRequestConfig) {
-        requireNonNull(dataRequestConfig, "The data request config cannot be set to null.");
-        this.dataRequestConfig = dataRequestConfig;
-        return this;
-    }
-
+    /**
+     * Set the time to live for this cache entry in milliseconds. If the cache supports time to live, it will be
+     * automatically expired after this amount of time.
+     *
+     * @param ttlMillis milliseconds for this entry to stay in the cache
+     * @return this object
+     * @throws IllegalArgumentException if <code>ttlMillis</code> is negative
+     */
     public AddCacheRequest timeToLive(final long ttlMillis) {
         this.timeToLive = toDuration(ttlMillis);
         return this;
     }
 
+    /**
+     * Set the time to live for this cache entry. If the cache supports time to live, it will be automatically expired
+     * after this point in time.
+     *
+     * @param expiryPoint the time point after which this entry should expire
+     * @return this object
+     * @throws IllegalArgumentException if the expiry point is before now
+     */
     public AddCacheRequest timeToLive(final Temporal expiryPoint) {
-        requireNonNull(expiryPoint, "The expiry point cannot be set to null.");
+        Objects.requireNonNull(expiryPoint, "expiryPoint");
         this.timeToLive = until(expiryPoint);
         return this;
     }
 
+    /**
+     * Set the time to live for this cache entry. If the cache supports time to live, it will be automatically expired
+     * after this amount of time. An empty {@link Optional} means the time to live is infinite.
+     *
+     * @param timeToLive the duration this should be alive in the cache
+     * @return this object
+     * @throws IllegalArgumentException if a negative duration is specified
+     */
     public AddCacheRequest timeToLive(final Optional<Duration> timeToLive) {
-        requireNonNull(timeToLive, "The time to live cannot be set to null.");
+        Objects.requireNonNull(timeToLive, "timeToLive");
         timeToLive.ifPresent(x -> {
             if (x.isNegative()) {
                 throw new IllegalArgumentException("negative time to live specified!");
@@ -81,52 +95,120 @@ public class AddCacheRequest extends Request {
         return this;
     }
 
-    public RequestId getRequestId() {
-        requireNonNull(requestId, "The request id has not been set.");
-        return requestId;
-    }
-
-    public DataRequestConfig getDataRequestConfig() {
-        requireNonNull(dataRequestConfig, "The data request config has not been set.");
-        return dataRequestConfig;
-    }
-
+    /**
+     * Get the length of time this entry should be alive in the cache.
+     *
+     * @return the time to live
+     */
     public Optional<Duration> getTimeToLive() {
-        // this will never be null
+        // can never be null
         return timeToLive;
     }
 
-    public void setRequestId(final RequestId requestId) {
-        requestId(requestId);
-    }
-
-    public void setDataRequestConfig(final DataRequestConfig dataRequestConfig) {
-        dataRequestConfig(dataRequestConfig);
+    /**
+     * Set the value to be cached.
+     *
+     * @param value object to be cached
+     * @return this object
+     */
+    public AddCacheRequest value(final V value) {
+        Objects.requireNonNull(value, "value");
+        this.value = value;
+        return this;
     }
 
     /**
-     * Sets the time to live for this cache entry. If the given ${@code Optional} is empty, then no time to live is
-     * assumed.
+     * Set value to be cached.
      *
-     * @param timeToLive the TTL for this cache entry
-     * @throws IllegalArgumentException if the duration is negative
+     * @param value object to be cached
+     */
+    public void setValue(final V value) {
+        value(value);
+    }
+
+    /**
+     * Get the cached object.
+     *
+     * @return the object
+     */
+    public V getValue() {
+        Objects.requireNonNull(value, "value cannot be null");
+        return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AddCacheRequest key(final String key) {
+        super.key(key);
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AddCacheRequest service(final Class<? extends Service> service) {
+        super.service(service);
+        return this;
+    }
+
+    /**
+     * Set the time to live for this cache entry. If the cache supports time to live, it will be automatically expired
+     * after this amount of time. An empty {@link Optional} means the time to live is infinite.
+     *
+     * @param timeToLive the duration this should be alive in the cache
+     * @throws IllegalArgumentException if a negative duration is specified
      */
     public void setTimeToLive(final Optional<Duration> timeToLive) {
         timeToLive(timeToLive);
     }
 
+    /**
+     * Set the time to live for this cache entry in milliseconds. If the cache supports time to live, it will be
+     * automatically expired after this amount of time.
+     *
+     * @param ttlMillis milliseconds for this entry to stay in the cache
+     * @throws IllegalArgumentException if <code>ttlMillis</code> is negative
+     */
     public void setTimeToLive(final long ttlMillis) {
         timeToLive(ttlMillis);
     }
 
+    /**
+     * Set the time to live for this cache entry. If the cache supports time to live, it will be automatically expired
+     * after this point in time.
+     *
+     * @param expiryPoint the time point after which this entry should expire
+     * @throws IllegalArgumentException if the expiry point is before now
+     */
     public void setTimeToLive(final Temporal expiryPoint) {
-       timeToLive(expiryPoint);
+        timeToLive(expiryPoint);
     }
 
-    public void cancelTimeToLive() {
-        this.timeToLive = Optional.empty();
+    /**
+     * Converts a {@link Temporal} point to a {@link Duration}.
+     *
+     * @param pointInTime the point in time
+     * @return the duration from now
+     * @throws IllegalArgumentException if the resulting duration is negative
+     */
+    private static Optional<Duration> until(final Temporal pointInTime) {
+        Duration ttl = Duration.between(LocalDateTime.now(), pointInTime);
+        if (ttl.isNegative()) {
+            throw new IllegalArgumentException("negative time to live specified!");
+        }
+        return Optional.of(ttl);
     }
 
+    /**
+     * Converts the given milliseconds into a {@link Duration}.
+     *
+     * @param ttlMillis the milliseconds to convert
+     * @return a {@link Duration}
+     * @throws IllegalArgumentException if <code>ttlMillis</code> is negative
+     */
     private static Optional<Duration> toDuration(final long ttlMillis) {
         if (ttlMillis < 0) {
             throw new IllegalArgumentException("negative time to live specified!");
@@ -134,9 +216,20 @@ public class AddCacheRequest extends Request {
         return Optional.of(Duration.ofMillis(ttlMillis));
     }
 
-    private static Optional<Duration> until(final Temporal pointInTime) {
-        Duration ttl = Duration.between(LocalDateTime.now(), pointInTime);
-        return Optional.of(ttl);
+    /**
+     * Cancels any time to live set on this cache request.
+     */
+    public void cancelTimeToLive() {
+        this.timeToLive = Optional.empty();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("timeToLive", timeToLive)
+                .append("value", value)
+                .toString();
     }
 
     @Override
@@ -149,33 +242,21 @@ public class AddCacheRequest extends Request {
             return false;
         }
 
-        final AddCacheRequest that = (AddCacheRequest) o;
+        AddCacheRequest that = (AddCacheRequest) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(requestId, that.requestId)
-                .append(dataRequestConfig, that.dataRequestConfig)
                 .append(timeToLive, that.timeToLive)
+                .append(value, that.value)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(23, 37)
+        return new HashCodeBuilder(11, 47)
                 .appendSuper(super.hashCode())
-                .append(requestId)
-                .append(dataRequestConfig)
                 .append(timeToLive)
+                .append(value)
                 .toHashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .appendSuper(super.toString())
-                .append("requestId", requestId)
-                .append("dataRequestConfig", dataRequestConfig)
-                .append("TTL", timeToLive)
-                .toString();
     }
 }

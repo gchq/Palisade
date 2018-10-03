@@ -22,9 +22,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.concurrent.CompletableFuture;
@@ -33,6 +33,9 @@ import java.util.concurrent.CompletableFuture;
  * This class defines the top level services API.
  * <p>
  * The only requirement is that there is a process method, used to process all requests that are passed to a service.
+ * <p>
+ * The {@link Service#configure(InitialConfig)} method should implemented so that the class can be configured with an
+ * initial configuration.
  */
 @JsonPropertyOrder(value = {"class"}, alphabetic = true)
 @JsonTypeInfo(
@@ -44,6 +47,10 @@ import java.util.concurrent.CompletableFuture;
 public interface Service {
     default CompletableFuture<?> process(final Request request) {
         throw new IllegalArgumentException("Request type was not recognised: " + request.getClass().getName());
+    }
+
+    default void configure(final InitialConfig config) {
+        //does nothing by default
     }
 
     @JsonGetter("class")

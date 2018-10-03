@@ -161,13 +161,14 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     private void cache(final RegisterDataRequest request, final User user, final RequestId requestId, final MultiPolicy multiPolicy) {
-        final AddCacheRequest cacheRequest = new AddCacheRequest()
-                .requestId(requestId)
-                .dataRequestConfig(new DataRequestConfig()
+        final AddCacheRequest<DataRequestConfig> cacheRequest = new AddCacheRequest<>()
+                .key(requestId.getId())
+                .value(new DataRequestConfig()
                                 .user(user)
                                 .context(request.getContext())
                                 .rules(multiPolicy.getRuleMap())
-                );
+                )
+                .service(this.getClass());
         LOGGER.debug("Caching: {}", cacheRequest);
         final Boolean success = cacheService.add(cacheRequest).join();
         if (null == success || !success) {
@@ -181,17 +182,21 @@ public class SimplePalisadeService implements PalisadeService {
         requireNonNull(request.getRequestId());
         // TODO: need to validate that the user is actually requesting the correct info.
         // extract resources from request and check they are a subset of the original RegisterDataRequest resources
-        final GetCacheRequest cacheRequest = new GetCacheRequest().requestId(request.getRequestId());
+        final GetCacheRequest<DataRequestConfig> cacheRequest = new GetCacheRequest<>().key(request.getRequestId().getId()).service(this.getClass());
         LOGGER.debug("Getting cached data: {}", cacheRequest);
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {
-                    if (null == cache
-                            || null == cache.getUser()) {
-                        throw new RuntimeException("User's request was not in the cache: " + request.getRequestId().getId());
+                    DataRequestConfig value = cache.orElseThrow(() -> createCacheException(request.getRequestId().getId()));
+                    if (null == value.getUser()) {
+                        throw createCacheException(request.getRequestId().getId());
                     }
-                    LOGGER.debug("Got cache: {}", cache);
-                    return cache;
+                    LOGGER.debug("Got cache: {}", value);
+                    return value;
                 });
+    }
+
+    private RuntimeException createCacheException(final String id) {
+        return new RuntimeException("User's request was not in the cache: " + id);
     }
 
     public AuditService getAuditService() {

@@ -28,7 +28,7 @@ import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
-import uk.gov.gchq.palisade.policy.service.request.SetPolicyRequest;
+import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -123,15 +123,15 @@ public class RestPolicyServiceV1IT {
         final PolicyService policyService = Mockito.mock(PolicyService.class);
         MockPolicyService.setMock(policyService);
 
-        final SetPolicyRequest request = new SetPolicyRequest().resource(fileResource1).policy(new Policy<>().owner(user));
+        final SetResourcePolicyRequest request = new SetResourcePolicyRequest().resource(fileResource1).policy(new Policy<>().owner(user));
 
-        given(policyService.setPolicy(request)).willReturn(CompletableFuture.completedFuture(true));
+        given(policyService.setResourcePolicy(request)).willReturn(CompletableFuture.completedFuture(true));
 
         // When
-        final Boolean result = proxy.setPolicy(request).join();
+        final Boolean result = proxy.setResourcePolicy(request).join();
 
         // Then
         assertTrue(result);
-        verify(policyService).setPolicy(request);
+        verify(policyService).setResourcePolicy(request);
     }
 }
