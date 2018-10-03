@@ -51,7 +51,7 @@ public class SingleJvmExample {
         try {
             ExampleConfigurator.setupSingleJVMConfigurationService(Paths.get(CACHE_FILE));
             final InitialConfigurationService ics = ExampleConfigurator.createConfigService(Paths.get(CACHE_FILE));
-            //request the client configuration by not specifiying a service
+            //request the client configuration by not specifying a service
             final InitialConfig config = ics.get(new GetConfigRequest()
                     .service(Optional.empty()))
                     .join();

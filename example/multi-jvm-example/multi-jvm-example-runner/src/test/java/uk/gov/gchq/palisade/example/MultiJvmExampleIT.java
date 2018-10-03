@@ -30,6 +30,7 @@ import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.policy.service.impl.RestPolicyServiceV1;
 import uk.gov.gchq.palisade.resource.service.impl.RestResourceServiceV1;
@@ -40,6 +41,8 @@ import uk.gov.gchq.palisade.user.service.impl.RestUserServiceV1;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletionException;
@@ -49,10 +52,9 @@ import java.util.stream.Stream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static uk.gov.gchq.palisade.example.MultiJvmExample.CACHE_FILE;
 import static uk.gov.gchq.palisade.example.MultiJvmExample.FILE;
 
-//TODO remove
-@Ignore
 public class MultiJvmExampleIT {
 
     private static EmbeddedHttpServer palisadeServer;
@@ -66,10 +68,9 @@ public class MultiJvmExampleIT {
 
     @BeforeClass
     public static void createConfig() {
-        //TODO fix
-        final InitialConfigurationService ics = null;
-//        final InitialConfigurationService ics = ExampleConfigCreator.setupMultiJVMConfigurationService();
-        //request the client configuration by not specifiying a service
+        ExampleConfigurator.setupMultiJVMConfigurationService(Paths.get(CACHE_FILE));
+        final InitialConfigurationService ics = ExampleConfigurator.createConfigService(Paths.get(CACHE_FILE));
+        //request the client configuration by not specifying a service
         config = ics.get(new GetConfigRequest()
                 .service(Optional.empty()))
                 .join();

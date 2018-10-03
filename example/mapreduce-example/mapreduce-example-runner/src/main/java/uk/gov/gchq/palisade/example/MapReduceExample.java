@@ -91,7 +91,8 @@ public class MapReduceExample extends Configured implements Tool {
     private static class ExampleReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
         private IntWritable result = new IntWritable();
 
-        public void reduce(final Text key, final Iterable<IntWritable> values, final Context context) throws IOException, InterruptedException {
+        public void reduce(final Text key, final Iterable<IntWritable> values, final Context context)
+                throws IOException, InterruptedException {
             int sum = 0;
             for (IntWritable val : values) {
                 sum += val.get();
@@ -128,18 +129,19 @@ public class MapReduceExample extends Configured implements Tool {
         job.setOutputFormatClass(TextOutputFormat.class);
         FileOutputFormat.setOutputPath(job, new Path(args[0]));
 
+        //configure the Palisade input format on an example client
+        ExampleConfigurator.setupSingleJVMConfigurationService(Paths.get(CACHE_FILE));
+        final InitialConfigurationService ics = ExampleConfigurator.createConfigService(Paths.get(CACHE_FILE));
+        //request the client configuration by not specifiying a service
+        final InitialConfig config = ics.get(new GetConfigRequest()
+                .service(Optional.empty()))
+                .join();
+        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
         try {
-            //configure the Palisade input format on an example client
-            ExampleConfigurator.setupSingleJVMConfigurationService(Paths.get(CACHE_FILE));
-            final InitialConfigurationService ics = ExampleConfigurator.createConfigService(Paths.get(CACHE_FILE));
-            //request the client configuration by not specifiying a service
-            final InitialConfig config = ics.get(new GetConfigRequest()
-                    .service(Optional.empty()))
-                    .join();
-            final ConfiguredServices cs = new ConfiguredServices(config);
-            final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
             configureJob(job, cs, 2);
 
             //next add a resource request to the job

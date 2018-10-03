@@ -27,31 +27,31 @@ import org.junit.Test;
 import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.gov.gchq.palisade.example.SingleJvmExample.CACHE_FILE;
 import static uk.gov.gchq.palisade.example.SingleJvmExample.FILE;
 import static uk.gov.gchq.palisade.example.SingleJvmExample.createDataPath;
 import static uk.gov.gchq.palisade.util.JsonAssert.assertEquals;
 
-//TODO: remove
-@Ignore
 public class SingleJvmExampleIT {
 
     private static InitialConfig config;
 
     @BeforeClass
     public static void createConfig() {
-        //TODO: fix
-        // final InitialConfigurationService ics = ExampleConfigCreator.setupSingleJVMConfigurationService();
-        //request the client configuration by not specifiying a service
-        final InitialConfigurationService ics = null;
+        ExampleConfigurator.setupSingleJVMConfigurationService(Paths.get(CACHE_FILE));
+        final InitialConfigurationService ics = ExampleConfigurator.createConfigService(Paths.get(CACHE_FILE));
+        //request the client configuration by not specifying a service
         config = ics.get(new GetConfigRequest()
                 .service(Optional.empty()))
                 .join();
@@ -59,6 +59,7 @@ public class SingleJvmExampleIT {
 
     @AfterClass
     public static void deleteFile() {
+        FileUtils.deleteQuietly(new File(CACHE_FILE));
         FileUtils.deleteQuietly(new File(FILE));
     }
 
