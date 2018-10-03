@@ -28,6 +28,7 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.MockConfigurationService;
 import uk.gov.gchq.palisade.config.service.exception.NoConfigException;
+import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.PalisadeWrappedErrorRuntimeException;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -127,5 +128,25 @@ public class RestConfigServiceV1IT {
         // Then
         assertEquals(expected, result);
         verify(configService).get(request);
+    }
+
+    @Test
+    public void shouldAddConfig() throws IOException {
+        // Given
+        final InitialConfigurationService configService = Mockito.mock(InitialConfigurationService.class);
+        MockConfigurationService.setMock(configService);
+
+        InitialConfig expected = new InitialConfig();
+
+        final AddConfigRequest request = (AddConfigRequest) new AddConfigRequest().config(expected).service(Optional.empty());
+
+        given(configService.add(request)).willReturn(CompletableFuture.completedFuture(Boolean.TRUE));
+
+        // When
+        final Boolean result = proxy.add(request).join();
+
+        // Then
+        assertEquals(Boolean.TRUE, result);
+        verify(configService).add(request);
     }
 }
