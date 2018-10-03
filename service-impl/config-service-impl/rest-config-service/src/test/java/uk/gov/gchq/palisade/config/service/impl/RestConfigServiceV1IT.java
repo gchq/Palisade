@@ -59,7 +59,7 @@ public class RestConfigServiceV1IT {
     @BeforeClass
     public static void beforeClass() throws IOException {
         System.setProperty(RestConfigServiceV1.SERVICE_CONFIG, "mockConfig.json");
-        proxy = new ProxyRestConfigService("http://localhost:8080/palisade");
+        proxy = new ProxyRestConfigService("http://localhost:8085/config");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }

@@ -20,12 +20,13 @@ import org.apache.hadoop.conf.Configuration;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.cache.service.impl.PropertiesBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
+import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
@@ -48,7 +49,6 @@ import java.util.Optional;
 /**
  * Convenience class for the examples to configure the config creation service.
  */
-
 public final class ExampleConfigurator {
     private ExampleConfigurator() {
     }
@@ -60,18 +60,20 @@ public final class ExampleConfigurator {
      * @return the config service
      */
     public static SimpleConfigService createConfigService(final Path backingStorePath) {
-        CacheService cache = new SimpleCacheService().backingStore(new PropertiesBackingStore(backingStorePath.toString()));
+        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore());
         return new SimpleConfigService(cache);
     }
 
     /**
      * Allows the creation of some configuration data for the single JVM example.
      *
-     * @param backingStorePath the file path for where the properties backing store is
+     * @return the configuration service that provides the entry to Palisade
      */
-    public static void setupSingleJVMConfigurationService(final Path backingStorePath) {
-        SimpleConfigService localConfigService = createConfigService(backingStorePath);
-        CacheService cache = localConfigService.getCache();
+    public static InitialConfigurationService setupSingleJVMConfigurationService() {
+        InitialConfigurationService configService = new SimpleConfigService(
+                new SimpleCacheService()
+                        .backingStore(new HashMapBackingStore(true))
+        );
         //configure the single JVM settings
         AuditService audit = new LoggerAuditService();
         PolicyService policy = new HierarchicalPolicyService();
@@ -81,6 +83,7 @@ public final class ExampleConfigurator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
         UserService user = new HashMapUserService();
         PalisadeService palisade = new SimplePalisadeService()
                 .resourceService(resource)
@@ -108,30 +111,30 @@ public final class ExampleConfigurator {
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
                 .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)))
 
-                .put(InitialConfigurationService.class.getCanonicalName(), localConfigService.getClass().getCanonicalName())
-                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(localConfigService)));
+                .put(InitialConfigurationService.class.getCanonicalName(), configService.getClass().getCanonicalName())
+                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise
+                        (configService)));
         //insert this into the cache manually so it can be created later
-        localConfigService.put((PutConfigRequest) new PutConfigRequest()
+        configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(singleJVMconfig)
                 .service(Optional.empty())).join();
+        return configService;
     }
 
     /**
      * Allows the bootstrapping of some configuration data for the multi-JVM example.
-     * <p>
      *
-     * @param backingStorePath the file path for where the properties backing store is
+     * @return the configuration service to provide the Palisade entry point
      */
-    public static void setupMultiJVMConfigurationService(final Path backingStorePath) {
-        SimpleConfigService localConfigService = createConfigService(backingStorePath);
-        CacheService cache = localConfigService.getCache();
+    public static InitialConfigurationService setupMultiJVMConfigurationService() {
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
+        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
         ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
         UserService user = new ProxyRestUserService("http://localhost:8083/user");
-        InitialConfigurationService config = new ProxyRestConfigService("http://localhost:8085/config");
+        ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
 
         InitialConfig multiJVMConfig = new InitialConfig()
                 .put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName())
@@ -152,11 +155,12 @@ public final class ExampleConfigurator {
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
                 .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)))
 
-                .put(InitialConfigurationService.class.getCanonicalName(), config.getClass().getCanonicalName())
-                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(config)));
+                .put(InitialConfigurationService.class.getCanonicalName(), configService.getClass().getCanonicalName())
+                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(configService)));
         //insert this into the cache manually so it can be created later
-        localConfigService.put((PutConfigRequest) new PutConfigRequest()
+        configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(multiJVMConfig)
                 .service(Optional.empty())).join();
+        return configService;
     }
 }

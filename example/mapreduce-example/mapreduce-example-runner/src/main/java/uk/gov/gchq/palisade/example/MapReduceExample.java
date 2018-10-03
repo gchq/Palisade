@@ -51,7 +51,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -66,7 +65,6 @@ public class MapReduceExample extends Configured implements Tool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
 
     protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
-    protected static final String CACHE_FILE = new File("example_config.txt").getAbsolutePath();
     protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
     private static final String RESOURCE_TYPE = "exampleObj";
 
@@ -130,8 +128,7 @@ public class MapReduceExample extends Configured implements Tool {
         FileOutputFormat.setOutputPath(job, new Path(args[0]));
 
         //configure the Palisade input format on an example client
-        ExampleConfigurator.setupSingleJVMConfigurationService(Paths.get(CACHE_FILE));
-        final InitialConfigurationService ics = ExampleConfigurator.createConfigService(Paths.get(CACHE_FILE));
+        final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
         //request the client configuration by not specifiying a service
         final InitialConfig config = ics.get(new GetConfigRequest()
                 .service(Optional.empty()))
@@ -154,7 +151,6 @@ public class MapReduceExample extends Configured implements Tool {
             return (success) ? 0 : 1;
         } finally {
             FileUtils.deleteQuietly(new File(FILE));
-            FileUtils.deleteQuietly(new File(CACHE_FILE));
         }
     }
 

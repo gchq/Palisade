@@ -43,7 +43,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>properties-backing-store</artifactId>
+            <artifactId>hashmap-backing-store</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

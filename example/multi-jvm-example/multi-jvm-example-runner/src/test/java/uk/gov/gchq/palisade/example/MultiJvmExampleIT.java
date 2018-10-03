@@ -22,7 +22,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
@@ -41,8 +40,6 @@ import uk.gov.gchq.palisade.user.service.impl.RestUserServiceV1;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletionException;
@@ -52,7 +49,6 @@ import java.util.stream.Stream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static uk.gov.gchq.palisade.example.MultiJvmExample.CACHE_FILE;
 import static uk.gov.gchq.palisade.example.MultiJvmExample.FILE;
 
 public class MultiJvmExampleIT {
@@ -65,16 +61,6 @@ public class MultiJvmExampleIT {
     private static EmbeddedHttpServer configServer;
 
     private static InitialConfig config;
-
-    @BeforeClass
-    public static void createConfig() {
-        ExampleConfigurator.setupMultiJVMConfigurationService(Paths.get(CACHE_FILE));
-        final InitialConfigurationService ics = ExampleConfigurator.createConfigService(Paths.get(CACHE_FILE));
-        //request the client configuration by not specifying a service
-        config = ics.get(new GetConfigRequest()
-                .service(Optional.empty()))
-                .join();
-    }
 
     @BeforeClass
     public static void beforeClass() throws IOException {
@@ -101,6 +87,12 @@ public class MultiJvmExampleIT {
         System.setProperty(RestConfigServiceV1.SERVICE_CONFIG, "configserviceConfig.json");
         configServer = new EmbeddedHttpServer("http://localhost:8085/config/v1", new uk.gov.gchq.palisade.config.service.impl.ApplicationConfigV1());
         configServer.startServer();
+
+        final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
+        //request the client configuration by not specifying a service
+        config = ics.get(new GetConfigRequest()
+                .service(Optional.empty()))
+                .join();
     }
 
     @AfterClass

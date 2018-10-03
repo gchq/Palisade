@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.client.ConfiguredServices;
@@ -32,13 +31,11 @@ import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.gov.gchq.palisade.example.SingleJvmExample.CACHE_FILE;
 import static uk.gov.gchq.palisade.example.SingleJvmExample.FILE;
 import static uk.gov.gchq.palisade.example.SingleJvmExample.createDataPath;
 import static uk.gov.gchq.palisade.util.JsonAssert.assertEquals;
@@ -49,8 +46,7 @@ public class SingleJvmExampleIT {
 
     @BeforeClass
     public static void createConfig() {
-        ExampleConfigurator.setupSingleJVMConfigurationService(Paths.get(CACHE_FILE));
-        final InitialConfigurationService ics = ExampleConfigurator.createConfigService(Paths.get(CACHE_FILE));
+        final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
         //request the client configuration by not specifying a service
         config = ics.get(new GetConfigRequest()
                 .service(Optional.empty()))
@@ -59,7 +55,6 @@ public class SingleJvmExampleIT {
 
     @AfterClass
     public static void deleteFile() {
-        FileUtils.deleteQuietly(new File(CACHE_FILE));
         FileUtils.deleteQuietly(new File(FILE));
     }
 
