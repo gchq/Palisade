@@ -112,8 +112,7 @@ public final class ExampleConfigurator {
                 .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)))
 
                 .put(InitialConfigurationService.class.getCanonicalName(), configService.getClass().getCanonicalName())
-                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise
-                        (configService)));
+                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(configService)));
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(singleJVMconfig)
