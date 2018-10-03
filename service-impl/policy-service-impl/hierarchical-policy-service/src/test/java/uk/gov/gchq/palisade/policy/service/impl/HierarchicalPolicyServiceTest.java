@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
@@ -14,7 +16,6 @@ import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
@@ -41,6 +42,7 @@ import static org.junit.Assert.assertTrue;
 public class HierarchicalPolicyServiceTest {
 
     private HierarchicalPolicyService policyService;
+    private static final SimpleCacheService cacheService = new SimpleCacheService().backingStore(new HashMapBackingStore());
     private static final User testUser = new User().userId("testUser");
     private final SystemResource systemResource = createTestSystemResource();
     private final DirectoryResource directoryResource = createTestDirectoryResource();
@@ -49,7 +51,8 @@ public class HierarchicalPolicyServiceTest {
 
     @Before
     public void setup() {
-        policyService = new HierarchicalPolicyService();
+//        cacheService.getCodecs().registerFunctionPair(Policy.class, );
+        policyService = new HierarchicalPolicyService().cacheService(cacheService);
 
         policyService.setResourcePolicy(new SetResourcePolicyRequest()
                         .resource(fileResource1)
@@ -113,7 +116,7 @@ public class HierarchicalPolicyServiceTest {
     @Test
     public void getApplicableResourceLevelRules() {
         // try
-        Rules<Resource> result = policyService.getApplicableRules(fileResource1, true, fileResource1.getType());
+        Rules result = policyService.getApplicableRules(fileResource1, true, fileResource1.getType()).join();
         // check
         assertEquals("Resource serialised format is txt, Input is not null", result.getMessage());
         assertEquals(2, result.getRules().keySet().size());
@@ -122,7 +125,7 @@ public class HierarchicalPolicyServiceTest {
     @Test
     public void getApplicableRecordLevelRules() {
         // try
-        Rules<Resource> result = policyService.getApplicableRules(fileResource1, false, fileResource1.getType());
+        Rules result = policyService.getApplicableRules(fileResource1, false, fileResource1.getType()).join();
         // check
         assertEquals("Does nothing, Check user has 'Sensitive' auth", result.getMessage());
         assertEquals(2, result.getRules().keySet().size());
