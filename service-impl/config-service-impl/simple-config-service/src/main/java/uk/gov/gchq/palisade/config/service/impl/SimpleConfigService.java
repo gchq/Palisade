@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.exception.NoConfigException;
+import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -105,13 +106,12 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     /**
-<<<<<<< HEAD
      * Allows new configuration data to be added to the cache.
      *
      * @param request the request to put in the cache
      * @return a boolean that becomes {@code true} when the request is added to cache
      */
-    public CompletableFuture<Boolean> put(final PutConfigRequest request) {
+    public CompletableFuture<Boolean> add(final AddConfigRequest request) {
         requireNonNull(request, "request");
         final Optional<Class<? extends Service>> clazz = request.getService();
         final AddCacheRequest<InitialConfig> addRequest = new AddCacheRequest<>()
@@ -128,8 +128,6 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     /**
-=======
->>>>>>> develop
      * Creates the anonymous configuration that can be provided to clients. This only needs to contain the details for
      * the minimum necessary to interact with Palisade.
      *

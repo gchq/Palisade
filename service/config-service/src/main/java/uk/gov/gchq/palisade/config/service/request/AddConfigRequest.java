@@ -13,50 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.config.service.impl;
+package uk.gov.gchq.palisade.config.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Request to place some configuration data into a {@link uk.gov.gchq.palisade.config.service.InitialConfigurationService}.
+ * A request class that is used by system internal services to add configurations for clients/services into Palisades.
+ * This should NOT be used by clients.
+ * <p>
+ * This class has an {@link java.util.Optional} service field that is used to specify which {@link
+ * uk.gov.gchq.palisade.service.Service} to request the configuration for. If this is left empty, then the Palisade
+ * client configuration is set, i.e. the "anonymous" configuration. Note that there may be additional
+ * authentication/authorisation constraints placed upon requestees. This means that for example, a client may not be
+ * able to set configuration details for a particular service.
  */
-public class PutConfigRequest extends GetConfigRequest {
-    /**
-     * The configuration being added.
-     */
+public class AddConfigRequest extends GetConfigRequest {
+
     private InitialConfig config;
 
     /**
-     * Gets the configuration in this request.
+     * Create an empty request.
+     */
+    public AddConfigRequest() {
+    }
+
+    /**
+     * The current configuration is returned.
      *
      * @return the configuration
      */
     public InitialConfig getConfig() {
-        requireNonNull(config, "config must be set");
+        requireNonNull(config, "config cannot be left null");
         return config;
     }
 
     /**
-     * Set the configuration.
+     * Set the configuration to be added to the service.
      *
      * @param config the configuration
      * @return this object
      */
-    public PutConfigRequest config(final InitialConfig config) {
+    public AddConfigRequest config(final InitialConfig config) {
         requireNonNull(config, "config");
         this.config = config;
         return this;
     }
 
     /**
-     * Set the configuration.
+     * Set the configuration to be added to the service.
      *
      * @param config the configuration
      */
@@ -82,7 +92,7 @@ public class PutConfigRequest extends GetConfigRequest {
             return false;
         }
 
-        PutConfigRequest that = (PutConfigRequest) o;
+        AddConfigRequest that = (AddConfigRequest) o;
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
@@ -92,7 +102,7 @@ public class PutConfigRequest extends GetConfigRequest {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
+        return new HashCodeBuilder(7, 23)
                 .appendSuper(super.hashCode())
                 .append(getConfig())
                 .toHashCode();
