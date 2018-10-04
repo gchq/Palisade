@@ -49,6 +49,14 @@ public interface Service {
         throw new IllegalArgumentException("Request type was not recognised: " + request.getClass().getName());
     }
 
+    /**
+     * Gives the initial configuration to a service to allow it to configure itself. This method is called by the
+     * internal system to configure a service.
+     * <p>
+     * Subclasses should override this implementation which does nothing.
+     *
+     * @param config the configuration
+     */
     default void configure(final InitialConfig config) {
         //does nothing by default
     }
