@@ -26,7 +26,7 @@ import org.junit.Test;
 import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
-import uk.gov.gchq.palisade.example.client.ExampleConfigCreator;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
@@ -46,8 +46,8 @@ public class SingleJvmExampleIT {
 
     @BeforeClass
     public static void createConfig() {
-        final InitialConfigurationService ics = ExampleConfigCreator.setupSingleJVMConfigurationService();
-        //request the client configuration by not specifiying a service
+        final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
+        //request the client configuration by not specifying a service
         config = ics.get(new GetConfigRequest()
                 .service(Optional.empty()))
                 .join();

@@ -56,6 +56,16 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
+            <artifactId>simple-cache-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>hashmap-backing-store</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>proxy-rest-policy-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
@@ -72,6 +82,11 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>proxy-rest-palisade-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>proxy-rest-config-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

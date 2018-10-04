@@ -39,7 +39,7 @@ import uk.gov.gchq.palisade.client.ConfiguredServices;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
-import uk.gov.gchq.palisade.example.client.ExampleConfigCreator;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
@@ -89,7 +89,8 @@ public class MapReduceExample extends Configured implements Tool {
     private static class ExampleReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
         private IntWritable result = new IntWritable();
 
-        public void reduce(final Text key, final Iterable<IntWritable> values, final Context context) throws IOException, InterruptedException {
+        public void reduce(final Text key, final Iterable<IntWritable> values, final Context context)
+                throws IOException, InterruptedException {
             int sum = 0;
             for (IntWritable val : values) {
                 sum += val.get();
@@ -126,31 +127,31 @@ public class MapReduceExample extends Configured implements Tool {
         job.setOutputFormatClass(TextOutputFormat.class);
         FileOutputFormat.setOutputPath(job, new Path(args[0]));
 
-        // Edit the configuration of the Palisade requests below here
-        // ==========================================================
-
         //configure the Palisade input format on an example client
-        final InitialConfigurationService ics = ExampleConfigCreator.setupSingleJVMConfigurationService();
+        final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
         //request the client configuration by not specifiying a service
         final InitialConfig config = ics.get(new GetConfigRequest()
                 .service(Optional.empty()))
                 .join();
-
         final ConfiguredServices cs = new ConfiguredServices(config);
-        //the example client will configure the various services
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
-        configureJob(job, cs, 2);
 
-        //next add a resource request to the job
-        addDataRequest(job, FILE, RESOURCE_TYPE, "Alice", "Payroll");
-        addDataRequest(job, FILE, RESOURCE_TYPE, "Bob", "Payroll");
+        // Edit the configuration of the Palisade requests below here
+        // ==========================================================
+        try {
+            configureJob(job, cs, 2);
 
-        //launch job
-        boolean success = job.waitForCompletion(true);
+            //next add a resource request to the job
+            addDataRequest(job, FILE, RESOURCE_TYPE, "Alice", "Payroll");
+            addDataRequest(job, FILE, RESOURCE_TYPE, "Bob", "Payroll");
 
-        FileUtils.deleteQuietly(new File(FILE));
+            //launch job
+            boolean success = job.waitForCompletion(true);
 
-        return (success) ? 0 : 1;
+            return (success) ? 0 : 1;
+        } finally {
+            FileUtils.deleteQuietly(new File(FILE));
+        }
     }
 
     /**

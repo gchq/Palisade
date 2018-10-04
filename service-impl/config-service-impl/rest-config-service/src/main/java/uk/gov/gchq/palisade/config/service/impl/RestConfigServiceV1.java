@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -33,6 +34,7 @@ import uk.gov.gchq.palisade.util.StreamUtil;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
@@ -91,9 +93,28 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
         return get(request).join();
     }
 
+    @PUT
+    @Path("/add")
+    @ApiOperation(value = "Adds the config from this InitialConfig",
+            response = Boolean.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Something went wrong in the server")
+    })
+    public Boolean addSync(
+            @ApiParam(value = "The request") final AddConfigRequest request) {
+        LOGGER.debug("Invoking add: {}", request);
+        return add(request).join();
+    }
+
     @Override
     public CompletableFuture<InitialConfig> get(final GetConfigRequest request) {
         return delegate.get(request);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> add(final AddConfigRequest request) {
+        return delegate.add(request);
     }
 
     protected InitialConfigurationService getDelegate() {
