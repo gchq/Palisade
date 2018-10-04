@@ -28,6 +28,7 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.MockConfigurationService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
@@ -57,7 +58,7 @@ public class RestConfigServiceV1IT {
     @BeforeClass
     public static void beforeClass() throws IOException {
         System.setProperty(RestConfigServiceV1.SERVICE_CONFIG, "mockConfig.json");
-        proxy = new ProxyRestConfigService("http://localhost:8080/palisade");
+        proxy = new ProxyRestConfigService("http://localhost:8085/config");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
@@ -126,5 +127,25 @@ public class RestConfigServiceV1IT {
         // Then
         assertEquals(expected, result);
         verify(configService).get(request);
+    }
+
+    @Test
+    public void shouldAddConfig() throws IOException {
+        // Given
+        final InitialConfigurationService configService = Mockito.mock(InitialConfigurationService.class);
+        MockConfigurationService.setMock(configService);
+
+        InitialConfig expected = new InitialConfig();
+
+        final AddConfigRequest request = (AddConfigRequest) new AddConfigRequest().config(expected).service(Optional.empty());
+
+        given(configService.add(request)).willReturn(CompletableFuture.completedFuture(Boolean.TRUE));
+
+        // When
+        final Boolean result = proxy.add(request).join();
+
+        // Then
+        assertEquals(Boolean.TRUE, result);
+        verify(configService).add(request);
     }
 }

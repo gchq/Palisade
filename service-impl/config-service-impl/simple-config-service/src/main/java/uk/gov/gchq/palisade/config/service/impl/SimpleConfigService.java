@@ -19,9 +19,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -101,6 +103,28 @@ public class SimpleConfigService implements InitialConfigurationService {
         } else { //grab the anonymous client config
             return CompletableFuture.completedFuture(getAnonymousConfig());
         }
+    }
+
+    /**
+     * Allows new configuration data to be added to the cache.
+     *
+     * @param request the request to put in the cache
+     * @return a boolean that becomes {@code true} when the request is added to cache
+     */
+    public CompletableFuture<Boolean> add(final AddConfigRequest request) {
+        requireNonNull(request, "request");
+        final Optional<Class<? extends Service>> clazz = request.getService();
+        final AddCacheRequest<InitialConfig> addRequest = new AddCacheRequest<>()
+                .service(InitialConfigurationService.class)
+                .value(request.getConfig());
+        //are we setting anonymous config
+        if (clazz.isPresent()) {
+            addRequest.key(clazz.get().getCanonicalName());
+        } else {
+            addRequest.key(ANONYMOUS_CONFIG_KEY);
+        }
+        //put in the cache
+        return cache.add(addRequest);
     }
 
     /**

@@ -16,6 +16,7 @@
 package uk.gov.gchq.palisade.config.service;
 
 import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -49,12 +50,27 @@ public interface InitialConfigurationService extends Service {
     CompletableFuture<InitialConfig> get(final GetConfigRequest request) throws NoConfigException;
 
     /**
+     * Add the given initial configuration to the configuration service. This should not be used by clients and should
+     * only be used by Palisade internal components.
+     *
+     * @param request the request giving the configuration to add
+     * @return boolean indicating success
+     */
+    CompletableFuture<Boolean> add(final AddConfigRequest request);
+
+    /**
      * {@inheritDoc}
      */
     @Override
     default CompletableFuture<?> process(final Request request) {
         if (request instanceof GetConfigRequest) {
             return get((GetConfigRequest) request);
+<<<<<<< HEAD
+=======
+        }
+        if (request instanceof AddConfigRequest) {
+            return add((AddConfigRequest) request);
+>>>>>>> develop
         }
         return Service.super.process(request);
     }

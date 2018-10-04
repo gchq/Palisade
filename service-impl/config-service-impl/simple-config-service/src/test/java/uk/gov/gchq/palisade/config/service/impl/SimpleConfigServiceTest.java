@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -59,6 +60,9 @@ public class SimpleConfigServiceTest {
     }
 
     static class NotInCache implements Service {
+    }
+
+    static class CacheAddTest implements Service {
     }
 
     @BeforeClass
@@ -141,5 +145,20 @@ public class SimpleConfigServiceTest {
         InitialConfig actual = scs.get(req).join();
         //Then
         assertEquals(genericService, actual);
+    }
+
+    @Test
+    public void shouldPutAndRetrieveConfig() {
+        //Given
+        InitialConfig expected = serviceClass2;
+        AddConfigRequest request = (AddConfigRequest) new AddConfigRequest()
+                .config(expected)
+                .service(Optional.of(CacheAddTest.class));
+        scs.add(request);
+        //When
+        GetConfigRequest req = new GetConfigRequest().service(Optional.of(CacheAddTest.class));
+        InitialConfig actual = scs.get(req).join();
+        //Then
+        assertEquals(expected, actual);
     }
 }

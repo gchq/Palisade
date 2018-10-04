@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -40,5 +41,10 @@ public class ProxyRestConfigService extends ProxyRestService implements InitialC
     @Override
     public CompletableFuture<InitialConfig> get(final GetConfigRequest request) {
         return doPostAsync("get", request, InitialConfig.class);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> add(final AddConfigRequest request) {
+        return doPutAsync("add", request, Boolean.class);
     }
 }
