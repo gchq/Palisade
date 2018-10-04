@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.config.service.exception;
-
-import uk.gov.gchq.palisade.exception.PalisadeRuntimeException;
+package uk.gov.gchq.palisade.exception;
 
 /**
  * An exception thrown when a request is made for an {@link uk.gov.gchq.palisade.service.request.InitialConfig} that is

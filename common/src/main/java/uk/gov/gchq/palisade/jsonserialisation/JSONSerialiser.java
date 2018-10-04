@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -80,6 +81,10 @@ public class JSONSerialiser {
 
     public static final String STRICT_JSON = "palisade.serialiser.json.strict";
     public static final boolean STRICT_JSON_DEFAULT = true;
+    /**
+     * Charset for serialising data.
+     */
+    public static final Charset UTF8 = Charset.forName("UTF-8");
     private static final String STRICT_JSON_DEFAULT_STR = Boolean.toString(STRICT_JSON_DEFAULT);
 
     public static final String FILTER_FIELDS_BY_NAME = "filterFieldsByName";

@@ -36,7 +36,10 @@ import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.ChildResource;
+import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
@@ -46,8 +49,10 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -79,8 +84,10 @@ public class HDFSResourceService implements ResourceService {
     public static final String ERROR_DETAIL_NOT_FOUND = "Connection detail could not be found for type: %s format: %s";
     public static final String ERROR_RESOLVING_PARENTS = "Error occurred while resolving resourceParents";
 
-    private final Configuration conf;
-    private final FileSystem fileSystem;
+    public static final String HADOOP_CONF_STRING = "hdfs.init.conf";
+
+    private Configuration conf;
+    private FileSystem fileSystem;
 
     private ConnectionDetailStorage connectionDetailStorage;
 
@@ -115,6 +122,51 @@ public class HDFSResourceService implements ResourceService {
         this(createConfig(conf), dataFormat, dataType);
     }
 
+    private static Configuration createConfig(final Map<String, String> conf) {
+        final Configuration config = new Configuration();
+        if (nonNull(conf)) {
+            for (final Entry<String, String> entry : conf.entrySet()) {
+                config.set(entry.getKey(), entry.getValue());
+            }
+        }
+        return config;
+    }
+
+    @Override
+    public void configure(final InitialConfig config) throws NoConfigException {
+        requireNonNull(config, "config");
+        LOGGER.info("CONFIGURE CALLED ON HDFS RESOURCE SERVICE");
+        //get the configuration string
+        String serialisedConfig = config.getOrDefault(HADOOP_CONF_STRING, null);
+        //make this into a map
+        Map<String, String> confMap = null;
+        if (nonNull(serialisedConfig)) {
+            confMap = JSONSerialiser.deserialise(serialisedConfig.getBytes(JSONSerialiser.UTF8), Map.class);
+        }
+        //make this into a config
+        Configuration newConf = createConfig(confMap);
+        this.conf = newConf;
+    }
+
+    @Override
+    public void writeConfiguration(final InitialConfig config) {
+        requireNonNull(config, "config");
+        LOGGER.info("WRITE CONFIGURATION CALLED ON HDFS RESOURCE SERVICE");
+        Map<String, String> confMap = getConf();
+        String serialisedConf = new String(JSONSerialiser.serialise(confMap), JSONSerialiser.UTF8);
+        config.put(HADOOP_CONF_STRING, serialisedConf);
+    }
+
+    protected Configuration getInternalConf() {
+        requireNonNull(conf, "configuration must be set");
+        return conf;
+    }
+
+    protected FileSystem getFileSystem() {
+        requireNonNull(fileSystem, "configuration must be set");
+        return fileSystem;
+    }
+
     public HDFSResourceService connectionDetail(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
         this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
         updateSharedConnectionDetails();
@@ -136,24 +188,26 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @Override
-    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.LeafResource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>>
+    getResourcesByResource(final GetResourcesByResourceRequest request) {
         return getResourcesById(new GetResourcesByIdRequest().resourceId(request.getResource().getId()));
     }
 
     @Override
-    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         final String resourceId = request.getResourceId();
-        final String path = conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+        final String path = getInternalConf().get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
         if (!resourceId.startsWith(path) && !resourceId.startsWith(new Path(path).toUri().getPath())) {
             throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, path));
         }
         return getMapCompletableFuture(resourceId, ignore -> true);
     }
 
-    private CompletableFuture<Map<uk.gov.gchq.palisade.resource.LeafResource, ConnectionDetail>> getMapCompletableFuture(final String pathString, final Predicate<HDFSResourceDetails> predicate) {
+    private CompletableFuture<Map<LeafResource, ConnectionDetail>> getMapCompletableFuture(
+            final String pathString, final Predicate<HDFSResourceDetails> predicate) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                final RemoteIterator<LocatedFileStatus> remoteIterator = this.fileSystem.listFiles(new Path(pathString), true);
+                final RemoteIterator<LocatedFileStatus> remoteIterator = this.getFileSystem().listFiles(new Path(pathString), true);
                 return getPaths(remoteIterator)
                         .stream()
                         .map(HDFSResourceDetails::getResourceDetailsFromConnectionDetails)
@@ -162,7 +216,7 @@ public class HDFSResourceService implements ResourceService {
                                 (HDFSResourceDetails resourceDetails) -> {
                                     final String connectionDetail = resourceDetails.getConnectionDetail();
                                     final FileResource fileFileResource = new FileResource().id(connectionDetail).type(resourceDetails.getType()).serialisedFormat(resourceDetails.getFormat());
-                                    resolveParents(fileFileResource, conf);
+                                    resolveParents(fileFileResource, getInternalConf());
                                     return fileFileResource;
                                 },
                                 resourceDetails -> retrieveConnectionDetailStorage().get(resourceDetails.getType(), resourceDetails.getFormat())
@@ -175,17 +229,17 @@ public class HDFSResourceService implements ResourceService {
         });
     }
 
-    public static void resolveParents(final ChildResource resource, final Configuration conf) {
+    public static void resolveParents(final ChildResource resource, final Configuration configuration) {
         try {
             final String connectionDetail = resource.getId();
             final Path path = new Path(connectionDetail);
             final int fileDepth = path.depth();
-            final int fsDepth = new Path(conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)).depth();
+            final int fsDepth = new Path(configuration.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)).depth();
 
             if (fileDepth > fsDepth + 1) {
                 DirectoryResource parent = new DirectoryResource().id(path.getParent().toString());
                 resource.setParent(parent);
-                resolveParents(parent, conf);
+                resolveParents(parent, configuration);
             } else {
                 resource.setParent(new SystemResource().id(path.getParent().toString()));
             }
@@ -195,15 +249,15 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @Override
-    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.LeafResource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
-        final String pathString = conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
+        final String pathString = getInternalConf().get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
         final Predicate<HDFSResourceDetails> predicate = detail -> request.getType().equals(detail.getType());
         return getMapCompletableFuture(pathString, predicate);
     }
 
     @Override
-    public CompletableFuture<Map<uk.gov.gchq.palisade.resource.LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
-        final String pathString = conf.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
+        final String pathString = getInternalConf().get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
         final Predicate<HDFSResourceDetails> predicate = detail -> request.getSerialisedFormat().equals(detail.getFormat());
         return getMapCompletableFuture(pathString, predicate);
     }
@@ -238,7 +292,7 @@ public class HDFSResourceService implements ResourceService {
         Map<String, String> rtn = Maps.newHashMap();
         Map<String, String> plainJobConfWithoutResolvingValues = getPlainJobConfWithoutResolvingValues();
 
-        for (Entry<String, String> entry : conf) {
+        for (Entry<String, String> entry : getInternalConf()) {
             final String plainValue = plainJobConfWithoutResolvingValues.get(entry.getKey());
             final String thisValue = entry.getValue();
             if (isNull(plainValue) || !plainValue.equals(thisValue)) {
@@ -269,14 +323,14 @@ public class HDFSResourceService implements ResourceService {
         final HDFSResourceService that = (HDFSResourceService) o;
 
         final EqualsBuilder builder = new EqualsBuilder()
-                .append(this.fileSystem, that.fileSystem)
+                .append(this.getFileSystem(), that.getFileSystem())
                 .append(this.retrieveConnectionDetailStorage(), that.retrieveConnectionDetailStorage());
 
         if (builder.isEquals()) {
-            builder.append(this.conf.size(), that.conf.size());
-            for (Entry<String, String> entry : this.conf) {
-                final String lhs = this.conf.get(entry.getKey());
-                final String rhs = that.conf.get(entry.getKey());
+            builder.append(this.getInternalConf().size(), that.getInternalConf().size());
+            for (Entry<String, String> entry : this.getInternalConf()) {
+                final String lhs = this.getInternalConf().get(entry.getKey());
+                final String rhs = that.getInternalConf().get(entry.getKey());
                 builder.append(lhs, rhs);
                 if (!builder.isEquals()) {
                     break;
@@ -308,6 +362,7 @@ public class HDFSResourceService implements ResourceService {
 
     private class ConnectionDetailStorage {
         private final HashMap<String, ConnectionDetail> dataFormat = new HashMap<>();
+
         private final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
 
         ConnectionDetailStorage(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
@@ -374,15 +429,5 @@ public class HDFSResourceService implements ResourceService {
                     .append("dataType", dataType)
                     .toString();
         }
-    }
-
-    private static Configuration createConfig(final Map<String, String> conf) {
-        final Configuration config = new Configuration();
-        if (nonNull(conf)) {
-            for (final Entry<String, String> entry : conf.entrySet()) {
-                config.set(entry.getKey(), entry.getValue());
-            }
-        }
-        return config;
     }
 }

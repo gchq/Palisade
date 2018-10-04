@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -54,10 +55,25 @@ public interface Service {
      * internal system to configure a service.
      * <p>
      * Subclasses should override this implementation which does nothing.
+     * <p>
+     * Subclasses should ONLY throws {@link NoConfigException} if a required configuration key is not present
      *
      * @param config the configuration
+     * @throws NoConfigException if some required element of the configuration is not present
      */
-    default void configure(final InitialConfig config) {
+    default void configure(final InitialConfig config) throws NoConfigException {
+        //does nothing by default
+    }
+
+    /**
+     * Tells a service to save its configuration to the given configuration object. This method is called by the
+     * internal system to save a configuration.
+     * <p>
+     * Subclasses should override this implementation which does nothing.
+     *
+     * @param config the configuration to place initial configuration information into
+     */
+    default void writeConfiguration(final InitialConfig config) {
         //does nothing by default
     }
 

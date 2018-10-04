@@ -31,7 +31,6 @@ import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,11 +53,6 @@ import java.util.stream.IntStream;
  */
 public class PalisadeInputFormat<V> extends InputFormat<LeafResource, V> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PalisadeInputFormat.class);
-
-    /**
-     * Char-set for serialising data.
-     */
-    public static final Charset UTF8 = Charset.forName("UTF-8");
 
     /**
      * Hadoop configuration key for storing requests to be processed.
@@ -222,7 +216,7 @@ public class PalisadeInputFormat<V> extends InputFormat<LeafResource, V> {
         Objects.requireNonNull(request, "request");
         List<RegisterDataRequest> reqs = getDataRequests(context);
         reqs.add(request);
-        context.getConfiguration().set(REGISTER_REQUESTS_KEY, new String(JSONSerialiser.serialise(reqs.toArray(new RegisterDataRequest[0])), UTF8));
+        context.getConfiguration().set(REGISTER_REQUESTS_KEY, new String(JSONSerialiser.serialise(reqs.toArray(new RegisterDataRequest[0])), JSONSerialiser.UTF8));
     }
 
     /**
@@ -316,7 +310,7 @@ public class PalisadeInputFormat<V> extends InputFormat<LeafResource, V> {
         Objects.requireNonNull(conf, "conf");
         Objects.requireNonNull(serialiser, "serialiser");
         conf.set(SERIALISER_CLASSNAME_KEY, serialiser.getClass().getName());
-        conf.set(SERLIALISER_CONFIG_KEY, new String(JSONSerialiser.serialise(serialiser), UTF8));
+        conf.set(SERLIALISER_CONFIG_KEY, new String(JSONSerialiser.serialise(serialiser), JSONSerialiser.UTF8));
     }
 
     /**

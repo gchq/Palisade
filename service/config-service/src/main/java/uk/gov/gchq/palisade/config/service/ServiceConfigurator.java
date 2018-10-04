@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.config.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.config.service.exception.NoConfigException;
+import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -33,6 +33,7 @@ import java.util.concurrent.TimeoutException;
 import static java.util.Objects.requireNonNull;
 
 public class ServiceConfigurator {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceConfigurator.class);
     private static final long DELAY = 500;
 
@@ -43,16 +44,16 @@ public class ServiceConfigurator {
         this.configurationService = configService;
     }
 
-    public <S extends Service> S configure(final S service) {
+    public <S extends Service> S configure(final S service) throws NoConfigException {
         return configureImpl(service, 0);
     }
 
-    public <S extends Service> S configure(final S service, final Duration timeout) {
+    public <S extends Service> S configure(final S service, final Duration timeout) throws NoConfigException {
         requireNonNull(timeout, "timeout");
         return configureImpl(service, timeout.toMillis());
     }
 
-    private <S extends Service> S configureImpl(final S service, long timeout) {
+    private <S extends Service> S configureImpl(final S service, long timeout) throws NoConfigException {
         requireNonNull(service, "service");
         if (timeout < 0) {
             throw new IllegalArgumentException("negative timeout not allowed");
