@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.client;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
-import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
+import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
@@ -27,11 +27,15 @@ import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.user.service.UserService;
 
+import java.util.Optional;
+
 import static java.util.Objects.requireNonNull;
 
-public class ConfiguredServices implements ServicesFactory {
+public class ConfiguredClientServices implements ServicesFactory {
 
     public static final String STATE = ".state";
+
+    private final InitialConfigurationService configService;
 
     private final InitialConfig config;
 
@@ -41,18 +45,18 @@ public class ConfiguredServices implements ServicesFactory {
     private final UserService userService;
     private final CacheService cacheService;
     private final PalisadeService palisadeService;
-    private final InitialConfigurationService configurationService;
 
-    public ConfiguredServices(final InitialConfig config) {
-        requireNonNull(config, "config");
-        this.config = config;
+    public ConfiguredClientServices(final InitialConfigurationService configService) {
+        requireNonNull(configService, "configService");
+        this.configService = configService;
+
+        this.config = new Configurator(configService).retrieveConfig(Optional.empty());
         this.resourceService = createResourceService();
         this.auditService = createAuditService();
         this.policyService = createPolicyService();
         this.userService = createUserService();
         this.cacheService = createCacheService();
         this.palisadeService = createPalisadeService();
-        this.configurationService = createConfigService();
     }
 
     @Override
@@ -87,7 +91,7 @@ public class ConfiguredServices implements ServicesFactory {
 
     @Override
     public InitialConfigurationService getConfigService() {
-        return configurationService;
+        return configService;
     }
 
     protected CacheService createCacheService() {
@@ -95,7 +99,7 @@ public class ConfiguredServices implements ServicesFactory {
     }
 
     public ResourceService createResourceService() {
-        return createAndConfigure(ResourceService.class);
+        return new Configurator(configService).createAndConfigure(ResourceService.class, config);
     }
 
     public AuditService createAuditService() {
@@ -114,11 +118,10 @@ public class ConfiguredServices implements ServicesFactory {
         return createAndConfigure(PalisadeService.class);
     }
 
-    private InitialConfigurationService createConfigService() {
-        return new SimpleConfigService(getCacheService());
-    }
-
-    protected <S extends Service> S createAndConfigure(final Class<? extends Service> serviceClass) {
+    /*
+     * This can eventually be removed once all services are configuring themselves based on the InitialConfig.
+     */
+    private <S extends Service> S createAndConfigure(final Class<? extends Service> serviceClass) {
         requireNonNull(serviceClass, "serviceClass");
         try {
             String servClass = config.get(serviceClass.getCanonicalName());

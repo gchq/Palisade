@@ -92,6 +92,7 @@ public class HDFSResourceService implements ResourceService {
     private ConnectionDetailStorage connectionDetailStorage;
 
     //===== REMOVE ONCE Issue gh-108 IS RESOLVED ============
+    public static final String USE_SHARED_STORAGE_KEY = "hdfs.init.shared.storage";
     private boolean useSharedConnectionDetails = false;
 
     private static ConnectionDetailStorage sharedConnectionStorage;
@@ -106,6 +107,9 @@ public class HDFSResourceService implements ResourceService {
         }
     }
     //=====================
+
+    public HDFSResourceService() {
+    }
 
     public HDFSResourceService(final Configuration conf, final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) throws IOException {
         requireNonNull(conf);
@@ -135,7 +139,10 @@ public class HDFSResourceService implements ResourceService {
     @Override
     public void configure(final InitialConfig config) throws NoConfigException {
         requireNonNull(config, "config");
-        LOGGER.info("CONFIGURE CALLED ON HDFS RESOURCE SERVICE");
+        //get use shared storage
+        String useShared = config.getOrDefault(USE_SHARED_STORAGE_KEY, "false");
+        boolean useSharedStorage = Boolean.parseBoolean(useShared);
+        this.setUseSharedConnectionDetails(useSharedStorage);
         //get the configuration string
         String serialisedConfig = config.getOrDefault(HADOOP_CONF_STRING, null);
         //make this into a map
@@ -146,15 +153,20 @@ public class HDFSResourceService implements ResourceService {
         //make this into a config
         Configuration newConf = createConfig(confMap);
         this.conf = newConf;
+        try {
+            this.fileSystem = FileSystem.get(this.conf);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void writeConfiguration(final InitialConfig config) {
         requireNonNull(config, "config");
-        LOGGER.info("WRITE CONFIGURATION CALLED ON HDFS RESOURCE SERVICE");
         Map<String, String> confMap = getConf();
         String serialisedConf = new String(JSONSerialiser.serialise(confMap), JSONSerialiser.UTF8);
         config.put(HADOOP_CONF_STRING, serialisedConf);
+        config.put(USE_SHARED_STORAGE_KEY, Boolean.toString(getUseSharedConnectionDetails()));
     }
 
     protected Configuration getInternalConf() {
@@ -220,6 +232,7 @@ public class HDFSResourceService implements ResourceService {
                                     return fileFileResource;
                                 },
                                 resourceDetails -> retrieveConnectionDetailStorage().get(resourceDetails.getType(), resourceDetails.getFormat())
+
                         ));
             } catch (RuntimeException e) {
                 throw e;

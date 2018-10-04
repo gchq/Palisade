@@ -98,46 +98,46 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                 new SetResourcePolicyRequest()
                         .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                         .policy(new Policy<ExampleObj>()
-                                .owner(alice)
-                                .recordLevelRule(
-                                        "1-visibility",
-                                        new IsExampleObjVisible()
-                                )
-                                .recordLevelRule(
-                                        "2-ageOff",
-                                        new IsExampleObjRecent(12L)
-                                )
-                                .recordLevelRule(
-                                        "3-redactProperty",
-                                        new RedactExampleObjProperty()
-                                )
+                                        .owner(alice)
+                                        .recordLevelRule(
+                                                "1-visibility",
+                                                new IsExampleObjVisible()
+                                        )
+                                        .recordLevelRule(
+                                                "2-ageOff",
+                                                new IsExampleObjRecent(12L)
+                                        )
+                                        .recordLevelRule(
+                                                "3-redactProperty",
+                                                new RedactExampleObjProperty()
+                                        )
                         );
 
         // Using Koryphe's functions/predicates
         final SetResourcePolicyRequest koryphePolicies = new SetResourcePolicyRequest()
                 .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                 .policy(new Policy<ExampleObj>()
-                        .owner(alice)
-                        .recordLevelRule(
-                                "1-visibility",
-                                new TupleRule<ExampleObj>()
-                                        .selection("Record.visibility", "User.auths")
-                                        .predicate(new IsXInCollectionY()))
-                        .recordLevelRule(
-                                "2-ageOff",
-                                new TupleRule<ExampleObj>()
-                                        .selection("Record.timestamp")
-                                        .predicate(new IsMoreThan(12L))
-                        )
-                        .recordLevelRule(
-                                "3-redactProperty",
-                                new TupleRule<ExampleObj>()
-                                        .selection("User.roles", "Record.property")
-                                        .function(new If<>()
-                                                .predicate(0, new Not<>(new CollectionContains("admin")))
-                                                .then(1, new SetValue("redacted")))
-                                        .projection("User.roles", "Record.property")
-                        )
+                                .owner(alice)
+                                .recordLevelRule(
+                                        "1-visibility",
+                                        new TupleRule<ExampleObj>()
+                                                .selection("Record.visibility", "User.auths")
+                                                .predicate(new IsXInCollectionY()))
+                                .recordLevelRule(
+                                        "2-ageOff",
+                                        new TupleRule<ExampleObj>()
+                                                .selection("Record.timestamp")
+                                                .predicate(new IsMoreThan(12L))
+                                )
+                                .recordLevelRule(
+                                        "3-redactProperty",
+                                        new TupleRule<ExampleObj>()
+                                                .selection("User.roles", "Record.property")
+                                                .function(new If<>()
+                                                        .predicate(0, new Not<>(new CollectionContains("admin")))
+                                                        .then(1, new SetValue("redacted")))
+                                                .projection("User.roles", "Record.property")
+                                )
                 );
 
         final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setResourcePolicy(
@@ -145,7 +145,6 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         );
 
         // The sys admin needs to configure the resource service
-        //if this is running as a multi JVM example, then we will get the ProxyRestResourceService and should not insert this connection detail
         if (getServicesFactory().getResourceService() instanceof HDFSResourceService) {
             final HdfsDataReader reader;
             try {

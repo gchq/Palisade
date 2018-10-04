@@ -22,7 +22,7 @@ import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
-import uk.gov.gchq.palisade.client.ConfiguredServices;
+import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
@@ -93,26 +93,23 @@ public final class ExampleConfigurator {
                 .cacheService(cache);
         //build a config for client
         InitialConfig singleJVMconfig = new InitialConfig()
-                .put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName())
-                .put(ResourceService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(resource)))
-
                 .put(AuditService.class.getCanonicalName(), audit.getClass().getCanonicalName())
-                .put(AuditService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(audit)))
+                .put(AuditService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
 
                 .put(PolicyService.class.getCanonicalName(), policy.getClass().getCanonicalName())
-                .put(PolicyService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(policy)))
+                .put(PolicyService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
 
                 .put(UserService.class.getCanonicalName(), user.getClass().getCanonicalName())
-                .put(UserService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(user)))
+                .put(UserService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(user)))
 
                 .put(CacheService.class.getCanonicalName(), cache.getClass().getCanonicalName())
-                .put(CacheService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(cache)))
+                .put(CacheService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
 
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
-                .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)))
+                .put(PalisadeService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
 
-                .put(InitialConfigurationService.class.getCanonicalName(), configService.getClass().getCanonicalName())
-                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(configService)));
+        singleJVMconfig.put(ResourceService.class.getCanonicalName(),resource.getClass().getCanonicalName());
+        resource.writeConfiguration(singleJVMconfig);
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(singleJVMconfig)
@@ -137,25 +134,23 @@ public final class ExampleConfigurator {
 
         InitialConfig multiJVMConfig = new InitialConfig()
                 .put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName())
-                .put(ResourceService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(resource)))
+                .put(ResourceService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(resource)))
 
                 .put(AuditService.class.getCanonicalName(), audit.getClass().getCanonicalName())
-                .put(AuditService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(audit)))
+                .put(AuditService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
 
                 .put(PolicyService.class.getCanonicalName(), policy.getClass().getCanonicalName())
-                .put(PolicyService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(policy)))
+                .put(PolicyService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
 
                 .put(UserService.class.getCanonicalName(), user.getClass().getCanonicalName())
-                .put(UserService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(user)))
+                .put(UserService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(user)))
 
                 .put(CacheService.class.getCanonicalName(), cache.getClass().getCanonicalName())
-                .put(CacheService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(cache)))
+                .put(CacheService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
 
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
-                .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)))
+                .put(PalisadeService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
 
-                .put(InitialConfigurationService.class.getCanonicalName(), configService.getClass().getCanonicalName())
-                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(configService)));
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(multiJVMConfig)
