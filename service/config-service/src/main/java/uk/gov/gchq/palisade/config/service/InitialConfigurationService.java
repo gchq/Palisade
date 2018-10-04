@@ -65,12 +65,9 @@ public interface InitialConfigurationService extends Service {
     default CompletableFuture<?> process(final Request request) {
         if (request instanceof GetConfigRequest) {
             return get((GetConfigRequest) request);
-<<<<<<< HEAD
-=======
         }
         if (request instanceof AddConfigRequest) {
             return add((AddConfigRequest) request);
->>>>>>> develop
         }
         return Service.super.process(request);
     }
