@@ -77,6 +77,7 @@ public class RestResourceServiceV1 implements ResourceService {
         if (resourceService == null) {
             final InputStream stream = StreamUtil.openStream(RestResourceServiceV1.class, serviceConfigPath);
             resourceService = JSONSerialiser.deserialise(stream, ResourceService.class);
+            
             ret = resourceService;
         } else {
             ret = resourceService;
