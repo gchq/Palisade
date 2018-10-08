@@ -70,7 +70,7 @@ public final class ExampleConfigCreator {
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
         //configure the single JVM settings
         AuditService audit = new LoggerAuditService();
-        PolicyService policy = new HierarchicalPolicyService();
+        PolicyService policy = new HierarchicalPolicyService().cacheService(cache);
         ResourceService resource = null;
         try {
             resource = new HDFSResourceService(new Configuration(), null, null).useSharedConnectionDetails(true);
