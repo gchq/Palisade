@@ -19,6 +19,7 @@ public class EtcdBackingStoreTest extends AbstractBackingStoreTest {
 
     @Override
     public BackingStore createBackingStore() {
+        // TODO Need to stand up an embedded etcd store
         return new EtcdBackingStore();
     }
 }
