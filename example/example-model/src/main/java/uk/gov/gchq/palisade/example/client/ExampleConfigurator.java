@@ -50,6 +50,10 @@ import java.util.Optional;
  * Convenience class for the examples to configure the config creation service.
  */
 public final class ExampleConfigurator {
+
+    private static CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore());
+
+
     private ExampleConfigurator() {
     }
 
@@ -60,7 +64,6 @@ public final class ExampleConfigurator {
      * @return the config service
      */
     public static SimpleConfigService createConfigService(final Path backingStorePath) {
-        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore());
         return new SimpleConfigService(cache);
     }
 
