@@ -53,7 +53,6 @@ public final class ExampleConfigurator {
 
     private static CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore());
 
-
     private ExampleConfigurator() {
     }
 
