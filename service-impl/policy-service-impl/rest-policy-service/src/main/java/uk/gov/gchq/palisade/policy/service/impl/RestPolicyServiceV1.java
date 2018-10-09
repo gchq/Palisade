@@ -54,6 +54,8 @@ public class RestPolicyServiceV1 implements PolicyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestPolicyServiceV1.class);
     private final PolicyService delegate;
 
+    private static PolicyService policyService;
+
     public RestPolicyServiceV1() {
         this(System.getProperty(SERVICE_CONFIG));
     }
@@ -66,9 +68,16 @@ public class RestPolicyServiceV1 implements PolicyService {
         this.delegate = delegate;
     }
 
-    private static PolicyService createService(final String serviceConfigPath) {
-        final InputStream stream = StreamUtil.openStream(RestPolicyServiceV1.class, serviceConfigPath);
-        return JSONSerialiser.deserialise(stream, PolicyService.class);
+    private static synchronized PolicyService createService(final String serviceConfigPath) {
+        PolicyService ret;
+        if (policyService == null) {
+            final InputStream stream = StreamUtil.openStream(RestPolicyServiceV1.class, serviceConfigPath);
+            policyService = JSONSerialiser.deserialise(stream, PolicyService.class);
+            ret = policyService;
+        } else {
+            ret = policyService;
+        }
+        return ret;
     }
 
     @POST

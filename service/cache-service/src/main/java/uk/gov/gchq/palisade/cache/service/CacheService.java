@@ -70,16 +70,13 @@ public interface CacheService extends Service {
     @Override
     default CompletableFuture<?> process(final Request request) {
         if (request instanceof AddCacheRequest) {
-            add((AddCacheRequest) request);
-            return null;
+            return add((AddCacheRequest) request);
         }
         if (request instanceof GetCacheRequest) {
-            get((GetCacheRequest) request);
-            return null;
+            return get((GetCacheRequest) request);
         }
         if (request instanceof ListCacheRequest) {
-            list((ListCacheRequest) request);
-            return null;
+            return list((ListCacheRequest) request);
         }
         return Service.super.process(request);
     }
