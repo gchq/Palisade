@@ -43,11 +43,11 @@ public class SimpleServices implements ServicesFactory {
     private final PalisadeService palisadeService;
 
     public SimpleServices() {
+        this.cacheService = createCacheService();
         this.resourceService = createResourceService();
         this.auditService = createAuditService();
         this.policyService = createPolicyService();
         this.userService = createUserService();
-        this.cacheService = createCacheService();
         this.palisadeService = createPalisadeService();
     }
 
@@ -90,7 +90,7 @@ public class SimpleServices implements ServicesFactory {
     }
 
     protected PolicyService createPolicyService() {
-        return new HierarchicalPolicyService();
+        return new HierarchicalPolicyService().cacheService(cacheService);
     }
 
     protected ResourceService createResourceService() {
