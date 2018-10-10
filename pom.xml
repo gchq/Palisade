@@ -60,7 +60,7 @@
         <jackson.version>2.6.5</jackson.version>
         <maven-war-plugin.version>3.0.0</maven-war-plugin.version>
         <apache.commons.version>3.3.2</apache.commons.version>
-        <guava.version>13.0.1</guava.version>
+        <guava.version>26.0-jre</guava.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <jersey.version>2.25</jersey.version>
@@ -68,6 +68,7 @@
         <hadoop.version>2.6.5</hadoop.version>
         <avro.version>1.8.2</avro.version>
         <koryphe.version>1.5.0</koryphe.version>
+        <jetcd.version>0.0.2</jetcd.version>
 
         <!-- Testing properties -->
         <junit.version>4.12</junit.version>
@@ -80,6 +81,7 @@
         <findbugs.phase>test</findbugs.phase>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
         <findbugs.plugin.version>3.0.1</findbugs.plugin.version>
+        <testcontainers.version>1.9.1</testcontainers.version>
         <surefireArgLine />
         <failsafeArgLine />
         <exclude.tests />
@@ -138,7 +140,6 @@
             <artifactId>annotations</artifactId>
             <version>${findbugs.plugin.version}</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -58,12 +58,12 @@ public abstract class AbstractBackingStoreTest {
         //Given - two keys
         byte[] b1 = new byte[10];
         byte[] b2 = new byte[10];
-        impl.add("test_key1", Object.class, b1);
-        impl.add("test_key2", Object.class, b2);
+        impl.add("test1_key1", Object.class, b1);
+        impl.add("test1_key2", Object.class, b2);
         //When
-        Stream<String> ret = impl.list("test");
+        Stream<String> ret = impl.list("test1");
         //Then
-        assertTrue(streamEqual(Stream.of("test_key1", "test_key2"), ret));
+        assertTrue(streamEqual(Stream.of("test1_key1", "test1_key2"), ret));
     }
 
     @Test
@@ -163,7 +163,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnNullDuration() {
         //Given - nothing
         //When
-        impl.add("test", Object.class, new byte[]{1}, null);
+        impl.add("test2", Object.class, new byte[]{1}, null);
         //Then
         fail("exception expected");
     }
@@ -172,7 +172,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnNegativeDuration() {
         //Given - nothing
         //When
-        impl.add("test", Object.class, new byte[0], Optional.of(Duration.of(-10, ChronoUnit.SECONDS)));
+        impl.add("test3", Object.class, new byte[0], Optional.of(Duration.of(-10, ChronoUnit.SECONDS)));
         //Then
         fail("exception expected");
     }
@@ -181,7 +181,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnNullClass() {
         //Given - nothing
         //When
-        impl.add("test", null, new byte[0]);
+        impl.add("test4", null, new byte[0]);
         //Then
         fail("exception expected");
     }
@@ -190,7 +190,7 @@ public abstract class AbstractBackingStoreTest {
     public void throwOnNullValue() {
         //Given - nothing
         //When
-        impl.add("test", Object.class, null);
+        impl.add("test5", Object.class, null);
         //Then
         fail("exception expected");
     }
@@ -212,8 +212,8 @@ public abstract class AbstractBackingStoreTest {
         //Given
         byte[] expected = new byte[]{1, 2, 3, 4};
         //When
-        impl.add("test", Integer.class, expected);
-        SimpleCacheObject actual = impl.get("test");
+        impl.add("test6", Integer.class, expected);
+        SimpleCacheObject actual = impl.get("test6");
         //Then
         assertArrayEquals(expected, actual.getValue().get());
         assertEquals(Integer.class, actual.getValueClass());
@@ -225,10 +225,10 @@ public abstract class AbstractBackingStoreTest {
         byte[] expected = new byte[]{1, 2, 3, 4};
         byte[] expected2 = new byte[]{5, 6, 7, 8};
         //When
-        impl.add("test", Integer.class, expected);
-        impl.add("test2", String.class, expected2);
-        SimpleCacheObject actual = impl.get("test");
-        SimpleCacheObject actual2 = impl.get("test2");
+        impl.add("test7", Integer.class, expected);
+        impl.add("test8", String.class, expected2);
+        SimpleCacheObject actual = impl.get("test7");
+        SimpleCacheObject actual2 = impl.get("test8");
 
         //Then
         assertArrayEquals(expected, actual.getValue().get());
@@ -243,8 +243,8 @@ public abstract class AbstractBackingStoreTest {
         byte[] expected = new byte[]{1, 2, 3, 4};
         byte[] expected2 = new byte[]{5, 6, 7, 8};
         //When
-        impl.add("test", Integer.class, expected);
-        impl.add("test2", String.class, expected2);
+        impl.add("new_test", Integer.class, expected);
+        impl.add("new_test1", String.class, expected2);
         SimpleCacheObject actual = impl.get("not_there");
         //Then
         assertFalse(actual.getValue().isPresent());
@@ -257,11 +257,11 @@ public abstract class AbstractBackingStoreTest {
         byte[] expected = new byte[]{1, 2, 3, 4};
         byte[] expected2 = new byte[]{5, 6, 7, 8};
         //When
-        impl.add("test", Integer.class, expected);
-        SimpleCacheObject actual = impl.get("test");
+        impl.add("new_test2", Integer.class, expected);
+        SimpleCacheObject actual = impl.get("new_test2");
         //overwrite it
-        impl.add("test", String.class, expected2);
-        SimpleCacheObject overwrite = impl.get("test");
+        impl.add("new_test2", String.class, expected2);
+        SimpleCacheObject overwrite = impl.get("new_test2");
         //Then
         assertEquals(Integer.class, actual.getValueClass());
         assertArrayEquals(expected, actual.getValue().get());
@@ -284,10 +284,10 @@ public abstract class AbstractBackingStoreTest {
     public void shouldRemoveZeroDurationObject() {
         //Given
         byte[] expected = new byte[]{1, 2, 3, 4};
-        impl.add("test", Object.class, expected, Optional.of(Duration.of(0, ChronoUnit.SECONDS)));
+        impl.add("new_test3", Object.class, expected, Optional.of(Duration.of(0, ChronoUnit.SECONDS)));
         //When
         delay(100);
-        SimpleCacheObject empty = impl.get("test");
+        SimpleCacheObject empty = impl.get("new_test3");
         //Then
         assertFalse(empty.getValue().isPresent());
     }
@@ -316,17 +316,17 @@ public abstract class AbstractBackingStoreTest {
     public void shouldRemoveAfterDelay() {
         //Given
         byte[] expected = new byte[]{1, 2, 3, 4};
-        impl.add("test", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
+        impl.add("new_test4", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
         //When
         //we avoid this first test to protect against the corner case where the backing add takes longer than the delay
         //respond and ages off the add before we check it the first time which would cause the test case to fail
-        TestResult present = timedRetrieve("test", 1000);
+        TestResult present = timedRetrieve("new_test4", 1000);
         if (present.completedInTime) {
             assertTrue(present.result.getValue().isPresent());
         }
         //Then
         delay(1200);
-        SimpleCacheObject empty = impl.get("test");
+        SimpleCacheObject empty = impl.get("new_test4");
         assertFalse(empty.getValue().isPresent());
     }
 
@@ -336,22 +336,22 @@ public abstract class AbstractBackingStoreTest {
         byte[] expected = new byte[]{1, 2, 3, 4};
         byte[] expected2 = new byte[]{5, 6, 7, 8};
         byte[] expected3 = new byte[]{9, 10, 11, 12};
-        impl.add("test", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
-        impl.add("test2", Object.class, expected2, Optional.of(Duration.of(2, ChronoUnit.SECONDS)));
-        impl.add("test3", Object.class, expected3, Optional.empty());
+        impl.add("new_test5", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
+        impl.add("new_test6", Object.class, expected2, Optional.of(Duration.of(2, ChronoUnit.SECONDS)));
+        impl.add("new_test7", Object.class, expected3, Optional.empty());
         //When
-        TestResult zeroSeconds1 = timedRetrieve("test", 333);
-        TestResult zeroSeconds2 = timedRetrieve("test2", 333);
-        TestResult zeroSeconds3 = timedRetrieve("test3", 333);
+        TestResult zeroSeconds1 = timedRetrieve("new_test5", 333);
+        TestResult zeroSeconds2 = timedRetrieve("new_test6", 333);
+        TestResult zeroSeconds3 = timedRetrieve("new_test7", 333);
         if (zeroSeconds1.completedInTime && zeroSeconds2.completedInTime && zeroSeconds3.completedInTime) {
             assertTrue(zeroSeconds1.result.getValue().isPresent());
             assertTrue(zeroSeconds2.result.getValue().isPresent());
             assertTrue(zeroSeconds3.result.getValue().isPresent());
         }
         delay(1200);
-        TestResult oneSecond1 = timedRetrieve("test", 333);
-        TestResult oneSecond2 = timedRetrieve("test2", 333);
-        TestResult oneSecond3 = timedRetrieve("test3", 333);
+        TestResult oneSecond1 = timedRetrieve("new_test5", 333);
+        TestResult oneSecond2 = timedRetrieve("new_test6", 333);
+        TestResult oneSecond3 = timedRetrieve("new_test7", 333);
         if (oneSecond1.completedInTime && oneSecond2.completedInTime && oneSecond3.completedInTime) {
             //first one should have expired
             assertFalse(oneSecond1.result.getValue().isPresent());
@@ -359,9 +359,9 @@ public abstract class AbstractBackingStoreTest {
             assertTrue(oneSecond3.result.getValue().isPresent());
         }
         delay(1000);
-        TestResult twoSeconds1 = timedRetrieve("test", 1000);
-        TestResult twoSeconds2 = timedRetrieve("test2", 1000);
-        TestResult twoSeconds3 = timedRetrieve("test3", 1000);
+        TestResult twoSeconds1 = timedRetrieve("new_test5", 1000);
+        TestResult twoSeconds2 = timedRetrieve("new_test6", 1000);
+        TestResult twoSeconds3 = timedRetrieve("new_test7", 1000);
         //Then
         //second one should have expired
         assertFalse(twoSeconds1.result.getValue().isPresent());
