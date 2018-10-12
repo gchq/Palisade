@@ -24,6 +24,9 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.config.service.Configurator;
+import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
@@ -34,6 +37,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFor
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import javax.ws.rs.Consumes;
@@ -43,7 +47,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -55,6 +61,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class RestResourceServiceV1 implements ResourceService {
     public static final String SERVICE_CONFIG = "palisade.rest.resource.service.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestResourceServiceV1.class);
+    public static final int DELAY = 500;
 
     private final ResourceService delegate;
 
@@ -75,9 +82,25 @@ public class RestResourceServiceV1 implements ResourceService {
     private static synchronized ResourceService createService(final String serviceConfigPath) {
         ResourceService ret;
         if (resourceService == null) {
+            //create config service object
             final InputStream stream = StreamUtil.openStream(RestResourceServiceV1.class, serviceConfigPath);
-            resourceService = JSONSerialiser.deserialise(stream, ResourceService.class);
-            
+            InitialConfigurationService service = JSONSerialiser.deserialise(stream, InitialConfigurationService.class);
+
+            //get the config for this service, try repeatedly until we get a valid configuration
+            boolean success = false;
+            while (!success) {
+                try {
+                    resourceService = new Configurator(service).retrieveConfigAndCreate(ResourceService.class);
+                    success = true;
+                } catch (NoConfigException e) {
+                    LOGGER.warn("Failed to get valid configuration for {}", ResourceService.class.getCanonicalName(), e);
+                    try {
+                        Thread.sleep(DELAY);
+                    } catch (InterruptedException ignore) {
+                        //ignore
+                    }
+                }
+            }
             ret = resourceService;
         } else {
             ret = resourceService;

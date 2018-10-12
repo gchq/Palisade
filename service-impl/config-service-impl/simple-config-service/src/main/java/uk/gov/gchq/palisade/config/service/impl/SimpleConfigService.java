@@ -170,7 +170,7 @@ public class SimpleConfigService implements InitialConfigurationService {
         if (genericResult.isPresent()) {
             return genericResult.get();
         } else {
-            throw new NoConfigException("no service configuration could bd found");
+            throw new NoConfigException("no service configuration could be found");
         }
     }
 }

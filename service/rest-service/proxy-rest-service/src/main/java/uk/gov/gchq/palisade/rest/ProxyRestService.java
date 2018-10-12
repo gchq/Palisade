@@ -24,9 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.exception.Error;
+import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.exception.PalisadeRuntimeException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -39,6 +41,7 @@ import javax.ws.rs.core.Response.Status.Family;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 
 import static java.util.Objects.requireNonNull;
@@ -47,6 +50,7 @@ public abstract class ProxyRestService implements Service {
     public static final String CHARSET = "UTF8";
     public static final String VERSION = "v1";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyRestService.class);
+    private static final String URL_CONF_KEY_SUFFIX = ".proxy.rest.url";
     private String baseUrl;
     private String baseUrlWithVersion;
     private Client client;
@@ -86,6 +90,23 @@ public abstract class ProxyRestService implements Service {
     public String getBaseUrlWithVersion() {
         requireNonNull(baseUrlWithVersion, "The base url with version has not been set.");
         return baseUrlWithVersion;
+    }
+
+    @Override
+    public void configure(InitialConfig config) throws NoConfigException {
+        requireNonNull(config, "config");
+        try {
+            String base = config.get(this.getClass().getCanonicalName() + URL_CONF_KEY_SUFFIX);
+            baseUrl(base);
+        } catch (NoSuchElementException e) {
+            throw new NoConfigException(e);
+        }
+    }
+
+    @Override
+    public void writeConfiguration(InitialConfig config) {
+        requireNonNull(config, "config");
+        config.put(this.getClass().getCanonicalName() + URL_CONF_KEY_SUFFIX, this.baseUrl);
     }
 
     protected URL getUrl() {

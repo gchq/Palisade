@@ -57,7 +57,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
-    private static final String RESOURCE_TYPE = "exampleObj";
     private final String file;
 
     public ExampleSimpleClient(final ServicesFactory services, final String file) {
@@ -149,12 +148,12 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
             final HdfsDataReader reader;
             try {
                 reader = new HdfsDataReader().conf(new Configuration());
-                reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
+                reader.addSerialiser(ExampleConfigurator.RESOURCE_TYPE, new ExampleObjSerialiser());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             final Map<String, ConnectionDetail> dataType = new HashMap<>();
-            dataType.put(RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService()).reader(reader)));
+            dataType.put(ExampleConfigurator.RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService()).reader(reader)));
             ((HDFSResourceService) getServicesFactory().getResourceService()).connectionDetail(null, dataType);
         }
         // Wait for the users and policies to be loaded
@@ -162,7 +161,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     }
 
     public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, RESOURCE_TYPE, userId, justification);
+        return super.read(filename, ExampleConfigurator.RESOURCE_TYPE, userId, justification);
     }
 
     private ParentResource getParent(final String fileURL) {

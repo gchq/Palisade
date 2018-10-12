@@ -27,41 +27,40 @@ import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
+import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
+import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
 import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
+import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
+import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
- * Convenience class for the examples to configure the config creation service.
+ * Convenience class for the examples to configure the config creation service. This is used to create an entire
+ * configuration for Palisade for the examples from scratch.
  */
 public final class ExampleConfigurator {
-    private ExampleConfigurator() {
-    }
+    protected static final String RESOURCE_TYPE = "exampleObj";
 
-    /**
-     * Create a properties backed config service for examples.
-     *
-     * @param backingStorePath the path to keep config in
-     * @return the config service
-     */
-    public static SimpleConfigService createConfigService(final Path backingStorePath) {
-        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore());
-        return new SimpleConfigService(cache);
+    private ExampleConfigurator() {
     }
 
     /**
@@ -108,7 +107,7 @@ public final class ExampleConfigurator {
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
                 .put(PalisadeService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
 
-        singleJVMconfig.put(ResourceService.class.getCanonicalName(),resource.getClass().getCanonicalName());
+        singleJVMconfig.put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName());
         resource.writeConfiguration(singleJVMconfig);
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
@@ -133,9 +132,6 @@ public final class ExampleConfigurator {
         ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
 
         InitialConfig multiJVMConfig = new InitialConfig()
-                .put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName())
-                .put(ResourceService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(resource)))
-
                 .put(AuditService.class.getCanonicalName(), audit.getClass().getCanonicalName())
                 .put(AuditService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
 
@@ -151,10 +147,43 @@ public final class ExampleConfigurator {
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
                 .put(PalisadeService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
 
+        multiJVMConfig.put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName());
+        resource.writeConfiguration(multiJVMConfig);
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(multiJVMConfig)
                 .service(Optional.empty())).join();
+
+        //create the services config that they will retrieve
+        configureMultiJVMResourceService(configService);
+
         return configService;
+    }
+
+    /**
+     * Sets the resource service configuration up that will be retrieved by the resource service from the configuration
+     * service.
+     *
+     * @param configService the central configuration service
+     */
+    private static void configureMultiJVMResourceService(final InitialConfigurationService configService) {
+        InitialConfig resourceConfig = new InitialConfig();
+        HDFSResourceService resourceServer = null;
+        try {
+            resourceServer = new HDFSResourceService(new Configuration(), null, null).useSharedConnectionDetails(true);
+            //set up the example object type
+            final Map<String, ConnectionDetail> dataType = new HashMap<>();
+            dataType.put(RESOURCE_TYPE, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
+            resourceServer.connectionDetail(null, dataType);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //write class name
+        resourceConfig.put(ResourceService.class.getCanonicalName(), resourceServer.getClass().getCanonicalName());
+        //write the configured data
+        resourceServer.writeConfiguration(resourceConfig);
+        configService.add((AddConfigRequest) new AddConfigRequest()
+                .config(resourceConfig)
+                .service(Optional.of(ResourceService.class))).join();
     }
 }

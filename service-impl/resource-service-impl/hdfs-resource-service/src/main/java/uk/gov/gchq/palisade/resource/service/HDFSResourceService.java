@@ -20,10 +20,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -35,7 +33,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.ChildResource;
@@ -48,18 +46,21 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
+import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
+import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -106,6 +107,20 @@ public class HDFSResourceService implements ResourceService {
             sharedConnectionStorage = this.connectionDetailStorage;
         }
     }
+
+
+    public static final String CONNECTION_DETAIL_IN_CONFIG = "hdfs.init.connection.detail";
+
+    public static void main(String[] args) throws Exception {
+        HDFSResourceService s=new HDFSResourceService(new Configuration(),null,null);
+        final Map<String, ConnectionDetail> dataType = new HashMap<>();
+        dataType.put("fdsf", new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestService.class));
+        s.connectionDetail(null, dataType);
+
+        
+    }
+
+
     //=====================
 
     public HDFSResourceService() {
@@ -158,6 +173,16 @@ public class HDFSResourceService implements ResourceService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        //remove once gh-108 is fixed========
+        try {
+            String connectionDetailSerialised = config.get(CONNECTION_DETAIL_IN_CONFIG);
+            this.connectionDetailStorage = JSONSerialiser.deserialise(connectionDetailSerialised, ConnectionDetailStorage.class);
+            updateSharedConnectionDetails();
+        } catch (NoSuchElementException e) {
+            throw new NoConfigException(e);
+        }
+        //================
     }
 
     @Override
@@ -167,6 +192,10 @@ public class HDFSResourceService implements ResourceService {
         String serialisedConf = new String(JSONSerialiser.serialise(confMap), JSONSerialiser.UTF8);
         config.put(HADOOP_CONF_STRING, serialisedConf);
         config.put(USE_SHARED_STORAGE_KEY, Boolean.toString(getUseSharedConnectionDetails()));
+
+        //remove this once gh-108 is fixed ==================
+        config.put(CONNECTION_DETAIL_IN_CONFIG, new String(JSONSerialiser.serialise(retrieveConnectionDetailStorage())));
+        //=======
     }
 
     protected Configuration getInternalConf() {
@@ -378,7 +407,11 @@ public class HDFSResourceService implements ResourceService {
 
         private final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
 
-        ConnectionDetailStorage(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
+        ConnectionDetailStorage() {
+        }
+
+        @JsonCreator
+        ConnectionDetailStorage(@JsonProperty("dataformat") final Map<String, ConnectionDetail> dataFormat, @JsonProperty("datatype") final Map<String, ConnectionDetail> dataType) {
             if (nonNull(dataFormat)) {
                 this.dataFormat.putAll(dataFormat);
                 this.dataFormat.values().removeIf(Objects::isNull);
@@ -400,10 +433,12 @@ public class HDFSResourceService implements ResourceService {
             return rtn;
         }
 
+        @JsonProperty("dataformat")
         public HashMap<String, ConnectionDetail> getDataFormat() {
             return new HashMap<>(dataFormat);
         }
 
+        @JsonProperty("datatype")
         public HashMap<String, ConnectionDetail> getDataType() {
             return new HashMap<>(dataType);
         }

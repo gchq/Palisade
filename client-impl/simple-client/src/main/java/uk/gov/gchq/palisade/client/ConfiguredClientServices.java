@@ -89,39 +89,44 @@ public class ConfiguredClientServices implements ServicesFactory {
         return palisadeService;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return the configuration service instance that was passed on construction
+     */
     @Override
     public InitialConfigurationService getConfigService() {
         return configService;
     }
 
     protected CacheService createCacheService() {
-        return createAndConfigure(CacheService.class);
+        return legacyCreate(CacheService.class);
     }
 
-    public ResourceService createResourceService() {
-        return new Configurator(configService).createAndConfigure(ResourceService.class, config);
+    protected ResourceService createResourceService() {
+        return new Configurator(configService).createFromConfig(ResourceService.class, config);
     }
 
-    public AuditService createAuditService() {
-        return createAndConfigure(AuditService.class);
+    protected AuditService createAuditService() {
+        return legacyCreate(AuditService.class);
     }
 
-    public PolicyService createPolicyService() {
-        return createAndConfigure(PolicyService.class);
+    protected PolicyService createPolicyService() {
+        return legacyCreate(PolicyService.class);
     }
 
-    public UserService createUserService() {
-        return createAndConfigure(UserService.class);
+    protected UserService createUserService() {
+        return legacyCreate(UserService.class);
     }
 
-    public PalisadeService createPalisadeService() {
-        return createAndConfigure(PalisadeService.class);
+    protected PalisadeService createPalisadeService() {
+        return legacyCreate(PalisadeService.class);
     }
 
     /*
      * This can eventually be removed once all services are configuring themselves based on the InitialConfig.
      */
-    private <S extends Service> S createAndConfigure(final Class<? extends Service> serviceClass) {
+    private <S extends Service> S legacyCreate(final Class<? extends Service> serviceClass) {
         requireNonNull(serviceClass, "serviceClass");
         try {
             String servClass = config.get(serviceClass.getCanonicalName());
@@ -133,8 +138,6 @@ public class ConfiguredClientServices implements ServicesFactory {
             //create it
             S instance = JSONSerialiser.deserialise(jsonState, classImpl);
 
-            //configure it
-            instance.configure(config);
             return instance;
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("couldn't create service class " + serviceClass, e);

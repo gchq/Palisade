@@ -26,6 +26,8 @@ import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.resource.service.ResourceService;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.File;
@@ -50,6 +52,13 @@ public class MultiJvmExample {
             //this will write an initial configuration
             final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
+
+
+
+            ResourceService res=cs.getResourceService();
+            res.getResourcesById(new GetResourcesByIdRequest().resourceId("bork")).join();
+
+
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
             LOGGER.info("");

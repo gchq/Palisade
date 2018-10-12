@@ -44,20 +44,20 @@ public class Configurator {
         this.service = service;
     }
 
-    public <S extends Service> S configureAndConfigure(final Class<S> serviceClass) throws NoConfigException {
+    public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         InitialConfig config = retrieveConfig(Optional.of(serviceClass));
-        return createAndConfigure(serviceClass, config);
+        return createFromConfig(serviceClass, config);
     }
 
-    public <S extends Service> S createAndConfigure(final Class<S> serviceClass, final Duration timeout) throws NoConfigException {
+    public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass, final Duration timeout) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(timeout, "timeout");
         InitialConfig config = retrieveConfig(Optional.of(serviceClass), timeout);
-        return createAndConfigure(serviceClass, config);
+        return createFromConfig(serviceClass, config);
     }
 
-    public <S extends Service> S createAndConfigure(final Class<? extends Service> serviceClass, final InitialConfig config) {
+    public <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final InitialConfig config) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(config, "config");
         try {
@@ -110,7 +110,7 @@ public class Configurator {
                 }
 
             } catch (InterruptedException | ExecutionException | CancellationException e) {
-                LOGGER.warn("Error while retrieving configuration for {}", serviceClass.getClass(), e);
+                LOGGER.warn("Error while retrieving configuration for {}", serviceClass, e);
                 //keep trying after short delay
                 try {
                     Thread.sleep(DELAY);
