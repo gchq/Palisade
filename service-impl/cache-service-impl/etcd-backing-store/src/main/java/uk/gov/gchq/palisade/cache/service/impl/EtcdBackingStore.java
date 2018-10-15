@@ -48,6 +48,11 @@ public class EtcdBackingStore implements BackingStore {
 
     @JsonCreator
     public EtcdBackingStore etcdClient(final Collection<String> connectionDetails) {
+        requireNonNull(connectionDetails, "The connection details cannot be set to null.");
+        if (etcdClient != null)  {
+            etcdClient.close();
+            etcdClient = null;
+        }
         this.connectionDetails = connectionDetails;
         this.etcdClient = Client.builder().endpoints(connectionDetails).build();
         this.keyValueClient = etcdClient.getKVClient();
@@ -110,8 +115,7 @@ public class EtcdBackingStore implements BackingStore {
                 ByteSequence.fromString(key + ".value"),
                 ByteSequence.fromBytes(value),
                 PutOption.newBuilder().withLeaseId(leaseID).build());
-        response1.join();
-        response2.join();
+        CompletableFuture.allOf(response1, response2).join();
         return true;
     }
 
