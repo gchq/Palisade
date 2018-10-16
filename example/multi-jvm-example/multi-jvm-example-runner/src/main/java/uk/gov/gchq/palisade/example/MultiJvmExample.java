@@ -52,14 +52,9 @@ public class MultiJvmExample {
             //this will write an initial configuration
             final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-
-
-
-            ResourceService res=cs.getResourceService();
-            res.getResourcesById(new GetResourcesByIdRequest().resourceId("bork")).join();
-
-
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+
+
 
             LOGGER.info("");
             LOGGER.info("Alice is reading file1...");

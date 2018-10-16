@@ -33,7 +33,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.ChildResource;
@@ -46,8 +45,6 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
-import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
-import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
@@ -60,7 +57,6 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -108,18 +104,7 @@ public class HDFSResourceService implements ResourceService {
         }
     }
 
-
     public static final String CONNECTION_DETAIL_IN_CONFIG = "hdfs.init.connection.detail";
-
-    public static void main(String[] args) throws Exception {
-        HDFSResourceService s=new HDFSResourceService(new Configuration(),null,null);
-        final Map<String, ConnectionDetail> dataType = new HashMap<>();
-        dataType.put("fdsf", new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestService.class));
-        s.connectionDetail(null, dataType);
-
-        
-    }
-
 
     //=====================
 
@@ -320,12 +305,12 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
-    public HashMap<String, ConnectionDetail> getDataType() {
+    public Map<String, ConnectionDetail> getDataType() {
         return retrieveConnectionDetailStorage().getDataType();
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
-    public HashMap<String, ConnectionDetail> getDataFormat() {
+    public Map<String, ConnectionDetail> getDataFormat() {
         return retrieveConnectionDetailStorage().getDataFormat();
     }
 
@@ -402,16 +387,15 @@ public class HDFSResourceService implements ResourceService {
                 .toHashCode();
     }
 
-    private class ConnectionDetailStorage {
-        private final HashMap<String, ConnectionDetail> dataFormat = new HashMap<>();
+    private static class ConnectionDetailStorage {
+        private final Map<String, ConnectionDetail> dataFormat = new HashMap<>();
 
-        private final HashMap<String, ConnectionDetail> dataType = new HashMap<>();
+        private final Map<String, ConnectionDetail> dataType = new HashMap<>();
 
         ConnectionDetailStorage() {
         }
 
-        @JsonCreator
-        ConnectionDetailStorage(@JsonProperty("dataformat") final Map<String, ConnectionDetail> dataFormat, @JsonProperty("datatype") final Map<String, ConnectionDetail> dataType) {
+        ConnectionDetailStorage(final Map<String, ConnectionDetail> dataFormat,  final Map<String, ConnectionDetail> dataType) {
             if (nonNull(dataFormat)) {
                 this.dataFormat.putAll(dataFormat);
                 this.dataFormat.values().removeIf(Objects::isNull);
@@ -433,13 +417,13 @@ public class HDFSResourceService implements ResourceService {
             return rtn;
         }
 
-        @JsonProperty("dataformat")
-        public HashMap<String, ConnectionDetail> getDataFormat() {
+
+        public Map<String, ConnectionDetail> getDataFormat() {
             return new HashMap<>(dataFormat);
         }
 
-        @JsonProperty("datatype")
-        public HashMap<String, ConnectionDetail> getDataType() {
+
+        public Map<String, ConnectionDetail> getDataType() {
             return new HashMap<>(dataType);
         }
 
