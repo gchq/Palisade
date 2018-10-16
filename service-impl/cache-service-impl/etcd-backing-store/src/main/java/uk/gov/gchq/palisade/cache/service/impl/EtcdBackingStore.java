@@ -48,22 +48,28 @@ public class EtcdBackingStore implements BackingStore {
 
     @JsonCreator
     public EtcdBackingStore etcdClient(final Collection<String> connectionDetails) {
-        requireNonNull(connectionDetails, "The connection details cannot be set to null.");
+        connect(connectionDetails);
+        return this;
+    }
+
+    public void connect(final Collection<String> connectionDetails) {
+        requireNonNull(connectionDetails, "The connection details cannot be null.");
         if (etcdClient != null)  {
-            etcdClient.close();
-            etcdClient = null;
+            close();
         }
         this.connectionDetails = connectionDetails;
         this.etcdClient = Client.builder().endpoints(connectionDetails).build();
         this.keyValueClient = etcdClient.getKVClient();
         this.leaseClient = etcdClient.getLeaseClient();
-        return this;
     }
 
     public void close() {
         keyValueClient.close();
         leaseClient.close();
         etcdClient.close();
+        keyValueClient = null;
+        leaseClient = null;
+        etcdClient = null;
     }
 
     public Collection<String> getConnectionDetails() {
@@ -78,19 +84,19 @@ public class EtcdBackingStore implements BackingStore {
 
     @JsonIgnore
     public Client getEtcdClient() {
-        requireNonNull(etcdClient, "The etcd client has not been set.");
+        requireNonNull(etcdClient, "No connection is open to the etcd cluster.");
         return etcdClient;
     }
 
     @JsonIgnore
     private KV getKeyValueClient() {
-        requireNonNull(keyValueClient, "The etcd client has not been set.");
+        requireNonNull(keyValueClient, "No connection is open to the etcd cluster.");
         return keyValueClient;
     }
 
     @JsonIgnore
     private Lease getLeaseClient() {
-        requireNonNull(leaseClient, "The etcd client has not been set.");
+        requireNonNull(leaseClient, "No connection is open to the etcd cluster.");
         return leaseClient;
     }
 
