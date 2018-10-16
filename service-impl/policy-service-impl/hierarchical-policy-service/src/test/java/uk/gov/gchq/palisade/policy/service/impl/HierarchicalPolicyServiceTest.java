@@ -6,6 +6,12 @@ import org.junit.Test;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
+import uk.gov.gchq.palisade.policy.HasSensitiveAuthRule;
+import uk.gov.gchq.palisade.policy.HasTestingJustification;
+import uk.gov.gchq.palisade.policy.IsTextResourceRule;
+import uk.gov.gchq.palisade.policy.PassThroughRule;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
@@ -14,7 +20,6 @@ import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
@@ -24,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -41,6 +45,7 @@ import static org.junit.Assert.assertTrue;
 public class HierarchicalPolicyServiceTest {
 
     private HierarchicalPolicyService policyService;
+    private static final SimpleCacheService cacheService = new SimpleCacheService().backingStore(new HashMapBackingStore());
     private static final User testUser = new User().userId("testUser");
     private final SystemResource systemResource = createTestSystemResource();
     private final DirectoryResource directoryResource = createTestDirectoryResource();
@@ -49,48 +54,36 @@ public class HierarchicalPolicyServiceTest {
 
     @Before
     public void setup() {
-        policyService = new HierarchicalPolicyService();
+        policyService = new HierarchicalPolicyService().cacheService(cacheService);
 
         policyService.setResourcePolicy(new SetResourcePolicyRequest()
                         .resource(fileResource1)
                         .policy(new Policy<>()
                                 .owner(testUser)
-                                .resourceLevelSimplePredicateRule("Input is not null", Objects::nonNull)
-                                .recordLevelRule("Check user has 'Sensitive' auth", (record, user, justification) -> {
-                                    if (user.getAuths().contains("Sensitive")) {
-                                        return record;
-                                    } else {
-                                        return null;
-                                    }
-                                }))
+                                .resourceLevelRule("Input is not null", new PassThroughRule<>())
+                                .recordLevelRule("Check user has 'Sensitive' auth", new HasSensitiveAuthRule<>()))
         );
 
         policyService.setResourcePolicy(new SetResourcePolicyRequest()
                         .resource(fileResource2)
                         .policy(new Policy<>()
                                 .owner(testUser)
-                                .resourceLevelSimplePredicateRule("Input is not null", Objects::nonNull)
-                                .recordLevelRule("Check user has 'Sensitive' auth", (record, user, justification) -> {
-                                    if (user.getAuths().contains("Sensitive")) {
-                                        return record;
-                                    } else {
-                                        return null;
-                                    }
-                                }))
+                                .resourceLevelRule("Input is not null", new PassThroughRule<>())
+                                .recordLevelRule("Check user has 'Sensitive' auth", new HasSensitiveAuthRule<>()))
         );
 
         policyService.setResourcePolicy(new SetResourcePolicyRequest()
                         .resource(directoryResource)
                         .policy(new Policy<>()
                                 .owner(testUser)
-                                .recordLevelSimpleFunctionRule("Does nothing", a -> a))
+                                .recordLevelRule("Does nothing", new PassThroughRule<>()))
         );
 
         policyService.setResourcePolicy(new SetResourcePolicyRequest()
                         .resource(systemResource)
                         .policy(new Policy<>()
                                 .owner(testUser)
-                                .resourceLevelSimplePredicateRule("Resource serialised format is txt", resource -> ((LeafResource) resource).getSerialisedFormat().equalsIgnoreCase("txt")))
+                                .resourceLevelRule("Resource serialised format is txt", new IsTextResourceRule()))
         );
     }
 
@@ -113,7 +106,7 @@ public class HierarchicalPolicyServiceTest {
     @Test
     public void getApplicableResourceLevelRules() {
         // try
-        Rules<Resource> result = policyService.getApplicableRules(fileResource1, true, fileResource1.getType());
+        Rules result = policyService.getApplicableRules(fileResource1, true, fileResource1.getType()).join();
         // check
         assertEquals("Resource serialised format is txt, Input is not null", result.getMessage());
         assertEquals(2, result.getRules().keySet().size());
@@ -122,7 +115,7 @@ public class HierarchicalPolicyServiceTest {
     @Test
     public void getApplicableRecordLevelRules() {
         // try
-        Rules<Resource> result = policyService.getApplicableRules(fileResource1, false, fileResource1.getType());
+        Rules result = policyService.getApplicableRules(fileResource1, false, fileResource1.getType()).join();
         // check
         assertEquals("Does nothing, Check user has 'Sensitive' auth", result.getMessage());
         assertEquals(2, result.getRules().keySet().size());
@@ -170,7 +163,7 @@ public class HierarchicalPolicyServiceTest {
         newResource.setParent(createTestDirectoryResource());
         Policy newPolicy = new Policy()
                 .owner(testUser)
-                .resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
+                .resourceLevelRule("Justification is testing", new HasTestingJustification<>());
         // try
         CompletableFuture<Boolean> future = policyService.setResourcePolicy(new SetResourcePolicyRequest().resource(newResource).policy(newPolicy));
         Boolean result = future.get();
@@ -198,7 +191,7 @@ public class HierarchicalPolicyServiceTest {
         assertEquals(fileResource1, resources.iterator().next());
 
         // given
-        Policy newPolicy = new Policy().owner(testUser).resourceLevelPredicateRule("Justification is testing", (resource, user, justification) -> justification.getJustification().equals("testing"));
+        Policy newPolicy = new Policy().owner(testUser).resourceLevelRule("Justification is testing", new HasTestingJustification<>());
         // try
         CompletableFuture<Boolean> future = policyService.setResourcePolicy(new SetResourcePolicyRequest().resource(fileResource1).policy(newPolicy));
         Boolean result = future.get();

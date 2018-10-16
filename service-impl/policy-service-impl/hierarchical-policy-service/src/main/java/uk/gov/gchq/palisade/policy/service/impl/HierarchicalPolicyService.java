@@ -22,6 +22,9 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.Util;
+import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
@@ -35,13 +38,11 @@ import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.rule.Rules;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -58,31 +59,27 @@ import static java.util.Objects.requireNonNull;
 public class HierarchicalPolicyService implements PolicyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HierarchicalPolicyService.class);
 
-    private static final Map<String, Policy> DATA_TYPE_POLICIES_MAP = new ConcurrentHashMap<>();
-    private static final Map<Resource, Policy> RESOURCE_POLICIES_MAP = new ConcurrentHashMap<>();
+    private static final String DATA_TYPE_POLICIES_PREFIX = "dataTypePolicy.";
+    private static final String RESOURCE_POLICIES_PREFIX = "resourcePolicy.";
 
-    private Map<String, Policy> dataTypePoliciesMap;
-    private Map<Resource, Policy> resourcePoliciesMap;
+    private CacheService cacheService;
 
     public HierarchicalPolicyService() {
-        this(true);
     }
 
-    public HierarchicalPolicyService(final boolean useStatic) {
-        if (useStatic) {
-            this.dataTypePoliciesMap = DATA_TYPE_POLICIES_MAP;
-            this.resourcePoliciesMap = RESOURCE_POLICIES_MAP;
-        } else {
-            this.dataTypePoliciesMap = new ConcurrentHashMap<>();
-            this.resourcePoliciesMap = new ConcurrentHashMap<>();
-        }
+    public HierarchicalPolicyService cacheService(final CacheService cacheService) {
+        requireNonNull(cacheService, "Cache service cannot be set to null.");
+        this.cacheService = cacheService;
+        return this;
     }
 
-    public HierarchicalPolicyService(final Map<String, Policy> dataTypePoliciesMap, final Map<Resource, Policy> resourcePoliciesMap) {
-        requireNonNull(dataTypePoliciesMap);
-        requireNonNull(resourcePoliciesMap);
-        this.dataTypePoliciesMap = dataTypePoliciesMap;
-        this.resourcePoliciesMap = resourcePoliciesMap;
+    public void setCacheService(final CacheService cacheService) {
+        cacheService(cacheService);
+    }
+
+    public CacheService getCacheService() {
+        requireNonNull(cacheService, "The cache service has not been set.");
+        return cacheService;
     }
 
     @Override
@@ -97,7 +94,8 @@ public class HierarchicalPolicyService implements PolicyService {
     private Collection<LeafResource> canAccess(final Context context, final User user, final Collection<LeafResource> resources) {
         return resources.stream()
                 .map(resource -> {
-                    Rules<LeafResource> rules = getApplicableRules(resource, true, resource.getType());
+                    CompletableFuture<Rules<LeafResource>> futureRules = getApplicableRules(resource, true, resource.getType());
+                    Rules<LeafResource> rules = futureRules.join();
                     return Util.applyRulesToRecord(resource, user, context, rules);
                 })
                 .filter(Objects::nonNull)
@@ -115,33 +113,51 @@ public class HierarchicalPolicyService implements PolicyService {
      *                         Resource hierarchy tree, which will be the data type of the
      *                         first resource in the recursive calls to this method.
      * @param <T>              The type of the returned {@link Rules}.
-     * @return A {@link Rules} object of type T, which contains the list of rules
+     * @return A completable future of {@link Rules} object of type T, which contains the list of rules
      * that need to be applied to the resource.
      */
-    protected <T> Rules<T> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
+    protected <T> CompletableFuture<Rules<T>> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
 
-        Rules<T> inheritedRules;
+        CompletableFuture<Rules<T>> inheritedRules;
         if (resource instanceof ChildResource) {
             inheritedRules = getApplicableRules(((ChildResource) resource).getParent(), canAccessRequest, originalDataType);
         } else {
-            Policy inheritedPolicy = dataTypePoliciesMap.getOrDefault(originalDataType, new Policy());
-            if (canAccessRequest) {
-                inheritedRules = inheritedPolicy.getResourceRules();
-            } else {
-                inheritedRules = inheritedPolicy.getRecordRules();
-            }
+            CompletableFuture<Optional<Policy>> inheritedPolicy = (CompletableFuture<Optional<Policy>>) getCacheService().get(
+                    new GetCacheRequest<Policy>()
+                            .service(this.getClass())
+                            .key(DATA_TYPE_POLICIES_PREFIX + originalDataType));
+
+            inheritedRules = inheritedPolicy.thenApply(policy -> extractRules(canAccessRequest, policy));
         }
-        Policy newPolicy = resourcePoliciesMap.getOrDefault(resource, null);
-        if (newPolicy == null) {
-            return inheritedRules;
-        } else {
-            Rules<T> newRules;
-            if (canAccessRequest) {
-                newRules = newPolicy.getResourceRules();
+
+        CompletableFuture<Optional<Policy>> newPolicy = (CompletableFuture<Optional<Policy>>) getCacheService().get(
+                new GetCacheRequest<Policy>()
+                        .service(this.getClass())
+                        .key(RESOURCE_POLICIES_PREFIX + resource.getId()));
+
+        return inheritedRules.thenCombine(newPolicy, (oldRules, policy) -> {
+            if (policy.isPresent()) {
+                Rules<T> newRules = extractRules(canAccessRequest, policy);
+                return mergeRules(oldRules, newRules);
             } else {
-                newRules = newPolicy.getRecordRules();
+                return oldRules;
             }
-            return mergeRules(inheritedRules, newRules);
+        });
+    }
+
+    private <T> Rules<T> extractRules(final boolean canAccessRequest, final Optional<Policy> policy) {
+        if (canAccessRequest) {
+            if (policy.isPresent()) {
+                return policy.get().getResourceRules();
+            } else {
+                return new Rules<>();
+            }
+        } else {
+            if (policy.isPresent()) {
+                return policy.get().getRecordRules();
+            } else {
+                return new Rules<>();
+            }
         }
     }
 
@@ -164,8 +180,8 @@ public class HierarchicalPolicyService implements PolicyService {
         Collection<LeafResource> canAccessResources = canAccess(context, user, resources);
         HashMap<LeafResource, Policy> map = new HashMap<>();
         canAccessResources.forEach(resource -> {
-            Rules rules = getApplicableRules(resource, false, resource.getType());
-            map.put(resource, new Policy<>().recordRules(rules));
+            CompletableFuture<Rules<Object>> rules = getApplicableRules(resource, false, resource.getType());
+            map.put(resource, new Policy<>().recordRules(rules.join()));
         });
         return CompletableFuture.completedFuture(new MultiPolicy().policies(map));
     }
@@ -173,33 +189,26 @@ public class HierarchicalPolicyService implements PolicyService {
     @Override
     public CompletableFuture<Boolean> setResourcePolicy(final SetResourcePolicyRequest request) {
         requireNonNull(request);
-        requireNonNull(request.getPolicy());
-        requireNonNull(request.getResource());
         Resource resource = request.getResource();
-        if (resource.getId() == null) {
-            if (resource instanceof LeafResource) {
-                dataTypePoliciesMap.put(((LeafResource) resource).getType(), request.getPolicy());
-                LOGGER.debug("Set %s to data type %s", request.getPolicy(), ((LeafResource) resource).getType());
-            } else {
-                LOGGER.debug("The resource provided does not have the id or type field populated. Therefore the policy can not be added: %s", resource);
-                final CompletableFuture<Boolean> future = new CompletableFuture<>();
-                future.completeExceptionally(new IOException("The resource provided does not have the id or type field populated. Therefore the policy can not be added."));
-                return future;
-            }
-        } else {
-            resourcePoliciesMap.put(resource, request.getPolicy());
-            LOGGER.debug("Set %s to %s", request.getPolicy(), resource);
-        }
-        return CompletableFuture.completedFuture(Boolean.TRUE);
+        Policy policy = request.getPolicy();
+        LOGGER.debug("Set %s to resource %s", policy, resource);
+        return getCacheService().add(
+                new AddCacheRequest<Policy>()
+                        .service(this.getClass())
+                        .key(RESOURCE_POLICIES_PREFIX + resource.getId())
+                        .value(policy));
     }
 
     @Override
     public CompletableFuture<Boolean> setTypePolicy(final SetTypePolicyRequest request) {
         requireNonNull(request);
-        requireNonNull(request.getPolicy());
         final String type = request.getType();
-        dataTypePoliciesMap.put(type, request.getPolicy());
-        LOGGER.debug("Set %s to data type %s", request.getPolicy(), type);
-        return CompletableFuture.completedFuture(Boolean.TRUE);
+        final Policy policy = request.getPolicy();
+        LOGGER.debug("Set %s to data type %s", policy, type);
+        return getCacheService().add(
+                new AddCacheRequest<Policy>()
+                        .service(this.getClass())
+                        .key(DATA_TYPE_POLICIES_PREFIX + type)
+                        .value(policy));
     }
 }

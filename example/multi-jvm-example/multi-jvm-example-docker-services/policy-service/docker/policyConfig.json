@@ -1,4 +1,10 @@
 {
   "class": "uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService",
-  "@id": 1
+  "@id": 1,
+  "cacheService" : {
+    "class": "uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService",
+    "backingStore": {
+      "class": "uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore"
+    }
+  }
 }
