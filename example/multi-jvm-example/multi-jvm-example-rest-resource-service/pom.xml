@@ -121,7 +121,8 @@
                                     ${standalone-path}
                                 </palisade.rest.basePath>
                                 <palisade.rest.resource.service.config.path>
-                                    ${project.build.outputDirectory}/resourceConfig.json
+                                    <!-- This file exists in the example-model module -->
+                                    configRest.json
                                 </palisade.rest.resource.service.config.path>
                                 <palisade.error-mode.debug>
                                     true

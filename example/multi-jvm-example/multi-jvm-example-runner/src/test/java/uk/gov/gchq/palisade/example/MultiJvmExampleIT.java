@@ -69,7 +69,7 @@ public class MultiJvmExampleIT {
         policyServer = new EmbeddedHttpServer("http://localhost:8081/policy/v1", new uk.gov.gchq.palisade.policy.service.impl.ApplicationConfigV1());
         policyServer.startServer();
 
-        System.setProperty(RestResourceServiceV1.SERVICE_CONFIG, "resourceConfig.json");
+        System.setProperty(RestResourceServiceV1.SERVICE_CONFIG, "configRest.json");
         resourceServer = new EmbeddedHttpServer("http://localhost:8082/resource/v1", new uk.gov.gchq.palisade.resource.service.impl.ApplicationConfigV1());
         resourceServer.startServer();
 
@@ -85,7 +85,7 @@ public class MultiJvmExampleIT {
         configServer = new EmbeddedHttpServer("http://localhost:8085/config/v1", new uk.gov.gchq.palisade.config.service.impl.ApplicationConfigV1());
         configServer.startServer();
 
-        final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
+        configService = ExampleConfigurator.setupMultiJVMConfigurationService();
     }
 
     @AfterClass

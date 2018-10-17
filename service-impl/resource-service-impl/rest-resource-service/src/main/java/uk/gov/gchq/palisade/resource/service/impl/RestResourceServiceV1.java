@@ -35,6 +35,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
+import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -61,7 +62,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class RestResourceServiceV1 implements ResourceService {
     public static final String SERVICE_CONFIG = "palisade.rest.resource.service.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestResourceServiceV1.class);
-    public static final int DELAY = 500;
 
     private final ResourceService delegate;
 
@@ -82,29 +82,9 @@ public class RestResourceServiceV1 implements ResourceService {
     private static synchronized ResourceService createService(final String serviceConfigPath) {
         ResourceService ret;
         if (resourceService == null) {
-            //create config service object
-            final InputStream stream = StreamUtil.openStream(RestResourceServiceV1.class, serviceConfigPath);
-            InitialConfigurationService service = JSONSerialiser.deserialise(stream, InitialConfigurationService.class);
-
-            //get the config for this service, try repeatedly until we get a valid configuration
-            boolean success = false;
-            while (!success) {
-                try {
-                    resourceService = new Configurator(service).retrieveConfigAndCreate(ResourceService.class);
-                    success = true;
-                } catch (NoConfigException e) {
-                    LOGGER.warn("Failed to get valid configuration for {}", ResourceService.class.getCanonicalName(), e);
-                    try {
-                        Thread.sleep(DELAY);
-                    } catch (InterruptedException ignore) {
-                        //ignore
-                    }
-                }
-            }
-            ret = resourceService;
-        } else {
-            ret = resourceService;
+            resourceService = RestUtil.createService(RestResourceServiceV1.class, serviceConfigPath, ResourceService.class);
         }
+        ret = resourceService;
         return ret;
     }
 
