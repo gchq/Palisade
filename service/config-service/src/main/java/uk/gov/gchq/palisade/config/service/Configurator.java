@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.time.Duration;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -32,24 +33,62 @@ import java.util.concurrent.TimeoutException;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * A {@code Configurator} is responsible for creating Palisade {@link Service}s either from a supplied {@link
+ * InitialConfig} or by connecting to a {@link InitialConfigurationService} and retrieving the configuration from
+ * there.
+ * <p>
+ * No parameter may be {@code null}.
+ */
 public class Configurator {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurator.class);
+    /**
+     * The delay between sending requests to the configuration service. In milliseconds.
+     */
     private static final long DELAY = 500;
 
+    /**
+     * The configuration service.
+     */
     private final InitialConfigurationService service;
 
+    /**
+     * Create a {@code Configurator} object that retrieves configuration from the given service.
+     *
+     * @param service the configuration service
+     */
     public Configurator(final InitialConfigurationService service) {
         requireNonNull(service, "service");
         this.service = service;
     }
 
+    /**
+     * Attempts to connect to the configuration service to get the configuration for the named service class. It will
+     * then create the class and configure it based on the given information. This method will repeatedly try to connect
+     * to the configuration service until a call succeeds.
+     *
+     * @param serviceClass the service class type to create
+     * @param <S>          the type of service
+     * @return a created service
+     * @throws NoConfigException if no configuration for the service type could be found
+     */
     public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         InitialConfig config = retrieveConfig(Optional.of(serviceClass));
         return createFromConfig(serviceClass, config);
     }
 
+    /**
+     * Attempts to connect to the configuration service to get the configuration for the named service class. It will
+     * then create the class and configure it based on the given information. This method will repeatedly try to connect
+     * to the configuration service until a call succeeds or the given duration expires.
+     *
+     * @param serviceClass the service class type to create
+     * @param timeout      the length of time to try to retrieve a configuration before failing
+     * @param <S>          the type of service
+     * @return a created service
+     * @throws NoConfigException if no configuration for the service type could be found, or the operation timed out
+     */
     public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass, final Duration timeout) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(timeout, "timeout");
@@ -57,6 +96,19 @@ public class Configurator {
         return createFromConfig(serviceClass, config);
     }
 
+    /**
+     * Create a Palisade service from the given configuration. This method will look up the implementing class name for
+     * the given service class from the configuration, attempt to create it and then call {@link
+     * Service#configure(InitialConfig)} on the object.
+     *
+     * @param serviceClass the type of service class to create
+     * @param config       the configuration to create the service from
+     * @param <S>          the type of service
+     * @return a created service
+     * @throws IllegalStateException if the service class could not be created
+     * @throws NoConfigException     if the implementing class name couldn't be looked up, or the instance can't be
+     *                               configured properly from the given configuration
+     */
     public <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final InitialConfig config) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(config, "config");
@@ -72,20 +124,52 @@ public class Configurator {
             //configure it
             instance.configure(config);
             return instance;
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchElementException e) {
             throw new IllegalStateException("couldn't create service class " + serviceClass, e);
         }
     }
 
+    /**
+     * Retrieves the initial configuration for a given service class. This will communicate with the configuration
+     * service to try and get the configuration details for the given service class. If no service class is provided
+     * (empty optional) then the client configuration will be retrieved. This method waits indefinitely for the
+     * configuration to respond.
+     *
+     * @param serviceClass the optional service class to retrieve data for
+     * @return the configuration data
+     * @throws NoConfigException if no configuration data can be retrieved
+     * @implNote This is equivalent to calling {@code retrieveConfig(serviceClass, 0)}.
+     */
     public InitialConfig retrieveConfig(final Optional<Class<? extends Service>> serviceClass) throws NoConfigException {
         return retrieveConfig(serviceClass, 0);
     }
 
+    /**
+     * Retrieves the initial configuration for a given service class. This will communicate with the configuration
+     * service to try and get the configuration details for the given service class. If no service class is provided
+     * (empty optional) then the client configuration will be retrieved. This method throws an exception if the
+     * configuration could not be retrieved in the given time specified.
+     *
+     * @param serviceClass the optional service class to retrieve data for
+     * @param timeout      the amount of time to wait for the configuration service to respond
+     * @return the configuration data
+     * @throws NoConfigException if no configuration data can be retrieved, or the operation timed out
+     */
     public InitialConfig retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final Duration timeout) throws NoConfigException {
         requireNonNull(timeout, "timeout");
         return retrieveConfig(serviceClass, timeout.toMillis());
     }
 
+    /**
+     * Implements the logic to talk to a configuration service. Requests are repeatedly made in the case of failure (for
+     * whatever reason, e.g. communication failure) until the time out expires. If the time out is zero, then this
+     * method will try indefinitely.
+     *
+     * @param serviceClass the service class type to retrieve the configuration for
+     * @param timeout      the time to wait for a successful response, 0 indicates try indefinitely
+     * @return the configuration
+     * @throws NoConfigException if the time out expires or no configuration could be found
+     */
     private InitialConfig retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final long timeout) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         if (timeout < 0) {

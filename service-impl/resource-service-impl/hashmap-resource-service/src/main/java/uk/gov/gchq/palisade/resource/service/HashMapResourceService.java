@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.resource.service;
 
+import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
@@ -25,6 +26,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,15 +38,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Objects.requireNonNull;
 
 /**
+ * <p> A HashMapResourceService is a  simple implementation of a {@link ResourceService} that simply stores the
+ * resources in a {@link ConcurrentHashMap}. More precisely it uses multiple maps to allow the resources to be indexed
+ * by resource, id, type and format. </p>
  * <p>
- * A HashMapResourceService is a  simple implementation of a {@link ResourceService}
- * that simply stores the resources in a {@link ConcurrentHashMap}. More
- * precisely it uses multiple maps to allow the resources to be indexed by
- * resource, id, type and format.
- * </p>
+ * This class is only intended to be used in simple example scenarios, it is not suitable for production deployment.
  * <p>
  * By default the map is static so it will be shared across the same JVM.
- * </p>
  */
 public class HashMapResourceService implements ResourceService {
     private static final Map<Resource, Map<LeafResource, ConnectionDetail>> RES_TO_RES = new ConcurrentHashMap<>();
@@ -56,6 +56,8 @@ public class HashMapResourceService implements ResourceService {
     private final Map<String, Map<LeafResource, ConnectionDetail>> idToResources;
     private final Map<String, Map<LeafResource, ConnectionDetail>> typeToResources;
     private final Map<String, Map<LeafResource, ConnectionDetail>> serialisedFormatToResources;
+
+    private final boolean useStatic;
 
     public HashMapResourceService() {
         this(true);
@@ -73,10 +75,22 @@ public class HashMapResourceService implements ResourceService {
             typeToResources = new ConcurrentHashMap<>();
             serialisedFormatToResources = new ConcurrentHashMap<>();
         }
+        this.useStatic = useStatic;
+    }
+
+    @Override
+    public void configure(final InitialConfig config) throws NoConfigException {
+        throw new UnsupportedOperationException(this.getClass() + " cannot be configured");
+    }
+
+    @Override
+    public void writeConfiguration(final InitialConfig config) {
+        throw new UnsupportedOperationException(this.getClass() + " cannot be written into a configuration");
     }
 
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
+        requireNonNull(request, "request");
         Map<LeafResource, ConnectionDetail> result = resourceToResources.get(request.getResource());
         if (null == result) {
             result = Collections.emptyMap();
@@ -86,6 +100,7 @@ public class HashMapResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
+        requireNonNull(request, "request");
         Map<LeafResource, ConnectionDetail> result = idToResources.get(request.getResourceId());
         if (null == result) {
             result = Collections.emptyMap();
@@ -95,6 +110,7 @@ public class HashMapResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
+        requireNonNull(request, "request");
         Map<LeafResource, ConnectionDetail> result = typeToResources.get(request.getType());
         if (null == result) {
             result = Collections.emptyMap();
@@ -104,6 +120,7 @@ public class HashMapResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
+        requireNonNull(request, "request");
         Map<LeafResource, ConnectionDetail> result = serialisedFormatToResources.get(request.getSerialisedFormat());
         if (null == result) {
 
@@ -114,6 +131,7 @@ public class HashMapResourceService implements ResourceService {
 
     @Override
     public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
+        requireNonNull(request, "request");
         LeafResource resource = request.getResource();
         ConnectionDetail connectionDetail = request.getConnectionDetail();
 
@@ -128,6 +146,9 @@ public class HashMapResourceService implements ResourceService {
     }
 
     private void recursiveAddParentResourceToIndex(final Resource parent, final LeafResource resource, final ConnectionDetail connectionDetail) {
+        requireNonNull(parent, "parent");
+        requireNonNull(resource, "resource");
+        requireNonNull(connectionDetail, "connectionDetail");
         if (parent instanceof ChildResource) {
             recursiveAddParentResourceToIndex(((ChildResource) parent).getParent(), resource, connectionDetail);
         }
