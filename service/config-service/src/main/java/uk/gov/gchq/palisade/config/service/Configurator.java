@@ -105,11 +105,11 @@ public class Configurator {
      * @param config       the configuration to create the service from
      * @param <S>          the type of service
      * @return a created service
-     * @throws IllegalStateException if the service class could not be created
-     * @throws NoConfigException     if the implementing class name couldn't be looked up, or the instance can't be
-     *                               configured properly from the given configuration
+     * @throws IllegalStateException if the service class could not be created, if the implementing class name couldn't
+     *                               be looked up, or the instance can't be configured properly from the given
+     *                               configuration
      */
-    public <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final InitialConfig config) throws NoConfigException {
+    public static <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final InitialConfig config) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(config, "config");
         try {

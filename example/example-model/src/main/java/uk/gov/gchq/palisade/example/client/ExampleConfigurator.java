@@ -104,7 +104,7 @@ public final class ExampleConfigurator {
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
                 .put(PalisadeService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
 
-        singleJVMconfig.put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName());
+        singleJVMconfig.put(ResourceService.class.getCanonicalName(), resource.getClass().getTypeName());
         resource.writeConfiguration(singleJVMconfig);
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
@@ -144,7 +144,7 @@ public final class ExampleConfigurator {
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
                 .put(PalisadeService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
 
-        multiJVMConfig.put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName());
+        multiJVMConfig.put(ResourceService.class.getCanonicalName(), resource.getClass().getTypeName());
         resource.writeConfiguration(multiJVMConfig);
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
@@ -176,7 +176,7 @@ public final class ExampleConfigurator {
             throw new RuntimeException(e);
         }
         //write class name
-        resourceConfig.put(ResourceService.class.getCanonicalName(), resourceServer.getClass().getCanonicalName());
+        resourceConfig.put(ResourceService.class.getCanonicalName(), resourceServer.getClass().getTypeName());
         //write the configured data
         resourceServer.writeConfiguration(resourceConfig);
         configService.add((AddConfigRequest) new AddConfigRequest()

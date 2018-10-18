@@ -56,8 +56,6 @@ public final class RestUtil {
         //create config service object
         final InputStream stream = StreamUtil.openStream(resolverClass, configDetailsPath);
         InitialConfigurationService service = JSONSerialiser.deserialise(stream, InitialConfigurationService.class);
-        System.err.println(service);
-        System.out.println(service);
         //get the config for this service, try repeatedly until we get a valid configuration
         while (true) {
             try {
