@@ -22,7 +22,7 @@ import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
-import uk.gov.gchq.palisade.config.service.exception.NoConfigException;
+import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
@@ -79,15 +79,15 @@ public class SimpleConfigServiceTest {
                 .value(clientConfig)).join();
         scs.getCache().add(new AddCacheRequest<InitialConfig>()
                 .service(InitialConfigurationService.class)
-                .key(Dummy1.class.getCanonicalName())
+                .key(Dummy1.class.getTypeName())
                 .value(serviceClass1)).join();
         scs.getCache().add(new AddCacheRequest<InitialConfig>()
                 .service(InitialConfigurationService.class)
-                .key(Dummy2.class.getCanonicalName())
+                .key(Dummy2.class.getTypeName())
                 .value(serviceClass2)).join();
         scs.getCache().add(new AddCacheRequest<InitialConfig>()
                 .service(InitialConfigurationService.class)
-                .key(Service.class.getCanonicalName())
+                .key(Service.class.getTypeName())
                 .value(genericService)).join();
     }
 

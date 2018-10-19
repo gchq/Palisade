@@ -13,26 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package uk.gov.gchq.palisade.config.service.exception;
-
-import uk.gov.gchq.palisade.exception.PalisadeRuntimeException;
+package uk.gov.gchq.palisade.service.request;
 
 /**
- * An exception thrown when a request is made for an {@link uk.gov.gchq.palisade.service.request.InitialConfig} that is
- * not present, or could not be found.
+ * Class constants.
  */
-public class NoConfigException extends PalisadeRuntimeException {
+public final class ConfigConsts {
 
-    public NoConfigException(final String e) {
-        super(e);
+    private ConfigConsts() {
     }
 
-    public NoConfigException(final Throwable cause) {
-        super(cause);
-    }
-
-    public NoConfigException(final String e, final Throwable cause) {
-        super(e, cause);
-    }
+    /**
+     * The delay between sending requests to the configuration service. In milliseconds.
+     */
+    public static final long DELAY = 500;
 }

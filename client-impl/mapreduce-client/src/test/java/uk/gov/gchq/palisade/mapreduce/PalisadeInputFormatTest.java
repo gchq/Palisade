@@ -60,7 +60,7 @@ public class PalisadeInputFormatTest {
 
         RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).context(new Context().justification("justification"));
         RegisterDataRequest[] rdrArray = {rdr};
-        String json = new String(JSONSerialiser.serialise(rdrArray), PalisadeInputFormat.UTF8);
+        String json = new String(JSONSerialiser.serialise(rdrArray), JSONSerialiser.UTF8);
         //When
         PalisadeInputFormat.addDataRequest(mockJob, rdr);
         //Then
@@ -78,7 +78,7 @@ public class PalisadeInputFormatTest {
         PalisadeInputFormat.addDataRequest(mockJob, rdr);
         PalisadeInputFormat.addDataRequest(mockJob, rdr);
         RegisterDataRequest[] rdrArray = {rdr, rdr};
-        String json = new String(JSONSerialiser.serialise(rdrArray), PalisadeInputFormat.UTF8);
+        String json = new String(JSONSerialiser.serialise(rdrArray), JSONSerialiser.UTF8);
         //Then
         assertEquals(json, c.get(PalisadeInputFormat.REGISTER_REQUESTS_KEY));
     }

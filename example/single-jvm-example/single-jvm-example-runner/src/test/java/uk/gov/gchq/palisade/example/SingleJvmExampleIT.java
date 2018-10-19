@@ -23,16 +23,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uk.gov.gchq.palisade.client.ConfiguredServices;
+import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
-import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,15 +39,11 @@ import static uk.gov.gchq.palisade.util.JsonAssert.assertEquals;
 
 public class SingleJvmExampleIT {
 
-    private static InitialConfig config;
+    private static InitialConfigurationService configService;
 
     @BeforeClass
     public static void createConfig() {
-        final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
-        //request the client configuration by not specifying a service
-        config = ics.get(new GetConfigRequest()
-                .service(Optional.empty()))
-                .join();
+        configService = ExampleConfigurator.setupSingleJVMConfigurationService();
     }
 
     @AfterClass
@@ -77,7 +70,7 @@ public class SingleJvmExampleIT {
     @Test
     public void shouldReadAsAlice() throws Exception {
         // Given
-        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // When
@@ -98,7 +91,7 @@ public class SingleJvmExampleIT {
     @Test
     public void shouldReadAsBob() throws Exception {
         // Given
-        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // When

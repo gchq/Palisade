@@ -19,15 +19,12 @@ package uk.gov.gchq.palisade.example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.client.ConfiguredServices;
+import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
-import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.io.File;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class MultiDockerJvmExample {
@@ -42,12 +39,7 @@ public class MultiDockerJvmExample {
     public void run() throws Exception {
         //this will write an initial configuration
         final InitialConfigurationService ics = ExampleConfigurator.setupDockerConfigurationService();
-        //request the client configuration by not specifiying a service
-        final InitialConfig config = ics.get(new GetConfigRequest()
-                .service(Optional.empty()))
-                .join();
-
-        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         LOGGER.info("");

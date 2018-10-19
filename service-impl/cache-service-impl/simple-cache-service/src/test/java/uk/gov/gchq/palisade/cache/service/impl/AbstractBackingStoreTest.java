@@ -272,7 +272,7 @@ public abstract class AbstractBackingStoreTest {
 
     //Time to live tests
 
-    private void delay(long millis) {
+    protected void delay(long millis) {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
@@ -305,7 +305,7 @@ public abstract class AbstractBackingStoreTest {
     /**
      * Method to check if the retrieval happened within a certain time.
      */
-    private TestResult timedRetrieve(String key, long safeDelay) {
+    protected TestResult timedRetrieve(String key, long safeDelay) {
         long time = System.currentTimeMillis();
         SimpleCacheObject result = impl.get(key);
         time = System.currentTimeMillis() - time;

@@ -35,6 +35,7 @@ import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -54,7 +55,14 @@ public class RestResourceServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        System.setProperty(RestResourceServiceV1.SERVICE_CONFIG, "mockConfig.json");
+        //force RestResourceServiceV1 to use the mock
+        try {
+            Field mainRestDelegate = RestResourceServiceV1.class.getDeclaredField("resourceService");
+            mainRestDelegate.setAccessible(true);
+            mainRestDelegate.set(null,new MockResourceService());
+        } catch (Exception e) {
+
+        }
         proxy = new ProxyRestResourceService("http://localhost:8082/resource");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
