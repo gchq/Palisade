@@ -31,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
  * between currently active user IDs and the users they correspond to. Each user has a given ID which can be added to
  * the user service and retrieved later by the client. </p> <p> <strong>Please note that it is not the responsibility of
  * any {@link UserService} implementation to provide the authentication of individual users, or to maintain a database
- * of 'Palisade' users.</strong> The actual authentication of users should provided by an external service outside of
+ * of 'Palisade' users.</strong> The actual authentication of users should be provided by an external service outside of
  * Palisade. For example, this could be via a centralised PKI service or by a SASL/Kerberos implementation. </p>
  */
 public interface UserService extends Service {

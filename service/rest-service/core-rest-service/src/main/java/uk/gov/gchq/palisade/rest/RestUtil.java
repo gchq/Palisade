@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
+import uk.gov.gchq.palisade.service.request.ConfigConsts;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.InputStream;
@@ -33,7 +34,6 @@ import java.io.InputStream;
 public final class RestUtil {
     public static final String CONFIG_SERVICE_PATH = "palisade.rest.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestUtil.class);
-    public static final int DELAY = 500;
 
     private RestUtil() {
     }
@@ -64,7 +64,7 @@ public final class RestUtil {
             } catch (NoConfigException e) {
                 LOGGER.warn("Failed to get valid configuration for {}", serviceClass.getTypeName(), e);
                 try {
-                    Thread.sleep(DELAY);
+                    Thread.sleep(ConfigConsts.DELAY);
                 } catch (InterruptedException ignore) {
                     //ignore
                 }

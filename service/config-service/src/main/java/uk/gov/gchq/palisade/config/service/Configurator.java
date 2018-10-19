@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
+import uk.gov.gchq.palisade.service.request.ConfigConsts;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.time.Duration;
@@ -42,10 +43,6 @@ import static java.util.Objects.requireNonNull;
  */
 public class Configurator {
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurator.class);
-    /**
-     * The delay between sending requests to the configuration service. In milliseconds.
-     */
-    private static final long DELAY = 500;
 
     /**
      * The configuration service.
@@ -197,7 +194,7 @@ public class Configurator {
                 LOGGER.warn("Error while retrieving configuration for {}", serviceClass, e);
                 //keep trying after short delay
                 try {
-                    Thread.sleep(DELAY);
+                    Thread.sleep(ConfigConsts.DELAY);
                 } catch (InterruptedException ignore) {
                 }
                 continue;
