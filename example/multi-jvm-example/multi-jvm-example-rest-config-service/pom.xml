@@ -48,6 +48,11 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
+            <artifactId>etcd-backing-store</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>simple-config-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

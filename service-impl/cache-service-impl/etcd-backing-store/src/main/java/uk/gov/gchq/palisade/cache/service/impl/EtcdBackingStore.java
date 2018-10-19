@@ -66,9 +66,22 @@ public class EtcdBackingStore implements BackingStore {
         return connectionDetails;
     }
 
+    public void setConnectionDetails(final Collection<String> connectionDetails) {
+        connectionDetails(connectionDetails);
+    }
+
+    public EtcdBackingStore connectionDetails(final Collection<String> connectionDetails) {
+        requireNonNull(connectionDetails, "The etcd connection details have not been set.");
+        this.connectionDetails = connectionDetails;
+        this.etcdClient = Client.builder().endpoints(connectionDetails).build();
+        this.keyValueClient = etcdClient.getKVClient();
+        this.leaseClient = etcdClient.getLeaseClient();
+        return this;
+    }
+
     @JsonIgnore
     public void setEtcdClient(final Collection<String> connectionDetails) {
-        etcdClient(connectionDetails);
+        connectionDetails(connectionDetails);
     }
 
     @JsonIgnore

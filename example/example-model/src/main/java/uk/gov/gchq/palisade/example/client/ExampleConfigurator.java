@@ -20,6 +20,7 @@ import org.apache.hadoop.conf.Configuration;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.client.ConfiguredServices;
@@ -43,7 +44,7 @@ import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -54,26 +55,13 @@ public final class ExampleConfigurator {
     }
 
     /**
-     * Create a properties backed config service for examples.
-     *
-     * @param backingStorePath the path to keep config in
-     * @return the config service
-     */
-    public static SimpleConfigService createConfigService(final Path backingStorePath) {
-        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore());
-        return new SimpleConfigService(cache);
-    }
-
-    /**
      * Allows the creation of some configuration data for the single JVM example.
      *
      * @return the configuration service that provides the entry to Palisade
      */
     public static InitialConfigurationService setupSingleJVMConfigurationService() {
-        InitialConfigurationService configService = new SimpleConfigService(
-                new SimpleCacheService()
-                        .backingStore(new HashMapBackingStore(true))
-        );
+        final CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+        final InitialConfigurationService configService = new SimpleConfigService(cache);
         //configure the single JVM settings
         AuditService audit = new LoggerAuditService();
         PolicyService policy = new HierarchicalPolicyService();
@@ -83,7 +71,6 @@ public final class ExampleConfigurator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
         UserService user = new HashMapUserService();
         PalisadeService palisade = new SimplePalisadeService()
                 .resourceService(resource)
@@ -129,6 +116,49 @@ public final class ExampleConfigurator {
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+        PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
+        PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
+        ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
+        UserService user = new ProxyRestUserService("http://localhost:8083/user");
+        ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
+
+        InitialConfig multiJVMConfig = new InitialConfig()
+                .put(ResourceService.class.getCanonicalName(), resource.getClass().getCanonicalName())
+                .put(ResourceService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(resource)))
+
+                .put(AuditService.class.getCanonicalName(), audit.getClass().getCanonicalName())
+                .put(AuditService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(audit)))
+
+                .put(PolicyService.class.getCanonicalName(), policy.getClass().getCanonicalName())
+                .put(PolicyService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(policy)))
+
+                .put(UserService.class.getCanonicalName(), user.getClass().getCanonicalName())
+                .put(UserService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(user)))
+
+                .put(CacheService.class.getCanonicalName(), cache.getClass().getCanonicalName())
+                .put(CacheService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(cache)))
+
+                .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getCanonicalName())
+                .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)))
+
+                .put(InitialConfigurationService.class.getCanonicalName(), configService.getClass().getCanonicalName())
+                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(configService)));
+        //insert this into the cache manually so it can be created later
+        configService.add((AddConfigRequest) new AddConfigRequest()
+                .config(multiJVMConfig)
+                .service(Optional.empty())).join();
+        return configService;
+    }
+
+    /**
+     * Allows the bootstrapping of some configuration data for the Docker example.
+     *
+     * @return the configuration service to provide the Palisade entry point
+     */
+    public static InitialConfigurationService setupDockerConfigurationService() {
+        //configure the multi JVM settings
+        AuditService audit = new LoggerAuditService();
+        CacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379")));
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
         ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
