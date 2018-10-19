@@ -65,7 +65,7 @@ public class ServiceConfiguratorTest {
     public void throwClassCantBeConfigured() {
         //Given
         InitialConfig conf = new InitialConfig()
-                .put(TestService.class.getCanonicalName(), NoConfigureTestService.class.getTypeName());
+                .put(TestService.class.getTypeName(), NoConfigureTestService.class.getTypeName());
 
         //When
         TestService t = Configurator.createFromConfig(TestService.class, conf);
@@ -90,7 +90,7 @@ public class ServiceConfiguratorTest {
     public void shouldCreateInstance() {
         //Given
         InitialConfig conf = new InitialConfig()
-                .put(TestService.class.getCanonicalName(), TestServiceImpl.class.getTypeName());
+                .put(TestService.class.getTypeName(), TestServiceImpl.class.getTypeName());
 
         //When
         TestService t = Configurator.createFromConfig(TestService.class, conf);

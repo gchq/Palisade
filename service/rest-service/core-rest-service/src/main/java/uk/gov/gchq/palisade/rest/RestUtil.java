@@ -61,7 +61,7 @@ public final class RestUtil {
             try {
                 return new Configurator(service).retrieveConfigAndCreate(serviceClass);
             } catch (NoConfigException e) {
-                LOGGER.warn("Failed to get valid configuration for {}", serviceClass.getCanonicalName(), e);
+                LOGGER.warn("Failed to get valid configuration for {}", serviceClass.getTypeName(), e);
                 try {
                     Thread.sleep(DELAY);
                 } catch (InterruptedException ignore) {

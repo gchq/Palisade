@@ -79,15 +79,15 @@ public class SimpleConfigServiceTest {
                 .value(clientConfig)).join();
         scs.getCache().add(new AddCacheRequest<InitialConfig>()
                 .service(InitialConfigurationService.class)
-                .key(Dummy1.class.getCanonicalName())
+                .key(Dummy1.class.getTypeName())
                 .value(serviceClass1)).join();
         scs.getCache().add(new AddCacheRequest<InitialConfig>()
                 .service(InitialConfigurationService.class)
-                .key(Dummy2.class.getCanonicalName())
+                .key(Dummy2.class.getTypeName())
                 .value(serviceClass2)).join();
         scs.getCache().add(new AddCacheRequest<InitialConfig>()
                 .service(InitialConfigurationService.class)
-                .key(Service.class.getCanonicalName())
+                .key(Service.class.getTypeName())
                 .value(genericService)).join();
     }
 

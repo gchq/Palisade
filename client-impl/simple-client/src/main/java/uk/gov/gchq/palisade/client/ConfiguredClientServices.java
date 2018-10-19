@@ -129,8 +129,8 @@ public class ConfiguredClientServices implements ServicesFactory {
     private <S extends Service> S legacyCreate(final Class<? extends Service> serviceClass) {
         requireNonNull(serviceClass, "serviceClass");
         try {
-            String servClass = config.get(serviceClass.getCanonicalName());
-            String jsonState = config.get(serviceClass.getCanonicalName() + STATE);
+            String servClass = config.get(serviceClass.getTypeName());
+            String jsonState = config.get(serviceClass.getTypeName() + STATE);
 
             //try to create class type
             Class<S> classImpl = (Class<S>) Class.forName(servClass).asSubclass(Service.class);

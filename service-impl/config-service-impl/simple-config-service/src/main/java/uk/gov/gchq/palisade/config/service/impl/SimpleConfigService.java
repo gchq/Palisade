@@ -119,7 +119,7 @@ public class SimpleConfigService implements InitialConfigurationService {
                 .value(request.getConfig());
         //are we setting anonymous config
         if (clazz.isPresent()) {
-            addRequest.key(clazz.get().getCanonicalName());
+            addRequest.key(clazz.get().getTypeName());
         } else {
             addRequest.key(ANONYMOUS_CONFIG_KEY);
         }
@@ -156,7 +156,7 @@ public class SimpleConfigService implements InitialConfigurationService {
         //first can we find anything for this class specifically?
         final GetCacheRequest<InitialConfig> serviceRequest = new GetCacheRequest<>()
                 .service(InitialConfigurationService.class)
-                .key(clazz.getCanonicalName());
+                .key(clazz.getTypeName());
         Optional<InitialConfig> result = cache.get(serviceRequest).join();
         //if we get an object back, then return it
         if (result.isPresent()) {
@@ -165,7 +165,7 @@ public class SimpleConfigService implements InitialConfigurationService {
         //make a call for the generic object
         final GetCacheRequest<InitialConfig> genericRequest = new GetCacheRequest<>()
                 .service(InitialConfigurationService.class)
-                .key(Service.class.getCanonicalName());
+                .key(Service.class.getTypeName());
         Optional<InitialConfig> genericResult = cache.get(genericRequest).join();
         if (genericResult.isPresent()) {
             return genericResult.get();

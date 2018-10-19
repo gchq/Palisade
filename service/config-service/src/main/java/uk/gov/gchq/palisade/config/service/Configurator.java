@@ -113,7 +113,7 @@ public class Configurator {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(config, "config");
         try {
-            String servClass = config.get(serviceClass.getCanonicalName());
+            String servClass = config.get(serviceClass.getTypeName());
 
             //try to create class type
             Class<S> classImpl = (Class<S>) Class.forName(servClass).asSubclass(Service.class);

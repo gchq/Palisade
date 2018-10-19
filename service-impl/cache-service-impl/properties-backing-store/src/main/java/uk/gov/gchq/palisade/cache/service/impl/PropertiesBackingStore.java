@@ -324,7 +324,7 @@ public class PropertiesBackingStore implements BackingStore {
         //this isn't meant to be thread safe, but we can at least make the cache add atomic
         synchronized (this) {
             props.setProperty(cacheKey, B64_ENCODER.encodeToString(value));
-            props.setProperty(makeClassKey(cacheKey), valueClass.getCanonicalName());
+            props.setProperty(makeClassKey(cacheKey), valueClass.getTypeName());
             //convert duration to a final time
             timeToLive.ifPresent(d -> {
                 LocalDateTime expiryTime = LocalDateTime.now().plus(d);
