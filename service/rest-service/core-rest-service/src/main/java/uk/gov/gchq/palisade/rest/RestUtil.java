@@ -26,6 +26,7 @@ import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.InputStream;
+import java.util.Scanner;
 
 /**
  * Utility class that includes functionality to create a {@link Service} from a given class name.
