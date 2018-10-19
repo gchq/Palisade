@@ -26,12 +26,12 @@ import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.InputStream;
-import java.util.Scanner;
 
 /**
  * Utility class that includes functionality to create a {@link Service} from a given class name.
  */
 public final class RestUtil {
+    public static final String CONFIG_SERVICE_PATH = "palisade.rest.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestUtil.class);
     public static final int DELAY = 500;
 

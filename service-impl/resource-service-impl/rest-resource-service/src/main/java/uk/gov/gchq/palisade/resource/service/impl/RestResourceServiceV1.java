@@ -52,7 +52,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 @Api(value = "/")
 public class RestResourceServiceV1 implements ResourceService {
-    public static final String SERVICE_CONFIG = "palisade.rest.resource.service.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestResourceServiceV1.class);
 
     private final ResourceService delegate;
@@ -60,7 +59,7 @@ public class RestResourceServiceV1 implements ResourceService {
     private static ResourceService resourceService;
 
     public RestResourceServiceV1() {
-        this(System.getProperty(SERVICE_CONFIG));
+        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
     }
 
     public RestResourceServiceV1(final String serviceConfigPath) {

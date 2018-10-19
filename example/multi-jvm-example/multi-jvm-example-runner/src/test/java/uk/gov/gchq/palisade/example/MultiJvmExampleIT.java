@@ -31,8 +31,8 @@ import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.policy.service.impl.RestPolicyServiceV1;
-import uk.gov.gchq.palisade.resource.service.impl.RestResourceServiceV1;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
+import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.impl.RestPalisadeServiceV1;
 import uk.gov.gchq.palisade.user.service.impl.RestUserServiceV1;
 
@@ -69,7 +69,7 @@ public class MultiJvmExampleIT {
         policyServer = new EmbeddedHttpServer("http://localhost:8081/policy/v1", new uk.gov.gchq.palisade.policy.service.impl.ApplicationConfigV1());
         policyServer.startServer();
 
-        System.setProperty(RestResourceServiceV1.SERVICE_CONFIG, "configRest.json");
+        System.setProperty(RestUtil.CONFIG_SERVICE_PATH, "configRest.json");
         resourceServer = new EmbeddedHttpServer("http://localhost:8082/resource/v1", new uk.gov.gchq.palisade.resource.service.impl.ApplicationConfigV1());
         resourceServer.startServer();
 
