@@ -25,23 +25,20 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
-import uk.gov.gchq.palisade.client.ConfiguredServices;
+import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
-import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.policy.service.impl.RestPolicyServiceV1;
-import uk.gov.gchq.palisade.resource.service.impl.RestResourceServiceV1;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
+import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.impl.RestPalisadeServiceV1;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.user.service.impl.RestUserServiceV1;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,7 +57,7 @@ public class MultiJvmExampleIT {
     private static EmbeddedHttpServer dataServer;
     private static EmbeddedHttpServer configServer;
 
-    private static InitialConfig config;
+    private static InitialConfigurationService configService;
 
     @BeforeClass
     public static void beforeClass() throws IOException {
@@ -72,7 +69,7 @@ public class MultiJvmExampleIT {
         policyServer = new EmbeddedHttpServer("http://localhost:8081/policy/v1", new uk.gov.gchq.palisade.policy.service.impl.ApplicationConfigV1());
         policyServer.startServer();
 
-        System.setProperty(RestResourceServiceV1.SERVICE_CONFIG, "resourceConfig.json");
+        System.setProperty(RestUtil.CONFIG_SERVICE_PATH, "configRest.json");
         resourceServer = new EmbeddedHttpServer("http://localhost:8082/resource/v1", new uk.gov.gchq.palisade.resource.service.impl.ApplicationConfigV1());
         resourceServer.startServer();
 
@@ -88,11 +85,7 @@ public class MultiJvmExampleIT {
         configServer = new EmbeddedHttpServer("http://localhost:8085/config/v1", new uk.gov.gchq.palisade.config.service.impl.ApplicationConfigV1());
         configServer.startServer();
 
-        final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
-        //request the client configuration by not specifying a service
-        config = ics.get(new GetConfigRequest()
-                .service(Optional.empty()))
-                .join();
+        configService = ExampleConfigurator.setupMultiJVMConfigurationService();
     }
 
     @AfterClass
@@ -141,7 +134,7 @@ public class MultiJvmExampleIT {
     @Test
     public void shouldReadAsAlice() throws Exception {
         // Given
-        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // When
@@ -162,7 +155,7 @@ public class MultiJvmExampleIT {
     @Test
     public void shouldReadAsBob() throws Exception {
         // Given
-        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // When
@@ -181,7 +174,7 @@ public class MultiJvmExampleIT {
     @Test
     public void proxyServiceShouldReturnActualExceptionThrownByUnderlyingService() throws Exception {
         // Given
-        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // When / Then

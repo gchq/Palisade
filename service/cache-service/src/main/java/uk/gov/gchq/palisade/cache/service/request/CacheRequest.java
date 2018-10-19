@@ -128,7 +128,7 @@ public abstract class CacheRequest extends Request {
      * @return typically this is the class name of the {@link Service} instance
      */
     public String getServiceStringForm() {
-        return getService().getCanonicalName();
+        return getService().getTypeName();
     }
 
     @Override

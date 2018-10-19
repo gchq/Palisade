@@ -15,9 +15,9 @@
  */
 package uk.gov.gchq.palisade.config.service;
 
-import uk.gov.gchq.palisade.config.service.exception.NoConfigException;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
+import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.service.request.Request;

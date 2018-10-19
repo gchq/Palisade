@@ -51,8 +51,8 @@ public interface BackingStore {
      * be empty. Durations must not be negative.
      * <p>
      * It is the responsibility of the backing store to ensure that the <code>valueClass</code> is stored along with the
-     * object byte array. The standard way to do this is to store the canonical name of the class. See {@link
-     * Class#getCanonicalName()}.
+     * object byte array. The standard way to do this is to store the type name of the class. See {@link
+     * Class#getTypeName()}.
      *
      * @param key        the cache key
      * @param valueClass the object type represented in the byte array

@@ -22,9 +22,9 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
-import uk.gov.gchq.palisade.config.service.exception.NoConfigException;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
+import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
@@ -119,7 +119,7 @@ public class SimpleConfigService implements InitialConfigurationService {
                 .value(request.getConfig());
         //are we setting anonymous config
         if (clazz.isPresent()) {
-            addRequest.key(clazz.get().getCanonicalName());
+            addRequest.key(clazz.get().getTypeName());
         } else {
             addRequest.key(ANONYMOUS_CONFIG_KEY);
         }
@@ -156,7 +156,7 @@ public class SimpleConfigService implements InitialConfigurationService {
         //first can we find anything for this class specifically?
         final GetCacheRequest<InitialConfig> serviceRequest = new GetCacheRequest<>()
                 .service(InitialConfigurationService.class)
-                .key(clazz.getCanonicalName());
+                .key(clazz.getTypeName());
         Optional<InitialConfig> result = cache.get(serviceRequest).join();
         //if we get an object back, then return it
         if (result.isPresent()) {
@@ -165,12 +165,12 @@ public class SimpleConfigService implements InitialConfigurationService {
         //make a call for the generic object
         final GetCacheRequest<InitialConfig> genericRequest = new GetCacheRequest<>()
                 .service(InitialConfigurationService.class)
-                .key(Service.class.getCanonicalName());
+                .key(Service.class.getTypeName());
         Optional<InitialConfig> genericResult = cache.get(genericRequest).join();
         if (genericResult.isPresent()) {
             return genericResult.get();
         } else {
-            throw new NoConfigException("no service configuration could bd found");
+            throw new NoConfigException("no service configuration could be found");
         }
     }
 }

@@ -35,16 +35,14 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.client.ConfiguredServices;
+import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
-import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.File;
@@ -52,7 +50,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
@@ -129,11 +126,7 @@ public class MapReduceExample extends Configured implements Tool {
 
         //configure the Palisade input format on an example client
         final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
-        //request the client configuration by not specifiying a service
-        final InitialConfig config = ics.get(new GetConfigRequest()
-                .service(Optional.empty()))
-                .join();
-        final ConfiguredServices cs = new ConfiguredServices(config);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // Edit the configuration of the Palisade requests below here

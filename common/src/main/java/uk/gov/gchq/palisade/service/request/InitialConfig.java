@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -35,6 +36,8 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * All methods in this class throw {@link NullPointerException} unless otherwise stated for <code>null</code>
  * parameters.
+ * <p>
+ * This class may contain {@code null} values.
  */
 public class InitialConfig {
 
@@ -69,7 +72,11 @@ public class InitialConfig {
      */
     public InitialConfig putAll(final Map<String, String> map) {
         requireNonNull(map, "map");
-        configMap.putAll(map);
+        //filter out any null keys
+        map.entrySet()
+                .stream()
+                .filter(e -> nonNull(e.getKey()))
+                .forEach(e -> configMap.put(e.getKey(), e.getValue()));
         return this;
     }
 
@@ -77,12 +84,11 @@ public class InitialConfig {
      * Enters the given key and value pair into the configuration.
      *
      * @param key   the configuration key
-     * @param value the configuration value
+     * @param value the configuration value, maybe {@code null}
      * @return this object
      */
     public InitialConfig put(final String key, final String value) {
         requireNonNull(key, "key");
-        requireNonNull(value, "value");
         configMap.put(key, value);
         return this;
     }
@@ -96,11 +102,10 @@ public class InitialConfig {
      */
     public String get(final String key) throws NoSuchElementException {
         requireNonNull(key, "key");
-        String value = configMap.get(key);
-        if (value == null) {
-            throw new NoSuchElementException("no such key " + key);
+        if (configMap.containsKey(key)) {
+            return configMap.get(key);
         } else {
-            return value;
+            throw new NoSuchElementException("no such key " + key);
         }
     }
 

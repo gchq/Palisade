@@ -57,7 +57,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
-    private static final String RESOURCE_TYPE = "exampleObj";
     private final String file;
 
     public ExampleSimpleClient(final ServicesFactory services, final String file) {
@@ -98,46 +97,46 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                 new SetResourcePolicyRequest()
                         .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                         .policy(new Policy<ExampleObj>()
-                                .owner(alice)
-                                .recordLevelRule(
-                                        "1-visibility",
-                                        new IsExampleObjVisible()
-                                )
-                                .recordLevelRule(
-                                        "2-ageOff",
-                                        new IsExampleObjRecent(12L)
-                                )
-                                .recordLevelRule(
-                                        "3-redactProperty",
-                                        new RedactExampleObjProperty()
-                                )
+                                        .owner(alice)
+                                        .recordLevelRule(
+                                                "1-visibility",
+                                                new IsExampleObjVisible()
+                                        )
+                                        .recordLevelRule(
+                                                "2-ageOff",
+                                                new IsExampleObjRecent(12L)
+                                        )
+                                        .recordLevelRule(
+                                                "3-redactProperty",
+                                                new RedactExampleObjProperty()
+                                        )
                         );
 
         // Using Koryphe's functions/predicates
         final SetResourcePolicyRequest koryphePolicies = new SetResourcePolicyRequest()
                 .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                 .policy(new Policy<ExampleObj>()
-                        .owner(alice)
-                        .recordLevelRule(
-                                "1-visibility",
-                                new TupleRule<ExampleObj>()
-                                        .selection("Record.visibility", "User.auths")
-                                        .predicate(new IsXInCollectionY()))
-                        .recordLevelRule(
-                                "2-ageOff",
-                                new TupleRule<ExampleObj>()
-                                        .selection("Record.timestamp")
-                                        .predicate(new IsMoreThan(12L))
-                        )
-                        .recordLevelRule(
-                                "3-redactProperty",
-                                new TupleRule<ExampleObj>()
-                                        .selection("User.roles", "Record.property")
-                                        .function(new If<>()
-                                                .predicate(0, new Not<>(new CollectionContains("admin")))
-                                                .then(1, new SetValue("redacted")))
-                                        .projection("User.roles", "Record.property")
-                        )
+                                .owner(alice)
+                                .recordLevelRule(
+                                        "1-visibility",
+                                        new TupleRule<ExampleObj>()
+                                                .selection("Record.visibility", "User.auths")
+                                                .predicate(new IsXInCollectionY()))
+                                .recordLevelRule(
+                                        "2-ageOff",
+                                        new TupleRule<ExampleObj>()
+                                                .selection("Record.timestamp")
+                                                .predicate(new IsMoreThan(12L))
+                                )
+                                .recordLevelRule(
+                                        "3-redactProperty",
+                                        new TupleRule<ExampleObj>()
+                                                .selection("User.roles", "Record.property")
+                                                .function(new If<>()
+                                                        .predicate(0, new Not<>(new CollectionContains("admin")))
+                                                        .then(1, new SetValue("redacted")))
+                                                .projection("User.roles", "Record.property")
+                                )
                 );
 
         final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setResourcePolicy(
@@ -145,17 +144,16 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         );
 
         // The sys admin needs to configure the resource service
-        //if this is running as a multi JVM example, then we will get the ProxyRestResourceService and should not insert this connection detail
         if (getServicesFactory().getResourceService() instanceof HDFSResourceService) {
             final HdfsDataReader reader;
             try {
                 reader = new HdfsDataReader().conf(new Configuration());
-                reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
+                reader.addSerialiser(ExampleConfigurator.RESOURCE_TYPE, new ExampleObjSerialiser());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             final Map<String, ConnectionDetail> dataType = new HashMap<>();
-            dataType.put(RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService()).reader(reader)));
+            dataType.put(ExampleConfigurator.RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService()).reader(reader)));
             ((HDFSResourceService) getServicesFactory().getResourceService()).connectionDetail(null, dataType);
         }
         // Wait for the users and policies to be loaded
@@ -163,7 +161,7 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     }
 
     public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, RESOURCE_TYPE, userId, justification);
+        return super.read(filename, ExampleConfigurator.RESOURCE_TYPE, userId, justification);
     }
 
     private ParentResource getParent(final String fileURL) {
