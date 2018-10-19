@@ -21,8 +21,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.net.URI;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class EtcdBackingStoreTest extends AbstractBackingStoreTest {
 
@@ -41,7 +47,7 @@ public class EtcdBackingStoreTest extends AbstractBackingStoreTest {
 
     @Override
     public EtcdBackingStore createBackingStore() {
-        etcdBackingStore = new EtcdBackingStore().connectionDetails(clientEndpoints);
+        etcdBackingStore = new EtcdBackingStore().etcdClient(clientEndpoints);
         return etcdBackingStore;
     }
 

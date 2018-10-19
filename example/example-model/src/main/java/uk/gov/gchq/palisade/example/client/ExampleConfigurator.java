@@ -47,9 +47,9 @@ import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -131,22 +131,22 @@ public final class ExampleConfigurator {
         InitialConfig multiJVMConfig = new InitialConfig()
 
                 .put(AuditService.class.getCanonicalName(), audit.getClass().getTypeName())
-                .put(AuditService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(audit)))
+                .put(AuditService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
 
                 .put(PolicyService.class.getCanonicalName(), policy.getClass().getTypeName())
-                .put(PolicyService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(policy)))
+                .put(PolicyService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
 
                 .put(UserService.class.getCanonicalName(), user.getClass().getTypeName())
-                .put(UserService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(user)))
+                .put(UserService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(user)))
 
                 .put(CacheService.class.getCanonicalName(), cache.getClass().getTypeName())
-                .put(CacheService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(cache)))
+                .put(CacheService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
 
                 .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getTypeName())
-                .put(PalisadeService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(palisade)))
+                .put(PalisadeService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)))
 
                 .put(InitialConfigurationService.class.getCanonicalName(), configService.getClass().getTypeName())
-                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredServices.STATE, new String(JSONSerialiser.serialise(configService)));
+                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(configService)));
         multiJVMConfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
         resource.writeConfiguration(multiJVMConfig);
         //insert this into the cache manually so it can be created later
@@ -168,7 +168,7 @@ public final class ExampleConfigurator {
     public static InitialConfigurationService setupDockerConfigurationService() {
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
-        CacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379")));
+        CacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().etcdClient(Collections.singletonList("http://localhost:2379")));
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
         ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
