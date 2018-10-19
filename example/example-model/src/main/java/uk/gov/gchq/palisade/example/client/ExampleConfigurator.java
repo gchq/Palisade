@@ -73,7 +73,6 @@ public final class ExampleConfigurator {
         );
         //configure the single JVM settings
         AuditService audit = new LoggerAuditService();
-        PolicyService policy = new HierarchicalPolicyService().cacheService(cache);
         ResourceService resource = null;
         try {
             resource = new HDFSResourceService(new Configuration(), null, null).useSharedConnectionDetails(true);
@@ -81,6 +80,7 @@ public final class ExampleConfigurator {
             throw new RuntimeException(e);
         }
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+        PolicyService policy = new HierarchicalPolicyService().cacheService(cache);
         UserService user = new HashMapUserService();
         PalisadeService palisade = new SimplePalisadeService()
                 .resourceService(resource)
