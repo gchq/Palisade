@@ -40,10 +40,6 @@ import static java.util.Objects.requireNonNull;
  * This class may contain {@code null} values.
  */
 public class InitialConfig {
-    /**
-     * The delay between sending requests to the configuration service. In milliseconds.
-     */
-    private static final long DELAY = 500;
 
     /**
      * The map of configuration data.
