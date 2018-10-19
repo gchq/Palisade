@@ -187,7 +187,7 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>./data-service/docker/bin/rest-config-service</directory>
+                            <directory>./config-service/docker/bin/rest-config-service</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
