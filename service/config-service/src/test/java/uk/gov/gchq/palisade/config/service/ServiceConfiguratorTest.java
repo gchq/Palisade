@@ -17,6 +17,7 @@ package uk.gov.gchq.palisade.config.service;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
@@ -25,14 +26,15 @@ import uk.gov.gchq.palisade.service.request.InitialConfig;
 import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.Is.isA;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ServiceConfiguratorTest {
@@ -110,12 +112,40 @@ public class ServiceConfiguratorTest {
         fail("exception expected");
     }
 
+    @Test
+    public void shouldGetConfig() {
+        //Given
+        InitialConfig cfg = new InitialConfig()
+                .put(TestService.class.getTypeName(), TestServiceImpl.class.getTypeName());
 
-    //tests needed
+        InitialConfigurationService mock = Mockito.mock(InitialConfigurationService.class);
+        when(mock.get(any(GetConfigRequest.class))).thenReturn(CompletableFuture.completedFuture(cfg));
 
+        //When
+        InitialConfig ret = new Configurator(mock).retrieveConfig(Optional.of(TestService.class));
 
-    //should get config
-    //should call configure
-    //should throw on timeout
-    //should recall on execution exception
+        //Then
+        assertThat(ret, is(equalTo(cfg)));
+        verify(mock).get(any(GetConfigRequest.class));
+    }
+
+    @Test(expected = NoConfigException.class)
+    public void throwOnTimeout() {
+        //Given
+        InitialConfigurationService mock = Mockito.mock(InitialConfigurationService.class);
+        //make a deliberately slow request
+        when(mock.get(any(GetConfigRequest.class))).thenReturn(CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+            }
+            throw new RuntimeException("deliberate fail");
+        }));
+
+        //When
+        new Configurator(mock).retrieveConfig(Optional.empty(), Duration.ofMillis(10));
+
+        //Then
+        fail("exception expected");
+    }
 }

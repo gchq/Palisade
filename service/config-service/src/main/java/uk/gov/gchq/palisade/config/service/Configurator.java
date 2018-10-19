@@ -109,7 +109,7 @@ public class Configurator {
      *                               be looked up, or the instance can't be configured properly from the given
      *                               configuration
      */
-    public static <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final InitialConfig config) throws NoConfigException {
+    public static <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final InitialConfig config) throws IllegalStateException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(config, "config");
         try {
