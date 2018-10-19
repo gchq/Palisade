@@ -50,7 +50,7 @@ public class SimpleCacheService implements CacheService {
     private final CacheCodecRegistry codecs = new CacheCodecRegistry();
 
     /**
-     * The add for our data.
+     * The store for our data.
      */
     private BackingStore store;
 
@@ -68,7 +68,7 @@ public class SimpleCacheService implements CacheService {
      * @return this object
      */
     public SimpleCacheService backingStore(final BackingStore store) {
-        requireNonNull(store, "add");
+        requireNonNull(store, "store");
         this.store = store;
         return this;
     }
@@ -97,7 +97,7 @@ public class SimpleCacheService implements CacheService {
      * @return the backing store
      */
     public BackingStore getBackingStore() {
-        requireNonNull(store, "add must be initialised");
+        requireNonNull(store, "store must be initialised");
         return store;
     }
 

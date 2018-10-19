@@ -55,6 +55,7 @@ import java.util.Optional;
  * configuration for Palisade for the examples from scratch.
  */
 public final class ExampleConfigurator {
+
     protected static final String RESOURCE_TYPE = "exampleObj";
 
     private ExampleConfigurator() {
@@ -72,7 +73,7 @@ public final class ExampleConfigurator {
         );
         //configure the single JVM settings
         AuditService audit = new LoggerAuditService();
-        PolicyService policy = new HierarchicalPolicyService();
+        PolicyService policy = new HierarchicalPolicyService().cacheService(cache);
         ResourceService resource = null;
         try {
             resource = new HDFSResourceService(new Configuration(), null, null).useSharedConnectionDetails(true);
