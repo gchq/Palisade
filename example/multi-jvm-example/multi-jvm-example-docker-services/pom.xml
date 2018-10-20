@@ -222,7 +222,7 @@
                         </fileset>
                         <!-- Remove the config service file -->
                         <fileset>
-                            <directory>./resource-service/docker</directory>
+                            <directory>./resource-service/docker/bin</directory>
                             <includes>
                                 <include>configRest.json</include>
                             </includes>

@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -87,6 +88,7 @@ public abstract class ProxyRestService implements Service {
         baseUrl(baseUrl);
     }
 
+    @JsonIgnore
     public String getBaseUrlWithVersion() {
         requireNonNull(baseUrlWithVersion, "The base url with version has not been set.");
         return baseUrlWithVersion;

@@ -129,24 +129,21 @@ public final class ExampleConfigurator {
         ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
 
         InitialConfig multiJVMConfig = new InitialConfig()
+                .put(AuditService.class.getTypeName(), audit.getClass().getTypeName())
+                .put(AuditService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
 
-                .put(AuditService.class.getCanonicalName(), audit.getClass().getTypeName())
-                .put(AuditService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
+                .put(PolicyService.class.getTypeName(), policy.getClass().getTypeName())
+                .put(PolicyService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
 
-                .put(PolicyService.class.getCanonicalName(), policy.getClass().getTypeName())
-                .put(PolicyService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
+                .put(UserService.class.getTypeName(), user.getClass().getTypeName())
+                .put(UserService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(user)))
 
-                .put(UserService.class.getCanonicalName(), user.getClass().getTypeName())
-                .put(UserService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(user)))
+                .put(CacheService.class.getTypeName(), cache.getClass().getTypeName())
+                .put(CacheService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
 
-                .put(CacheService.class.getCanonicalName(), cache.getClass().getTypeName())
-                .put(CacheService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
+                .put(PalisadeService.class.getTypeName(), palisade.getClass().getTypeName())
+                .put(PalisadeService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
 
-                .put(PalisadeService.class.getCanonicalName(), palisade.getClass().getTypeName())
-                .put(PalisadeService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)))
-
-                .put(InitialConfigurationService.class.getCanonicalName(), configService.getClass().getTypeName())
-                .put(InitialConfigurationService.class.getCanonicalName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(configService)));
         multiJVMConfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
         resource.writeConfiguration(multiJVMConfig);
         //insert this into the cache manually so it can be created later
@@ -168,14 +165,14 @@ public final class ExampleConfigurator {
     public static InitialConfigurationService setupDockerConfigurationService() {
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
-        CacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().etcdClient(Collections.singletonList("http://localhost:2379")));
+        CacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379")));
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
         ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
         UserService user = new ProxyRestUserService("http://localhost:8083/user");
         ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
 
-        InitialConfig multiJVMConfig = new InitialConfig()
+        InitialConfig dockerConfig = new InitialConfig()
                 .put(AuditService.class.getTypeName(), audit.getClass().getTypeName())
                 .put(AuditService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
 
@@ -191,11 +188,11 @@ public final class ExampleConfigurator {
                 .put(PalisadeService.class.getTypeName(), palisade.getClass().getTypeName())
                 .put(PalisadeService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
 
-        multiJVMConfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
-        resource.writeConfiguration(multiJVMConfig);
+        dockerConfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
+        resource.writeConfiguration(dockerConfig);
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
-                .config(multiJVMConfig)
+                .config(dockerConfig)
                 .service(Optional.empty())).join();
 
         //create the services config that they will retrieve

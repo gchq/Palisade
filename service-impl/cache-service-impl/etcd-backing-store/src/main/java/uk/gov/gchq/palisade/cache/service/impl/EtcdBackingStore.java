@@ -24,7 +24,6 @@ import com.coreos.jetcd.kv.GetResponse;
 import com.coreos.jetcd.kv.PutResponse;
 import com.coreos.jetcd.options.GetOption;
 import com.coreos.jetcd.options.PutOption;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.Duration;
@@ -46,8 +45,7 @@ public class EtcdBackingStore implements BackingStore {
     public EtcdBackingStore() {
     }
 
-    @JsonCreator
-    public EtcdBackingStore etcdClient(final Collection<String> connectionDetails) {
+    public EtcdBackingStore connectionDetails(final Collection<String> connectionDetails) {
         connect(connectionDetails);
         return this;
     }
@@ -64,12 +62,18 @@ public class EtcdBackingStore implements BackingStore {
     }
 
     public void close() {
-        keyValueClient.close();
-        leaseClient.close();
-        etcdClient.close();
-        keyValueClient = null;
-        leaseClient = null;
-        etcdClient = null;
+        if (keyValueClient != null) {
+            keyValueClient.close();
+            keyValueClient = null;
+        }
+        if (leaseClient != null) {
+            leaseClient.close();
+            leaseClient = null;
+        }
+        if (etcdClient != null) {
+            etcdClient.close();
+            etcdClient = null;
+        }
     }
 
     public Collection<String> getConnectionDetails() {
@@ -77,9 +81,8 @@ public class EtcdBackingStore implements BackingStore {
         return connectionDetails;
     }
 
-    @JsonIgnore
-    public void setEtcdClient(final Collection<String> connectionDetails) {
-        etcdClient(connectionDetails);
+    public void setConnectionDetails(final Collection<String> connectionDetails) {
+        connectionDetails(connectionDetails);
     }
 
     @JsonIgnore
