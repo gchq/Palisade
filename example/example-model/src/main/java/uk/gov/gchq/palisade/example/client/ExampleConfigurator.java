@@ -119,7 +119,7 @@ public final class ExampleConfigurator {
      * @return the configuration service to provide the Palisade entry point
      */
     public static InitialConfigurationService setupMultiJVMConfigurationService() {
-        //configure the multi JVM settings
+        //configure the client and Palisade service settings
         AuditService audit = new LoggerAuditService();
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
@@ -163,7 +163,7 @@ public final class ExampleConfigurator {
      * @return the configuration service to provide the Palisade entry point
      */
     public static InitialConfigurationService setupDockerConfigurationService() {
-        //configure the multi JVM settings
+        //configure the client and Palisade service settings
         AuditService audit = new LoggerAuditService();
         CacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379")));
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
