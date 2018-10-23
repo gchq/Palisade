@@ -38,7 +38,7 @@ public class MultiDockerJvmExample {
 
     public void run() throws Exception {
         //this will write an initial configuration
-        final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
+        final InitialConfigurationService ics = ExampleConfigurator.setupDockerConfigurationService();
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 

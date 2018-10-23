@@ -20,6 +20,7 @@ import org.apache.hadoop.conf.Configuration;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
@@ -46,6 +47,7 @@ import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -183,5 +185,48 @@ public final class ExampleConfigurator {
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(resourceConfig)
                 .service(Optional.of(ResourceService.class))).join();
+    }
+
+    /**
+     * Allows the bootstrapping of some configuration data for the Docker example.
+     *
+     * @return the configuration service to provide the Palisade entry point
+     */
+    public static InitialConfigurationService setupDockerConfigurationService() {
+        //configure the multi JVM settings
+        AuditService audit = new LoggerAuditService();
+        CacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379")));
+        PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
+        PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
+        ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
+        UserService user = new ProxyRestUserService("http://localhost:8083/user");
+        ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
+        InitialConfig multiJVMConfig = new InitialConfig()
+                .put(AuditService.class.getTypeName(), audit.getClass().getTypeName())
+                .put(AuditService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
+
+                .put(PolicyService.class.getTypeName(), policy.getClass().getTypeName())
+                .put(PolicyService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
+
+                .put(UserService.class.getTypeName(), user.getClass().getTypeName())
+                .put(UserService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(user)))
+
+                .put(CacheService.class.getTypeName(), cache.getClass().getTypeName())
+                .put(CacheService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
+
+                .put(PalisadeService.class.getTypeName(), palisade.getClass().getTypeName())
+                .put(PalisadeService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
+
+        multiJVMConfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
+        resource.writeConfiguration(multiJVMConfig);
+        //insert this into the cache manually so it can be created later
+        configService.add((AddConfigRequest) new AddConfigRequest()
+                .config(multiJVMConfig)
+                .service(Optional.empty())).join();
+
+        //create the services config that they will retrieve
+        configureMultiJVMResourceService(configService);
+
+        return configService;
     }
 }
