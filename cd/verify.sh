@@ -23,8 +23,8 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Stopping the multi-jvm-example containers"
     ./example/multi-jvm-example/scripts/dockerComposeDown.sh
     echo "Compiling javadoc"
-    mvn -q clean install -P quick
-    mvn -q javadoc:aggregate -P quick
+    mvn clean install -P quick -B
+    mvn javadoc:aggregate -P quick -B
 
 fi
 
