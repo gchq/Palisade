@@ -19,7 +19,8 @@
   "cacheService": {
     "class" : "uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService",
     "backingStore" : {
-      "class" : "uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore"
+      "class" : "uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore",
+      "connectionDetails" : ["http://etcd:2379"]
     },
     "@id": 5
   },

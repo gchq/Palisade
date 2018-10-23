@@ -45,6 +45,11 @@
             <version>${jetcd.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
+        </dependency>
+        <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>jetcd-launcher</artifactId>
             <version>${project.parent.version}</version>
