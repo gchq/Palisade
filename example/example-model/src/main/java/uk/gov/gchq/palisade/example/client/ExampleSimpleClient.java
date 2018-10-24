@@ -37,7 +37,6 @@ import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
-import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
