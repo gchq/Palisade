@@ -67,19 +67,16 @@ public final class ExampleConfigurator {
      * @return the configuration service that provides the entry to Palisade
      */
     public static InitialConfigurationService setupSingleJVMConfigurationService() {
-        InitialConfigurationService configService = new SimpleConfigService(
-                new SimpleCacheService()
-                        .backingStore(new HashMapBackingStore(true))
-        );
+        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+        InitialConfigurationService configService = new SimpleConfigService(cache);
         //configure the single JVM settings
         AuditService audit = new LoggerAuditService();
         ResourceService resource = null;
         try {
-            resource = new HDFSResourceService(new Configuration(), null, null).useSharedConnectionDetails(true);
+            resource = new HDFSResourceService(new Configuration(), cache);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
         PolicyService policy = new HierarchicalPolicyService().cacheService(cache);
         UserService user = new HashMapUserService();
         PalisadeService palisade = new SimplePalisadeService()
@@ -153,7 +150,7 @@ public final class ExampleConfigurator {
                 .service(Optional.empty())).join();
 
         //create the services config that they will retrieve
-        configureMultiJVMResourceService(configService);
+        configureMultiJVMResourceService(configService, cache);
 
         return configService;
     }
@@ -163,12 +160,13 @@ public final class ExampleConfigurator {
      * service.
      *
      * @param configService the central configuration service
+     * @param cache         the cache service to connect this to
      */
-    private static void configureMultiJVMResourceService(final InitialConfigurationService configService) {
+    private static void configureMultiJVMResourceService(final InitialConfigurationService configService, final CacheService cache) {
         InitialConfig resourceConfig = new InitialConfig();
         HDFSResourceService resourceServer = null;
         try {
-            resourceServer = new HDFSResourceService(new Configuration(), null, null).useSharedConnectionDetails(true);
+            resourceServer = new HDFSResourceService(new Configuration(), cache);
             //set up the example object type
             final Map<String, ConnectionDetail> dataType = new HashMap<>();
             dataType.put(RESOURCE_TYPE, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
