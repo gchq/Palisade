@@ -59,6 +59,17 @@
             <artifactId>proxy-rest-config-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>jetcd-launcher</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <!-- Added for jetcd-launcher -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
 
         <!-- Test dependencies -->
 

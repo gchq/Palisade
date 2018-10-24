@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example;
 
+import io.etcd.jetcd.launcher.junit.EtcdClusterResource;
 import org.apache.commons.io.FileUtils;
 
 import org.slf4j.Logger;
@@ -43,7 +44,9 @@ public class MultiJvmExample {
 
     public void run() throws Exception {
         createDataPath();
+        EtcdClusterResource etcd = new EtcdClusterResource("test-etcd", 1);
         try {
+            etcd.cluster().start();
             //this will write an initial configuration
             final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
@@ -62,6 +65,9 @@ public class MultiJvmExample {
             bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {
             FileUtils.deleteQuietly(new File(FILE));
+            if (etcd != null) {
+                etcd.cluster().close();
+            }
         }
     }
 
