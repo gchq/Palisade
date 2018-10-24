@@ -39,6 +39,7 @@ import uk.gov.gchq.palisade.user.service.impl.RestUserServiceV1;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,7 +86,7 @@ public class MultiJvmExampleIT {
         configServer = new EmbeddedHttpServer("http://localhost:8085/config/v1", new uk.gov.gchq.palisade.config.service.impl.ApplicationConfigV1());
         configServer.startServer();
 
-        configService = ExampleConfigurator.setupMultiJVMConfigurationService();
+        configService = ExampleConfigurator.setupMultiJVMConfigurationService(Collections.emptyList());
     }
 
     @AfterClass

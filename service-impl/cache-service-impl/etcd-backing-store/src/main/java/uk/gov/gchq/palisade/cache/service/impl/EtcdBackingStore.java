@@ -114,7 +114,7 @@ public class EtcdBackingStore implements BackingStore {
         }
         CompletableFuture<PutResponse> response1 = getKeyValueClient().put(
                 ByteSequence.fromString(key + ".class"),
-                ByteSequence.fromString(valueClass.getCanonicalName()),
+                ByteSequence.fromString(valueClass.getTypeName()),
                 PutOption.newBuilder().withLeaseId(leaseID).build());
         CompletableFuture<PutResponse> response2 = getKeyValueClient().put(
                 ByteSequence.fromString(key + ".value"),

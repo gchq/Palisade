@@ -53,6 +53,7 @@ import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -144,9 +145,10 @@ public final class ExampleConfigurator {
     /**
      * Allows the bootstrapping of some configuration data for the multi-JVM example.
      *
+     * @param etcdEndpoints the list of etcd end points
      * @return the configuration service to provide the Palisade entry point
      */
-    public static InitialConfigurationService setupMultiJVMConfigurationService() {
+    public static InitialConfigurationService setupMultiJVMConfigurationService(final List<String> etcdEndpoints) {
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
@@ -180,7 +182,20 @@ public final class ExampleConfigurator {
                 .service(Optional.empty())).join();
 
         //create the services config that they will be able to find the example data
-        createMultiJVMResourceService(configService, cache);
+        //if there are no endpoints, assume we are using a HashMap backing store for now
+        //at the moment only resource service is using the etcd cache, once all config management work is done, then all services will
+        SimpleCacheService resourceCache = new SimpleCacheService();
+        if (etcdEndpoints.isEmpty()) {
+            resourceCache.backingStore(new HashMapBackingStore(true));
+        } else {
+            EtcdBackingStore etcdStore = new EtcdBackingStore().connectionDetails(etcdEndpoints);
+            resourceCache.backingStore(etcdStore);
+        }
+        createMultiJVMResourceService(configService, resourceCache);
+        //close the resourceCache
+        if (resourceCache.getBackingStore() instanceof EtcdBackingStore) {
+            ((EtcdBackingStore) resourceCache.getBackingStore()).close();
+        }
 
         return configService;
     }
@@ -196,6 +211,7 @@ public final class ExampleConfigurator {
     private static HDFSResourceService createMultiJVMResourceService(final InitialConfigurationService configService, final CacheService cache) {
         InitialConfig resourceConfig = new InitialConfig();
         HDFSResourceService resourceServer = null;
+
         try {
             resourceServer = new HDFSResourceService(new Configuration(), cache);
             //set up the example object type
