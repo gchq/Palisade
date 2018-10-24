@@ -186,11 +186,6 @@
                                         <ports>
                                             <port>2379:2379</port>
                                         </ports>
-                                        <volumes>
-                                            <bind>
-                                                <volume>../../example-model/target/classes:/etcd_data</volume>
-                                            </bind>
-                                        </volumes>
                                         <network>
                                             <mode>custom</mode>
                                             <name>test-network</name>
@@ -200,7 +195,7 @@
                                             <arg>-name</arg>
                                             <arg>etcd</arg>
                                             <arg>--data-dir</arg>
-                                            <arg>/etcd_data</arg>
+                                            <arg>/tmp/etcd_data</arg>
                                             <arg>-advertise-client-urls</arg>
                                             <arg>http://etcd:2379</arg>
                                             <arg>-listen-client-urls</arg>

@@ -11,14 +11,14 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.gov.gchq.palisade.example.MultiDockerJvmExample.FILE;
+import static uk.gov.gchq.palisade.example.MultiJVMDockerExample.FILE;
 
 public class MultiJvmDockerExampleIT {
 
     @Test
     public void shouldRunWithoutErrors() throws Exception {
         // Given
-        final MultiDockerJvmExample example = new MultiDockerJvmExample();
+        final MultiJVMDockerExample example = new MultiJVMDockerExample();
 
         // When
         example.run();
