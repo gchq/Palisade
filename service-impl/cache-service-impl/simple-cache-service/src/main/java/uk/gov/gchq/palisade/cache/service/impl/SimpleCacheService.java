@@ -173,7 +173,7 @@ public class SimpleCacheService implements CacheService {
         LOGGER.debug("Got request to get item {}", baseKey);
 
         //get from add
-        Supplier<Optional<V>> r = () -> {
+        Supplier<Optional<V>> getFunction = () -> {
             LOGGER.debug("Requesting backing store to get {}", baseKey);
             SimpleCacheObject result = getBackingStore().get(baseKey);
             if (result.getValue().isPresent()) {
@@ -186,7 +186,7 @@ public class SimpleCacheService implements CacheService {
             BiFunction<byte[], Class<V>, V> decode = codecs.getValueDecoder((Class<V>) result.getValueClass());
             return result.getValue().map(x -> decode.apply(x, (Class<V>) result.getValueClass()));
         };
-        return CompletableFuture.completedFuture(r.get());
+        return CompletableFuture.supplyAsync(getFunction);
     }
 
     @Override
