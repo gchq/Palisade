@@ -1,5 +1,7 @@
 ## Standard flow for a read request through the Palisade system
 
+![picture](../img/sequence.png)
+
 1. The user makes use of a plug-in (client code) for the data processing technology that they are using which makes it almost invisible to them that they are actually querying data via Palisade.
 
 2. For a distributed workflow that client code will usually be made up of a driver component and an executor/mapper component. The driver component starts by registering the data request with the 

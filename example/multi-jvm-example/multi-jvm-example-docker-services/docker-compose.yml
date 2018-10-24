@@ -7,14 +7,12 @@ services:
       image: quay.io/coreos/etcd
       ports:
         - 2379:2379
-      volumes:
-        - "../../example-model/target/classes:/etcd_data"
       command:
         - /usr/local/bin/etcd
         - -name
         - etcd
         - --data-dir
-        - /etcd_data
+        - /tmp/etcd_data
         - -advertise-client-urls
         - http://etcd:2379
         - -listen-client-urls
