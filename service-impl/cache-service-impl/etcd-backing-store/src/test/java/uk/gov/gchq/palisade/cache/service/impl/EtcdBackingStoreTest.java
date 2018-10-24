@@ -47,7 +47,7 @@ public class EtcdBackingStoreTest extends AbstractBackingStoreTest {
 
     @Override
     public EtcdBackingStore createBackingStore() {
-        etcdBackingStore = new EtcdBackingStore().etcdClient(clientEndpoints);
+        etcdBackingStore = new EtcdBackingStore().connectionDetails(clientEndpoints);
         return etcdBackingStore;
     }
 
