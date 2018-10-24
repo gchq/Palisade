@@ -16,8 +16,6 @@
 
 package uk.gov.gchq.palisade.example.client;
 
-import org.apache.hadoop.conf.Configuration;
-
 import uk.gov.gchq.koryphe.impl.function.If;
 import uk.gov.gchq.koryphe.impl.function.SetValue;
 import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
@@ -26,8 +24,6 @@ import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.client.SimpleClient;
-import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
-import uk.gov.gchq.palisade.data.service.reader.HdfsDataReader;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
@@ -42,17 +38,12 @@ import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
-import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
-import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -142,20 +133,6 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setResourcePolicy(
                 koryphePolicies
         );
-
-        // The sys admin needs to configure the resource service
-        if (getServicesFactory().getResourceService() instanceof HDFSResourceService) {
-            final HdfsDataReader reader;
-            try {
-                reader = new HdfsDataReader().conf(new Configuration());
-                reader.addSerialiser(ExampleConfigurator.RESOURCE_TYPE, new ExampleObjSerialiser());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            final Map<String, ConnectionDetail> dataType = new HashMap<>();
-            dataType.put(ExampleConfigurator.RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(getServicesFactory().getPalisadeService()).reader(reader)));
-            ((HDFSResourceService) getServicesFactory().getResourceService()).connectionDetail(null, dataType);
-        }
         // Wait for the users and policies to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
     }

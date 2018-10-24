@@ -99,6 +99,7 @@ public class HDFSResourceService implements ResourceService {
 
     private CacheService cacheService;
 
+    @JsonIgnore
     private ConnectionDetailStorage connectionDetailStorage = new ConnectionDetailStorage();
 
     public HDFSResourceService() {

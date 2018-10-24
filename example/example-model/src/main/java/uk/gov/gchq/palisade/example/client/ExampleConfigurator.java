@@ -29,6 +29,9 @@ import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
+import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
+import uk.gov.gchq.palisade.data.service.reader.HDFSDataReader;
+import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
@@ -42,6 +45,7 @@ import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
@@ -72,21 +76,17 @@ public final class ExampleConfigurator {
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
         InitialConfigurationService configService = new SimpleConfigService(cache);
         //configure the single JVM settings
-        AuditService audit = new LoggerAuditService();
-        ResourceService resource = null;
-        try {
-            resource = new HDFSResourceService(new Configuration(), cache);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         PolicyService policy = new HierarchicalPolicyService().cacheService(cache);
         UserService user = new HashMapUserService();
-        PalisadeService palisade = new SimplePalisadeService()
-                .resourceService(resource)
+        AuditService audit = new LoggerAuditService();
+        SimplePalisadeService palisade = new SimplePalisadeService()
                 .auditService(audit)
                 .policyService(policy)
                 .userService(user)
                 .cacheService(cache);
+
+        HDFSResourceService resource = createSingleJVMResourceService(configService, cache, palisade);
+
         //build a config for client
         InitialConfig singleJVMconfig = new InitialConfig()
                 .put(AuditService.class.getTypeName(), audit.getClass().getTypeName())
@@ -111,6 +111,34 @@ public final class ExampleConfigurator {
                 .config(singleJVMconfig)
                 .service(Optional.empty())).join();
         return configService;
+    }
+
+    /**
+     * Create resource service for the single JVM example. This method will configure the service as well with example
+     * details.
+     *
+     * @param configService the Palisade configuration service
+     * @param cache         the Palisade cache service
+     * @param palisade      the Palisade service
+     * @return a configured resource service
+     */
+    private static HDFSResourceService createSingleJVMResourceService(final InitialConfigurationService configService, final CacheService cache, final SimplePalisadeService palisade) {
+        HDFSResourceService resource = null;
+        HDFSDataReader reader = null;
+        try {
+            resource = new HDFSResourceService(new Configuration(), cache);
+            reader = new HDFSDataReader().conf(new Configuration());
+            reader.addSerialiser(ExampleConfigurator.RESOURCE_TYPE, new ExampleObjSerialiser());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //tell the palisade service about this resource service
+        palisade.resourceService(resource);
+        //write the connection details to the resource service, this will cause it to write these to the cache
+        final Map<String, ConnectionDetail> dataType = new HashMap<>();
+        dataType.put(ExampleConfigurator.RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisade).reader(reader)));
+        resource.connectionDetail(null, dataType);
+        return resource;
     }
 
     /**
@@ -151,8 +179,8 @@ public final class ExampleConfigurator {
                 .config(multiJVMConfig)
                 .service(Optional.empty())).join();
 
-        //create the services config that they will retrieve
-        configureMultiJVMResourceService(configService, cache);
+        //create the services config that they will be able to find the example data
+        createMultiJVMResourceService(configService, cache);
 
         return configService;
     }
@@ -163,8 +191,9 @@ public final class ExampleConfigurator {
      *
      * @param configService the central configuration service
      * @param cache         the cache service to connect this to
+     * @return the configured resource service
      */
-    private static void configureMultiJVMResourceService(final InitialConfigurationService configService, final CacheService cache) {
+    private static HDFSResourceService createMultiJVMResourceService(final InitialConfigurationService configService, final CacheService cache) {
         InitialConfig resourceConfig = new InitialConfig();
         HDFSResourceService resourceServer = null;
         try {
@@ -183,6 +212,7 @@ public final class ExampleConfigurator {
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(resourceConfig)
                 .service(Optional.of(ResourceService.class))).join();
+        return resourceServer;
     }
 
     /**
@@ -223,7 +253,7 @@ public final class ExampleConfigurator {
                 .service(Optional.empty())).join();
 
         //create the services config that they will retrieve
-        configureMultiJVMResourceService(configService, cache);
+        createMultiJVMResourceService(configService, cache);
 
         return configService;
     }
