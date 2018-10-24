@@ -79,7 +79,7 @@ public final class ExampleConfigurator {
         //configure the single JVM settings
         PolicyService policy = new HierarchicalPolicyService().cacheService(cache);
         UserService user = new HashMapUserService();
-        AuditService audit = new LoggerAuditService();
+        AuditService audit = createAuditService(configService);
         SimplePalisadeService palisade = new SimplePalisadeService()
                 .auditService(audit)
                 .policyService(policy)
@@ -90,9 +90,6 @@ public final class ExampleConfigurator {
 
         //build a config for client
         InitialConfig singleJVMconfig = new InitialConfig()
-                .put(AuditService.class.getTypeName(), audit.getClass().getTypeName())
-                .put(AuditService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
-
                 .put(PolicyService.class.getTypeName(), policy.getClass().getTypeName())
                 .put(PolicyService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
 
@@ -105,6 +102,9 @@ public final class ExampleConfigurator {
                 .put(PalisadeService.class.getTypeName(), palisade.getClass().getTypeName())
                 .put(PalisadeService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
 
+        singleJVMconfig.put(AuditService.class.getTypeName(), audit.getClass().getTypeName());
+        audit.writeConfiguration(singleJVMconfig);
+
         singleJVMconfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
         resource.writeConfiguration(singleJVMconfig);
         //insert this into the cache manually so it can be created later
@@ -112,6 +112,17 @@ public final class ExampleConfigurator {
                 .config(singleJVMconfig)
                 .service(Optional.empty())).join();
         return configService;
+    }
+
+    /**
+     * Makes an audit service.
+     *
+     * @param configService the configuration service
+     * @return the audit service
+     */
+    private static AuditService createAuditService(final InitialConfigurationService configService) {
+        AuditService audit = new LoggerAuditService();
+        return audit;
     }
 
     /**
@@ -150,18 +161,15 @@ public final class ExampleConfigurator {
      */
     public static InitialConfigurationService setupMultiJVMConfigurationService(final List<String> etcdEndpoints) {
         //configure the multi JVM settings
-        AuditService audit = new LoggerAuditService();
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
         ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
         UserService user = new ProxyRestUserService("http://localhost:8083/user");
         ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
+        AuditService audit = createAuditService(configService);
 
         InitialConfig multiJVMConfig = new InitialConfig()
-                .put(AuditService.class.getTypeName(), audit.getClass().getTypeName())
-                .put(AuditService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
-
                 .put(PolicyService.class.getTypeName(), policy.getClass().getTypeName())
                 .put(PolicyService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
 
@@ -173,6 +181,9 @@ public final class ExampleConfigurator {
 
                 .put(PalisadeService.class.getTypeName(), palisade.getClass().getTypeName())
                 .put(PalisadeService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
+
+        multiJVMConfig.put(AuditService.class.getTypeName(), audit.getClass().getTypeName());
+        audit.writeConfiguration(multiJVMConfig);
 
         multiJVMConfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
         resource.writeConfiguration(multiJVMConfig);
