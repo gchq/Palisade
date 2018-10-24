@@ -223,7 +223,7 @@ public final class ExampleConfigurator {
                 .service(Optional.empty())).join();
 
         //create the services config that they will retrieve
-        configureMultiJVMResourceService(configService);
+        configureMultiJVMResourceService(configService, cache);
 
         return configService;
     }
