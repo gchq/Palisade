@@ -15,6 +15,9 @@
  */
 package uk.gov.gchq.palisade.cache.service.impl;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -59,6 +63,41 @@ public class SimpleCacheService implements CacheService {
      * instance of this class without first initialising a backing store will result in exceptions being thrown.
      */
     public SimpleCacheService() {
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("codecs", codecs)
+                .append("store", store)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SimpleCacheService that = (SimpleCacheService) o;
+
+        return new EqualsBuilder()
+                .append(getCodecs(), that.getCodecs())
+                .append(store, that.store)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getCodecs())
+                .append(store)
+                .toHashCode();
     }
 
     /**
@@ -135,7 +174,7 @@ public class SimpleCacheService implements CacheService {
         LOGGER.debug("Got request to get item {}", baseKey);
 
         //get from add
-        return CompletableFuture.supplyAsync(() -> {
+        Supplier<Optional<V>> getFunction = () -> {
             LOGGER.debug("Requesting backing store to get {}", baseKey);
             SimpleCacheObject result = getBackingStore().get(baseKey);
             if (result.getValue().isPresent()) {
@@ -146,9 +185,9 @@ public class SimpleCacheService implements CacheService {
 
             //assign so Javac can infer the generic type
             BiFunction<byte[], Class<V>, V> decode = codecs.getValueDecoder((Class<V>) result.getValueClass());
-
             return result.getValue().map(x -> decode.apply(x, (Class<V>) result.getValueClass()));
-        });
+        };
+        return CompletableFuture.supplyAsync(getFunction);
     }
 
     @Override

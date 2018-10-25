@@ -54,8 +54,10 @@ public class EtcdBackingStore implements BackingStore {
             leaseClient.close();
             leaseClient = null;
         }
-        etcdClient.close();
-        etcdClient = null;
+        if (null != etcdClient) {
+            etcdClient.close();
+            etcdClient = null;
+        }
     }
 
     public Collection<String> getConnectionDetails() {
@@ -68,11 +70,20 @@ public class EtcdBackingStore implements BackingStore {
     }
 
     public EtcdBackingStore connectionDetails(final Collection<String> connectionDetails) {
+        return connectionDetails(connectionDetails, true);
+    }
+
+    public EtcdBackingStore connectionDetails(final Collection<String> connectionDetails, final boolean connect) {
         requireNonNull(connectionDetails, "The etcd connection details have not been set.");
+        if (connectionDetails.isEmpty()) {
+            throw new IllegalArgumentException("connection details must not be empty");
+        }
         this.connectionDetails = connectionDetails;
-        this.etcdClient = Client.builder().endpoints(connectionDetails).build();
-        this.keyValueClient = etcdClient.getKVClient();
-        this.leaseClient = etcdClient.getLeaseClient();
+        if (connect) {
+            this.etcdClient = Client.builder().endpoints(connectionDetails).build();
+            this.keyValueClient = etcdClient.getKVClient();
+            this.leaseClient = etcdClient.getLeaseClient();
+        }
         return this;
     }
 
@@ -114,7 +125,7 @@ public class EtcdBackingStore implements BackingStore {
         }
         CompletableFuture<PutResponse> response1 = getKeyValueClient().put(
                 ByteSequence.fromString(key + ".class"),
-                ByteSequence.fromString(valueClass.getCanonicalName()),
+                ByteSequence.fromString(valueClass.getTypeName()),
                 PutOption.newBuilder().withLeaseId(leaseID).build());
         CompletableFuture<PutResponse> response2 = getKeyValueClient().put(
                 ByteSequence.fromString(key + ".value"),

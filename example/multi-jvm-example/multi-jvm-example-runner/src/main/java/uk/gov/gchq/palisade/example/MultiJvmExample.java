@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example;
 
+import io.etcd.jetcd.launcher.junit.EtcdClusterResource;
 import org.apache.commons.io.FileUtils;
 
 import org.slf4j.Logger;
@@ -29,6 +30,9 @@ import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -43,9 +47,16 @@ public class MultiJvmExample {
 
     public void run() throws Exception {
         createDataPath();
+        EtcdClusterResource etcd = null;
         try {
+            etcd = new EtcdClusterResource("test-etcd", 1);
+            etcd.cluster().start();
+            List<String> etcdEndpointURLs = etcd.cluster().getClientEndpoints()
+                    .stream()
+                    .map(URI::toString)
+                    .collect(Collectors.toList());
             //this will write an initial configuration
-            final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService();
+            final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs);
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
@@ -62,6 +73,9 @@ public class MultiJvmExample {
             bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {
             FileUtils.deleteQuietly(new File(FILE));
+            if (etcd != null) {
+                etcd.cluster().close();
+            }
         }
     }
 

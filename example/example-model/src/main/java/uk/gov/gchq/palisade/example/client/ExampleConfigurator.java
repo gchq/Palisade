@@ -29,6 +29,9 @@ import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
+import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
+import uk.gov.gchq.palisade.data.service.reader.HDFSDataReader;
+import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
@@ -42,6 +45,7 @@ import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
@@ -49,6 +53,7 @@ import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -69,27 +74,20 @@ public final class ExampleConfigurator {
      * @return the configuration service that provides the entry to Palisade
      */
     public static InitialConfigurationService setupSingleJVMConfigurationService() {
-        InitialConfigurationService configService = new SimpleConfigService(
-                new SimpleCacheService()
-                        .backingStore(new HashMapBackingStore(true))
-        );
-        //configure the single JVM settings
-        AuditService audit = new LoggerAuditService();
-        ResourceService resource = null;
-        try {
-            resource = new HDFSResourceService(new Configuration(), null, null).useSharedConnectionDetails(true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+        InitialConfigurationService configService = new SimpleConfigService(cache);
+        //configure the single JVM settings
         PolicyService policy = new HierarchicalPolicyService().cacheService(cache);
         UserService user = new HashMapUserService();
-        PalisadeService palisade = new SimplePalisadeService()
-                .resourceService(resource)
+        AuditService audit = new LoggerAuditService();
+        SimplePalisadeService palisade = new SimplePalisadeService()
                 .auditService(audit)
                 .policyService(policy)
                 .userService(user)
                 .cacheService(cache);
+
+        HDFSResourceService resource = createSingleJVMResourceService(configService, cache, palisade);
+
         //build a config for client
         InitialConfig singleJVMconfig = new InitialConfig()
                 .put(AuditService.class.getTypeName(), audit.getClass().getTypeName())
@@ -117,11 +115,40 @@ public final class ExampleConfigurator {
     }
 
     /**
+     * Create resource service for the single JVM example. This method will configure the service as well with example
+     * details.
+     *
+     * @param configService the Palisade configuration service
+     * @param cache         the Palisade cache service
+     * @param palisade      the Palisade service
+     * @return a configured resource service
+     */
+    private static HDFSResourceService createSingleJVMResourceService(final InitialConfigurationService configService, final CacheService cache, final SimplePalisadeService palisade) {
+        HDFSResourceService resource;
+        HDFSDataReader reader;
+        try {
+            resource = new HDFSResourceService().conf(new Configuration()).cacheService(cache);
+            reader = new HDFSDataReader().conf(new Configuration());
+            reader.addSerialiser(ExampleConfigurator.RESOURCE_TYPE, new ExampleObjSerialiser());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //tell the palisade service about this resource service
+        palisade.resourceService(resource);
+        //write the connection details to the resource service, this will cause it to write these to the cache
+        final Map<String, ConnectionDetail> dataType = new HashMap<>();
+        dataType.put(ExampleConfigurator.RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisade).reader(reader)));
+        resource.connectionDetail(null, dataType);
+        return resource;
+    }
+
+    /**
      * Allows the bootstrapping of some configuration data for the multi-JVM example.
      *
+     * @param etcdEndpoints the list of etcd end points
      * @return the configuration service to provide the Palisade entry point
      */
-    public static InitialConfigurationService setupMultiJVMConfigurationService() {
+    public static InitialConfigurationService setupMultiJVMConfigurationService(final List<String> etcdEndpoints) {
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
@@ -154,8 +181,21 @@ public final class ExampleConfigurator {
                 .config(multiJVMConfig)
                 .service(Optional.empty())).join();
 
-        //create the services config that they will retrieve
-        configureMultiJVMResourceService(configService);
+        //create the services config that they will be able to find the example data
+        //if there are no endpoints, assume we are using a HashMap backing store for now
+        //at the moment only resource service is using the etcd cache, once all config management work is done, then all services will
+        SimpleCacheService resourceCache = new SimpleCacheService();
+        if (etcdEndpoints.isEmpty()) {
+            resourceCache.backingStore(new HashMapBackingStore(true));
+        } else {
+            EtcdBackingStore etcdStore = new EtcdBackingStore().connectionDetails(etcdEndpoints);
+            resourceCache.backingStore(etcdStore);
+        }
+        createMultiJVMResourceService(configService, resourceCache, Optional.empty());
+        //close the resourceCache
+        if (resourceCache.getBackingStore() instanceof EtcdBackingStore) {
+            ((EtcdBackingStore) resourceCache.getBackingStore()).close();
+        }
 
         return configService;
     }
@@ -164,13 +204,17 @@ public final class ExampleConfigurator {
      * Sets the resource service configuration up that will be retrieved by the resource service from the configuration
      * service.
      *
-     * @param configService the central configuration service
+     * @param configService  the Palisade configuration service
+     * @param cache          the cache service to connect this resource service to outside of a container
+     * @param containerCache the cache to use once running containerised
+     * @return the configured resource service
      */
-    private static void configureMultiJVMResourceService(final InitialConfigurationService configService) {
+    private static HDFSResourceService createMultiJVMResourceService(final InitialConfigurationService configService, final CacheService cache, final Optional<CacheService> containerCache) {
         InitialConfig resourceConfig = new InitialConfig();
-        HDFSResourceService resourceServer = null;
+        HDFSResourceService resourceServer;
+
         try {
-            resourceServer = new HDFSResourceService(new Configuration(), null, null).useSharedConnectionDetails(true);
+            resourceServer = new HDFSResourceService(new Configuration(), cache);
             //set up the example object type
             final Map<String, ConnectionDetail> dataType = new HashMap<>();
             dataType.put(RESOURCE_TYPE, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
@@ -178,6 +222,9 @@ public final class ExampleConfigurator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        //switch to containerised cache
+        containerCache.ifPresent(resourceServer::setCacheService);
+
         //write class name
         resourceConfig.put(ResourceService.class.getTypeName(), resourceServer.getClass().getTypeName());
         //write the configured data
@@ -185,6 +232,7 @@ public final class ExampleConfigurator {
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(resourceConfig)
                 .service(Optional.of(ResourceService.class))).join();
+        return resourceServer;
     }
 
     /**
@@ -195,6 +243,7 @@ public final class ExampleConfigurator {
     public static InitialConfigurationService setupDockerConfigurationService() {
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
+        //this is the cache that is used by the client to talk to the containerised etcd
         CacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379")));
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
@@ -225,7 +274,9 @@ public final class ExampleConfigurator {
                 .service(Optional.empty())).join();
 
         //create the services config that they will retrieve
-        configureMultiJVMResourceService(configService);
+        //this is the cache that is used from within a container
+        CacheService containerCache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"), false));
+        createMultiJVMResourceService(configService, cache, Optional.of(containerCache));
 
         return configService;
     }

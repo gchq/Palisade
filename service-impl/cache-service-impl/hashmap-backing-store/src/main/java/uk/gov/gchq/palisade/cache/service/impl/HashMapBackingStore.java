@@ -16,6 +16,9 @@
 
 package uk.gov.gchq.palisade.cache.service.impl;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,19 +44,59 @@ public class HashMapBackingStore implements BackingStore {
      * The static cache that will cause all instances of this across a JVM to be shared.
      */
     private static final ConcurrentHashMap<String, CachedPair> CACHE = new ConcurrentHashMap<>();
+
     /**
      * The actual backing store for all cached data.
      */
     private final ConcurrentHashMap<String, CachedPair> cache;
 
+    /** Is the shared instance in use? */
+    private final boolean useStatic;
+
     /**
      * Simple POJO for pairing together the object's class with the encoded form of the object.
      */
     private static class CachedPair {
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this)
+                    .append("value", "\"" + new String(value) + "\"")
+                    .append("clazz", clazz)
+                    .toString();
+        }
+
         /**
          * Encoded form.
          */
         public final byte[] value;
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            CachedPair that = (CachedPair) o;
+
+            return new EqualsBuilder()
+                    .append(value, that.value)
+                    .append(clazz, that.clazz)
+                    .isEquals();
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder(17, 37)
+                    .append(value)
+                    .append(clazz)
+                    .toHashCode();
+        }
+
         /**
          * Class of the value field.
          */
@@ -69,6 +112,7 @@ public class HashMapBackingStore implements BackingStore {
             this.value = value;
             this.clazz = clazz;
         }
+
     }
 
     /**
@@ -83,6 +127,32 @@ public class HashMapBackingStore implements BackingStore {
         this(true);
     }
 
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        HashMapBackingStore that = (HashMapBackingStore) o;
+
+        return new EqualsBuilder()
+                .append(cache, that.cache)
+                .append(useStatic, that.useStatic)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(cache)
+                .append(useStatic)
+                .toHashCode();
+    }
+
     /**
      * Create a store which may have its own store or may use the JVM shared instance.
      *
@@ -94,6 +164,11 @@ public class HashMapBackingStore implements BackingStore {
         } else {
             cache = new ConcurrentHashMap<>();
         }
+        this.useStatic = useStatic;
+    }
+
+    public boolean getUseStatic() {
+        return useStatic;
     }
 
     @Override
@@ -127,5 +202,13 @@ public class HashMapBackingStore implements BackingStore {
                 .filter(x -> x.startsWith(
                                 prefix)
                 );
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("cache", cache)
+                .append("useStatic", useStatic)
+                .toString();
     }
 }
