@@ -21,17 +21,15 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
+import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
+
+import static java.util.Objects.requireNonNull;
 
 /**
- * A LoggerAuditService is a simple implementation of an {@link AuditService}
- * that simply constructs a message and logs it using log4j {@link Logger}.
- * <ul>
- * <li>Messages are logged at INFO logging level.</li>
- * <li>Error messages are logged at ERROR logging level.</li>
- * </ul>
- * <p>
- * An example message is:
- * </p>
+ * A LoggerAuditService is a simple implementation of an {@link AuditService} that simply constructs a message and logs
+ * it using log4j {@link Logger}. <ul> <li>Messages are logged at INFO logging level.</li> <li>Error messages are logged
+ * at ERROR logging level.</li> </ul> <p> An example message is: </p>
  * <pre>
  * 'Alice' accessed 'file1' for 'Payroll' and it was processed using 'Age off and visibility filtering'
  * </pre>
@@ -51,5 +49,17 @@ public class LoggerAuditService implements AuditService {
         } else {
             LOGGER.info(msg);
         }
+    }
+
+    @Override
+    public void writeConfiguration(final InitialConfig config) {
+        requireNonNull(config, "config");
+        LOGGER.debug("Wrote configuration data: no-op");
+    }
+
+    @Override
+    public void configure(final InitialConfig config) throws NoConfigException {
+        requireNonNull(config, "config");
+        LOGGER.debug("Read configuration data: no-op");
     }
 }
