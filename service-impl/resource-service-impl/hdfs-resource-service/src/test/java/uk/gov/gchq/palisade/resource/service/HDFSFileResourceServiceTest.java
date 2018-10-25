@@ -274,16 +274,16 @@ public class HDFSFileResourceServiceTest {
         final String expected = "{\n" +
                 "  \"@id\" : 1,\n" +
                 "  \"class\" : \"uk.gov.gchq.palisade.resource.service.HDFSResourceService\",\n" +
-                "  \"conf\" : {\n" +
-                "  },\n" +
                 "  \"cacheService\" : {\n" +
                 "    \"@id\" : 2,\n" +
                 "    \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService\",\n" +
                 "    \"backingStore\" : {\n" +
                 "      \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore\",\n" +
-                "      \"static\" : true\n" +
+                "      \"useStatic\" : true\n" +
                 "    },\n" +
                 "    \"codecs\" : { }\n" +
+                "  },\n" +
+                "  \"conf\" : {\n" +
                 "  }\n" +
                 "}\n";
 

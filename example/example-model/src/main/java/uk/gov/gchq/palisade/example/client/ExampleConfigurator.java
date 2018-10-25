@@ -135,10 +135,10 @@ public final class ExampleConfigurator {
      * @return a configured resource service
      */
     private static HDFSResourceService createSingleJVMResourceService(final InitialConfigurationService configService, final CacheService cache, final SimplePalisadeService palisade) {
-        HDFSResourceService resource = null;
-        HDFSDataReader reader = null;
+        HDFSResourceService resource;
+        HDFSDataReader reader;
         try {
-            resource = new HDFSResourceService(new Configuration(), cache);
+            resource = new HDFSResourceService().conf(new Configuration()).cacheService(cache);
             reader = new HDFSDataReader().conf(new Configuration());
             reader.addSerialiser(ExampleConfigurator.RESOURCE_TYPE, new ExampleObjSerialiser());
         } catch (IOException e) {
@@ -215,7 +215,7 @@ public final class ExampleConfigurator {
      * Sets the resource service configuration up that will be retrieved by the resource service from the configuration
      * service.
      *
-     * @param configService  the central configuration service
+     * @param configService  the Palisade configuration service
      * @param cache          the cache service to connect this resource service to outside of a container
      * @param containerCache the cache to use once running containerised
      * @return the configured resource service

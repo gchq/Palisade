@@ -16,8 +16,6 @@
 
 package uk.gov.gchq.palisade.cache.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -143,6 +141,7 @@ public class HashMapBackingStore implements BackingStore {
 
         return new EqualsBuilder()
                 .append(cache, that.cache)
+                .append(useStatic, that.useStatic)
                 .isEquals();
     }
 
@@ -150,6 +149,7 @@ public class HashMapBackingStore implements BackingStore {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(cache)
+                .append(useStatic)
                 .toHashCode();
     }
 
@@ -158,8 +158,7 @@ public class HashMapBackingStore implements BackingStore {
      *
      * @param useStatic if true then use the JVM shared backing store
      */
-    @JsonCreator
-    public HashMapBackingStore(@JsonProperty("static") final boolean useStatic) {
+    public HashMapBackingStore(final boolean useStatic) {
         if (useStatic) {
             cache = CACHE;
         } else {
@@ -168,7 +167,6 @@ public class HashMapBackingStore implements BackingStore {
         this.useStatic = useStatic;
     }
 
-    @JsonProperty("static")
     public boolean getUseStatic() {
         return useStatic;
     }

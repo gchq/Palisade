@@ -68,6 +68,7 @@ public class SimpleCacheService implements CacheService {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("codecs", codecs)
                 .append("store", store)
                 .toString();
