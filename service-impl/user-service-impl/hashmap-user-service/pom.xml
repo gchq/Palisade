@@ -23,4 +23,12 @@
         <version>0.1.2-SNAPSHOT</version>
     </parent>
     <artifactId>hashmap-user-service</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>cache-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
 </project>
