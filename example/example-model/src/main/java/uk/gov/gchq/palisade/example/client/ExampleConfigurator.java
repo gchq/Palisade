@@ -204,7 +204,7 @@ public final class ExampleConfigurator {
      * Sets the resource service configuration up that will be retrieved by the resource service from the configuration
      * service.
      *
-     * @param configService  the central configuration service
+     * @param configService  the Palisade configuration service
      * @param cache          the cache service to connect this resource service to outside of a container
      * @param containerCache the cache to use once running containerised
      * @return the configured resource service
