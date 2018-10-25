@@ -78,7 +78,7 @@ public final class ExampleConfigurator {
         InitialConfigurationService configService = new SimpleConfigService(cache);
         //configure the single JVM settings
         PolicyService policy = new HierarchicalPolicyService().cacheService(cache);
-        UserService user = new HashMapUserService();
+        UserService user = createUserService(configService, cache);
         AuditService audit = createAuditService(configService);
         SimplePalisadeService palisade = new SimplePalisadeService()
                 .auditService(audit)
@@ -93,9 +93,6 @@ public final class ExampleConfigurator {
                 .put(PolicyService.class.getTypeName(), policy.getClass().getTypeName())
                 .put(PolicyService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
 
-                .put(UserService.class.getTypeName(), user.getClass().getTypeName())
-                .put(UserService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(user)))
-
                 .put(CacheService.class.getTypeName(), cache.getClass().getTypeName())
                 .put(CacheService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
 
@@ -105,13 +102,28 @@ public final class ExampleConfigurator {
         singleJVMconfig.put(AuditService.class.getTypeName(), audit.getClass().getTypeName());
         audit.writeConfiguration(singleJVMconfig);
 
+        singleJVMconfig.put(UserService.class.getTypeName(), user.getClass().getTypeName());
+        user.writeConfiguration(singleJVMconfig);
+
         singleJVMconfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
         resource.writeConfiguration(singleJVMconfig);
+
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(singleJVMconfig)
                 .service(Optional.empty())).join();
         return configService;
+    }
+
+    /**
+     * Makes a user service.
+     *
+     * @param configService the configuration service
+     * @param cache         the cache service the user service should use
+     * @return the user service
+     */
+    private static UserService createUserService(final InitialConfigurationService configService, final CacheService cache) {
+        return new HashMapUserService().cacheService(cache);
     }
 
     /**
@@ -156,7 +168,7 @@ public final class ExampleConfigurator {
     /**
      * Allows the bootstrapping of some configuration data for the multi-JVM example.
      *
-     * @param etcdEndpoints the list of etcd end points
+     * @param etcdEndpoints the list of etcd end points, if empty then a HashMap backing store is used
      * @return the configuration service to provide the Palisade entry point
      */
     public static InitialConfigurationService setupMultiJVMConfigurationService(final List<String> etcdEndpoints) {
@@ -173,9 +185,6 @@ public final class ExampleConfigurator {
                 .put(PolicyService.class.getTypeName(), policy.getClass().getTypeName())
                 .put(PolicyService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
 
-                .put(UserService.class.getTypeName(), user.getClass().getTypeName())
-                .put(UserService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(user)))
-
                 .put(CacheService.class.getTypeName(), cache.getClass().getTypeName())
                 .put(CacheService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
 
@@ -185,6 +194,9 @@ public final class ExampleConfigurator {
         multiJVMConfig.put(AuditService.class.getTypeName(), audit.getClass().getTypeName());
         audit.writeConfiguration(multiJVMConfig);
 
+        multiJVMConfig.put(UserService.class.getTypeName(), user.getClass().getTypeName());
+        user.writeConfiguration(multiJVMConfig);
+
         multiJVMConfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
         resource.writeConfiguration(multiJVMConfig);
         //insert this into the cache manually so it can be created later
@@ -193,8 +205,7 @@ public final class ExampleConfigurator {
                 .service(Optional.empty())).join();
 
         //create the services config that they will be able to find the example data
-        //if there are no endpoints, assume we are using a HashMap backing store for now
-        //at the moment only resource service is using the etcd cache, once all config management work is done, then all services will
+        //if there are no endpoints, assume we are using a HashMap backing store
         SimpleCacheService resourceCache = new SimpleCacheService();
         if (etcdEndpoints.isEmpty()) {
             resourceCache.backingStore(new HashMapBackingStore(true));
@@ -202,6 +213,9 @@ public final class ExampleConfigurator {
             EtcdBackingStore etcdStore = new EtcdBackingStore().connectionDetails(etcdEndpoints);
             resourceCache.backingStore(etcdStore);
         }
+
+        createMultiJVMUserService(configService, resourceCache);
+
         createMultiJVMResourceService(configService, resourceCache, Optional.empty());
         //close the resourceCache
         if (resourceCache.getBackingStore() instanceof EtcdBackingStore) {
@@ -209,6 +223,25 @@ public final class ExampleConfigurator {
         }
 
         return configService;
+    }
+
+    /**
+     * Creates a user service that can be used for the multi JVM examples.
+     *
+     * @param configService the configuration service that the service will write it's configuration to
+     * @param resourceCache the cache that this user service should be configured to use
+     * @return the created user service
+     */
+    private static UserService createMultiJVMUserService(final ProxyRestConfigService configService, final CacheService resourceCache) {
+        InitialConfig userServiceConfig = new InitialConfig();
+        UserService remoteUserService = createUserService(configService, resourceCache);
+        //write class name
+        userServiceConfig.put(UserService.class.getTypeName(), remoteUserService.getClass().getTypeName());
+        remoteUserService.writeConfiguration(userServiceConfig);
+        configService.add((AddConfigRequest) new AddConfigRequest()
+                .config(userServiceConfig)
+                .service(Optional.of(UserService.class))).join();
+        return remoteUserService;
     }
 
     /**
@@ -262,20 +295,20 @@ public final class ExampleConfigurator {
         UserService user = new ProxyRestUserService("http://localhost:8083/user");
         ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
         InitialConfig multiJVMConfig = new InitialConfig()
-                .put(AuditService.class.getTypeName(), audit.getClass().getTypeName())
-                .put(AuditService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(audit)))
-
                 .put(PolicyService.class.getTypeName(), policy.getClass().getTypeName())
                 .put(PolicyService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
-
-                .put(UserService.class.getTypeName(), user.getClass().getTypeName())
-                .put(UserService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(user)))
 
                 .put(CacheService.class.getTypeName(), cache.getClass().getTypeName())
                 .put(CacheService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
 
                 .put(PalisadeService.class.getTypeName(), palisade.getClass().getTypeName())
                 .put(PalisadeService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
+
+        multiJVMConfig.put(AuditService.class.getTypeName(), audit.getClass().getTypeName());
+        audit.writeConfiguration(multiJVMConfig);
+
+        multiJVMConfig.put(UserService.class.getTypeName(), user.getClass().getTypeName());
+        user.writeConfiguration(multiJVMConfig);
 
         multiJVMConfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
         resource.writeConfiguration(multiJVMConfig);
@@ -288,6 +321,8 @@ public final class ExampleConfigurator {
         //this is the cache that is used from within a container
         CacheService containerCache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"), false));
         createMultiJVMResourceService(configService, cache, Optional.of(containerCache));
+
+        createMultiJVMUserService(configService, containerCache);
 
         return configService;
     }

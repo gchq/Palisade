@@ -116,7 +116,7 @@ public class ConfiguredClientServices implements ServicesFactory {
     }
 
     protected UserService createUserService() {
-        return legacyCreate(UserService.class);
+        return new Configurator(configService).createFromConfig(UserService.class, config);
     }
 
     protected PalisadeService createPalisadeService() {

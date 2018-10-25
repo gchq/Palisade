@@ -20,15 +20,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
-import uk.gov.gchq.palisade.util.StreamUtil;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -36,7 +36,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -46,7 +45,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 @Api(value = "/")
 public class RestUserServiceV1 implements UserService {
-    public static final String SERVICE_CONFIG = "palisade.rest.user.service.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestUserServiceV1.class);
 
     private final UserService delegate;
@@ -54,7 +52,7 @@ public class RestUserServiceV1 implements UserService {
     private static UserService userService;
 
     public RestUserServiceV1() {
-        this(System.getProperty(SERVICE_CONFIG));
+        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
     }
 
     public RestUserServiceV1(final String serviceConfigPath) {
@@ -68,12 +66,9 @@ public class RestUserServiceV1 implements UserService {
     private static synchronized UserService createService(final String serviceConfigPath) {
         UserService ret;
         if (userService == null) {
-            final InputStream stream = StreamUtil.openStream(RestUserServiceV1.class, serviceConfigPath);
-            userService = JSONSerialiser.deserialise(stream, UserService.class);
-            ret = userService;
-        } else {
-            ret = userService;
+            userService = RestUtil.createService(RestUserServiceV1.class, serviceConfigPath, UserService.class);
         }
+        ret = userService;
         return ret;
     }
 

@@ -122,6 +122,7 @@ public class Configurator {
             instance.configure(config);
             return instance;
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchElementException e) {
+            System.err.println(config);
             throw new IllegalStateException("couldn't create service class " + serviceClass, e);
         }
     }

@@ -62,6 +62,7 @@ public class MultiJvmExampleIT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
+        System.setProperty(RestUtil.CONFIG_SERVICE_PATH, "configRest.json");
 
         System.setProperty(RestPalisadeServiceV1.SERVICE_CONFIG, "palisadeConfig.json");
         palisadeServer = new EmbeddedHttpServer("http://localhost:8080/palisade/v1", new uk.gov.gchq.palisade.service.impl.ApplicationConfigV1());
@@ -71,11 +72,9 @@ public class MultiJvmExampleIT {
         policyServer = new EmbeddedHttpServer("http://localhost:8081/policy/v1", new uk.gov.gchq.palisade.policy.service.impl.ApplicationConfigV1());
         policyServer.startServer();
 
-        System.setProperty(RestUtil.CONFIG_SERVICE_PATH, "configRest.json");
         resourceServer = new EmbeddedHttpServer("http://localhost:8082/resource/v1", new uk.gov.gchq.palisade.resource.service.impl.ApplicationConfigV1());
         resourceServer.startServer();
 
-        System.setProperty(RestUserServiceV1.SERVICE_CONFIG, "userConfig.json");
         userServer = new EmbeddedHttpServer("http://localhost:8083/user/v1", new uk.gov.gchq.palisade.user.service.impl.ApplicationConfigV1());
         userServer.startServer();
 

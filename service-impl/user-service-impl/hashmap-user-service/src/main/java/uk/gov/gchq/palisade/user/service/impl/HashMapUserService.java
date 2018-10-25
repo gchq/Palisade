@@ -16,6 +16,10 @@
 
 package uk.gov.gchq.palisade.user.service.impl;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.cache.service.CacheService;
@@ -27,7 +31,6 @@ import uk.gov.gchq.palisade.user.service.exception.NoSuchUserIdException;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -41,6 +44,7 @@ import static java.util.Objects.requireNonNull;
  * ConcurrentHashMap}. By default the map is static so it will be shared across the same JVM.
  */
 public class HashMapUserService implements UserService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HashMapUserService.class);
     private static final Map<UserId, User> USERS = new ConcurrentHashMap<>();
 
     public static final String CACHE_IMPL_KEY = "user.svc.cache.svc";
@@ -86,6 +90,7 @@ public class HashMapUserService implements UserService {
     public HashMapUserService cacheService(final CacheService cacheService) {
         requireNonNull(cacheService, "Cache service cannot be set to null.");
         this.cacheService = cacheService;
+        LOGGER.debug("Configured to use cache {}", cacheService);
         return this;
     }
 
