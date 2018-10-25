@@ -202,7 +202,7 @@ public final class ExampleConfigurator {
             EtcdBackingStore etcdStore = new EtcdBackingStore().connectionDetails(etcdEndpoints);
             resourceCache.backingStore(etcdStore);
         }
-        createMultiJVMResourceService(configService, resourceCache);
+        createMultiJVMResourceService(configService, resourceCache, Optional.empty());
         //close the resourceCache
         if (resourceCache.getBackingStore() instanceof EtcdBackingStore) {
             ((EtcdBackingStore) resourceCache.getBackingStore()).close();
@@ -215,13 +215,14 @@ public final class ExampleConfigurator {
      * Sets the resource service configuration up that will be retrieved by the resource service from the configuration
      * service.
      *
-     * @param configService the central configuration service
-     * @param cache         the cache service to connect this to
+     * @param configService  the central configuration service
+     * @param cache          the cache service to connect this resource service to outside of a container
+     * @param containerCache the cache to use once running containerised
      * @return the configured resource service
      */
-    private static HDFSResourceService createMultiJVMResourceService(final InitialConfigurationService configService, final CacheService cache) {
+    private static HDFSResourceService createMultiJVMResourceService(final InitialConfigurationService configService, final CacheService cache, final Optional<CacheService> containerCache) {
         InitialConfig resourceConfig = new InitialConfig();
-        HDFSResourceService resourceServer = null;
+        HDFSResourceService resourceServer;
 
         try {
             resourceServer = new HDFSResourceService(new Configuration(), cache);
@@ -232,6 +233,9 @@ public final class ExampleConfigurator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        //switch to containerised cache
+        containerCache.ifPresent(resourceServer::setCacheService);
+
         //write class name
         resourceConfig.put(ResourceService.class.getTypeName(), resourceServer.getClass().getTypeName());
         //write the configured data
@@ -250,6 +254,7 @@ public final class ExampleConfigurator {
     public static InitialConfigurationService setupDockerConfigurationService() {
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
+        //this is the cache that is used by the client to talk to the containerised etcd
         CacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379")));
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
@@ -280,7 +285,9 @@ public final class ExampleConfigurator {
                 .service(Optional.empty())).join();
 
         //create the services config that they will retrieve
-        createMultiJVMResourceService(configService, cache);
+        //this is the cache that is used from within a container
+        CacheService containerCache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"), false));
+        createMultiJVMResourceService(configService, cache, Optional.of(containerCache));
 
         return configService;
     }
