@@ -70,6 +70,7 @@
         <koryphe.version>1.5.0</koryphe.version>
         <jetcd.version>0.0.2</jetcd.version>
         <protobuf.version>3.5.1</protobuf.version>
+        <docker.maven.version>0.26.1</docker.maven.version>
 
         <!-- Testing properties -->
         <junit.version>4.12</junit.version>
