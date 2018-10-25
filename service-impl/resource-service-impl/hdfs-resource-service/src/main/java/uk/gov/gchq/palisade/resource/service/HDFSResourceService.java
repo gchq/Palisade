@@ -16,10 +16,8 @@
 
 package uk.gov.gchq.palisade.resource.service;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import com.google.common.collect.Lists;
@@ -82,7 +80,6 @@ import static java.util.Objects.requireNonNull;
  *
  * @see ResourceService
  */
-@JsonPropertyOrder(value = {"class", "conf", "dataFormat", "dataType"}, alphabetic = true)
 public class HDFSResourceService implements ResourceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HDFSResourceService.class);
     public static final String ERROR_ADD_RESOURCE = "AddResource is not supported by HDFSResourceService resources should be added/created via regular HDFS behaviour.";
@@ -95,9 +92,9 @@ public class HDFSResourceService implements ResourceService {
     public static final String CONNECTION_DETAIL_KEY = "hdfs.conn.detail";
 
     private Configuration conf;
-    private FileSystem fileSystem;
-
     private CacheService cacheService;
+
+    private FileSystem fileSystem;
 
     @JsonIgnore
     private ConnectionDetailStorage connectionDetailStorage = new ConnectionDetailStorage();
@@ -105,18 +102,16 @@ public class HDFSResourceService implements ResourceService {
     public HDFSResourceService() {
     }
 
-    public HDFSResourceService(final Configuration conf, final CacheService cache) throws IOException {
+    public HDFSResourceService(final Configuration conf, final CacheService cacheService) throws IOException {
         requireNonNull(conf, "conf");
-        requireNonNull(cache, "cache");
+        requireNonNull(cacheService, "cache");
         this.conf = conf;
         this.fileSystem = FileSystem.get(conf);
-        this.cacheService = cache;
+        this.cacheService = cacheService;
     }
 
-    @JsonCreator
-    public HDFSResourceService(@JsonProperty("conf") final Map<String, String> conf,
-                               @JsonProperty("cacheService") final CacheService cache) throws IOException {
-        this(createConfig(conf), cache);
+    public HDFSResourceService(@JsonProperty("conf") final Map<String, String> conf, @JsonProperty("cacheService") final CacheService cacheService) throws IOException {
+        this(createConfig(conf), cacheService);
     }
 
     public HDFSResourceService cacheService(final CacheService cacheService) {
@@ -321,13 +316,11 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @JsonIgnore
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
     public Map<String, ConnectionDetail> getDataType() {
         return this.connectionDetailStorage.getDataType();
     }
 
     @JsonIgnore
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
     public Map<String, ConnectionDetail> getDataFormat() {
         return this.connectionDetailStorage.getDataFormat();
     }
@@ -345,6 +338,26 @@ public class HDFSResourceService implements ResourceService {
             }
         }
         return rtn;
+    }
+
+    public HDFSResourceService conf(final Map<String, String> conf) throws IOException {
+        return conf(createConfig(conf));
+    }
+
+    public void setConf(final Map<String, String> conf) throws IOException {
+        setConf(createConfig(conf));
+    }
+
+    @JsonIgnore
+    public void setConf(final Configuration conf) throws IOException {
+        conf(conf);
+    }
+
+    public HDFSResourceService conf(final Configuration conf) throws IOException {
+        requireNonNull(conf, "conf");
+        this.conf = conf;
+        this.fileSystem = FileSystem.get(conf);
+        return this;
     }
 
     private Map<String, String> getPlainJobConfWithoutResolvingValues() {
@@ -401,6 +414,7 @@ public class HDFSResourceService implements ResourceService {
         return new HashCodeBuilder(17, 37)
                 .append(conf)
                 .append(fileSystem)
+                .append(cacheService)
                 .toHashCode();
     }
 

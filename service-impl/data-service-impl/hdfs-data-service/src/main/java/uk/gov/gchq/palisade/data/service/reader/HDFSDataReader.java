@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Maps;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -40,8 +41,8 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * An HDFSDataReader is an implementation of {@link SerialisedDataReader} for {@code HDFS}
- * that opens a file and returns a single {@link InputStream} containing all the records.
+ * An HDFSDataReader is an implementation of {@link SerialisedDataReader} for {@code HDFS} that opens a file and returns
+ * a single {@link InputStream} containing all the records.
  */
 public class HDFSDataReader extends SerialisedDataReader {
     @JsonIgnore
@@ -51,8 +52,7 @@ public class HDFSDataReader extends SerialisedDataReader {
     }
 
     @JsonCreator
-    public HDFSDataReader(@JsonProperty("conf") final Map<String, String> conf,
-                          @JsonProperty("serialisers") final Map<String, Serialiser<?>> serialisers) throws IOException {
+    public HDFSDataReader(@JsonProperty("conf") final Map<String, String> conf, @JsonProperty("serialisers") final Map<String, Serialiser<?>> serialisers) throws IOException {
         conf(conf);
         serialisers(serialisers);
     }

@@ -75,6 +75,9 @@ public class EtcdBackingStore implements BackingStore {
 
     public EtcdBackingStore connectionDetails(final Collection<String> connectionDetails, final boolean connect) {
         requireNonNull(connectionDetails, "The etcd connection details have not been set.");
+        if (connectionDetails.isEmpty()) {
+            throw new IllegalArgumentException("connection details must not be empty");
+        }
         this.connectionDetails = connectionDetails;
         if (connect) {
             this.etcdClient = Client.builder().endpoints(connectionDetails).build();
