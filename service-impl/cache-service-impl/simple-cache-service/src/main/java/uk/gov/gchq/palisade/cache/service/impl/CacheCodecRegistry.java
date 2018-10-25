@@ -16,6 +16,8 @@
 package uk.gov.gchq.palisade.cache.service.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -114,5 +116,31 @@ public final class CacheCodecRegistry {
     public synchronized <V> BiFunction<byte[], Class<V>, V> getValueDecoder(final Class<V> valueClass) {
         requireNonNull(valueClass, "valueClass");
         return (BiFunction<byte[], Class<V>, V>) getMap.getOrDefault(valueClass, CacheCodecUtils.DEFAULT_DECODER);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CacheCodecRegistry that = (CacheCodecRegistry) o;
+
+        return new EqualsBuilder()
+                .append(addMap, that.addMap)
+                .append(getMap, that.getMap)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(addMap)
+                .append(getMap)
+                .toHashCode();
     }
 }

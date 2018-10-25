@@ -24,7 +24,7 @@ import org.junit.rules.TemporaryFolder;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
-import uk.gov.gchq.palisade.data.service.reader.HdfsDataReader;
+import uk.gov.gchq.palisade.data.service.reader.HDFSDataReader;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -54,7 +54,7 @@ public class HdfsDataReaderTest {
         FileUtils.write(tmpFile, "some data\nsome more data");
 
         final Configuration conf = new Configuration();
-        final HdfsDataReader reader = new HdfsDataReader().conf(conf);
+        final HDFSDataReader reader = new HDFSDataReader().conf(conf);
 
         final FileResource resource = (FileResource) new FileResource().type("string").id(tmpFile.getAbsolutePath());
         final Rules<String> rules = new Rules<>();
@@ -81,7 +81,7 @@ public class HdfsDataReaderTest {
         FileUtils.write(tmpFile, "some data\nsome more data");
 
         final Configuration conf = new Configuration();
-        final HdfsDataReader reader = new HdfsDataReader().conf(conf);
+        final HDFSDataReader reader = new HDFSDataReader().conf(conf);
         reader.addSerialiser("string", new SimpleStringSerialiser());
 
         final FileResource resource = new FileResource().id(tmpFile.getAbsolutePath()).type("string");

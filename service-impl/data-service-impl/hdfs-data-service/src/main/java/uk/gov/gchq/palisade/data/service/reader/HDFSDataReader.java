@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Maps;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -40,34 +41,33 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * An HdfsDataReader is an implementation of {@link SerialisedDataReader} for {@code HDFS}
- * that opens a file and returns a single {@link InputStream} containing all the records.
+ * An HDFSDataReader is an implementation of {@link SerialisedDataReader} for {@code HDFS} that opens a file and returns
+ * a single {@link InputStream} containing all the records.
  */
-public class HdfsDataReader extends SerialisedDataReader {
+public class HDFSDataReader extends SerialisedDataReader {
     @JsonIgnore
     private FileSystem fs;
 
-    public HdfsDataReader() {
+    public HDFSDataReader() {
     }
 
     @JsonCreator
-    public HdfsDataReader(@JsonProperty("conf") final Map<String, String> conf,
-                          @JsonProperty("serialisers") final Map<String, Serialiser<?>> serialisers) throws IOException {
+    public HDFSDataReader(@JsonProperty("conf") final Map<String, String> conf, @JsonProperty("serialisers") final Map<String, Serialiser<?>> serialisers) throws IOException {
         conf(conf);
         serialisers(serialisers);
     }
 
-    public HdfsDataReader conf(final Map<String, String> conf) throws IOException {
+    public HDFSDataReader conf(final Map<String, String> conf) throws IOException {
         requireNonNull(conf, "The conf cannot be null.");
         return conf(createConfig(conf));
     }
 
-    public HdfsDataReader conf(final Configuration conf) throws IOException {
+    public HDFSDataReader conf(final Configuration conf) throws IOException {
         requireNonNull(conf, "The conf cannot be null.");
         return fs(FileSystem.get(conf));
     }
 
-    public HdfsDataReader fs(final FileSystem fs) {
+    public HDFSDataReader fs(final FileSystem fs) {
         requireNonNull(fs, "The file system cannot be set to null.");
         this.fs = fs;
         return this;

@@ -16,9 +16,8 @@
 
 package uk.gov.gchq.palisade.resource.service;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import com.google.common.collect.Lists;
@@ -27,6 +26,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileSystem;
@@ -37,6 +37,9 @@ import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.ChildResource;
@@ -58,8 +61,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -77,7 +80,6 @@ import static java.util.Objects.requireNonNull;
  *
  * @see ResourceService
  */
-@JsonPropertyOrder(value = {"class", "conf", "dataFormat", "dataType"}, alphabetic = true)
 public class HDFSResourceService implements ResourceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HDFSResourceService.class);
     public static final String ERROR_ADD_RESOURCE = "AddResource is not supported by HDFSResourceService resources should be added/created via regular HDFS behaviour.";
@@ -86,48 +88,45 @@ public class HDFSResourceService implements ResourceService {
     public static final String ERROR_RESOLVING_PARENTS = "Error occurred while resolving resourceParents";
 
     public static final String HADOOP_CONF_STRING = "hdfs.init.conf";
+    public static final String CACHE_IMPL_KEY = "hdfs.cache.svc";
+    public static final String CONNECTION_DETAIL_KEY = "hdfs.conn.detail";
 
     private Configuration conf;
+    private CacheService cacheService;
+
     private FileSystem fileSystem;
 
-    private ConnectionDetailStorage connectionDetailStorage;
-
-    //===== REMOVE ONCE Issue gh-108 IS RESOLVED ============
-    public static final String USE_SHARED_STORAGE_KEY = "hdfs.init.shared.storage";
-    private boolean useSharedConnectionDetails = false;
-
-    private static ConnectionDetailStorage sharedConnectionStorage;
-
-    private ConnectionDetailStorage retrieveConnectionDetailStorage() {
-        return (useSharedConnectionDetails) ? sharedConnectionStorage : connectionDetailStorage;
-    }
-
-    private void updateSharedConnectionDetails() {
-        if (useSharedConnectionDetails) {
-            sharedConnectionStorage = this.connectionDetailStorage;
-        }
-    }
-
-    public static final String CONNECTION_DETAIL_IN_CONFIG = "hdfs.init.connection.detail";
-
-    //=====================
+    @JsonIgnore
+    private ConnectionDetailStorage connectionDetailStorage = new ConnectionDetailStorage();
 
     public HDFSResourceService() {
     }
 
-    public HDFSResourceService(final Configuration conf, final HashMap<String, ConnectionDetail> dataFormat, final HashMap<String, ConnectionDetail> dataType) throws IOException {
-        requireNonNull(conf);
+    public HDFSResourceService(final Configuration conf, final CacheService cacheService) throws IOException {
+        requireNonNull(conf, "conf");
+        requireNonNull(cacheService, "cache");
         this.conf = conf;
         this.fileSystem = FileSystem.get(conf);
-        this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
-        updateSharedConnectionDetails();
+        this.cacheService = cacheService;
     }
 
-    @JsonCreator
-    public HDFSResourceService(@JsonProperty("conf") final Map<String, String> conf,
-                               @JsonProperty("dataFormat") final HashMap<String, ConnectionDetail> dataFormat,
-                               @JsonProperty("dataType") final HashMap<String, ConnectionDetail> dataType) throws IOException {
-        this(createConfig(conf), dataFormat, dataType);
+    public HDFSResourceService(@JsonProperty("conf") final Map<String, String> conf, @JsonProperty("cacheService") final CacheService cacheService) throws IOException {
+        this(createConfig(conf), cacheService);
+    }
+
+    public HDFSResourceService cacheService(final CacheService cacheService) {
+        requireNonNull(cacheService, "Cache service cannot be set to null.");
+        this.cacheService = cacheService;
+        return this;
+    }
+
+    public void setCacheService(final CacheService cacheService) {
+        cacheService(cacheService);
+    }
+
+    public CacheService getCacheService() {
+        requireNonNull(cacheService, "The cache service has not been set.");
+        return cacheService;
     }
 
     private static Configuration createConfig(final Map<String, String> conf) {
@@ -140,13 +139,33 @@ public class HDFSResourceService implements ResourceService {
         return config;
     }
 
+    /**
+     * Write the internal details to the given cache.
+     */
+    private void writeConnectionDetails() {
+        final CacheService cache = getCacheService();
+        AddCacheRequest<ConnectionDetailStorage> dataFormatRequest = new AddCacheRequest<>()
+                .service(HDFSResourceService.class)
+                .key(CONNECTION_DETAIL_KEY)
+                .value(this.connectionDetailStorage);
+        cache.add(dataFormatRequest).join();
+    }
+
+    /**
+     * Read the internal details from the given cache.
+     */
+    private void readConnectionDetails() {
+        final CacheService cache = getCacheService();
+        GetCacheRequest<ConnectionDetailStorage> dataFormatRequest = new GetCacheRequest<>()
+                .service(HDFSResourceService.class)
+                .key(CONNECTION_DETAIL_KEY);
+        Optional<ConnectionDetailStorage> formats = cache.get(dataFormatRequest).join();
+        formats.ifPresent(cds -> connectionDetail(cds.getDataFormat(), cds.getDataType(), true));
+    }
+
     @Override
     public void configure(final InitialConfig config) throws NoConfigException {
         requireNonNull(config, "config");
-        //get use shared storage
-        String useShared = config.getOrDefault(USE_SHARED_STORAGE_KEY, "false");
-        boolean useSharedStorage = Boolean.parseBoolean(useShared);
-        this.setUseSharedConnectionDetails(useSharedStorage);
         //get the configuration string
         String serialisedConfig = config.getOrDefault(HADOOP_CONF_STRING, null);
         //make this into a map
@@ -154,7 +173,7 @@ public class HDFSResourceService implements ResourceService {
         if (nonNull(serialisedConfig)) {
             confMap = JSONSerialiser.deserialise(serialisedConfig.getBytes(JSONSerialiser.UTF8), Map.class);
         }
-        //make this into a config
+        //make this into a config, confMap may be null at this point
         Configuration newConf = createConfig(confMap);
         this.conf = newConf;
         try {
@@ -162,16 +181,13 @@ public class HDFSResourceService implements ResourceService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        //remove once gh-108 is fixed========
-        try {
-            String connectionDetailSerialised = config.get(CONNECTION_DETAIL_IN_CONFIG);
-            this.connectionDetailStorage = JSONSerialiser.deserialise(connectionDetailSerialised, ConnectionDetailStorage.class);
-            updateSharedConnectionDetails();
-        } catch (NoSuchElementException e) {
-            throw new NoConfigException(e);
+        //extract cache
+        String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
+        if (nonNull(serialisedCache)) {
+            cacheService = JSONSerialiser.deserialise(serialisedCache.getBytes(JSONSerialiser.UTF8), CacheService.class);
+        } else {
+            throw new NoConfigException("no cache service specified in configuration");
         }
-        //================
     }
 
     @Override
@@ -180,11 +196,8 @@ public class HDFSResourceService implements ResourceService {
         Map<String, String> confMap = getConf();
         String serialisedConf = new String(JSONSerialiser.serialise(confMap), JSONSerialiser.UTF8);
         config.put(HADOOP_CONF_STRING, serialisedConf);
-        config.put(USE_SHARED_STORAGE_KEY, Boolean.toString(getUseSharedConnectionDetails()));
-
-        //remove this once gh-108 is fixed ==================
-        config.put(CONNECTION_DETAIL_IN_CONFIG, new String(JSONSerialiser.serialise(retrieveConnectionDetailStorage())));
-        //=======
+        String serialisedCache = new String(JSONSerialiser.serialise(cacheService), JSONSerialiser.UTF8);
+        config.put(CACHE_IMPL_KEY, serialisedCache);
     }
 
     protected Configuration getInternalConf() {
@@ -198,22 +211,14 @@ public class HDFSResourceService implements ResourceService {
     }
 
     public HDFSResourceService connectionDetail(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
+        return connectionDetail(dataFormat, dataType, false);
+    }
+
+    private HDFSResourceService connectionDetail(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType, final boolean skipWrite) {
         this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
-        updateSharedConnectionDetails();
-        return this;
-    }
-
-    public boolean getUseSharedConnectionDetails() {
-        return useSharedConnectionDetails;
-    }
-
-    public void setUseSharedConnectionDetails(final boolean useSharedConnectionDetails) {
-        useSharedConnectionDetails(useSharedConnectionDetails);
-    }
-
-    public HDFSResourceService useSharedConnectionDetails(final boolean useSharedConnectionDetails) {
-        this.useSharedConnectionDetails = useSharedConnectionDetails;
-        updateSharedConnectionDetails();
+        if (!skipWrite) {
+            writeConnectionDetails();
+        }
         return this;
     }
 
@@ -235,8 +240,10 @@ public class HDFSResourceService implements ResourceService {
 
     private CompletableFuture<Map<LeafResource, ConnectionDetail>> getMapCompletableFuture(
             final String pathString, final Predicate<HDFSResourceDetails> predicate) {
+        readConnectionDetails();
         return CompletableFuture.supplyAsync(() -> {
             try {
+                //pull latest connection details
                 final RemoteIterator<LocatedFileStatus> remoteIterator = this.getFileSystem().listFiles(new Path(pathString), true);
                 return getPaths(remoteIterator)
                         .stream()
@@ -249,7 +256,7 @@ public class HDFSResourceService implements ResourceService {
                                     resolveParents(fileFileResource, getInternalConf());
                                     return fileFileResource;
                                 },
-                                resourceDetails -> retrieveConnectionDetailStorage().get(resourceDetails.getType(), resourceDetails.getFormat())
+                                resourceDetails -> this.connectionDetailStorage.get(resourceDetails.getType(), resourceDetails.getFormat())
 
                         ));
             } catch (RuntimeException e) {
@@ -308,14 +315,14 @@ public class HDFSResourceService implements ResourceService {
         return paths;
     }
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
+    @JsonIgnore
     public Map<String, ConnectionDetail> getDataType() {
-        return retrieveConnectionDetailStorage().getDataType();
+        return this.connectionDetailStorage.getDataType();
     }
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
+    @JsonIgnore
     public Map<String, ConnectionDetail> getDataFormat() {
-        return retrieveConnectionDetailStorage().getDataFormat();
+        return this.connectionDetailStorage.getDataFormat();
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
@@ -331,6 +338,26 @@ public class HDFSResourceService implements ResourceService {
             }
         }
         return rtn;
+    }
+
+    public HDFSResourceService conf(final Map<String, String> conf) throws IOException {
+        return conf(createConfig(conf));
+    }
+
+    public void setConf(final Map<String, String> conf) throws IOException {
+        setConf(createConfig(conf));
+    }
+
+    @JsonIgnore
+    public void setConf(final Configuration conf) throws IOException {
+        conf(conf);
+    }
+
+    public HDFSResourceService conf(final Configuration conf) throws IOException {
+        requireNonNull(conf, "conf");
+        this.conf = conf;
+        this.fileSystem = FileSystem.get(conf);
+        return this;
     }
 
     private Map<String, String> getPlainJobConfWithoutResolvingValues() {
@@ -355,7 +382,7 @@ public class HDFSResourceService implements ResourceService {
 
         final EqualsBuilder builder = new EqualsBuilder()
                 .append(this.getFileSystem(), that.getFileSystem())
-                .append(this.retrieveConnectionDetailStorage(), that.retrieveConnectionDetailStorage());
+                .append(this.cacheService, that.cacheService);
 
         if (builder.isEquals()) {
             builder.append(this.getInternalConf().size(), that.getInternalConf().size());
@@ -378,7 +405,7 @@ public class HDFSResourceService implements ResourceService {
                 .appendSuper(super.toString())
                 .append("conf", conf)
                 .append("fileSystem", fileSystem)
-                .append("connectionDetailStorage", retrieveConnectionDetailStorage())
+                .append("cacheService", cacheService)
                 .toString();
     }
 
@@ -387,19 +414,20 @@ public class HDFSResourceService implements ResourceService {
         return new HashCodeBuilder(17, 37)
                 .append(conf)
                 .append(fileSystem)
-                .append(retrieveConnectionDetailStorage())
+                .append(cacheService)
                 .toHashCode();
     }
 
-    private static class ConnectionDetailStorage {
+    public static class ConnectionDetailStorage {
+        @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
         private final Map<String, ConnectionDetail> dataFormat = new HashMap<>();
-
+        @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
         private final Map<String, ConnectionDetail> dataType = new HashMap<>();
 
         ConnectionDetailStorage() {
         }
 
-        ConnectionDetailStorage(final Map<String, ConnectionDetail> dataFormat,  final Map<String, ConnectionDetail> dataType) {
+        ConnectionDetailStorage(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
             if (nonNull(dataFormat)) {
                 this.dataFormat.putAll(dataFormat);
                 this.dataFormat.values().removeIf(Objects::isNull);
@@ -421,11 +449,9 @@ public class HDFSResourceService implements ResourceService {
             return rtn;
         }
 
-
         public Map<String, ConnectionDetail> getDataFormat() {
             return new HashMap<>(dataFormat);
         }
-
 
         public Map<String, ConnectionDetail> getDataType() {
             return new HashMap<>(dataType);

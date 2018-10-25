@@ -19,6 +19,7 @@ package io.etcd.jetcd.launcher;
 import com.github.dockerjava.api.DockerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.ContainerLaunchException;
