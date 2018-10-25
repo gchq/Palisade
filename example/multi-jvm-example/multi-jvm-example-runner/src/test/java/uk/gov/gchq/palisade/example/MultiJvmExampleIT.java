@@ -62,6 +62,7 @@ public class MultiJvmExampleIT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
+
         System.setProperty(RestPalisadeServiceV1.SERVICE_CONFIG, "palisadeConfig.json");
         palisadeServer = new EmbeddedHttpServer("http://localhost:8080/palisade/v1", new uk.gov.gchq.palisade.service.impl.ApplicationConfigV1());
         palisadeServer.startServer();
