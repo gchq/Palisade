@@ -288,7 +288,7 @@ public final class ExampleConfigurator {
         //configure the multi JVM settings
         AuditService audit = new LoggerAuditService();
         //this is the cache that is used by the client to talk to the containerised etcd
-        CacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379")));
+        SimpleCacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379")));
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
         ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
@@ -323,6 +323,8 @@ public final class ExampleConfigurator {
         createMultiJVMResourceService(configService, cache, Optional.of(containerCache));
 
         createMultiJVMUserService(configService, containerCache);
+
+        ((EtcdBackingStore)cache.getBackingStore()).close();
 
         return configService;
     }
