@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import java.io.Closeable;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.stream.Stream;
