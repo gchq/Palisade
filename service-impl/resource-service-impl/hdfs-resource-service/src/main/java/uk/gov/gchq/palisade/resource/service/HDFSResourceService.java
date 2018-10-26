@@ -193,6 +193,7 @@ public class HDFSResourceService implements ResourceService {
     @Override
     public void writeConfiguration(final InitialConfig config) {
         requireNonNull(config, "config");
+        config.put(ResourceService.class.getTypeName(), getClass().getTypeName());
         Map<String, String> confMap = getConf();
         String serialisedConf = new String(JSONSerialiser.serialise(confMap), JSONSerialiser.UTF8);
         config.put(HADOOP_CONF_STRING, serialisedConf);

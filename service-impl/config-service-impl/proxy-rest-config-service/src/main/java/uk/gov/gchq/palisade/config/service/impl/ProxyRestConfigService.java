@@ -22,6 +22,7 @@ import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
+import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.util.concurrent.CompletableFuture;
@@ -31,6 +32,11 @@ public class ProxyRestConfigService extends ProxyRestService implements InitialC
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyRestConfigService.class);
 
     public ProxyRestConfigService() {
+    }
+
+    @Override
+    protected Class<? extends Service> getServiceClass() {
+        return InitialConfigurationService.class;
     }
 
     public ProxyRestConfigService(final String baseUrl) {

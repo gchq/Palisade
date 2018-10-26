@@ -106,8 +106,11 @@ public abstract class ProxyRestService implements Service {
     @Override
     public void writeConfiguration(final InitialConfig config) {
         requireNonNull(config, "config");
+        config.put(getServiceClass().getTypeName(), getClass().getTypeName());
         config.put(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX, this.baseUrl);
     }
+
+    protected abstract Class<? extends Service> getServiceClass();
 
     protected URL getUrl() {
         return getUrl(null);

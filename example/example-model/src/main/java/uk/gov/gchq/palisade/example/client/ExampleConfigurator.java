@@ -40,6 +40,7 @@ import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
@@ -51,11 +52,15 @@ import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Convenience class for the examples to configure the config creation service. This is used to create an entire
@@ -78,8 +83,8 @@ public final class ExampleConfigurator {
         InitialConfigurationService configService = new SimpleConfigService(cache);
         //configure the single JVM settings
         PolicyService policy = new HierarchicalPolicyService().cacheService(cache);
-        UserService user = createUserService(configService, cache);
-        AuditService audit = createAuditService(configService);
+        UserService user = createClientUserService(configService, cache);
+        AuditService audit = createAuditService(configService, cache);
         SimplePalisadeService palisade = new SimplePalisadeService()
                 .auditService(audit)
                 .policyService(policy)
@@ -88,29 +93,46 @@ public final class ExampleConfigurator {
 
         HDFSResourceService resource = createSingleJVMResourceService(configService, cache, palisade);
 
-        //build a config for client
-        InitialConfig singleJVMconfig = new InitialConfig()
-                .put(PolicyService.class.getTypeName(), policy.getClass().getTypeName())
-                .put(PolicyService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
+        //write each of these to the initial config
+        Collection<Service> services = Stream.of(audit, user, resource).collect(Collectors.toList());
+        return writeClientConfiguration(configService, services, new LegacyPair(PolicyService.class, policy), new LegacyPair(CacheService.class, cache), new LegacyPair(PalisadeService.class, palisade));
+    }
 
-                .put(CacheService.class.getTypeName(), cache.getClass().getTypeName())
-                .put(CacheService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
+    //TODO: remove this once gh-129 done
+    static class LegacyPair {
+        public final Service service;
+        public final Class<? extends Service> clazz;
 
-                .put(PalisadeService.class.getTypeName(), palisade.getClass().getTypeName())
-                .put(PalisadeService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
+        LegacyPair(final Class<? extends Service> clazz, final Service service) {
+            this.service = service;
+            this.clazz = clazz;
+        }
+    }
 
-        singleJVMconfig.put(AuditService.class.getTypeName(), audit.getClass().getTypeName());
-        audit.writeConfiguration(singleJVMconfig);
+    /**
+     * Create an {@link InitialConfig} for the client and insert have each of the services write their configuration
+     * into the service.
+     *
+     * @param configService  the configuration service
+     * @param services       collection of services to write to the configuration service
+     * @param legacyServices (TODO remove once gh-129 done) service that don't yet use the config service
+     * @return the {@code configService} argument
+     */
+    private static InitialConfigurationService writeClientConfiguration(final InitialConfigurationService configService, final Collection<Service> services, final LegacyPair... legacyServices) {
+        InitialConfig initial = new InitialConfig();
 
-        singleJVMconfig.put(UserService.class.getTypeName(), user.getClass().getTypeName());
-        user.writeConfiguration(singleJVMconfig);
+        //deal with the legacy services (TODO: to be deleted once gh-129 closed)
+        for (LegacyPair s : legacyServices) {
+            initial.put(s.clazz.getTypeName(), s.service.getClass().getTypeName())
+                    .put(s.clazz.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(s.service)));
+        }
 
-        singleJVMconfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
-        resource.writeConfiguration(singleJVMconfig);
+        //each service to write their configuration into the initial configuration
+        services.forEach(service -> service.writeConfiguration(initial));
 
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
-                .config(singleJVMconfig)
+                .config(initial)
                 .service(Optional.empty())).join();
         return configService;
     }
@@ -119,22 +141,22 @@ public final class ExampleConfigurator {
      * Makes a user service.
      *
      * @param configService the configuration service
-     * @param cache         the cache service the user service should use
+     * @param cacheService  the cache service the user service should use
      * @return the user service
      */
-    private static UserService createUserService(final InitialConfigurationService configService, final CacheService cache) {
-        return new HashMapUserService().cacheService(cache);
+    private static UserService createClientUserService(final InitialConfigurationService configService, final CacheService cacheService) {
+        return new HashMapUserService().cacheService(cacheService);
     }
 
     /**
      * Makes an audit service.
      *
      * @param configService the configuration service
+     * @param cacheService  the cache service
      * @return the audit service
      */
-    private static AuditService createAuditService(final InitialConfigurationService configService) {
-        AuditService audit = new LoggerAuditService();
-        return audit;
+    private static AuditService createAuditService(final InitialConfigurationService configService, final CacheService cacheService) {
+        return new LoggerAuditService();
     }
 
     /**
@@ -166,85 +188,6 @@ public final class ExampleConfigurator {
     }
 
     /**
-     * Allows the bootstrapping of some configuration data for the multi-JVM example.
-     *
-     * @param etcdEndpoints the list of etcd end points, if empty then a HashMap backing store is used
-     * @return the configuration service to provide the Palisade entry point
-     */
-    public static InitialConfigurationService setupMultiJVMConfigurationService(final List<String> etcdEndpoints) {
-        //configure the multi JVM settings
-        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
-        PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
-        PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
-        ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
-        UserService user = new ProxyRestUserService("http://localhost:8083/user");
-        ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
-        AuditService audit = createAuditService(configService);
-
-        InitialConfig multiJVMConfig = new InitialConfig()
-                .put(PolicyService.class.getTypeName(), policy.getClass().getTypeName())
-                .put(PolicyService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
-
-                .put(CacheService.class.getTypeName(), cache.getClass().getTypeName())
-                .put(CacheService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
-
-                .put(PalisadeService.class.getTypeName(), palisade.getClass().getTypeName())
-                .put(PalisadeService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
-
-        multiJVMConfig.put(AuditService.class.getTypeName(), audit.getClass().getTypeName());
-        audit.writeConfiguration(multiJVMConfig);
-
-        multiJVMConfig.put(UserService.class.getTypeName(), user.getClass().getTypeName());
-        user.writeConfiguration(multiJVMConfig);
-
-        multiJVMConfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
-        resource.writeConfiguration(multiJVMConfig);
-        //insert this into the cache manually so it can be created later
-        configService.add((AddConfigRequest) new AddConfigRequest()
-                .config(multiJVMConfig)
-                .service(Optional.empty())).join();
-
-        //create the services config that they will be able to find the example data
-        //if there are no endpoints, assume we are using a HashMap backing store
-        SimpleCacheService resourceCache = new SimpleCacheService();
-        if (etcdEndpoints.isEmpty()) {
-            resourceCache.backingStore(new HashMapBackingStore(true));
-        } else {
-            EtcdBackingStore etcdStore = new EtcdBackingStore().connectionDetails(etcdEndpoints);
-            resourceCache.backingStore(etcdStore);
-        }
-
-        createMultiJVMUserService(configService, resourceCache);
-
-        createMultiJVMResourceService(configService, resourceCache, Optional.empty());
-        //close the resourceCache
-        if (resourceCache.getBackingStore() instanceof EtcdBackingStore) {
-            ((EtcdBackingStore) resourceCache.getBackingStore()).close();
-        }
-
-        return configService;
-    }
-
-    /**
-     * Creates a user service that can be used for the multi JVM examples.
-     *
-     * @param configService the configuration service that the service will write it's configuration to
-     * @param resourceCache the cache that this user service should be configured to use
-     * @return the created user service
-     */
-    private static UserService createMultiJVMUserService(final ProxyRestConfigService configService, final CacheService resourceCache) {
-        InitialConfig userServiceConfig = new InitialConfig();
-        UserService remoteUserService = createUserService(configService, resourceCache);
-        //write class name
-        userServiceConfig.put(UserService.class.getTypeName(), remoteUserService.getClass().getTypeName());
-        remoteUserService.writeConfiguration(userServiceConfig);
-        configService.add((AddConfigRequest) new AddConfigRequest()
-                .config(userServiceConfig)
-                .service(Optional.of(UserService.class))).join();
-        return remoteUserService;
-    }
-
-    /**
      * Sets the resource service configuration up that will be retrieved by the resource service from the configuration
      * service.
      *
@@ -254,78 +197,79 @@ public final class ExampleConfigurator {
      * @return the configured resource service
      */
     private static HDFSResourceService createMultiJVMResourceService(final InitialConfigurationService configService, final CacheService cache, final Optional<CacheService> containerCache) {
-        InitialConfig resourceConfig = new InitialConfig();
-        HDFSResourceService resourceServer;
-
         try {
-            resourceServer = new HDFSResourceService(new Configuration(), cache);
+            HDFSResourceService resourceServer = new HDFSResourceService(new Configuration(), cache);
             //set up the example object type
             final Map<String, ConnectionDetail> dataType = new HashMap<>();
             dataType.put(RESOURCE_TYPE, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
             resourceServer.connectionDetail(null, dataType);
+            //switch to containerised cache
+            containerCache.ifPresent(resourceServer::setCacheService);
+            writeConfiguration(configService, resourceServer, ResourceService.class);
+
+            return resourceServer;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        //switch to containerised cache
-        containerCache.ifPresent(resourceServer::setCacheService);
-
-        //write class name
-        resourceConfig.put(ResourceService.class.getTypeName(), resourceServer.getClass().getTypeName());
-        //write the configured data
-        resourceServer.writeConfiguration(resourceConfig);
-        configService.add((AddConfigRequest) new AddConfigRequest()
-                .config(resourceConfig)
-                .service(Optional.of(ResourceService.class))).join();
-        return resourceServer;
     }
 
     /**
-     * Allows the bootstrapping of some configuration data for the Docker example.
+     * Write the given configuration to the configuration manager from the service.
      *
+     * @param configService the configuration service to write to
+     * @param service       the service that will write its configuration
+     * @param serviceClass  the type of Palisade service
+     */
+    private static void writeConfiguration(final InitialConfigurationService configService, final Service service, final Class<? extends Service> serviceClass) {
+        InitialConfig config = new InitialConfig();
+        service.writeConfiguration(config);
+        configService.add((AddConfigRequest) new AddConfigRequest()
+                .config(config)
+                .service(Optional.of(serviceClass))).join();
+    }
+
+    /**
+     * Allows the bootstrapping of some configuration data for the multi-JVM examples. This can be used by the multi JVM
+     * examples, including the containerised examples. If no etcd endpoints are given, then a hashmap cache backing
+     * store is created and services are told to use that. This is useful in the integration tests. If an endpoint is
+     * given, then this will be used instead. The {@code containerisedCache} argument is the cache service details that
+     * will be put into the configuration given to various services when they startup. This may need to be different to
+     * the cache used on the client side, due to changes in how containers contact other containers, e.g. different host
+     * names in network URLs.
+     *
+     * @param etcdEndpoints      the list of etcd end points, if empty then a HashMap backing store is used
+     * @param containerisedCache the {@link CacheService} that services should be told to use once they start
+     *                           (potentially inside containers)
      * @return the configuration service to provide the Palisade entry point
      */
-    public static InitialConfigurationService setupDockerConfigurationService() {
-        //configure the multi JVM settings
-        AuditService audit = new LoggerAuditService();
-        //this is the cache that is used by the client to talk to the containerised etcd
-        SimpleCacheService cache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379")));
+    public static InitialConfigurationService setupMultiJVMConfigurationService(final List<String> etcdEndpoints, final Optional<CacheService> containerisedCache) {
+        requireNonNull(etcdEndpoints, "etcd endpoints can not be null");
+        requireNonNull(containerisedCache, "containerisedCache can not be null");
+
+        ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
+
+        //if there are no endpoints, assume we are using a HashMap backing store
+        SimpleCacheService cache = new SimpleCacheService();
+        if (etcdEndpoints.isEmpty()) {
+            cache.backingStore(new HashMapBackingStore(true));
+        } else {
+            EtcdBackingStore etcdStore = new EtcdBackingStore().connectionDetails(etcdEndpoints);
+            cache.backingStore(etcdStore);
+        }
+
+        AuditService audit = createAuditService(configService, cache);
+
         PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
         ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
         UserService user = new ProxyRestUserService("http://localhost:8083/user");
-        ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
-        InitialConfig multiJVMConfig = new InitialConfig()
-                .put(PolicyService.class.getTypeName(), policy.getClass().getTypeName())
-                .put(PolicyService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(policy)))
 
-                .put(CacheService.class.getTypeName(), cache.getClass().getTypeName())
-                .put(CacheService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(cache)))
+        Collection<Service> services = Stream.of(audit, user, resource).collect(Collectors.toList());
+        writeClientConfiguration(configService, services, new LegacyPair(PolicyService.class, policy), new LegacyPair(CacheService.class, cache), new LegacyPair(PalisadeService.class, palisade));
 
-                .put(PalisadeService.class.getTypeName(), palisade.getClass().getTypeName())
-                .put(PalisadeService.class.getTypeName() + ConfiguredClientServices.STATE, new String(JSONSerialiser.serialise(palisade)));
-
-        multiJVMConfig.put(AuditService.class.getTypeName(), audit.getClass().getTypeName());
-        audit.writeConfiguration(multiJVMConfig);
-
-        multiJVMConfig.put(UserService.class.getTypeName(), user.getClass().getTypeName());
-        user.writeConfiguration(multiJVMConfig);
-
-        multiJVMConfig.put(ResourceService.class.getTypeName(), resource.getClass().getTypeName());
-        resource.writeConfiguration(multiJVMConfig);
-        //insert this into the cache manually so it can be created later
-        configService.add((AddConfigRequest) new AddConfigRequest()
-                .config(multiJVMConfig)
-                .service(Optional.empty())).join();
-
-        //create the services config that they will retrieve
-        //this is the cache that is used from within a container
-        CacheService containerCache = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"), false));
-        createMultiJVMResourceService(configService, cache, Optional.of(containerCache));
-
-        createMultiJVMUserService(configService, containerCache);
-
-        ((EtcdBackingStore)cache.getBackingStore()).close();
-
+        writeConfiguration(configService, createClientUserService(configService, cache), UserService.class);
+        createMultiJVMResourceService(configService, cache, containerisedCache);
+        //TODO: must manually close this connection
         return configService;
     }
 }

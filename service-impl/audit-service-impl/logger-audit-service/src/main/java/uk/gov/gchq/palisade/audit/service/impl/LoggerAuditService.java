@@ -54,6 +54,7 @@ public class LoggerAuditService implements AuditService {
     @Override
     public void writeConfiguration(final InitialConfig config) {
         requireNonNull(config, "config");
+        config.put(AuditService.class.getTypeName(), getClass().getTypeName());
         LOGGER.debug("Wrote configuration data: no-op");
     }
 

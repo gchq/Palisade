@@ -22,6 +22,7 @@ import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.io.Closeable;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;

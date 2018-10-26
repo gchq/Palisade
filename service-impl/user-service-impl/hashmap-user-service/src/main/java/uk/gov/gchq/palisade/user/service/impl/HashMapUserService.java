@@ -83,6 +83,7 @@ public class HashMapUserService implements UserService {
     @Override
     public void writeConfiguration(final InitialConfig config) {
         requireNonNull(config, "config");
+        config.put(UserService.class.getTypeName(), getClass().getTypeName());
         String serialisedCache = new String(JSONSerialiser.serialise(cacheService), JSONSerialiser.UTF8);
         config.put(CACHE_IMPL_KEY, serialisedCache);
     }

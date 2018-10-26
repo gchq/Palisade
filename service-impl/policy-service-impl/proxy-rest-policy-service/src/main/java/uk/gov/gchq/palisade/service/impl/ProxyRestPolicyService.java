@@ -25,11 +25,17 @@ import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
+import uk.gov.gchq.palisade.service.Service;
 
 import java.util.concurrent.CompletableFuture;
 
 public class ProxyRestPolicyService extends ProxyRestService implements PolicyService {
     public ProxyRestPolicyService() {
+    }
+
+    @Override
+    protected Class<? extends Service> getServiceClass() {
+        return PolicyService.class;
     }
 
     public ProxyRestPolicyService(final String baseUrl) {

@@ -2,12 +2,16 @@ package uk.gov.gchq.palisade.example;
 
 import org.junit.Assert;
 import org.junit.Test;
+import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,7 +33,7 @@ public class MultiJvmDockerExampleIT {
     @Test
     public void shouldReadAsAlice() throws Exception {
         // Given
-        final InitialConfigurationService ics = ExampleConfigurator.setupDockerConfigurationService();
+        final InitialConfigurationService ics = getConfigurationService();
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
@@ -48,10 +52,16 @@ public class MultiJvmDockerExampleIT {
         );
     }
 
+    private InitialConfigurationService getConfigurationService() {
+        return ExampleConfigurator.setupMultiJVMConfigurationService(Collections.singletonList("http://localhost:2379"),
+                Optional.of(new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"), false)))
+        );
+    }
+
     @Test
     public void shouldReadAsBob() throws Exception {
         // Given
-        final InitialConfigurationService ics = ExampleConfigurator.setupDockerConfigurationService();
+        final InitialConfigurationService ics = getConfigurationService();
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 

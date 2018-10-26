@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,7 +57,7 @@ public class MultiJvmExample {
                     .map(URI::toString)
                     .collect(Collectors.toList());
             //this will write an initial configuration
-            final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs);
+            final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs, Optional.empty());
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
