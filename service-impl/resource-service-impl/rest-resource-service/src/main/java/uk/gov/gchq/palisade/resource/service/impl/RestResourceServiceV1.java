@@ -71,12 +71,10 @@ public class RestResourceServiceV1 implements ResourceService {
     }
 
     private static synchronized ResourceService createService(final String serviceConfigPath) {
-        ResourceService ret;
         if (resourceService == null) {
             resourceService = RestUtil.createService(RestResourceServiceV1.class, serviceConfigPath, ResourceService.class);
         }
-        ret = resourceService;
-        return ret;
+        return resourceService;
     }
 
     @POST

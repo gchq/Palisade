@@ -64,12 +64,10 @@ public class RestUserServiceV1 implements UserService {
     }
 
     private static synchronized UserService createService(final String serviceConfigPath) {
-        UserService ret;
         if (userService == null) {
             userService = RestUtil.createService(RestUserServiceV1.class, serviceConfigPath, UserService.class);
         }
-        ret = userService;
-        return ret;
+        return userService;
     }
 
     @POST

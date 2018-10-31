@@ -18,6 +18,8 @@ package uk.gov.gchq.palisade.config.service.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
@@ -40,6 +42,8 @@ import static java.util.Objects.requireNonNull;
  * All methods throw {@link NullPointerException} for any {@code null} parameters.
  */
 public class SimpleConfigService implements InitialConfigurationService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleConfigService.class);
+
     /**
      * Key used to specify the "client" configuration.
      */
@@ -59,6 +63,18 @@ public class SimpleConfigService implements InitialConfigurationService {
     public SimpleConfigService(@JsonProperty("cache") final CacheService cache) {
         requireNonNull(cache, "cache");
         this.cache = cache;
+    }
+
+    @Override
+    public void configure(final InitialConfig config) throws NoConfigException {
+        requireNonNull(config,"config cannot be null");
+        LOGGER.debug("Configure called: no-op");
+    }
+
+    @Override
+    public void writeConfiguration(final InitialConfig config) {
+        requireNonNull(config,"config cannot be null");
+        LOGGER.debug("Write configuration called: no-op");
     }
 
     /**
