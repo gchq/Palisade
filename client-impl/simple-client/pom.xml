@@ -28,11 +28,6 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hashmap-resource-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
             <artifactId>logger-audit-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
