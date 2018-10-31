@@ -25,10 +25,59 @@
     <artifactId>example</artifactId>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>example-model</module>
-        <module>single-jvm-example</module>
-        <module>multi-jvm-example</module>
-        <module>mapreduce-example</module>
-    </modules>
+    <profiles>
+        <!-- full build default option, integration-test and test profile build examples.-->
+        <profile>
+            <id>full</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>example-model</module>
+                <module>single-jvm-example</module>
+                <module>multi-jvm-example</module>
+                <module>mapreduce-example</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>integration-test</id>
+            <modules>
+                <module>example-model</module>
+                <module>single-jvm-example</module>
+                <module>multi-jvm-example</module>
+                <module>mapreduce-example</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>test</id>
+            <modules>
+                <module>example-model</module>
+                <module>single-jvm-example</module>
+                <module>multi-jvm-example</module>
+                <module>mapreduce-example</module>
+            </modules>
+        </profile>
+
+        <!-- quick build, unit-test, analyze and styling dont build examples -->
+        <profile>
+            <id>quick</id>
+            <modules>
+            </modules>
+        </profile>
+        <profile>
+            <id>unit-test</id>
+            <modules>
+            </modules>
+        </profile>
+        <profile>
+            <id>analyze</id>
+            <modules>
+            </modules>
+        </profile>
+        <profile>
+            <id>styling</id>
+            <modules>
+            </modules>
+        </profile>
+    </profiles>
 </project>
