@@ -24,6 +24,8 @@ import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 
+import java.util.concurrent.CompletableFuture;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -38,7 +40,8 @@ public class LoggerAuditService implements AuditService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggerAuditService.class);
 
     @Override
-    public void audit(final AuditRequest request) {
+    public CompletableFuture<Boolean> audit(final AuditRequest request) {
+        requireNonNull(request, "The audit request can not be null.");
         final String msg = "'" + request.getUser().getUserId().getId()
                 + "' accessed '" + request.getResource().getId()
                 + "' for '" + request.getContext().getJustification()
@@ -49,6 +52,7 @@ public class LoggerAuditService implements AuditService {
         } else {
             LOGGER.info(msg);
         }
+        return CompletableFuture.completedFuture(Boolean.TRUE);
     }
 
     @Override
