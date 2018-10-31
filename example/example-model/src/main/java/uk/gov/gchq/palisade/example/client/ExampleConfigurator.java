@@ -94,7 +94,7 @@ public final class ExampleConfigurator {
         HDFSResourceService resource;
         try {
             HDFSDataReader reader = new HDFSDataReader().conf(new Configuration());
-            reader.addSerialiser(ExampleConfigurator.RESOURCE_TYPE, new ExampleObjSerialiser());
+            reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
             resource = createResourceService(configService, cache);
             palisade.resourceService(resource);
             configureResourceConnectionDetails(resource, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisade).reader(reader)));
@@ -114,7 +114,7 @@ public final class ExampleConfigurator {
      */
     private static void configureResourceConnectionDetails(final HDFSResourceService resource, final ConnectionDetail exampleObjConnection) {
         final Map<String, ConnectionDetail> dataType = new HashMap<>();
-        dataType.put(ExampleConfigurator.RESOURCE_TYPE, exampleObjConnection);
+        dataType.put(RESOURCE_TYPE, exampleObjConnection);
         resource.connectionDetail(null, dataType);
     }
 
