@@ -91,16 +91,40 @@ public final class ExampleConfigurator {
                 .userService(user)
                 .cacheService(cache);
 
-        HDFSResourceService resource = createSingleJVMResourceService(configService, cache, palisade);
-
+        HDFSResourceService resource;
+        try {
+            HDFSDataReader reader = new HDFSDataReader().conf(new Configuration());
+            reader.addSerialiser(ExampleConfigurator.RESOURCE_TYPE, new ExampleObjSerialiser());
+            resource = createResourceService(configService, cache);
+            palisade.resourceService(resource);
+            configureResourceConnectionDetails(resource, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisade).reader(reader)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         //write each of these to the initial config
         Collection<Service> services = Stream.of(audit, user, resource).collect(Collectors.toList());
         return writeClientConfiguration(configService, services, new LegacyPair(PolicyService.class, policy), new LegacyPair(CacheService.class, cache), new LegacyPair(PalisadeService.class, palisade));
     }
 
-    //TODO: remove this once gh-129 done
+    /**
+     * Set up the example connection details in the resource service.
+     *
+     * @param resource             the resource service
+     * @param exampleObjConnection connection details for the example resource
+     */
+    private static void configureResourceConnectionDetails(final HDFSResourceService resource, final ConnectionDetail exampleObjConnection) {
+        final Map<String, ConnectionDetail> dataType = new HashMap<>();
+        dataType.put(ExampleConfigurator.RESOURCE_TYPE, exampleObjConnection);
+        resource.connectionDetail(null, dataType);
+    }
+
+    /**
+     * TODO: remove this once gh-129 done
+     */
     static class LegacyPair {
+
         public final Service service;
+
         public final Class<? extends Service> clazz;
 
         LegacyPair(final Class<? extends Service> clazz, final Service service) {
@@ -160,54 +184,16 @@ public final class ExampleConfigurator {
     }
 
     /**
-     * Create resource service for the single JVM example. This method will configure the service as well with example
-     * details.
+     * Makes a resource service.
      *
      * @param configService the Palisade configuration service
      * @param cache         the Palisade cache service
-     * @param palisade      the Palisade service
      * @return a configured resource service
      */
-    private static HDFSResourceService createSingleJVMResourceService(final InitialConfigurationService configService, final CacheService cache, final SimplePalisadeService palisade) {
-        HDFSResourceService resource;
-        HDFSDataReader reader;
+    private static HDFSResourceService createResourceService(final InitialConfigurationService configService, final CacheService cache) {
         try {
-            resource = new HDFSResourceService().conf(new Configuration()).cacheService(cache);
-            reader = new HDFSDataReader().conf(new Configuration());
-            reader.addSerialiser(ExampleConfigurator.RESOURCE_TYPE, new ExampleObjSerialiser());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        //tell the palisade service about this resource service
-        palisade.resourceService(resource);
-        //write the connection details to the resource service, this will cause it to write these to the cache
-        final Map<String, ConnectionDetail> dataType = new HashMap<>();
-        dataType.put(ExampleConfigurator.RESOURCE_TYPE, new SimpleConnectionDetail().service(new SimpleDataService().palisadeService(palisade).reader(reader)));
-        resource.connectionDetail(null, dataType);
-        return resource;
-    }
-
-    /**
-     * Sets the resource service configuration up that will be retrieved by the resource service from the configuration
-     * service.
-     *
-     * @param configService  the Palisade configuration service
-     * @param cache          the cache service to connect this resource service to outside of a container
-     * @param containerCache the cache to use once running containerised
-     * @return the configured resource service
-     */
-    private static HDFSResourceService createMultiJVMResourceService(final InitialConfigurationService configService, final CacheService cache, final Optional<CacheService> containerCache) {
-        try {
-            HDFSResourceService resourceServer = new HDFSResourceService(new Configuration(), cache);
-            //set up the example object type
-            final Map<String, ConnectionDetail> dataType = new HashMap<>();
-            dataType.put(RESOURCE_TYPE, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
-            resourceServer.connectionDetail(null, dataType);
-            //switch to containerised cache
-            containerCache.ifPresent(resourceServer::setCacheService);
-            writeConfiguration(configService, resourceServer, ResourceService.class);
-
-            return resourceServer;
+            HDFSResourceService resource = new HDFSResourceService().conf(new Configuration()).cacheService(cache);
+            return resource;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -246,30 +232,38 @@ public final class ExampleConfigurator {
         requireNonNull(etcdEndpoints, "etcd endpoints can not be null");
         requireNonNull(containerisedCache, "containerisedCache can not be null");
 
-        ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
+        EtcdBackingStore etcdStore = null;
+        try {
+            ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
+            //if there are no endpoints, assume we are using a HashMap backing store
+            SimpleCacheService cache = new SimpleCacheService();
+            if (etcdEndpoints.isEmpty()) {
+                cache.backingStore(new HashMapBackingStore(true));
+            } else {
+                etcdStore = new EtcdBackingStore().connectionDetails(etcdEndpoints);
+                cache.backingStore(etcdStore);
+            }
 
-        //if there are no endpoints, assume we are using a HashMap backing store
-        SimpleCacheService cache = new SimpleCacheService();
-        if (etcdEndpoints.isEmpty()) {
-            cache.backingStore(new HashMapBackingStore(true));
-        } else {
-            EtcdBackingStore etcdStore = new EtcdBackingStore().connectionDetails(etcdEndpoints);
-            cache.backingStore(etcdStore);
+            AuditService audit = createAuditService(configService, cache);
+            PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
+            PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
+            ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
+            UserService user = new ProxyRestUserService("http://localhost:8083/user");
+
+            Collection<Service> services = Stream.of(audit, user, resource).collect(Collectors.toList());
+            writeClientConfiguration(configService, services, new LegacyPair(PolicyService.class, policy), new LegacyPair(CacheService.class, cache), new LegacyPair(PalisadeService.class, palisade));
+            //now populate cache with details for services to start up
+            writeConfiguration(configService, createClientUserService(configService, cache), UserService.class);
+
+            HDFSResourceService remoteResource = createResourceService(configService, cache);
+            configureResourceConnectionDetails(remoteResource, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
+            containerisedCache.ifPresent(remoteResource::setCacheService);
+            writeConfiguration(configService, remoteResource, ResourceService.class);
+            return configService;
+        } finally {
+            if (etcdStore != null) {
+                etcdStore.close();
+            }
         }
-
-        AuditService audit = createAuditService(configService, cache);
-
-        PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
-        PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
-        ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
-        UserService user = new ProxyRestUserService("http://localhost:8083/user");
-
-        Collection<Service> services = Stream.of(audit, user, resource).collect(Collectors.toList());
-        writeClientConfiguration(configService, services, new LegacyPair(PolicyService.class, policy), new LegacyPair(CacheService.class, cache), new LegacyPair(PalisadeService.class, palisade));
-
-        writeConfiguration(configService, createClientUserService(configService, cache), UserService.class);
-        createMultiJVMResourceService(configService, cache, containerisedCache);
-        //TODO: must manually close this connection
-        return configService;
     }
 }
