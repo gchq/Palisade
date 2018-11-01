@@ -57,7 +57,7 @@ public class SimpleConfigService implements InitialConfigurationService {
     /**
      * Create a configuration service.
      *
-     * @param cache the storage service
+     * @param cache the cache service
      */
     @JsonCreator
     public SimpleConfigService(@JsonProperty("cache") final CacheService cache) {

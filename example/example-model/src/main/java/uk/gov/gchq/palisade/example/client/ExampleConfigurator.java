@@ -152,7 +152,7 @@ public final class ExampleConfigurator {
         }
 
         //each service to write their configuration into the initial configuration
-        services.forEach(service -> service.writeConfiguration(initial));
+        services.forEach(service -> service.recordCurrentConfigTo(initial));
 
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
@@ -208,7 +208,7 @@ public final class ExampleConfigurator {
      */
     private static void writeConfiguration(final InitialConfigurationService configService, final Service service, final Class<? extends Service> serviceClass) {
         InitialConfig config = new InitialConfig();
-        service.writeConfiguration(config);
+        service.recordCurrentConfigTo(config);
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(config)
                 .service(Optional.of(serviceClass))).join();
