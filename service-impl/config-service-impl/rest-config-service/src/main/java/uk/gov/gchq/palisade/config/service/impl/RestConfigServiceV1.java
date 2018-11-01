@@ -77,7 +77,7 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
             //now retrieve any further configuration data from the cache
             InitialConfig cfg = new Configurator(configService).retrieveConfig(Optional.of(InitialConfigurationService.class));
             //complete our configuration
-            configService.configure(cfg);
+            configService.applyConfigFrom(cfg);
         }
         return configService;
     }

@@ -66,14 +66,14 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     @Override
-    public void configure(final InitialConfig config) throws NoConfigException {
-        requireNonNull(config,"config cannot be null");
+    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
+        requireNonNull(config, "config cannot be null");
         LOGGER.debug("Configure called: no-op");
     }
 
     @Override
-    public void writeConfiguration(final InitialConfig config) {
-        requireNonNull(config,"config cannot be null");
+    public void recordCurrentConfigTo(final InitialConfig config) {
+        requireNonNull(config, "config cannot be null");
         LOGGER.debug("Write configuration called: no-op");
     }
 
