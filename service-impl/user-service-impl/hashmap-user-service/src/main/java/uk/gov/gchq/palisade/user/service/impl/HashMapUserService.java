@@ -69,7 +69,7 @@ public class HashMapUserService implements UserService {
     }
 
     @Override
-    public void configure(final InitialConfig config) throws NoConfigException {
+    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
         requireNonNull(config, "config");
         //extract cache
         String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
@@ -81,7 +81,7 @@ public class HashMapUserService implements UserService {
     }
 
     @Override
-    public void writeConfiguration(final InitialConfig config) {
+    public void recordCurrentConfigTo(final InitialConfig config) {
         requireNonNull(config, "config");
         config.put(UserService.class.getTypeName(), getClass().getTypeName());
         String serialisedCache = new String(JSONSerialiser.serialise(cacheService), JSONSerialiser.UTF8);

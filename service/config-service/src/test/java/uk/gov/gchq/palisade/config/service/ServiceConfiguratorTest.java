@@ -48,7 +48,7 @@ public class ServiceConfiguratorTest {
 
     public static class NoConfigureTestService implements TestService {
         @Override
-        public void configure(InitialConfig config) throws NoConfigException {
+        public void applyConfigFrom(InitialConfig config) throws NoConfigException {
             throw new NoSuchElementException("test");
         }
     }

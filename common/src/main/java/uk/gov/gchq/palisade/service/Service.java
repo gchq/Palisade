@@ -35,7 +35,7 @@ import java.util.concurrent.CompletableFuture;
  * <p>
  * The only requirement is that there is a process method, used to process all requests that are passed to a service.
  * <p>
- * The {@link Service#configure(InitialConfig)} method should implemented so that the class can be configured with an
+ * The {@link Service#applyConfigFrom(InitialConfig)} method should implemented so that the class can be configured with an
  * initial configuration.
  */
 @JsonPropertyOrder(value = {"class"}, alphabetic = true)
@@ -61,7 +61,7 @@ public interface Service {
      * @param config the configuration
      * @throws NoConfigException if some required element of the configuration is not present
      */
-    default void configure(final InitialConfig config) throws NoConfigException {
+    default void applyConfigFrom(final InitialConfig config) throws NoConfigException {
         //does nothing by default
     }
 
@@ -73,7 +73,7 @@ public interface Service {
      *
      * @param config the configuration to place initial configuration information into
      */
-    default void writeConfiguration(final InitialConfig config) {
+    default void recordCurrentConfigTo(final InitialConfig config) {
         //does nothing by default
     }
 

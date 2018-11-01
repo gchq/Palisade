@@ -56,14 +56,14 @@ public class LoggerAuditService implements AuditService {
     }
 
     @Override
-    public void writeConfiguration(final InitialConfig config) {
+    public void recordCurrentConfigTo(final InitialConfig config) {
         requireNonNull(config, "config");
         config.put(AuditService.class.getTypeName(), getClass().getTypeName());
         LOGGER.debug("Wrote configuration data: no-op");
     }
 
     @Override
-    public void configure(final InitialConfig config) throws NoConfigException {
+    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
         requireNonNull(config, "config");
         LOGGER.debug("Read configuration data: no-op");
     }

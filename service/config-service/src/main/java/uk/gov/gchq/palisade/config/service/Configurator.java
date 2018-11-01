@@ -96,7 +96,7 @@ public class Configurator {
     /**
      * Create a Palisade service from the given configuration. This method will look up the implementing class name for
      * the given service class from the configuration, attempt to create it and then call {@link
-     * Service#configure(InitialConfig)} on the object.
+     * Service#applyConfigFrom(InitialConfig)} on the object.
      *
      * @param serviceClass the type of service class to create
      * @param config       the configuration to create the service from
@@ -119,7 +119,7 @@ public class Configurator {
             S instance = classImpl.newInstance();
 
             //configure it
-            instance.configure(config);
+            instance.applyConfigFrom(config);
             return instance;
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchElementException e) {
             throw new IllegalStateException("couldn't create service class " + serviceClass, e);
