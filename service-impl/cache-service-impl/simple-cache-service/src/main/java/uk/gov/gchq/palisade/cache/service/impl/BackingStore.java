@@ -80,8 +80,8 @@ public interface BackingStore {
     }
 
     /**
-     * Attempt to get the given key from the backing store. Looks up the given key and attempts to get it. If
-     * the requested key couldn't be found then the value of the returned {@link SimpleCacheObject} will be empty. A new
+     * Attempt to get the given key from the backing store. Looks up the given key and attempts to get it. If the
+     * requested key couldn't be found then the value of the returned {@link SimpleCacheObject} will be empty. A new
      * cache object should be returned for each call to this method. If the key can't be found, then the expected class
      * should be <code>Object.class</code> inside the returned object.
      *

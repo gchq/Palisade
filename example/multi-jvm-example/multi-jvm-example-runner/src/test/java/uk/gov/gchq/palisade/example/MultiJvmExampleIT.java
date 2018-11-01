@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,6 +63,7 @@ public class MultiJvmExampleIT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
+        System.setProperty(RestUtil.CONFIG_SERVICE_PATH, "configRest.json");
 
         System.setProperty(RestPalisadeServiceV1.SERVICE_CONFIG, "palisadeConfig.json");
         palisadeServer = new EmbeddedHttpServer("http://localhost:8080/palisade/v1", new uk.gov.gchq.palisade.service.impl.ApplicationConfigV1());
@@ -71,11 +73,9 @@ public class MultiJvmExampleIT {
         policyServer = new EmbeddedHttpServer("http://localhost:8081/policy/v1", new uk.gov.gchq.palisade.policy.service.impl.ApplicationConfigV1());
         policyServer.startServer();
 
-        System.setProperty(RestUtil.CONFIG_SERVICE_PATH, "configRest.json");
         resourceServer = new EmbeddedHttpServer("http://localhost:8082/resource/v1", new uk.gov.gchq.palisade.resource.service.impl.ApplicationConfigV1());
         resourceServer.startServer();
 
-        System.setProperty(RestUserServiceV1.SERVICE_CONFIG, "userConfig.json");
         userServer = new EmbeddedHttpServer("http://localhost:8083/user/v1", new uk.gov.gchq.palisade.user.service.impl.ApplicationConfigV1());
         userServer.startServer();
 
@@ -87,7 +87,7 @@ public class MultiJvmExampleIT {
         configServer = new EmbeddedHttpServer("http://localhost:8085/config/v1", new uk.gov.gchq.palisade.config.service.impl.ApplicationConfigV1());
         configServer.startServer();
 
-        configService = ExampleConfigurator.setupMultiJVMConfigurationService(Collections.emptyList());
+        configService = ExampleConfigurator.setupMultiJVMConfigurationService(Collections.emptyList(), Optional.empty());
     }
 
     @AfterClass

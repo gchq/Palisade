@@ -164,7 +164,7 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @Override
-    public void configure(final InitialConfig config) throws NoConfigException {
+    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
         requireNonNull(config, "config");
         //get the configuration string
         String serialisedConfig = config.getOrDefault(HADOOP_CONF_STRING, null);
@@ -191,8 +191,9 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @Override
-    public void writeConfiguration(final InitialConfig config) {
+    public void recordCurrentConfigTo(final InitialConfig config) {
         requireNonNull(config, "config");
+        config.put(ResourceService.class.getTypeName(), getClass().getTypeName());
         Map<String, String> confMap = getConf();
         String serialisedConf = new String(JSONSerialiser.serialise(confMap), JSONSerialiser.UTF8);
         config.put(HADOOP_CONF_STRING, serialisedConf);

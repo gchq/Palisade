@@ -93,7 +93,7 @@ public abstract class ProxyRestService implements Service {
     }
 
     @Override
-    public void configure(final InitialConfig config) throws NoConfigException {
+    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
         requireNonNull(config, "config");
         try {
             String base = config.get(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX);
@@ -104,10 +104,13 @@ public abstract class ProxyRestService implements Service {
     }
 
     @Override
-    public void writeConfiguration(final InitialConfig config) {
+    public void recordCurrentConfigTo(final InitialConfig config) {
         requireNonNull(config, "config");
+        config.put(getServiceClass().getTypeName(), getClass().getTypeName());
         config.put(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX, this.baseUrl);
     }
+
+    protected abstract Class<? extends Service> getServiceClass();
 
     protected URL getUrl() {
         return getUrl(null);

@@ -16,8 +16,16 @@
 
 package uk.gov.gchq.palisade.user.service.impl;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.exception.NoSuchUserIdException;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
@@ -28,14 +36,25 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+
 /**
  * A HashMapUserService is a simple implementation of a {@link UserService} that simply stores the users in a {@link
  * ConcurrentHashMap}. By default the map is static so it will be shared across the same JVM.
  */
 public class HashMapUserService implements UserService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HashMapUserService.class);
     private static final Map<UserId, User> USERS = new ConcurrentHashMap<>();
 
+    public static final String CACHE_IMPL_KEY = "user.svc.cache.svc";
+
     private final Map<UserId, User> users;
+
+    /**
+     * Cache service that user service can use.
+     */
+    private CacheService cacheService;
 
     public HashMapUserService() {
         this(true);
@@ -47,6 +66,42 @@ public class HashMapUserService implements UserService {
         } else {
             users = new ConcurrentHashMap<>();
         }
+    }
+
+    @Override
+    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
+        requireNonNull(config, "config");
+        //extract cache
+        String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
+        if (nonNull(serialisedCache)) {
+            cacheService = JSONSerialiser.deserialise(serialisedCache.getBytes(JSONSerialiser.UTF8), CacheService.class);
+        } else {
+            throw new NoConfigException("no cache service specified in configuration");
+        }
+    }
+
+    @Override
+    public void recordCurrentConfigTo(final InitialConfig config) {
+        requireNonNull(config, "config");
+        config.put(UserService.class.getTypeName(), getClass().getTypeName());
+        String serialisedCache = new String(JSONSerialiser.serialise(cacheService), JSONSerialiser.UTF8);
+        config.put(CACHE_IMPL_KEY, serialisedCache);
+    }
+
+    public HashMapUserService cacheService(final CacheService cacheService) {
+        requireNonNull(cacheService, "Cache service cannot be set to null.");
+        this.cacheService = cacheService;
+        LOGGER.debug("Configured to use cache {}", cacheService);
+        return this;
+    }
+
+    public void setCacheService(final CacheService cacheService) {
+        cacheService(cacheService);
+    }
+
+    public CacheService getCacheService() {
+        requireNonNull(cacheService, "The cache service has not been set.");
+        return cacheService;
     }
 
     @Override

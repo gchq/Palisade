@@ -19,7 +19,7 @@
                 <version>3.0.2</version>
                 <executions>
                     <execution>
-                        <id>copy-config-json</id>
+                        <id>copy-config-json-resource</id>
                         <!-- here the phase you need -->
                         <phase>install</phase>
                         <goals>
@@ -27,6 +27,24 @@
                         </goals>
                         <configuration>
                             <outputDirectory>./resource-service/docker/bin</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <filtering>false</filtering>
+                                    <include>configRest.json</include>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-config-json-user</id>
+                        <!-- here the phase you need -->
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>./user-service/docker/bin</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.basedir}</directory>
@@ -334,6 +352,12 @@
                         <!-- Remove the config service file -->
                         <fileset>
                             <directory>./resource-service/docker</directory>
+                            <includes>
+                                <include>configRest.json</include>
+                            </includes>
+                        </fileset>
+                        <fileset>
+                            <directory>./user-service/docker</directory>
                             <includes>
                                 <include>configRest.json</include>
                             </includes>

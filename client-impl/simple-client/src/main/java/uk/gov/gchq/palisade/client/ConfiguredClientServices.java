@@ -32,7 +32,7 @@ import java.util.Optional;
 import static java.util.Objects.requireNonNull;
 
 public class ConfiguredClientServices implements ServicesFactory {
-
+    //TODO: remove after gh-129 done
     public static final String STATE = ".state";
 
     private final InitialConfigurationService configService;
@@ -116,7 +116,7 @@ public class ConfiguredClientServices implements ServicesFactory {
     }
 
     protected UserService createUserService() {
-        return legacyCreate(UserService.class);
+        return new Configurator(configService).createFromConfig(UserService.class, config);
     }
 
     protected PalisadeService createPalisadeService() {
@@ -125,6 +125,7 @@ public class ConfiguredClientServices implements ServicesFactory {
 
     /*
      * This can eventually be removed once all services are configuring themselves based on the InitialConfig.
+     * TODO: remove after gh-129 done
      */
     private <S extends Service> S legacyCreate(final Class<? extends Service> serviceClass) {
         requireNonNull(serviceClass, "serviceClass");

@@ -29,6 +29,7 @@ import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertEquals;
@@ -43,7 +44,14 @@ public class RestUserServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        System.setProperty(RestUserServiceV1.SERVICE_CONFIG, "mockConfig.json");
+        //force RestResourceServiceV1 to use the mock
+        try {
+            Field mainRestDelegate = RestUserServiceV1.class.getDeclaredField("userService");
+            mainRestDelegate.setAccessible(true);
+            mainRestDelegate.set(null,new MockUserService());
+        } catch (Exception e) {
+
+        }
         proxy = new ProxyRestUserService("http://localhost:8083/user");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
