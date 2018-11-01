@@ -192,11 +192,11 @@ public class HDFSFileResourceServiceTest {
     public void shouldBeEqualAfterConfigure() {
         //given
         InitialConfig is = new InitialConfig();
-        hdfsService.writeConfiguration(is);
+        hdfsService.recordCurrentConfigTo(is);
 
         //when
         HDFSResourceService actual = new HDFSResourceService();
-        actual.configure(is);
+        actual.applyConfigFrom(is);
 
         //then
         assertEquals(hdfsService, actual);
