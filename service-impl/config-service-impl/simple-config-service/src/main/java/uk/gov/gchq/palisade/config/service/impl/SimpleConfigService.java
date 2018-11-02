@@ -108,6 +108,17 @@ public class SimpleConfigService implements InitialConfigurationService {
         return this;
     }
 
+    @Override
+    public void configureSelfFromCache() {
+        try {
+            LOGGER.debug("Getting auxiliary configuration from cache");
+            InitialConfig selfConfig = getServiceConfig(InitialConfigurationService.class);
+            applyConfigFrom(selfConfig);
+        } catch (NoConfigException e) {
+            LOGGER.debug("No auxiliary configuration available", e);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */

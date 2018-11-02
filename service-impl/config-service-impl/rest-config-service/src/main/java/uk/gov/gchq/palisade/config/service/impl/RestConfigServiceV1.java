@@ -74,10 +74,7 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
             //create the configuration service from the initial bootstrap information
             final InputStream stream = StreamUtil.openStream(RestConfigServiceV1.class, serviceConfigPath);
             configService = JSONSerialiser.deserialise(stream, InitialConfigurationService.class);
-            //now retrieve any further configuration data from the cache
-            InitialConfig cfg = new Configurator(configService).retrieveConfig(Optional.of(InitialConfigurationService.class));
-            //complete our configuration
-            configService.applyConfigFrom(cfg);
+            configService.configureSelfFromCache();
         }
         return configService;
     }

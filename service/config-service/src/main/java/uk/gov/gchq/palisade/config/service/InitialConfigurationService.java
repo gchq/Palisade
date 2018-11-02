@@ -71,4 +71,15 @@ public interface InitialConfigurationService extends Service {
         }
         return Service.super.process(request);
     }
+
+    /**
+     * Instructs this configuration service to query its cache for extra configuration data. This may be called as part
+     * of a bootstrapping process. Once a {@link InitialConfigurationService} has been created with minimal configuration,
+     * this method can be called to cause it to retrieve any extra configuration information from the cache. It is an error
+     * to call this method before a cache service has been configured for an instance.
+     *
+     * @throws IllegalStateException if no cache has been configured
+     */
+    default void configureSelfFromCache() {
+    }
 }
