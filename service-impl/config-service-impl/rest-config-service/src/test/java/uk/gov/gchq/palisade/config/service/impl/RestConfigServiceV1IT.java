@@ -43,7 +43,9 @@ import java.util.concurrent.CompletionException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RestConfigServiceV1IT {
 
@@ -57,10 +59,18 @@ public class RestConfigServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        System.setProperty(RestConfigServiceV1.BOOTSTRAP_CONFIG, "mockConfig.json");
+        //ensure there is a empty config object to hand to the mock service when it is created
+        InitialConfigurationService mock = Mockito.mock(InitialConfigurationService.class);
+        when(mock.get(any(GetConfigRequest.class)))
+                .thenReturn(CompletableFuture.completedFuture(new InitialConfig()));
+        MockConfigurationService.setMock(mock);
+        //start the server
+        System.setProperty(RestConfigServiceV1.BOOTSTRAP_CONFIG, "mockBootstrapConfig.json");
         proxy = new ProxyRestConfigService("http://localhost:8085/config");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
+        //trigger a call
+        proxy.get(null).join();
     }
 
     @AfterClass

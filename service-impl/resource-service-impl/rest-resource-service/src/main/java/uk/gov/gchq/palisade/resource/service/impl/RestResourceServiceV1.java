@@ -45,6 +45,7 @@ import javax.ws.rs.Produces;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/")
@@ -75,6 +76,11 @@ public class RestResourceServiceV1 implements ResourceService {
             resourceService = RestUtil.createService(RestResourceServiceV1.class, serviceConfigPath, ResourceService.class);
         }
         return resourceService;
+    }
+
+    static synchronized void setDefaultDelegate(final ResourceService resourceService) {
+        requireNonNull(resourceService, "resourceService");
+        RestResourceServiceV1.resourceService = resourceService;
     }
 
     @POST
