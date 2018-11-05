@@ -69,7 +69,6 @@ public class MultiJvmExampleIT {
         palisadeServer = new EmbeddedHttpServer("http://localhost:8080/palisade/v1", new uk.gov.gchq.palisade.service.impl.ApplicationConfigV1());
         palisadeServer.startServer();
 
-        System.setProperty(RestPolicyServiceV1.SERVICE_CONFIG, "policyConfig.json");
         policyServer = new EmbeddedHttpServer("http://localhost:8081/policy/v1", new uk.gov.gchq.palisade.policy.service.impl.ApplicationConfigV1());
         policyServer.startServer();
 

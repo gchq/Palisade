@@ -168,7 +168,7 @@ public final class ExampleConfigurator {
      * @param cacheService  the cache service the user service should use
      * @return the user service
      */
-    private static UserService createUserService(final InitialConfigurationService configService, final CacheService cacheService) {
+    private static HashMapUserService createUserService(final InitialConfigurationService configService, final CacheService cacheService) {
         return new HashMapUserService().cacheService(cacheService);
     }
 
@@ -179,7 +179,7 @@ public final class ExampleConfigurator {
      * @param cacheService  the cache service the user service should use
      * @return the policy service
      */
-    private static PolicyService createPolicyService(final InitialConfigurationService configService, final CacheService cacheService) {
+    private static HierarchicalPolicyService createPolicyService(final InitialConfigurationService configService, final CacheService cacheService) {
         return new HierarchicalPolicyService().cacheService(cacheService);
     }
 
@@ -190,7 +190,7 @@ public final class ExampleConfigurator {
      * @param cacheService  the cache service
      * @return the audit service
      */
-    private static AuditService createAuditService(final InitialConfigurationService configService, final CacheService cacheService) {
+    private static LoggerAuditService createAuditService(final InitialConfigurationService configService, final CacheService cacheService) {
         return new LoggerAuditService();
     }
 
@@ -263,10 +263,16 @@ public final class ExampleConfigurator {
 
             Collection<Service> services = Stream.of(audit, user, resource, policy).collect(Collectors.toList());
             writeClientConfiguration(configService, services, new LegacyPair(CacheService.class, cache), new LegacyPair(PalisadeService.class, palisade));
-            //now populate cache with details for services to start up
-            writeConfiguration(configService, createUserService(configService, cache), UserService.class);
 
-            writeConfiguration(configService, createPolicyService(configService, cache), PolicyService.class);
+            //now populate cache with details for services to start up
+
+            HashMapUserService remoteUser = createUserService(configService, cache);
+            containerisedCache.ifPresent(remoteUser::setCacheService);
+            writeConfiguration(configService, remoteUser, UserService.class);
+
+            HierarchicalPolicyService remotePolicy = createPolicyService(configService, cache);
+            containerisedCache.ifPresent(remotePolicy::setCacheService);
+            writeConfiguration(configService, remotePolicy, PolicyService.class);
 
             HDFSResourceService remoteResource = createResourceService(configService, cache);
             configureResourceConnectionDetails(remoteResource, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
