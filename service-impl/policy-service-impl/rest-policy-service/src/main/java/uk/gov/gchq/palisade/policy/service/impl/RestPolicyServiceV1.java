@@ -21,10 +21,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
@@ -32,7 +32,7 @@ import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
-import uk.gov.gchq.palisade.util.StreamUtil;
+import uk.gov.gchq.palisade.rest.RestUtil;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -40,9 +40,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/")
@@ -50,14 +50,13 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 @Api(value = "/")
 public class RestPolicyServiceV1 implements PolicyService {
-    public static final String SERVICE_CONFIG = "palisade.rest.policy.service.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestPolicyServiceV1.class);
     private final PolicyService delegate;
 
     private static PolicyService policyService;
 
     public RestPolicyServiceV1() {
-        this(System.getProperty(SERVICE_CONFIG));
+        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
     }
 
     public RestPolicyServiceV1(final String serviceConfigPath) {
@@ -69,15 +68,15 @@ public class RestPolicyServiceV1 implements PolicyService {
     }
 
     private static synchronized PolicyService createService(final String serviceConfigPath) {
-        PolicyService ret;
         if (policyService == null) {
-            final InputStream stream = StreamUtil.openStream(RestPolicyServiceV1.class, serviceConfigPath);
-            policyService = JSONSerialiser.deserialise(stream, PolicyService.class);
-            ret = policyService;
-        } else {
-            ret = policyService;
+            policyService = RestUtil.createService(RestPolicyServiceV1.class, serviceConfigPath, PolicyService.class);
         }
-        return ret;
+        return policyService;
+    }
+
+    static synchronized void setDefaultDelegate(final PolicyService policyService) {
+        requireNonNull(policyService, "policyService");
+        RestPolicyServiceV1.policyService = policyService;
     }
 
     @POST

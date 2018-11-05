@@ -62,7 +62,7 @@ public class RestPolicyServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        System.setProperty(RestPolicyServiceV1.SERVICE_CONFIG, "mockConfig.json");
+        RestPolicyServiceV1.setDefaultDelegate(new MockPolicyService());
         proxy = new ProxyRestPolicyService("http://localhost:8081/policy");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
