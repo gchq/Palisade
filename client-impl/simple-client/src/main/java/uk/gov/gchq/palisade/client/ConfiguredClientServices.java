@@ -120,7 +120,7 @@ public class ConfiguredClientServices implements ServicesFactory {
     }
 
     protected PalisadeService createPalisadeService() {
-        return legacyCreate(PalisadeService.class);
+        return new Configurator(configService).createFromConfig(PalisadeService.class, config);
     }
 
     /*
