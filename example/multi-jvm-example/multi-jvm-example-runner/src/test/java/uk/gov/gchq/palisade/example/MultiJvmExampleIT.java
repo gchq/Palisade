@@ -83,7 +83,7 @@ public class MultiJvmExampleIT {
         dataServer = new EmbeddedHttpServer("http://localhost:8084/data/v1", new uk.gov.gchq.palisade.data.service.impl.ApplicationConfigV1());
         dataServer.startServer();
 
-        System.setProperty(RestConfigServiceV1.SERVICE_CONFIG, "configserviceConfig.json");
+        System.setProperty(RestConfigServiceV1.BOOTSTRAP_CONFIG, "bootstrapConfig.json");
         configServer = new EmbeddedHttpServer("http://localhost:8085/config/v1", new uk.gov.gchq.palisade.config.service.impl.ApplicationConfigV1());
         configServer.startServer();
 

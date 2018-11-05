@@ -48,7 +48,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 @Api(value = "/")
 public class RestConfigServiceV1 implements InitialConfigurationService {
-    public static final String SERVICE_CONFIG = "palisade.rest.config.service.config.path";
+    public static final String BOOTSTRAP_CONFIG = "palisade.rest.bootstrap.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestConfigServiceV1.class);
 
     private final InitialConfigurationService delegate;
@@ -56,7 +56,7 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
     private static InitialConfigurationService configService;
 
     public RestConfigServiceV1() {
-        this(System.getProperty(SERVICE_CONFIG));
+        this(System.getProperty(BOOTSTRAP_CONFIG));
     }
 
     public RestConfigServiceV1(final String serviceConfigPath) {
@@ -68,15 +68,13 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
     }
 
     private static synchronized InitialConfigurationService createService(final String serviceConfigPath) {
-        InitialConfigurationService ret;
         if (configService == null) {
+            //create the configuration service from the initial bootstrap information
             final InputStream stream = StreamUtil.openStream(RestConfigServiceV1.class, serviceConfigPath);
             configService = JSONSerialiser.deserialise(stream, InitialConfigurationService.class);
-            ret = configService;
-        } else {
-            ret = configService;
+            configService.configureSelfFromCache();
         }
-        return ret;
+        return configService;
     }
 
     @POST

@@ -20,7 +20,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +37,7 @@ import javax.ws.rs.Produces;
 
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/")
@@ -64,12 +64,15 @@ public class RestUserServiceV1 implements UserService {
     }
 
     private static synchronized UserService createService(final String serviceConfigPath) {
-        UserService ret;
         if (userService == null) {
             userService = RestUtil.createService(RestUserServiceV1.class, serviceConfigPath, UserService.class);
         }
-        ret = userService;
-        return ret;
+        return userService;
+    }
+
+    static synchronized void setDefaultDelegate(final UserService userService) {
+        requireNonNull(userService, "userService");
+        RestUserServiceV1.userService = userService;
     }
 
     @POST

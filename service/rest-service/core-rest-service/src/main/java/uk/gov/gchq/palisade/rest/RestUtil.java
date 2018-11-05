@@ -52,8 +52,6 @@ public final class RestUtil {
      * @return an instantiated configured service
      */
     public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass) {
-        S ret = null;
-
         //create config service object
         final InputStream stream = StreamUtil.openStream(resolverClass, configDetailsPath);
         InitialConfigurationService service = JSONSerialiser.deserialise(stream, InitialConfigurationService.class);

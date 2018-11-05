@@ -259,6 +259,10 @@ public final class ExampleConfigurator {
             configureResourceConnectionDetails(remoteResource, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
             containerisedCache.ifPresent(remoteResource::setCacheService);
             writeConfiguration(configService, remoteResource, ResourceService.class);
+
+            //since the InitialConfigurationService will have already started, there is no extra configuration to
+            //write for it, so there is no writeConfiguration call for the config. service
+
             return configService;
         } finally {
             if (etcdStore != null) {

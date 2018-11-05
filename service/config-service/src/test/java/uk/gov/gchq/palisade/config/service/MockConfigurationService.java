@@ -15,8 +15,8 @@
  */
 package uk.gov.gchq.palisade.config.service;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.mockito.Mockito;
+
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
