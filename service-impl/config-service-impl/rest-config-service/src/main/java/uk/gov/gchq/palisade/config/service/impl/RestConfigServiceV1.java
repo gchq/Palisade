@@ -25,7 +25,6 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
@@ -40,7 +39,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import java.io.InputStream;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
