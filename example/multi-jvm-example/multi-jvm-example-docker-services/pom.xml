@@ -20,7 +20,6 @@
                 <executions>
                     <execution>
                         <id>copy-config-json-resource</id>
-                        <!-- here the phase you need -->
                         <phase>install</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -38,13 +37,29 @@
                     </execution>
                     <execution>
                         <id>copy-config-json-user</id>
-                        <!-- here the phase you need -->
                         <phase>install</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
                             <outputDirectory>./user-service/docker/bin</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <filtering>false</filtering>
+                                    <include>configRest.json</include>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-config-json-policy</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>./policy-service/docker/bin</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${project.basedir}</directory>
@@ -358,6 +373,12 @@
                         </fileset>
                         <fileset>
                             <directory>./user-service/docker</directory>
+                            <includes>
+                                <include>configRest.json</include>
+                            </includes>
+                        </fileset>
+                        <fileset>
+                            <directory>./policy-service/docker</directory>
                             <includes>
                                 <include>configRest.json</include>
                             </includes>

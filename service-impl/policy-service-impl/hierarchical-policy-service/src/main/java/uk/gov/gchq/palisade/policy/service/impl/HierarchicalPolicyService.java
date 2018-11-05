@@ -25,6 +25,8 @@ import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
+import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
@@ -37,6 +39,7 @@ import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.rule.Rules;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,6 +48,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -61,6 +65,8 @@ public class HierarchicalPolicyService implements PolicyService {
 
     private static final String DATA_TYPE_POLICIES_PREFIX = "dataTypePolicy.";
     private static final String RESOURCE_POLICIES_PREFIX = "resourcePolicy.";
+
+    public static final String CACHE_IMPL_KEY = "policy.svc.cache.svc";
 
     private CacheService cacheService;
 
@@ -80,6 +86,26 @@ public class HierarchicalPolicyService implements PolicyService {
     public CacheService getCacheService() {
         requireNonNull(cacheService, "The cache service has not been set.");
         return cacheService;
+    }
+
+    @Override
+    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
+        requireNonNull(config, "config");
+        //extract cache
+        String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
+        if (nonNull(serialisedCache)) {
+            cacheService = JSONSerialiser.deserialise(serialisedCache.getBytes(JSONSerialiser.UTF8), CacheService.class);
+        } else {
+            throw new NoConfigException("no cache service specified in configuration");
+        }
+    }
+
+    @Override
+    public void recordCurrentConfigTo(final InitialConfig config) {
+        requireNonNull(config, "config");
+        config.put(PolicyService.class.getTypeName(), getClass().getTypeName());
+        String serialisedCache = new String(JSONSerialiser.serialise(cacheService), JSONSerialiser.UTF8);
+        config.put(CACHE_IMPL_KEY, serialisedCache);
     }
 
     @Override

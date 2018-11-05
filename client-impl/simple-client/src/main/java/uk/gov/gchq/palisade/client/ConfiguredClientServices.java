@@ -112,7 +112,7 @@ public class ConfiguredClientServices implements ServicesFactory {
     }
 
     protected PolicyService createPolicyService() {
-        return legacyCreate(PolicyService.class);
+        return new Configurator(configService).createFromConfig(PolicyService.class, config);
     }
 
     protected UserService createUserService() {
