@@ -100,7 +100,7 @@ public class ConfiguredClientServices implements ServicesFactory {
     }
 
     protected CacheService createCacheService() {
-        return legacyCreate(CacheService.class);
+        return new Configurator(configService).createFromConfig(CacheService.class, config);
     }
 
     protected ResourceService createResourceService() {
