@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.RequestId;
+import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
@@ -83,11 +84,11 @@ public class SimplePalisadeService implements PalisadeService {
     @Override
     public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
         requireNonNull(config, "config");
-        getFromConfig(config, AUDIT_IMPL_KEY, AuditService.class);
-        getFromConfig(config, POLICY_IMPL_KEY, PolicyService.class);
-        getFromConfig(config, USER_IMPL_KEY, UserService.class);
-        getFromConfig(config, RESOURCE_IMPL_KEY, ResourceService.class);
-        getFromConfig(config, CACHE_IMPL_KEY, CacheService.class);
+        auditService = getFromConfig(config, AUDIT_IMPL_KEY, AuditService.class);
+        policyService = getFromConfig(config, POLICY_IMPL_KEY, PolicyService.class);
+        userService = getFromConfig(config, USER_IMPL_KEY, UserService.class);
+        resourceService = getFromConfig(config, RESOURCE_IMPL_KEY, ResourceService.class);
+        cacheService = getFromConfig(config, CACHE_IMPL_KEY, CacheService.class);
     }
 
     /**
@@ -167,6 +168,18 @@ public class SimplePalisadeService implements PalisadeService {
         requireNonNull(cacheService, "The cache service cannot be set to null.");
         this.cacheService = cacheService;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("auditService", auditService)
+                .append("policyService", policyService)
+                .append("userService", userService)
+                .append("resourceService", resourceService)
+                .append("cacheService", cacheService)
+                .toString();
     }
 
     @Override
