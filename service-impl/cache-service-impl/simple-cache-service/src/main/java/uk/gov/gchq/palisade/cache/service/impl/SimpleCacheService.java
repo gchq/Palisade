@@ -25,6 +25,9 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
+import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -34,6 +37,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -45,6 +49,8 @@ import static java.util.Objects.requireNonNull;
  * @apiNote no parameters may be <code>null</code>.
  */
 public class SimpleCacheService implements CacheService {
+
+    private static final String STORE_IMPL_KEY = "cache.svc.store";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleCacheService.class);
 
@@ -63,6 +69,26 @@ public class SimpleCacheService implements CacheService {
      * instance of this class without first initialising a backing store will result in exceptions being thrown.
      */
     public SimpleCacheService() {
+    }
+
+    @Override
+    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
+        requireNonNull(config, "config");
+        //extract cache
+        String serialised = config.getOrDefault(STORE_IMPL_KEY, null);
+        if (nonNull(serialised)) {
+            store = JSONSerialiser.deserialise(serialised.getBytes(JSONSerialiser.UTF8), BackingStore.class);
+        } else {
+            throw new NoConfigException("no backing store specified in configuration");
+        }
+    }
+
+    @Override
+    public void recordCurrentConfigTo(final InitialConfig config) {
+        requireNonNull(config, "config");
+        config.put(CacheService.class.getTypeName(), getClass().getTypeName());
+        String serialisedCache = new String(JSONSerialiser.serialise(store), JSONSerialiser.UTF8);
+        config.put(STORE_IMPL_KEY, serialisedCache);
     }
 
     @Override

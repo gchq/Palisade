@@ -20,6 +20,7 @@ import org.apache.hadoop.conf.Configuration;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.impl.BackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
@@ -79,7 +80,7 @@ public final class ExampleConfigurator {
      * @return the configuration service that provides the entry to Palisade
      */
     public static InitialConfigurationService setupSingleJVMConfigurationService() {
-        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+        CacheService cache = createCacheService(new HashMapBackingStore(true));
         InitialConfigurationService configService = new SimpleConfigService(cache);
         //configure the single JVM settings
         PolicyService policy = createPolicyService(configService, cache);
@@ -98,8 +99,8 @@ public final class ExampleConfigurator {
             throw new RuntimeException(e);
         }
         //write each of these to the initial config
-        Collection<Service> services = Stream.of(audit, user, resource, policy, palisade).collect(Collectors.toList());
-        return writeClientConfiguration(configService, services, new LegacyPair(CacheService.class, cache));
+        Collection<Service> services = Stream.of(audit, user, resource, policy, palisade, cache).collect(Collectors.toList());
+        return writeClientConfiguration(configService, services);
     }
 
     /**
@@ -210,6 +211,16 @@ public final class ExampleConfigurator {
     }
 
     /**
+     * Makes a cache service.
+     *
+     * @param store the backing store
+     * @return the cache service
+     */
+    private static SimpleCacheService createCacheService(final BackingStore store) {
+        return new SimpleCacheService().backingStore(store);
+    }
+
+    /**
      * Makes a resource service.
      *
      * @param configService the Palisade configuration service
@@ -275,22 +286,23 @@ public final class ExampleConfigurator {
         try {
             ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
             //if there are no endpoints, assume we are using a HashMap backing store
-            SimpleCacheService cache = new SimpleCacheService();
+            BackingStore store;
             if (etcdEndpoints.isEmpty()) {
-                cache.backingStore(new HashMapBackingStore(true));
+                store = new HashMapBackingStore(true);
             } else {
                 etcdStore = new EtcdBackingStore().connectionDetails(etcdEndpoints);
-                cache.backingStore(etcdStore);
+                store = etcdStore;
             }
 
+            SimpleCacheService cache = createCacheService(store);
             AuditService audit = createAuditService(configService, cache);
             PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
             PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
             ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
             UserService user = new ProxyRestUserService("http://localhost:8083/user");
 
-            Collection<Service> services = Stream.of(audit, user, resource, policy, palisade).collect(Collectors.toList());
-            writeClientConfiguration(configService, services, new LegacyPair(CacheService.class, cache));
+            Collection<Service> services = Stream.of(audit, user, resource, policy, palisade, cache).collect(Collectors.toList());
+            writeClientConfiguration(configService, services);
 
             //now populate cache with details for services to start up
 
