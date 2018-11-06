@@ -85,11 +85,7 @@ public final class ExampleConfigurator {
         PolicyService policy = createPolicyService(configService, cache);
         UserService user = createUserService(configService, cache);
         AuditService audit = createAuditService(configService, cache);
-        SimplePalisadeService palisade = new SimplePalisadeService()
-                .auditService(audit)
-                .policyService(policy)
-                .userService(user)
-                .cacheService(cache);
+        SimplePalisadeService palisade = createPalisadeService(configService, cache, policy, user, audit);
 
         HDFSResourceService resource;
         try {
@@ -102,8 +98,8 @@ public final class ExampleConfigurator {
             throw new RuntimeException(e);
         }
         //write each of these to the initial config
-        Collection<Service> services = Stream.of(audit, user, resource, policy).collect(Collectors.toList());
-        return writeClientConfiguration(configService, services, new LegacyPair(CacheService.class, cache), new LegacyPair(PalisadeService.class, palisade));
+        Collection<Service> services = Stream.of(audit, user, resource, policy, palisade).collect(Collectors.toList());
+        return writeClientConfiguration(configService, services, new LegacyPair(CacheService.class, cache));
     }
 
     /**
@@ -131,6 +127,7 @@ public final class ExampleConfigurator {
             this.service = service;
             this.clazz = clazz;
         }
+
     }
 
     /**
@@ -170,6 +167,24 @@ public final class ExampleConfigurator {
      */
     private static HashMapUserService createUserService(final InitialConfigurationService configService, final CacheService cacheService) {
         return new HashMapUserService().cacheService(cacheService);
+    }
+
+    /**
+     * Makes a Palisade service.
+     *
+     * @param configService the configuration service this service can use
+     * @param cache         the cache service this service should use
+     * @param policy        the policy service this service should use
+     * @param user          the user service this service should use
+     * @param audit         the audit service this service should use
+     * @return the Palisade service
+     */
+    private static SimplePalisadeService createPalisadeService(final InitialConfigurationService configService, final CacheService cache, final PolicyService policy, final UserService user, final AuditService audit) {
+        return new SimplePalisadeService()
+                .auditService(audit)
+                .policyService(policy)
+                .userService(user)
+                .cacheService(cache);
     }
 
     /**
@@ -261,14 +276,19 @@ public final class ExampleConfigurator {
             ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
             UserService user = new ProxyRestUserService("http://localhost:8083/user");
 
-            Collection<Service> services = Stream.of(audit, user, resource, policy).collect(Collectors.toList());
-            writeClientConfiguration(configService, services, new LegacyPair(CacheService.class, cache), new LegacyPair(PalisadeService.class, palisade));
+            Collection<Service> services = Stream.of(audit, user, resource, policy, palisade).collect(Collectors.toList());
+            writeClientConfiguration(configService, services, new LegacyPair(CacheService.class, cache));
 
             //now populate cache with details for services to start up
 
             HashMapUserService remoteUser = createUserService(configService, cache);
             containerisedCache.ifPresent(remoteUser::setCacheService);
             writeConfiguration(configService, remoteUser, UserService.class);
+
+            //TODO: broken fix me
+            SimplePalisadeService remotePalisade = createPalisadeService(configService, cache, policy, user, audit);
+            containerisedCache.ifPresent(remotePalisade::setCacheService);
+            writeConfiguration(configService, remotePalisade, PalisadeService.class);
 
             HierarchicalPolicyService remotePolicy = createPolicyService(configService, cache);
             containerisedCache.ifPresent(remotePolicy::setCacheService);
