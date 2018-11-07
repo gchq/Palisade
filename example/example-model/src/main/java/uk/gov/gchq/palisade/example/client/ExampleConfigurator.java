@@ -49,8 +49,8 @@ import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
-import uk.gov.gchq.palisade.user.service.impl.SimpleUserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
+import uk.gov.gchq.palisade.user.service.impl.SimpleUserService;
 
 import java.io.IOException;
 import java.util.Collection;
