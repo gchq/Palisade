@@ -20,12 +20,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.RequestId;
+import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
+import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
@@ -34,10 +37,12 @@ import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
@@ -49,6 +54,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -60,6 +66,12 @@ import static java.util.Objects.requireNonNull;
 public class SimplePalisadeService implements PalisadeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplePalisadeService.class);
 
+    public static final String AUDIT_IMPL_KEY = "palisade.svc.audit.svc";
+    public static final String POLICY_IMPL_KEY = "palisade.svc.policy.svc";
+    public static final String USER_IMPL_KEY = "palisade.svc.user.svc";
+    public static final String RESOURCE_IMPL_KEY = "palisade.svc.resource.svc";
+    public static final String CACHE_IMPL_KEY = "palisade.svc.cache.svc";
+
     private AuditService auditService;
     private PolicyService policyService;
     private UserService userService;
@@ -67,6 +79,65 @@ public class SimplePalisadeService implements PalisadeService {
     private CacheService cacheService;
 
     public SimplePalisadeService() {
+    }
+
+    @Override
+    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
+        requireNonNull(config, "config");
+        auditService = getFromConfig(config, AUDIT_IMPL_KEY, AuditService.class);
+        policyService = getFromConfig(config, POLICY_IMPL_KEY, PolicyService.class);
+        userService = getFromConfig(config, USER_IMPL_KEY, UserService.class);
+        resourceService = getFromConfig(config, RESOURCE_IMPL_KEY, ResourceService.class);
+        cacheService = getFromConfig(config, CACHE_IMPL_KEY, CacheService.class);
+    }
+
+    /**
+     * Given an {@link InitialConfig} object, this will create an instance of the given service. The {@code key} gives the
+     * name of the serialised form inside the configuration object.
+     *
+     * @param config       the configuration for this Palisade service
+     * @param key          the config key name
+     * @param serviceClass the class of the service to create
+     * @param <S>          the service type
+     * @return a created service
+     * @throws NoConfigException if the required configuration item could not be found
+     */
+    private static <S extends Service> S getFromConfig(final InitialConfig config, final String key, final Class<S> serviceClass) throws NoConfigException {
+        requireNonNull(config, "config");
+        requireNonNull(key, "key");
+        requireNonNull(serviceClass, "serviceClass");
+        String serialised = config.getOrDefault(key, null);
+        if (nonNull(serialised)) {
+            return JSONSerialiser.deserialise(serialised.getBytes(JSONSerialiser.UTF8), serviceClass);
+        } else {
+            throw new NoConfigException("no cache service specified in configuration");
+        }
+    }
+
+    @Override
+    public void recordCurrentConfigTo(final InitialConfig config) {
+        requireNonNull(config, "config");
+        config.put(PalisadeService.class.getTypeName(), getClass().getTypeName());
+        storeInConfig(config, auditService, AUDIT_IMPL_KEY);
+        storeInConfig(config, policyService, POLICY_IMPL_KEY);
+        storeInConfig(config, userService, USER_IMPL_KEY);
+        storeInConfig(config, resourceService, RESOURCE_IMPL_KEY);
+        storeInConfig(config, cacheService, CACHE_IMPL_KEY);
+    }
+
+    /**
+     * Store the given service into the configuration object with the given key.
+     *
+     * @param config  the configuration object to store the detail in
+     * @param service the service to store
+     * @param key     the key name
+     */
+    private static void storeInConfig(final InitialConfig config, final Service service, final String key) {
+        requireNonNull(config, "config");
+        requireNonNull(service, "service");
+        requireNonNull(key, "key");
+        String serialised = new String(JSONSerialiser.serialise(service), JSONSerialiser.UTF8);
+        config.put(key, serialised);
     }
 
     public SimplePalisadeService resourceService(final ResourceService resourceService) {
@@ -97,6 +168,18 @@ public class SimplePalisadeService implements PalisadeService {
         requireNonNull(cacheService, "The cache service cannot be set to null.");
         this.cacheService = cacheService;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("auditService", auditService)
+                .append("policyService", policyService)
+                .append("userService", userService)
+                .append("resourceService", resourceService)
+                .append("cacheService", cacheService)
+                .toString();
     }
 
     @Override
@@ -164,9 +247,9 @@ public class SimplePalisadeService implements PalisadeService {
         final AddCacheRequest<DataRequestConfig> cacheRequest = new AddCacheRequest<>()
                 .key(requestId.getId())
                 .value(new DataRequestConfig()
-                                .user(user)
-                                .context(request.getContext())
-                                .rules(multiPolicy.getRuleMap())
+                        .user(user)
+                        .context(request.getContext())
+                        .rules(multiPolicy.getRuleMap())
                 )
                 .service(this.getClass());
         LOGGER.debug("Caching: {}", cacheRequest);

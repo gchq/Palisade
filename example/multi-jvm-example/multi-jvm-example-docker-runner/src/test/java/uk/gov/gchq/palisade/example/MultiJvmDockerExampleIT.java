@@ -8,6 +8,9 @@ import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
+import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
+import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,6 +57,10 @@ public class MultiJvmDockerExampleIT {
 
     private InitialConfigurationService getConfigurationService() {
         return ExampleConfigurator.setupMultiJVMConfigurationService(Collections.singletonList("http://localhost:2379"),
+                Optional.empty(),
+                Optional.of(new ProxyRestPolicyService("http://policy-service:8080/policy")),
+                Optional.of(new ProxyRestUserService("http://user-service:8080/user")),
+                Optional.of(new ProxyRestResourceService("http://resource-service:8080/resource")),
                 Optional.of(new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"), false)))
         );
     }

@@ -58,7 +58,7 @@ public class RestPalisadeServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        System.setProperty(RestPalisadeServiceV1.SERVICE_CONFIG, "mockConfig.json");
+        RestPalisadeServiceV1.setDefaultDelegate(new MockPalisadeService());
         proxy = new ProxyRestPalisadeService("http://localhost:8080/palisade");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
