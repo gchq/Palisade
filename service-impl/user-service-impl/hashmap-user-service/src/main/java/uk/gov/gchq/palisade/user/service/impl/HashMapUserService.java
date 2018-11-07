@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -33,6 +35,7 @@ import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -47,20 +50,31 @@ public class HashMapUserService implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HashMapUserService.class);
     private static final Map<UserId, User> USERS = new ConcurrentHashMap<>();
 
-    public static final String CACHE_IMPL_KEY = "user.svc.cache.svc";
+    public static final String CACHE_IMPL_KEY = "user.svc.hashmap.cache.svc";
+    public static final String STATIC_KEY = "user.svc.hashmap.static";
 
-    private final Map<UserId, User> users;
+    private Map<UserId, User> users;
 
     /**
      * Cache service that user service can use.
      */
     private CacheService cacheService;
 
+    /**
+     * Is the shared instance in use?
+     */
+    private boolean useStatic;
+
     public HashMapUserService() {
         this(true);
     }
 
     public HashMapUserService(final boolean useStatic) {
+        makeMap(useStatic);
+        this.useStatic = useStatic;
+    }
+
+    private void makeMap(final boolean useStatic) {
         if (useStatic) {
             users = USERS;
         } else {
@@ -78,6 +92,8 @@ public class HashMapUserService implements UserService {
         } else {
             throw new NoConfigException("no cache service specified in configuration");
         }
+        useStatic = Boolean.valueOf(config.getOrDefault(STATIC_KEY, "true"));
+        makeMap(useStatic);
     }
 
     @Override
@@ -86,6 +102,7 @@ public class HashMapUserService implements UserService {
         config.put(UserService.class.getTypeName(), getClass().getTypeName());
         String serialisedCache = new String(JSONSerialiser.serialise(cacheService), JSONSerialiser.UTF8);
         config.put(CACHE_IMPL_KEY, serialisedCache);
+        config.put(STATIC_KEY, Boolean.toString(useStatic));
     }
 
     public HashMapUserService cacheService(final CacheService cacheService) {
@@ -109,7 +126,18 @@ public class HashMapUserService implements UserService {
         Objects.requireNonNull(request);
         User user = users.get(request.getUserId());
 
+        // if not local then try cache service
+        if (user == null) {
+            Optional<User> cachedUser = (Optional<User>) getCacheService().get(new GetCacheRequest<User>()
+                    .service(this.getClass())
+                    .key(request.getUserId().getId())).join();
+            if (cachedUser.isPresent()) {
+                user = cachedUser.get();
+            }
+        }
+
         CompletableFuture<User> userCompletion = CompletableFuture.completedFuture(user);
+
         if (user == null) {
             userCompletion.obtrudeException(new NoSuchUserIdException(request.getUserId().getId()));
         }
@@ -123,6 +151,12 @@ public class HashMapUserService implements UserService {
         Objects.requireNonNull(request.getUser().getUserId());
         Objects.requireNonNull(request.getUser().getUserId().getId());
         users.put(request.getUser().getUserId(), request.getUser());
+        //save to cache service
+        CacheService localCache = getCacheService();
+        localCache.add(new AddCacheRequest<User>()
+                .service(this.getClass())
+                .key(request.getUser().getUserId().getId())
+                .value(request.getUser())).join();
         return CompletableFuture.completedFuture(true);
     }
 }
