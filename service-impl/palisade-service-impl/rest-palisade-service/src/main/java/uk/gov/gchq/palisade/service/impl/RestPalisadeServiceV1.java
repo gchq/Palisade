@@ -21,25 +21,25 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.util.StreamUtil;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/")
@@ -47,7 +47,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 @Api(value = "/")
 public class RestPalisadeServiceV1 implements PalisadeService {
-    public static final String SERVICE_CONFIG = "palisade.rest.service.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestPalisadeServiceV1.class);
 
     private final PalisadeService delegate;
@@ -55,7 +54,7 @@ public class RestPalisadeServiceV1 implements PalisadeService {
     private static PalisadeService palisadeService;
 
     public RestPalisadeServiceV1() {
-        this(System.getProperty(SERVICE_CONFIG));
+        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
     }
 
     public RestPalisadeServiceV1(final String serviceConfigPath) {
@@ -67,15 +66,15 @@ public class RestPalisadeServiceV1 implements PalisadeService {
     }
 
     private static synchronized PalisadeService createService(final String serviceConfigPath) {
-        PalisadeService ret;
         if (palisadeService == null) {
-            final InputStream stream = StreamUtil.openStream(RestPalisadeServiceV1.class, serviceConfigPath);
-            palisadeService = JSONSerialiser.deserialise(stream, PalisadeService.class);
-            ret = palisadeService;
-        } else {
-            ret = palisadeService;
+            palisadeService = RestUtil.createService(RestPalisadeServiceV1.class, serviceConfigPath, PalisadeService.class);
         }
-        return ret;
+        return palisadeService;
+    }
+
+    static synchronized void setDefaultDelegate(final PalisadeService palisadeService) {
+        requireNonNull(palisadeService, "palisadeService");
+        RestPalisadeServiceV1.palisadeService = palisadeService;
     }
 
     @POST

@@ -20,6 +20,7 @@ import org.apache.hadoop.conf.Configuration;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.impl.BackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
@@ -79,17 +80,13 @@ public final class ExampleConfigurator {
      * @return the configuration service that provides the entry to Palisade
      */
     public static InitialConfigurationService setupSingleJVMConfigurationService() {
-        CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+        CacheService cache = createCacheService(new HashMapBackingStore(true));
         InitialConfigurationService configService = new SimpleConfigService(cache);
         //configure the single JVM settings
         PolicyService policy = createPolicyService(configService, cache);
         UserService user = createUserService(configService, cache);
         AuditService audit = createAuditService(configService, cache);
-        SimplePalisadeService palisade = new SimplePalisadeService()
-                .auditService(audit)
-                .policyService(policy)
-                .userService(user)
-                .cacheService(cache);
+        SimplePalisadeService palisade = createPalisadeService(configService, cache, policy, user, audit);
 
         HDFSResourceService resource;
         try {
@@ -102,8 +99,8 @@ public final class ExampleConfigurator {
             throw new RuntimeException(e);
         }
         //write each of these to the initial config
-        Collection<Service> services = Stream.of(audit, user, resource, policy).collect(Collectors.toList());
-        return writeClientConfiguration(configService, services, new LegacyPair(CacheService.class, cache), new LegacyPair(PalisadeService.class, palisade));
+        Collection<Service> services = Stream.of(audit, user, resource, policy, palisade, cache).collect(Collectors.toList());
+        return writeClientConfiguration(configService, services);
     }
 
     /**
@@ -131,6 +128,7 @@ public final class ExampleConfigurator {
             this.service = service;
             this.clazz = clazz;
         }
+
     }
 
     /**
@@ -173,6 +171,24 @@ public final class ExampleConfigurator {
     }
 
     /**
+     * Makes a Palisade service.
+     *
+     * @param configService the configuration service this service can use
+     * @param cache         the cache service this service should use
+     * @param policy        the policy service this service should use
+     * @param user          the user service this service should use
+     * @param audit         the audit service this service should use
+     * @return the Palisade service
+     */
+    private static SimplePalisadeService createPalisadeService(final InitialConfigurationService configService, final CacheService cache, final PolicyService policy, final UserService user, final AuditService audit) {
+        return new SimplePalisadeService()
+                .auditService(audit)
+                .policyService(policy)
+                .userService(user)
+                .cacheService(cache);
+    }
+
+    /**
      * Makes a policy service.
      *
      * @param configService the configuration service
@@ -192,6 +208,16 @@ public final class ExampleConfigurator {
      */
     private static LoggerAuditService createAuditService(final InitialConfigurationService configService, final CacheService cacheService) {
         return new LoggerAuditService();
+    }
+
+    /**
+     * Makes a cache service.
+     *
+     * @param store the backing store
+     * @return the cache service
+     */
+    private static SimpleCacheService createCacheService(final BackingStore store) {
+        return new SimpleCacheService().backingStore(store);
     }
 
     /**
@@ -234,49 +260,72 @@ public final class ExampleConfigurator {
      * the cache used on the client side, due to changes in how containers contact other containers, e.g. different host
      * names in network URLs.
      *
-     * @param etcdEndpoints      the list of etcd end points, if empty then a HashMap backing store is used
-     * @param containerisedCache the {@link CacheService} that services should be told to use once they start
-     *                           (potentially inside containers)
+     * @param etcdEndpoints     the list of etcd end points, if empty then a HashMap backing store is used
+     * @param containerAudit    the {@link AuditService} that services should be told to use once they start
+     * @param containerPolicy   the {@link PolicyService}  that services should be told to use once they start
+     * @param containerResource the {@link ResourceService}  that services should be told to use once they start
+     * @param containerUser     the {@link  UserService}  that services should be told to use once they start
+     * @param containerCache    the {@link CacheService} that services should be told to use once they start
+     *                          (potentially inside containers)
      * @return the configuration service to provide the Palisade entry point
      */
-    public static InitialConfigurationService setupMultiJVMConfigurationService(final List<String> etcdEndpoints, final Optional<CacheService> containerisedCache) {
-        requireNonNull(etcdEndpoints, "etcd endpoints can not be null");
-        requireNonNull(containerisedCache, "containerisedCache can not be null");
+    public static InitialConfigurationService setupMultiJVMConfigurationService(final List<String> etcdEndpoints,
+                                                                                final Optional<AuditService> containerAudit,
+                                                                                final Optional<PolicyService> containerPolicy,
+                                                                                final Optional<UserService> containerUser,
+                                                                                final Optional<ResourceService> containerResource,
+                                                                                final Optional<CacheService> containerCache) {
+        requireNonNull(etcdEndpoints, "etcdEndpoints can not be null");
+        requireNonNull(containerAudit, "containerAudit can not be null");
+        requireNonNull(containerPolicy, "containerPolicy can not be null");
+        requireNonNull(containerUser, "containerUser can not be null");
+        requireNonNull(containerResource, "containerResource can not be null");
+        requireNonNull(containerCache, "containerCache can not be null");
 
         EtcdBackingStore etcdStore = null;
         try {
             ProxyRestConfigService configService = new ProxyRestConfigService("http://localhost:8085/config");
             //if there are no endpoints, assume we are using a HashMap backing store
-            SimpleCacheService cache = new SimpleCacheService();
+            BackingStore store;
             if (etcdEndpoints.isEmpty()) {
-                cache.backingStore(new HashMapBackingStore(true));
+                store = new HashMapBackingStore(true);
             } else {
                 etcdStore = new EtcdBackingStore().connectionDetails(etcdEndpoints);
-                cache.backingStore(etcdStore);
+                store = etcdStore;
             }
 
+            SimpleCacheService cache = createCacheService(store);
             AuditService audit = createAuditService(configService, cache);
             PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
             PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
             ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
             UserService user = new ProxyRestUserService("http://localhost:8083/user");
 
-            Collection<Service> services = Stream.of(audit, user, resource, policy).collect(Collectors.toList());
-            writeClientConfiguration(configService, services, new LegacyPair(CacheService.class, cache), new LegacyPair(PalisadeService.class, palisade));
+            Collection<Service> services = Stream.of(audit, user, resource, policy, palisade, cache).collect(Collectors.toList());
+            writeClientConfiguration(configService, services);
 
             //now populate cache with details for services to start up
 
             HashMapUserService remoteUser = createUserService(configService, cache);
-            containerisedCache.ifPresent(remoteUser::setCacheService);
+            containerCache.ifPresent(remoteUser::setCacheService);
             writeConfiguration(configService, remoteUser, UserService.class);
 
+            SimplePalisadeService remotePalisade = createPalisadeService(configService, cache, policy, user, audit);
+            remotePalisade.resourceService(resource);
+            containerAudit.ifPresent(remotePalisade::setAuditService);
+            containerPolicy.ifPresent(remotePalisade::setPolicyService);
+            containerUser.ifPresent(remotePalisade::setUserService);
+            containerResource.ifPresent(remotePalisade::setResourceService);
+            containerCache.ifPresent(remotePalisade::setCacheService);
+            writeConfiguration(configService, remotePalisade, PalisadeService.class);
+
             HierarchicalPolicyService remotePolicy = createPolicyService(configService, cache);
-            containerisedCache.ifPresent(remotePolicy::setCacheService);
+            containerCache.ifPresent(remotePolicy::setCacheService);
             writeConfiguration(configService, remotePolicy, PolicyService.class);
 
             HDFSResourceService remoteResource = createResourceService(configService, cache);
             configureResourceConnectionDetails(remoteResource, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
-            containerisedCache.ifPresent(remoteResource::setCacheService);
+            containerCache.ifPresent(remoteResource::setCacheService);
             writeConfiguration(configService, remoteResource, ResourceService.class);
 
             //since the InitialConfigurationService will have already started, there is no extra configuration to
