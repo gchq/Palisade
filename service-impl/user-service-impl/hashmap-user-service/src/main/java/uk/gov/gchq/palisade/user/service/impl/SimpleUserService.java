@@ -40,10 +40,10 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A HashMapUserService is a simple implementation of a {@link UserService} that keeps user data in the cache service.
+ * A SimpleUserService is a simple implementation of a {@link UserService} that keeps user data in the cache service.
  */
-public class HashMapUserService implements UserService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HashMapUserService.class);
+public class SimpleUserService implements UserService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleUserService.class);
 
     public static final String CACHE_IMPL_KEY = "user.svc.hashmap.cache.svc";
 
@@ -52,7 +52,7 @@ public class HashMapUserService implements UserService {
      */
     private CacheService cacheService;
 
-    public HashMapUserService() {
+    public SimpleUserService() {
     }
 
     @Override
@@ -75,7 +75,7 @@ public class HashMapUserService implements UserService {
         config.put(CACHE_IMPL_KEY, serialisedCache);
     }
 
-    public HashMapUserService cacheService(final CacheService cacheService) {
+    public SimpleUserService cacheService(final CacheService cacheService) {
         requireNonNull(cacheService, "Cache service cannot be set to null.");
         this.cacheService = cacheService;
         LOGGER.debug("Configured to use cache {}", cacheService);

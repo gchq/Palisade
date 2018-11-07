@@ -48,7 +48,7 @@ import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
-import uk.gov.gchq.palisade.user.service.impl.HashMapUserService;
+import uk.gov.gchq.palisade.user.service.impl.SimpleUserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.IOException;
@@ -168,8 +168,8 @@ public final class ExampleConfigurator {
      * @param cacheService  the cache service the user service should use
      * @return the user service
      */
-    private static HashMapUserService createUserService(final InitialConfigurationService configService, final CacheService cacheService) {
-        return new HashMapUserService().cacheService(cacheService);
+    private static SimpleUserService createUserService(final InitialConfigurationService configService, final CacheService cacheService) {
+        return new SimpleUserService().cacheService(cacheService);
     }
 
     /**
@@ -266,7 +266,7 @@ public final class ExampleConfigurator {
 
             //now populate cache with details for services to start up
 
-            HashMapUserService remoteUser = createUserService(configService, cache);
+            SimpleUserService remoteUser = createUserService(configService, cache);
             containerisedCache.ifPresent(remoteUser::setCacheService);
             writeConfiguration(configService, remoteUser, UserService.class);
 
