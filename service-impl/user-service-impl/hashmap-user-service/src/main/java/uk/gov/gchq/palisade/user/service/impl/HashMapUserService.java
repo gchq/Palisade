@@ -151,7 +151,7 @@ public class HashMapUserService implements UserService {
         Objects.requireNonNull(request.getUser().getUserId());
         Objects.requireNonNull(request.getUser().getUserId().getId());
         users.put(request.getUser().getUserId(), request.getUser());
-        //save to cache service
+        //save to the cache service
         CacheService localCache = getCacheService();
         localCache.add(new AddCacheRequest<User>()
                 .service(this.getClass())
