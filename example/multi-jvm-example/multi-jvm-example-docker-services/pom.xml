@@ -69,6 +69,23 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-config-json-palisade</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>./palisade-service/docker/bin</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <filtering>false</filtering>
+                                    <include>configRest.json</include>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -379,6 +396,12 @@
                         </fileset>
                         <fileset>
                             <directory>./policy-service/docker</directory>
+                            <includes>
+                                <include>configRest.json</include>
+                            </includes>
+                        </fileset>
+                        <fileset>
+                            <directory>./palisade-service/docker</directory>
                             <includes>
                                 <include>configRest.json</include>
                             </includes>

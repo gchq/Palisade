@@ -100,7 +100,7 @@ public class ConfiguredClientServices implements ServicesFactory {
     }
 
     protected CacheService createCacheService() {
-        return legacyCreate(CacheService.class);
+        return new Configurator(configService).createFromConfig(CacheService.class, config);
     }
 
     protected ResourceService createResourceService() {
@@ -120,7 +120,7 @@ public class ConfiguredClientServices implements ServicesFactory {
     }
 
     protected PalisadeService createPalisadeService() {
-        return legacyCreate(PalisadeService.class);
+        return new Configurator(configService).createFromConfig(PalisadeService.class, config);
     }
 
     /*
