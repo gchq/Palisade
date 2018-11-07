@@ -36,11 +36,11 @@ import static org.junit.Assert.fail;
 public class HashMapUserServiceTest {
 
     @Test
-    public void shouldConfigureAndUseSharedInstance() {
+    public void shouldConfigureAndUseSharedData() {
         //Given
         User user = new User().userId("uid1").auths("test", "test2").roles("test_role");
         User user2 = new User().userId("uid2").auths("other_test").roles("role");
-        HashMapUserService hms = new HashMapUserService(true);
+        HashMapUserService hms = new HashMapUserService();
         hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(true)));
         hms.addUser(new AddUserRequest().user(user)).join();
 
@@ -50,7 +50,7 @@ public class HashMapUserServiceTest {
         //When
         HashMapUserService test = new HashMapUserService();
         test.applyConfigFrom(con);
-        //sneakily add a user to the first service
+        //add a user to the first service
         hms.addUser(new AddUserRequest().user(user2)).join();
         //both should be in the second service
         User actual1 = test.getUser(new GetUserRequest().userId(new UserId().id("uid1"))).join();
@@ -65,7 +65,7 @@ public class HashMapUserServiceTest {
     public void shouldSaveToCache() {
         //Given
         User user = new User().userId("uid1").auths("test", "test2").roles("test_role");
-        HashMapUserService hms = new HashMapUserService(false);
+        HashMapUserService hms = new HashMapUserService();
         hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(true)));
         hms.addUser(new AddUserRequest().user(user)).join();
 
@@ -84,7 +84,7 @@ public class HashMapUserServiceTest {
     @Test(expected = NoSuchUserIdException.class)
     public void throwOnNonExistantUser() throws Throwable {
         //Given
-        HashMapUserService hms = new HashMapUserService(false);
+        HashMapUserService hms = new HashMapUserService();
         hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(false)));
 
         InitialConfig con = new InitialConfig();

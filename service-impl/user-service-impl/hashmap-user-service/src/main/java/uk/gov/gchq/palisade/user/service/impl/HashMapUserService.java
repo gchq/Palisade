@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
@@ -33,53 +32,27 @@ import uk.gov.gchq.palisade.user.service.exception.NoSuchUserIdException;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A HashMapUserService is a simple implementation of a {@link UserService} that simply stores the users in a {@link
- * ConcurrentHashMap}. By default the map is static so it will be shared across the same JVM.
+ * A HashMapUserService is a simple implementation of a {@link UserService} that keeps user data in the cache service.
  */
 public class HashMapUserService implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HashMapUserService.class);
-    private static final Map<UserId, User> USERS = new ConcurrentHashMap<>();
 
     public static final String CACHE_IMPL_KEY = "user.svc.hashmap.cache.svc";
-    public static final String STATIC_KEY = "user.svc.hashmap.static";
-
-    private Map<UserId, User> users;
 
     /**
      * Cache service that user service can use.
      */
     private CacheService cacheService;
 
-    /**
-     * Is the shared instance in use?
-     */
-    private boolean useStatic;
-
     public HashMapUserService() {
-        this(true);
-    }
-
-    public HashMapUserService(final boolean useStatic) {
-        makeMap(useStatic);
-        this.useStatic = useStatic;
-    }
-
-    private void makeMap(final boolean useStatic) {
-        if (useStatic) {
-            users = USERS;
-        } else {
-            users = new ConcurrentHashMap<>();
-        }
     }
 
     @Override
@@ -92,8 +65,6 @@ public class HashMapUserService implements UserService {
         } else {
             throw new NoConfigException("no cache service specified in configuration");
         }
-        useStatic = Boolean.valueOf(config.getOrDefault(STATIC_KEY, "true"));
-        makeMap(useStatic);
     }
 
     @Override
@@ -102,7 +73,6 @@ public class HashMapUserService implements UserService {
         config.put(UserService.class.getTypeName(), getClass().getTypeName());
         String serialisedCache = new String(JSONSerialiser.serialise(cacheService), JSONSerialiser.UTF8);
         config.put(CACHE_IMPL_KEY, serialisedCache);
-        config.put(STATIC_KEY, Boolean.toString(useStatic));
     }
 
     public HashMapUserService cacheService(final CacheService cacheService) {
@@ -124,18 +94,14 @@ public class HashMapUserService implements UserService {
     @Override
     public CompletableFuture<User> getUser(final GetUserRequest request) {
         Objects.requireNonNull(request);
-        User user = users.get(request.getUserId());
+        User user = null;
+        Optional<User> cachedUser = (Optional<User>) getCacheService().get(new GetCacheRequest<User>()
+                .service(this.getClass())
+                .key(request.getUserId().getId())).join();
 
-        // if not local then try cache service
-        if (user == null) {
-            Optional<User> cachedUser = (Optional<User>) getCacheService().get(new GetCacheRequest<User>()
-                    .service(this.getClass())
-                    .key(request.getUserId().getId())).join();
-            if (cachedUser.isPresent()) {
-                user = cachedUser.get();
-            }
+        if (cachedUser.isPresent()) {
+            user = cachedUser.get();
         }
-
         CompletableFuture<User> userCompletion = CompletableFuture.completedFuture(user);
 
         if (user == null) {
@@ -150,10 +116,8 @@ public class HashMapUserService implements UserService {
         Objects.requireNonNull(request.getUser());
         Objects.requireNonNull(request.getUser().getUserId());
         Objects.requireNonNull(request.getUser().getUserId().getId());
-        users.put(request.getUser().getUserId(), request.getUser());
         //save to cache service
-        CacheService localCache = getCacheService();
-        localCache.add(new AddCacheRequest<User>()
+        getCacheService().add(new AddCacheRequest<User>()
                 .service(this.getClass())
                 .key(request.getUser().getUserId().getId())
                 .value(request.getUser())).join();
