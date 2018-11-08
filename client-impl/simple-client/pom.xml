@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hashmap-user-service</artifactId>
+            <artifactId>simple-user-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

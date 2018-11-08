@@ -21,8 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
@@ -31,41 +32,27 @@ import uk.gov.gchq.palisade.user.service.exception.NoSuchUserIdException;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A HashMapUserService is a simple implementation of a {@link UserService} that simply stores the users in a {@link
- * ConcurrentHashMap}. By default the map is static so it will be shared across the same JVM.
+ * A SimpleUserService is a simple implementation of a {@link UserService} that keeps user data in the cache service.
  */
-public class HashMapUserService implements UserService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HashMapUserService.class);
-    private static final Map<UserId, User> USERS = new ConcurrentHashMap<>();
+public class SimpleUserService implements UserService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleUserService.class);
 
-    public static final String CACHE_IMPL_KEY = "user.svc.cache.svc";
-
-    private final Map<UserId, User> users;
+    public static final String CACHE_IMPL_KEY = "user.svc.hashmap.cache.svc";
 
     /**
      * Cache service that user service can use.
      */
     private CacheService cacheService;
 
-    public HashMapUserService() {
-        this(true);
-    }
-
-    public HashMapUserService(final boolean useStatic) {
-        if (useStatic) {
-            users = USERS;
-        } else {
-            users = new ConcurrentHashMap<>();
-        }
+    public SimpleUserService() {
     }
 
     @Override
@@ -88,7 +75,7 @@ public class HashMapUserService implements UserService {
         config.put(CACHE_IMPL_KEY, serialisedCache);
     }
 
-    public HashMapUserService cacheService(final CacheService cacheService) {
+    public SimpleUserService cacheService(final CacheService cacheService) {
         requireNonNull(cacheService, "Cache service cannot be set to null.");
         this.cacheService = cacheService;
         LOGGER.debug("Configured to use cache {}", cacheService);
@@ -107,9 +94,16 @@ public class HashMapUserService implements UserService {
     @Override
     public CompletableFuture<User> getUser(final GetUserRequest request) {
         Objects.requireNonNull(request);
-        User user = users.get(request.getUserId());
+        User user = null;
+        Optional<User> cachedUser = (Optional<User>) getCacheService().get(new GetCacheRequest<User>()
+                .service(this.getClass())
+                .key(request.getUserId().getId())).join();
 
+        if (cachedUser.isPresent()) {
+            user = cachedUser.get();
+        }
         CompletableFuture<User> userCompletion = CompletableFuture.completedFuture(user);
+
         if (user == null) {
             userCompletion.obtrudeException(new NoSuchUserIdException(request.getUserId().getId()));
         }
@@ -122,7 +116,11 @@ public class HashMapUserService implements UserService {
         Objects.requireNonNull(request.getUser());
         Objects.requireNonNull(request.getUser().getUserId());
         Objects.requireNonNull(request.getUser().getUserId().getId());
-        users.put(request.getUser().getUserId(), request.getUser());
+        //save to the cache service
+        getCacheService().add(new AddCacheRequest<User>()
+                .service(this.getClass())
+                .key(request.getUser().getUserId().getId())
+                .value(request.getUser())).join();
         return CompletableFuture.completedFuture(true);
     }
 }

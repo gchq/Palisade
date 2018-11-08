@@ -22,12 +22,22 @@
         <artifactId>user-service-impl</artifactId>
         <version>0.1.2-SNAPSHOT</version>
     </parent>
-    <artifactId>hashmap-user-service</artifactId>
+    <artifactId>simple-user-service</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>cache-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>simple-cache-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>hashmap-backing-store</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
