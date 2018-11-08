@@ -18,16 +18,16 @@ package uk.gov.gchq.palisade.config.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.util.concurrent.CompletableFuture;
 
-public class ProxyRestConfigService extends ProxyRestService implements InitialConfigurationService {
+public class ProxyRestConfigService extends ProxyRestService implements ConfigurationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyRestConfigService.class);
 
@@ -36,7 +36,7 @@ public class ProxyRestConfigService extends ProxyRestService implements InitialC
 
     @Override
     protected Class<? extends Service> getServiceClass() {
-        return InitialConfigurationService.class;
+        return ConfigurationService.class;
     }
 
     public ProxyRestConfigService(final String baseUrl) {
@@ -45,8 +45,8 @@ public class ProxyRestConfigService extends ProxyRestService implements InitialC
     }
 
     @Override
-    public CompletableFuture<InitialConfig> get(final GetConfigRequest request) {
-        return doPostAsync("get", request, InitialConfig.class);
+    public CompletableFuture<ServiceConfiguration> get(final GetConfigRequest request) {
+        return doPostAsync("get", request, ServiceConfiguration.class);
     }
 
     @Override

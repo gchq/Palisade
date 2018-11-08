@@ -39,7 +39,7 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * This class may contain {@code null} values.
  */
-public class InitialConfig {
+public class ServiceConfiguration {
 
     /**
      * The map of configuration data.
@@ -50,7 +50,7 @@ public class InitialConfig {
     /**
      * Create empty configuration.
      */
-    public InitialConfig() {
+    public ServiceConfiguration() {
     }
 
     /**
@@ -70,7 +70,7 @@ public class InitialConfig {
      * @param map the map to copy
      * @return this object
      */
-    public InitialConfig putAll(final Map<String, String> map) {
+    public ServiceConfiguration putAll(final Map<String, String> map) {
         requireNonNull(map, "map");
         //filter out any null keys
         map.entrySet()
@@ -87,7 +87,7 @@ public class InitialConfig {
      * @param value the configuration value, maybe {@code null}
      * @return this object
      */
-    public InitialConfig put(final String key, final String value) {
+    public ServiceConfiguration put(final String key, final String value) {
         requireNonNull(key, "key");
         configMap.put(key, value);
         return this;
@@ -131,7 +131,7 @@ public class InitialConfig {
             return false;
         }
 
-        InitialConfig that = (InitialConfig) o;
+        ServiceConfiguration that = (ServiceConfiguration) o;
 
         return new EqualsBuilder()
                 .append(configMap, that.configMap)

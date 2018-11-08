@@ -22,10 +22,11 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
+import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
@@ -45,11 +46,12 @@ public class MultiJVMDockerExample {
 
     public void run() throws Exception {
         //this will write an initial configuration
-        final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(Collections.singletonList("http://localhost:2379"),
+        final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(Collections.singletonList("http://localhost:2379"),
                 Optional.empty(),
                 Optional.of(new ProxyRestPolicyService("http://policy-service:8080/policy")),
                 Optional.of(new ProxyRestUserService("http://user-service:8080/user")),
                 Optional.of(new ProxyRestResourceService("http://resource-service:8080/resource")),
+                Optional.of(new ProxyRestPalisadeService("http://palisade-service:8080/palisade")),
                 Optional.of(new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"), false)))
         );
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);

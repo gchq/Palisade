@@ -27,7 +27,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 
 import java.io.BufferedWriter;
@@ -191,7 +191,7 @@ public class HDFSFileResourceServiceTest {
     @Test
     public void shouldBeEqualAfterConfigure() {
         //given
-        InitialConfig is = new InitialConfig();
+        ServiceConfiguration is = new ServiceConfiguration();
         hdfsService.recordCurrentConfigTo(is);
 
         //when

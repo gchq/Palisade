@@ -17,7 +17,7 @@ package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
@@ -73,7 +73,7 @@ public interface ServicesFactory {
     /**
      * Get the Palisade configuration service.
      *
-     * @return an instance of {@link InitialConfigurationService}
+     * @return an instance of {@link ConfigurationService}
      */
-    InitialConfigurationService getConfigService();
+    ConfigurationService getConfigService();
 }

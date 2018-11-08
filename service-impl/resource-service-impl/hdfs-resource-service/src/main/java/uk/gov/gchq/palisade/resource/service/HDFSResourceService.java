@@ -53,7 +53,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -164,7 +164,7 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @Override
-    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
         requireNonNull(config, "config");
         //get the configuration string
         String serialisedConfig = config.getOrDefault(HADOOP_CONF_STRING, null);
@@ -191,7 +191,7 @@ public class HDFSResourceService implements ResourceService {
     }
 
     @Override
-    public void recordCurrentConfigTo(final InitialConfig config) {
+    public void recordCurrentConfigTo(final ServiceConfiguration config) {
         requireNonNull(config, "config");
         config.put(ResourceService.class.getTypeName(), getClass().getTypeName());
         Map<String, String> confMap = getConf();

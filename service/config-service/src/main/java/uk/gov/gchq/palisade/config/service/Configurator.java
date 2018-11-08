@@ -22,7 +22,7 @@ import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ConfigConsts;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.time.Duration;
 import java.util.NoSuchElementException;
@@ -36,7 +36,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * A {@code Configurator} is responsible for creating Palisade {@link Service}s either from a supplied {@link
- * InitialConfig} or by connecting to a {@link InitialConfigurationService} and retrieving the configuration from
+ * ServiceConfiguration} or by connecting to a {@link ConfigurationService} and retrieving the configuration from
  * there.
  * <p>
  * No parameter may be {@code null}.
@@ -47,14 +47,14 @@ public class Configurator {
     /**
      * The configuration service.
      */
-    private final InitialConfigurationService service;
+    private final ConfigurationService service;
 
     /**
      * Create a {@code Configurator} object that retrieves configuration from the given service.
      *
      * @param service the configuration service
      */
-    public Configurator(final InitialConfigurationService service) {
+    public Configurator(final ConfigurationService service) {
         requireNonNull(service, "service");
         this.service = service;
     }
@@ -71,7 +71,7 @@ public class Configurator {
      */
     public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
-        InitialConfig config = retrieveConfig(Optional.of(serviceClass));
+        ServiceConfiguration config = retrieveConfig(Optional.of(serviceClass));
         return createFromConfig(serviceClass, config);
     }
 
@@ -89,14 +89,14 @@ public class Configurator {
     public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass, final Duration timeout) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(timeout, "timeout");
-        InitialConfig config = retrieveConfig(Optional.of(serviceClass), timeout);
+        ServiceConfiguration config = retrieveConfig(Optional.of(serviceClass), timeout);
         return createFromConfig(serviceClass, config);
     }
 
     /**
      * Create a Palisade service from the given configuration. This method will look up the implementing class name for
      * the given service class from the configuration, attempt to create it and then call {@link
-     * Service#applyConfigFrom(InitialConfig)} on the object.
+     * Service#applyConfigFrom(ServiceConfiguration)} on the object.
      *
      * @param serviceClass the type of service class to create
      * @param config       the configuration to create the service from
@@ -106,7 +106,7 @@ public class Configurator {
      *                               be looked up, or the instance can't be configured properly from the given
      *                               configuration
      */
-    public static <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final InitialConfig config) throws IllegalStateException {
+    public static <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final ServiceConfiguration config) throws IllegalStateException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(config, "config");
         try {
@@ -137,7 +137,7 @@ public class Configurator {
      * @throws NoConfigException if no configuration data can be retrieved
      * @implNote This is equivalent to calling {@code retrieveConfig(serviceClass, 0)}.
      */
-    public InitialConfig retrieveConfig(final Optional<Class<? extends Service>> serviceClass) throws NoConfigException {
+    public ServiceConfiguration retrieveConfig(final Optional<Class<? extends Service>> serviceClass) throws NoConfigException {
         return retrieveConfig(serviceClass, 0);
     }
 
@@ -152,7 +152,7 @@ public class Configurator {
      * @return the configuration data
      * @throws NoConfigException if no configuration data can be retrieved, or the operation timed out
      */
-    public InitialConfig retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final Duration timeout) throws NoConfigException {
+    public ServiceConfiguration retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final Duration timeout) throws NoConfigException {
         requireNonNull(timeout, "timeout");
         return retrieveConfig(serviceClass, timeout.toMillis());
     }
@@ -167,7 +167,7 @@ public class Configurator {
      * @return the configuration
      * @throws NoConfigException if the time out expires or no configuration could be found
      */
-    private InitialConfig retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final long timeout) throws NoConfigException {
+    private ServiceConfiguration retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final long timeout) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         if (timeout < 0) {
             throw new IllegalArgumentException("negative timeout not allowed");
@@ -177,7 +177,7 @@ public class Configurator {
         long timeExpiry = System.currentTimeMillis() + timeout;
 
         GetConfigRequest request = new GetConfigRequest().service(serviceClass);
-        InitialConfig config = null;
+        ServiceConfiguration config = null;
         LOGGER.debug("Getting configuration for {} with timeout {}", serviceClass, timeout);
 
         while (config == null && (timeout == 0 || System.currentTimeMillis() < timeExpiry)) {
