@@ -22,7 +22,7 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.user.service.exception.NoSuchUserIdException;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
@@ -44,7 +44,7 @@ public class SimpleUserServiceTest {
         hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(true)));
         hms.addUser(new AddUserRequest().user(user)).join();
 
-        InitialConfig con = new InitialConfig();
+        ServiceConfiguration con = new ServiceConfiguration();
         hms.recordCurrentConfigTo(con);
 
         //When
@@ -69,7 +69,7 @@ public class SimpleUserServiceTest {
         hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(true)));
         hms.addUser(new AddUserRequest().user(user)).join();
 
-        InitialConfig con = new InitialConfig();
+        ServiceConfiguration con = new ServiceConfiguration();
         hms.recordCurrentConfigTo(con);
 
         //When
@@ -87,7 +87,7 @@ public class SimpleUserServiceTest {
         SimpleUserService hms = new SimpleUserService();
         hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(false)));
 
-        InitialConfig con = new InitialConfig();
+        ServiceConfiguration con = new ServiceConfiguration();
         hms.recordCurrentConfigTo(con);
 
         //When

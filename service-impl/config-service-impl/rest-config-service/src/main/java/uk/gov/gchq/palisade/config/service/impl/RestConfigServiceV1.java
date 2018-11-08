@@ -25,11 +25,11 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import javax.ws.rs.Consumes;
@@ -47,13 +47,13 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Consumes(APPLICATION_JSON)
 @Produces(APPLICATION_JSON)
 @Api(value = "/")
-public class RestConfigServiceV1 implements InitialConfigurationService {
+public class RestConfigServiceV1 implements ConfigurationService {
     public static final String BOOTSTRAP_CONFIG = "palisade.rest.bootstrap.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestConfigServiceV1.class);
 
-    private final InitialConfigurationService delegate;
+    private final ConfigurationService delegate;
 
-    private static InitialConfigurationService configService;
+    private static ConfigurationService configService;
 
     public RestConfigServiceV1() {
         this(System.getProperty(BOOTSTRAP_CONFIG));
@@ -63,15 +63,15 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
         this(createService(serviceConfigPath));
     }
 
-    public RestConfigServiceV1(final InitialConfigurationService delegate) {
+    public RestConfigServiceV1(final ConfigurationService delegate) {
         this.delegate = delegate;
     }
 
-    private static synchronized InitialConfigurationService createService(final String serviceConfigPath) {
+    private static synchronized ConfigurationService createService(final String serviceConfigPath) {
         if (configService == null) {
             //create the configuration service from the initial bootstrap information
             final InputStream stream = StreamUtil.openStream(RestConfigServiceV1.class, serviceConfigPath);
-            configService = JSONSerialiser.deserialise(stream, InitialConfigurationService.class);
+            configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
             configService.configureSelfFromCache();
         }
         return configService;
@@ -79,13 +79,13 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
 
     @POST
     @Path("/get")
-    @ApiOperation(value = "Gets the config in a InitialConfig",
-            response = InitialConfig.class)
+    @ApiOperation(value = "Gets the config in a ServiceConfiguration",
+            response = ServiceConfiguration.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    public InitialConfig getSync(
+    public ServiceConfiguration getSync(
             @ApiParam(value = "The request") final GetConfigRequest request) {
         LOGGER.debug("Invoking get: {}", request);
         return get(request).join();
@@ -93,7 +93,7 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
 
     @PUT
     @Path("/add")
-    @ApiOperation(value = "Adds the config from this InitialConfig",
+    @ApiOperation(value = "Adds the config from this ServiceConfiguration",
             response = Boolean.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -106,7 +106,7 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
     }
 
     @Override
-    public CompletableFuture<InitialConfig> get(final GetConfigRequest request) {
+    public CompletableFuture<ServiceConfiguration> get(final GetConfigRequest request) {
         return delegate.get(request);
     }
 
@@ -115,7 +115,7 @@ public class RestConfigServiceV1 implements InitialConfigurationService {
         return delegate.add(request);
     }
 
-    protected InitialConfigurationService getDelegate() {
+    protected ConfigurationService getDelegate() {
         return delegate;
     }
 }

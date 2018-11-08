@@ -26,15 +26,11 @@ import org.junit.Test;
 
 import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
-import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.policy.service.impl.RestPolicyServiceV1;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.rest.RestUtil;
-import uk.gov.gchq.palisade.service.impl.RestPalisadeServiceV1;
-import uk.gov.gchq.palisade.user.service.impl.RestUserServiceV1;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +55,7 @@ public class MultiJvmExampleIT {
     private static EmbeddedHttpServer dataServer;
     private static EmbeddedHttpServer configServer;
 
-    private static InitialConfigurationService configService;
+    private static ConfigurationService configService;
 
     @BeforeClass
     public static void beforeClass() throws IOException {

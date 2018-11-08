@@ -24,7 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
@@ -39,7 +39,7 @@ import static uk.gov.gchq.palisade.util.JsonAssert.assertEquals;
 
 public class SingleJvmExampleIT {
 
-    private static InitialConfigurationService configService;
+    private static ConfigurationService configService;
 
     @BeforeClass
     public static void createConfig() {

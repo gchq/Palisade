@@ -17,12 +17,12 @@ package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.user.service.UserService;
 
 import java.util.Optional;
@@ -31,9 +31,9 @@ import static java.util.Objects.requireNonNull;
 
 public class ConfiguredClientServices implements ServicesFactory {
 
-    private final InitialConfigurationService configService;
+    private final ConfigurationService configService;
 
-    private final InitialConfig config;
+    private final ServiceConfiguration config;
 
     private final ResourceService resourceService;
     private final AuditService auditService;
@@ -42,7 +42,7 @@ public class ConfiguredClientServices implements ServicesFactory {
     private final CacheService cacheService;
     private final PalisadeService palisadeService;
 
-    public ConfiguredClientServices(final InitialConfigurationService configService) {
+    public ConfiguredClientServices(final ConfigurationService configService) {
         requireNonNull(configService, "configService");
         this.configService = configService;
 
@@ -91,7 +91,7 @@ public class ConfiguredClientServices implements ServicesFactory {
      * @return the configuration service instance that was passed on construction
      */
     @Override
-    public InitialConfigurationService getConfigService() {
+    public ConfigurationService getConfigService() {
         return configService;
     }
 

@@ -24,12 +24,12 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -37,12 +37,12 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.Objects.requireNonNull;
 
 /**
- * An implementation of {@link InitialConfigurationService} that uses the {@link CacheService} to provide all of its
+ * An implementation of {@link ConfigurationService} that uses the {@link CacheService} to provide all of its
  * storage.
  * <p>
  * All methods throw {@link NullPointerException} for any {@code null} parameters.
  */
-public class SimpleConfigService implements InitialConfigurationService {
+public class SimpleConfigService implements ConfigurationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleConfigService.class);
 
     /**
@@ -67,13 +67,13 @@ public class SimpleConfigService implements InitialConfigurationService {
     }
 
     @Override
-    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
         requireNonNull(config, "config cannot be null");
         LOGGER.debug("Configure called: no-op");
     }
 
     @Override
-    public void recordCurrentConfigTo(final InitialConfig config) {
+    public void recordCurrentConfigTo(final ServiceConfiguration config) {
         requireNonNull(config, "config cannot be null");
         LOGGER.debug("Write configuration called: no-op");
     }
@@ -113,7 +113,7 @@ public class SimpleConfigService implements InitialConfigurationService {
     public void configureSelfFromCache() {
         try {
             LOGGER.debug("Getting auxiliary configuration from cache");
-            InitialConfig selfConfig = getServiceConfig(InitialConfigurationService.class);
+            ServiceConfiguration selfConfig = getServiceConfig(ConfigurationService.class);
             applyConfigFrom(selfConfig);
         } catch (NoConfigException e) {
             LOGGER.debug("No auxiliary configuration available", e);
@@ -124,7 +124,7 @@ public class SimpleConfigService implements InitialConfigurationService {
      * {@inheritDoc}
      */
     @Override
-    public CompletableFuture<InitialConfig> get(final GetConfigRequest request) throws NoConfigException {
+    public CompletableFuture<ServiceConfiguration> get(final GetConfigRequest request) throws NoConfigException {
         requireNonNull(request, "request");
         if (request.getService().isPresent()) { //has a Service requested some config?
             return CompletableFuture.completedFuture(request.getService().map(this::getServiceConfig).get());
@@ -142,8 +142,8 @@ public class SimpleConfigService implements InitialConfigurationService {
     public CompletableFuture<Boolean> add(final AddConfigRequest request) {
         requireNonNull(request, "request");
         final Optional<Class<? extends Service>> clazz = request.getService();
-        final AddCacheRequest<InitialConfig> addRequest = new AddCacheRequest<>()
-                .service(InitialConfigurationService.class)
+        final AddCacheRequest<ServiceConfiguration> addRequest = new AddCacheRequest<>()
+                .service(ConfigurationService.class)
                 .value(request.getConfig());
         //are we setting anonymous config
         if (clazz.isPresent()) {
@@ -162,9 +162,9 @@ public class SimpleConfigService implements InitialConfigurationService {
      * @return the client configuration
      * @throws NoConfigException if no client configuration could be found
      */
-    private InitialConfig getAnonymousConfig() throws NoConfigException {
-        CompletableFuture<Optional<InitialConfig>> cachedObject = cache.get(new GetCacheRequest<InitialConfig>()
-                .service(InitialConfigurationService.class)
+    private ServiceConfiguration getAnonymousConfig() throws NoConfigException {
+        CompletableFuture<Optional<ServiceConfiguration>> cachedObject = cache.get(new GetCacheRequest<ServiceConfiguration>()
+                .service(ConfigurationService.class)
                 .key(ANONYMOUS_CONFIG_KEY));
         return cachedObject.join().orElseThrow(() -> new NoConfigException("no initial configuration could be found"));
     }
@@ -179,22 +179,22 @@ public class SimpleConfigService implements InitialConfigurationService {
      * @return the service configuration
      * @throws NoConfigException if no configuration could be found
      */
-    private InitialConfig getServiceConfig(final Class<? extends Service> clazz) throws NoConfigException {
+    private ServiceConfiguration getServiceConfig(final Class<? extends Service> clazz) throws NoConfigException {
         requireNonNull(clazz, "clazz");
         //first can we find anything for this class specifically?
-        final GetCacheRequest<InitialConfig> serviceRequest = new GetCacheRequest<>()
-                .service(InitialConfigurationService.class)
+        final GetCacheRequest<ServiceConfiguration> serviceRequest = new GetCacheRequest<>()
+                .service(ConfigurationService.class)
                 .key(clazz.getTypeName());
-        Optional<InitialConfig> result = cache.get(serviceRequest).join();
+        Optional<ServiceConfiguration> result = cache.get(serviceRequest).join();
         //if we get an object back, then return it
         if (result.isPresent()) {
             return result.get();
         }
         //make a call for the generic object
-        final GetCacheRequest<InitialConfig> genericRequest = new GetCacheRequest<>()
-                .service(InitialConfigurationService.class)
+        final GetCacheRequest<ServiceConfiguration> genericRequest = new GetCacheRequest<>()
+                .service(ConfigurationService.class)
                 .key(Service.class.getTypeName());
-        Optional<InitialConfig> genericResult = cache.get(genericRequest).join();
+        Optional<ServiceConfiguration> genericResult = cache.get(genericRequest).join();
         if (genericResult.isPresent()) {
             return genericResult.get();
         } else {

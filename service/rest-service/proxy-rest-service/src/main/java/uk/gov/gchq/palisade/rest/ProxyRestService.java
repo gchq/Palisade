@@ -28,7 +28,7 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.exception.PalisadeRuntimeException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -93,7 +93,7 @@ public abstract class ProxyRestService implements Service {
     }
 
     @Override
-    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
         requireNonNull(config, "config");
         try {
             String base = config.get(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX);
@@ -104,7 +104,7 @@ public abstract class ProxyRestService implements Service {
     }
 
     @Override
-    public void recordCurrentConfigTo(final InitialConfig config) {
+    public void recordCurrentConfigTo(final ServiceConfiguration config) {
         requireNonNull(config, "config");
         config.put(getServiceClass().getTypeName(), getClass().getTypeName());
         config.put(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX, this.baseUrl);

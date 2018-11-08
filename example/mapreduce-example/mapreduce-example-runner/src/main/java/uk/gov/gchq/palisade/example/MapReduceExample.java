@@ -37,7 +37,7 @@ import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.client.ServicesFactory;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
@@ -125,7 +125,7 @@ public class MapReduceExample extends Configured implements Tool {
         FileOutputFormat.setOutputPath(job, new Path(args[0]));
 
         //configure the Palisade input format on an example client
-        final InitialConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
+        final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 

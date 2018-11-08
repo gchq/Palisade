@@ -19,7 +19,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import static java.util.Objects.requireNonNull;
 
@@ -35,7 +35,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class AddConfigRequest extends GetConfigRequest {
 
-    private InitialConfig config;
+    private ServiceConfiguration config;
 
     /**
      * Create an empty request.
@@ -48,7 +48,7 @@ public class AddConfigRequest extends GetConfigRequest {
      *
      * @return the configuration
      */
-    public InitialConfig getConfig() {
+    public ServiceConfiguration getConfig() {
         requireNonNull(config, "config cannot be left null");
         return config;
     }
@@ -59,7 +59,7 @@ public class AddConfigRequest extends GetConfigRequest {
      * @param config the configuration
      * @return this object
      */
-    public AddConfigRequest config(final InitialConfig config) {
+    public AddConfigRequest config(final ServiceConfiguration config) {
         requireNonNull(config, "config");
         this.config = config;
         return this;
@@ -70,7 +70,7 @@ public class AddConfigRequest extends GetConfigRequest {
      *
      * @param config the configuration
      */
-    public void setConfig(final InitialConfig config) {
+    public void setConfig(final ServiceConfiguration config) {
         config(config);
     }
 

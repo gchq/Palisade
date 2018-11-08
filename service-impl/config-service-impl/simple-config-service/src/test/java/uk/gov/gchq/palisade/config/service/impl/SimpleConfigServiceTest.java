@@ -21,12 +21,12 @@ import org.junit.Test;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.util.Optional;
 
@@ -37,19 +37,19 @@ public class SimpleConfigServiceTest {
 
     private static SimpleConfigService scs;
 
-    private static InitialConfig clientConfig = new InitialConfig()
+    private static ServiceConfiguration clientConfig = new ServiceConfiguration()
             .put("test1_client", "value1_client")
             .put("test2_client", "value2_client");
 
-    private static InitialConfig genericService = new InitialConfig()
+    private static ServiceConfiguration genericService = new ServiceConfiguration()
             .put("test1_generic", "value1_generic")
             .put("test2_generic", "value2_generic");
 
-    private static InitialConfig serviceClass1 = new InitialConfig()
+    private static ServiceConfiguration serviceClass1 = new ServiceConfiguration()
             .put("test1_service1", "value1_service1")
             .put("test2_service1", "value2_service1");
 
-    private static InitialConfig serviceClass2 = new InitialConfig()
+    private static ServiceConfiguration serviceClass2 = new ServiceConfiguration()
             .put("test1_service2", "value1_service2")
             .put("test2_service2", "value2_service2");
 
@@ -73,20 +73,20 @@ public class SimpleConfigServiceTest {
                                 new HashMapBackingStore(false)
                         )
         );
-        scs.getCache().add(new AddCacheRequest<InitialConfig>()
-                .service(InitialConfigurationService.class)
+        scs.getCache().add(new AddCacheRequest<ServiceConfiguration>()
+                .service(ConfigurationService.class)
                 .key(SimpleConfigService.ANONYMOUS_CONFIG_KEY)
                 .value(clientConfig)).join();
-        scs.getCache().add(new AddCacheRequest<InitialConfig>()
-                .service(InitialConfigurationService.class)
+        scs.getCache().add(new AddCacheRequest<ServiceConfiguration>()
+                .service(ConfigurationService.class)
                 .key(Dummy1.class.getTypeName())
                 .value(serviceClass1)).join();
-        scs.getCache().add(new AddCacheRequest<InitialConfig>()
-                .service(InitialConfigurationService.class)
+        scs.getCache().add(new AddCacheRequest<ServiceConfiguration>()
+                .service(ConfigurationService.class)
                 .key(Dummy2.class.getTypeName())
                 .value(serviceClass2)).join();
-        scs.getCache().add(new AddCacheRequest<InitialConfig>()
-                .service(InitialConfigurationService.class)
+        scs.getCache().add(new AddCacheRequest<ServiceConfiguration>()
+                .service(ConfigurationService.class)
                 .key(Service.class.getTypeName())
                 .value(genericService)).join();
     }
@@ -94,7 +94,7 @@ public class SimpleConfigServiceTest {
     @Test(expected = NoConfigException.class)
     public void throwNoConfig() {
         //Given
-        InitialConfigurationService localConfigService = new SimpleConfigService(
+        ConfigurationService localConfigService = new SimpleConfigService(
                 new SimpleCacheService()
                         .backingStore(
                                 new HashMapBackingStore(false)
@@ -112,7 +112,7 @@ public class SimpleConfigServiceTest {
         //Given
         GetConfigRequest req = new GetConfigRequest();
         //When
-        InitialConfig actual = scs.get(req).join();
+        ServiceConfiguration actual = scs.get(req).join();
         //Then
         assertEquals(clientConfig, actual);
     }
@@ -122,7 +122,7 @@ public class SimpleConfigServiceTest {
         //Given
         GetConfigRequest req = new GetConfigRequest().service(Optional.of(Dummy1.class));
         //When
-        InitialConfig actual = scs.get(req).join();
+        ServiceConfiguration actual = scs.get(req).join();
         //Then
         assertEquals(serviceClass1, actual);
     }
@@ -132,7 +132,7 @@ public class SimpleConfigServiceTest {
         //Given
         GetConfigRequest req = new GetConfigRequest().service(Optional.of(Dummy2.class));
         //When
-        InitialConfig actual = scs.get(req).join();
+        ServiceConfiguration actual = scs.get(req).join();
         //Then
         assertEquals(serviceClass2, actual);
     }
@@ -142,7 +142,7 @@ public class SimpleConfigServiceTest {
         //Given
         GetConfigRequest req = new GetConfigRequest().service(Optional.of(NotInCache.class));
         //When
-        InitialConfig actual = scs.get(req).join();
+        ServiceConfiguration actual = scs.get(req).join();
         //Then
         assertEquals(genericService, actual);
     }
@@ -150,14 +150,14 @@ public class SimpleConfigServiceTest {
     @Test
     public void shouldPutAndRetrieveConfig() {
         //Given
-        InitialConfig expected = serviceClass2;
+        ServiceConfiguration expected = serviceClass2;
         AddConfigRequest request = (AddConfigRequest) new AddConfigRequest()
                 .config(expected)
                 .service(Optional.of(CacheAddTest.class));
         scs.add(request);
         //When
         GetConfigRequest req = new GetConfigRequest().service(Optional.of(CacheAddTest.class));
-        InitialConfig actual = scs.get(req).join();
+        ServiceConfiguration actual = scs.get(req).join();
         //Then
         assertEquals(expected, actual);
     }

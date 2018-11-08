@@ -21,7 +21,7 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.time.Duration;
 import java.util.NoSuchElementException;
@@ -48,7 +48,7 @@ public class ServiceConfiguratorTest {
 
     public static class NoConfigureTestService implements TestService {
         @Override
-        public void applyConfigFrom(InitialConfig config) throws NoConfigException {
+        public void applyConfigFrom(ServiceConfiguration config) throws NoConfigException {
             throw new NoSuchElementException("test");
         }
     }
@@ -64,7 +64,7 @@ public class ServiceConfiguratorTest {
     @Test(expected = IllegalStateException.class)
     public void throwClassCantBeConfigured() {
         //Given
-        InitialConfig conf = new InitialConfig()
+        ServiceConfiguration conf = new ServiceConfiguration()
                 .put(TestService.class.getTypeName(), NoConfigureTestService.class.getTypeName());
 
         //When
@@ -77,7 +77,7 @@ public class ServiceConfiguratorTest {
     @Test(expected = IllegalStateException.class)
     public void throwNoClassSpecified() {
         //Given
-        InitialConfig conf = new InitialConfig();
+        ServiceConfiguration conf = new ServiceConfiguration();
 
         //When
         TestService t = Configurator.createFromConfig(TestService.class, conf);
@@ -89,7 +89,7 @@ public class ServiceConfiguratorTest {
     @Test
     public void shouldCreateInstance() {
         //Given
-        InitialConfig conf = new InitialConfig()
+        ServiceConfiguration conf = new ServiceConfiguration()
                 .put(TestService.class.getTypeName(), TestServiceImpl.class.getTypeName());
 
         //When
@@ -102,11 +102,11 @@ public class ServiceConfiguratorTest {
     @Test(expected = NoConfigException.class)
     public void throwOnNoConfig() {
         //Given
-        InitialConfigurationService mock = Mockito.mock(InitialConfigurationService.class);
+        ConfigurationService mock = Mockito.mock(ConfigurationService.class);
         when(mock.get(any(GetConfigRequest.class))).thenThrow(NoConfigException.class);
 
         //When
-        InitialConfig s = new Configurator(mock).retrieveConfig(Optional.of(TestService.class));
+        ServiceConfiguration s = new Configurator(mock).retrieveConfig(Optional.of(TestService.class));
 
         //Then
         fail("exception expected");
@@ -115,14 +115,14 @@ public class ServiceConfiguratorTest {
     @Test
     public void shouldGetConfig() {
         //Given
-        InitialConfig cfg = new InitialConfig()
+        ServiceConfiguration cfg = new ServiceConfiguration()
                 .put(TestService.class.getTypeName(), TestServiceImpl.class.getTypeName());
 
-        InitialConfigurationService mock = Mockito.mock(InitialConfigurationService.class);
+        ConfigurationService mock = Mockito.mock(ConfigurationService.class);
         when(mock.get(any(GetConfigRequest.class))).thenReturn(CompletableFuture.completedFuture(cfg));
 
         //When
-        InitialConfig ret = new Configurator(mock).retrieveConfig(Optional.of(TestService.class));
+        ServiceConfiguration ret = new Configurator(mock).retrieveConfig(Optional.of(TestService.class));
 
         //Then
         assertThat(ret, is(equalTo(cfg)));
@@ -132,7 +132,7 @@ public class ServiceConfiguratorTest {
     @Test(expected = NoConfigException.class)
     public void throwOnTimeout() {
         //Given
-        InitialConfigurationService mock = Mockito.mock(InitialConfigurationService.class);
+        ConfigurationService mock = Mockito.mock(ConfigurationService.class);
         //make a deliberately slow request
         when(mock.get(any(GetConfigRequest.class))).thenReturn(CompletableFuture.supplyAsync(() -> {
             try {

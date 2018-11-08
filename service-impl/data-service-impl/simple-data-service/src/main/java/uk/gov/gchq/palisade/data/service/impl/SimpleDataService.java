@@ -27,11 +27,10 @@ import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -118,7 +117,7 @@ public class SimpleDataService implements DataService {
     }
 
     @Override
-    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
         requireNonNull(config, "config");
         String serialisedPalisade = config.getOrDefault(PALISADE_IMPL_KEY, null);
         if (nonNull(serialisedPalisade)) {
@@ -135,7 +134,7 @@ public class SimpleDataService implements DataService {
     }
 
     @Override
-    public void recordCurrentConfigTo(final InitialConfig config) {
+    public void recordCurrentConfigTo(final ServiceConfiguration config) {
         requireNonNull(config, "config");
         config.put(DataService.class.getTypeName(), getClass().getTypeName());
         String serialised = new String(JSONSerialiser.serialise(palisadeService), JSONSerialiser.UTF8);

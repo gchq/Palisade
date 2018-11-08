@@ -19,7 +19,7 @@ import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.concurrent.CompletableFuture;
@@ -38,7 +38,7 @@ import java.util.concurrent.CompletableFuture;
  * All methods in this class throw {@link NullPointerException} unless otherwise stated for <code>null</code>
  * parameters.
  */
-public interface InitialConfigurationService extends Service {
+public interface ConfigurationService extends Service {
 
     /**
      * Get the initial configuration from Palisade. This is the entry method into the Palisade system.
@@ -47,7 +47,7 @@ public interface InitialConfigurationService extends Service {
      * @return the configuration object
      * @throws NoConfigException if no configuration for the given request code be found
      */
-    CompletableFuture<InitialConfig> get(final GetConfigRequest request) throws NoConfigException;
+    CompletableFuture<ServiceConfiguration> get(final GetConfigRequest request) throws NoConfigException;
 
     /**
      * Add the given initial configuration to the configuration service. This should not be used by clients and should
@@ -74,7 +74,7 @@ public interface InitialConfigurationService extends Service {
 
     /**
      * Instructs this configuration service to query its cache for extra configuration data. This may be called as part
-     * of a bootstrapping process. Once a {@link InitialConfigurationService} has been created with minimal configuration,
+     * of a bootstrapping process. Once a {@link ConfigurationService} has been created with minimal configuration,
      * this method can be called to cause it to retrieve any extra configuration information from the cache. It is an error
      * to call this method before a cache service has been configured for an instance.
      *

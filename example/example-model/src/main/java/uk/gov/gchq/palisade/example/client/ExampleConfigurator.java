@@ -24,7 +24,7 @@ import uk.gov.gchq.palisade.cache.service.impl.BackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.impl.SimpleConfigService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
@@ -46,7 +46,7 @@ import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
@@ -79,9 +79,9 @@ public final class ExampleConfigurator {
      *
      * @return the configuration service that provides the entry to Palisade
      */
-    public static InitialConfigurationService setupSingleJVMConfigurationService() {
+    public static ConfigurationService setupSingleJVMConfigurationService() {
         CacheService cache = createCacheService(new HashMapBackingStore(true));
-        InitialConfigurationService configService = new SimpleConfigService(cache);
+        ConfigurationService configService = new SimpleConfigService(cache);
         //configure the single JVM settings
         PolicyService policy = createPolicyService(configService, cache);
         UserService user = createUserService(configService, cache);
@@ -121,13 +121,13 @@ public final class ExampleConfigurator {
      *                          (potentially inside containers)
      * @return the configuration service to provide the Palisade entry point
      */
-    public static InitialConfigurationService setupMultiJVMConfigurationService(final List<String> etcdEndpoints,
-                                                                                final Optional<AuditService> containerAudit,
-                                                                                final Optional<PolicyService> containerPolicy,
-                                                                                final Optional<UserService> containerUser,
-                                                                                final Optional<ResourceService> containerResource,
-                                                                                final Optional<PalisadeService> containerPalisade,
-                                                                                final Optional<CacheService> containerCache) {
+    public static ConfigurationService setupMultiJVMConfigurationService(final List<String> etcdEndpoints,
+                                                                         final Optional<AuditService> containerAudit,
+                                                                         final Optional<PolicyService> containerPolicy,
+                                                                         final Optional<UserService> containerUser,
+                                                                         final Optional<ResourceService> containerResource,
+                                                                         final Optional<PalisadeService> containerPalisade,
+                                                                         final Optional<CacheService> containerCache) {
         requireNonNull(etcdEndpoints, "etcdEndpoints can not be null");
         requireNonNull(containerAudit, "containerAudit can not be null");
         requireNonNull(containerPolicy, "containerPolicy can not be null");
@@ -194,7 +194,7 @@ public final class ExampleConfigurator {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            //since the InitialConfigurationService will have already started, there is no extra configuration to
+            //since the ConfigurationService will have already started, there is no extra configuration to
             //write for it, so there is no writeConfiguration call for the config. service
 
             return configService;
@@ -206,15 +206,15 @@ public final class ExampleConfigurator {
     }
 
     /**
-     * Create an {@link InitialConfig} for the client and insert have each of the services write their configuration
+     * Create an {@link ServiceConfiguration} for the client and insert have each of the services write their configuration
      * into the service.
      *
      * @param configService the configuration service
      * @param services      collection of services to write to the configuration service
      * @return the {@code configService} argument
      */
-    private static InitialConfigurationService writeClientConfiguration(final InitialConfigurationService configService, final Collection<Service> services) {
-        InitialConfig initial = new InitialConfig();
+    private static ConfigurationService writeClientConfiguration(final ConfigurationService configService, final Collection<Service> services) {
+        ServiceConfiguration initial = new ServiceConfiguration();
 
         //each service to write their configuration into the initial configuration
         services.forEach(service -> service.recordCurrentConfigTo(initial));
@@ -233,8 +233,8 @@ public final class ExampleConfigurator {
      * @param service       the service that will write its configuration
      * @param serviceClass  the type of Palisade service
      */
-    private static void writeConfiguration(final InitialConfigurationService configService, final Service service, final Class<? extends Service> serviceClass) {
-        InitialConfig config = new InitialConfig();
+    private static void writeConfiguration(final ConfigurationService configService, final Service service, final Class<? extends Service> serviceClass) {
+        ServiceConfiguration config = new ServiceConfiguration();
         service.recordCurrentConfigTo(config);
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(config)
@@ -249,7 +249,7 @@ public final class ExampleConfigurator {
      * @return the data reader
      * @throws IOException if a failure occurs creating the reader
      */
-    private static HDFSDataReader createDataReader(final InitialConfigurationService configService, final CacheService cacheService) throws IOException {
+    private static HDFSDataReader createDataReader(final ConfigurationService configService, final CacheService cacheService) throws IOException {
         HDFSDataReader reader = new HDFSDataReader().conf(new Configuration());
         reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
         return reader;
@@ -264,7 +264,7 @@ public final class ExampleConfigurator {
      * @param reader               the associated data reader
      * @return a data service
      */
-    private static SimpleDataService createDataService(final InitialConfigurationService configurationService, final CacheService cache, final PalisadeService palisade, final DataReader reader) {
+    private static SimpleDataService createDataService(final ConfigurationService configurationService, final CacheService cache, final PalisadeService palisade, final DataReader reader) {
         return new SimpleDataService().palisadeService(palisade).reader(reader);
     }
 
@@ -287,7 +287,7 @@ public final class ExampleConfigurator {
      * @param cacheService  the cache service the user service should use
      * @return the user service
      */
-    private static SimpleUserService createUserService(final InitialConfigurationService configService, final CacheService cacheService) {
+    private static SimpleUserService createUserService(final ConfigurationService configService, final CacheService cacheService) {
         return new SimpleUserService().cacheService(cacheService);
     }
 
@@ -301,7 +301,7 @@ public final class ExampleConfigurator {
      * @param audit         the audit service this service should use
      * @return the Palisade service
      */
-    private static SimplePalisadeService createPalisadeService(final InitialConfigurationService configService, final CacheService cache, final PolicyService policy, final UserService user, final AuditService audit) {
+    private static SimplePalisadeService createPalisadeService(final ConfigurationService configService, final CacheService cache, final PolicyService policy, final UserService user, final AuditService audit) {
         return new SimplePalisadeService()
                 .auditService(audit)
                 .policyService(policy)
@@ -316,7 +316,7 @@ public final class ExampleConfigurator {
      * @param cacheService  the cache service the user service should use
      * @return the policy service
      */
-    private static HierarchicalPolicyService createPolicyService(final InitialConfigurationService configService, final CacheService cacheService) {
+    private static HierarchicalPolicyService createPolicyService(final ConfigurationService configService, final CacheService cacheService) {
         return new HierarchicalPolicyService().cacheService(cacheService);
     }
 
@@ -327,7 +327,7 @@ public final class ExampleConfigurator {
      * @param cacheService  the cache service
      * @return the audit service
      */
-    private static LoggerAuditService createAuditService(final InitialConfigurationService configService, final CacheService cacheService) {
+    private static LoggerAuditService createAuditService(final ConfigurationService configService, final CacheService cacheService) {
         return new LoggerAuditService();
     }
 
@@ -348,7 +348,7 @@ public final class ExampleConfigurator {
      * @param cache         the Palisade cache service
      * @return a configured resource service
      */
-    private static HDFSResourceService createResourceService(final InitialConfigurationService configService, final CacheService cache) {
+    private static HDFSResourceService createResourceService(final ConfigurationService configService, final CacheService cache) {
         try {
             HDFSResourceService resource = new HDFSResourceService().conf(new Configuration()).cacheService(cache);
             return resource;

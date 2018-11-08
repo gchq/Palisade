@@ -25,7 +25,7 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.MockConfigurationService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
@@ -33,7 +33,7 @@ import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
-import uk.gov.gchq.palisade.service.request.InitialConfig;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -45,7 +45,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class RestConfigServiceV1IT {
 
@@ -76,7 +75,7 @@ public class RestConfigServiceV1IT {
     @Test(expected = NoConfigException.class)
     public void throwWhenNoConfig() throws Throwable {
         // Given
-        final InitialConfigurationService configService = Mockito.mock(InitialConfigurationService.class);
+        final ConfigurationService configService = Mockito.mock(ConfigurationService.class);
         MockConfigurationService.setMock(configService);
 
         final GetConfigRequest request = new GetConfigRequest().service(Optional.empty());
@@ -84,7 +83,7 @@ public class RestConfigServiceV1IT {
         given(configService.get(request)).willThrow(new NoConfigException("No configuration has been set!"));
         // When
         try {
-            final InitialConfig result = proxy.get(request).join();
+            final ServiceConfiguration result = proxy.get(request).join();
         } catch (CompletionException e) {
             throw e.getCause();
         }
@@ -95,17 +94,17 @@ public class RestConfigServiceV1IT {
     @Test
     public void shouldGetConfigClient() throws IOException {
         // Given
-        final InitialConfigurationService configService = Mockito.mock(InitialConfigurationService.class);
+        final ConfigurationService configService = Mockito.mock(ConfigurationService.class);
         MockConfigurationService.setMock(configService);
 
         final GetConfigRequest request = new GetConfigRequest().service(Optional.empty());
 
-        InitialConfig expected = new InitialConfig().put("test_key", "test_value");
+        ServiceConfiguration expected = new ServiceConfiguration().put("test_key", "test_value");
 
         given(configService.get(request)).willReturn(CompletableFuture.completedFuture(expected));
 
         // When
-        final InitialConfig result = proxy.get(request).join();
+        final ServiceConfiguration result = proxy.get(request).join();
 
         // Then
         assertEquals(expected, result);
@@ -115,17 +114,17 @@ public class RestConfigServiceV1IT {
     @Test
     public void shouldGetConfigService() throws IOException {
         // Given
-        final InitialConfigurationService configService = Mockito.mock(InitialConfigurationService.class);
+        final ConfigurationService configService = Mockito.mock(ConfigurationService.class);
         MockConfigurationService.setMock(configService);
 
         final GetConfigRequest request = new GetConfigRequest().service(Optional.empty());
 
-        InitialConfig expected = new InitialConfig().put("some_important_key", "some_important_value");
+        ServiceConfiguration expected = new ServiceConfiguration().put("some_important_key", "some_important_value");
 
         given(configService.get(request)).willReturn(CompletableFuture.completedFuture(expected));
 
         // When
-        final InitialConfig result = proxy.get(request).join();
+        final ServiceConfiguration result = proxy.get(request).join();
 
         // Then
         assertEquals(expected, result);
@@ -135,10 +134,10 @@ public class RestConfigServiceV1IT {
     @Test
     public void shouldAddConfig() throws IOException {
         // Given
-        final InitialConfigurationService configService = Mockito.mock(InitialConfigurationService.class);
+        final ConfigurationService configService = Mockito.mock(ConfigurationService.class);
         MockConfigurationService.setMock(configService);
 
-        InitialConfig expected = new InitialConfig();
+        ServiceConfiguration expected = new ServiceConfiguration();
 
         final AddConfigRequest request = (AddConfigRequest) new AddConfigRequest().config(expected).service(Optional.empty());
 

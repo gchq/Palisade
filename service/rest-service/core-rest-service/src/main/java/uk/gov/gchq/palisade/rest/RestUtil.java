@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.config.service.Configurator;
-import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
@@ -41,7 +41,7 @@ public final class RestUtil {
     /**
      * Attempts to create the configured {@link Service}. This method provides the boot strapping for the REST services
      * to instantiate their services to which they delegate the actual implementations. This method will attempt to load
-     * the {@link InitialConfigurationService} class details from the given path. Once this has been instantiated, it
+     * the {@link ConfigurationService} class details from the given path. Once this has been instantiated, it
      * will repeatedly call the configuration service trying to ge the name of the actual implementing class for the
      * given service and then configure it.
      *
@@ -54,7 +54,7 @@ public final class RestUtil {
     public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass) {
         //create config service object
         final InputStream stream = StreamUtil.openStream(resolverClass, configDetailsPath);
-        InitialConfigurationService service = JSONSerialiser.deserialise(stream, InitialConfigurationService.class);
+        ConfigurationService service = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         //get the config for this service, try repeatedly until we get a valid configuration
         while (true) {
             try {
