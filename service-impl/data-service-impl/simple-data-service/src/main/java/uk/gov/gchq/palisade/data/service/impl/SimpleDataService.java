@@ -25,12 +25,17 @@ import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
+import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
+import uk.gov.gchq.palisade.service.request.InitialConfig;
 
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -48,6 +53,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class SimpleDataService implements DataService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDataService.class);
+
+    private static final String PALISADE_IMPL_KEY = "sds.svc.palisade.svc";
+    private static final String READER_IMPL_KEY = "sds.svc.reader.svc";
 
     private PalisadeService palisadeService;
     private DataReader reader;
@@ -107,6 +115,33 @@ public class SimpleDataService implements DataService {
     public void setPalisadeService(final PalisadeService palisadeService) {
         requireNonNull(palisadeService, "The palisade service cannot be set to null.");
         palisadeService(palisadeService);
+    }
+
+    @Override
+    public void applyConfigFrom(final InitialConfig config) throws NoConfigException {
+        requireNonNull(config, "config");
+        String serialisedPalisade = config.getOrDefault(PALISADE_IMPL_KEY, null);
+        if (nonNull(serialisedPalisade)) {
+            palisadeService = JSONSerialiser.deserialise(serialisedPalisade.getBytes(JSONSerialiser.UTF8), PalisadeService.class);
+        } else {
+            throw new NoConfigException("no service specified in configuration");
+        }
+        String serialisedReader = config.getOrDefault(READER_IMPL_KEY, null);
+        if (nonNull(serialisedReader)) {
+            reader = JSONSerialiser.deserialise(serialisedReader.getBytes(JSONSerialiser.UTF8), DataReader.class);
+        } else {
+            throw new NoConfigException("no service specified in configuration");
+        }
+    }
+
+    @Override
+    public void recordCurrentConfigTo(final InitialConfig config) {
+        requireNonNull(config, "config");
+        config.put(DataService.class.getTypeName(), getClass().getTypeName());
+        String serialised = new String(JSONSerialiser.serialise(palisadeService), JSONSerialiser.UTF8);
+        config.put(PALISADE_IMPL_KEY, serialised);
+        String serialisedReader = new String(JSONSerialiser.serialise(reader), JSONSerialiser.UTF8);
+        config.put(READER_IMPL_KEY, serialisedReader);
     }
 
     public DataReader getReader() {

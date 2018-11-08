@@ -58,7 +58,7 @@ public class MultiJvmExample {
                     .collect(Collectors.toList());
             //this will write an initial configuration
             final InitialConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs,
-                    Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+                    Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 

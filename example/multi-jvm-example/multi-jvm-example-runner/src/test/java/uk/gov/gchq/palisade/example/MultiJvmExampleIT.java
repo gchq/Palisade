@@ -77,7 +77,6 @@ public class MultiJvmExampleIT {
         userServer = new EmbeddedHttpServer("http://localhost:8083/user/v1", new uk.gov.gchq.palisade.user.service.impl.ApplicationConfigV1());
         userServer.startServer();
 
-        System.setProperty(RestDataServiceV1.SERVICE_CONFIG, "dataConfig.json");
         dataServer = new EmbeddedHttpServer("http://localhost:8084/data/v1", new uk.gov.gchq.palisade.data.service.impl.ApplicationConfigV1());
         dataServer.startServer();
 
@@ -86,7 +85,7 @@ public class MultiJvmExampleIT {
         configServer.startServer();
 
         configService = ExampleConfigurator.setupMultiJVMConfigurationService(Collections.emptyList(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     @AfterClass

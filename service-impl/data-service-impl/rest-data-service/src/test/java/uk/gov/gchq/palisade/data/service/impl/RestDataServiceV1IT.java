@@ -50,7 +50,7 @@ public class RestDataServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        System.setProperty(RestDataServiceV1.SERVICE_CONFIG, "mockConfig.json");
+        RestDataServiceV1.setDefaultDelegate(new MockDataService());
         proxy = new ProxyRestDataService("http://localhost:8084/data");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();

@@ -110,7 +110,7 @@ public class SimplePalisadeService implements PalisadeService {
         if (nonNull(serialised)) {
             return JSONSerialiser.deserialise(serialised.getBytes(JSONSerialiser.UTF8), serviceClass);
         } else {
-            throw new NoConfigException("no cache service specified in configuration");
+            throw new NoConfigException("no service specified in configuration for class " + serviceClass.getTypeName());
         }
     }
 

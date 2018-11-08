@@ -19,11 +19,9 @@ import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.config.service.InitialConfigurationService;
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.InitialConfig;
 import uk.gov.gchq.palisade.user.service.UserService;
 
@@ -32,8 +30,6 @@ import java.util.Optional;
 import static java.util.Objects.requireNonNull;
 
 public class ConfiguredClientServices implements ServicesFactory {
-    //TODO: remove after gh-129 done
-    public static final String STATE = ".state";
 
     private final InitialConfigurationService configService;
 
@@ -121,27 +117,5 @@ public class ConfiguredClientServices implements ServicesFactory {
 
     protected PalisadeService createPalisadeService() {
         return new Configurator(configService).createFromConfig(PalisadeService.class, config);
-    }
-
-    /*
-     * This can eventually be removed once all services are configuring themselves based on the InitialConfig.
-     * TODO: remove after gh-129 done
-     */
-    private <S extends Service> S legacyCreate(final Class<? extends Service> serviceClass) {
-        requireNonNull(serviceClass, "serviceClass");
-        try {
-            String servClass = config.get(serviceClass.getTypeName());
-            String jsonState = config.get(serviceClass.getTypeName() + STATE);
-
-            //try to create class type
-            Class<S> classImpl = (Class<S>) Class.forName(servClass).asSubclass(Service.class);
-
-            //create it
-            S instance = JSONSerialiser.deserialise(jsonState, classImpl);
-
-            return instance;
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("couldn't create service class " + serviceClass, e);
-        }
     }
 }
