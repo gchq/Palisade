@@ -25,8 +25,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import uk.gov.gchq.palisade.exception.NoConfigException;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.service.request.Request;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.util.concurrent.CompletableFuture;
 
