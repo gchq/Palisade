@@ -24,7 +24,6 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ConfigConsts;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.InputStream;
@@ -52,7 +51,7 @@ public final class RestUtil {
      * @param overridable       list of regular expressions for keys that can be overridden from system properties
      * @param <S>               type of service being returned
      * @return an instantiated configured service
-     * @see Configurator#createFromConfig(Class, ServiceConfiguration, String...)
+     * @see Configurator#createFromConfig(Class, uk.gov.gchq.palisade.service.request.ServiceConfiguration, String...)
      */
     public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass, final String... overridable) {
         //create config service object

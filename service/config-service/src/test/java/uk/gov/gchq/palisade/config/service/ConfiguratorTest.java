@@ -62,8 +62,7 @@ public class ConfiguratorTest {
     private static final String VALUE1 = "value1";
     private static final String VALUE2 = "value2";
     private static final String VALUE3 = "value3";
-
-
+    
     @BeforeClass
     public static void setupConfig() {
         testConfig = new ServiceConfiguration();
