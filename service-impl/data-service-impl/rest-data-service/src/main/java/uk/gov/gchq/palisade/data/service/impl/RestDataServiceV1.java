@@ -71,7 +71,8 @@ public class RestDataServiceV1 implements DataService {
 
     private static synchronized DataService createService(final String serviceConfigPath) {
         if (dataService == null) {
-            dataService = RestUtil.createService(RestDataServiceV1.class, serviceConfigPath, DataService.class);
+            //note that here we specifically allow the DataService implementing class to be overridden from a system property
+            dataService = RestUtil.createService(RestDataServiceV1.class, serviceConfigPath, DataService.class, DataService.class.getTypeName());
         }
         return dataService;
     }

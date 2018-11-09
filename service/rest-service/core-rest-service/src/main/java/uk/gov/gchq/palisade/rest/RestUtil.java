@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ConfigConsts;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.InputStream;
@@ -48,17 +49,19 @@ public final class RestUtil {
      * @param resolverClass     the class to resolve the {@code configDetailsPath} against
      * @param configDetailsPath the path to the configuration JSON, either on the file system or in a JAR
      * @param serviceClass      the type of service to create and configure
+     * @param overridable       list of regular expressions for keys that can be overridden from system properties
      * @param <S>               type of service being returned
      * @return an instantiated configured service
+     * @see Configurator#createFromConfig(Class, ServiceConfiguration, String...)
      */
-    public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass) {
+    public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass, final String... overridable) {
         //create config service object
         final InputStream stream = StreamUtil.openStream(resolverClass, configDetailsPath);
         ConfigurationService service = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         //get the config for this service, try repeatedly until we get a valid configuration
         while (true) {
             try {
-                return new Configurator(service).retrieveConfigAndCreate(serviceClass);
+                return new Configurator(service).retrieveConfigAndCreate(serviceClass, overridable);
             } catch (NoConfigException e) {
                 LOGGER.warn("Failed to get valid configuration for {}", serviceClass.getTypeName(), e);
                 try {

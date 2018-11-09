@@ -125,6 +125,11 @@
                                     <!-- This file exists in the example-model module -->
                                     configRest.json
                                 </palisade.rest.config.path>
+                                <!-- Here you could override the Data service implementing class
+                                <uk.gov.gchq.palisade.data.service.DataService>
+                                    uk.gov.gchq.palisade.data.service.impl.SimpleDataService
+                                </uk.gov.gchq.palisade.data.service.DataService>
+                                -->
                                 <palisade.error-mode.debug>
                                     true
                                 </palisade.error-mode.debug>
