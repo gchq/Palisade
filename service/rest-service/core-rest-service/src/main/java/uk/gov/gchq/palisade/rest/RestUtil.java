@@ -42,7 +42,7 @@ public final class RestUtil {
      * Attempts to create the configured {@link Service}. This method provides the boot strapping for the REST services
      * to instantiate their services to which they delegate the actual implementations. This method will attempt to load
      * the {@link ConfigurationService} class details from the given path. Once this has been instantiated, it
-     * will repeatedly call the configuration service trying to ge the name of the actual implementing class for the
+     * will repeatedly call the configuration service trying to get the name of the actual implementing class for the
      * given service and then configure it.
      *
      * @param resolverClass     the class to resolve the {@code configDetailsPath} against
