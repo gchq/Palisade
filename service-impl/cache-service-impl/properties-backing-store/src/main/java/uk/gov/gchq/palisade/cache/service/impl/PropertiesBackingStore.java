@@ -330,9 +330,9 @@ public class PropertiesBackingStore implements BackingStore {
                 LocalDateTime expiryTime = LocalDateTime.now().plus(d);
                 props.setProperty(makeDateKey(cacheKey), expiryTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             });
+            //run cleanup and sync
+            update(true);
         }
-        //run cleanup and sync
-        update(true);
         return true;
     }
 
@@ -377,14 +377,14 @@ public class PropertiesBackingStore implements BackingStore {
         }
         return clonedSet
                 .stream()
-                        //filter any non string properties
+                //filter any non string properties
                 .filter(String.class::isInstance)
-                        //perform cast now we know it's safe
+                //perform cast now we know it's safe
                 .map(String.class::cast)
                 .filter(x -> !x.endsWith(EXPIRY_SUFFIX))
                 .filter(x -> !x.endsWith(CLASS_SUFFIX))
                 .filter(x -> x.startsWith(
-                                prefix)
+                        prefix)
                 );
     }
 
