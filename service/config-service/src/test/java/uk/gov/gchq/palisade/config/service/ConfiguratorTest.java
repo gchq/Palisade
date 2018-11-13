@@ -15,9 +15,11 @@
  */
 package uk.gov.gchq.palisade.config.service;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import sun.security.krb5.Config;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
@@ -27,20 +29,21 @@ import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.PatternSyntaxException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ServiceConfiguratorTest {
+public class ConfiguratorTest {
 
     public interface TestService extends Service {
-
     }
 
     public static class TestServiceImpl implements TestService {
@@ -52,6 +55,21 @@ public class ServiceConfiguratorTest {
             throw new NoSuchElementException("test");
         }
     }
+
+    private static ServiceConfiguration testConfig;
+    private static final String KEY1 = "key1";
+    private static final String KEY2 = "key2";
+    private static final String VALUE1 = "value1";
+    private static final String VALUE2 = "value2";
+    private static final String VALUE3 = "value3";
+
+    @BeforeClass
+    public static void setupConfig() {
+        testConfig = new ServiceConfiguration();
+        testConfig.put(KEY1, VALUE1);
+        testConfig.put(KEY2, VALUE2);
+    }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void throwOnNegativeTimeout() {
@@ -147,5 +165,89 @@ public class ServiceConfiguratorTest {
 
         //Then
         fail("exception expected");
+    }
+
+    @Test(expected = PatternSyntaxException.class)
+    public void throwOnIllegalPattern() {
+        //Given - nothing
+        //When
+        Configurator.applyOverrides(testConfig, "[[[["); //illegal regex
+        //Then
+        fail("exception expected");
+    }
+
+    @Test
+    public void shouldBeSameWhenNoneMatch() {
+        //Given - nothing
+        //When
+        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, "no match");
+        //Then
+        assertEquals(testConfig.getConfig().size(), actual.getConfig().size());
+        assertEquals(testConfig, actual);
+    }
+
+    @Test
+    public void shouldBeSameWhenPropNotPresent() {
+        //Given
+        System.clearProperty(KEY1);
+        //When
+        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, KEY1);
+        //Then
+        assertEquals(testConfig.getConfig().size(), actual.getConfig().size());
+        assertEquals(testConfig, actual);
+    }
+
+    @Test
+    public void shouldChangeWhenPresent() {
+        //Given
+        System.setProperty(KEY2, VALUE3);
+        ServiceConfiguration expected = new ServiceConfiguration();
+        expected.put(KEY1, VALUE1);
+        expected.put(KEY2, VALUE3);
+        //When
+        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, KEY2);
+        System.clearProperty(KEY2);
+        //Then
+        assertEquals(expected.getConfig().size(), actual.getConfig().size());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldBeSameWhenPropPresentNoneMatch() {
+        //Given
+        System.setProperty(KEY2, VALUE3);
+        //When
+        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, KEY1);
+        System.clearProperty(KEY2);
+        //Then
+        assertEquals(testConfig.getConfig().size(), actual.getConfig().size());
+        assertEquals(testConfig, actual);
+    }
+
+    @Test
+    public void shouldBeSameWithEmptyOverrides() {
+        //Given
+        System.setProperty(KEY1, VALUE3);
+        //When
+        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, "");
+        System.clearProperty(KEY1);
+        //Then
+        assertEquals(testConfig.getConfig().size(), actual.getConfig().size());
+        assertEquals(testConfig, actual);
+    }
+
+    @Test
+    public void shouldChangeOnWildcard() {
+        //Given
+        System.setProperty(KEY2, VALUE3);
+        ServiceConfiguration expected = new ServiceConfiguration();
+        expected.put(KEY1, VALUE1);
+        expected.put(KEY2, VALUE3);
+        //When
+        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, KEY2);
+        System.clearProperty(KEY2);
+        //Then
+        assertEquals(expected.getConfig().size(), actual.getConfig().size());
+        assertEquals(expected, actual);
     }
 }

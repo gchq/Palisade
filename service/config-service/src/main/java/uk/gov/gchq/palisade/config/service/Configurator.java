@@ -25,12 +25,17 @@ import uk.gov.gchq.palisade.service.request.ConfigConsts;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -65,14 +70,16 @@ public class Configurator {
      * to the configuration service until a call succeeds.
      *
      * @param serviceClass the service class type to create
+     * @param overridable  array of regex for properties that can be overridden from system properties
      * @param <S>          the type of service
      * @return a created service
      * @throws NoConfigException if no configuration for the service type could be found
+     * @see Configurator#createFromConfig(Class, ServiceConfiguration, String...)
      */
-    public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass) throws NoConfigException {
+    public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass, final String... overridable) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         ServiceConfiguration config = retrieveConfig(Optional.of(serviceClass));
-        return createFromConfig(serviceClass, config);
+        return createFromConfig(serviceClass, config, overridable);
     }
 
     /**
@@ -82,35 +89,47 @@ public class Configurator {
      *
      * @param serviceClass the service class type to create
      * @param timeout      the length of time to try to retrieve a configuration before failing
+     * @param overridable  array of regex for properties that can be overridden from system properties
      * @param <S>          the type of service
      * @return a created service
      * @throws NoConfigException if no configuration for the service type could be found, or the operation timed out
+     * @see Configurator#createFromConfig(Class, ServiceConfiguration, String...)
      */
-    public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass, final Duration timeout) throws NoConfigException {
+    public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass, final Duration timeout, final String... overridable) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(timeout, "timeout");
         ServiceConfiguration config = retrieveConfig(Optional.of(serviceClass), timeout);
-        return createFromConfig(serviceClass, config);
+        return createFromConfig(serviceClass, config, overridable);
     }
 
     /**
      * Create a Palisade service from the given configuration. This method will look up the implementing class name for
      * the given service class from the configuration, attempt to create it and then call {@link
      * Service#applyConfigFrom(ServiceConfiguration)} on the object.
+     * <p>
+     * Certain keys and values can be overridden in the {@link ServiceConfiguration} from Java system properties. By default
+     * none can be overridden, but by specifying regex patterns to this method,
+     * clients can allow certain properties to be overridden. For example, providing a single entry of ".*" would allow all
+     * properties to be overridden.
      *
      * @param serviceClass the type of service class to create
      * @param config       the configuration to create the service from
+     * @param overridable  array of regex for properties that can be overridden from system properties
      * @param <S>          the type of service
      * @return a created service
      * @throws IllegalStateException if the service class could not be created, if the implementing class name couldn't
      *                               be looked up, or the instance can't be configured properly from the given
      *                               configuration
+     * @see System#getProperties()
      */
-    public static <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final ServiceConfiguration config) throws IllegalStateException {
+    public static <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final ServiceConfiguration config, final String... overridable) throws IllegalStateException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(config, "config");
+
+        ServiceConfiguration adapted = applyOverrides(config, overridable);
+
         try {
-            String servClass = config.get(serviceClass.getTypeName());
+            String servClass = adapted.get(serviceClass.getTypeName());
 
             //try to create class type
             Class<S> classImpl = (Class<S>) Class.forName(servClass).asSubclass(Service.class);
@@ -119,11 +138,51 @@ public class Configurator {
             S instance = classImpl.newInstance();
 
             //configure it
-            instance.applyConfigFrom(config);
+            instance.applyConfigFrom(adapted);
             return instance;
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchElementException e) {
             throw new IllegalStateException("couldn't create service class " + serviceClass, e);
         }
+    }
+
+    /**
+     * Allows for certain keys in the {@link ServiceConfiguration} to be overidden from values from Java system properties.
+     * Any of the regular expressions provided in {@code overridable} that match a key in the configuration key and values
+     * pairs will be replaced with the identically named system property if it exists
+     *
+     * @param config      the configuration to copy from, this object is not modified
+     * @param overridable the array of regular expressions to allow overriding for
+     * @return a new configuration object
+     */
+    public static ServiceConfiguration applyOverrides(final ServiceConfiguration config, final String... overridable) {
+        requireNonNull(config, "config");
+        requireNonNull(overridable, "overridable");
+        ServiceConfiguration adapted = new ServiceConfiguration();
+        Map<String, String> entries = config.getConfig();
+
+        //compile strings into set of patterns
+        Set<Pattern> patterns = Arrays.stream(overridable)
+                .map(Pattern::compile)
+                .collect(Collectors.toSet());
+
+        //read the ones that match a regex in the set from system properties
+        entries.entrySet().stream()
+                .forEach(entry -> {
+                    //if any of the strings in patterns matches this one then override it if it exists in system properties
+                    if (patterns.stream().anyMatch(pattern -> pattern.matcher(entry.getKey()).matches())) {
+                        adapted.put(entry.getKey(), System.getProperty(entry.getKey(), entry.getValue()));
+                    } else {
+                        //copy the old one
+                        adapted.put(entry.getKey(), entry.getValue());
+                    }
+                });
+
+        //assert same size
+        if (adapted.getConfig().size() != entries.size()) {
+            throw new RuntimeException(String.format("initial configuration contained %d items, but overridden set contains %d items", entries.size(), adapted.getConfig().size()));
+        }
+
+        return adapted;
     }
 
     /**
