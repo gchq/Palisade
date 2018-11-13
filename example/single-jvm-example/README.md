@@ -38,7 +38,7 @@ To run the example following the steps (from the root of the project):
 
 1. Compile the code
 ```bash
-mvn clean install -Pquick
+mvn clean install
 ```
 
 2. Run the example
