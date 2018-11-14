@@ -1,4 +1,4 @@
-# Proxy REST Policy Service
+# Proxy REST Config Service
 
 A Proxy to REST implementation for the Initial Configuration Service.
 

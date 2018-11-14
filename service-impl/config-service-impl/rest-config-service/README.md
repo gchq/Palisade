@@ -1,4 +1,4 @@
-# REST Policy Service
+# REST Config Service
 
 A REST implementation for the Initial Configuration Service.
 
