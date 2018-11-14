@@ -6,12 +6,14 @@ Apache Avro (org.apache.avro:avro:1.8.2):
 - Apache License, Version 2.0
 
 
-Apache Commons (org.apache.commons:commons-lang3:3.3.2, org.apache.commons:commons-jcs-core:2.1):
+Apache Commons (org.apache.commons:commons-lang3:3.3.2, org.apache.commons:commons-jcs-core:2.1, commons-io:commons-io:2.4):
 
 - Apache License, Version 2.0
 
 
-Apache Hadoop (org.apache.hadoop:hadoop-common:2.6.5):
+Apache Hadoop (org.apache.hadoop:hadoop-common:2.6.5,
+org.apache.hadoop:hadoop-client:2.6.5,
+org.apache.hadoop:hadoop-mapreduce-client-core:2.6.5):
 
 - Apache License, Version 2.0
 
@@ -116,7 +118,30 @@ Maven war plugin (org.apache.maven.plugins:maven-war-plugin:3.0.0):
 
 - Apache License, Version 2.0
 
+Maven Plugins (org.apache.maven.plugins:maven-compiler-plugin:3.7.0,
+org.apache.maven.plugins:maven-failsafe-plugin:2.18.1,
+org.apache.maven.plugins:maven-jar-plugin:2.4,
+org.apache.maven.plugins:maven-javadoc-plugin:3.0.1,
+org.apache.maven.plugins:maven-surefire-plugin:2.19.1,
+org.apache.maven.plugins:maven-shade-plugin:3.1.1,
+org.apache.maven.plugins:maven-dependency-plugin:2.10)
 
+- Apache License, Version 2.0
+
+
+Exec Maven Plugin (org.codehaus.mojo:exec-maven-plugin:1.2.1)
+
+- Apache License, Version 2.0
+
+
+Tomcat Maven Plugin (org.apache.tomcat.maven:tomcat7-maven-plugin:2.0)
+
+- Apache License, Version 2.0
+
+
+Scala Library (org.scala-lang:scala-library:2.11.8)
+
+- BSD 3-Clause License
 
 ------------------------------------------------------------------------------------------------
 
