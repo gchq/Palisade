@@ -48,7 +48,7 @@ When a user submits a query (or executes some analytic code), Palisade uses the 
 
 ### Multi-platform compatibility
 
-Palisade aims to provide a stable framework for defining and enforcing policy and auditing requirements for data access requests while allowing you to keep up with the fast-changing world of data science tools. Palisade does that by sharing the burden of creating connectors to new data storage technologies and the connectors from new data processing technologies into Palisade. Palisade is not dependant on any platform ecosystem such as Hadoop, Kubernetes, AWS, Azure, Google.io, etc. 
+Palisade aims to provide a stable framework for defining and enforcing policy and auditing requirements for data access requests while allowing you to keep up with the fast-changing world of data science tools. Palisade does that by sharing the burden of creating connectors to new data storage technologies and the connectors from new data processing technologies into Palisade. Palisade is not dependent on any platform ecosystem such as Hadoop, Kubernetes, AWS, Azure, Google.io, etc. 
 
 ### Centralised or Local Policy
 
