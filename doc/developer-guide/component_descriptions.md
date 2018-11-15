@@ -41,5 +41,9 @@ The job of the resource service is to provide the detailed information about eac
 [Check out the resource service readme for more details](../../service/resource-service/README.md)
 
 ### Cache Service
-The job of the cache service is to provide a shared cache of the information that the data service is going to require about a read request that has been registered. 
+The job of the cache service is to provide a shared short term cache of the information that a service is going to require which then forwards the data to a backing store to allow for persistence of data and sharing of data between services. 
 [Check out the cache service readme for more details](../../service/cache-service/README.md)
+
+### Config Service
+The job of the config service is to centralise all the configuration of a Palisade deployment such that all the services need to bootstrap is the details of how to connect to the config service.
+[Check out the config service readme for more details](../../service/config-service/README.md)

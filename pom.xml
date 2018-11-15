@@ -71,6 +71,13 @@
         <jetcd.version>0.0.2</jetcd.version>
         <protobuf.version>3.5.1</protobuf.version>
         <docker.maven.version>0.26.1</docker.maven.version>
+        <json4s.version>3.2.11</json4s.version>
+        <swagger.version>1.5.15</swagger.version>
+        <javassist.version>3.19.0-GA</javassist.version>
+        <scala.minor.version>2.11.8</scala.minor.version>
+        <commons-io.version>2.4</commons-io.version>
+        <reflections.version>0.9.10</reflections.version>
+
 
         <!-- Testing properties -->
         <junit.version>4.12</junit.version>

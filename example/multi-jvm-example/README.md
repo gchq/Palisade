@@ -2,7 +2,7 @@
 
 This example demonstrates 2 different users querying a database over a REST api. 
 
-The database has been hardcoded in class: uk.gov.gchq.palisade.example.data.ExampleSimpleDataReader and has been loaded with the following records:
+The example data is a text file which can be found in the example-model module and has the following records:
 
 | Property      | Visibility           | Timestamp  |
 | ------------- | -------------------- | ---------- |
@@ -38,7 +38,7 @@ To run the example following the steps (from the root of the project):
 
 1. Compile the code
 ```bash
-mvn clean install -Pquick
+mvn clean install
 ```
 
 2. Start the REST services

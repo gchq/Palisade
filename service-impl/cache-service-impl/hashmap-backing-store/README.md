@@ -1,5 +1,5 @@
-# HashMap Cache Service
+# HashMap backing store
 
-A simple implementation of a Cache Service that simply caches the objects
-in a ConcurrentHashMap. By default the cache is static so it will
+A simple implementation of a backing store that simply stores the key value pairs
+in a ConcurrentHashMap. By default the ConcurrentHashMap is static so it will
 be shared across the same JVM.
