@@ -143,6 +143,11 @@ Scala Library (org.scala-lang:scala-library:2.11.8)
 
 - BSD 3-Clause License
 
+
+Jetcd (com.coreos:jetcd-core:0.0.2)
+
+- Apache License, Version 2.0
+
 ------------------------------------------------------------------------------------------------
 
 The Palisade core-rest-service module contains the following javascript dependencies:
