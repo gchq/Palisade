@@ -58,8 +58,7 @@ if [ "$TRAVIS_BRANCH" == 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; th
         mv toDelete/_book/* .
         rm -rf toDelete
         rm -f doc/.gitignore
-        git add .
-        git commit -m "Updated documentation - $RELEASE_VERSION"
+        git commit -am "Updated documentation - $RELEASE_VERSION"
         git push -u origin gh-pages -f
         git checkout master
 
