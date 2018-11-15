@@ -21,10 +21,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
@@ -32,9 +32,9 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
+import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
-import uk.gov.gchq.palisade.util.StreamUtil;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -42,10 +42,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/")
@@ -53,13 +53,14 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 @Api(value = "/")
 public class RestResourceServiceV1 implements ResourceService {
-    public static final String SERVICE_CONFIG = "palisade.rest.resource.service.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestResourceServiceV1.class);
 
     private final ResourceService delegate;
 
+    private static ResourceService resourceService;
+
     public RestResourceServiceV1() {
-        this(System.getProperty(SERVICE_CONFIG));
+        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
     }
 
     public RestResourceServiceV1(final String serviceConfigPath) {
@@ -70,9 +71,16 @@ public class RestResourceServiceV1 implements ResourceService {
         this.delegate = delegate;
     }
 
-    private static ResourceService createService(final String serviceConfigPath) {
-        final InputStream stream = StreamUtil.openStream(RestResourceServiceV1.class, serviceConfigPath);
-        return JSONSerialiser.deserialise(stream, ResourceService.class);
+    private static synchronized ResourceService createService(final String serviceConfigPath) {
+        if (resourceService == null) {
+            resourceService = RestUtil.createService(RestResourceServiceV1.class, serviceConfigPath, ResourceService.class);
+        }
+        return resourceService;
+    }
+
+    static synchronized void setDefaultDelegate(final ResourceService resourceService) {
+        requireNonNull(resourceService, "resourceService");
+        RestResourceServiceV1.resourceService = resourceService;
     }
 
     @POST

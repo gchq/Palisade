@@ -15,25 +15,18 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>multi-jvm-example</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2-SNAPSHOT</version>
     </parent>
     <artifactId>multi-jvm-example-runner</artifactId>
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>example-model</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>simple-rest-client</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -61,6 +54,22 @@
             <artifactId>proxy-rest-policy-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>proxy-rest-config-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>jetcd-launcher</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <!-- Added for jetcd-launcher -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
 
         <!-- Test dependencies -->
 
@@ -81,6 +90,13 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>multi-jvm-example-rest-policy-service</artifactId>
+            <version>${project.parent.version}</version>
+            <classifier>classes</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>multi-jvm-example-rest-config-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
@@ -131,6 +147,13 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>rest-resource-service</artifactId>
+            <version>${project.parent.version}</version>
+            <classifier>classes</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>rest-config-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
@@ -229,6 +252,20 @@
                             </excludes>
                         </filter>
                     </filters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>.</directory>
+                            <includes>
+                                <include>exampleObj_file1.txt</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
                 </configuration>
             </plugin>
         </plugins>

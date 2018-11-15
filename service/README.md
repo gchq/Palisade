@@ -9,8 +9,10 @@ Always check that there is not an existing service that could be tweaked before 
 
 * [Audit Service](audit-service/README.md)
 * [Cache Service](cache-service/README.md)
+* [Config Service](config-service/README.md)
 * [Data Service](data-service/README.md)
 * [Palisade Service](palisade-service/README.md)
 * [Policy Service](policy-service/README.md)
 * [Resource Service](resource-service/README.md)
+* [Rest Service](rest-service/README.md)
 * [User Service](user-service/README.md)

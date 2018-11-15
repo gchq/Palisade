@@ -27,8 +27,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.util.StreamUtil;
+import uk.gov.gchq.palisade.rest.RestUtil;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -44,6 +43,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/")
@@ -53,11 +53,12 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class RestDataServiceV1 implements DataService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestDataServiceV1.class);
 
-    public static final String SERVICE_CONFIG = "palisade.rest.data.service.config.path";
     private final DataService delegate;
 
+    private static DataService dataService;
+
     public RestDataServiceV1() {
-        this(System.getProperty(SERVICE_CONFIG));
+        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
     }
 
     public RestDataServiceV1(final String serviceConfigPath) {
@@ -68,9 +69,17 @@ public class RestDataServiceV1 implements DataService {
         this.delegate = delegate;
     }
 
-    private static DataService createService(final String serviceConfigPath) {
-        final InputStream stream = StreamUtil.openStream(RestDataServiceV1.class, serviceConfigPath);
-        return JSONSerialiser.deserialise(stream, DataService.class);
+    private static synchronized DataService createService(final String serviceConfigPath) {
+        if (dataService == null) {
+            //note that here we specifically allow the DataService implementing class to be overridden from a system property
+            dataService = RestUtil.createService(RestDataServiceV1.class, serviceConfigPath, DataService.class, DataService.class.getTypeName());
+        }
+        return dataService;
+    }
+
+    static synchronized void setDefaultDelegate(final DataService dataService) {
+        requireNonNull(dataService, "dataService");
+        RestDataServiceV1.dataService = dataService;
     }
 
     @POST

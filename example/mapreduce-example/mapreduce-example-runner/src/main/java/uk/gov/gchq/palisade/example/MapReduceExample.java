@@ -29,12 +29,16 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.client.ServicesFactory;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
@@ -82,7 +86,8 @@ public class MapReduceExample extends Configured implements Tool {
     private static class ExampleReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
         private IntWritable result = new IntWritable();
 
-        public void reduce(final Text key, final Iterable<IntWritable> values, final Context context) throws IOException, InterruptedException {
+        public void reduce(final Text key, final Iterable<IntWritable> values, final Context context)
+                throws IOException, InterruptedException {
             int sum = 0;
             for (IntWritable val : values) {
                 sum += val.get();
@@ -119,23 +124,27 @@ public class MapReduceExample extends Configured implements Tool {
         job.setOutputFormatClass(TextOutputFormat.class);
         FileOutputFormat.setOutputPath(job, new Path(args[0]));
 
+        //configure the Palisade input format on an example client
+        final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
+        final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
+        try {
+            configureJob(job, cs, 2);
 
-        //configure the Palisade input format on an example client
-        ExampleSimpleClient client = new ExampleSimpleClient(FILE);
-        configureJob(job, client.getServicesFactory(), 2);
+            //next add a resource request to the job
+            addDataRequest(job, FILE, RESOURCE_TYPE, "Alice", "Payroll");
+            addDataRequest(job, FILE, RESOURCE_TYPE, "Bob", "Payroll");
 
-        //next add a resource request to the job
-        addDataRequest(job, FILE, RESOURCE_TYPE, "Alice", "Payroll");
-        addDataRequest(job, FILE, RESOURCE_TYPE, "Bob", "Payroll");
+            //launch job
+            boolean success = job.waitForCompletion(true);
 
-        //launch job
-        boolean success = job.waitForCompletion(true);
-
-        FileUtils.deleteQuietly(new File(FILE));
-
-        return (success) ? 0 : 1;
+            return (success) ? 0 : 1;
+        } finally {
+            FileUtils.deleteQuietly(new File(FILE));
+        }
     }
 
     /**

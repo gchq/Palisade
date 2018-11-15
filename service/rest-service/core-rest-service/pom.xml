@@ -20,20 +20,13 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>rest-service</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>core-rest-service</artifactId>
     <packaging>war</packaging>
 
     <properties>
-        <json4s.version>3.2.11</json4s.version>
-        <swagger.version>1.5.15</swagger.version>
-        <javassist.version>3.19.0-GA</javassist.version>
-        <scala.minor.version>2.11.8</scala.minor.version>
-        <commons-io.version>2.4</commons-io.version>
-        <reflections.version>0.9.10</reflections.version>
-
         <standalone-path>rest</standalone-path>
         <standalone-port>8080</standalone-port>
     </properties>
@@ -41,6 +34,11 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>common</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>config-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 

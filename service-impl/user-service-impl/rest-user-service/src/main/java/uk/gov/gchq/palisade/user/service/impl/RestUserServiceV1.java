@@ -24,11 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
-import uk.gov.gchq.palisade.util.StreamUtil;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -36,9 +35,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/")
@@ -46,13 +45,14 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 @Api(value = "/")
 public class RestUserServiceV1 implements UserService {
-    public static final String SERVICE_CONFIG = "palisade.rest.user.service.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestUserServiceV1.class);
 
     private final UserService delegate;
 
+    private static UserService userService;
+
     public RestUserServiceV1() {
-        this(System.getProperty(SERVICE_CONFIG));
+        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
     }
 
     public RestUserServiceV1(final String serviceConfigPath) {
@@ -63,9 +63,16 @@ public class RestUserServiceV1 implements UserService {
         this.delegate = delegate;
     }
 
-    private static UserService createService(final String serviceConfigPath) {
-        final InputStream stream = StreamUtil.openStream(RestUserServiceV1.class, serviceConfigPath);
-        return JSONSerialiser.deserialise(stream, UserService.class);
+    private static synchronized UserService createService(final String serviceConfigPath) {
+        if (userService == null) {
+            userService = RestUtil.createService(RestUserServiceV1.class, serviceConfigPath, UserService.class);
+        }
+        return userService;
+    }
+
+    static synchronized void setDefaultDelegate(final UserService userService) {
+        requireNonNull(userService, "userService");
+        RestUserServiceV1.userService = userService;
     }
 
     @POST

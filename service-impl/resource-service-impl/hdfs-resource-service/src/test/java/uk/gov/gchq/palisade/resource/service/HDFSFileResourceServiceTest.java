@@ -12,6 +12,8 @@ import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.data.service.impl.MockDataService;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.ChildResource;
@@ -25,6 +27,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 
 import java.io.BufferedWriter;
@@ -63,6 +66,9 @@ public class HDFSFileResourceServiceTest {
     private String inputPathString;
     private FileSystem fs;
     private HashMap<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail> expected;
+    private SimpleCacheService simpleCache;
+
+    private HDFSResourceService hdfsService;
 
     static {
         final String tmpDirectoryProperty = System.getProperty("java.io.tmpdir");
@@ -91,6 +97,11 @@ public class HDFSFileResourceServiceTest {
         dataType = new HashMap<>();
         simpleType = new SimpleConnectionDetail().service(new MockDataService());
         dataType.put(TYPE_VALUE, simpleType);
+
+        simpleCache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+
+        hdfsService = new HDFSResourceService(conf, simpleCache);
+        hdfsService.connectionDetail(dataFormat, dataType);
     }
 
     @Test
@@ -106,8 +117,7 @@ public class HDFSFileResourceServiceTest {
         ), simpleType);
 
         //when
-        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hdfsService.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -119,10 +129,9 @@ public class HDFSFileResourceServiceTest {
         final String id = inputPathString + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
 
         //when
-        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
         final String found = HDFS + "/unknownDir/" + id;
         try {
-            service.getResourcesById(new GetResourcesByIdRequest().resourceId(found));
+            hdfsService.getResourcesById(new GetResourcesByIdRequest().resourceId(found));
             fail("exception expected");
         } catch (Exception e) {
             //then
@@ -148,8 +157,7 @@ public class HDFSFileResourceServiceTest {
         ), simpleType);
 
         //when
-        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hdfsService.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -174,13 +182,25 @@ public class HDFSFileResourceServiceTest {
         ), simpleType);
 
         //when
-        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = service.getResourcesByType(new GetResourcesByTypeRequest().type(TYPE_VALUE));
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hdfsService.getResourcesByType(new GetResourcesByTypeRequest().type(TYPE_VALUE));
 
         //then
         assertEquals(expected, resourcesById.join());
     }
 
+    @Test
+    public void shouldBeEqualAfterConfigure() {
+        //given
+        ServiceConfiguration is = new ServiceConfiguration();
+        hdfsService.recordCurrentConfigTo(is);
+
+        //when
+        HDFSResourceService actual = new HDFSResourceService();
+        actual.applyConfigFrom(is);
+
+        //then
+        assertEquals(hdfsService, actual);
+    }
 
     @Test
     public void shouldGetResourcesByFormat() throws Exception {
@@ -201,8 +221,7 @@ public class HDFSFileResourceServiceTest {
         ), simpleType);
 
         //when
-        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = service.getResourcesBySerialisedFormat(new GetResourcesBySerialisedFormatRequest().serialisedFormat(FORMAT_VALUE));
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hdfsService.getResourcesBySerialisedFormat(new GetResourcesBySerialisedFormatRequest().serialisedFormat(FORMAT_VALUE));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -225,8 +244,7 @@ public class HDFSFileResourceServiceTest {
                 )
         ), simpleType);
         //when
-        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = service.getResourcesByResource(new GetResourcesByResourceRequest().resource(new DirectoryResource().id("file:///" + id)));
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hdfsService.getResourcesByResource(new GetResourcesByResourceRequest().resource(new DirectoryResource().id("file:///" + id)));
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -234,9 +252,8 @@ public class HDFSFileResourceServiceTest {
 
     @Test
     public void testAddResource() throws Exception {
-        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
         try {
-            service.addResource(null);
+            hdfsService.addResource(null);
             fail("exception expected");
         } catch (UnsupportedOperationException e) {
             assertEquals(HDFSResourceService.ERROR_ADD_RESOURCE, e.getMessage());
@@ -249,29 +266,29 @@ public class HDFSFileResourceServiceTest {
         dataType.clear();
 
         dataFormat.put("testKey1", new SimpleConnectionDetail().service(new MockDataService()));
-        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final byte[] serialise = JSONSerialiser.serialise(service, true);
+        //use local copy for this test
+        final HDFSResourceService service = new HDFSResourceService(conf, simpleCache);
 
+        service.connectionDetail(dataFormat, dataType);
+        final byte[] serialise = JSONSerialiser.serialise(service, true);
         final String expected = "{\n" +
                 "  \"@id\" : 1,\n" +
                 "  \"class\" : \"uk.gov.gchq.palisade.resource.service.HDFSResourceService\",\n" +
+                "  \"cacheService\" : {\n" +
+                "    \"@id\" : 2,\n" +
+                "    \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService\",\n" +
+                "    \"backingStore\" : {\n" +
+                "      \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore\",\n" +
+                "      \"useStatic\" : true\n" +
+                "    },\n" +
+                "    \"codecs\" : { }\n" +
+                "  },\n" +
                 "  \"conf\" : {\n" +
-                "  },\n" +
-                "  \"dataFormat\" : {\n" +
-                "    \"testKey1\" : {\n" +
-                "      \"class\" : \"uk.gov.gchq.palisade.service.request.SimpleConnectionDetail\",\n" +
-                "      \"service\" : {\n" +
-                "        \"class\" : \"uk.gov.gchq.palisade.data.service.impl.MockDataService\",\n" +
-                "        \"@id\" : 2,\n" +
-                "        \"class\" : \"uk.gov.gchq.palisade.data.service.impl.MockDataService\"\n" +
-                "      }\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"dataType\" : { }\n" +
+                "  }\n" +
                 "}\n";
 
-        final String StringOfSerialised = new String(serialise);
-        final String[] split = StringOfSerialised.split(System.lineSeparator());
+        final String stringOfSerialised = new String(serialise);
+        final String[] split = stringOfSerialised.split(System.lineSeparator());
         final StringBuilder modified = new StringBuilder();
         for (String s : split) {
             if (!s.startsWith("    \"fs.defaultFS")) {
@@ -280,12 +297,12 @@ public class HDFSFileResourceServiceTest {
         }
 
         final String modifiedActual = modified.toString();
-        assertEquals(StringOfSerialised, expected, modifiedActual);
-        assertEquals(StringOfSerialised, service, JSONSerialiser.deserialise(serialise, HDFSResourceService.class));
+        assertEquals(stringOfSerialised, expected, modifiedActual);
+        assertEquals(stringOfSerialised, service, JSONSerialiser.deserialise(serialise, HDFSResourceService.class));
     }
 
     @Test
-    public void shouldErrorWithNotConnectionDetails() throws Exception {
+    public void shouldErrorWithNoConnectionDetails() throws Exception {
         //given
         dataFormat.clear();
         dataType.clear();
@@ -295,9 +312,10 @@ public class HDFSFileResourceServiceTest {
         expected.put(new FileResource().id(id).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE), simpleType);
 
         //when
-        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
         try {
-            final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
+            //this test needs a local HDFS resource service
+            final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = new HDFSResourceService(conf, simpleCache).connectionDetail(dataFormat, dataType)
+                    .getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
             resourcesById.get();
             fail("exception expected");
         } catch (ExecutionException e) {
@@ -320,8 +338,7 @@ public class HDFSFileResourceServiceTest {
         ), simpleFormat);
 
         //when
-        final HDFSResourceService service = new HDFSResourceService(conf, dataFormat, dataType);
-        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = service.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hdfsService.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
 
         //then
         assertEquals(expected, resourcesById.join());

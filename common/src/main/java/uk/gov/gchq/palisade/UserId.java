@@ -71,7 +71,7 @@ public class UserId implements Cloneable {
      * Adds a key value pair to a map which can then be used within the policy rules to make policy decisions.
      *
      * @param reference the key that references the value in the map
-     * @param value the object that you want to store in the map
+     * @param value     the object that you want to store in the map
      * @return the UserId object
      */
     public UserId field(final String reference, final Object value) {

@@ -19,17 +19,12 @@ package uk.gov.gchq.palisade.resource.service.impl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import uk.gov.gchq.palisade.data.service.impl.MockDataService;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
-import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
+import uk.gov.gchq.palisade.resource.service.request.*;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
@@ -54,7 +49,7 @@ public class RestResourceServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        System.setProperty(RestResourceServiceV1.SERVICE_CONFIG, "mockConfig.json");
+        RestResourceServiceV1.setDefaultDelegate(new MockResourceService());
         proxy = new ProxyRestResourceService("http://localhost:8082/resource");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();

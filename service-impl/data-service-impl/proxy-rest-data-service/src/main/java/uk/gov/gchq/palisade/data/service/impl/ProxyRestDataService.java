@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
+import uk.gov.gchq.palisade.service.Service;
 
 import javax.ws.rs.core.Response;
 
@@ -33,6 +34,11 @@ public class ProxyRestDataService extends ProxyRestService implements DataServic
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyRestDataService.class);
 
     public ProxyRestDataService() {
+    }
+
+    @Override
+    protected Class<? extends Service> getServiceClass() {
+        return DataService.class;
     }
 
     public ProxyRestDataService(final String baseUrl) {
