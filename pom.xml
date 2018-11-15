@@ -21,7 +21,7 @@
     <groupId>uk.gov.gchq.palisade</groupId>
     <artifactId>palisade</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.2.0</version>
     <modules>
         <module>common</module>
         <module>service</module>
