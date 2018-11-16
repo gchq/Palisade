@@ -53,11 +53,10 @@ if [ "$TRAVIS_BRANCH" == 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; th
         npm install -g gitbook-cli > /dev/null 2>&1
         ./doc/scripts/buildGitbook.sh
         git checkout --orphan gh-pages
-        mkdir toDelete
-        mv * toDelete > /dev/null 2>&1
-        mv toDelete/_book/* .
-        rm -rf toDelete
-        rm -f doc/.gitignore
+        mv _book .book
+        rm -rf *
+        mv .book/* .
+        rm -rf .book
         git commit -am "Updated documentation - $RELEASE_VERSION"
         git push -u origin gh-pages -f
         git checkout master
