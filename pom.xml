@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.gov.gchq.palisade</groupId>
@@ -64,7 +65,11 @@
         <commons-io.version>2.4</commons-io.version>
         <commons-lang3.version>3.3.2</commons-lang3.version>
         <jersey.version>2.25</jersey.version>
+        <glassfish.hk2.version>2.5.0-b30</glassfish.hk2.version>
         <servlet-api.version>3.1.0</servlet-api.version>
+        <javax.ws.rs.version>2.0.1</javax.ws.rs.version>
+        <javax.ws.rs.jsr311.version>1.1.1</javax.ws.rs.jsr311.version>
+        <grizzly.version>2.3.28</grizzly.version>
         <hadoop.version>2.6.5</hadoop.version>
         <avro.version>1.8.2</avro.version>
         <koryphe.version>1.5.0</koryphe.version>
@@ -79,8 +84,10 @@
         <reflections.version>0.9.10</reflections.version>
 
 
+
         <!-- Testing properties -->
         <junit.version>4.12</junit.version>
+        <hamcrest.version>1.3</hamcrest.version>
         <mockito.version>1.10.19</mockito.version>
         <surefire.plugin.version>2.19.1</surefire.plugin.version>
         <failsafe.version>2.18.1</failsafe.version>
@@ -91,9 +98,9 @@
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
         <findbugs.plugin.version>3.0.1</findbugs.plugin.version>
         <testcontainers.version>1.9.1</testcontainers.version>
-        <surefireArgLine />
-        <failsafeArgLine />
-        <exclude.tests />
+        <surefireArgLine/>
+        <failsafeArgLine/>
+        <exclude.tests/>
 
         <!-- Other -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -401,6 +408,23 @@
                             <goal>aggregate</goal>
                         </goals>
                         <phase>site</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>analyze</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <scriptableOutput>true</scriptableOutput>
+                            <outputXML>true</outputXML>
+                            <failOnWarning>false</failOnWarning>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
