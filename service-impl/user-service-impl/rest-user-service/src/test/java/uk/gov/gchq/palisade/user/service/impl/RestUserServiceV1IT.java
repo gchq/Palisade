@@ -43,7 +43,7 @@ public class RestUserServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        System.setProperty(RestUserServiceV1.SERVICE_CONFIG, "mockConfig.json");
+        RestUserServiceV1.setDefaultDelegate(new MockUserService());
         proxy = new ProxyRestUserService("http://localhost:8083/user");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();

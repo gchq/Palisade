@@ -34,8 +34,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -46,7 +50,7 @@ public class RestDataServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        System.setProperty(RestDataServiceV1.SERVICE_CONFIG, "mockConfig.json");
+        RestDataServiceV1.setDefaultDelegate(new MockDataService());
         proxy = new ProxyRestDataService("http://localhost:8084/data");
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
@@ -60,7 +64,7 @@ public class RestDataServiceV1IT {
     }
 
     @Test
-    public <T> void shouldRead() throws IOException {
+    public void shouldRead() throws IOException {
         // Given
         final DataService dataService = Mockito.mock(DataService.class);
         MockDataService.setMock(dataService);
@@ -82,5 +86,32 @@ public class RestDataServiceV1IT {
         // Then
         assertArrayEquals(data, IOUtils.toByteArray(result.getData()));
         verify(dataService).read(request);
+    }
+
+    @Test
+    public void proxyServiceShouldThrowOriginalException() {
+        // Given
+        final DataService dataService = Mockito.mock(DataService.class);
+        MockDataService.setMock(dataService);
+
+        final SystemResource sysResource = new SystemResource().id("File");
+        final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
+        final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);
+
+        final String message = "some message";
+        given(dataService.read(request)).willThrow(new IllegalArgumentException(message));
+
+        // When / Then
+        try {
+            final CompletableFuture<ReadResponse> futureRead = proxy.read(request);
+            futureRead.join();
+            fail("Exception expected");
+        } catch (final CompletionException e) {
+            assertTrue("CompletionException cause should be an IllegalArgumentException",
+                    e.getCause() instanceof IllegalArgumentException);
+            assertEquals(message, e.getCause().getMessage());
+        } catch (final IllegalArgumentException e) {
+            assertEquals(message, e.getMessage());
+        }
     }
 }

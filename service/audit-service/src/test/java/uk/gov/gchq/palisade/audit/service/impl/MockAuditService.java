@@ -22,6 +22,8 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 
+import java.util.concurrent.CompletableFuture;
+
 public class MockAuditService implements AuditService {
     private static AuditService mock = Mockito.mock(AuditService.class);
 
@@ -35,8 +37,9 @@ public class MockAuditService implements AuditService {
         }
         MockAuditService.mock = mock;
     }
+
     @Override
-    public void audit(final AuditRequest request) {
-        mock.audit(request);
+    public CompletableFuture<Boolean> audit(final AuditRequest request) {
+        return mock.audit(request);
     }
 }

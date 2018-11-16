@@ -9,8 +9,6 @@ result=0
 if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Running verify script: mvn -q verify -P analyze -B"
     mvn -q verify -P analyze -B
-    echo "Running verify script: mvn -q verify -P test -B"
-    mvn -q verify -P test -B
     echo "Starting the multi-jvm-example containerised"
     ./example/multi-jvm-example/scripts/dockerComposeUp.sh
     #Sleep to ensure all containers are up

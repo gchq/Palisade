@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.user.service.impl;
 
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
+import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
@@ -26,6 +27,11 @@ import java.util.concurrent.CompletableFuture;
 
 public class ProxyRestUserService extends ProxyRestService implements UserService {
     public ProxyRestUserService() {
+    }
+
+    @Override
+    protected Class<? extends Service> getServiceClass() {
+        return UserService.class;
     }
 
     public ProxyRestUserService(final String baseUrl) {

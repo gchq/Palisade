@@ -28,6 +28,7 @@ import uk.gov.gchq.palisade.rest.mapper.PalisadeCheckedExceptionMapper;
 import uk.gov.gchq.palisade.rest.mapper.PalisadeRuntimeExceptionMapper;
 import uk.gov.gchq.palisade.rest.mapper.ProcessingExceptionMapper;
 import uk.gov.gchq.palisade.rest.mapper.WebApplicationExceptionMapper;
+import uk.gov.gchq.palisade.rest.serialisation.OctetStreamMessageBodyWriter;
 import uk.gov.gchq.palisade.rest.serialisation.RestJsonProvider;
 import uk.gov.gchq.palisade.rest.serialisation.TextMessageBodyWriter;
 
@@ -63,6 +64,7 @@ public abstract class AbstractApplicationConfig extends ResourceConfig {
         resources.add(SwaggerSerializers.class);
         resources.add(RestJsonProvider.class);
         resources.add(TextMessageBodyWriter.class);
+        resources.add(OctetStreamMessageBodyWriter.class);
     }
 
     protected void addExceptionMappers() {

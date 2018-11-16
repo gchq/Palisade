@@ -17,10 +17,15 @@
 package uk.gov.gchq.palisade.example;
 
 import org.apache.commons.io.FileUtils;
+
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.client.ConfiguredClientServices;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.io.File;
@@ -33,6 +38,14 @@ import static uk.gov.gchq.palisade.example.SingleJvmExample.createDataPath;
 import static uk.gov.gchq.palisade.util.JsonAssert.assertEquals;
 
 public class SingleJvmExampleIT {
+
+    private static ConfigurationService configService;
+
+    @BeforeClass
+    public static void createConfig() {
+        configService = ExampleConfigurator.setupSingleJVMConfigurationService();
+    }
+
     @AfterClass
     public static void deleteFile() {
         FileUtils.deleteQuietly(new File(FILE));
@@ -57,7 +70,8 @@ public class SingleJvmExampleIT {
     @Test
     public void shouldReadAsAlice() throws Exception {
         // Given
-        final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // When
         final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
@@ -77,7 +91,8 @@ public class SingleJvmExampleIT {
     @Test
     public void shouldReadAsBob() throws Exception {
         // Given
-        final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         // When
         final Stream<ExampleObj> aliceResults = client.read(FILE, "Bob", "Payroll");

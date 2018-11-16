@@ -6,11 +6,12 @@
 
 The core API for the cache service.
 
-The purpose of the cache service is to store the information that the data
-service will require based on a `registerDataRequest()` made to the Palisade
-service. The reason this is required is because you might have multiple
-instances of the Palisade service running (for resilience) and the registration request might
-go to a different Palisade service instance to the `getDataRequestConfig()`.
+The purpose of the cache service is to act as a short term caching layer between 
+a service and a backing store that ultimately stores the data for the duration 
+of the TTL. As such the cache service will usually be part of another services 
+process and not shared between different services. 
+
+The cache service has three methods `add()`, `get()` and `list()`.
 
 The data in the cache should be maintained by a time to live (TTL) value rather than
 manually removing after the get request as any scalable deployment would likely make

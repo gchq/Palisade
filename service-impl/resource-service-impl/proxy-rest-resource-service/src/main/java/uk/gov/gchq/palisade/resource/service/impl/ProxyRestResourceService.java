@@ -26,6 +26,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
+import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 
 import java.util.Map;
@@ -35,6 +36,11 @@ public class ProxyRestResourceService extends ProxyRestService implements Resour
     public static final ResultType OUTPUT_TYPE = new ResultType();
 
     public ProxyRestResourceService() {
+    }
+
+    @Override
+    protected Class<? extends Service> getServiceClass() {
+        return ResourceService.class;
     }
 
     public ProxyRestResourceService(final String baseUrl) {

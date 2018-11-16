@@ -21,6 +21,9 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.client.ConfiguredClientServices;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.io.File;
@@ -31,6 +34,7 @@ import java.util.stream.Stream;
 
 public class SingleJvmExample {
     protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleJvmExample.class);
 
     public static void main(final String[] args) throws Exception {
@@ -40,7 +44,10 @@ public class SingleJvmExample {
     public void run() throws Exception {
         createDataPath();
         try {
-            final ExampleSimpleClient client = new ExampleSimpleClient(FILE);
+            final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
+            //request the client configuration by not specifying a service
+            final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
+            final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
             LOGGER.info("");
             LOGGER.info("Alice is reading file1...");
