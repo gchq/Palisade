@@ -17,6 +17,9 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <modules>
+        <module>hr-data-generator</module>
+    </modules>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>palisade</artifactId>
@@ -33,6 +36,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
+                <module>hr-data-generator</module>
                 <module>example-model</module>
                 <module>single-jvm-example</module>
                 <module>multi-jvm-example</module>
@@ -42,6 +46,7 @@
         <profile>
             <id>integration-test</id>
             <modules>
+                <module>hr-data-generator</module>
                 <module>example-model</module>
                 <module>single-jvm-example</module>
                 <module>multi-jvm-example</module>
@@ -51,6 +56,7 @@
         <profile>
             <id>test</id>
             <modules>
+                <module>hr-data-generator</module>
                 <module>example-model</module>
                 <module>single-jvm-example</module>
                 <module>multi-jvm-example</module>
