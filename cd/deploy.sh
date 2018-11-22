@@ -57,7 +57,6 @@ if [ "$TRAVIS_BRANCH" == 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; th
         rm -rf *
         mv .book/* .
         rm -rf .book
-        rm -f doc/.gitignore
         git commit -am "Updated documentation - $RELEASE_VERSION"
         git push -u origin gh-pages -f
         git checkout master
