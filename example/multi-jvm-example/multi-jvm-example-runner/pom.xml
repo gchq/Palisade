@@ -65,7 +65,7 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>uk.gov.gchq.palisade</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>simple-client</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
@@ -75,7 +75,7 @@
             <version>${commons-io.version}</version>
         </dependency>
         <dependency>
-            <groupId>uk.gov.gchq.palisade</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>config-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
