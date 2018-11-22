@@ -66,55 +66,10 @@
             <artifactId>data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>${project.parent.groupId}</groupId>-->
-            <!--<artifactId>logger-audit-service</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>${project.parent.groupId}</groupId>-->
-            <!--<artifactId>hierarchical-policy-service</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>${project.parent.groupId}</groupId>-->
-            <!--<artifactId>simple-user-service</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>${project.parent.groupId}</groupId>-->
-            <!--<artifactId>simple-palisade-service</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>${project.parent.groupId}</groupId>-->
-            <!--<artifactId>hashmap-backing-store</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>${project.parent.groupId}</groupId>-->
-            <!--<artifactId>hdfs-resource-service</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>${project.parent.groupId}</groupId>-->
-            <!--<artifactId>hdfs-data-service</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>${project.parent.groupId}</groupId>-->
-            <!--<artifactId>simple-cache-service</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>config-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>${project.parent.groupId}</groupId>-->
-            <!--<artifactId>simple-config-service</artifactId>-->
-            <!--<version>${project.parent.version}</version>-->
-        <!--</dependency>-->
     </dependencies>
 </project>
