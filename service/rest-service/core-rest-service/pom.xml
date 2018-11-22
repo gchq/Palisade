@@ -43,16 +43,6 @@
         </dependency>
 
         <!-- External dependencies -->
-        <!--<dependency>-->
-            <!--<groupId>commons-io</groupId>-->
-            <!--<artifactId>commons-io</artifactId>-->
-            <!--<version>${commons-io.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.reflections</groupId>-->
-            <!--<artifactId>reflections</artifactId>-->
-            <!--<version>${reflections.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
@@ -107,103 +97,26 @@
             <artifactId>swagger-annotations</artifactId>
             <version>${swagger.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.glassfish.jersey.media</groupId>-->
-            <!--<artifactId>jersey-media-multipart</artifactId>-->
-            <!--<version>${jersey.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
             <version>${jersey.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.glassfish.jersey.test-framework</groupId>-->
-            <!--<artifactId>jersey-test-framework-core</artifactId>-->
-            <!--<version>${jersey.version}</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.glassfish.jersey.test-framework.providers</groupId>-->
-            <!--<artifactId>jersey-test-framework-provider-grizzly2</artifactId>-->
-            <!--<version>${jersey.version}</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.glassfish.grizzly</groupId>
             <artifactId>grizzly-http-server</artifactId>
             <version>${grizzly.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.json4s</groupId>-->
-            <!--<artifactId>json4s-core_2.10</artifactId>-->
-            <!--<version>${json4s.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.json4s</groupId>-->
-            <!--<artifactId>json4s-ext_2.10</artifactId>-->
-            <!--<version>${json4s.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.json4s</groupId>-->
-            <!--<artifactId>json4s-jackson_2.10</artifactId>-->
-            <!--<version>${json4s.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.json4s</groupId>-->
-            <!--<artifactId>json4s-native_2.10</artifactId>-->
-            <!--<version>${json4s.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.json4s</groupId>-->
-            <!--<artifactId>json4s-ast_2.10</artifactId>-->
-            <!--<version>${json4s.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.fasterxml.jackson.jaxrs</groupId>-->
-            <!--<artifactId>jackson-jaxrs-json-provider</artifactId>-->
-            <!--<version>${jackson.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.fasterxml.jackson.datatype</groupId>-->
-            <!--<artifactId>jackson-datatype-json-org</artifactId>-->
-            <!--<version>${jackson.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.fasterxml.jackson.datatype</groupId>-->
-            <!--<artifactId>jackson-datatype-jsr310</artifactId>-->
-            <!--<version>${jackson.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.fasterxml.jackson.jaxrs</groupId>-->
-            <!--<artifactId>jackson-jaxrs-base</artifactId>-->
-            <!--<version>${jackson.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.fasterxml.jackson.core</groupId>-->
-            <!--<artifactId>jackson-core</artifactId>-->
-            <!--<version>${jackson.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.scala-lang</groupId>-->
-            <!--<artifactId>scala-library</artifactId>-->
-            <!--<version>${scala.minor.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.javassist</groupId>-->
-            <!--<artifactId>javassist</artifactId>-->
-            <!--<version>${javassist.version}</version>-->
-        <!--</dependency>-->
 
         <!-- Test dependencies -->
         <dependency>
