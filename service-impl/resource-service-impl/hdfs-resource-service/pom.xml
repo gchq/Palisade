@@ -11,13 +11,6 @@
     <artifactId>hdfs-resource-service</artifactId>
 
     <dependencies>
-        <!--<dependency>-->
-        <!--<groupId>${project.parent.groupId}</groupId>-->
-        <!--<artifactId>resource-service</artifactId>-->
-        <!--<version>${project.parent.version}</version>-->
-        <!--<type>test-jar</type>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>common</artifactId>
@@ -122,12 +115,6 @@
             <artifactId>cache-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>${project.parent.groupId}</groupId>-->
-        <!--<artifactId>data-service</artifactId>-->
-        <!--<version>${project.parent.version}</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>simple-cache-service</artifactId>
