@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileStream;
 import org.apache.avro.file.DataFileWriter;
-import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.specific.SpecificDatumReader;
@@ -55,28 +54,24 @@ public class AvroSerialiser<O> implements Serialiser<O> {
 
     private final Class<O> domainClass;
     private final Schema schema;
-    private final DatumWriter<O> datumWriter;
-    private final DatumReader<O> datumReader;
 
     @JsonCreator
     public AvroSerialiser(@JsonProperty("domainClass") final Class<O> domainClass) {
         requireNonNull(domainClass, "domainClass is required");
         this.domainClass = domainClass;
         this.schema = SpecificData.get().getSchema(domainClass);
-        datumWriter = new SpecificDatumWriter<>(schema);
-        datumReader = new SpecificDatumReader<>(domainClass);
     }
 
     @Override
     public InputStream serialise(final Stream<O> stream) {
-        return new BytesSuppliedInputStream(new AvroSupplier<>(stream, datumWriter, schema));
+        return new BytesSuppliedInputStream(new AvroSupplier<>(stream, new SpecificDatumWriter<>(schema), schema));
     }
 
     @Override
     public Stream<O> deserialise(final InputStream input) {
         DataFileStream<O> in = null;
         try {
-            in = new DataFileStream<>(input, datumReader);
+            in = new DataFileStream<>(input, new SpecificDatumReader<>(domainClass));
             return StreamSupport.stream(in.spliterator(), false);
         } catch (final Exception e) {
             LOGGER.debug("Closing streams");
