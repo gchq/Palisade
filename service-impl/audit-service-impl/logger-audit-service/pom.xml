@@ -27,7 +27,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>uk.gov.gchq.palisade</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
