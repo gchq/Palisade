@@ -84,21 +84,6 @@
             <version>${jersey.version}</version>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>javax.ws.rs</groupId>-->
-            <!--<artifactId>jsr311-api</artifactId>-->
-            <!--<version>${javax.ws.rs.jsr311.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>javax.ws.rs.</groupId>-->
-            <!--<artifactId>javax.ws.rs-api</artifactId>-->
-            <!--<version>${javax.ws.rs.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>javax.ws.rs</groupId>-->
-            <!--<artifactId>javax.ws.rs-api</artifactId>-->
-            <!--<version>2.0.1</version>-->
-        <!--</dependency>-->
     </dependencies>
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
