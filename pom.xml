@@ -58,7 +58,7 @@
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <slf4j.simple.version>1.6.4</slf4j.simple.version>
         <dependency.plugin.version>2.10</dependency.plugin.version>
-        <jackson.version>2.6.5</jackson.version>
+        <jackson.version>2.9.7</jackson.version>
         <maven-war-plugin.version>3.0.0</maven-war-plugin.version>
         <apache.commons.version>3.3.2</apache.commons.version>
         <guava.version>26.0-jre</guava.version>
