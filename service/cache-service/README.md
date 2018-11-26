@@ -21,7 +21,7 @@ multiple requests to the cache due to many data services working on a subset
 of the list of resources in parallel.
 
 The cache service will store Java objects for a given length of time. How these objects are stored is left unspecified.
-The cache requests themselves (see `AddCacheRequest` for example) are all namespaced according to the Palisade service
+The cache requests themselves (see `AddCacheRequest` for an example) are all namespaced according to the Palisade service
 that they are representing. This means that different services have a separate key space, thus avoiding
 de-duplication of keys across various Palisade services. The `CacheRequest` class contains methods for setting the service
 for a particular request.
