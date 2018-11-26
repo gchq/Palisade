@@ -29,8 +29,8 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.ser.BeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -217,7 +217,7 @@ public class JSONSerialiser {
         mapper.registerModule(UserIdKeySerialiser.getModule());
 
         // Use the 'setFilters' method so it is compatible with older versions of jackson
-        mapper.setFilters(getFilterProvider());
+        mapper.setFilterProvider(getFilterProvider());
 
         return mapper;
     }
@@ -226,11 +226,11 @@ public class JSONSerialiser {
         if (null == fieldsToExclude || fieldsToExclude.length == 0) {
             // Use the 'serializeAllExcept' method so it is compatible with older versions of jackson
             return new SimpleFilterProvider()
-                    .addFilter(FILTER_FIELDS_BY_NAME, (BeanPropertyFilter) SimpleBeanPropertyFilter.serializeAllExcept());
+                    .addFilter(FILTER_FIELDS_BY_NAME, (PropertyFilter) SimpleBeanPropertyFilter.serializeAllExcept());
         }
 
         return new SimpleFilterProvider()
-                .addFilter(FILTER_FIELDS_BY_NAME, (BeanPropertyFilter) SimpleBeanPropertyFilter.serializeAllExcept(fieldsToExclude));
+                .addFilter(FILTER_FIELDS_BY_NAME, (PropertyFilter) SimpleBeanPropertyFilter.serializeAllExcept(fieldsToExclude));
     }
 
     /**
