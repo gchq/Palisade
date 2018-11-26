@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -209,9 +208,6 @@ public class JSONSerialiser {
 
         // Allow unknown properties. This will help to avoid conflicts between Palisade versions.
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, STRICT_JSON_DEFAULT);
-
-        // Using the deprecated version for compatibility with older versions of jackson
-        mapper.registerModule(new JSR310Module());
 
         // Add JDK8 module for Optional
         mapper.registerModule(new Jdk8Module());
