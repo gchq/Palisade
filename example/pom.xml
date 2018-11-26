@@ -40,7 +40,7 @@
             </modules>
         </profile>
         <profile>
-            <id>integration-test</id>
+            <id>example</id>
             <modules>
                 <module>example-model</module>
                 <module>single-jvm-example</module>
@@ -49,7 +49,7 @@
             </modules>
         </profile>
         <profile>
-            <id>test</id>
+            <id>integration-test</id>
             <modules>
                 <module>example-model</module>
                 <module>single-jvm-example</module>
@@ -58,7 +58,7 @@
             </modules>
         </profile>
 
-        <!-- quick build, unit-test, analyze and styling dont build examples -->
+        <!-- quick build, unit-test and analyse dont build examples -->
         <profile>
             <id>quick</id>
             <modules>
@@ -70,12 +70,7 @@
             </modules>
         </profile>
         <profile>
-            <id>analyze</id>
-            <modules>
-            </modules>
-        </profile>
-        <profile>
-            <id>styling</id>
+            <id>analyse</id>
             <modules>
             </modules>
         </profile>
