@@ -11,9 +11,17 @@ a service and a backing store that ultimately stores the data for the duration
 of the TTL. As such the cache service will usually be part of another services 
 process and not shared between different services. 
 
+## Operation
+
 The cache service has three methods `add()`, `get()` and `list()`.
 
 The data in the cache should be maintained by a time to live (TTL) value rather than
 manually removing after the get request as any scalable deployment would likely make
 multiple requests to the cache due to many data services working on a subset
 of the list of resources in parallel.
+
+The cache service will store Java objects for a given length of time. How these objects are stored is left unspecified.
+The cache requests themselves (see `AddCacheRequest` for an example) are all namespaced according to the Palisade service
+that they are representing. This means that different services have a separate key space, thus avoiding
+de-duplication of keys across various Palisade services. The `CacheRequest` class contains methods for setting the service
+class type for a particular request.

@@ -72,7 +72,7 @@ public class RestConfigServiceV1 implements ConfigurationService {
             //create the configuration service from the initial bootstrap information
             final InputStream stream = StreamUtil.openStream(RestConfigServiceV1.class, serviceConfigPath);
             configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-            configService.configureSelfFromCache();
+            configService.configureSelfFromConfig();
         }
         return configService;
     }
