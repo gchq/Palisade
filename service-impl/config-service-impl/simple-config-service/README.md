@@ -15,4 +15,4 @@ for that specific service class. If that fails, then a second attempt is made to
 information for all services by looking up configuration for the generic `Service` class. If this
 fails then an exception is thrown. Note that putting all configuration information for all services
 together under a `Service` key should only be used in test deployments. Production deployments
-should separate the the configuration information for each deployed service. 
+should separate the the configuration information for each deployed service.
