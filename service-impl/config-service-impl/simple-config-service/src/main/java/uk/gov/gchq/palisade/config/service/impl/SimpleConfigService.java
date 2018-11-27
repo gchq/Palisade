@@ -110,7 +110,7 @@ public class SimpleConfigService implements ConfigurationService {
     }
 
     @Override
-    public void configureSelfFromCache() {
+    public void configureSelfFromConfig() {
         try {
             LOGGER.debug("Getting auxiliary configuration from cache");
             ServiceConfiguration selfConfig = getServiceConfig(ConfigurationService.class);
