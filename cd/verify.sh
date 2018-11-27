@@ -7,8 +7,8 @@ set -e
 result=0
 
 if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
-    echo "Running verify script: mvn -q verify -P analyze -B"
-    mvn -q verify -P analyze -B
+    echo "Building Palisade code: mvn install -q -B -V"
+    mvn install -q -B -V
     echo "Starting the multi-jvm-example containerised"
     ./example/multi-jvm-example/scripts/dockerComposeUp.sh
     #Sleep to ensure all containers are up
@@ -21,8 +21,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Stopping the multi-jvm-example containers"
     ./example/multi-jvm-example/scripts/dockerComposeDown.sh
     echo "Compiling javadoc"
-    mvn -q javadoc:aggregate -P quick
-
+    mvn javadoc:aggregate -q
 fi
 
 exit $result

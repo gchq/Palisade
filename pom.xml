@@ -58,7 +58,7 @@
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <slf4j.simple.version>1.6.4</slf4j.simple.version>
         <dependency.plugin.version>2.10</dependency.plugin.version>
-        <jackson.version>2.6.5</jackson.version>
+        <jackson.version>2.9.7</jackson.version>
         <maven-war-plugin.version>3.0.0</maven-war-plugin.version>
         <apache.commons.version>3.3.2</apache.commons.version>
         <guava.version>26.0-jre</guava.version>
@@ -172,16 +172,6 @@
 
     <profiles>
         <profile>
-            <id>styling</id>
-            <properties>
-                <skipTests>true</skipTests>
-                <skip.surefire.tests>true</skip.surefire.tests>
-                <skip.failsafe.tests>true</skip.failsafe.tests>
-                <checkstyle.phase>compile</checkstyle.phase>
-                <findbugs.phase>none</findbugs.phase>
-            </properties>
-        </profile>
-        <profile>
             <id>quick</id>
             <properties>
                 <skipTests>true</skipTests>
@@ -192,21 +182,13 @@
             </properties>
         </profile>
         <profile>
-            <id>analyze</id>
+            <id>analyse</id>
             <properties>
+                <skipTests>true</skipTests>
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>test</checkstyle.phase>
                 <findbugs.phase>test</findbugs.phase>
-            </properties>
-        </profile>
-        <profile>
-            <id>test</id>
-            <properties>
-                <skip.surefire.tests>false</skip.surefire.tests>
-                <skip.failsafe.tests>false</skip.failsafe.tests>
-                <checkstyle.phase>none</checkstyle.phase>
-                <findbugs.phase>none</findbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -222,6 +204,16 @@
             <id>unit-test</id>
             <properties>
                 <skip.surefire.tests>false</skip.surefire.tests>
+                <skip.failsafe.tests>true</skip.failsafe.tests>
+                <checkstyle.phase>none</checkstyle.phase>
+                <findbugs.phase>none</findbugs.phase>
+            </properties>
+        </profile>
+        <profile>
+            <id>example</id>
+            <properties>
+                <skipTests>true</skipTests>
+                <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
                 <findbugs.phase>none</findbugs.phase>
