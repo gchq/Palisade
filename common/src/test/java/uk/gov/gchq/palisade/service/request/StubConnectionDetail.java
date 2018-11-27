@@ -35,6 +35,7 @@ public class StubConnectionDetail implements ConnectionDetail {
     private Service serviceToCreate;
 
     @Override
+    @SuppressWarnings("unchecked")
     public <S extends Service> S createService() {
         return (S) getServiceToCreate();
     }

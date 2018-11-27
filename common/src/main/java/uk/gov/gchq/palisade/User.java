@@ -222,11 +222,12 @@ public class User implements Cloneable {
         return Collections.unmodifiableMap(map);
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, FieldSetter<User>> createFieldSetters() {
         Map<String, FieldSetter<User>> map = new HashMap<>();
         map.put(USER_ID, (user, subfield, value) -> user.getUserId().setField(subfield, value));
-        map.put(ROLES, (user, subfield, value) -> user.roles(((Set<String>) value)));
-        map.put(AUTHS, (user, subfield, value) -> user.auths(((Set<String>) value)));
+        map.put(ROLES, (user, subfield, value) -> user.roles((Set<String>) value));
+        map.put(AUTHS, (user, subfield, value) -> user.auths((Set<String>) value));
         return Collections.unmodifiableMap(map);
     }
 }
