@@ -19,7 +19,7 @@ The simple cache service abstracts the details of *how* the data is stored from 
 storage responsibilities off into a `BackingStore`. A backing store is the lowest level of abstraction and only deals
 with a flat key space and the storage of byte sequences. A backing store implementation must connect to the data
 storage facility and only needs to provide basic guarantees to its behaviour. It must also implement the time to live
-functionality required by interface.
+functionality required by the interface.
 
 As well as storing the byte array data associated with a key, a backing store must also store the Java class type of the
 cached object. How this is performed is left unspecified, however a common way is to add a *second* key to the backing store
