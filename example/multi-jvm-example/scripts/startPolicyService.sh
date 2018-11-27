@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-mvn clean install -Pmulti-jvm-example-rest-policy-service -pl :multi-jvm-example-rest-policy-service -Dstandalone-path=policy -Dstandalone-port=8081 $@
+java -jar example/multi-jvm-example/multi-jvm-example-rest-policy-service/target/multi-jvm-example-rest-policy-service-*-executable.jar

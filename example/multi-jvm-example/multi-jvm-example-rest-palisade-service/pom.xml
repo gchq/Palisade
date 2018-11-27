@@ -159,6 +159,7 @@
                         <configuration>
                             <path>/${standalone-path}</path>
                             <port>${standalone-port}</port>
+                            <finalName>${project.artifactId}-${project.version}-executable.jar</finalName>
                             <systemProperties>
                                 <palisade.properties.app.title>
                                     ${project.artifactId}
@@ -180,7 +181,7 @@
                                 <id>deploy</id>
                                 <phase>integration-test</phase>
                                 <goals>
-                                    <goal>run-war</goal>
+                                    <goal>exec-war</goal>
                                 </goals>
                             </execution>
                         </executions>

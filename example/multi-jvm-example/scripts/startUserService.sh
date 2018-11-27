@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-mvn clean install -Pmulti-jvm-example-rest-user-service -pl :multi-jvm-example-rest-user-service -Dstandalone-path=user -Dstandalone-port=8083 $@
+java -jar example/multi-jvm-example/multi-jvm-example-rest-user-service/target/multi-jvm-example-rest-user-service-*-executable.jar
