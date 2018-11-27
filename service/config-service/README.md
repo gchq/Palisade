@@ -24,20 +24,19 @@ config service.
 ### Design
 
 The config service has a simple interface. The `get()` API returns a `ServiceConfiguration` object
-which is a simple map of string key/value pairs that is handed back to the service that made the request.
+which is a map of string key/value pairs that is handed back to the service that made the request.
 The only information that the config service needs on a get request is the service class making the
 request. This information is contained in the `GetConfigRequest` object.
 
-The returned `ServiceConfiguration` should contain only the information relevant and necessary for
+The returned `ServiceConfiguration` should contain only the information relevant and necessary to
 that service. It should not contain information relating to other services in a production environment
 (though this maybe acceptable for test environments) and should not contain unnecessary information
 as that encourages bloat and increases the chances of an information leak between services.
 
 One **crucial** key in the map should be the name of class to instantiate for a given service
 class. For example, having retrieved the `ServiceConfiguration` for the service class `PalisadeService`
-their should be a mapping from a key of `PalisadeService` to `SimplePalisadeService` which implements
+their should be a mapping from a key of `PalisadeService` to `SimplePalisadeService` (as an example) which implements
 it. This is needed so the correct implementation of a service can be instantiated.
-
 
 Authentication and authorisation is a separate concern; however, we note here how crucial this is
 to the config service since there is likely to be sensitive information stored by it that should
@@ -46,7 +45,7 @@ not be handed out to anonymous clients.
 Clients can request their configuration from the config service by making a `get` request with
 an empty service field in the `GetConfigRequest`. This signifies to the config service to only
 provided the minimal and safe configuration data to the requester. Nominally for a client,
-this may only include the location of where to find an instance of the `PalisadeService` since
+this might only include the location of where to find an instance of the `PalisadeService` since
 that is the client's entry point into the system.
 
 The config service differs from other services in one crucial but necessary way: it must be able
@@ -54,16 +53,16 @@ to start and enter a running state on its own. It must contain enough bootstrap 
 initialise itself without talking to another external service. The amount of bootstrap information
 should still be minimal though, i.e. to allow the config service to make itself basically functional.
 It doesn't need to contain full information to allow the config service to become fully operational.
-The `ConfigurationService` class contains a `configureSelfFromCache()` method that acts as the second
+The `ConfigurationService` class contains a `configureSelfFromConfig()` method that acts as the second
 stage of config service initialisation. Essentially, this allows the config service to achieve full
-operational status by loading any extra information from the cache service. This "self-configuration"
+operational status by loading any extra information from the stored configuration. This "self-configuration"
 allows the bootstrap information to kept to a minimum. An example is below:
 
 1. Config service starts up and reads its bootstrap information.
 2. Config service uses bootstrap information to connect to backend storage.
 3. Config service is now able to retrieve further information it might need about itself from
-backend  storage.
-4. Config service calls `configureSelfFromCache()` to complete its configuration, e.g. credentials
+backend storage.
+4. Config service calls `configureSelfFromConfig()` to complete its configuration, e.g. credentials
 for sensitive configuration data.
 5. Config service is now fully operational.
 
@@ -92,3 +91,11 @@ The methods contained in the `Configurator` class allow for the creation of a se
 configuration and more importantly, creating a runnable service from a service class name and a
 config service. It also provides timeout variants on all methods to allow the user to make the choice
 between retrying indefinitely or failing after a given amount of time.
+
+The `Configurator` class also allows for certain configuration keys to be overridden via Java system properties. The
+methods in that class accept a list of regular expressions that specify which keys can be overridden. For example, if
+service A starts up and wishes to allow configuration keys for its storage provider to be set manually from system properties,
+then it calls a method in this class with an override regex of `^.*\.storage\.backend.*$`. Thus, if the `ServiceConfiguration` provided by the config
+service contained the key `primary.storage.backend.class`, then as this matches the regex, a similarly named system property
+would replace the value in the `ServiceConfiguration`. The main purpose of this facility to allow for external orchestration
+systems to inject specific configuration items into a service's configuration without needing to interact with the config service.

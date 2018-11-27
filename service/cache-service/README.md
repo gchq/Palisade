@@ -24,4 +24,4 @@ The cache service will store Java objects for a given length of time. How these 
 The cache requests themselves (see `AddCacheRequest` for an example) are all namespaced according to the Palisade service
 that they are representing. This means that different services have a separate key space, thus avoiding
 de-duplication of keys across various Palisade services. The `CacheRequest` class contains methods for setting the service
-for a particular request.
+class type for a particular request.
