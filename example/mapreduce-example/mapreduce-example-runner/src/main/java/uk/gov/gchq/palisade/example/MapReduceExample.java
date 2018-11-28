@@ -39,6 +39,7 @@ import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
+import uk.gov.gchq.palisade.example.client.ExampleFileLoader;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
@@ -47,9 +48,7 @@ import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.Objects;
 
 /**
  * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
@@ -186,7 +185,7 @@ public class MapReduceExample extends Configured implements Tool {
             outputDir = args[0];
         }
         // create the data in the correct place
-        createDataPath();
+        ExampleFileLoader.createDataPath(FILE, "/example/exampleObj_file1.txt", MapReduceExample.class);
         //remove this as it needs to be not present when the job runs
         FileUtils.deleteDirectory(new File(outputDir));
         try {
@@ -207,15 +206,6 @@ public class MapReduceExample extends Configured implements Tool {
             return Files.createTempDirectory("mapreduce-example-").toAbsolutePath().toString();
         } catch (IOException e) {
             LOGGER.error("Failed to create an output directory.");
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void createDataPath() {
-        try (final InputStream data = MapReduceExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
-            Objects.requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
-            FileUtils.copyInputStreamToFile(data, new File(FILE));
-        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

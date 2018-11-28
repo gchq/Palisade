@@ -24,13 +24,17 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
+import uk.gov.gchq.palisade.example.client.ExampleFileLoader;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 public class SingleJvmExample {
     protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
@@ -42,7 +46,7 @@ public class SingleJvmExample {
     }
 
     public void run() throws Exception {
-        createDataPath();
+        ExampleFileLoader.createDataPath(FILE, "/example/exampleObj_file1.txt", this.getClass());
         try {
             final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
             //request the client configuration by not specifying a service
@@ -62,15 +66,6 @@ public class SingleJvmExample {
             bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {
             FileUtils.deleteQuietly(new File(FILE));
-        }
-    }
-
-    static void createDataPath() {
-        try (final InputStream data = SingleJvmExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
-            Objects.requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
-            FileUtils.copyInputStreamToFile(data, new File(FILE));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }

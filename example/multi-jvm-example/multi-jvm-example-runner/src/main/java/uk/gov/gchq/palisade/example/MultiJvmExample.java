@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
+import uk.gov.gchq.palisade.example.client.ExampleFileLoader;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.io.File;
@@ -47,7 +48,7 @@ public class MultiJvmExample {
     }
 
     public void run() throws Exception {
-        createDataPath();
+        ExampleFileLoader.createDataPath(FILE, "/example/exampleObj_file1.txt", this.getClass());
         EtcdClusterResource etcd = null;
         try {
             etcd = new EtcdClusterResource("test-etcd", 1);
@@ -78,16 +79,6 @@ public class MultiJvmExample {
             if (etcd != null) {
                 etcd.cluster().close();
             }
-        }
-    }
-
-    static void createDataPath() {
-        final File targetFile = new File(FILE);
-        try (final InputStream data = MultiJvmExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
-            requireNonNull(data, "couldn't load file: " + FILE);
-            FileUtils.copyInputStreamToFile(data, targetFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
