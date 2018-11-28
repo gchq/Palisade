@@ -60,7 +60,8 @@ import java.nio.file.Files;
 public class MapReduceExample extends Configured implements Tool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
 
-    protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
+    protected static final String DESTINATION = new File("exampleObj_file1.txt").getAbsolutePath();
+    protected static final String FILE = new File("example/exampleObj_file1.txt").getAbsolutePath();
     protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
     private static final String RESOURCE_TYPE = "exampleObj";
 
@@ -126,24 +127,20 @@ public class MapReduceExample extends Configured implements Tool {
         //configure the Palisade input format on an example client
         final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
 
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
-        try {
-            configureJob(job, cs, 2);
+        configureJob(job, cs, 2);
 
-            //next add a resource request to the job
-            addDataRequest(job, FILE, RESOURCE_TYPE, "Alice", "Payroll");
-            addDataRequest(job, FILE, RESOURCE_TYPE, "Bob", "Payroll");
+        //next add a resource request to the job
+        addDataRequest(job, DESTINATION, RESOURCE_TYPE, "Alice", "Payroll");
+        addDataRequest(job, DESTINATION, RESOURCE_TYPE, "Bob", "Payroll");
 
-            //launch job
-            boolean success = job.waitForCompletion(true);
+        //launch job
+        boolean success = job.waitForCompletion(true);
 
-            return (success) ? 0 : 1;
-        } finally {
-            FileUtils.deleteQuietly(new File(FILE));
-        }
+        return (success) ? 0 : 1;
     }
 
     /**
@@ -185,7 +182,7 @@ public class MapReduceExample extends Configured implements Tool {
             outputDir = args[0];
         }
         // create the data in the correct place
-        ExampleFileLoader.createDataPath(FILE, "/example/exampleObj_file1.txt", MapReduceExample.class);
+        ExampleFileLoader.createDataPath(FILE, DESTINATION, MapReduceExample.class);
         //remove this as it needs to be not present when the job runs
         FileUtils.deleteDirectory(new File(outputDir));
         try {
@@ -197,7 +194,7 @@ public class MapReduceExample extends Configured implements Tool {
             ToolRunner.run(conf, new MapReduceExample(), new String[]{outputDir});
         } finally {
             // clean up
-            Files.deleteIfExists(new File(FILE).toPath());
+            FileUtils.deleteQuietly(new File(DESTINATION));
         }
     }
 

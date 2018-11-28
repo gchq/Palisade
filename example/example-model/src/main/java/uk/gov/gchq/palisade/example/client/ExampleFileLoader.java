@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.example.client;
 
 import org.apache.commons.io.FileUtils;
+
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.File;
@@ -28,7 +29,10 @@ import static java.util.Objects.requireNonNull;
 /**
  * Utility methods for example clients.
  */
-public class ExampleFileLoader {
+public final class ExampleFileLoader {
+
+    private ExampleFileLoader() {
+    }
 
     /**
      * Copies the example file containing serialised {@link uk.gov.gchq.palisade.example.ExampleObj} records to the given
@@ -43,8 +47,8 @@ public class ExampleFileLoader {
         requireNonNull(file, "file");
         requireNonNull(destination, "destination");
         requireNonNull(resource, "resource");
-        final File targetFile = new File(file);
-        try (final InputStream data = StreamUtil.openStream(resource, destination)) {
+        final File targetFile = new File(destination);
+        try (final InputStream data = StreamUtil.openStream(resource, file)) {
             requireNonNull(data, "couldn't load file: " + file);
             FileUtils.copyInputStreamToFile(data, targetFile);
         } catch (IOException e) {

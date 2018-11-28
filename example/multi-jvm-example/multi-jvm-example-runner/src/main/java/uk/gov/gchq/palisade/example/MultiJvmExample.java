@@ -29,26 +29,23 @@ import uk.gov.gchq.palisade.example.client.ExampleFileLoader;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Objects.requireNonNull;
-
 public class MultiJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
-    protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
+    protected static final String DESTINATION = new File("exampleObj_file1.txt").getAbsolutePath();
+    protected static final String FILE = new File("example/exampleObj_file1.txt").getAbsolutePath();
 
     public static void main(final String[] args) throws Exception {
         new MultiJvmExample().run();
     }
 
     public void run() throws Exception {
-        ExampleFileLoader.createDataPath(FILE, "/example/exampleObj_file1.txt", this.getClass());
+        ExampleFileLoader.createDataPath(FILE, DESTINATION, this.getClass());
         EtcdClusterResource etcd = null;
         try {
             etcd = new EtcdClusterResource("test-etcd", 1);
@@ -61,21 +58,21 @@ public class MultiJvmExample {
             final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs,
                     Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-            final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+            final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
 
             LOGGER.info("");
             LOGGER.info("Alice is reading file1...");
-            final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
+            final Stream<ExampleObj> aliceResults = client.read(DESTINATION, "Alice", "Payroll");
             LOGGER.info("Alice got back: ");
             aliceResults.map(Object::toString).forEach(LOGGER::info);
 
             LOGGER.info("");
             LOGGER.info("Bob is reading file1...");
-            final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
+            final Stream<ExampleObj> bobResults = client.read(DESTINATION, "Bob", "Payroll");
             LOGGER.info("Bob got back: ");
             bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {
-            FileUtils.deleteQuietly(new File(FILE));
+            FileUtils.deleteQuietly(new File(DESTINATION));
             if (etcd != null) {
                 etcd.cluster().close();
             }
