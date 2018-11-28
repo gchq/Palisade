@@ -20,7 +20,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>example</artifactId>
-        <version>0.1.2-SNAPSHOT</version>
+        <version>0.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>mapreduce-example</artifactId>
     <packaging>pom</packaging>
