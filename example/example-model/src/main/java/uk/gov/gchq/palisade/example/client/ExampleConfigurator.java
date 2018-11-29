@@ -16,6 +16,8 @@
 package uk.gov.gchq.palisade.example.client;
 
 import org.apache.hadoop.conf.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
@@ -52,7 +54,11 @@ import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 import uk.gov.gchq.palisade.user.service.impl.SimpleUserService;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +67,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -70,6 +77,8 @@ import static java.util.Objects.requireNonNull;
 public final class ExampleConfigurator {
 
     protected static final String RESOURCE_TYPE = "exampleObj";
+    private static final String HADOOP_CONF_PATH = "HADOOP_CONF_PATH";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExampleConfigurator.class);
 
     private ExampleConfigurator() {
     }
@@ -250,7 +259,8 @@ public final class ExampleConfigurator {
      * @throws IOException if a failure occurs creating the reader
      */
     private static HDFSDataReader createDataReader(final ConfigurationService configService, final CacheService cacheService) throws IOException {
-        HDFSDataReader reader = new HDFSDataReader().conf(new Configuration());
+        Configuration conf = createHadoopConfiguration();
+        HDFSDataReader reader = new HDFSDataReader().conf(conf);
         reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
         return reader;
     }
@@ -342,7 +352,36 @@ public final class ExampleConfigurator {
     }
 
     /**
-     * Makes a resource service.
+     * Creates a Hadoop configuration object. This loads the default Hadoop configuration and then checks the environment
+     * variable {@link ExampleConfigurator#HADOOP_CONF_PATH} for a list of paths. Each one in the environment variable is
+     * loaded into the configuration.
+     *
+     * @return a Hadoop configuration object
+     */
+    private static Configuration createHadoopConfiguration() {
+        Configuration ret = new Configuration();
+        String extraFiles = System.getenv(HADOOP_CONF_PATH);
+        if (nonNull(extraFiles)) {
+            String[] parts = extraFiles.split(File.pathSeparator);
+            for (String part : parts) {
+                try {
+                    if (Files.exists(Paths.get(part))) {
+                        LOGGER.debug("Loading extra configuration from {}", part);
+                        ret.addResource(new File(part).toURI().toURL());
+                    } else {
+                        LOGGER.warn("No such file {}", part);
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Makes a resource service. A Hadoop configuration is created that is provided to the resource service. The configuration
+     * is created via the {@link ExampleConfigurator#createHadoopConfiguration()} method.
      *
      * @param configService the Palisade configuration service
      * @param cache         the Palisade cache service
@@ -350,7 +389,8 @@ public final class ExampleConfigurator {
      */
     private static HDFSResourceService createResourceService(final ConfigurationService configService, final CacheService cache) {
         try {
-            HDFSResourceService resource = new HDFSResourceService().conf(new Configuration()).cacheService(cache);
+            Configuration conf = createHadoopConfiguration();
+            HDFSResourceService resource = new HDFSResourceService().conf(conf).cacheService(cache);
             return resource;
         } catch (IOException e) {
             throw new RuntimeException(e);
