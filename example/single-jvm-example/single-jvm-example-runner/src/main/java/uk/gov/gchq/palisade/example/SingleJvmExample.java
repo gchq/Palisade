@@ -17,22 +17,21 @@
 package uk.gov.gchq.palisade.example;
 
 import org.apache.commons.io.FileUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleFileLoader;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.client.ExampleUtils;
 
 import java.io.File;
 import java.util.stream.Stream;
 
 public class SingleJvmExample {
     protected static final String DESTINATION = new File("exampleObj_file1.txt").getAbsolutePath();
-    protected static final String FILE = new File("example/exampleObj_file1.txt").getAbsolutePath();
+    protected static final String FILE = new File("example/exampleObj_file1.txt").getPath();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleJvmExample.class);
 
@@ -41,7 +40,7 @@ public class SingleJvmExample {
     }
 
     public void run() throws Exception {
-        ExampleFileLoader.createDataPath(FILE, DESTINATION, this.getClass());
+        ExampleUtils.createDataPath(FILE, DESTINATION, this.getClass());
         try {
             final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
             //request the client configuration by not specifying a service

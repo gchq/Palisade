@@ -26,7 +26,7 @@ import org.junit.Test;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleFileLoader;
+import uk.gov.gchq.palisade.example.client.ExampleUtils;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.io.File;
@@ -49,12 +49,12 @@ public class SingleJvmExampleIT {
 
     @AfterClass
     public static void deleteFile() {
-        FileUtils.deleteQuietly(new File(FILE));
+        FileUtils.deleteQuietly(new File(DESTINATION));
     }
 
     @Before
     public void before() {
-        ExampleFileLoader.createDataPath(FILE, DESTINATION, SingleJvmExample.class);
+        ExampleUtils.createDataPath(FILE, DESTINATION, SingleJvmExample.class);
     }
 
     @Test
@@ -72,10 +72,10 @@ public class SingleJvmExampleIT {
     public void shouldReadAsAlice() throws Exception {
         // Given
         final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(DESTINATION, "Alice", "Payroll");
 
         // Then
         assertEquals(
@@ -93,10 +93,10 @@ public class SingleJvmExampleIT {
     public void shouldReadAsBob() throws Exception {
         // Given
         final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(FILE, "Bob", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(DESTINATION, "Bob", "Payroll");
 
         // Then
         assertEquals(

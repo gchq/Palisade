@@ -28,7 +28,7 @@ import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleFileLoader;
+import uk.gov.gchq.palisade.example.client.ExampleUtils;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.rest.RestUtil;
@@ -45,6 +45,7 @@ import java.util.stream.Stream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import static uk.gov.gchq.palisade.example.MultiJvmExample.DESTINATION;
 import static uk.gov.gchq.palisade.example.MultiJvmExample.FILE;
 
@@ -110,12 +111,12 @@ public class MultiJvmExampleIT {
 
     @Before
     public void before() {
-        ExampleFileLoader.createDataPath(FILE, DESTINATION, MultiJvmExample.class);
+        ExampleUtils.createDataPath(FILE, DESTINATION, MultiJvmExample.class);
     }
 
     @After
     public void after() {
-        FileUtils.deleteQuietly(new File(FILE));
+        FileUtils.deleteQuietly(new File(DESTINATION));
     }
 
     @Test
@@ -133,10 +134,10 @@ public class MultiJvmExampleIT {
     public void shouldReadAsAlice() throws Exception {
         // Given
         final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(DESTINATION, "Alice", "Payroll");
 
         // Then
         assertEquals(
@@ -154,10 +155,10 @@ public class MultiJvmExampleIT {
     public void shouldReadAsBob() throws Exception {
         // Given
         final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(FILE, "Bob", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(DESTINATION, "Bob", "Payroll");
 
         // Then
         assertEquals(
@@ -173,7 +174,7 @@ public class MultiJvmExampleIT {
     public void proxyServiceShouldReturnActualExceptionThrownByUnderlyingService() throws Exception {
         // Given
         final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
 
         // When / Then
         try {

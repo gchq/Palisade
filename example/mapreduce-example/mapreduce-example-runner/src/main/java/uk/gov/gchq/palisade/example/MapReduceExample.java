@@ -39,8 +39,8 @@ import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleFileLoader;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.client.ExampleUtils;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -61,7 +61,7 @@ public class MapReduceExample extends Configured implements Tool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
 
     protected static final String DESTINATION = new File("exampleObj_file1.txt").getAbsolutePath();
-    protected static final String FILE = new File("example/exampleObj_file1.txt").getAbsolutePath();
+    protected static final String FILE = new File("example/exampleObj_file1.txt").getPath();
     protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
     private static final String RESOURCE_TYPE = "exampleObj";
 
@@ -182,7 +182,7 @@ public class MapReduceExample extends Configured implements Tool {
             outputDir = args[0];
         }
         // create the data in the correct place
-        ExampleFileLoader.createDataPath(FILE, DESTINATION, MapReduceExample.class);
+        ExampleUtils.createDataPath(FILE, DESTINATION, MapReduceExample.class);
         //remove this as it needs to be not present when the job runs
         FileUtils.deleteDirectory(new File(outputDir));
         try {

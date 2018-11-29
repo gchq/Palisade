@@ -29,9 +29,9 @@ import static java.util.Objects.requireNonNull;
 /**
  * Utility methods for example clients.
  */
-public final class ExampleFileLoader {
+public final class ExampleUtils {
 
-    private ExampleFileLoader() {
+    private ExampleUtils() {
     }
 
     /**

@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleFileLoader;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.client.ExampleUtils;
 
 import java.io.File;
 import java.net.URI;
@@ -38,14 +38,14 @@ import java.util.stream.Stream;
 public class MultiJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
     protected static final String DESTINATION = new File("exampleObj_file1.txt").getAbsolutePath();
-    protected static final String FILE = new File("example/exampleObj_file1.txt").getAbsolutePath();
+    protected static final String FILE = new File("example/exampleObj_file1.txt").getPath();
 
     public static void main(final String[] args) throws Exception {
         new MultiJvmExample().run();
     }
 
     public void run() throws Exception {
-        ExampleFileLoader.createDataPath(FILE, DESTINATION, this.getClass());
+        ExampleUtils.createDataPath(FILE, DESTINATION, this.getClass());
         EtcdClusterResource etcd = null;
         try {
             etcd = new EtcdClusterResource("test-etcd", 1);
