@@ -26,6 +26,7 @@ import org.junit.Test;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
+import uk.gov.gchq.palisade.example.client.ExampleFileLoader;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.io.File;
@@ -33,8 +34,8 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.gov.gchq.palisade.example.SingleJvmExample.DESTINATION;
 import static uk.gov.gchq.palisade.example.SingleJvmExample.FILE;
-import static uk.gov.gchq.palisade.example.SingleJvmExample.createDataPath;
 import static uk.gov.gchq.palisade.util.JsonAssert.assertEquals;
 
 public class SingleJvmExampleIT {
@@ -53,7 +54,7 @@ public class SingleJvmExampleIT {
 
     @Before
     public void before() {
-        createDataPath();
+        ExampleFileLoader.createDataPath(FILE, DESTINATION, SingleJvmExample.class);
     }
 
     @Test
