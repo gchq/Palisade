@@ -83,10 +83,6 @@ public class RestResourceServiceV1 implements ResourceService {
         RestResourceServiceV1.resourceService = resourceService;
     }
 
-    static {
-        
-    }
-
     @POST
     @Path("/getResourcesByResource")
     @ApiOperation(value = "Returns the resources",
