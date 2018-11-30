@@ -7,7 +7,9 @@ then
     OUT_PATH='/tmp/palisade-mapreduce-example/output'
 fi
 
-java -cp example/mapreduce-example/mapreduce-example-runner/target/mapreduce-example-runner-*-shaded.jar uk.gov.gchq.palisade.example.MapReduceExample "$OUT_PATH"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+java -cp example/mapreduce-example/mapreduce-example-runner/target/mapreduce-example-runner-*-shaded.jar uk.gov.gchq.palisade.example.MapReduceExample "$DIR/../../resources/exampleObj_file1.txt" "$OUT_PATH"
 
 if [[ $? -eq 0 ]]
 then

@@ -17,6 +17,8 @@
 package uk.gov.gchq.palisade.example;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,16 +33,22 @@ import java.util.stream.Stream;
 
 public class SingleJvmExample {
     protected static final String DESTINATION = new File("exampleObj_file1.txt").getAbsolutePath();
-    protected static final String FILE = new File("example/exampleObj_file1.txt").getPath();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleJvmExample.class);
 
     public static void main(final String[] args) throws Exception {
-        new SingleJvmExample().run();
+        if (args.length < 1) {
+            System.out.printf("Usage: %s file\n", SingleJvmExample.class.getTypeName());
+            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
+            System.exit(1);
+        }
+
+        String sourceFile = args[0];
+        new SingleJvmExample().run(sourceFile);
     }
 
-    public void run() throws Exception {
-        ExampleUtils.createDataPath(FILE, DESTINATION, this.getClass());
+    public void run(final String sourceFile) throws Exception {
+        ExampleUtils.createDataPath(sourceFile, DESTINATION, this.getClass());
         try {
             final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
             //request the client configuration by not specifying a service

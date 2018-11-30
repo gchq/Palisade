@@ -47,9 +47,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import static uk.gov.gchq.palisade.example.MultiJvmExample.DESTINATION;
-import static uk.gov.gchq.palisade.example.MultiJvmExample.FILE;
 
 public class MultiJvmExampleIT {
+
+    public static final String TEST_FILE = "/test_ExampleObj.txt";
 
     private static EmbeddedHttpServer palisadeServer;
     private static EmbeddedHttpServer policyServer;
@@ -111,7 +112,7 @@ public class MultiJvmExampleIT {
 
     @Before
     public void before() {
-        ExampleUtils.createDataPath(FILE, DESTINATION, MultiJvmExample.class);
+        ExampleUtils.createDataPath(TEST_FILE, DESTINATION, MultiJvmExample.class);
     }
 
     @After
@@ -125,7 +126,7 @@ public class MultiJvmExampleIT {
         final MultiJvmExample example = new MultiJvmExample();
 
         // When
-        example.run();
+        example.run(TEST_FILE);
 
         // Then - no exceptions
     }

@@ -1,10 +1,10 @@
 package uk.gov.gchq.palisade.resource.service;
 
 import com.google.common.collect.Maps;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.JobConf;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,7 +62,7 @@ public class HDFSFileResourceServiceTest {
     private SimpleConnectionDetail simpleType;
     private HashMap<String, ConnectionDetail> dataFormat;
     private HashMap<String, ConnectionDetail> dataType;
-    private JobConf conf;
+    private Configuration conf;
     private String inputPathString;
     private FileSystem fs;
     private HashMap<uk.gov.gchq.palisade.resource.Resource, ConnectionDetail> expected;
@@ -396,9 +396,9 @@ public class HDFSFileResourceServiceTest {
         }
     }
 
-    private JobConf createConf() {
+    private Configuration createConf() {
         // Set up local conf
-        final JobConf conf = new JobConf();
+        final Configuration conf = new Configuration();
         conf.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, CommonConfigurationKeysPublic.FS_DEFAULT_NAME_DEFAULT + testFolder.getRoot().getAbsolutePath());
         return conf;
     }

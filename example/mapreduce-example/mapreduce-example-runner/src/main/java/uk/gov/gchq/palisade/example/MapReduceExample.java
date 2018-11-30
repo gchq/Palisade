@@ -60,7 +60,6 @@ public class MapReduceExample extends Configured implements Tool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
 
     protected static final String DESTINATION = new File("exampleObj_file1.txt").getAbsolutePath();
-    protected static final String FILE = new File("example/exampleObj_file1.txt").getPath();
     protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
     private static final String RESOURCE_TYPE = "exampleObj";
 
@@ -101,7 +100,7 @@ public class MapReduceExample extends Configured implements Tool {
     public int run(final String... args) throws Exception {
         //usage check
         if (args.length < 1) {
-            System.out.println("Args: " + MapReduceExample.class.getName() + " <output directory path to create>");
+            System.out.println("MapReduce output directory not specified. Please provide path as argument.");
             return 1;
         }
 
@@ -176,12 +175,21 @@ public class MapReduceExample extends Configured implements Tool {
     public static void main(final String... args) throws Exception {
         final String outputDir;
         if (args.length < 1) {
+            System.out.printf("Usage: %s file [output_directory]\n",MapReduceExample.class.getTypeName());
+            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
+            System.out.println("output_directory\tdirectory to write mapreduce outputs to");
+            System.exit(1);
+        }
+
+        String sourceFile = args[0];
+
+        if (args.length < 2) {
             outputDir = DEFAULT_OUTPUT_DIR;
         } else {
-            outputDir = args[0];
+            outputDir = args[1];
         }
         // create the data in the correct place
-        ExampleUtils.createDataPath(FILE, DESTINATION, MapReduceExample.class);
+        ExampleUtils.createDataPath(sourceFile, DESTINATION, MapReduceExample.class);
         //remove this as it needs to be not present when the job runs
         FileUtils.deleteDirectory(new File(outputDir));
         try {

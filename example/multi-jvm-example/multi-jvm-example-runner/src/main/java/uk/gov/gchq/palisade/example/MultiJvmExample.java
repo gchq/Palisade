@@ -38,14 +38,21 @@ import java.util.stream.Stream;
 public class MultiJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
     protected static final String DESTINATION = new File("exampleObj_file1.txt").getAbsolutePath();
-    protected static final String FILE = new File("example/exampleObj_file1.txt").getPath();
 
     public static void main(final String[] args) throws Exception {
-        new MultiJvmExample().run();
+        if (args.length < 1) {
+            System.out.printf("Usage: %s file\n", MultiJvmExample.class.getTypeName());
+            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
+            System.exit(1);
+        }
+
+
+        String sourceFile = args[0];
+        new MultiJvmExample().run(sourceFile);
     }
 
-    public void run() throws Exception {
-        ExampleUtils.createDataPath(FILE, DESTINATION, this.getClass());
+    public void run(final String sourceFile) throws Exception {
+        ExampleUtils.createDataPath(sourceFile, DESTINATION, this.getClass());
         EtcdClusterResource etcd = null;
         try {
             etcd = new EtcdClusterResource("test-etcd", 1);

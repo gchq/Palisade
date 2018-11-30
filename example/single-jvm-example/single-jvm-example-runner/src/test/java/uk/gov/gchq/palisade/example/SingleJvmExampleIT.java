@@ -35,11 +35,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.gchq.palisade.example.SingleJvmExample.DESTINATION;
-import static uk.gov.gchq.palisade.example.SingleJvmExample.FILE;
 import static uk.gov.gchq.palisade.util.JsonAssert.assertEquals;
 
 public class SingleJvmExampleIT {
 
+    public static final String TEST_FILE = "/test_ExampleObj.txt";
     private static ConfigurationService configService;
 
     @BeforeClass
@@ -54,7 +54,7 @@ public class SingleJvmExampleIT {
 
     @Before
     public void before() {
-        ExampleUtils.createDataPath(FILE, DESTINATION, SingleJvmExample.class);
+        ExampleUtils.createDataPath(TEST_FILE, DESTINATION, SingleJvmExample.class);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class SingleJvmExampleIT {
         final SingleJvmExample example = new SingleJvmExample();
 
         // When
-        example.run();
+        example.run(TEST_FILE);
 
         // Then - no exceptions
     }

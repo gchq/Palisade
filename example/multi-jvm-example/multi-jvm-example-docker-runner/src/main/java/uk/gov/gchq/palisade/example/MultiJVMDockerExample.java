@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 public class MultiJVMDockerExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiJVMDockerExample.class);
     //For the Docker build, this will have been created in the container before this executes
-    protected static final String FILE = new File("/data/example/exampleObj_file1.txt").getAbsolutePath();
+    protected static final String FILE = new File("/data/exampleObj_file1.txt").getAbsolutePath();
 
     public static void main(final String[] args) throws Exception {
         new MultiJVMDockerExample().run();

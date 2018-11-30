@@ -29,7 +29,7 @@ services:
       ports:
          - 8084:8080
       volumes:
-         - "../../example-model/target/classes:/data"
+         - "../../resources:/data"
    policy-service:
       build: policy-service
       container_name: policy-service
@@ -41,7 +41,7 @@ services:
       ports:
          - 8082:8080
       volumes:
-         - "../../example-model/target/classes:/data"
+         - "../../resources:/data"
    user-service:
       build: user-service
       container_name: user-service

@@ -133,6 +133,13 @@
 
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
+            <artifactId>example-model</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>rest-data-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
@@ -267,6 +274,9 @@
                             </excludes>
                         </filter>
                     </filters>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                    </transformers>
                 </configuration>
             </plugin>
             <plugin>
