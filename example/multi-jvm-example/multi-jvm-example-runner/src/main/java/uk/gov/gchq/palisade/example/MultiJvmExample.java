@@ -27,6 +27,9 @@ import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.client.ExampleUtils;
+import uk.gov.gchq.palisade.resource.service.ResourceService;
+import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 
 import java.io.File;
 import java.net.URI;
@@ -55,29 +58,35 @@ public class MultiJvmExample {
         ExampleUtils.createDataPath(sourceFile, DESTINATION, this.getClass());
         EtcdClusterResource etcd = null;
         try {
-            etcd = new EtcdClusterResource("test-etcd", 1);
-            etcd.cluster().start();
-            List<String> etcdEndpointURLs = etcd.cluster().getClientEndpoints()
-                    .stream()
-                    .map(URI::toString)
-                    .collect(Collectors.toList());
-            //this will write an initial configuration
-            final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs,
-                    Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
-            final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-            final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
+//            etcd = new EtcdClusterResource("test-etcd", 1);
+//            etcd.cluster().start();
+//            List<String> etcdEndpointURLs = etcd.cluster().getClientEndpoints()
+//                    .stream()
+//                    .map(URI::toString)
+//                    .collect(Collectors.toList());
+//            //this will write an initial configuration
+//            final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs,
+//                    Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+//            final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
+//            final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
 
-            LOGGER.info("");
-            LOGGER.info("Alice is reading file1...");
-            final Stream<ExampleObj> aliceResults = client.read(DESTINATION, "Alice", "Payroll");
-            LOGGER.info("Alice got back: ");
-            aliceResults.map(Object::toString).forEach(LOGGER::info);
+            ResourceService bob=new ProxyRestResourceService("http://localhost:8082/resource");
+            System.err.println(bob.getClass());
+            bob.getResourcesById(new GetResourcesByIdRequest().resourceId("file:///whatever")).join();
+            System.exit(0);
 
-            LOGGER.info("");
-            LOGGER.info("Bob is reading file1...");
-            final Stream<ExampleObj> bobResults = client.read(DESTINATION, "Bob", "Payroll");
-            LOGGER.info("Bob got back: ");
-            bobResults.map(Object::toString).forEach(LOGGER::info);
+//
+//            LOGGER.info("");
+//            LOGGER.info("Alice is reading file1...");
+//            final Stream<ExampleObj> aliceResults = client.read(DESTINATION, "Alice", "Payroll");
+//            LOGGER.info("Alice got back: ");
+//            aliceResults.map(Object::toString).forEach(LOGGER::info);
+//
+//            LOGGER.info("");
+//            LOGGER.info("Bob is reading file1...");
+//            final Stream<ExampleObj> bobResults = client.read(DESTINATION, "Bob", "Payroll");
+//            LOGGER.info("Bob got back: ");
+//            bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {
             FileUtils.deleteQuietly(new File(DESTINATION));
             if (etcd != null) {

@@ -31,9 +31,10 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.ws.rs.</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>${javax.ws.rs.version}</version>
+            <groupId>uk.gov.gchq.palisade</groupId>
+            <artifactId>core-rest-service</artifactId>
+            <version>0.1.2-SNAPSHOT</version>
+            <classifier>classes</classifier>
         </dependency>
     </dependencies>
 </project>
