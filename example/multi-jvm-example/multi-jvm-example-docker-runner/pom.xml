@@ -159,7 +159,7 @@
 
     <build>
         <plugins>
-            <!-- Docker plugin for managing containers to run tsts against -->
+            <!-- Docker plugin for managing containers to run tests against -->
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
@@ -259,7 +259,7 @@
                                         </ports>
                                         <volumes>
                                             <bind>
-                                                <volume>../../example-model/target/classes:/data</volume>
+                                                <volume>../../resources:/data</volume>
                                             </bind>
                                         </volumes>
                                         <network>
@@ -297,7 +297,7 @@
                                         <namingStrategy>alias</namingStrategy>
                                         <volumes>
                                             <bind>
-                                                <volume>../../example-model/target/classes:/data</volume>
+                                                <volume>../../resources:/data</volume>
                                             </bind>
                                         </volumes>
                                         <ports>
