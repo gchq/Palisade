@@ -175,7 +175,7 @@ public class MapReduceExample extends Configured implements Tool {
     public static void main(final String... args) throws Exception {
         final String outputDir;
         if (args.length < 1) {
-            System.out.printf("Usage: %s file [output_directory]\n",MapReduceExample.class.getTypeName());
+            System.out.printf("Usage: %s file [output_directory]\n", MapReduceExample.class.getTypeName());
             System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
             System.out.println("output_directory\tdirectory to write mapreduce outputs to");
             System.exit(1);
