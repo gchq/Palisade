@@ -45,7 +45,11 @@ mvn clean install -P example
 
 The services can be started within Docker containers or ran within a local Tomcat.
 
-To run them in them in a local Tomcat:
+To run them in them in a local Tomcat, firstly build the executable jars:
+
+```bash
+ ./example/multi-jvm-example/scripts/buildServices.sh
+```
 
 Either start them all in a single terminal using:
 ```bash
