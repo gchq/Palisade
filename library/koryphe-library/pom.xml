@@ -21,7 +21,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>library</artifactId>
-        <version>0.1.2-SNAPSHOT</version>
+        <version>0.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>koryphe-library</artifactId>
 
