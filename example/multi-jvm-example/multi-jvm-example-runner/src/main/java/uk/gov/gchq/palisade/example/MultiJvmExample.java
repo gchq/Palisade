@@ -27,6 +27,7 @@ import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,18 +59,20 @@ public class MultiJvmExample {
             //this will write an initial configuration
             final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs,
                     Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+
+            String absoluteFile = Paths.get(sourceFile).toRealPath().toString();
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-            final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
+            final ExampleSimpleClient client = new ExampleSimpleClient(cs, absoluteFile);
 
             LOGGER.info("");
             LOGGER.info("Alice is reading file1...");
-            final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
+            final Stream<ExampleObj> aliceResults = client.read(absoluteFile, "Alice", "Payroll");
             LOGGER.info("Alice got back: ");
             aliceResults.map(Object::toString).forEach(LOGGER::info);
 
             LOGGER.info("");
             LOGGER.info("Bob is reading file1...");
-            final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
+            final Stream<ExampleObj> bobResults = client.read(absoluteFile, "Bob", "Payroll");
             LOGGER.info("Bob got back: ");
             bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {

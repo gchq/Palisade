@@ -47,6 +47,7 @@ import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
@@ -58,7 +59,6 @@ import java.nio.file.Files;
 public class MapReduceExample extends Configured implements Tool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
 
-    protected static final String DESTINATION = new File("exampleObj_file1.txt").getAbsolutePath();
     protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
     private static final String RESOURCE_TYPE = "exampleObj";
 
@@ -98,10 +98,12 @@ public class MapReduceExample extends Configured implements Tool {
     @Override
     public int run(final String... args) throws Exception {
         //usage check
-        if (args.length < 1) {
-            System.out.println("MapReduce output directory not specified. Please provide path as argument.");
+        if (args.length < 2) {
+            System.out.println("Example file and MapReduce output directory not specified. Please provide path as argument.");
             return 1;
         }
+
+        String sourceFile = args[0];
 
         //create the basic job object and configure it for this example
         Job job = Job.getInstance(getConf(), "Palisade MapReduce Example");
@@ -119,20 +121,20 @@ public class MapReduceExample extends Configured implements Tool {
         job.setOutputValueClass(IntWritable.class);
         //set the output format
         job.setOutputFormatClass(TextOutputFormat.class);
-        FileOutputFormat.setOutputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
         //configure the Palisade input format on an example client
         final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
         configureJob(job, cs, 2);
 
         //next add a resource request to the job
-        addDataRequest(job, DESTINATION, RESOURCE_TYPE, "Alice", "Payroll");
-        addDataRequest(job, DESTINATION, RESOURCE_TYPE, "Bob", "Payroll");
+        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Alice", "Payroll");
+        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Bob", "Payroll");
 
         //launch job
         boolean success = job.waitForCompletion(true);
@@ -181,6 +183,7 @@ public class MapReduceExample extends Configured implements Tool {
         }
 
         String sourceFile = args[0];
+        String absoluteFile = Paths.get(sourceFile).toRealPath().toString();
 
         if (args.length < 2) {
             outputDir = DEFAULT_OUTPUT_DIR;
@@ -194,7 +197,7 @@ public class MapReduceExample extends Configured implements Tool {
         conf.set("mapred.job.tracker", "local");
         //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
         conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
-        ToolRunner.run(conf, new MapReduceExample(), new String[]{outputDir});
+        ToolRunner.run(conf, new MapReduceExample(), new String[]{absoluteFile, outputDir});
     }
 
     private static String createOutputDir() {

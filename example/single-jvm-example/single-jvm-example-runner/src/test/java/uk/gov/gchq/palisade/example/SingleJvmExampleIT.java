@@ -30,16 +30,17 @@ import uk.gov.gchq.palisade.example.client.ExampleUtils;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.gov.gchq.palisade.example.SingleJvmExample.DESTINATION;
 import static uk.gov.gchq.palisade.util.JsonAssert.assertEquals;
 
 public class SingleJvmExampleIT {
 
     public static final String TEST_FILE = "/test_ExampleObj.txt";
+    public static String TEMP_DESTINATION;
     private static ConfigurationService configService;
 
     @BeforeClass
@@ -49,12 +50,13 @@ public class SingleJvmExampleIT {
 
     @AfterClass
     public static void deleteFile() {
-        FileUtils.deleteQuietly(new File(DESTINATION));
+        FileUtils.deleteQuietly(new File(TEMP_DESTINATION));
     }
 
     @Before
-    public void before() {
-        ExampleUtils.createDataPath(TEST_FILE, DESTINATION, SingleJvmExample.class);
+    public void before() throws Exception {
+        TEMP_DESTINATION = Files.createTempFile("exampleObj_", ".txt").toAbsolutePath().toString();
+        ExampleUtils.createDataPath(TEST_FILE, TEMP_DESTINATION, SingleJvmExampleIT.class);
     }
 
     @Test
@@ -63,7 +65,7 @@ public class SingleJvmExampleIT {
         final SingleJvmExample example = new SingleJvmExample();
 
         // When
-        example.run(TEST_FILE);
+        example.run(TEMP_DESTINATION);
 
         // Then - no exceptions
     }
@@ -72,10 +74,10 @@ public class SingleJvmExampleIT {
     public void shouldReadAsAlice() throws Exception {
         // Given
         final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, TEMP_DESTINATION);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(DESTINATION, "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(TEMP_DESTINATION, "Alice", "Payroll");
 
         // Then
         assertEquals(
@@ -93,10 +95,10 @@ public class SingleJvmExampleIT {
     public void shouldReadAsBob() throws Exception {
         // Given
         final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, TEMP_DESTINATION);
 
         // When
-        final Stream<ExampleObj> aliceResults = client.read(DESTINATION, "Bob", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(TEMP_DESTINATION, "Bob", "Payroll");
 
         // Then
         assertEquals(
