@@ -38,6 +38,7 @@ import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
+import uk.gov.gchq.palisade.example.client.ExampleFileUtil;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
@@ -46,6 +47,7 @@ import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -183,7 +185,8 @@ public class MapReduceExample extends Configured implements Tool {
         }
 
         String sourceFile = args[0];
-        String absoluteFile = Paths.get(sourceFile).toRealPath().toString();
+        URI absoluteFileURI = ExampleFileUtil.convertToFileURI(sourceFile);
+        String absoluteFile = absoluteFileURI.toString();
 
         if (args.length < 2) {
             outputDir = DEFAULT_OUTPUT_DIR;

@@ -26,7 +26,7 @@ import org.junit.Test;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleUtils;
+import uk.gov.gchq.palisade.example.client.ExampleFileUtil;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.io.File;
@@ -56,7 +56,7 @@ public class SingleJvmExampleIT {
     @Before
     public void before() throws Exception {
         TEMP_DESTINATION = Files.createTempFile("exampleObj_", ".txt").toAbsolutePath().toString();
-        ExampleUtils.createDataPath(TEST_FILE, TEMP_DESTINATION, SingleJvmExampleIT.class);
+        ExampleFileUtil.createDataPath(TEST_FILE, TEMP_DESTINATION, SingleJvmExampleIT.class);
     }
 
     @Test
@@ -75,7 +75,6 @@ public class SingleJvmExampleIT {
         // Given
         final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, TEMP_DESTINATION);
-
         // When
         final Stream<ExampleObj> aliceResults = client.read(TEMP_DESTINATION, "Alice", "Payroll");
 

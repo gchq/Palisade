@@ -17,21 +17,22 @@
 package uk.gov.gchq.palisade.example.client;
 
 import org.apache.commons.io.FileUtils;
-
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
-/**
- * Utility methods for example clients.
- */
-public final class ExampleUtils {
-
-    private ExampleUtils() {
+public final class ExampleFileUtil {
+    private ExampleFileUtil() {
     }
 
     /**
@@ -54,5 +55,43 @@ public final class ExampleUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Convert the given path to an absolute URI. If the given path represents something on the local file system, then
+     * the path will be converted to a full absolute path and converted to a {@code file:} URI, if not then it will be returned verbatim.
+     *
+     * @param path the path to convert
+     * @return the URI of the path
+     */
+    public static URI convertToFileURI(final String path) {
+        URI uriPath;
+        try {
+            uriPath = new URI(path);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Can't parse the given file name", e);
+        }
+
+        // if this path has the the file:// scheme, then convert it via URI
+        Path file;
+        if (FileSystems.getDefault().provider().getScheme().equals(uriPath.getScheme())) {
+            file = Paths.get(uriPath);
+        } else {
+            file = Paths.get(path);
+        }
+
+        //is this a local file URL? If so attempt to normalise it
+
+        if (isNull(uriPath.getScheme()) ||
+                FileSystems.getDefault().provider().getScheme().equals(uriPath.getScheme())) {
+            //normalise this against the file system
+            try {
+                file = file.toRealPath();
+            } catch (IOException e) {
+                //doesn't exist
+            }
+            return file.toUri();
+        }
+        return uriPath;
     }
 }

@@ -217,7 +217,7 @@ public class HierarchicalPolicyService implements PolicyService {
         requireNonNull(request);
         Resource resource = request.getResource();
         Policy policy = request.getPolicy();
-        LOGGER.debug("Set %s to resource %s", policy, resource);
+        LOGGER.debug("Set {} to resource {}", policy, resource);
         return getCacheService().add(
                 new AddCacheRequest<Policy>()
                         .service(this.getClass())
@@ -230,7 +230,7 @@ public class HierarchicalPolicyService implements PolicyService {
         requireNonNull(request);
         final String type = request.getType();
         final Policy policy = request.getPolicy();
-        LOGGER.debug("Set %s to data type %s", policy, type);
+        LOGGER.debug("Set {} to data type {}", policy, type);
         return getCacheService().add(
                 new AddCacheRequest<Policy>()
                         .service(this.getClass())

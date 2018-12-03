@@ -276,11 +276,11 @@ public class HDFSResourceService implements ResourceService {
             final int fsDepth = new Path(configuration.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)).depth();
 
             if (fileDepth > fsDepth + 1) {
-                DirectoryResource parent = new DirectoryResource().id(path.getParent().toString());
+                DirectoryResource parent = new DirectoryResource().id(path.getParent().toUri().toString());
                 resource.setParent(parent);
                 resolveParents(parent, configuration);
             } else {
-                resource.setParent(new SystemResource().id(path.getParent().toString()));
+                resource.setParent(new SystemResource().id(path.getParent().toUri().toString()));
             }
         } catch (Exception e) {
             throw new RuntimeException(ERROR_RESOLVING_PARENTS, e);
@@ -310,7 +310,7 @@ public class HDFSResourceService implements ResourceService {
         final ArrayList<String> paths = Lists.newArrayList();
         while (remoteIterator.hasNext()) {
             final LocatedFileStatus next = remoteIterator.next();
-            final String pathWithoutFSName = next.getPath().toString().split(Pattern.quote(":"))[1];
+            final String pathWithoutFSName = next.getPath().toUri().toString();
             paths.add(pathWithoutFSName);
         }
         return paths;

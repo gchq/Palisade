@@ -24,10 +24,10 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
+import uk.gov.gchq.palisade.example.client.ExampleFileUtil;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.net.URI;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -60,7 +60,8 @@ public class MultiJvmExample {
             final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs,
                     Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
 
-            String absoluteFile = Paths.get(sourceFile).toRealPath().toString();
+            URI absoluteFileURI = ExampleFileUtil.convertToFileURI(sourceFile);
+            String absoluteFile = absoluteFileURI.toString();
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, absoluteFile);
 

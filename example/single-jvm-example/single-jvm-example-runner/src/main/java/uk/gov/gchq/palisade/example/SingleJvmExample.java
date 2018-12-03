@@ -24,7 +24,6 @@ import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
-import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 public class SingleJvmExample {
@@ -44,20 +43,19 @@ public class SingleJvmExample {
 
     public void run(final String sourceFile) throws Exception {
         final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
-        String absoluteFile = Paths.get(sourceFile).toRealPath().toString();
         //request the client configuration by not specifying a service
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, absoluteFile);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");
-        final Stream<ExampleObj> aliceResults = client.read(absoluteFile, "Alice", "Payroll");
+        final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Bob is reading file1...");
-        final Stream<ExampleObj> bobResults = client.read(absoluteFile, "Bob", "Payroll");
+        final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
         LOGGER.info("Bob got back: ");
         bobResults.map(Object::toString).forEach(LOGGER::info);
     }

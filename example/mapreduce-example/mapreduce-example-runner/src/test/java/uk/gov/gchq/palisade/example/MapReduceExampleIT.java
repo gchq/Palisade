@@ -19,7 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.gchq.palisade.example.client.ExampleUtils;
+import uk.gov.gchq.palisade.example.client.ExampleFileUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +39,7 @@ public class MapReduceExampleIT {
     @Before
     public void before() throws Exception {
         TEMP_DESTINATION = Files.createTempFile("exampleObj_", ".txt").toAbsolutePath().toString();
-        ExampleUtils.createDataPath(TEST_FILE, TEMP_DESTINATION, MapReduceExampleIT.class);
+        ExampleFileUtil.createDataPath(TEST_FILE, TEMP_DESTINATION, MapReduceExampleIT.class);
     }
 
     @AfterClass

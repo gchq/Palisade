@@ -28,7 +28,7 @@ import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleUtils;
+import uk.gov.gchq.palisade.example.client.ExampleFileUtil;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.rest.RestUtil;
@@ -113,7 +113,7 @@ public class MultiJvmExampleIT {
     @Before
     public void before() throws Exception {
         TEMP_DESTINATION = Files.createTempFile("exampleObj_", ".txt").toAbsolutePath().toString();
-        ExampleUtils.createDataPath(TEST_FILE, TEMP_DESTINATION, MultiJvmExampleIT.class);
+        ExampleFileUtil.createDataPath(TEST_FILE, TEMP_DESTINATION, MultiJvmExampleIT.class);
     }
 
     @After
