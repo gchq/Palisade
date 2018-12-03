@@ -39,7 +39,6 @@ import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.example.client.ExampleUtils;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -188,21 +187,14 @@ public class MapReduceExample extends Configured implements Tool {
         } else {
             outputDir = args[1];
         }
-        // create the data in the correct place
-        ExampleUtils.createDataPath(sourceFile, DESTINATION, MapReduceExample.class);
         //remove this as it needs to be not present when the job runs
         FileUtils.deleteDirectory(new File(outputDir));
-        try {
-            Configuration conf = new Configuration();
-            //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
-            conf.set("mapred.job.tracker", "local");
-            //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
-            conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
-            ToolRunner.run(conf, new MapReduceExample(), new String[]{outputDir});
-        } finally {
-            // clean up
-            FileUtils.deleteQuietly(new File(DESTINATION));
-        }
+        Configuration conf = new Configuration();
+        //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
+        conf.set("mapred.job.tracker", "local");
+        //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
+        conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
+        ToolRunner.run(conf, new MapReduceExample(), new String[]{outputDir});
     }
 
     private static String createOutputDir() {
