@@ -65,6 +65,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -91,6 +92,11 @@ public class HDFSResourceService implements ResourceService {
     public static final String CACHE_IMPL_KEY = "hdfs.cache.svc";
     public static final String CONNECTION_DETAIL_KEY = "hdfs.conn.detail";
 
+    /**
+     * A regular expression that matches URIs that have the file:/ scheme with a single slash but not any more slashes.
+     */
+    private final static Pattern FILE_PAT = Pattern.compile("(?i)(?<=^file:)/(?=([^/]|$))");
+
     private Configuration conf;
     private CacheService cacheService;
 
@@ -98,6 +104,7 @@ public class HDFSResourceService implements ResourceService {
 
     @JsonIgnore
     private ConnectionDetailStorage connectionDetailStorage = new ConnectionDetailStorage();
+
 
     public HDFSResourceService() {
     }
@@ -276,14 +283,31 @@ public class HDFSResourceService implements ResourceService {
             final int fsDepth = new Path(configuration.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)).depth();
 
             if (fileDepth > fsDepth + 1) {
-                DirectoryResource parent = new DirectoryResource().id(path.getParent().toUri().toString());
+                DirectoryResource parent = new DirectoryResource().id(fixURIScheme(path.getParent().toUri().toString()));
                 resource.setParent(parent);
                 resolveParents(parent, configuration);
             } else {
-                resource.setParent(new SystemResource().id(path.getParent().toUri().toString()));
+                resource.setParent(new SystemResource().id(fixURIScheme(path.getParent().toUri().toString())));
             }
         } catch (Exception e) {
             throw new RuntimeException(ERROR_RESOLVING_PARENTS, e);
+        }
+    }
+
+    /**
+     * Fixes URI schemes that use the file: scheme with no authority component. Any URI that starts file:/ will be changed to file:///
+     *
+     * @param uri URI to check
+     * @return the file URI with authority separator inserted
+     * @throws NullPointerException if {@code uri} is {@code null}
+     */
+    private static String fixURIScheme(final String uri) {
+        requireNonNull(uri, "uri");
+        Matcher match = FILE_PAT.matcher(uri);
+        if (match.find()) {
+            return match.replaceFirst("///");
+        } else {
+            return uri;
         }
     }
 
