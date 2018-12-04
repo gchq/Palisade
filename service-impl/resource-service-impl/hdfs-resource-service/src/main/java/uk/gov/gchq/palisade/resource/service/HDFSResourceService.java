@@ -95,7 +95,7 @@ public class HDFSResourceService implements ResourceService {
     /**
      * A regular expression that matches URIs that have the file:/ scheme with a single slash but not any more slashes.
      */
-    private final static Pattern FILE_PAT = Pattern.compile("(?i)(?<=^file:)/(?=([^/]|$))");
+    private static final Pattern FILE_PAT = Pattern.compile("(?i)(?<=^file:)/(?=([^/]|$))");
 
     private Configuration conf;
     private CacheService cacheService;
