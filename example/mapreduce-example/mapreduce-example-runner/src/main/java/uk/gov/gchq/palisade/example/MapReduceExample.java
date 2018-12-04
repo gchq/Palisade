@@ -38,7 +38,6 @@ import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleFileUtil;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
@@ -47,9 +46,7 @@ import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
@@ -129,7 +126,6 @@ public class MapReduceExample extends Configured implements Tool {
         final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
-
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
         configureJob(job, cs, 2);
@@ -185,8 +181,6 @@ public class MapReduceExample extends Configured implements Tool {
         }
 
         String sourceFile = args[0];
-        URI absoluteFileURI = ExampleFileUtil.convertToFileURI(sourceFile);
-        String absoluteFile = absoluteFileURI.toString();
 
         if (args.length < 2) {
             outputDir = DEFAULT_OUTPUT_DIR;
@@ -200,7 +194,7 @@ public class MapReduceExample extends Configured implements Tool {
         conf.set("mapred.job.tracker", "local");
         //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
         conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
-        ToolRunner.run(conf, new MapReduceExample(), new String[]{absoluteFile, outputDir});
+        ToolRunner.run(conf, new MapReduceExample(), new String[]{sourceFile, outputDir});
     }
 
     private static String createOutputDir() {

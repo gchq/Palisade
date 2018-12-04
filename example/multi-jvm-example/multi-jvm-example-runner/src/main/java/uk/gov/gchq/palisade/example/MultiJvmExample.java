@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleFileUtil;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
 import java.net.URI;
@@ -60,20 +59,18 @@ public class MultiJvmExample {
             final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs,
                     Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
 
-            URI absoluteFileURI = ExampleFileUtil.convertToFileURI(sourceFile);
-            String absoluteFile = absoluteFileURI.toString();
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-            final ExampleSimpleClient client = new ExampleSimpleClient(cs, absoluteFile);
+            final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
             LOGGER.info("");
             LOGGER.info("Alice is reading file1...");
-            final Stream<ExampleObj> aliceResults = client.read(absoluteFile, "Alice", "Payroll");
+            final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
             LOGGER.info("Alice got back: ");
             aliceResults.map(Object::toString).forEach(LOGGER::info);
 
             LOGGER.info("");
             LOGGER.info("Bob is reading file1...");
-            final Stream<ExampleObj> bobResults = client.read(absoluteFile, "Bob", "Payroll");
+            final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
             LOGGER.info("Bob got back: ");
             bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {

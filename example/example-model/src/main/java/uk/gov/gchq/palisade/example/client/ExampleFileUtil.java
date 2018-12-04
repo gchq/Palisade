@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.example.client;
 
 import org.apache.commons.io.FileUtils;
+
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.File;
@@ -25,6 +26,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -86,7 +88,7 @@ public final class ExampleFileUtil {
                 FileSystems.getDefault().provider().getScheme().equals(uriPath.getScheme())) {
             //normalise this against the file system
             try {
-                file = file.toRealPath();
+                file = file.toRealPath(LinkOption.NOFOLLOW_LINKS);
             } catch (IOException e) {
                 //doesn't exist
             }

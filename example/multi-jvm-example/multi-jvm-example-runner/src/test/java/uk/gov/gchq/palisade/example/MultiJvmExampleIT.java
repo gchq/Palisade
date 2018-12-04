@@ -180,7 +180,7 @@ public class MultiJvmExampleIT {
 
         // When / Then
         try {
-            client.read("unknown file", "Bob", "Payroll");
+            client.read("badscheme:///unknown_file/stuff", "Bob", "Payroll");
             fail("Exception expected");
         } catch (final CompletionException e) {
             assertTrue("CompletionException cause should be an UnsupportedOperationException",
