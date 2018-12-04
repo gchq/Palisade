@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-mvn clean install -Pmulti-jvm-example-rest-palisade-service -pl :multi-jvm-example-rest-palisade-service -Dstandalone-path=palisade -Dstandalone-port=8080 $@
+java -jar example/multi-jvm-example/multi-jvm-example-rest-palisade-service/target/multi-jvm-example-rest-palisade-service-*-executable.jar -httpPort=8080 -extractDirectory=.extract/Palisade -Dpalisade.rest.config.path=example/example-model/src/main/resources/configRest.json
+
