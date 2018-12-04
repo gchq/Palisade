@@ -110,9 +110,9 @@ public class HDFSFileResourceServiceTest {
         final String id = inputPathString + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource().id(id).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
-                new DirectoryResource().id(inputPathString).parent(
-                        new SystemResource().id(testFolder.getRoot().getAbsolutePath())
+        expected.put(new FileResource().id("file://" + id).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id("file://" + inputPathString).parent(
+                        new SystemResource().id("file://" + testFolder.getRoot().getAbsolutePath())
                 )
         ), simpleType);
 
@@ -145,14 +145,14 @@ public class HDFSFileResourceServiceTest {
         final String id = inputPathString;
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
-                new DirectoryResource().id(inputPathString).parent(
-                        new SystemResource().id(testFolder.getRoot().getAbsolutePath())
+        expected.put(new FileResource().id("file://" + id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id("file://" + inputPathString).parent(
+                        new SystemResource().id("file://" + testFolder.getRoot().getAbsolutePath())
                 )
         ), simpleType);
-        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
-                new DirectoryResource().id(inputPathString).parent(
-                        new SystemResource().id(testFolder.getRoot().getAbsolutePath())
+        expected.put(new FileResource().id("file://" + id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id("file://" + inputPathString).parent(
+                        new SystemResource().id("file://" + testFolder.getRoot().getAbsolutePath())
                 )
         ), simpleType);
 
@@ -170,14 +170,14 @@ public class HDFSFileResourceServiceTest {
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, "00003", FORMAT_VALUE, TYPE_VALUE + 2);
-        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
-                new DirectoryResource().id(inputPathString).parent(
-                        new SystemResource().id(testFolder.getRoot().getAbsolutePath())
+        expected.put(new FileResource().id("file://" + id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id("file://" + inputPathString).parent(
+                        new SystemResource().id("file://" + testFolder.getRoot().getAbsolutePath())
                 )
         ), simpleType);
-        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
-                new DirectoryResource().id(inputPathString).parent(
-                        new SystemResource().id(testFolder.getRoot().getAbsolutePath())
+        expected.put(new FileResource().id("file://" + id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id("file://" + inputPathString).parent(
+                        new SystemResource().id("file://" + testFolder.getRoot().getAbsolutePath())
                 )
         ), simpleType);
 
@@ -209,14 +209,14 @@ public class HDFSFileResourceServiceTest {
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, "00003", FORMAT_VALUE + 2, TYPE_VALUE);
-        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
-                new DirectoryResource().id(inputPathString).parent(
-                        new SystemResource().id(testFolder.getRoot().getAbsolutePath())
+        expected.put(new FileResource().id("file://" + id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id("file://" + inputPathString).parent(
+                        new SystemResource().id("file://" + testFolder.getRoot().getAbsolutePath())
                 )
         ), simpleType);
-        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
-                new DirectoryResource().id(inputPathString).parent(
-                        new SystemResource().id(testFolder.getRoot().getAbsolutePath())
+        expected.put(new FileResource().id("file://" + id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id("file://" + inputPathString).parent(
+                        new SystemResource().id("file://" + testFolder.getRoot().getAbsolutePath())
                 )
         ), simpleType);
 
@@ -233,14 +233,14 @@ public class HDFSFileResourceServiceTest {
         final String id = inputPathString;
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
-                new DirectoryResource().id(inputPathString).parent(
-                        new SystemResource().id(testFolder.getRoot().getAbsolutePath())
+        expected.put(new FileResource().id("file://" + id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id("file://" + inputPathString).parent(
+                        new SystemResource().id("file://" + testFolder.getRoot().getAbsolutePath())
                 )
         ), simpleType);
-        expected.put(new FileResource().id(id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
-                new DirectoryResource().id(inputPathString).parent(
-                        new SystemResource().id(testFolder.getRoot().getAbsolutePath())
+        expected.put(new FileResource().id("file://" + id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id("file://" + inputPathString).parent(
+                        new SystemResource().id("file://" + testFolder.getRoot().getAbsolutePath())
                 )
         ), simpleType);
         //when
@@ -331,9 +331,9 @@ public class HDFSFileResourceServiceTest {
         final String id = inputPathString + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
         writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
-        expected.put(new FileResource().id(id).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
-                new DirectoryResource().id(inputPathString).parent(
-                        new SystemResource().id(testFolder.getRoot().getAbsolutePath())
+        expected.put(new FileResource().id("file://" + id).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id("file://" + inputPathString).parent(
+                        new SystemResource().id("file://" + testFolder.getRoot().getAbsolutePath())
                 )
         ), simpleFormat);
 
