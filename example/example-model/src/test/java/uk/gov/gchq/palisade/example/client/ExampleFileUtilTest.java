@@ -16,14 +16,141 @@
 
 package uk.gov.gchq.palisade.example.client;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class ExampleFileUtilTest {
 
+    private static Path temp;
+
+    @BeforeClass
+    public static void createDummy() throws Exception {
+        temp = Files.createTempFile("test", "file");
+    }
+
+    @AfterClass
+    public static void removeDummy() {
+        FileUtils.deleteQuietly(temp.toFile());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void throwNPE() {
+        //Given - nothing
+
+        //When
+        ExampleFileUtil.convertToFileURI(null);
+
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwOnEmpty() {
+        //Given - nothing
+
+        //When
+        ExampleFileUtil.convertToFileURI("");
+
+        //Then
+        fail("exception expected");
+    }
+
     @Test
-    public void convertToFileURL() {
-        //TODO
+    public void shouldConvertLocalRelativePath() {
+        //Given
+        String input = temp.getParent().toString() + "/./././././././" + temp.getFileName();
+        String expected = "file://" + temp.toString();
+
+        //When
+        String actual = ExampleFileUtil.convertToFileURI(input).toString();
+
+        //Then
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    @Test
+    public void shouldConvertLocalAbsolutePath() {
+        //Given
+        String input = temp.toString();
+        String expected = "file://" + temp.toString();
+
+        //When
+        String actual = ExampleFileUtil.convertToFileURI(input).toString();
+
+        //Then
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    @Test
+    public void shouldConvertFileSchemeWithRelative() {
+        //Given
+        String input = "file://" + temp.getParent().toString() + "/././././" + temp.getFileName().toString();
+        String expected = "file://" + temp.toString();
+
+        //When
+        String actual = ExampleFileUtil.convertToFileURI(input).toString();
+
+        //Then
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    @Test
+    public void shouldConvertFileSchemeWithAbsolute() {
+        //Given
+        String input = "file://" + temp.toString();
+        String expected = "file://" + temp.toString();
+
+        //When
+        String actual = ExampleFileUtil.convertToFileURI(input).toString();
+
+        //Then
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    @Test
+    public void shouldConvertFileSchemeWithSingleSlash() {
+        //Given
+        String input = "file:" + temp.toString();
+        String expected = "file://" + temp.toString();
+
+        //When
+        String actual = ExampleFileUtil.convertToFileURI(input).toString();
+
+        //Then
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    @Test
+    public void shouldNotChangeOtherProtocol() {
+        //Given
+        String expected = "hdfs://some/path/to/some/file";
+
+        //When
+        String actual = ExampleFileUtil.convertToFileURI(expected).toString();
+
+        //Then
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    @Test
+    public void shouldNotChangeNonExistentFile() {
+        //Given
+        String expected = "file:///nowhere/no_file";
+
+        //When
+        String actual = ExampleFileUtil.convertToFileURI(expected).toString();
+
+        //Then
+        assertThat(actual, is(equalTo(expected)));
     }
 }

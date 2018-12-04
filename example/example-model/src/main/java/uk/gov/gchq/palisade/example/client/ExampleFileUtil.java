@@ -65,8 +65,13 @@ public final class ExampleFileUtil {
      *
      * @param path the path to convert
      * @return the URI of the path
+     * @throws IllegalArgumentException if {@code path} is empty
      */
     public static URI convertToFileURI(final String path) {
+        requireNonNull(path, "path");
+        if (path.isEmpty()) {
+            throw new IllegalArgumentException("path is empty");
+        }
         URI uriPath;
         try {
             uriPath = new URI(path);
@@ -97,3 +102,4 @@ public final class ExampleFileUtil {
         return uriPath;
     }
 }
+
