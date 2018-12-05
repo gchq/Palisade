@@ -28,9 +28,4 @@
         <value>5</value>
         <description>How many times we should retry commands on transient errors.</description>
     </property>
-
-    <property>
-        <name>fs.defaultFS</name>
-        <value>s3a://palisade-example-bucket</value>
-    </property>
 </configuration>
