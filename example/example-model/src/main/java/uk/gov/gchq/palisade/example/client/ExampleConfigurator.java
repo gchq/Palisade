@@ -358,7 +358,7 @@ public final class ExampleConfigurator {
      *
      * @return a Hadoop configuration object
      */
-    public static Configuration createHadoopConfiguration() {
+    private static Configuration createHadoopConfiguration() {
         Configuration ret = new Configuration();
         String extraFiles = System.getenv(HADOOP_CONF_PATH);
         if (nonNull(extraFiles)) {
