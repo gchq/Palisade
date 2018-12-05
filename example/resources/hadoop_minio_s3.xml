@@ -16,7 +16,7 @@
 
     <property>
         <name>fs.s3a.endpoint</name>
-        <value>localhost:9000</value>
+        <value>http://127.0.0.1:9000</value>
         <description>AWS S3 endpoint to connect to. An up-to-date list is
             provided in the AWS Documentation: regions and endpoints. Without this
             property, the standard region (s3.amazonaws.com) is assumed.
@@ -29,4 +29,8 @@
         <description>How many times we should retry commands on transient errors.</description>
     </property>
 
+    <property>
+        <name>fs.defaultFS</name>
+        <value>s3a://palisade-example-bucket</value>
+    </property>
 </configuration>

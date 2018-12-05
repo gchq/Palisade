@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.example;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -193,7 +194,7 @@ public class MapReduceExample extends Configured implements Tool {
         //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
         conf.set("mapred.job.tracker", "local");
         //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
-        conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
+        conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, new File(".").toURI().toURL().toString());
         ToolRunner.run(conf, new MapReduceExample(), new String[]{sourceFile, outputDir});
     }
 
