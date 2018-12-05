@@ -259,7 +259,7 @@ public class HDFSResourceService implements ResourceService {
                         .map(HDFSResourceDetails::getResourceDetailsFromConnectionDetails)
                         .filter(predicate)
                         .collect(Collectors.toMap(
-                                (HDFSResourceDetails resourceDetails) -> {
+                                resourceDetails -> {
                                     final String connectionDetail = resourceDetails.getConnectionDetail();
                                     final FileResource fileFileResource = new FileResource().id(connectionDetail).type(resourceDetails.getType()).serialisedFormat(resourceDetails.getFormat());
                                     resolveParents(fileFileResource, getInternalConf());
