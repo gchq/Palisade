@@ -1,5 +1,5 @@
 {
-  "namespace": "uk.gov.gchq.palisade.data.service.serialiser",
+  "namespace": "uk.gov.gchq.palisade.data.service.impl.serialiser",
   "type": "record",
   "name": "TestObj",
   "fields": [

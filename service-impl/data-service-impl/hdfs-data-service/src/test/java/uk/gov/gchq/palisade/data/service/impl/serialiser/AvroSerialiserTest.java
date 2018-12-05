@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.data.service.serialiser;
+package uk.gov.gchq.palisade.data.service.impl.serialiser;
 
 import com.google.common.collect.Lists;
 import org.apache.avro.Schema;
@@ -146,7 +146,7 @@ public class AvroSerialiserTest {
         // Then
         JsonAssert.assertEquals(String.format("{%n" +
                 "  \"domainClass\" : \"java.lang.Integer\",%n" +
-                "  \"class\" : \"uk.gov.gchq.palisade.data.service.serialiser.AvroSerialiser\"%n" +
+                "  \"class\" : \"uk.gov.gchq.palisade.data.service.impl.serialiser.AvroSerialiser\"%n" +
                 "}").getBytes(), json);
         assertEquals(AvroSerialiser.class, deserialised.getClass());
         assertEquals(serialiser.getDomainClass(), ((AvroSerialiser) deserialised).getDomainClass());
