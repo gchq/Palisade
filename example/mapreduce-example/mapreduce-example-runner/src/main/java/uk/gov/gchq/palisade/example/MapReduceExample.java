@@ -29,7 +29,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,6 @@ import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.example.client.ExampleUtils;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -60,8 +58,6 @@ import java.nio.file.Files;
 public class MapReduceExample extends Configured implements Tool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
 
-    protected static final String DESTINATION = new File("exampleObj_file1.txt").getAbsolutePath();
-    protected static final String FILE = new File("example/exampleObj_file1.txt").getPath();
     protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
     private static final String RESOURCE_TYPE = "exampleObj";
 
@@ -101,10 +97,12 @@ public class MapReduceExample extends Configured implements Tool {
     @Override
     public int run(final String... args) throws Exception {
         //usage check
-        if (args.length < 1) {
-            System.out.println("Args: " + MapReduceExample.class.getName() + " <output directory path to create>");
+        if (args.length < 2) {
+            System.out.println("Example file and MapReduce output directory not specified. Please provide path as argument.");
             return 1;
         }
+
+        String sourceFile = args[0];
 
         //create the basic job object and configure it for this example
         Job job = Job.getInstance(getConf(), "Palisade MapReduce Example");
@@ -122,20 +120,19 @@ public class MapReduceExample extends Configured implements Tool {
         job.setOutputValueClass(IntWritable.class);
         //set the output format
         job.setOutputFormatClass(TextOutputFormat.class);
-        FileOutputFormat.setOutputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
         //configure the Palisade input format on an example client
         final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, DESTINATION);
-
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
         configureJob(job, cs, 2);
 
         //next add a resource request to the job
-        addDataRequest(job, DESTINATION, RESOURCE_TYPE, "Alice", "Payroll");
-        addDataRequest(job, DESTINATION, RESOURCE_TYPE, "Bob", "Payroll");
+        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Alice", "Payroll");
+        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Bob", "Payroll");
 
         //launch job
         boolean success = job.waitForCompletion(true);
@@ -177,25 +174,27 @@ public class MapReduceExample extends Configured implements Tool {
     public static void main(final String... args) throws Exception {
         final String outputDir;
         if (args.length < 1) {
+            System.out.printf("Usage: %s file [output_directory]\n", MapReduceExample.class.getTypeName());
+            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
+            System.out.println("output_directory\tdirectory to write mapreduce outputs to");
+            System.exit(1);
+        }
+
+        String sourceFile = args[0];
+
+        if (args.length < 2) {
             outputDir = DEFAULT_OUTPUT_DIR;
         } else {
-            outputDir = args[0];
+            outputDir = args[1];
         }
-        // create the data in the correct place
-        ExampleUtils.createDataPath(FILE, DESTINATION, MapReduceExample.class);
         //remove this as it needs to be not present when the job runs
         FileUtils.deleteDirectory(new File(outputDir));
-        try {
-            Configuration conf = new Configuration();
-            //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
-            conf.set("mapred.job.tracker", "local");
-            //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
-            conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
-            ToolRunner.run(conf, new MapReduceExample(), new String[]{outputDir});
-        } finally {
-            // clean up
-            FileUtils.deleteQuietly(new File(DESTINATION));
-        }
+        Configuration conf = new Configuration();
+        //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
+        conf.set("mapred.job.tracker", "local");
+        //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
+        conf.set("fs.defaultFS", new File(".").toURI().toURL().toString());
+        ToolRunner.run(conf, new MapReduceExample(), new String[]{sourceFile, outputDir});
     }
 
     private static String createOutputDir() {

@@ -16,7 +16,10 @@
 package uk.gov.gchq.palisade.example;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
+import uk.gov.gchq.palisade.example.client.ExampleFileUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +32,20 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.gchq.palisade.example.MapReduceExample.DEFAULT_OUTPUT_DIR;
 
 public class MapReduceExampleIT {
+
+    public static final String TEST_FILE = "/test_ExampleObj.txt";
+    public static String TEMP_DESTINATION;
+
+    @Before
+    public void before() throws Exception {
+        TEMP_DESTINATION = Files.createTempFile("exampleObj_", ".txt").toAbsolutePath().toString();
+        ExampleFileUtil.createDataPath(TEST_FILE, TEMP_DESTINATION, MapReduceExampleIT.class);
+    }
+
+    @AfterClass
+    public static void deleteFile() {
+        FileUtils.deleteQuietly(new File(TEMP_DESTINATION));
+    }
 
     @Test
     public void shouldExitWithOneWithNoArgs() throws Exception {
@@ -45,7 +62,7 @@ public class MapReduceExampleIT {
         // Given
         // When
         try {
-            MapReduceExample.main();
+            MapReduceExample.main(new String[]{TEMP_DESTINATION});
         } finally {
             // Then - no exceptions
             FileUtils.deleteDirectory(new File(DEFAULT_OUTPUT_DIR));
@@ -55,15 +72,15 @@ public class MapReduceExampleIT {
     @Test
     public void shouldProduceKnownResults() throws Exception {
         try {
-        //Given
-        String expected = slurpStream(MapReduceExampleIT.class.getResourceAsStream("/expected_results.txt"));
-        // When
-        MapReduceExample.main();
-        //read actual results
-        requireNonNull(DEFAULT_OUTPUT_DIR, "The temp directory cannot be null.");
-        String actual = slurpStream(Files.newInputStream(new File(DEFAULT_OUTPUT_DIR).toPath().resolve("part-r-00000")));
-        //Then
-        assertEquals(expected, actual);
+            //Given
+            String expected = slurpStream(MapReduceExampleIT.class.getResourceAsStream("/expected_results.txt"));
+            // When
+            MapReduceExample.main(new String[]{TEMP_DESTINATION});
+            //read actual results
+            requireNonNull(DEFAULT_OUTPUT_DIR, "The temp directory cannot be null.");
+            String actual = slurpStream(Files.newInputStream(new File(DEFAULT_OUTPUT_DIR).toPath().resolve("part-r-00000")));
+            //Then
+            assertEquals(expected, actual);
         } finally {
             FileUtils.deleteDirectory(new File(DEFAULT_OUTPUT_DIR));
         }
