@@ -127,13 +127,14 @@ public class MapReduceExample extends Configured implements Tool {
         final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
         final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
+
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
         configureJob(job, cs, 2);
 
         //next add a resource request to the job
-        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Alice", "Payroll");
-        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Bob", "Payroll");
+        addDataRequest(job, client.getURIConvertedFile(), RESOURCE_TYPE, "Alice", "Payroll");
+        addDataRequest(job, client.getURIConvertedFile(), RESOURCE_TYPE, "Bob", "Payroll");
 
         //launch job
         boolean success = job.waitForCompletion(true);
