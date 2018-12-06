@@ -155,6 +155,34 @@
         </dependency>
     </dependencies>
 
+    <!-- Disable Docker container starting and stopping when integration tests are not run -->
+    <profiles>
+        <profile>
+            <id>quick</id>
+            <properties>
+                <docker.skip>true</docker.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>analyse</id>
+            <properties>
+                <docker.skip>true</docker.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>unit-test</id>
+            <properties>
+                <docker.skip>true</docker.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>example</id>
+            <properties>
+                <docker.skip>true</docker.skip>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <!-- Docker plugin for managing containers to run tests against -->
