@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hdfs-data-service</artifactId>
+            <artifactId>hadoop-data-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

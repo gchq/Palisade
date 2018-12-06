@@ -33,7 +33,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hdfs-resource-service</artifactId>
+            <artifactId>hadoop-resource-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

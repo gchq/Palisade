@@ -29,7 +29,7 @@
         <module>simple-data-service</module>
         <module>rest-data-service</module>
         <module>proxy-rest-data-service</module>
-        <module>hdfs-data-service</module>
+        <module>hadoop-data-service</module>
     </modules>
 
     <dependencies>
