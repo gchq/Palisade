@@ -34,11 +34,11 @@ import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.reader.DataReader;
-import uk.gov.gchq.palisade.data.service.reader.HDFSDataReader;
+import uk.gov.gchq.palisade.data.service.reader.HadoopDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
-import uk.gov.gchq.palisade.resource.service.HDFSResourceService;
+import uk.gov.gchq.palisade.resource.service.HadoopResourceService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
@@ -97,10 +97,10 @@ public final class ExampleConfigurator {
         AuditService audit = createAuditService(configService, cache);
         SimplePalisadeService palisade = createPalisadeService(configService, cache, policy, user, audit);
 
-        HDFSResourceService resource;
+        HadoopResourceService resource;
         try {
             resource = createResourceService(configService, cache);
-            HDFSDataReader reader = createDataReader(configService, cache);
+            HadoopDataReader reader = createDataReader(configService, cache);
             palisade.resourceService(resource);
             configureResourceConnectionDetails(resource, new SimpleConnectionDetail().service(createDataService(configService, cache, palisade, reader)));
         } catch (IOException e) {
@@ -189,13 +189,13 @@ public final class ExampleConfigurator {
             containerCache.ifPresent(remotePolicy::setCacheService);
             writeConfiguration(configService, remotePolicy, PolicyService.class);
 
-            HDFSResourceService remoteResource = createResourceService(configService, cache);
+            HadoopResourceService remoteResource = createResourceService(configService, cache);
             configureResourceConnectionDetails(remoteResource, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
             containerCache.ifPresent(remoteResource::setCacheService);
             writeConfiguration(configService, remoteResource, ResourceService.class);
 
             try {
-                HDFSDataReader remoteReader = createDataReader(configService, cache);
+                HadoopDataReader remoteReader = createDataReader(configService, cache);
                 SimpleDataService remoteDataService = createDataService(configService, cache, palisade, remoteReader);
                 containerPalisade.ifPresent(remoteDataService::setPalisadeService);
                 //write configuration for the specific data service sub class
@@ -258,9 +258,9 @@ public final class ExampleConfigurator {
      * @return the data reader
      * @throws IOException if a failure occurs creating the reader
      */
-    private static HDFSDataReader createDataReader(final ConfigurationService configService, final CacheService cacheService) throws IOException {
+    private static HadoopDataReader createDataReader(final ConfigurationService configService, final CacheService cacheService) throws IOException {
         Configuration conf = createHadoopConfiguration();
-        HDFSDataReader reader = new HDFSDataReader().conf(conf);
+        HadoopDataReader reader = new HadoopDataReader().conf(conf);
         reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
         return reader;
     }
@@ -284,7 +284,7 @@ public final class ExampleConfigurator {
      * @param resource             the resource service
      * @param exampleObjConnection connection details for the example resource
      */
-    private static void configureResourceConnectionDetails(final HDFSResourceService resource, final ConnectionDetail exampleObjConnection) {
+    private static void configureResourceConnectionDetails(final HadoopResourceService resource, final ConnectionDetail exampleObjConnection) {
         final Map<String, ConnectionDetail> dataType = new HashMap<>();
         dataType.put(RESOURCE_TYPE, exampleObjConnection);
         resource.connectionDetail(null, dataType);
@@ -387,10 +387,10 @@ public final class ExampleConfigurator {
      * @param cache         the Palisade cache service
      * @return a configured resource service
      */
-    private static HDFSResourceService createResourceService(final ConfigurationService configService, final CacheService cache) {
+    private static HadoopResourceService createResourceService(final ConfigurationService configService, final CacheService cache) {
         try {
             Configuration conf = createHadoopConfiguration();
-            HDFSResourceService resource = new HDFSResourceService().conf(conf).cacheService(cache);
+            HadoopResourceService resource = new HadoopResourceService().conf(conf).cacheService(cache);
             return resource;
         } catch (IOException e) {
             throw new RuntimeException(e);
