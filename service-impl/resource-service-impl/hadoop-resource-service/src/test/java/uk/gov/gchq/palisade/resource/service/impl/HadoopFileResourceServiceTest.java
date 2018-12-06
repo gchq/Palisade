@@ -1,4 +1,4 @@
-package uk.gov.gchq.palisade.resource.service;
+package uk.gov.gchq.palisade.resource.service.impl;
 
 import com.google.common.collect.Maps;
 import org.apache.hadoop.conf.Configuration;
@@ -273,7 +273,7 @@ public class HadoopFileResourceServiceTest {
         final byte[] serialise = JSONSerialiser.serialise(service, true);
         final String expected = "{\n" +
                 "  \"@id\" : 1,\n" +
-                "  \"class\" : \"uk.gov.gchq.palisade.resource.service.HadoopResourceService\",\n" +
+                "  \"class\" : \"uk.gov.gchq.palisade.resource.service.impl.HadoopResourceService\",\n" +
                 "  \"cacheService\" : {\n" +
                 "    \"@id\" : 2,\n" +
                 "    \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService\",\n" +
