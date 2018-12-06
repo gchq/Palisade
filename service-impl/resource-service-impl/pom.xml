@@ -28,7 +28,7 @@
     <modules>
         <module>rest-resource-service</module>
         <module>proxy-rest-resource-service</module>
-        <module>hdfs-resource-service</module>
+        <module>hadoop-resource-service</module>
     </modules>
 
     <dependencies>
