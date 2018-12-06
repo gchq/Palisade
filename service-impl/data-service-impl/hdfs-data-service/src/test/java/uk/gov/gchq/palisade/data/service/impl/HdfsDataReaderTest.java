@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.data.service;
+package uk.gov.gchq.palisade.data.service.impl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -24,7 +24,7 @@ import org.junit.rules.TemporaryFolder;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
-import uk.gov.gchq.palisade.data.service.reader.HDFSDataReader;
+import uk.gov.gchq.palisade.data.service.impl.reader.HDFSDataReader;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.resource.impl.FileResource;

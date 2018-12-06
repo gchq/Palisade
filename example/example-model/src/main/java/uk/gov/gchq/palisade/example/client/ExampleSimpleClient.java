@@ -183,4 +183,13 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                         .spliterator(), false)
                 .anyMatch(path::equals);
     }
+
+    /**
+     * Gets the file passed at construction as a fully qualified URI.
+     *
+     * @return the absolute URI file path
+     */
+    public String getURIConvertedFile() {
+        return file;
+    }
 }

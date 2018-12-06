@@ -3,7 +3,7 @@
  *
  * DO NOT EDIT DIRECTLY
  */
-package uk.gov.gchq.palisade.data.service.serialiser;
+package uk.gov.gchq.palisade.data.service.impl.serialiser;
 
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.message.BinaryMessageEncoder;
@@ -14,7 +14,7 @@ import org.apache.avro.message.SchemaStore;
 @org.apache.avro.specific.AvroGenerated
 public class TestObj extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = 7843905661986499514L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"TestObj\",\"namespace\":\"uk.gov.gchq.palisade.data.service.serialiser\",\"fields\":[{\"name\":\"fieldStr1\",\"type\":\"string\"},{\"name\":\"fieldInt\",\"type\":[\"int\",\"null\"]},{\"name\":\"fieldStr2\",\"type\":[\"string\",\"null\"]}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"TestObj\",\"namespace\":\"uk.gov.gchq.palisade.data.service.impl.serialiser\",\"fields\":[{\"name\":\"fieldStr1\",\"type\":\"string\"},{\"name\":\"fieldInt\",\"type\":[\"int\",\"null\"]},{\"name\":\"fieldStr2\",\"type\":[\"string\",\"null\"]}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
@@ -148,8 +148,8 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
    * Creates a new TestObj RecordBuilder.
    * @return A new TestObj RecordBuilder
    */
-  public static uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder newBuilder() {
-    return new uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder();
+  public static uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder newBuilder() {
+    return new uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder();
   }
 
   /**
@@ -157,8 +157,8 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
    * @param other The existing builder to copy.
    * @return A new TestObj RecordBuilder
    */
-  public static uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder newBuilder(uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder other) {
-    return new uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder(other);
+  public static uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder newBuilder(uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder other) {
+    return new uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder(other);
   }
 
   /**
@@ -166,8 +166,8 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
    * @param other The existing instance to copy.
    * @return A new TestObj RecordBuilder
    */
-  public static uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder newBuilder(uk.gov.gchq.palisade.data.service.serialiser.TestObj other) {
-    return new uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder(other);
+  public static uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder newBuilder(uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj other) {
+    return new uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder(other);
   }
 
   /**
@@ -189,7 +189,7 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
      * Creates a Builder by copying an existing Builder.
      * @param other The existing Builder to copy.
      */
-    private Builder(uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder other) {
+    private Builder(uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder other) {
       super(other);
       if (isValidValue(fields()[0], other.fieldStr1)) {
         this.fieldStr1 = data().deepCopy(fields()[0].schema(), other.fieldStr1);
@@ -209,7 +209,7 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
      * Creates a Builder by copying an existing TestObj instance
      * @param other The existing instance to copy.
      */
-    private Builder(uk.gov.gchq.palisade.data.service.serialiser.TestObj other) {
+    private Builder(uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj other) {
             super(SCHEMA$);
       if (isValidValue(fields()[0], other.fieldStr1)) {
         this.fieldStr1 = data().deepCopy(fields()[0].schema(), other.fieldStr1);
@@ -238,7 +238,7 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
       * @param value The value of 'fieldStr1'.
       * @return This builder.
       */
-    public uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder setFieldStr1(java.lang.CharSequence value) {
+    public uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder setFieldStr1(java.lang.CharSequence value) {
       validate(fields()[0], value);
       this.fieldStr1 = value;
       fieldSetFlags()[0] = true;
@@ -258,7 +258,7 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'fieldStr1' field.
       * @return This builder.
       */
-    public uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder clearFieldStr1() {
+    public uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder clearFieldStr1() {
       fieldStr1 = null;
       fieldSetFlags()[0] = false;
       return this;
@@ -277,7 +277,7 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
       * @param value The value of 'fieldInt'.
       * @return This builder.
       */
-    public uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder setFieldInt(java.lang.Integer value) {
+    public uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder setFieldInt(java.lang.Integer value) {
       validate(fields()[1], value);
       this.fieldInt = value;
       fieldSetFlags()[1] = true;
@@ -297,7 +297,7 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'fieldInt' field.
       * @return This builder.
       */
-    public uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder clearFieldInt() {
+    public uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder clearFieldInt() {
       fieldInt = null;
       fieldSetFlags()[1] = false;
       return this;
@@ -316,7 +316,7 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
       * @param value The value of 'fieldStr2'.
       * @return This builder.
       */
-    public uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder setFieldStr2(java.lang.CharSequence value) {
+    public uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder setFieldStr2(java.lang.CharSequence value) {
       validate(fields()[2], value);
       this.fieldStr2 = value;
       fieldSetFlags()[2] = true;
@@ -336,7 +336,7 @@ public class TestObj extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'fieldStr2' field.
       * @return This builder.
       */
-    public uk.gov.gchq.palisade.data.service.serialiser.TestObj.Builder clearFieldStr2() {
+    public uk.gov.gchq.palisade.data.service.impl.serialiser.TestObj.Builder clearFieldStr2() {
       fieldStr2 = null;
       fieldSetFlags()[2] = false;
       return this;
