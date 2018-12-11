@@ -16,5 +16,35 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator;
 
+import com.github.javafaker.Faker;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.Locale;
+
 public class Address {
+    private String fullAddress;
+
+
+    public static Address generate() {
+        Address address = new Address();
+        Faker faker = new Faker(new Locale("en-GB"));
+        String fullAddress = faker.address().fullAddress();
+        address.setFullAddress(fullAddress);
+        return address;
+    }
+
+    public String getFullAddress() {
+        return fullAddress;
+    }
+
+    public void setFullAddress(final String fullAddress) {
+        this.fullAddress = fullAddress;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("fullAddress", fullAddress)
+                .toString();
+    }
 }

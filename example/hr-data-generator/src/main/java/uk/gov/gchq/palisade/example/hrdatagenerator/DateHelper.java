@@ -19,12 +19,12 @@ package uk.gov.gchq.palisade.example.hrdatagenerator;
 import java.util.GregorianCalendar;
 import java.util.Random;
 
-public class RandomDateOfBirth {
+public class DateHelper {
 
-    private RandomDateOfBirth(){
+    private DateHelper(){
     }
 
-    public static String generate(final Random random) {
+    public static String generateDateOfBirth(final Random random) {
         GregorianCalendar gc = new GregorianCalendar();
         int year = 1800 + random.nextInt(100);
         gc.set(gc.YEAR, year);

@@ -26,4 +26,5 @@ public class EmployeeTest {
     public void generateEmployee() {
         System.out.println(Employee.generate(new Random(0)));
     }
+
 }

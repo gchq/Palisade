@@ -40,13 +40,23 @@ public class Employee {
         Employee employee = new Employee();
         employee.setUid(generateUID(random));
         employee.setName(new NameGenerator().generateName());
-        employee.setDateOfBirth(RandomDateOfBirth.generate(random));
+        employee.setDateOfBirth(DateHelper.generateDateOfBirth(random));
         employee.setContactNumbers(PhoneNumber.generateMany(random));
+        employee.setEmergencyContacts(EmergencyContact.generateMany(random));
+        employee.setAddress(Address.generate());
+        employee.setBankDetails(BankDetails.generate(random));
+        employee.setTaxCode(generateTaxCode());
+        employee.setEthnicity(Ethnicity.generate(random));
+        employee.setManager(Manager.generate(random));
         return employee;
     }
 
     private static int generateUID(final Random random) {
         return random.nextInt();
+    }
+
+    private static String generateTaxCode() {
+        return "11500L";
     }
 
     public int getUid() {
@@ -109,9 +119,7 @@ public class Employee {
         return taxCode;
     }
 
-    public void setTaxCode(final String taxCode) {
-        this.taxCode = taxCode;
-    }
+    public void setTaxCode(final String taxCode) { this.taxCode = taxCode; }
 
     public Ethnicity getEthnicity() {
         return ethnicity;

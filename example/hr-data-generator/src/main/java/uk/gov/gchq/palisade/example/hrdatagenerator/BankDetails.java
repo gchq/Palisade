@@ -16,8 +16,51 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.Random;
+
 public class BankDetails {
-    private String bankName;
     private String sortCode;
     private String accountNumber;
+
+    public static BankDetails generate(final Random random) {
+        BankDetails bankDetails = new BankDetails();
+        StringBuilder sortCode = new StringBuilder(String.valueOf(random.nextInt(999999)));
+        while (sortCode.length() < 6) {
+            sortCode.insert(0, "0");
+        }
+        StringBuilder accountNumber = new StringBuilder(String.valueOf(random.nextInt(99999999)));
+        while (accountNumber.length() < 8) {
+            accountNumber.insert(0, "0");
+        }
+        bankDetails.setSortCode(sortCode.toString());
+        bankDetails.setAccountNumber(accountNumber.toString());
+        return bankDetails;
+    }
+
+    public String getSortCode() {
+        return sortCode;
+    }
+
+    public void setSortCode(final String sortCode) {
+        this.sortCode = sortCode;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(final String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("sortCode", sortCode)
+                .append("accountNumber", accountNumber)
+                .toString();
+    }
 }
+
