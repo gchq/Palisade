@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.cache.service;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.RemoveCacheRequest;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -48,7 +49,7 @@ public interface CacheService extends Service {
     <V> CompletableFuture<Boolean> add(final AddCacheRequest<V> request);
 
     /**
-     * Retrieve an item from the cache. The <code>request</code> should be parameterized according to the expected type
+     * Retrieve an item from the cache. The {@code request} should be parameterized according to the expected type
      * of object to be retrieved. If the cache couldn't find an entry for the requested key, then the {@link Optional}
      * returned will be empty.
      *
@@ -67,6 +68,15 @@ public interface CacheService extends Service {
      */
     CompletableFuture<Stream<String>> list(final ListCacheRequest request);
 
+    /**
+     * Remove an item from the cache. The {@code request} contains the key name to remove. If an item with the matching key is in the cache,
+     * it will removed. If not, nothing will happen.
+     *
+     * @param request the request to remove a cache entry
+     * @return a future that will contain true if the key was sucessfully removed, false otherwise
+     */
+    CompletableFuture<Boolean> remove(final RemoveCacheRequest request);
+
     @Override
     default CompletableFuture<?> process(final Request request) {
         if (request instanceof AddCacheRequest) {
@@ -77,6 +87,9 @@ public interface CacheService extends Service {
         }
         if (request instanceof ListCacheRequest) {
             return list((ListCacheRequest) request);
+        }
+        if (request instanceof RemoveCacheRequest) {
+            return remove((RemoveCacheRequest) request);
         }
         return Service.super.process(request);
     }

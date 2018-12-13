@@ -13,7 +13,7 @@ process and not shared between different services.
 
 ## Operation
 
-The cache service has three methods `add()`, `get()` and `list()`.
+The cache service has four methods `add()`, `get()`, `remove()` and `list()`.
 
 The data in the cache should be maintained by a time to live (TTL) value rather than
 manually removing after the get request as any scalable deployment would likely make

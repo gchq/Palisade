@@ -91,6 +91,8 @@ public interface BackingStore {
      */
     SimpleCacheObject get(final String key);
 
+    boolean remove(final String key);
+
     /**
      * Get a stream of all keys with a given prefix. This method acts as a way to query the backing store to find which
      * keys it has. The returned list will have all the keys that start with the given string in it.
