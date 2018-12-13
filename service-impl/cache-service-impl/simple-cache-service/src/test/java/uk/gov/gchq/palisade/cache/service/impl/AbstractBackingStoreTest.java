@@ -108,13 +108,13 @@ public abstract class AbstractBackingStoreTest {
     }
 
     @Test
-    public void shouldReturnTrueOnKey() {
+    public void shouldReturnTrueOnKeyPresent() {
         //Given
         byte[] b1 = new byte[10];
-        impl.add("foo_key1", Object.class, b1);
+        impl.add("baz_key1", Object.class, b1);
 
         //When
-        boolean present = impl.remove("foo_key1");
+        boolean present = impl.remove("baz_key1");
 
         //Then
         assertTrue(present);
@@ -125,21 +125,21 @@ public abstract class AbstractBackingStoreTest {
         //Given
         byte[] b1 = new byte[10];
         //check nothing there
-        SimpleCacheObject result = impl.get("foo_key1");
+        SimpleCacheObject result = impl.get("remove_test1");
         assertFalse(result.getValue().isPresent());
 
         //Add key
-        impl.add("foo_key1", Object.class, b1);
+        impl.add("remove_test1", Object.class, b1);
         //check present
-        result = impl.get("foo_key1");
+        result = impl.get("remove_test1");
         assertTrue(result.getValue().isPresent());
 
         //When
-        impl.remove("foo_key1");
+        impl.remove("remove_test1");
 
         //Then
         //check not there
-        result = impl.get("foo_key1");
+        result = impl.get("remove_test1");
         assertFalse(result.getValue().isPresent());
     }
 
@@ -149,14 +149,14 @@ public abstract class AbstractBackingStoreTest {
         byte[] b1 = new byte[10];
         byte[] b2 = new byte[10];
 
-        impl.add("foo_key1", Object.class, b1);
-        impl.add("bar_key2", Object.class, b2);
+        impl.add("remove_test2", Object.class, b1);
+        impl.add("remove_test3", Object.class, b2);
 
         //When
-        impl.remove("bar_key2");
+        impl.remove("remove_test2");
 
         //Then
-        SimpleCacheObject result = impl.get("foo_key1");
+        SimpleCacheObject result = impl.get("remove_test3");
         assertTrue(result.getValue().isPresent());
     }
 

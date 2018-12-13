@@ -20,6 +20,7 @@ import com.coreos.jetcd.KV;
 import com.coreos.jetcd.Lease;
 import com.coreos.jetcd.data.ByteSequence;
 import com.coreos.jetcd.data.KeyValue;
+import com.coreos.jetcd.kv.DeleteResponse;
 import com.coreos.jetcd.kv.GetResponse;
 import com.coreos.jetcd.kv.PutResponse;
 import com.coreos.jetcd.options.GetOption;
@@ -166,6 +167,9 @@ public class EtcdBackingStore implements BackingStore {
     @Override
     public boolean remove(final String key) {
         String cacheKey = BackingStore.keyCheck(key);
-        throw new UnsupportedOperationException("not implemented yet");
+        CompletableFuture<DeleteResponse> removedValue = getKeyValueClient().delete(ByteSequence.fromString(cacheKey + ".value"));
+        CompletableFuture<DeleteResponse> removedClass = getKeyValueClient().delete(ByteSequence.fromString(cacheKey + ".class"));
+        removedClass.join();
+        return (removedValue.join().getDeleted() != 0);
     }
 }
