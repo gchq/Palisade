@@ -17,6 +17,9 @@ package uk.gov.gchq.palisade.cache.service.impl;
 
 import org.junit.Test;
 
+import java.time.Duration;
+import java.util.Optional;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -54,5 +57,13 @@ public class BackingStoreStaticTest {
         String real = BackingStore.keyCheck(key);
         //Then
         assertEquals(key, real);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwOnNegativeDuration() {
+        //Given whitespace
+        BackingStore.durationCheck(Optional.of(Duration.ofSeconds(-1)));
+        //Then - throw
+        fail("exception expected");
     }
 }

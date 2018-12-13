@@ -94,7 +94,100 @@ public abstract class AbstractBackingStoreTest {
         assertTrue(streamEqual(Stream.empty(), ret));
     }
 
+    //Remove tests
+
+    @Test
+    public void shouldReturnFalseOnNoKey() {
+        //Given - nothing
+
+        //When
+        boolean present = impl.remove("not_there");
+
+        //Then
+        assertFalse(present);
+    }
+
+    @Test
+    public void shouldReturnTrueOnKey() {
+        //Given
+        byte[] b1 = new byte[10];
+        impl.add("foo_key1", Object.class, b1);
+
+        //When
+        boolean present = impl.remove("foo_key1");
+
+        //Then
+        assertTrue(present);
+    }
+
+    @Test
+    public void shouldActuallyRemoveKey() {
+        //Given
+        byte[] b1 = new byte[10];
+        //check nothing there
+        SimpleCacheObject result = impl.get("foo_key1");
+        assertFalse(result.getValue().isPresent());
+
+        //Add key
+        impl.add("foo_key1", Object.class, b1);
+        //check present
+        result = impl.get("foo_key1");
+        assertTrue(result.getValue().isPresent());
+
+        //When
+        impl.remove("foo_key1");
+
+        //Then
+        //check not there
+        result = impl.get("foo_key1");
+        assertFalse(result.getValue().isPresent());
+    }
+
+    @Test
+    public void shouldNotRemoveOther() {
+        //Given
+        byte[] b1 = new byte[10];
+        byte[] b2 = new byte[10];
+
+        impl.add("foo_key1", Object.class, b1);
+        impl.add("bar_key2", Object.class, b2);
+
+        //When
+        impl.remove("bar_key2");
+
+        //Then
+        SimpleCacheObject result = impl.get("foo_key1");
+        assertTrue(result.getValue().isPresent());
+    }
+
     //Error tests
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwOnEmptyKeyRemove() {
+        //Given - nothing
+        //When
+        impl.remove("");
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwOnNullKeyRemove() {
+        //Given - nothing
+        //When
+        impl.remove(null);
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwOnWhitespaceKeyRemove() {
+        //Given - nothing
+        //When
+        impl.remove("  ");
+        //Then
+        fail("exception expected");
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void throwOnEmptyKeyStore() {

@@ -228,7 +228,6 @@ public class PropertiesBackingStore implements BackingStore {
         singleThread.submit(new WatchFile(this, configPath));
     }
 
-
     /**
      * The file path to where this backing store is storing the cache.
      *
@@ -361,6 +360,22 @@ public class PropertiesBackingStore implements BackingStore {
                 //key not found
                 return new SimpleCacheObject(Object.class, Optional.empty());
             }
+        }
+    }
+
+    @Override
+    public boolean remove(final String key) {
+        String cacheKey = BackingStore.keyCheck(key);
+        //perform first check to ensure we don't return true on a value that should have expired
+        update(false);
+        synchronized (this) {
+            boolean present = props.containsKey(cacheKey);
+            if (present) {
+                removeKey(cacheKey);
+                update(true);
+            }
+            LOGGER.debug("Cache key remove of {} possible {}", cacheKey, present);
+            return present;
         }
     }
 
