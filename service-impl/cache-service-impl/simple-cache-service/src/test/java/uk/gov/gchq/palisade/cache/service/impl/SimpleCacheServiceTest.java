@@ -254,6 +254,9 @@ public class SimpleCacheServiceTest {
         assertFalse(result.join().isPresent());
     }
 
+    //Test
+    //should add and remove correctly not across services
+
     @Test(expected = NullPointerException.class)
     public void throwOnNullBackingStore() {
         //Given - nothing
@@ -295,6 +298,15 @@ public class SimpleCacheServiceTest {
         //Given - nothing
         //When
         service.list(null);
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void throwOnNullRemove() {
+        //Given - nothing
+        //When
+        service.remove(null);
         //Then
         fail("exception expected");
     }

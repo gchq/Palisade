@@ -160,6 +160,22 @@ public abstract class AbstractBackingStoreTest {
         assertTrue(result.getValue().isPresent());
     }
 
+    @Test
+    public void shouldNotRemoveTwice() {
+        //Given
+        byte[] b1 = new byte[10];
+
+        impl.add("remove_test4", Object.class, b1);
+
+        //When
+        boolean removePresent = impl.remove("remove_test4");
+        boolean removeEmpty = impl.remove("remove_test4");
+
+        //Then
+        assertTrue(removePresent);
+        assertFalse(removeEmpty);
+    }
+
     //Error tests
 
     @Test(expected = IllegalArgumentException.class)
