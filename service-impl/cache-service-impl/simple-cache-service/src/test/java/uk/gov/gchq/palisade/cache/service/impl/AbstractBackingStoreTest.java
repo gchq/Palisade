@@ -121,7 +121,7 @@ public abstract class AbstractBackingStoreTest {
     }
 
     @Test
-    public void shouldActuallyRemoveKey() {
+    public void shouldRemoveKey() {
         //Given
         byte[] b1 = new byte[10];
         //check nothing there
