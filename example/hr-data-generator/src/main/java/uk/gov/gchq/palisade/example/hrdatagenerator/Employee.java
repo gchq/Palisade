@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,8 +33,8 @@ public class Employee {
     private Address address;
     private BankDetails bankDetails;
     private String taxCode;
-    private Ethnicity ethnicity;
-    private Manager manager;
+    private Nationality nationality;
+    private Manager[] manager;
 
     public static Employee generate(final Random random) {
         Employee employee = new Employee();
@@ -46,8 +46,8 @@ public class Employee {
         employee.setAddress(Address.generate());
         employee.setBankDetails(BankDetails.generate(random));
         employee.setTaxCode(generateTaxCode());
-        employee.setEthnicity(Ethnicity.generate(random));
-        employee.setManager(Manager.generate(random));
+        employee.setNationality(Nationality.generate(random));
+        employee.setManager(Manager.generateMany(random, random.nextInt(3) + 2));
         return employee;
     }
 
@@ -119,21 +119,23 @@ public class Employee {
         return taxCode;
     }
 
-    public void setTaxCode(final String taxCode) { this.taxCode = taxCode; }
-
-    public Ethnicity getEthnicity() {
-        return ethnicity;
+    public void setTaxCode(final String taxCode) {
+        this.taxCode = taxCode;
     }
 
-    public void setEthnicity(final Ethnicity ethnicity) {
-        this.ethnicity = ethnicity;
+    public Nationality getNationality() {
+        return nationality;
     }
 
-    public Manager getManager() {
+    public void setNationality(final Nationality nationality) {
+        this.nationality = nationality;
+    }
+
+    public Manager[] getManager() {
         return manager;
     }
 
-    public void setManager(final Manager manager) {
+    public void setManager(final Manager[] manager) {
         this.manager = manager;
     }
 
@@ -148,7 +150,7 @@ public class Employee {
                 .append("address", address)
                 .append("bankDetails", bankDetails)
                 .append("taxCode", taxCode)
-                .append("ethnicity", ethnicity)
+                .append("nationality", nationality)
                 .append("manager", manager)
                 .toString();
     }

@@ -186,7 +186,7 @@
             </properties>
         </profile>
         <profile>
-            <id>analyze</id>
+            <id>analyse</id>
             <properties>
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
