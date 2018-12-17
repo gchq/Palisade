@@ -65,10 +65,8 @@ To get started, clone the Palisade repo:
 
 `git clone https://github.com/gchq/Palisade.git`
 
-We have three simple examples that demonstrate the automated auditing and policy rule enforcement when users read some data. 
+We have two simple examples that demonstrate the automated auditing and policy rule enforcement when users read some data.
 These example should provide a good start to understanding how Palisade works.
-
-* To run the single-jvm-example module follow this guide: [single-jvm-example](example/single-jvm-example/README.md)
 
 * To run the REST based example follow this guide: [multi-jvm-example](example/multi-jvm-example/README.md)
 
