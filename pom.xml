@@ -80,7 +80,6 @@
         <scala.minor.version>2.11.8</scala.minor.version>
         <commons-io.version>2.4</commons-io.version>
         <reflections.version>0.9.10</reflections.version>
-        <org.json.version>20180813</org.json.version>
 
         <!-- Testing properties -->
         <junit.version>4.12</junit.version>

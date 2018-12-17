@@ -25,5 +25,4 @@ public enum Relation {
     SISTER,
     DAUGHTER,
     SON;
-
 }

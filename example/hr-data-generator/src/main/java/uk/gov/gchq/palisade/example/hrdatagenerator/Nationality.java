@@ -248,8 +248,6 @@ public enum Nationality {
         return Nationality.values()[random.nextInt(224)];
 
     }
-
-
 }
 
 

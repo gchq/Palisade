@@ -20,7 +20,6 @@ import org.ajbrown.namemachine.Name;
 import org.ajbrown.namemachine.NameGenerator;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class Employee {
@@ -145,7 +144,7 @@ public class Employee {
                 .append("uid", uid)
                 .append("name", name)
                 .append("dateOfBirth", dateOfBirth)
-                .append("contactNumbers", Arrays.toString(contactNumbers))
+                .append("contactNumbers", contactNumbers)
                 .append("emergencyContacts", emergencyContacts)
                 .append("address", address)
                 .append("bankDetails", bankDetails)

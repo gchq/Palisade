@@ -21,5 +21,4 @@ public enum Purpose {
     TAX,
     SALARY,
     EMPLOYEE_REPORT;
-
 }
