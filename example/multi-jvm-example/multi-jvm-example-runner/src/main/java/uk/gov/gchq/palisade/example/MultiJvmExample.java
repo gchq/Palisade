@@ -17,7 +17,6 @@
 package uk.gov.gchq.palisade.example;
 
 import io.etcd.jetcd.launcher.junit.EtcdClusterResource;
-import org.apache.commons.io.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,27 +26,27 @@ import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Objects.requireNonNull;
-
 public class MultiJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
-    protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
 
     public static void main(final String[] args) throws Exception {
-        new MultiJvmExample().run();
+        if (args.length < 1) {
+            System.out.printf("Usage: %s file\n", MultiJvmExample.class.getTypeName());
+            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
+            System.exit(1);
+        }
+
+        String sourceFile = args[0];
+        new MultiJvmExample().run(sourceFile);
     }
 
-    public void run() throws Exception {
-        createDataPath();
+    public void run(final String sourceFile) throws Exception {
         EtcdClusterResource etcd = null;
         try {
             etcd = new EtcdClusterResource("test-etcd", 1);
@@ -59,35 +58,25 @@ public class MultiJvmExample {
             //this will write an initial configuration
             final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs,
                     Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-            final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+            final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
             LOGGER.info("");
             LOGGER.info("Alice is reading file1...");
-            final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
+            final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
             LOGGER.info("Alice got back: ");
             aliceResults.map(Object::toString).forEach(LOGGER::info);
 
             LOGGER.info("");
             LOGGER.info("Bob is reading file1...");
-            final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
+            final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
             LOGGER.info("Bob got back: ");
             bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {
-            FileUtils.deleteQuietly(new File(FILE));
             if (etcd != null) {
                 etcd.cluster().close();
             }
-        }
-    }
-
-    static void createDataPath() {
-        final File targetFile = new File(FILE);
-        try (final InputStream data = MultiJvmExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
-            requireNonNull(data, "couldn't load file: " + FILE);
-            FileUtils.copyInputStreamToFile(data, targetFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }

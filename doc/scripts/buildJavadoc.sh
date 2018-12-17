@@ -6,7 +6,7 @@ set -e
 
 echo "Building javadoc"
 
-mvn clean install
+mvn install -P example
 mvn javadoc:aggregate
 rm -rf doc/javadoc
 mkdir doc/javadoc

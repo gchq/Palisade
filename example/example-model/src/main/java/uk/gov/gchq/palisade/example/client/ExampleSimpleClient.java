@@ -40,18 +40,24 @@ import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 
+import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.Iterator;
+import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import static java.util.Objects.isNull;
 
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     private final String file;
 
     public ExampleSimpleClient(final ServicesFactory services, final String file) {
         super(services, new ExampleObjSerialiser());
-        this.file = file;
+        URI absoluteFileURI = ExampleFileUtil.convertToFileURI(file);
+        String absoluteFile = absoluteFileURI.toString();
+        this.file = absoluteFile;
         initialiseServices();
     }
 
@@ -87,46 +93,46 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
                 new SetResourcePolicyRequest()
                         .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                         .policy(new Policy<ExampleObj>()
-                                        .owner(alice)
-                                        .recordLevelRule(
-                                                "1-visibility",
-                                                new IsExampleObjVisible()
-                                        )
-                                        .recordLevelRule(
-                                                "2-ageOff",
-                                                new IsExampleObjRecent(12L)
-                                        )
-                                        .recordLevelRule(
-                                                "3-redactProperty",
-                                                new RedactExampleObjProperty()
-                                        )
+                                .owner(alice)
+                                .recordLevelRule(
+                                        "1-visibility",
+                                        new IsExampleObjVisible()
+                                )
+                                .recordLevelRule(
+                                        "2-ageOff",
+                                        new IsExampleObjRecent(12L)
+                                )
+                                .recordLevelRule(
+                                        "3-redactProperty",
+                                        new RedactExampleObjProperty()
+                                )
                         );
 
         // Using Koryphe's functions/predicates
         final SetResourcePolicyRequest koryphePolicies = new SetResourcePolicyRequest()
                 .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
                 .policy(new Policy<ExampleObj>()
-                                .owner(alice)
-                                .recordLevelRule(
-                                        "1-visibility",
-                                        new TupleRule<ExampleObj>()
-                                                .selection("Record.visibility", "User.auths")
-                                                .predicate(new IsXInCollectionY()))
-                                .recordLevelRule(
-                                        "2-ageOff",
-                                        new TupleRule<ExampleObj>()
-                                                .selection("Record.timestamp")
-                                                .predicate(new IsMoreThan(12L))
-                                )
-                                .recordLevelRule(
-                                        "3-redactProperty",
-                                        new TupleRule<ExampleObj>()
-                                                .selection("User.roles", "Record.property")
-                                                .function(new If<>()
-                                                        .predicate(0, new Not<>(new CollectionContains("admin")))
-                                                        .then(1, new SetValue("redacted")))
-                                                .projection("User.roles", "Record.property")
-                                )
+                        .owner(alice)
+                        .recordLevelRule(
+                                "1-visibility",
+                                new TupleRule<ExampleObj>()
+                                        .selection("Record.visibility", "User.auths")
+                                        .predicate(new IsXInCollectionY()))
+                        .recordLevelRule(
+                                "2-ageOff",
+                                new TupleRule<ExampleObj>()
+                                        .selection("Record.timestamp")
+                                        .predicate(new IsMoreThan(12L))
+                        )
+                        .recordLevelRule(
+                                "3-redactProperty",
+                                new TupleRule<ExampleObj>()
+                                        .selection("User.roles", "Record.property")
+                                        .function(new If<>()
+                                                .predicate(0, new Not<>(new CollectionContains("admin")))
+                                                .then(1, new SetValue("redacted")))
+                                        .projection("User.roles", "Record.property")
+                        )
                 );
 
         final CompletableFuture<Boolean> policyStatus = getServicesFactory().getPolicyService().setResourcePolicy(
@@ -137,19 +143,53 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     }
 
     public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
-        return super.read(filename, ExampleConfigurator.RESOURCE_TYPE, userId, justification);
+        URI absoluteFileURI = ExampleFileUtil.convertToFileURI(filename);
+        String absoluteFile = absoluteFileURI.toString();
+        return super.read(absoluteFile, ExampleConfigurator.RESOURCE_TYPE, userId, justification);
     }
 
-    private ParentResource getParent(final String fileURL) {
-        if (fileURL.isEmpty()) {
-            Iterator<Path> rootDirectories = FileSystems.getDefault().getRootDirectories().iterator();
-            String root = "/";
-            if (rootDirectories.hasNext()) {
-                root = rootDirectories.next().toAbsolutePath().toString();
+    public static ParentResource getParent(final String fileURL) {
+        URI normalised = ExampleFileUtil.convertToFileURI(fileURL);
+        //this should only be applied to things that start with file:/// not other types of URL
+        if (normalised.getScheme().equals(FileSystems.getDefault().provider().getScheme())) {
+            Path current = Paths.get(normalised);
+            Path parent = current.getParent();
+            //no parent can be found, must already be a directory tree root
+            if (isNull(parent)) {
+                throw new IllegalArgumentException(fileURL + " is already a directory tree root");
+            } else if (isDirectoryRoot(parent)) {
+                //else if this is a directory tree root
+                return new SystemResource().id(parent.toUri().toString());
+            } else {
+                //else recurse up a level
+                return new DirectoryResource().id(parent.toUri().toString()).parent(getParent(parent.toUri().toString()));
             }
-            return new SystemResource().id(root);
+        } else {
+            //if this is another scheme then there is no definable parent
+            return new SystemResource().id("");
         }
-        String parentURL = fileURL.substring(0, fileURL.lastIndexOf(FileSystems.getDefault().getSeparator()));
-        return new DirectoryResource().id(parentURL).parent(getParent(parentURL));
+    }
+
+    /**
+     * Tests if the given {@link Path} represents a root of the default local file system.
+     *
+     * @param path the path to test
+     * @return true if {@code parent} is a root
+     */
+    private static boolean isDirectoryRoot(final Path path) {
+        return StreamSupport
+                .stream(FileSystems.getDefault()
+                        .getRootDirectories()
+                        .spliterator(), false)
+                .anyMatch(path::equals);
+    }
+
+    /**
+     * Gets the file passed at construction as a fully qualified URI.
+     *
+     * @return the absolute URI file path
+     */
+    public String getURIConvertedFile() {
+        return file;
     }
 }

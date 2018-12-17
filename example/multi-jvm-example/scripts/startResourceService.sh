@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 
-mvn clean install -Pmulti-jvm-example-rest-resource-service -pl :multi-jvm-example-rest-resource-service -Dstandalone-path=resource -Dstandalone-port=8082 $@
+java -jar example/multi-jvm-example/multi-jvm-example-rest-resource-service/target/multi-jvm-example-rest-resource-service-*-executable.jar \
+                -httpPort=8082 \
+                -extractDirectory=.extract/Resource \
+                -Dpalisade.rest.config.path=example/example-model/src/main/resources/configRest.json \
+                -Dpalisade.rest.basePath=resource \
+                -Dpalisade.properties.app.title=rest-resource-service

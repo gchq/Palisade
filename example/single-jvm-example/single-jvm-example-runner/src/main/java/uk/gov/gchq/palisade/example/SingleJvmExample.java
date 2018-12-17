@@ -16,8 +16,6 @@
 
 package uk.gov.gchq.palisade.example;
 
-import org.apache.commons.io.FileUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,51 +24,39 @@ import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 public class SingleJvmExample {
-    protected static final String FILE = new File("exampleObj_file1.txt").getAbsolutePath();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleJvmExample.class);
 
     public static void main(final String[] args) throws Exception {
-        new SingleJvmExample().run();
+        if (args.length < 1) {
+            System.out.printf("Usage: %s file\n", SingleJvmExample.class.getTypeName());
+            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
+            System.exit(1);
+        }
+
+        String sourceFile = args[0];
+        new SingleJvmExample().run(sourceFile);
     }
 
-    public void run() throws Exception {
-        createDataPath();
-        try {
-            final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
-            //request the client configuration by not specifying a service
-            final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-            final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+    public void run(final String sourceFile) throws Exception {
+        final ConfigurationService ics = ExampleConfigurator.setupSingleJVMConfigurationService();
+        //request the client configuration by not specifying a service
+        final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
-            LOGGER.info("");
-            LOGGER.info("Alice is reading file1...");
-            final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
-            LOGGER.info("Alice got back: ");
-            aliceResults.map(Object::toString).forEach(LOGGER::info);
+        LOGGER.info("");
+        LOGGER.info("Alice is reading file1...");
+        final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
+        LOGGER.info("Alice got back: ");
+        aliceResults.map(Object::toString).forEach(LOGGER::info);
 
-            LOGGER.info("");
-            LOGGER.info("Bob is reading file1...");
-            final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
-            LOGGER.info("Bob got back: ");
-            bobResults.map(Object::toString).forEach(LOGGER::info);
-        } finally {
-            FileUtils.deleteQuietly(new File(FILE));
-        }
-    }
-
-    static void createDataPath() {
-        try (final InputStream data = SingleJvmExample.class.getResourceAsStream("/example/exampleObj_file1.txt")) {
-            Objects.requireNonNull(data, "couldn't load file: data/example/exampleObj_file1.txt");
-            FileUtils.copyInputStreamToFile(data, new File(FILE));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        LOGGER.info("");
+        LOGGER.info("Bob is reading file1...");
+        final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
+        LOGGER.info("Bob got back: ");
+        bobResults.map(Object::toString).forEach(LOGGER::info);
     }
 }

@@ -80,6 +80,6 @@ public interface ConfigurationService extends Service {
      *
      * @throws IllegalStateException if no cache has been configured
      */
-    default void configureSelfFromCache() {
+    default void configureSelfFromConfig() {
     }
 }
