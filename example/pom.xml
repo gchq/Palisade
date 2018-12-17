@@ -34,7 +34,6 @@
             </activation>
             <modules>
                 <module>example-model</module>
-                <module>single-jvm-example</module>
                 <module>multi-jvm-example</module>
                 <module>mapreduce-example</module>
             </modules>
@@ -43,7 +42,6 @@
             <id>example</id>
             <modules>
                 <module>example-model</module>
-                <module>single-jvm-example</module>
                 <module>multi-jvm-example</module>
                 <module>mapreduce-example</module>
             </modules>
@@ -52,7 +50,6 @@
             <id>integration-test</id>
             <modules>
                 <module>example-model</module>
-                <module>single-jvm-example</module>
                 <module>multi-jvm-example</module>
                 <module>mapreduce-example</module>
             </modules>
