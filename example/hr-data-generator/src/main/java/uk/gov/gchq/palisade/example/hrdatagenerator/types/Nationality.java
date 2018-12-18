@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.hrdatagenerator;
+package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import java.util.Random;
 
@@ -246,7 +246,6 @@ public enum Nationality {
 
     public static Nationality generate(final Random random) {
         return Nationality.values()[random.nextInt(224)];
-
     }
 }
 

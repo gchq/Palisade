@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.hrdatagenerator;
+package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import org.ajbrown.namemachine.Name;
 import org.ajbrown.namemachine.NameGenerator;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import uk.gov.gchq.palisade.example.hrdatagenerator.utils.DateHelper;
 
 import java.util.Random;
 

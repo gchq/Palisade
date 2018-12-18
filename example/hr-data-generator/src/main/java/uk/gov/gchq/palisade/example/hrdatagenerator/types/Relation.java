@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.hrdatagenerator;
+package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 public enum Relation {
     GRANDMOTHER,

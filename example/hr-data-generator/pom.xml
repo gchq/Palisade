@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.8.1</version>
+            <version>${avro.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.gov.gchq.palisade</groupId>

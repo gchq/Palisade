@@ -18,6 +18,8 @@ package uk.gov.gchq.palisade.example.hrdatagenerator;
 
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
+
 import java.util.Random;
 
 public class EmployeeTest {

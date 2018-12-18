@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.example.hrdatagenerator;
 
 import uk.gov.gchq.palisade.data.service.impl.serialiser.AvroSerialiser;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.io.BytesSuppliedInputStream;
 
 import java.io.File;

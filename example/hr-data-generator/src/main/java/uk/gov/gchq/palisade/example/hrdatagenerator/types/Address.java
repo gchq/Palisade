@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.hrdatagenerator;
+package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import com.github.javafaker.Faker;
 import org.apache.commons.lang3.builder.ToStringBuilder;

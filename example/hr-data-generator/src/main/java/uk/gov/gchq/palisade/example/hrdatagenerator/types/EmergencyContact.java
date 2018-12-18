@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.hrdatagenerator;
+package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import org.ajbrown.namemachine.Gender;
 import org.ajbrown.namemachine.Name;
@@ -90,16 +90,4 @@ public class EmergencyContact {
                 .append("contactNumbers", contactNumbers)
                 .toString();
     }
-
-//    public String toJson(final int indent) {
-//        String prefix = "";
-//        for (int i = 0; i<indent; i++){
-//            prefix = prefix + "\t";
-//        }
-//        StringBuilder stringBuilder = new StringBuilder()
-//                .append(prefix + EmergencyContact.class.getName() + "{\n")
-//                .append(prefix + "\tcontactName : " +  contactName.toString() + ",")
-//                .append(prefix + "\trelation : " +  relation + ",")
-//                .append(prefix + "\tcontactNumbers : " +  contactNumbers.toJson(indent+2) + ",");
-//    }
 }
