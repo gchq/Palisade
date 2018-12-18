@@ -23,6 +23,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.util.Random;
 
 public class Employee {
+    private static final NameGenerator NAME_GENERATOR = new NameGenerator();
 
     private int uid;
     private Name name;
@@ -38,10 +39,10 @@ public class Employee {
     public static Employee generate(final Random random) {
         Employee employee = new Employee();
         employee.setUid(generateUID(random));
-        employee.setName(new NameGenerator().generateName());
+        employee.setName(NAME_GENERATOR.generateName());
         employee.setDateOfBirth(DateHelper.generateDateOfBirth(random));
         employee.setContactNumbers(PhoneNumber.generateMany(random));
-        employee.setEmergencyContacts(EmergencyContact.generateMany(random));
+        employee.setEmergencyContacts(EmergencyContact.generateMany(random, NAME_GENERATOR));
         employee.setAddress(Address.generate());
         employee.setBankDetails(BankDetails.generate(random));
         employee.setTaxCode(generateTaxCode());

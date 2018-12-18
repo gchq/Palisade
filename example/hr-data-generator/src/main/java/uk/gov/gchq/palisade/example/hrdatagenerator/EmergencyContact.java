@@ -24,22 +24,22 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.util.Random;
 
 public class EmergencyContact {
-    private static Relation[] maleRelations = new Relation[]{Relation.BROTHER, Relation.FATHER, Relation.GRANDFATHER, Relation.SON};
-    private static Relation[] femaleRelations = new Relation[]{Relation.DAUGHTER, Relation.GRANDMOTHER, Relation.MOTHER, Relation.SISTER};
+    private static final Relation[] MALE_RELATIONS = new Relation[]{Relation.BROTHER, Relation.FATHER, Relation.GRANDFATHER, Relation.SON};
+    private static final Relation[] FEMALE_RELATIONS = new Relation[]{Relation.DAUGHTER, Relation.GRANDMOTHER, Relation.MOTHER, Relation.SISTER};
 
     private Name contactName;
     private Relation relation;
     private PhoneNumber[] contactNumbers;
 
-    public static EmergencyContact generate(final Random random) {
+    public static EmergencyContact generate(final Random random, final NameGenerator nameGenerator) {
         EmergencyContact contact = new EmergencyContact();
-        Name name = new NameGenerator().generateName();
+        Name name = nameGenerator.generateName();
         contact.setContactName(name);
         Relation[] relations;
         if (name.getGender().equals(Gender.MALE)) {
-            relations = maleRelations;
+            relations = MALE_RELATIONS;
         } else {
-            relations = femaleRelations;
+            relations = FEMALE_RELATIONS;
         }
 
         contact.setRelation(relations[random.nextInt(3)]);
@@ -47,12 +47,12 @@ public class EmergencyContact {
         return contact;
     }
 
-    public static EmergencyContact[] generateMany(final Random random) {
+    public static EmergencyContact[] generateMany(final Random random, final NameGenerator nameGenerator) {
         int numberOfExtraContacts = random.nextInt(4);
         EmergencyContact[] emergencyContacts = new EmergencyContact[numberOfExtraContacts + 1];
-        emergencyContacts[0] = EmergencyContact.generate(random);
+        emergencyContacts[0] = EmergencyContact.generate(random, nameGenerator);
         for (int i = 1; i <= numberOfExtraContacts; i++) {
-            emergencyContacts[i] = EmergencyContact.generate(random);
+            emergencyContacts[i] = EmergencyContact.generate(random, nameGenerator);
         }
         return emergencyContacts;
     }

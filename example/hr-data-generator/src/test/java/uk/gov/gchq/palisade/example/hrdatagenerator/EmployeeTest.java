@@ -24,7 +24,18 @@ public class EmployeeTest {
 
     @Test
     public void generateEmployee() {
-        System.out.println(Employee.generate(new Random(0)));
+        long startTime = System.currentTimeMillis();
+        Random random = new Random(0);
+        for (int i = 0; i < 100; i++) {
+            Employee.generate(random);
+        }
+        long endTime = System.currentTimeMillis();
+        System.out.println("Took " + (endTime - startTime) + "ms to create 100 employees");
+    }
+
+    @Test
+    public void generateData() {
+        CreateData.main(new String[]{".data", "50", "1"});
     }
 
 }

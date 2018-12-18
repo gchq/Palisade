@@ -22,13 +22,12 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.util.Locale;
 
 public class Address {
+    private static final Faker FAKER = new Faker(new Locale("en-GB"));
     private String fullAddress;
-
 
     public static Address generate() {
         Address address = new Address();
-        Faker faker = new Faker(new Locale("en-GB"));
-        String fullAddress = faker.address().fullAddress();
+        String fullAddress = FAKER.address().fullAddress();
         address.setFullAddress(fullAddress);
         return address;
     }
