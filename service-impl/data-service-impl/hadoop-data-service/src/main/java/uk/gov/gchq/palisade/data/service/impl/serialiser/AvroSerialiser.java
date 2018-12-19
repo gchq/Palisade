@@ -22,9 +22,9 @@ import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileStream;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.io.DatumWriter;
-import org.apache.avro.specific.SpecificData;
-import org.apache.avro.specific.SpecificDatumReader;
-import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.avro.reflect.ReflectData;
+import org.apache.avro.reflect.ReflectDatumReader;
+import org.apache.avro.reflect.ReflectDatumWriter;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +51,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class AvroSerialiser<O> implements Serialiser<O> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AvroSerialiser.class);
+    private final ReflectDatumWriter<O> datumWriter;
 
     private final Class<O> domainClass;
     private final Schema schema;
@@ -59,19 +60,20 @@ public class AvroSerialiser<O> implements Serialiser<O> {
     public AvroSerialiser(@JsonProperty("domainClass") final Class<O> domainClass) {
         requireNonNull(domainClass, "domainClass is required");
         this.domainClass = domainClass;
-        this.schema = SpecificData.get().getSchema(domainClass);
+        this.schema = ReflectData.AllowNull.get().getSchema(domainClass);
+        this.datumWriter = new ReflectDatumWriter<>(schema);
     }
 
     @Override
     public InputStream serialise(final Stream<O> stream) {
-        return new BytesSuppliedInputStream(new AvroSupplier<>(stream, new SpecificDatumWriter<>(schema), schema));
+        return new BytesSuppliedInputStream(new AvroSupplier<>(stream, datumWriter, schema));
     }
 
     @Override
     public Stream<O> deserialise(final InputStream input) {
         DataFileStream<O> in = null;
         try {
-            in = new DataFileStream<>(input, new SpecificDatumReader<>(domainClass));
+            in = new DataFileStream<>(input, new ReflectDatumReader<>(domainClass));
             return StreamSupport.stream(in.spliterator(), false);
         } catch (final Exception e) {
             LOGGER.debug("Closing streams");
