@@ -25,6 +25,7 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.RemoveCacheRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
@@ -172,7 +173,7 @@ public class SimpleCacheService implements CacheService {
         requireNonNull(request, "request");
         //make the final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Got request to add item with key {}", baseKey);
+        LOGGER.debug("Add item with key {}", baseKey);
 
         V value = request.getValue();
         Class<V> valueClass = (Class<V>) request.getValue().getClass();
@@ -184,9 +185,9 @@ public class SimpleCacheService implements CacheService {
         byte[] encodedValue = encoder.apply(value);
         //send to add
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Requesting backing store to add {}", baseKey);
+            LOGGER.debug("-> Backing store add {}", baseKey);
             boolean result = getBackingStore().add(baseKey, valueClass, encodedValue, timeToLive);
-            LOGGER.debug("Backing store has stored {} with result {}", baseKey, result);
+            LOGGER.debug("-> Backing store stored {} with result {}", baseKey, result);
             return result;
         });
     }
@@ -197,16 +198,16 @@ public class SimpleCacheService implements CacheService {
         requireNonNull(request, "request");
         //make final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Got request to get item {}", baseKey);
+        LOGGER.debug("Get item {}", baseKey);
 
         //get from add
         Supplier<Optional<V>> getFunction = () -> {
-            LOGGER.debug("Requesting backing store to get {}", baseKey);
+            LOGGER.debug("-> Backing store get {}", baseKey);
             SimpleCacheObject result = getBackingStore().get(baseKey);
             if (result.getValue().isPresent()) {
-                LOGGER.debug("Backing store successfully retrieved {}", baseKey);
+                LOGGER.debug("-> Backing store retrieved {}", baseKey);
             } else {
-                LOGGER.debug("Backing store failed to get {}", baseKey);
+                LOGGER.debug("-> Backing store failed to get {}", baseKey);
             }
 
             //assign so Javac can infer the generic type
@@ -222,19 +223,38 @@ public class SimpleCacheService implements CacheService {
 
         //make final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Got request to list items with prefix {} ", baseKey);
+        LOGGER.debug("List items with prefix {}", baseKey);
 
         int len = request.getServiceStringForm().length();
 
         //get from add
         return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Sending list request to add {}", baseKey);
+            LOGGER.debug("-> Backing store list {}", baseKey);
 
             //remove the service name from the list of keys
             Stream<String> ret = getBackingStore().list(baseKey).map(x -> x.substring(len + 1));
-            LOGGER.debug("Store list returned for {}", baseKey);
+            LOGGER.debug("-> Backing store list returned for {}", baseKey);
 
             return ret;
+        });
+    }
+
+    @Override
+    public CompletableFuture<Boolean> remove(final RemoveCacheRequest request) {
+        requireNonNull(request, "request");
+
+        //make final key name
+        String baseKey = request.makeBaseName();
+        LOGGER.debug("Remove item key {}", baseKey);
+
+        //create remove request for backing store
+        return CompletableFuture.supplyAsync(() -> {
+            LOGGER.debug("-> Backing store remove {}", baseKey);
+
+            //remove the key
+            boolean removed = getBackingStore().remove(baseKey);
+            LOGGER.debug("-> Backing store removed {} with result {}", baseKey, removed);
+            return removed;
         });
     }
 }

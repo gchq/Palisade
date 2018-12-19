@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.RemoveCacheRequest;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -125,6 +126,9 @@ public class SimpleCacheServiceTest {
 
         when(store.list(eq(((ListCacheRequest) new ListCacheRequest().service(MockCacheService.class)).prefix(NOTHING).makeBaseName())))
                 .thenReturn(Stream.empty());
+
+        //set up the remove
+        when(store.remove(eq(KEY_1))).thenReturn(Boolean.TRUE);
 
         //set up a return of an empty object
         when(store.get(eq(NO_KEY))).thenReturn(new SimpleCacheObject(Object.class, Optional.empty()));
@@ -254,6 +258,24 @@ public class SimpleCacheServiceTest {
         assertFalse(result.join().isPresent());
     }
 
+    @Test
+    public void shouldNotRemoveFromWrongService() {
+        //Given
+        AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1).value(VALUE_1);
+        CompletableFuture<Boolean> future = service.add(req);
+        assertTrue(future.join());
+        AddCacheRequest<String> req2 = new AddCacheRequest<String>().service(fakeService.getClass()).key(BASE_KEY_1).value(VALUE_3);
+        CompletableFuture<Boolean> future2 = service.add(req2);
+        assertTrue(future2.join());
+
+        //When
+        RemoveCacheRequest request = new RemoveCacheRequest().service(MockCacheService.class).key(BASE_KEY_1);
+        CompletableFuture<Boolean> answer = service.remove(request);
+
+        //Then
+        assertTrue(answer.join());
+    }
+
     @Test(expected = NullPointerException.class)
     public void throwOnNullBackingStore() {
         //Given - nothing
@@ -295,6 +317,15 @@ public class SimpleCacheServiceTest {
         //Given - nothing
         //When
         service.list(null);
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void throwOnNullRemove() {
+        //Given - nothing
+        //When
+        service.remove(null);
         //Then
         fail("exception expected");
     }

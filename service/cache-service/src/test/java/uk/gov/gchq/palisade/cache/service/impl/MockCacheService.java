@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.RemoveCacheRequest;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -55,5 +56,10 @@ public class MockCacheService implements CacheService {
     @Override
     public CompletableFuture<Stream<String>> list(ListCacheRequest request) {
         return mock.list(request);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> remove(RemoveCacheRequest request) {
+        return mock.remove(request);
     }
 }

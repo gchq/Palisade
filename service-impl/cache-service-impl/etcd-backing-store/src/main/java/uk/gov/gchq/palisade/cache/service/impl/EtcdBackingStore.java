@@ -20,6 +20,7 @@ import com.coreos.jetcd.KV;
 import com.coreos.jetcd.Lease;
 import com.coreos.jetcd.data.ByteSequence;
 import com.coreos.jetcd.data.KeyValue;
+import com.coreos.jetcd.kv.DeleteResponse;
 import com.coreos.jetcd.kv.GetResponse;
 import com.coreos.jetcd.kv.PutResponse;
 import com.coreos.jetcd.options.GetOption;
@@ -112,7 +113,7 @@ public class EtcdBackingStore implements BackingStore {
 
     @Override
     public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
-        BackingStore.validateAddParameters(key, valueClass, value, timeToLive);
+        String cacheKey = BackingStore.validateAddParameters(key, valueClass, value, timeToLive);
         long leaseID = 0;
         if (timeToLive.isPresent()) {
             long ttl = timeToLive.get().getSeconds();
@@ -124,11 +125,11 @@ public class EtcdBackingStore implements BackingStore {
             }
         }
         CompletableFuture<PutResponse> response1 = getKeyValueClient().put(
-                ByteSequence.fromString(key + ".class"),
+                ByteSequence.fromString(cacheKey + ".class"),
                 ByteSequence.fromString(valueClass.getTypeName()),
                 PutOption.newBuilder().withLeaseId(leaseID).build());
         CompletableFuture<PutResponse> response2 = getKeyValueClient().put(
-                ByteSequence.fromString(key + ".value"),
+                ByteSequence.fromString(cacheKey + ".value"),
                 ByteSequence.fromBytes(value),
                 PutOption.newBuilder().withLeaseId(leaseID).build());
         CompletableFuture.allOf(response1, response2).join();
@@ -137,9 +138,9 @@ public class EtcdBackingStore implements BackingStore {
 
     @Override
     public SimpleCacheObject get(final String key) {
-        BackingStore.keyCheck(key);
-        CompletableFuture<GetResponse> futureValueClass = getKeyValueClient().get(ByteSequence.fromString(key + ".class"));
-        CompletableFuture<GetResponse> futureValue = getKeyValueClient().get(ByteSequence.fromString(key + ".value"));
+        String cacheKey = BackingStore.keyCheck(key);
+        CompletableFuture<GetResponse> futureValueClass = getKeyValueClient().get(ByteSequence.fromString(cacheKey + ".class"));
+        CompletableFuture<GetResponse> futureValue = getKeyValueClient().get(ByteSequence.fromString(cacheKey + ".value"));
         List<KeyValue> valueClassKV = futureValueClass.join().getKvs();
         if (valueClassKV.size() == 0) {
             return new SimpleCacheObject(Object.class, Optional.empty());
@@ -161,5 +162,14 @@ public class EtcdBackingStore implements BackingStore {
                 .map(keyValue -> keyValue.getKey().toStringUtf8())
                 .map(key -> key.substring(0, key.lastIndexOf('.')))
                 .distinct();
+    }
+
+    @Override
+    public boolean remove(final String key) {
+        String cacheKey = BackingStore.keyCheck(key);
+        CompletableFuture<DeleteResponse> removedValue = getKeyValueClient().delete(ByteSequence.fromString(cacheKey + ".value"));
+        CompletableFuture<DeleteResponse> removedClass = getKeyValueClient().delete(ByteSequence.fromString(cacheKey + ".class"));
+        removedClass.join();
+        return (removedValue.join().getDeleted() != 0);
     }
 }

@@ -92,6 +92,16 @@ public interface BackingStore {
     SimpleCacheObject get(final String key);
 
     /**
+     * Remove the given key from the backing store. If the key is present it will be removed, otherwise nothing will happen.
+     * The implementation must ensure that any supporting information that was originally added with the value such as the class name
+     * must also be removed.
+     *
+     * @param key the key to remove
+     * @return true if the key and value pair was removed, false otherwise
+     */
+    boolean remove(final String key);
+
+    /**
      * Get a stream of all keys with a given prefix. This method acts as a way to query the backing store to find which
      * keys it has. The returned list will have all the keys that start with the given string in it.
      *

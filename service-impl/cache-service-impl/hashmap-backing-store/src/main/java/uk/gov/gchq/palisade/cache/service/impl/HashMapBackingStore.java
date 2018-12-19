@@ -50,7 +50,9 @@ public class HashMapBackingStore implements BackingStore {
      */
     private final ConcurrentHashMap<String, CachedPair> cache;
 
-    /** Is the shared instance in use? */
+    /**
+     * Is the shared instance in use?
+     */
     private final boolean useStatic;
 
     /**
@@ -200,8 +202,17 @@ public class HashMapBackingStore implements BackingStore {
         return cache.keySet()
                 .stream()
                 .filter(x -> x.startsWith(
-                                prefix)
+                        prefix)
                 );
+    }
+
+    @Override
+    public boolean remove(final String key) {
+        String cacheKey = BackingStore.keyCheck(key);
+        CachedPair result = cache.remove(cacheKey);
+        boolean ret = (result != null);
+        LOGGER.debug("Remove cache key {} result {}", cacheKey, ret);
+        return ret;
     }
 
     @Override
