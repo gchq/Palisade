@@ -25,7 +25,6 @@
   * [User Service](service/user-service/README.md)
 
 * [Examples](example/README.md)
-  * [Single JVM](example/single-jvm-example/README.md)
   * [Multi JVM/Docker deployment](example/multi-jvm-example/README.md)
   * [Map Reduce](example/mapreduce-example/README.md)
 
