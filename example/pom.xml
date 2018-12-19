@@ -33,6 +33,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
+                <module>hr-data-generator</module>
                 <module>example-model</module>
                 <module>multi-jvm-example</module>
                 <module>mapreduce-example</module>
@@ -41,6 +42,7 @@
         <profile>
             <id>example</id>
             <modules>
+                <module>hr-data-generator</module>
                 <module>example-model</module>
                 <module>multi-jvm-example</module>
                 <module>mapreduce-example</module>
@@ -49,6 +51,7 @@
         <profile>
             <id>integration-test</id>
             <modules>
+                <module>hr-data-generator</module>
                 <module>example-model</module>
                 <module>multi-jvm-example</module>
                 <module>mapreduce-example</module>
