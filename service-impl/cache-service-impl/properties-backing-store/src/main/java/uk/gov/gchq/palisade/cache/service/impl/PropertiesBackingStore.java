@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.gchq.palisade.Util;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -220,14 +221,7 @@ public class PropertiesBackingStore implements BackingStore {
      */
     private void createWatch(final Path configPath) {
         requireNonNull(configPath, "configPath");
-        //set up a thread to watch this
-        final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
-        //ensure thread is daemon
-        ThreadFactory daemonise = runnable -> {
-            Thread t = defaultFactory.newThread(runnable);
-            t.setDaemon(true);
-            return t;
-        };
+        ThreadFactory daemonise = Util.createDaemonThreadFactory();
         ExecutorService singleThread = Executors.newSingleThreadExecutor(daemonise);
         singleThread.submit(new WatchFile(this, configPath));
     }
