@@ -111,7 +111,7 @@ public class AddCacheRequest<V> extends CacheRequest {
     }
 
     /**
-     * Is this cache rewquest locally cacheable by clients?
+     * Is this cache request locally cacheable by clients?
      *
      * @return true if the value can be cached locally
      */
@@ -120,7 +120,7 @@ public class AddCacheRequest<V> extends CacheRequest {
     }
 
     /**
-     * Sets whether this cache request key/valiue can be localled cached by clients.
+     * Sets whether this cache request key/value can be locally cached by clients.
      *
      * @param locallyCacheable if true, then clients may cache the key/value locally upon retrieval
      * @return this object
@@ -131,7 +131,7 @@ public class AddCacheRequest<V> extends CacheRequest {
     }
 
     /**
-     * Sets whether this cache request key/valiue can be localled cached by clients.
+     * Sets whether this cache request key/value can be locally cached by clients.
      *
      * @param locallyCacheable if true, then clients may cache the key/value locally upon retrieval
      */
