@@ -21,15 +21,18 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.gchq.palisade.Util;
 
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -46,9 +49,19 @@ public class HashMapBackingStore implements BackingStore {
     private static final ConcurrentHashMap<String, CachedPair> CACHE = new ConcurrentHashMap<>();
 
     /**
+     * The static map that contains the removal handles.
+     */
+    private static final ConcurrentHashMap<String, ScheduledFuture<?>> REMOVAL_HANDLES = new ConcurrentHashMap<>();
+
+    /**
      * The actual backing store for all cached data.
      */
     private final ConcurrentHashMap<String, CachedPair> cache;
+
+    /**
+     * The map of removal handles for time to live entries.
+     */
+    private final ConcurrentHashMap<String, ScheduledFuture<?>> removals;
 
     /**
      * Is the shared instance in use?
@@ -56,15 +69,43 @@ public class HashMapBackingStore implements BackingStore {
     private final boolean useStatic;
 
     /**
+     * Timer thread to remove cache entries after expiry.
+     */
+    private static final ScheduledExecutorService REMOVAL_TIMER = Executors.newSingleThreadScheduledExecutor(Util.createDaemonThreadFactory());
+
+    /**
+     * Create a {@link HashMapBackingStore} which uses the JVM wide shared object cache.
+     */
+    public HashMapBackingStore() {
+        this(true);
+    }
+
+    /**
+     * Create a store which may have its own store or may use the JVM shared instance.
+     *
+     * @param useStatic if true then use the JVM shared backing store
+     */
+    public HashMapBackingStore(final boolean useStatic) {
+        if (useStatic) {
+            cache = CACHE;
+            removals = REMOVAL_HANDLES;
+        } else {
+            cache = new ConcurrentHashMap<>();
+            removals = new ConcurrentHashMap<>();
+        }
+        this.useStatic = useStatic;
+    }
+
+    /**
      * Simple POJO for pairing together the object's class with the encoded form of the object.
      */
     private static class CachedPair {
-
         @Override
         public String toString() {
             return new ToStringBuilder(this)
                     .append("value", "\"" + new String(value) + "\"")
                     .append("clazz", clazz)
+                    .append("locallyCacheable", locallyCacheable)
                     .toString();
         }
 
@@ -83,6 +124,7 @@ public class HashMapBackingStore implements BackingStore {
             return new EqualsBuilder()
                     .append(value, that.value)
                     .append(clazz, that.clazz)
+                    .append(locallyCacheable, that.locallyCacheable)
                     .isEquals();
         }
 
@@ -91,6 +133,7 @@ public class HashMapBackingStore implements BackingStore {
             return new HashCodeBuilder(17, 37)
                     .append(value)
                     .append(clazz)
+                    .append(locallyCacheable)
                     .toHashCode();
         }
 
@@ -124,18 +167,6 @@ public class HashMapBackingStore implements BackingStore {
 
     }
 
-    /**
-     * Timer thread to remove cache entries after expiry.
-     */
-    private static final ScheduledExecutorService REMOVAL_TIMER = Executors.newSingleThreadScheduledExecutor();
-
-    /**
-     * Create a {@link HashMapBackingStore} which uses the JVM wide shared object cache.
-     */
-    public HashMapBackingStore() {
-        this(true);
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -151,6 +182,7 @@ public class HashMapBackingStore implements BackingStore {
         return new EqualsBuilder()
                 .append(cache, that.cache)
                 .append(useStatic, that.useStatic)
+                .append(removals, that.removals)
                 .isEquals();
     }
 
@@ -159,21 +191,17 @@ public class HashMapBackingStore implements BackingStore {
         return new HashCodeBuilder(17, 37)
                 .append(cache)
                 .append(useStatic)
+                .append(removals)
                 .toHashCode();
     }
 
-    /**
-     * Create a store which may have its own store or may use the JVM shared instance.
-     *
-     * @param useStatic if true then use the JVM shared backing store
-     */
-    public HashMapBackingStore(final boolean useStatic) {
-        if (useStatic) {
-            cache = CACHE;
-        } else {
-            cache = new ConcurrentHashMap<>();
-        }
-        this.useStatic = useStatic;
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("cache", cache)
+                .append("removals", removals)
+                .append("useStatic", useStatic)
+                .toString();
     }
 
     public boolean getUseStatic() {
@@ -189,8 +217,20 @@ public class HashMapBackingStore implements BackingStore {
          *This uses a single timer to remove elements, this is fine for this example, but in production we would want
          *something more performant.
          */
+        //remove the old TTL handle if is there
+        ScheduledFuture<?> oldHandle = removals.remove(cacheKey);
+        //cancel the task
+        if (nonNull(oldHandle)) {
+            oldHandle.cancel(true);
+        }
+
         timeToLive.ifPresent(duration -> {
-            REMOVAL_TIMER.schedule(() -> cache.remove(cacheKey), duration.toMillis(), TimeUnit.MILLISECONDS);
+            ScheduledFuture<?> removalHandle = REMOVAL_TIMER.schedule(() -> {
+                cache.remove(cacheKey);
+                removals.remove(cacheKey);
+            }, duration.toMillis(), TimeUnit.MILLISECONDS);
+            //store new handle
+            removals.put(cacheKey, removalHandle);
         });
         return true;
     }
@@ -220,13 +260,5 @@ public class HashMapBackingStore implements BackingStore {
         boolean ret = (result != null);
         LOGGER.debug("Remove cache key {} result {}", cacheKey, ret);
         return ret;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("cache", cache)
-                .append("useStatic", useStatic)
-                .toString();
     }
 }

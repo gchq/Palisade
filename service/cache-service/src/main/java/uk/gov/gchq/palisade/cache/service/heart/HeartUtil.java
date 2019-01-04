@@ -37,14 +37,22 @@ public final class HeartUtil {
     public static final Duration DEFAULT_HEARTBEAT_DURATION = Duration.ofSeconds(10);
 
     /**
-     * Prevent creation.
+     * The multiplication factor to boost cache time to live duration by relative to heart rate. Essentially this controls
+     * how many "missed" heartbeats are allowed before an instance is considered to have terminated.
      */
-    private HeartUtil() {}
+    public static final long TIME_TO_LIVE_RATIO = 2;
 
     /**
-     * Create the cache key for this instance.
+     * Prevent creation.
+     */
+    private HeartUtil() {
+    }
+
+    /**
+     * Create the cache key for an instance.
      *
-     * @return the given name
+     * @param instance the instance name; should be unique
+     * @return key for a particular instance
      */
     public static String makeKey(final String instance) {
         return HEARTBEAT_SENTINEL + instance;

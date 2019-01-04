@@ -124,6 +124,7 @@ public class Stethoscope {
                 .service(getServiceClass());
         //make call to cache
         CompletableFuture<Stream<String>> futureList = localCache.list(request);
-        return futureList.join();
+        return futureList.join()
+                .map(s -> s.substring(HeartUtil.HEARTBEAT_SENTINEL.length()));
     }
 }

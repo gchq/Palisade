@@ -101,7 +101,7 @@ public class Heartbeat {
      */
     public Heartbeat heartRate(final Duration heartRate) {
         requireNonNull(heartRate, "heartRate");
-        if (HeartUtil.MIN_HEARTBEAT_DURATION.compareTo(heartRate) < 0) {
+        if (HeartUtil.MIN_HEARTBEAT_DURATION.compareTo(heartRate) > 0) {
             throw new IllegalArgumentException("Minimum duration is " + HeartUtil.MIN_HEARTBEAT_DURATION.toMillis() + " milliseconds");
         }
         checkBeating();
@@ -293,7 +293,11 @@ public class Heartbeat {
         final AddCacheRequest<byte[]> cacheRequest = new AddCacheRequest<>()
                 .service(getServiceClass())
                 .value(DUMMY_DATA)
-                .timeToLive(Optional.of(getHeartBeat()))
+                .timeToLive(Optional.of(getHeartBeat()
+                        //multiply the heart rate by the TTL ratio to make a single heart beat last longer in cache than
+                        //the beat duration, thus an instance is allowed to "miss" a some beats before it will be thought
+                        //of as terminated
+                        .multipliedBy(HeartUtil.TIME_TO_LIVE_RATIO)))
                 .locallyCacheable(false)
                 .key(HeartUtil.makeKey(getInstanceName()));
 
