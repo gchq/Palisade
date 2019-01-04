@@ -309,7 +309,7 @@ public class SimpleCacheServiceTest {
         CompletableFuture<Boolean> future = service.add(req);
         assertTrue(future.join());
         //When
-        SimpleCacheObject retrieved = service.doCacheRetrieve(KEY_5, Duration.ofMillis(250));
+        SimpleCacheObject retrieved = service.doCacheRetrieve(KEY_5, Duration.ofMillis(50));
         //Then
         assertTrue(retrieved.canRetrieveLocally());
         assertFalse(retrieved.wasRetrieveLocally());
@@ -322,12 +322,13 @@ public class SimpleCacheServiceTest {
         CompletableFuture<Boolean> future = service.add(req);
         assertTrue(future.join());
         //When
-        SimpleCacheObject firstRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(250));
-        SimpleCacheObject secondRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(250));
+        SimpleCacheObject firstRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(50));
+        SimpleCacheObject secondRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(50));
 
         //Then
         assertTrue(firstRetrieve.canRetrieveLocally());
         assertFalse(firstRetrieve.wasRetrieveLocally());
+        //second time, the request should have been served locally
         assertTrue(secondRetrieve.canRetrieveLocally());
         assertTrue(secondRetrieve.wasRetrieveLocally());
     }
@@ -339,14 +340,15 @@ public class SimpleCacheServiceTest {
         CompletableFuture<Boolean> future = service.add(req);
         assertTrue(future.join());
         //When
-        SimpleCacheObject firstRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(100));
-        SimpleCacheObject secondRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(100));
-        Thread.sleep(200);
-        SimpleCacheObject thirdRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(100));
+        SimpleCacheObject firstRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(50));
+        SimpleCacheObject secondRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(50));
+        Thread.sleep(100);
+        SimpleCacheObject thirdRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(50));
 
         //Then
         assertTrue(firstRetrieve.canRetrieveLocally());
         assertFalse(firstRetrieve.wasRetrieveLocally());
+        //second time, the request should have been served locally
         assertTrue(secondRetrieve.canRetrieveLocally());
         assertTrue(secondRetrieve.wasRetrieveLocally());
         //after waiting, the local cache should have expired
