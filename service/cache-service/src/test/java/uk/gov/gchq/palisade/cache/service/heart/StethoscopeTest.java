@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.cache.service.heart;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+
 import uk.gov.gchq.palisade.cache.service.CacheService;
 
 import java.util.concurrent.CompletableFuture;
@@ -27,6 +28,7 @@ import java.util.stream.Stream;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+
 import static uk.gov.gchq.palisade.util.TestUtil.streamEqual;
 
 public class StethoscopeTest {
