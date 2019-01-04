@@ -83,6 +83,10 @@ public class PropertiesBackingStore implements BackingStore {
      */
     private static final String EXPIRY_SUFFIX = ":expiry";
     /**
+     * The suffix for storing a key's local cache status.
+     */
+    private static final String RETRIEVE_SUFFIX = ":local_cache";
+    /**
      * Backing store.
      */
     private final Properties props = new Properties();
@@ -310,20 +314,22 @@ public class PropertiesBackingStore implements BackingStore {
         props.remove(key);
         props.remove(makeDateKey(key));
         props.remove(makeClassKey(key));
+        props.remove(makeRetrieveStateKey(key));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
+    public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive, final boolean locallyCacheable) {
         //error checks
         String cacheKey = BackingStore.validateAddParameters(key, valueClass, value, timeToLive);
         LOGGER.debug("Adding cache key {} of {}", cacheKey, valueClass);
-        //this isn't meant to be thread safe, but we can at least make the cache add atomic
+        //we can at least make the cache add atomic
         synchronized (this) {
             props.setProperty(cacheKey, B64_ENCODER.encodeToString(value));
             props.setProperty(makeClassKey(cacheKey), valueClass.getTypeName());
+            props.setProperty(makeRetrieveStateKey(cacheKey), Boolean.toString(locallyCacheable));
             //convert duration to a final time
             timeToLive.ifPresent(d -> {
                 LocalDateTime expiryTime = LocalDateTime.now().plus(d);
@@ -351,14 +357,16 @@ public class PropertiesBackingStore implements BackingStore {
                 try {
                     byte[] value = B64_DECODER.decode(b64Value);
                     Class<?> valueClass = Class.forName(props.getProperty(makeClassKey(cacheKey)));
-                    return new SimpleCacheObject(valueClass, Optional.of(value));
+                    boolean localRetrieve = Boolean.valueOf(props.getProperty(makeRetrieveStateKey(cacheKey), Boolean.FALSE.toString()));
+
+                    return new SimpleCacheObject(valueClass, Optional.of(value), localRetrieve);
                 } catch (Exception e) {
                     LOGGER.warn("Couldn't retrieve key {}", key, e);
-                    return new SimpleCacheObject(Object.class, Optional.empty());
+                    return new SimpleCacheObject(Object.class, Optional.empty(), false);
                 }
             } else {
                 //key not found
-                return new SimpleCacheObject(Object.class, Optional.empty());
+                return new SimpleCacheObject(Object.class, Optional.empty(), false);
             }
         }
     }
@@ -398,6 +406,7 @@ public class PropertiesBackingStore implements BackingStore {
                 .map(String.class::cast)
                 .filter(x -> !x.endsWith(EXPIRY_SUFFIX))
                 .filter(x -> !x.endsWith(CLASS_SUFFIX))
+                .filter(x -> !x.endsWith(RETRIEVE_SUFFIX))
                 .filter(x -> x.startsWith(
                         prefix)
                 );
@@ -411,6 +420,16 @@ public class PropertiesBackingStore implements BackingStore {
      */
     private static String makeClassKey(final String key) {
         return key + CLASS_SUFFIX;
+    }
+
+    /**
+     * Create the unique key for storing the local retrieve status of a key.
+     *
+     * @param key the original key
+     * @return a string for the properties file
+     */
+    private static String makeRetrieveStateKey(final String key) {
+        return key + RETRIEVE_SUFFIX;
     }
 
     /**

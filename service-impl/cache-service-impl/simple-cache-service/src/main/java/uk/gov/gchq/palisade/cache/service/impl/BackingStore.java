@@ -53,30 +53,51 @@ public interface BackingStore {
      * It is the responsibility of the backing store to ensure that the <code>valueClass</code> is stored along with the
      * object byte array. The standard way to do this is to store the type name of the class. See {@link
      * Class#getTypeName()}.
+     * <p>
+     * The {@code locallyCacheable} parameter is only used as a flag for the {@link SimpleCacheService} and is not handled
+     * at the backing store level of abstraction.
+     *
+     * @param key              the cache key
+     * @param valueClass       the object type represented in the byte array
+     * @param value            the encoded object
+     * @param timeToLive       an optional time to live, maybe be empty
+     * @param locallyCacheable if the item may be cached locally on retrieval
+     * @return true if and only if the the cache entry was made successfully
+     * @throws IllegalArgumentException if the duration is negative
+     * @throws IllegalArgumentException if <code>key</code> is empty (once whitespace is trimmed)
+     * @see uk.gov.gchq.palisade.cache.service.request.AddCacheRequest#locallyCacheable(boolean)
+     */
+    boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive, final boolean locallyCacheable);
+
+    /**
+     * Store the given data with a specified time to live. This a convenience method that simply calls {@link
+     * BackingStore#add(String, Class, byte[], Optional, boolean)} with the given duration.
      *
      * @param key        the cache key
      * @param valueClass the object type represented in the byte array
      * @param value      the encoded object
      * @param timeToLive an optional time to live, maybe be empty
-     * @return true if and only if the the cache entry was made successfully
-     * @throws IllegalArgumentException if the duration is negative
+     * @return true if and only if the cache entry was made successfully
      * @throws IllegalArgumentException if <code>key</code> is empty (once whitespace is trimmed)
+     * @see BackingStore#add(String, Class, byte[], Optional, boolean)
      */
-    boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive);
+    default boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
+        return add(key, valueClass, value, timeToLive, false);
+    }
 
     /**
      * Store the given data with infinite time to live. This a convenience method that simply calls {@link
-     * BackingStore#add(String, Class, byte[], Optional)} with an empty duration.
+     * BackingStore#add(String, Class, byte[], Optional, boolean)} with an empty duration.
      *
      * @param key        the cache key
      * @param valueClass the object type represented in the byte array
      * @param value      the encoded object
      * @return true if and only if the cache entry was made successfully
      * @throws IllegalArgumentException if <code>key</code> is empty (once whitespace is trimmed)
-     * @see BackingStore#add(String, Class, byte[], Optional)
+     * @see BackingStore#add(String, Class, byte[], Optional, boolean)
      */
     default boolean add(final String key, final Class<?> valueClass, final byte[] value) {
-        return add(key, valueClass, value, Optional.empty());
+        return add(key, valueClass, value, Optional.empty(), false);
     }
 
     /**

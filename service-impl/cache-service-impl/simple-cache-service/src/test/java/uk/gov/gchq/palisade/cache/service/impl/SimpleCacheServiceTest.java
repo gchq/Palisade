@@ -26,6 +26,9 @@ import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.RemoveCacheRequest;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -36,6 +39,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +51,7 @@ public class SimpleCacheServiceTest {
 
     private final static String BASE_KEY_1 = "test";
     private final static String BASE_KEY_2 = "test2";
+    private final static String BASE_KEY_3 = "test3";
     private final static String NOTHING = "nothing";
 
     private static String KEY_1;
@@ -61,6 +66,9 @@ public class SimpleCacheServiceTest {
     private static String KEY_4;
     private static String VALUE_4 = "another alternate string";
 
+    private static String KEY_5;
+    private static String VALUE_5 = "some more test data";
+
     private static String NO_KEY;
 
     private static Function<String, byte[]> encoder;
@@ -73,7 +81,6 @@ public class SimpleCacheServiceTest {
         KEY_1 = new AddCacheRequest<String>()
                 .service(MockCacheService.class)
                 .key(BASE_KEY_1)
-                .value(VALUE_1)
                 .makeBaseName();
         KEY_2 = new AddCacheRequest<String>()
                 .service(MockCacheService.class)
@@ -87,35 +94,39 @@ public class SimpleCacheServiceTest {
                 .service(fakeService.getClass())
                 .key(BASE_KEY_2)
                 .makeBaseName();
+        KEY_5 = new AddCacheRequest<String>()
+                .service(MockCacheService.class)
+                .key(BASE_KEY_3)
+                .makeBaseName();
 
         NO_KEY = new GetCacheRequest<String>()
                 .service(MockCacheService.class)
                 .key(NOTHING)
                 .makeBaseName();
 
-        when(store.get(any())).thenReturn(new SimpleCacheObject(Object.class, Optional.empty()));
+        when(store.get(any())).thenReturn(new SimpleCacheObject(Object.class, Optional.empty(), false));
 
         //get the string encoder
         encoder = new SimpleCacheService().getCodecs().getValueEncoder(String.class);
 
         //configure backing add to act with test data
         byte[] encoded = encoder.apply(VALUE_1);
-        when(store.add(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
-        when(store.get(KEY_1)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded)));
+        when(store.add(eq(KEY_1), eq(String.class), eq(encoded), any(), anyBoolean())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_1)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded), false));
 
         byte[] encoded2 = encoder.apply(VALUE_2);
-        when(store.add(eq(KEY_2), eq(String.class), eq(encoded2), any())).thenReturn(Boolean.TRUE);
-        when(store.get(KEY_2)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded2)));
+        when(store.add(eq(KEY_2), eq(String.class), eq(encoded2), any(), anyBoolean())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_2)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded2), false));
 
         //set an entry in a different Service
 
         byte[] encoded3 = encoder.apply(VALUE_3);
-        when(store.add(eq(KEY_3), eq(String.class), eq(encoded3), any())).thenReturn(Boolean.TRUE);
-        when(store.get(KEY_3)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded3)));
+        when(store.add(eq(KEY_3), eq(String.class), eq(encoded3), any(), anyBoolean())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_3)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded3), false));
 
         byte[] encoded4 = encoder.apply(VALUE_4);
-        when(store.add(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
-        when(store.get(KEY_4)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded4)));
+        when(store.add(eq(KEY_4), eq(String.class), eq(encoded4), any(), anyBoolean())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_4)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded4), false));
 
         //set up the lists
         when(store.list(eq(((ListCacheRequest) new ListCacheRequest().service(MockCacheService.class)).prefix("").makeBaseName())))
@@ -131,7 +142,12 @@ public class SimpleCacheServiceTest {
         when(store.remove(eq(KEY_1))).thenReturn(Boolean.TRUE);
 
         //set up a return of an empty object
-        when(store.get(eq(NO_KEY))).thenReturn(new SimpleCacheObject(Object.class, Optional.empty()));
+        when(store.get(eq(NO_KEY))).thenReturn(new SimpleCacheObject(Object.class, Optional.empty(), false));
+
+        //set up the return of locally cacheable objects
+        byte[] encoded5 = encoder.apply(VALUE_5);
+        when(store.add(eq(KEY_5), eq(String.class), any(), any(), eq(true))).thenReturn(Boolean.TRUE);
+        when(store.get(eq(KEY_5))).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded5), true));
     }
 
     @Before
@@ -223,14 +239,14 @@ public class SimpleCacheServiceTest {
     public void shouldNotShareKeysAcrossServices() {
         //Given - configure a separate backing add for this test
         BackingStore uniqueStore = Mockito.mock(BackingStore.class);
-        when(uniqueStore.get(any())).thenReturn(new SimpleCacheObject(Object.class, Optional.empty()));
+        when(uniqueStore.get(any())).thenReturn(new SimpleCacheObject(Object.class, Optional.empty(), false));
         byte[] encoded = encoder.apply(VALUE_1);
-        when(uniqueStore.add(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
-        when(uniqueStore.get(KEY_1)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded)));
+        when(uniqueStore.add(eq(KEY_1), eq(String.class), eq(encoded), any(), anyBoolean())).thenReturn(Boolean.TRUE);
+        when(uniqueStore.get(KEY_1)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded), false));
 
         byte[] encoded4 = encoder.apply(VALUE_4);
-        when(uniqueStore.add(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
-        when(uniqueStore.get(KEY_4)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded4)));
+        when(uniqueStore.add(eq(KEY_4), eq(String.class), eq(encoded4), any(), anyBoolean())).thenReturn(Boolean.TRUE);
+        when(uniqueStore.get(KEY_4)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded4), false));
 
         try {
             service.backingStore(uniqueStore);
@@ -274,6 +290,68 @@ public class SimpleCacheServiceTest {
 
         //Then
         assertTrue(answer.join());
+    }
+
+    @Test
+    public void shouldNotErrorOnLocallyCacheLowTTL() {
+        //Given
+        AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_1).value(VALUE_1).timeToLive(2000).locallyCacheable(true);
+        //When
+        CompletableFuture<Boolean> future = service.add(req);
+        //Then
+        assertTrue(future.join());
+    }
+
+    @Test
+    public void shouldNotRetrieveLocallyFirstTime() {
+        //Given
+        AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_3).value(VALUE_5).timeToLive(2000).locallyCacheable(true);
+        CompletableFuture<Boolean> future = service.add(req);
+        assertTrue(future.join());
+        //When
+        SimpleCacheObject retrieved = service.doCacheRetrieve(KEY_5, Duration.ofMillis(250));
+        //Then
+        assertTrue(retrieved.canRetrieveLocally());
+        assertFalse(retrieved.wasRetrieveLocally());
+    }
+
+    @Test
+    public void shouldRetrieveLocallySecondTime() {
+        //Given
+        AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_3).value(VALUE_5).timeToLive(2000).locallyCacheable(true);
+        CompletableFuture<Boolean> future = service.add(req);
+        assertTrue(future.join());
+        //When
+        SimpleCacheObject firstRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(250));
+        SimpleCacheObject secondRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(250));
+
+        //Then
+        assertTrue(firstRetrieve.canRetrieveLocally());
+        assertFalse(firstRetrieve.wasRetrieveLocally());
+        assertTrue(secondRetrieve.canRetrieveLocally());
+        assertTrue(secondRetrieve.wasRetrieveLocally());
+    }
+
+    @Test
+    public void shouldRetrieveNotRetrieveLocallyAfterExpiry() throws InterruptedException {
+        //Given
+        AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_3).value(VALUE_5).timeToLive(2000).locallyCacheable(true);
+        CompletableFuture<Boolean> future = service.add(req);
+        assertTrue(future.join());
+        //When
+        SimpleCacheObject firstRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(100));
+        SimpleCacheObject secondRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(100));
+        Thread.sleep(200);
+        SimpleCacheObject thirdRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(100));
+
+        //Then
+        assertTrue(firstRetrieve.canRetrieveLocally());
+        assertFalse(firstRetrieve.wasRetrieveLocally());
+        assertTrue(secondRetrieve.canRetrieveLocally());
+        assertTrue(secondRetrieve.wasRetrieveLocally());
+        //after waiting, the local cache should have expired
+        assertTrue(thirdRetrieve.canRetrieveLocally());
+        assertFalse(thirdRetrieve.wasRetrieveLocally());
     }
 
     @Test(expected = NullPointerException.class)
@@ -326,6 +404,31 @@ public class SimpleCacheServiceTest {
         //Given - nothing
         //When
         service.remove(null);
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwOnHighTTLLocalCacheItem() {
+        //Given - nothing
+        //When
+        service.add(new AddCacheRequest<Object>()
+                .service(MockCacheService.class)
+                .key("test").value(new Object())
+                .locallyCacheable(true)
+                .timeToLive(Optional.of(Duration.ofDays(365))));
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwOnNoTTLLocalCacheItem() {
+        //Given - nothing
+        //When
+        service.add(new AddCacheRequest<Object>()
+                .service(MockCacheService.class)
+                .key("test").value(new Object())
+                .locallyCacheable(true));
         //Then
         fail("exception expected");
     }

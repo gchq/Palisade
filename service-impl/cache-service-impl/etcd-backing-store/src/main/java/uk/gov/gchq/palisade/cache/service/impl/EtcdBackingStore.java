@@ -38,6 +38,15 @@ import static java.util.Objects.requireNonNull;
 
 public class EtcdBackingStore implements BackingStore {
 
+    /**
+     * Flag to indicate boolean false.
+     */
+    public static final ByteSequence FALSE_FLAG = ByteSequence.fromBytes(new byte[]{0});
+    /**
+     * Flag to indicate boolean true.
+     */
+    public static final ByteSequence TRUE_FLAG = ByteSequence.fromBytes(new byte[]{1});
+
     private Collection<String> connectionDetails;
     private Client etcdClient;
     private KV keyValueClient;
@@ -112,7 +121,7 @@ public class EtcdBackingStore implements BackingStore {
     }
 
     @Override
-    public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
+    public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive, final boolean locallyCacheable) {
         String cacheKey = BackingStore.validateAddParameters(key, valueClass, value, timeToLive);
         long leaseID = 0;
         if (timeToLive.isPresent()) {
@@ -132,7 +141,11 @@ public class EtcdBackingStore implements BackingStore {
                 ByteSequence.fromString(cacheKey + ".value"),
                 ByteSequence.fromBytes(value),
                 PutOption.newBuilder().withLeaseId(leaseID).build());
-        CompletableFuture.allOf(response1, response2).join();
+        CompletableFuture<PutResponse> response3 = getKeyValueClient().put(
+                ByteSequence.fromString(cacheKey + ".state"),
+                (locallyCacheable) ? TRUE_FLAG : FALSE_FLAG,
+                PutOption.newBuilder().withLeaseId(leaseID).build());
+        CompletableFuture.allOf(response1, response2, response3).join();
         return true;
     }
 
@@ -141,12 +154,14 @@ public class EtcdBackingStore implements BackingStore {
         String cacheKey = BackingStore.keyCheck(key);
         CompletableFuture<GetResponse> futureValueClass = getKeyValueClient().get(ByteSequence.fromString(cacheKey + ".class"));
         CompletableFuture<GetResponse> futureValue = getKeyValueClient().get(ByteSequence.fromString(cacheKey + ".value"));
+        CompletableFuture<GetResponse> futureLocalCacheState = getKeyValueClient().get(ByteSequence.fromString(cacheKey + ".state"));
         List<KeyValue> valueClassKV = futureValueClass.join().getKvs();
         if (valueClassKV.size() == 0) {
-            return new SimpleCacheObject(Object.class, Optional.empty());
+            return new SimpleCacheObject(Object.class, Optional.empty(), false);
         }
         try {
-            return new SimpleCacheObject(Class.forName(futureValueClass.join().getKvs().get(0).getValue().toStringUtf8()), Optional.of(futureValue.join().getKvs().get(0).getValue().getBytes()));
+            boolean locallyCacheable = futureLocalCacheState.join().getKvs().get(0).getValue().equals(TRUE_FLAG);
+            return new SimpleCacheObject(Class.forName(futureValueClass.join().getKvs().get(0).getValue().toStringUtf8()), Optional.of(futureValue.join().getKvs().get(0).getValue().getBytes()), locallyCacheable);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Get request failed due to the class of the value not being found.", e);
         }
@@ -169,7 +184,8 @@ public class EtcdBackingStore implements BackingStore {
         String cacheKey = BackingStore.keyCheck(key);
         CompletableFuture<DeleteResponse> removedValue = getKeyValueClient().delete(ByteSequence.fromString(cacheKey + ".value"));
         CompletableFuture<DeleteResponse> removedClass = getKeyValueClient().delete(ByteSequence.fromString(cacheKey + ".class"));
-        removedClass.join();
+        CompletableFuture<DeleteResponse> removedState = getKeyValueClient().delete(ByteSequence.fromString(cacheKey + ".state"));
+        CompletableFuture.allOf(removedClass, removedState).join();
         return (removedValue.join().getDeleted() != 0);
     }
 }

@@ -379,6 +379,32 @@ public abstract class AbstractBackingStoreTest {
         assertArrayEquals(expected2, overwrite.getValue().get());
     }
 
+    @Test
+    public void shouldRetrieveNegativeLocalCacheState() {
+        //Given
+        byte[] expected = new byte[]{1, 2, 3, 4};
+        //When
+        impl.add("test6", Integer.class, expected, Optional.empty(), false);
+        SimpleCacheObject actual = impl.get("test6");
+        //Then
+        assertArrayEquals(expected, actual.getValue().get());
+        assertEquals(Integer.class, actual.getValueClass());
+        assertFalse(actual.canRetrieveLocally());
+    }
+
+    @Test
+    public void shouldRetrievePositiveLocalCacheState() {
+        //Given
+        byte[] expected = new byte[]{1, 2, 3, 4};
+        //When
+        impl.add("test6", Integer.class, expected, Optional.empty(), true);
+        SimpleCacheObject actual = impl.get("test6");
+        //Then
+        assertArrayEquals(expected, actual.getValue().get());
+        assertEquals(Integer.class, actual.getValueClass());
+        assertTrue(actual.canRetrieveLocally());
+    }
+
     //Time to live tests
 
     protected void delay(long millis) {

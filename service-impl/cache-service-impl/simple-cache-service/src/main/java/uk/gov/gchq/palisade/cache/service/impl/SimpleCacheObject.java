@@ -26,7 +26,6 @@ import java.util.Optional;
  * Represents the basic cache entry that will be stored and retrieved from the backing store. If a store is unable to
  * get a given key then it will return an instance of this class with an empty value. No entries in this class may
  * be <code>null</code>.
- *
  */
 public class SimpleCacheObject {
 
@@ -41,16 +40,41 @@ public class SimpleCacheObject {
     private final Optional<byte[]> value;
 
     /**
+     * Can this value be retrieved locally from the cache?
+     */
+    private final boolean canRetrieveLocally;
+
+    /**
+     * Was this value retrieved locally from the cache instead of being retrieved from the backing store?
+     */
+    private final boolean wasRetrievedLocally;
+
+    /**
      * Create a cache object.
      *
-     * @param valueClass the type of the value being cached
-     * @param value      the optional cache value, may be empty if no valid entry is present
+     * @param valueClass         the type of the value being cached
+     * @param value              the optional cache value, may be empty if no valid entry is present
+     * @param canRetrieveLocally whether this value can be retrieved locally
      */
-    public SimpleCacheObject(final Class<?> valueClass, final Optional<byte[]> value) {
+    public SimpleCacheObject(final Class<?> valueClass, final Optional<byte[]> value, final boolean canRetrieveLocally) {
+        this(valueClass, value, canRetrieveLocally, false);
+    }
+
+    /**
+     * Create a cache object.
+     *
+     * @param valueClass          the type of the value being cached
+     * @param value               the optional cache value, may be empty if no valid entry is present
+     * @param canRetrieveLocally  whether this value can be retrieved locally
+     * @param wasRetrievedLocally whether this value was retrieved locally
+     */
+    public SimpleCacheObject(final Class<?> valueClass, final Optional<byte[]> value, final boolean canRetrieveLocally, final boolean wasRetrievedLocally) {
         Objects.requireNonNull(valueClass, "valueClass");
         Objects.requireNonNull(value, "value");
         this.valueClass = valueClass;
         this.value = value;
+        this.canRetrieveLocally = canRetrieveLocally;
+        this.wasRetrievedLocally = wasRetrievedLocally;
     }
 
     /**
@@ -71,12 +95,32 @@ public class SimpleCacheObject {
         return value;
     }
 
+    /**
+     * Get whether this item can be safely cached locally.
+     *
+     * @return true if the item can be stored locally in a cache
+     */
+    public boolean canRetrieveLocally() {
+        return canRetrieveLocally;
+    }
+
+    /**
+     * Get whether this item actually was retrieved from a local cache.
+     *
+     * @return true if the item was retrieved locally from a cache
+     */
+    public boolean wasRetrieveLocally() {
+        return wasRetrievedLocally;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("valueClass", valueClass)
                 .append("value", value)
+                .append("canRetrieveLocally", canRetrieveLocally)
+                .append("wasRetrievedLocally", wasRetrievedLocally)
                 .toString();
     }
 
@@ -95,6 +139,8 @@ public class SimpleCacheObject {
         return new EqualsBuilder()
                 .append(valueClass, that.valueClass)
                 .append(value, that.value)
+                .append(canRetrieveLocally, that.canRetrieveLocally)
+                .append(wasRetrievedLocally, that.wasRetrievedLocally)
                 .isEquals();
     }
 
@@ -104,6 +150,8 @@ public class SimpleCacheObject {
                 .appendSuper(super.hashCode())
                 .append(valueClass)
                 .append(value)
+                .append(canRetrieveLocally)
+                .append(wasRetrievedLocally)
                 .toHashCode();
     }
 }

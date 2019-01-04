@@ -31,8 +31,14 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -46,6 +52,9 @@ import static java.util.Objects.requireNonNull;
  * Instances of this class primarily add an instance of {@link BackingStore} to which the work of persistence is
  * delegated. This class is responsible for managing data into and out of any backing store so clients have a
  * transparent interface to a backing store and the actual backing store implementation is abstracted away.
+ * <p>
+ * {@link SimpleCacheService} implements a local cache for low time to live requests. The maximum time to live for locally
+ * cacheable items is {@link SimpleCacheService#MAX_LOCAL_TTL}. Only positive cache hits are cached, not negative ones.
  *
  * @apiNote no parameters may be <code>null</code>.
  */
@@ -56,6 +65,11 @@ public class SimpleCacheService implements CacheService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleCacheService.class);
 
     /**
+     * The maximum allowed time to live for entries that are marked as locally cacheable.
+     */
+    public static final Duration MAX_LOCAL_TTL = Duration.of(5, ChronoUnit.MINUTES);
+
+    /**
      * The codec registry that knows how to encode objects.
      */
     private final CacheCodecRegistry codecs = new CacheCodecRegistry();
@@ -64,6 +78,16 @@ public class SimpleCacheService implements CacheService {
      * The store for our data.
      */
     private BackingStore store;
+
+    /**
+     * The local store for retrieved objects.
+     */
+    private final Map<String, SimpleCacheObject> localObjects = new ConcurrentHashMap<>();
+
+    /**
+     * Timer thread to remove local cache entries after expiry.
+     */
+    private static final ScheduledExecutorService REMOVAL_TIMER = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * Create and empty backing store. Note that this is for use by serialisation mechanisms and any attempt to use an
@@ -178,6 +202,18 @@ public class SimpleCacheService implements CacheService {
         V value = request.getValue();
         Class<V> valueClass = (Class<V>) request.getValue().getClass();
         Optional<Duration> timeToLive = request.getTimeToLive();
+        boolean localCacheable = request.getLocallyCacheable();
+
+        //is this locally cacheable? If so, check the TTL is below the maximum
+        if (localCacheable &&
+                (!timeToLive.isPresent() || (
+                        timeToLive.isPresent() &&
+                                MAX_LOCAL_TTL.compareTo(timeToLive.get()) <= 0
+                )
+                )
+                ) {
+            throw new IllegalArgumentException("time to live must be below " + MAX_LOCAL_TTL.getSeconds() + " seconds for locally cacheable values");
+        }
 
         //find encoder function
         Function<V, byte[]> encoder = codecs.getValueEncoder(valueClass);
@@ -186,7 +222,7 @@ public class SimpleCacheService implements CacheService {
         //send to add
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("-> Backing store add {}", baseKey);
-            boolean result = getBackingStore().add(baseKey, valueClass, encodedValue, timeToLive);
+            boolean result = getBackingStore().add(baseKey, valueClass, encodedValue, timeToLive, localCacheable);
             LOGGER.debug("-> Backing store stored {} with result {}", baseKey, result);
             return result;
         });
@@ -200,21 +236,49 @@ public class SimpleCacheService implements CacheService {
         String baseKey = request.makeBaseName();
         LOGGER.debug("Get item {}", baseKey);
 
-        //get from add
         Supplier<Optional<V>> getFunction = () -> {
-            LOGGER.debug("-> Backing store get {}", baseKey);
-            SimpleCacheObject result = getBackingStore().get(baseKey);
-            if (result.getValue().isPresent()) {
-                LOGGER.debug("-> Backing store retrieved {}", baseKey);
-            } else {
-                LOGGER.debug("-> Backing store failed to get {}", baseKey);
-            }
+            SimpleCacheObject result = doCacheRetrieve(baseKey, MAX_LOCAL_TTL);
 
             //assign so Javac can infer the generic type
             BiFunction<byte[], Class<V>, V> decode = codecs.getValueDecoder((Class<V>) result.getValueClass());
             return result.getValue().map(x -> decode.apply(x, (Class<V>) result.getValueClass()));
         };
         return CompletableFuture.supplyAsync(getFunction);
+    }
+
+    /**
+     * Performs the retrieval of the given key from the backing store or from the local cache if it is available. This method
+     * encapsulates the actual logic for performing the retrieval. If the backing store indicates that the returned value
+     * is suitable for local caching, then the cache object will be stored locally for the given time to live. Repeated retrieval
+     * attempts within that time window will not make a request to the backing store, but to the local cache.
+     *
+     * @param baseKey       the complete key name to use with the backing store
+     * @param localCacheTTL the time to live for a local storage entry
+     * @return the raw cache object provided by the backing store
+     */
+    SimpleCacheObject doCacheRetrieve(final String baseKey, final Duration localCacheTTL) {
+        //do we have this locally?
+        SimpleCacheObject localRetrieve = localObjects.get(baseKey);
+        if (localRetrieve != null) {
+            LOGGER.debug("Retrieved from local cache {}", baseKey);
+            return localRetrieve;
+        } else {
+            LOGGER.debug("-> Backing store get {}", baseKey);
+            SimpleCacheObject remoteRetrieve = getBackingStore().get(baseKey);
+            if (remoteRetrieve.getValue().isPresent()) {
+                LOGGER.debug("-> Backing store retrieved {}", baseKey);
+
+                //should this be cached?
+                if (remoteRetrieve.canRetrieveLocally()) {
+                    localObjects.put(baseKey, new SimpleCacheObject(remoteRetrieve.getValueClass(), remoteRetrieve.getValue(), remoteRetrieve.canRetrieveLocally(), true));
+                    //set up a timer to remove it after the max TTL has elapsed
+                    REMOVAL_TIMER.schedule(() -> localObjects.remove(baseKey), localCacheTTL.toMillis(), TimeUnit.MILLISECONDS);
+                }
+            } else {
+                LOGGER.debug("-> Backing store failed to get {}", baseKey);
+            }
+            return remoteRetrieve;
+        }
     }
 
     @Override
