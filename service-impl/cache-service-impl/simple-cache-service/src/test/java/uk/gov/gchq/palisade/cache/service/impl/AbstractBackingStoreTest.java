@@ -29,7 +29,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import static uk.gov.gchq.palisade.cache.service.impl.StreamUtil.streamEqual;
+import static uk.gov.gchq.palisade.util.TestUtil.streamEqual;
 
 public abstract class AbstractBackingStoreTest {
 

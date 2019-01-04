@@ -16,27 +16,8 @@
 
 package uk.gov.gchq.palisade.cache.service.heart;
 
-import org.junit.Test;
+import uk.gov.gchq.palisade.service.Service;
 
-import static org.junit.Assert.*;
+public class StubService implements Service {
 
-public class HeartbeatTest {
-
-   //Tests needed
-    /*
-    set below minimum heart rate
-    set heart rate while beating
-    check not beating when inited
-    check beating when started
-    check beating when stopped
-    check set cache when beating
-    check set service class when beating
-    check set instance name when beating
-    check name becomes default name when nulled
-    check throw empty name exception
-    check no start on null cache/null service
-    check starts
-    check stops
-
-     */
 }

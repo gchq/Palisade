@@ -14,29 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.cache.service.heart;
+package uk.gov.gchq.palisade.cache.service.impl;
 
-import org.junit.Test;
+public class HeartbeatIT {
 
-import static org.junit.Assert.*;
-
-public class HeartbeatTest {
-
-   //Tests needed
+    //tests needed
     /*
-    set below minimum heart rate
-    set heart rate while beating
-    check not beating when inited
-    check beating when started
-    check beating when stopped
-    check set cache when beating
-    check set service class when beating
-    check set instance name when beating
-    check name becomes default name when nulled
-    check throw empty name exception
-    check no start on null cache/null service
-    check starts
-    check stops
+    create a single one start it ..check..stop it..check its stopped
+    create two check they are both there
+    create two from different services, check no overlap
+    create one check name is a match
 
      */
 }
