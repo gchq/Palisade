@@ -52,6 +52,7 @@ public class SimpleCacheServiceTest {
     private final static String BASE_KEY_1 = "test";
     private final static String BASE_KEY_2 = "test2";
     private final static String BASE_KEY_3 = "test3";
+    private final static String BASE_KEY_4 = "test4";
     private final static String NOTHING = "nothing";
 
     private static String KEY_1;
@@ -67,6 +68,7 @@ public class SimpleCacheServiceTest {
     private static String VALUE_4 = "another alternate string";
 
     private static String KEY_5;
+    private static String KEY_6;
     private static String VALUE_5 = "some more test data";
 
     private static String NO_KEY;
@@ -97,6 +99,10 @@ public class SimpleCacheServiceTest {
         KEY_5 = new AddCacheRequest<String>()
                 .service(MockCacheService.class)
                 .key(BASE_KEY_3)
+                .makeBaseName();
+        KEY_6 = new AddCacheRequest<String>()
+                .service(MockCacheService.class)
+                .key(BASE_KEY_4)
                 .makeBaseName();
 
         NO_KEY = new GetCacheRequest<String>()
@@ -146,8 +152,12 @@ public class SimpleCacheServiceTest {
 
         //set up the return of locally cacheable objects
         byte[] encoded5 = encoder.apply(VALUE_5);
-        when(store.add(eq(KEY_5), eq(String.class), any(), any(), eq(true))).thenReturn(Boolean.TRUE);
+        when(store.add(eq(KEY_5), eq(String.class), any(), any(), anyBoolean())).thenReturn(Boolean.TRUE);
         when(store.get(eq(KEY_5))).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded5), true));
+        //set up a  specifically non local cacheable object
+        when(store.add(eq(KEY_6), eq(String.class), any(), any(), anyBoolean())).thenReturn(Boolean.TRUE);
+        when(store.get(eq(KEY_6))).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded5), false));
+
     }
 
     @Before
@@ -354,6 +364,23 @@ public class SimpleCacheServiceTest {
         //after waiting, the local cache should have expired
         assertTrue(thirdRetrieve.canRetrieveLocally());
         assertFalse(thirdRetrieve.wasRetrieveLocally());
+    }
+
+    @Test
+    public void shouldNotRetrieveFromLocalCache() {
+        //Given - a non local cacheable object
+        AddCacheRequest<String> req = new AddCacheRequest<String>().service(MockCacheService.class).key(BASE_KEY_4).value(VALUE_5).timeToLive(2000).locallyCacheable(false);
+        CompletableFuture<Boolean> future = service.add(req);
+        assertTrue(future.join());
+        //When
+        SimpleCacheObject firstRetrieve = service.doCacheRetrieve(KEY_6, Duration.ofMillis(50));
+        SimpleCacheObject secondRetrieve = service.doCacheRetrieve(KEY_6, Duration.ofMillis(50));
+
+        //Then
+        assertFalse(firstRetrieve.canRetrieveLocally());
+        assertFalse(firstRetrieve.wasRetrieveLocally());
+        assertFalse(secondRetrieve.canRetrieveLocally());
+        assertFalse(secondRetrieve.wasRetrieveLocally());
     }
 
     @Test(expected = NullPointerException.class)

@@ -204,15 +204,11 @@ public class SimpleCacheService implements CacheService {
         Optional<Duration> timeToLive = request.getTimeToLive();
         boolean localCacheable = request.getLocallyCacheable();
 
-        //is this locally cacheable? If so, check the TTL is below the maximum
-        if (localCacheable &&
-                (!timeToLive.isPresent() || (
-                        timeToLive.isPresent() &&
-                                MAX_LOCAL_TTL.compareTo(timeToLive.get()) <= 0
-                )
-                )
-                ) {
-            throw new IllegalArgumentException("time to live must be below " + MAX_LOCAL_TTL.getSeconds() + " seconds for locally cacheable values");
+        //is this locally cacheable? If so, check the TTL is present and below the maximum time
+        if (localCacheable) {
+            if (!timeToLive.isPresent() || (timeToLive.isPresent() && MAX_LOCAL_TTL.compareTo(timeToLive.get()) <= 0)) {
+                throw new IllegalArgumentException("time to live must be set and be below " + MAX_LOCAL_TTL.getSeconds() + " seconds for locally cacheable values");
+            }
         }
 
         //find encoder function
@@ -234,7 +230,6 @@ public class SimpleCacheService implements CacheService {
         requireNonNull(request, "request");
         //make final key name
         String baseKey = request.makeBaseName();
-        LOGGER.debug("Get item {}", baseKey);
 
         Supplier<Optional<V>> getFunction = () -> {
             SimpleCacheObject result = doCacheRetrieve(baseKey, MAX_LOCAL_TTL);
@@ -257,6 +252,7 @@ public class SimpleCacheService implements CacheService {
      * @return the raw cache object provided by the backing store
      */
     SimpleCacheObject doCacheRetrieve(final String baseKey, final Duration localCacheTTL) {
+        LOGGER.debug("Get item {}", baseKey);
         //do we have this locally?
         SimpleCacheObject localRetrieve = localObjects.get(baseKey);
         if (localRetrieve != null) {
