@@ -16,7 +16,17 @@
 
 package uk.gov.gchq.palisade.cache.service.impl;
 
+import org.junit.Test;
+import uk.gov.gchq.palisade.cache.service.CacheService;
+
 public class HeartbeatIT {
+
+    private static CacheService cache=new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+
+    @Test
+    public void shouldStartAndStopAndBeVisible() {
+    
+    }
 
     //tests needed
     /*
