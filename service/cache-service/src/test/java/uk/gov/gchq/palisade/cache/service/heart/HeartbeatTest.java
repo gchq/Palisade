@@ -16,27 +16,184 @@
 
 package uk.gov.gchq.palisade.cache.service.heart;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import uk.gov.gchq.palisade.cache.service.CacheService;
 
+import java.time.Duration;
+
+import static java.util.Objects.nonNull;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 public class HeartbeatTest {
 
-   //Tests needed
-    /*
-    set below minimum heart rate
-    set heart rate while beating
-    check not beating when inited
-    check beating when started
-    check beating when stopped
-    check set cache when beating
-    check set service class when beating
-    check set instance name when beating
-    check name becomes default name when nulled
-    check throw empty name exception
-    check no start on null cache/null service
-    check starts
-    check stops
+    private Heartbeat heart;
+    private CacheService mockCache = Mockito.mock(CacheService.class);
 
-     */
+    @Before
+    public void setup() {
+        heart = new Heartbeat();
+    }
+
+    @After
+    public void tearDown() {
+        if (nonNull(heart)) {
+            if (heart.isBeating()) {
+                heart.stop();
+            }
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwWhenIllegalHeartRate() {
+        //Given
+        //When
+        heart.setHeartRate(HeartUtil.MIN_HEARTBEAT_DURATION.dividedBy(2));
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwWhenBeatingSetRate() {
+        //Given
+        heart.cacheService(mockCache);
+        heart.serviceClass(StubService.class);
+        heart.start();
+        //When
+        heart.heartRate(Duration.ofSeconds(2));
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwWhenBeatingSetCache() {
+        //Given
+        heart.cacheService(mockCache);
+        heart.serviceClass(StubService.class);
+        heart.start();
+        //When
+        heart.cacheService(mockCache);
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwWhenBeatingSetService() {
+        //Given
+        heart.cacheService(mockCache);
+        heart.serviceClass(StubService.class);
+        heart.start();
+        //When
+        heart.serviceClass(StubService.class);
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwWhenBeatingSetInstance() {
+        //Given
+        heart.cacheService(mockCache);
+        heart.serviceClass(StubService.class);
+        heart.start();
+        //When
+        heart.instanceName("test");
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwEmptyInstanceName() {
+        //Given
+        //When
+        heart.instanceName("");
+        //Then
+        fail("exception expected");
+    }
+
+    @Test
+    public void shouldBeStoppedOnConstruction() {
+        assertFalse(heart.isBeating());
+    }
+
+    @Test
+    public void shouldBeatAfterStart() {
+        //Given
+        heart.cacheService(mockCache);
+        heart.serviceClass(StubService.class);
+        //When
+        heart.start();
+        //Then
+        assertTrue(heart.isBeating());
+    }
+
+    @Test
+    public void shouldNotBeatAfterStop() {
+        //Given
+        heart.cacheService(mockCache);
+        heart.serviceClass(StubService.class);
+        //When
+        heart.start();
+        heart.stop();
+        //Then
+        assertFalse(heart.isBeating());
+    }
+
+    @Test
+    public void shouldBeatAfterRestart() {
+        //Given
+        heart.cacheService(mockCache);
+        heart.serviceClass(StubService.class);
+        //When
+        heart.start();
+        heart.stop();
+        heart.start();
+        //Then
+        assertTrue(heart.isBeating());
+    }
+
+    @Test
+    public void shouldUseDefaultNameOnNullInstanceName() {
+        //Given
+        heart.instanceName(null);
+        //When
+        String actual = heart.getInstanceName();
+        //Then
+        assertThat(actual, is(equalTo(HeartUtil.createDefaultName())));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwOnNoCache() {
+        //Given
+        heart.serviceClass(StubService.class);
+        //When
+        heart.start();
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwOnNoService() {
+        //Given
+        heart.cacheService(mockCache);
+        //When
+        heart.start();
+        //Then
+        fail("exception expected");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwOnDoubleStart() {
+        //Given
+        heart.cacheService(mockCache);
+        heart.serviceClass(StubService.class);
+        //When
+        heart.start();
+        heart.start();
+        //Then
+        fail("exception expected");
+    }
 }
