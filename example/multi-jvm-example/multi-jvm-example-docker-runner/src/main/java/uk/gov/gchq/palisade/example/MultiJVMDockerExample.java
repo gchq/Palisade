@@ -19,20 +19,13 @@ package uk.gov.gchq.palisade.example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
-import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
-import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
-import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
+import uk.gov.gchq.palisade.example.config.DistributedServicesConfigurator;
+import uk.gov.gchq.palisade.rest.RestUtil;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class MultiJVMDockerExample {
@@ -46,15 +39,9 @@ public class MultiJVMDockerExample {
 
     public void run() throws Exception {
         //this will write an initial configuration
-        final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(Collections.singletonList("http://localhost:2379"),
-                Optional.empty(),
-                Optional.of(new ProxyRestPolicyService("http://policy-service:8080/policy")),
-                Optional.of(new ProxyRestUserService("http://user-service:8080/user")),
-                Optional.of(new ProxyRestResourceService("http://resource-service:8080/resource")),
-                Optional.of(new ProxyRestPalisadeService("http://palisade-service:8080/palisade")),
-                Optional.of(new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"), false)))
-        );
-        final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
+        DistributedServicesConfigurator.main(new String[]{"http://etcd:2379", "http://localhost:8080/palisade", "http://localhost:8081/policy", "http://localhost:8082/resource", "http://localhost:8083/user", "http://localhost:8084/data", "http://localhost:8085/config"});
+        ConfigurationService configService = RestUtil.createService(ExampleSimpleClient.class, "configRest.json", ConfigurationService.class);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         LOGGER.info("");

@@ -96,26 +96,26 @@ public class ConfiguredClientServices implements ServicesFactory {
     }
 
     protected CacheService createCacheService() {
-        return new Configurator(configService).createFromConfig(CacheService.class, config);
+        return Configurator.createFromConfig(CacheService.class, config);
     }
 
     protected ResourceService createResourceService() {
-        return new Configurator(configService).createFromConfig(ResourceService.class, config);
+        return Configurator.createFromConfig(ResourceService.class, config);
     }
 
     protected AuditService createAuditService() {
-        return new Configurator(configService).createFromConfig(AuditService.class, config);
+        return Configurator.createFromConfig(AuditService.class, config);
     }
 
     protected PolicyService createPolicyService() {
-        return new Configurator(configService).createFromConfig(PolicyService.class, config);
+        return Configurator.createFromConfig(PolicyService.class, config);
     }
 
     protected UserService createUserService() {
-        return new Configurator(configService).createFromConfig(UserService.class, config);
+        return Configurator.createFromConfig(UserService.class, config);
     }
 
     protected PalisadeService createPalisadeService() {
-        return new Configurator(configService).createFromConfig(PalisadeService.class, config);
+        return Configurator.createFromConfig(PalisadeService.class, config);
     }
 }

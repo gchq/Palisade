@@ -16,20 +16,14 @@
 
 package uk.gov.gchq.palisade.example;
 
-import io.etcd.jetcd.launcher.junit.EtcdClusterResource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
-import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.rest.RestUtil;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MultiJvmExample {
@@ -47,36 +41,22 @@ public class MultiJvmExample {
     }
 
     public void run(final String sourceFile) throws Exception {
-        EtcdClusterResource etcd = null;
-        try {
-            etcd = new EtcdClusterResource("test-etcd", 1);
-            etcd.cluster().start();
-            List<String> etcdEndpointURLs = etcd.cluster().getClientEndpoints()
-                    .stream()
-                    .map(URI::toString)
-                    .collect(Collectors.toList());
-            //this will write an initial configuration
-            final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs,
-                    Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
 
-            final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-            final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
+        final ConfiguredClientServices cs = new ConfiguredClientServices(RestUtil.createService(ExampleSimpleClient.class, RestUtil.CONFIG_SERVICE_PATH, ConfigurationService.class));
 
-            LOGGER.info("");
-            LOGGER.info("Alice is reading file1...");
-            final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
-            LOGGER.info("Alice got back: ");
-            aliceResults.map(Object::toString).forEach(LOGGER::info);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
-            LOGGER.info("");
-            LOGGER.info("Bob is reading file1...");
-            final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
-            LOGGER.info("Bob got back: ");
-            bobResults.map(Object::toString).forEach(LOGGER::info);
-        } finally {
-            if (etcd != null) {
-                etcd.cluster().close();
-            }
-        }
+        LOGGER.info("");
+        LOGGER.info("Alice is reading file1...");
+        final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
+        LOGGER.info("Alice got back: ");
+        aliceResults.map(Object::toString).forEach(LOGGER::info);
+
+        LOGGER.info("");
+        LOGGER.info("Bob is reading file1...");
+        final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
+        LOGGER.info("Bob got back: ");
+        bobResults.map(Object::toString).forEach(LOGGER::info);
+
     }
 }
