@@ -105,23 +105,15 @@ public class HashMapBackingStore implements BackingStore {
         public final Class<?> clazz;
 
         /**
-         * Should this value be locally cached?
-         */
-        public final boolean locallyCacheable;
-
-        /**
          * Create a cache entry pair.
          *
-         * @param value            encoded object
-         * @param clazz            Java class object
-         * @param locallyCacheable true if this value can be locally cached
+         * @param value encoded object
+         * @param clazz Java class object
          */
-        CachedPair(final byte[] value, final Class<?> clazz, final boolean locallyCacheable) {
+        CachedPair(final byte[] value, final Class<?> clazz) {
             this.value = value;
             this.clazz = clazz;
-            this.locallyCacheable = locallyCacheable;
         }
-
     }
 
     /**
@@ -181,10 +173,10 @@ public class HashMapBackingStore implements BackingStore {
     }
 
     @Override
-    public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive, final boolean locallyCacheable) {
+    public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
         String cacheKey = BackingStore.validateAddParameters(key, valueClass, value, timeToLive);
         LOGGER.debug("Adding to cache key {} of class {}", key, valueClass);
-        cache.put(cacheKey, new CachedPair(value, valueClass, locallyCacheable));
+        cache.put(cacheKey, new CachedPair(value, valueClass));
         /*Here we set up a simple timer to deal with the removal of the item from the cache if a duration is present
          *This uses a single timer to remove elements, this is fine for this example, but in production we would want
          *something more performant.
@@ -199,8 +191,8 @@ public class HashMapBackingStore implements BackingStore {
     public SimpleCacheObject get(final String key) {
         String cacheKey = BackingStore.keyCheck(key);
         LOGGER.debug("Getting from cache: {}", cacheKey);
-        final CachedPair result = cache.getOrDefault(cacheKey, new CachedPair(null, Object.class, false));
-        return new SimpleCacheObject(result.clazz, Optional.ofNullable(result.value), result.locallyCacheable);
+        final CachedPair result = cache.getOrDefault(cacheKey, new CachedPair(null, Object.class));
+        return new SimpleCacheObject(result.clazz, Optional.ofNullable(result.value), Optional.empty());
     }
 
     @Override

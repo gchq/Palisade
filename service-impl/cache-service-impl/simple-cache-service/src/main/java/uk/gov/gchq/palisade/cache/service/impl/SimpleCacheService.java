@@ -215,10 +215,12 @@ public class SimpleCacheService implements CacheService {
         Function<V, byte[]> encoder = codecs.getValueEncoder(valueClass);
         //encode value
         byte[] encodedValue = encoder.apply(value);
+        //add any needed metadata
+        byte[] metadataWrapped = CacheMetadata.addMetaData(encodedValue, request);
         //send to add
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("-> Backing store add {}", baseKey);
-            boolean result = getBackingStore().add(baseKey, valueClass, encodedValue, timeToLive, localCacheable);
+            boolean result = getBackingStore().add(baseKey, valueClass, metadataWrapped, timeToLive);
             LOGGER.debug("-> Backing store stored {} with result {}", baseKey, result);
             return result;
         });
@@ -264,12 +266,17 @@ public class SimpleCacheService implements CacheService {
             if (remoteRetrieve.getValue().isPresent()) {
                 LOGGER.debug("-> Backing store retrieved {}", baseKey);
 
+                SimpleCacheObject populated = CacheMetadata.populateMetaData(remoteRetrieve);
+
                 //should this be cached?
-                if (remoteRetrieve.canRetrieveLocally()) {
-                    localObjects.put(baseKey, new SimpleCacheObject(remoteRetrieve.getValueClass(), remoteRetrieve.getValue(), remoteRetrieve.canRetrieveLocally(), true));
+                if (populated.metadata().get().canBeRetrievedLocally()) {
+                    localObjects.put(baseKey, new SimpleCacheObject(populated.getValueClass(),
+                            populated.getValue(),
+                            Optional.of(populated.metadata().get().retrievedLocally())));
                     //set up a timer to remove it after the max TTL has elapsed
                     REMOVAL_TIMER.schedule(() -> localObjects.remove(baseKey), localCacheTTL.toMillis(), TimeUnit.MILLISECONDS);
                 }
+                return populated;
             } else {
                 LOGGER.debug("-> Backing store failed to get {}", baseKey);
             }
