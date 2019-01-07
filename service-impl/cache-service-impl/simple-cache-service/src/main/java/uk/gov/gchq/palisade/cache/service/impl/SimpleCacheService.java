@@ -61,11 +61,12 @@ import static java.util.Objects.requireNonNull;
 public class SimpleCacheService implements CacheService {
 
     private static final String STORE_IMPL_KEY = "cache.svc.store";
+    private static final String MAX_LOCAL_TTL_KEY = "cache.svc.max.ttl";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleCacheService.class);
 
     /**
-     * The maximum allowed time to live for entries that are marked as locally cacheable.
+     * The default maximum allowed time to live for entries that are marked as locally cacheable.
      */
     public static final Duration MAX_LOCAL_TTL = Duration.of(5, ChronoUnit.MINUTES);
 
@@ -78,6 +79,11 @@ public class SimpleCacheService implements CacheService {
      * The store for our data.
      */
     private BackingStore store;
+
+    /**
+     * The maximum length of time for entries that are marked as locally cacheable.
+     */
+    private Duration maxLocalTTL = MAX_LOCAL_TTL;
 
     /**
      * The local store for retrieved objects.
@@ -106,6 +112,9 @@ public class SimpleCacheService implements CacheService {
         } else {
             throw new NoConfigException("no backing store specified in configuration");
         }
+        //extract max local TTL
+        String serialisedDuration = config.getOrDefault(MAX_LOCAL_TTL_KEY, MAX_LOCAL_TTL.toString());
+        maxLocalTTL = Duration.parse(serialisedDuration);
     }
 
     @Override
@@ -114,6 +123,7 @@ public class SimpleCacheService implements CacheService {
         config.put(CacheService.class.getTypeName(), getClass().getTypeName());
         String serialisedCache = new String(JSONSerialiser.serialise(store), JSONSerialiser.UTF8);
         config.put(STORE_IMPL_KEY, serialisedCache);
+        config.put(MAX_LOCAL_TTL_KEY, maxLocalTTL.toString());
     }
 
     @Override
@@ -122,6 +132,7 @@ public class SimpleCacheService implements CacheService {
                 .appendSuper(super.toString())
                 .append("codecs", codecs)
                 .append("store", store)
+                .append("maxLocalTTL", maxLocalTTL)
                 .toString();
     }
 
@@ -140,6 +151,7 @@ public class SimpleCacheService implements CacheService {
         return new EqualsBuilder()
                 .append(getCodecs(), that.getCodecs())
                 .append(store, that.store)
+                .append(maxLocalTTL, that.maxLocalTTL)
                 .isEquals();
     }
 
@@ -148,6 +160,7 @@ public class SimpleCacheService implements CacheService {
         return new HashCodeBuilder(17, 37)
                 .append(getCodecs())
                 .append(store)
+                .append(maxLocalTTL)
                 .toHashCode();
     }
 
@@ -173,15 +186,6 @@ public class SimpleCacheService implements CacheService {
     }
 
     /**
-     * Get the codec registry.
-     *
-     * @return codec registry
-     */
-    public CacheCodecRegistry getCodecs() {
-        return codecs;
-    }
-
-    /**
      * Get the backing store for this instance.
      *
      * @return the backing store
@@ -189,6 +193,50 @@ public class SimpleCacheService implements CacheService {
     public BackingStore getBackingStore() {
         requireNonNull(store, "store must be initialised");
         return store;
+    }
+
+    /**
+     * Sets the maximum amount of time to live allowed for cache entries that are cached locally.
+     *
+     * @param maxLocalCacheTime maxmimum time for local cache entries
+     * @return this object
+     * @throws IllegalArgumentException if {@code maxLocalCacheTime} is negative
+     */
+    public SimpleCacheService maximumLocalCacheDuration(final Duration maxLocalCacheTime) {
+        requireNonNull(maxLocalCacheTime, "maxLocalCacheTime");
+        if (maxLocalCacheTime.isNegative()) {
+            throw new IllegalArgumentException("cannot be negative");
+        }
+        this.maxLocalTTL = maxLocalCacheTime;
+        return this;
+    }
+
+    /**
+     * Sets the maximum amount of time to live allowed for cache entries that are cached locally.
+     *
+     * @param maxLocalCacheTime maxmimum time for local cache entries
+     * @throws IllegalArgumentException if {@code maxLocalCacheTime} is negative
+     */
+    public void setMaximumLocalCacheDuration(final Duration maxLocalCacheTime) {
+        maximumLocalCacheDuration(maxLocalCacheTime);
+    }
+
+    /**
+     * The maximum length of time to live for an entry that is can be put into the local cache.
+     *
+     * @return the max cache duration for local entries
+     */
+    public Duration getMaximumLocalCacheDuration() {
+        return maxLocalTTL;
+    }
+
+    /**
+     * Get the codec registry.
+     *
+     * @return codec registry
+     */
+    public CacheCodecRegistry getCodecs() {
+        return codecs;
     }
 
     @Override
@@ -206,8 +254,8 @@ public class SimpleCacheService implements CacheService {
 
         //is this locally cacheable? If so, check the TTL is present and below the maximum time
         if (localCacheable) {
-            if (!timeToLive.isPresent() || (timeToLive.isPresent() && MAX_LOCAL_TTL.compareTo(timeToLive.get()) <= 0)) {
-                throw new IllegalArgumentException("time to live must be set and be below " + MAX_LOCAL_TTL.getSeconds() + " seconds for locally cacheable values");
+            if (!timeToLive.isPresent() || (timeToLive.isPresent() && maxLocalTTL.compareTo(timeToLive.get()) <= 0)) {
+                throw new IllegalArgumentException("time to live must be set and be below " + maxLocalTTL.getSeconds() + " seconds for locally cacheable values");
             }
         }
 
@@ -234,7 +282,7 @@ public class SimpleCacheService implements CacheService {
         String baseKey = request.makeBaseName();
 
         Supplier<Optional<V>> getFunction = () -> {
-            SimpleCacheObject result = doCacheRetrieve(baseKey, MAX_LOCAL_TTL);
+            SimpleCacheObject result = doCacheRetrieve(baseKey, maxLocalTTL);
 
             //assign so Javac can infer the generic type
             BiFunction<byte[], Class<V>, V> decode = codecs.getValueDecoder((Class<V>) result.getValueClass());
