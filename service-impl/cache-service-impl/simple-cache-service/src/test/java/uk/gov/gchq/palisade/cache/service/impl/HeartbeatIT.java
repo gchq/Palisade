@@ -21,7 +21,7 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 
 public class HeartbeatIT {
 
-    private static CacheService cache=new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+    private static CacheService cache=new SimpleCacheService().backingStore(new HeartbeatTestBackingStore(true));
 
     @Test
     public void shouldStartAndStopAndBeVisible() {

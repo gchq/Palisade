@@ -20,7 +20,6 @@ import org.junit.Test;
 
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.user.service.exception.NoSuchUserIdException;
@@ -41,7 +40,7 @@ public class SimpleUserServiceTest {
         User user = new User().userId("uid1").auths("test", "test2").roles("test_role");
         User user2 = new User().userId("uid2").auths("other_test").roles("role");
         SimpleUserService hms = new SimpleUserService();
-        hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(true)));
+        hms.cacheService(new SimpleCacheService().backingStore(new HeartbeatTestBackingStore(true)));
         hms.addUser(new AddUserRequest().user(user)).join();
 
         ServiceConfiguration con = new ServiceConfiguration();
@@ -66,7 +65,7 @@ public class SimpleUserServiceTest {
         //Given
         User user = new User().userId("uid1").auths("test", "test2").roles("test_role");
         SimpleUserService hms = new SimpleUserService();
-        hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(true)));
+        hms.cacheService(new SimpleCacheService().backingStore(new HeartbeatTestBackingStore(true)));
         hms.addUser(new AddUserRequest().user(user)).join();
 
         ServiceConfiguration con = new ServiceConfiguration();
@@ -85,7 +84,7 @@ public class SimpleUserServiceTest {
     public void throwOnNonExistantUser() throws Throwable {
         //Given
         SimpleUserService hms = new SimpleUserService();
-        hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(false)));
+        hms.cacheService(new SimpleCacheService().backingStore(new HeartbeatTestBackingStore(false)));
 
         ServiceConfiguration con = new ServiceConfiguration();
         hms.recordCurrentConfigTo(con);

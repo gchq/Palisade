@@ -12,7 +12,6 @@ import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.data.service.impl.MockDataService;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
@@ -98,7 +97,7 @@ public class HadoopFileResourceServiceTest {
         simpleType = new SimpleConnectionDetail().service(new MockDataService());
         dataType.put(TYPE_VALUE, simpleType);
 
-        simpleCache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+        simpleCache = new SimpleCacheService().backingStore(new HeartbeatTestBackingStore(true));
 
         hadoopService = new HadoopResourceService(conf, simpleCache);
         hadoopService.connectionDetail(dataFormat, dataType);
@@ -278,7 +277,7 @@ public class HadoopFileResourceServiceTest {
                 "    \"@id\" : 2,\n" +
                 "    \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService\",\n" +
                 "    \"backingStore\" : {\n" +
-                "      \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore\",\n" +
+                "      \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.HeartbeatTestBackingStore\",\n" +
                 "      \"useStatic\" : true\n" +
                 "    },\n" +
                 "    \"codecs\" : { }\n" +
