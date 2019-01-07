@@ -281,7 +281,8 @@ public class HadoopFileResourceServiceTest {
                 "      \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore\",\n" +
                 "      \"useStatic\" : true\n" +
                 "    },\n" +
-                "    \"codecs\" : { }\n" +
+                "    \"codecs\" : { },\n" +
+                "    \"maximumLocalCacheDuration\" : 300.000000000\n" +
                 "  },\n" +
                 "  \"conf\" : {\n" +
                 "  }\n" +
