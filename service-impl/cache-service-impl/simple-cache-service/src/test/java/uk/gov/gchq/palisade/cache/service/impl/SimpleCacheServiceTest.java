@@ -20,6 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import sun.misc.Cache;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
@@ -108,29 +109,34 @@ public class SimpleCacheServiceTest {
                 .key(NOTHING)
                 .makeBaseName();
 
-        when(store.get(any())).thenReturn(new SimpleCacheObject(Object.class, Optional.empty(), false));
+        when(store.get(any())).thenReturn(new SimpleCacheObject(Object.class, Optional.empty(), Optional.empty()));
 
         //get the string encoder
         encoder = new SimpleCacheService().getCodecs().getValueEncoder(String.class);
 
-        //configure backing add to act with test data
-        byte[] encoded = encoder.apply(VALUE_1);
-        when(store.add(eq(KEY_1), eq(String.class), eq(encoded), any(), anyBoolean())).thenReturn(Boolean.TRUE);
-        when(store.get(KEY_1)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded), false));
+        AddCacheRequest<?> addRequest = new AddCacheRequest<>().locallyCacheable(false);
+        AddCacheRequest<?> addRequestCachedLocal = new AddCacheRequest<>().locallyCacheable(true);
 
-        byte[] encoded2 = encoder.apply(VALUE_2);
-        when(store.add(eq(KEY_2), eq(String.class), eq(encoded2), any(), anyBoolean())).thenReturn(Boolean.TRUE);
-        when(store.get(KEY_2)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded2), false));
+        //configure backing add to act with test data
+        byte[] encoded = CacheMetadata.addMetaData(encoder.apply(VALUE_1), addRequest);
+        byte[] encoded_local_cache = CacheMetadata.addMetaData(encoder.apply(VALUE_1), addRequestCachedLocal);
+        when(store.add(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
+        when(store.add(eq(KEY_1), eq(String.class), eq(encoded_local_cache), any())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_1)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded), Optional.empty()));
+
+        byte[] encoded2 = CacheMetadata.addMetaData(encoder.apply(VALUE_2), addRequest);
+        when(store.add(eq(KEY_2), eq(String.class), eq(encoded2), any())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_2)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded2), Optional.empty()));
 
         //set an entry in a different Service
 
-        byte[] encoded3 = encoder.apply(VALUE_3);
-        when(store.add(eq(KEY_3), eq(String.class), eq(encoded3), any(), anyBoolean())).thenReturn(Boolean.TRUE);
-        when(store.get(KEY_3)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded3), false));
+        byte[] encoded3 = CacheMetadata.addMetaData(encoder.apply(VALUE_3), addRequest);
+        when(store.add(eq(KEY_3), eq(String.class), eq(encoded3), any())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_3)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded3), Optional.empty()));
 
-        byte[] encoded4 = encoder.apply(VALUE_4);
-        when(store.add(eq(KEY_4), eq(String.class), eq(encoded4), any(), anyBoolean())).thenReturn(Boolean.TRUE);
-        when(store.get(KEY_4)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded4), false));
+        byte[] encoded4 = CacheMetadata.addMetaData(encoder.apply(VALUE_4), addRequest);
+        when(store.add(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
+        when(store.get(KEY_4)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded4), Optional.empty()));
 
         //set up the lists
         when(store.list(eq(((ListCacheRequest) new ListCacheRequest().service(MockCacheService.class)).prefix("").makeBaseName())))
@@ -146,15 +152,16 @@ public class SimpleCacheServiceTest {
         when(store.remove(eq(KEY_1))).thenReturn(Boolean.TRUE);
 
         //set up a return of an empty object
-        when(store.get(eq(NO_KEY))).thenReturn(new SimpleCacheObject(Object.class, Optional.empty(), false));
+        when(store.get(eq(NO_KEY))).thenReturn(new SimpleCacheObject(Object.class, Optional.empty(), Optional.empty()));
 
         //set up the return of locally cacheable objects
-        byte[] encoded5 = encoder.apply(VALUE_5);
-        when(store.add(eq(KEY_5), eq(String.class), any(), any(), anyBoolean())).thenReturn(Boolean.TRUE);
-        when(store.get(eq(KEY_5))).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded5), true));
+        byte[] encoded5 = CacheMetadata.addMetaData(encoder.apply(VALUE_5), addRequestCachedLocal);
+        when(store.add(eq(KEY_5), eq(String.class), any(), any())).thenReturn(Boolean.TRUE);
+        when(store.get(eq(KEY_5))).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded5), Optional.empty()));
         //set up a  specifically non local cacheable object
-        when(store.add(eq(KEY_6), eq(String.class), any(), any(), anyBoolean())).thenReturn(Boolean.TRUE);
-        when(store.get(eq(KEY_6))).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded5), false));
+        byte[] encoded6 = CacheMetadata.addMetaData(encoder.apply(VALUE_5), addRequest);
+        when(store.add(eq(KEY_6), eq(String.class), any(), any())).thenReturn(Boolean.TRUE);
+        when(store.get(eq(KEY_6))).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded6), Optional.empty()));
 
     }
 
@@ -247,14 +254,15 @@ public class SimpleCacheServiceTest {
     public void shouldNotShareKeysAcrossServices() {
         //Given - configure a separate backing add for this test
         BackingStore uniqueStore = Mockito.mock(BackingStore.class);
-        when(uniqueStore.get(any())).thenReturn(new SimpleCacheObject(Object.class, Optional.empty(), false));
-        byte[] encoded = encoder.apply(VALUE_1);
-        when(uniqueStore.add(eq(KEY_1), eq(String.class), eq(encoded), any(), anyBoolean())).thenReturn(Boolean.TRUE);
-        when(uniqueStore.get(KEY_1)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded), false));
+        AddCacheRequest<?> addRequest = new AddCacheRequest<>().locallyCacheable(false);
+        when(uniqueStore.get(any())).thenReturn(new SimpleCacheObject(Object.class, Optional.empty(), Optional.empty()));
+        byte[] encoded = CacheMetadata.addMetaData(encoder.apply(VALUE_1), addRequest);
+        when(uniqueStore.add(eq(KEY_1), eq(String.class), eq(encoded), any())).thenReturn(Boolean.TRUE);
+        when(uniqueStore.get(KEY_1)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded), Optional.empty()));
 
-        byte[] encoded4 = encoder.apply(VALUE_4);
-        when(uniqueStore.add(eq(KEY_4), eq(String.class), eq(encoded4), any(), anyBoolean())).thenReturn(Boolean.TRUE);
-        when(uniqueStore.get(KEY_4)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded4), false));
+        byte[] encoded4 = CacheMetadata.addMetaData(encoder.apply(VALUE_4), addRequest);
+        when(uniqueStore.add(eq(KEY_4), eq(String.class), eq(encoded4), any())).thenReturn(Boolean.TRUE);
+        when(uniqueStore.get(KEY_4)).thenReturn(new SimpleCacheObject(String.class, Optional.of(encoded4), Optional.empty()));
 
         try {
             service.backingStore(uniqueStore);
@@ -319,8 +327,8 @@ public class SimpleCacheServiceTest {
         //When
         SimpleCacheObject retrieved = service.doCacheRetrieve(KEY_5, Duration.ofMillis(50));
         //Then
-        assertTrue(retrieved.canRetrieveLocally());
-        assertFalse(retrieved.wasRetrieveLocally());
+        assertTrue(retrieved.metadata().get().canBeRetrievedLocally());
+        assertFalse(retrieved.metadata().get().wasRetrievedLocally());
     }
 
     @Test
@@ -334,11 +342,11 @@ public class SimpleCacheServiceTest {
         SimpleCacheObject secondRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(50));
 
         //Then
-        assertTrue(firstRetrieve.canRetrieveLocally());
-        assertFalse(firstRetrieve.wasRetrieveLocally());
+        assertTrue(firstRetrieve.metadata().get().canBeRetrievedLocally());
+        assertFalse(firstRetrieve.metadata().get().wasRetrievedLocally());
         //second time, the request should have been served locally
-        assertTrue(secondRetrieve.canRetrieveLocally());
-        assertTrue(secondRetrieve.wasRetrieveLocally());
+        assertTrue(secondRetrieve.metadata().get().canBeRetrievedLocally());
+        assertTrue(secondRetrieve.metadata().get().wasRetrievedLocally());
     }
 
     @Test
@@ -354,14 +362,14 @@ public class SimpleCacheServiceTest {
         SimpleCacheObject thirdRetrieve = service.doCacheRetrieve(KEY_5, Duration.ofMillis(50));
 
         //Then
-        assertTrue(firstRetrieve.canRetrieveLocally());
-        assertFalse(firstRetrieve.wasRetrieveLocally());
+        assertTrue(firstRetrieve.metadata().get().canBeRetrievedLocally());
+        assertFalse(firstRetrieve.metadata().get().wasRetrievedLocally());
         //second time, the request should have been served locally
-        assertTrue(secondRetrieve.canRetrieveLocally());
-        assertTrue(secondRetrieve.wasRetrieveLocally());
+        assertTrue(secondRetrieve.metadata().get().canBeRetrievedLocally());
+        assertTrue(secondRetrieve.metadata().get().wasRetrievedLocally());
         //after waiting, the local cache should have expired
-        assertTrue(thirdRetrieve.canRetrieveLocally());
-        assertFalse(thirdRetrieve.wasRetrieveLocally());
+        assertTrue(thirdRetrieve.metadata().get().canBeRetrievedLocally());
+        assertFalse(thirdRetrieve.metadata().get().wasRetrievedLocally());
     }
 
     @Test
@@ -375,10 +383,10 @@ public class SimpleCacheServiceTest {
         SimpleCacheObject secondRetrieve = service.doCacheRetrieve(KEY_6, Duration.ofMillis(50));
 
         //Then
-        assertFalse(firstRetrieve.canRetrieveLocally());
-        assertFalse(firstRetrieve.wasRetrieveLocally());
-        assertFalse(secondRetrieve.canRetrieveLocally());
-        assertFalse(secondRetrieve.wasRetrieveLocally());
+        assertFalse(firstRetrieve.metadata().get().canBeRetrievedLocally());
+        assertFalse(firstRetrieve.metadata().get().wasRetrievedLocally());
+        assertFalse(secondRetrieve.metadata().get().canBeRetrievedLocally());
+        assertFalse(secondRetrieve.metadata().get().wasRetrievedLocally());
     }
 
     @Test(expected = NullPointerException.class)

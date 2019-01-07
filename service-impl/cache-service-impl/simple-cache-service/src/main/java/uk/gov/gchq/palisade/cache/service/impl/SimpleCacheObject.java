@@ -40,41 +40,33 @@ public class SimpleCacheObject {
     private final Optional<byte[]> value;
 
     /**
-     * Can this value be retrieved locally from the cache?
+     * Extra information about this entry and it's retrieval.
      */
-    private final boolean canRetrieveLocally;
-
-    /**
-     * Was this value retrieved locally from the cache instead of being retrieved from the backing store?
-     */
-    private final boolean wasRetrievedLocally;
+    private final Optional<CacheMetadata> metadata;
 
     /**
      * Create a cache object.
      *
-     * @param valueClass         the type of the value being cached
-     * @param value              the optional cache value, may be empty if no valid entry is present
-     * @param canRetrieveLocally whether this value can be retrieved locally
+     * @param valueClass the type of the value being cached
+     * @param value      the optional cache value, may be empty if no valid entry is present
+     * @param metadata   information about the cache entry
      */
-    public SimpleCacheObject(final Class<?> valueClass, final Optional<byte[]> value, final boolean canRetrieveLocally) {
-        this(valueClass, value, canRetrieveLocally, false);
+    public SimpleCacheObject(final Class<?> valueClass, final Optional<byte[]> value, final Optional<CacheMetadata> metadata) {
+        Objects.requireNonNull(valueClass, "valueClass");
+        Objects.requireNonNull(value, "value");
+        Objects.requireNonNull(metadata, "metadata");
+        this.valueClass = valueClass;
+        this.value = value;
+        this.metadata = metadata;
     }
 
     /**
-     * Create a cache object.
+     * Get the metadata about this cache entry.
      *
-     * @param valueClass          the type of the value being cached
-     * @param value               the optional cache value, may be empty if no valid entry is present
-     * @param canRetrieveLocally  whether this value can be retrieved locally
-     * @param wasRetrievedLocally whether this value was retrieved locally
+     * @return the metadata
      */
-    public SimpleCacheObject(final Class<?> valueClass, final Optional<byte[]> value, final boolean canRetrieveLocally, final boolean wasRetrievedLocally) {
-        Objects.requireNonNull(valueClass, "valueClass");
-        Objects.requireNonNull(value, "value");
-        this.valueClass = valueClass;
-        this.value = value;
-        this.canRetrieveLocally = canRetrieveLocally;
-        this.wasRetrievedLocally = wasRetrievedLocally;
+    public Optional<CacheMetadata> metadata() {
+        return metadata;
     }
 
     /**
@@ -95,32 +87,13 @@ public class SimpleCacheObject {
         return value;
     }
 
-    /**
-     * Get whether this item can be safely cached locally.
-     *
-     * @return true if the item can be stored locally in a cache
-     */
-    public boolean canRetrieveLocally() {
-        return canRetrieveLocally;
-    }
-
-    /**
-     * Get whether this item actually was retrieved from a local cache.
-     *
-     * @return true if the item was retrieved locally from a cache
-     */
-    public boolean wasRetrieveLocally() {
-        return wasRetrievedLocally;
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("valueClass", valueClass)
                 .append("value", value)
-                .append("canRetrieveLocally", canRetrieveLocally)
-                .append("wasRetrievedLocally", wasRetrievedLocally)
+                .append("metadata", metadata)
                 .toString();
     }
 
@@ -139,19 +112,16 @@ public class SimpleCacheObject {
         return new EqualsBuilder()
                 .append(valueClass, that.valueClass)
                 .append(value, that.value)
-                .append(canRetrieveLocally, that.canRetrieveLocally)
-                .append(wasRetrievedLocally, that.wasRetrievedLocally)
+                .append(metadata, that.metadata)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(13, 29)
-                .appendSuper(super.hashCode())
                 .append(valueClass)
                 .append(value)
-                .append(canRetrieveLocally)
-                .append(wasRetrievedLocally)
+                .append(metadata)
                 .toHashCode();
     }
 }
