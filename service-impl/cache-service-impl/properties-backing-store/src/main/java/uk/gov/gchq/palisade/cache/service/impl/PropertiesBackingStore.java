@@ -347,14 +347,14 @@ public class PropertiesBackingStore implements BackingStore {
                     byte[] value = B64_DECODER.decode(b64Value);
                     Class<?> valueClass = Class.forName(props.getProperty(makeClassKey(cacheKey)));
 
-                    return new SimpleCacheObject(valueClass, Optional.of(value), Optional.empty());
+                    return new SimpleCacheObject(valueClass, Optional.of(value));
                 } catch (Exception e) {
                     LOGGER.warn("Couldn't retrieve key {}", key, e);
-                    return new SimpleCacheObject(Object.class, Optional.empty(), Optional.empty());
+                    return new SimpleCacheObject(Object.class, Optional.empty());
                 }
             } else {
                 //key not found
-                return new SimpleCacheObject(Object.class, Optional.empty(), Optional.empty());
+                return new SimpleCacheObject(Object.class, Optional.empty());
             }
         }
     }

@@ -63,7 +63,7 @@ public class CacheMetadataTest {
     @Test(expected = IllegalStateException.class)
     public void throwOnNoValue() {
         //Given
-        SimpleCacheObject ob = new SimpleCacheObject(Object.class, Optional.empty(), Optional.empty());
+        SimpleCacheObject ob = new SimpleCacheObject(Object.class, Optional.empty());
         //When
         CacheMetadata.populateMetaData(ob);
         //Then
@@ -73,7 +73,7 @@ public class CacheMetadataTest {
     @Test(expected = IllegalStateException.class)
     public void throwOnAlreadyPopulatedMetadata() {
         //Given
-        SimpleCacheObject ob = new SimpleCacheObject(Object.class, Optional.of(new byte[1]), Optional.of(new CacheMetadata(false, true)));
+        SimpleCacheObject ob = new SimpleCacheObject(Object.class, Optional.of(new byte[1])).metadata(Optional.of(new CacheMetadata(true)));
         //When
         CacheMetadata.populateMetaData(ob);
         //Then
@@ -83,22 +83,22 @@ public class CacheMetadataTest {
     @Test
     public void shouldPopulateLocallyCacheableFalse() {
         //Given
-        SimpleCacheObject ob = new SimpleCacheObject(Object.class, Optional.of(new byte[]{0, 0, 0, 0, 0}), Optional.empty());
+        SimpleCacheObject ob = new SimpleCacheObject(Object.class, Optional.of(new byte[]{0, 0, 0, 0, 0}));
         //When
-        SimpleCacheObject actual = CacheMetadata.populateMetaData(ob);
+        CacheMetadata.populateMetaData(ob);
         //Then
-        assertTrue(actual.metadata().isPresent());
-        assertFalse(actual.metadata().get().canBeRetrievedLocally());
+        assertTrue(ob.getMetadata().isPresent());
+        assertFalse(ob.getMetadata().get().canBeRetrievedLocally());
     }
 
     @Test
     public void shouldPopulateLocallyCacheableTrue() {
         //Given
-        SimpleCacheObject ob = new SimpleCacheObject(Object.class, Optional.of(new byte[]{1, 0, 0, 0, 0}), Optional.empty());
+        SimpleCacheObject ob = new SimpleCacheObject(Object.class, Optional.of(new byte[]{1, 0, 0, 0, 0}));
         //When
-        SimpleCacheObject actual = CacheMetadata.populateMetaData(ob);
+        CacheMetadata.populateMetaData(ob);
         //Then
-        assertTrue(actual.metadata().isPresent());
-        assertTrue(actual.metadata().get().canBeRetrievedLocally());
+        assertTrue(ob.getMetadata().isPresent());
+        assertTrue(ob.getMetadata().get().canBeRetrievedLocally());
     }
 }

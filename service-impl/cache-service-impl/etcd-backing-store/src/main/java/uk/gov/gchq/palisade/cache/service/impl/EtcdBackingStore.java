@@ -152,10 +152,10 @@ public class EtcdBackingStore implements BackingStore {
         CompletableFuture<GetResponse> futureValue = getKeyValueClient().get(ByteSequence.fromString(cacheKey + ".value"));
         List<KeyValue> valueClassKV = futureValueClass.join().getKvs();
         if (valueClassKV.size() == 0) {
-            return new SimpleCacheObject(Object.class, Optional.empty(), Optional.empty());
+            return new SimpleCacheObject(Object.class, Optional.empty());
         }
         try {
-            return new SimpleCacheObject(Class.forName(futureValueClass.join().getKvs().get(0).getValue().toStringUtf8()), Optional.of(futureValue.join().getKvs().get(0).getValue().getBytes()), Optional.empty());
+            return new SimpleCacheObject(Class.forName(futureValueClass.join().getKvs().get(0).getValue().toStringUtf8()), Optional.of(futureValue.join().getKvs().get(0).getValue().getBytes()));
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Get request failed due to the class of the value not being found.", e);
         }
