@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.ListCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.RemoveCacheRequest;
+import uk.gov.gchq.palisade.util.TestUtil;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -174,7 +175,7 @@ public class SimpleCacheServiceTest {
                 .service(MockCacheService.class)).prefix(NOTHING));
 
         //Then
-        assertTrue(StreamUtil.streamEqual(Stream.empty(), getFuture.join()));
+        assertTrue(TestUtil.streamEqual(Stream.empty(), getFuture.join()));
     }
 
     @Test
@@ -190,7 +191,7 @@ public class SimpleCacheServiceTest {
         CompletableFuture<Stream<String>> getFuture = service.list(((ListCacheRequest) new ListCacheRequest().service(MockCacheService.class))
                 .prefix(""));
         //Then
-        assertTrue(StreamUtil.streamEqual(Stream.of(BASE_KEY_1, BASE_KEY_2), getFuture.join()));
+        assertTrue(TestUtil.streamEqual(Stream.of(BASE_KEY_1, BASE_KEY_2), getFuture.join()));
     }
 
     @Test

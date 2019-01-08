@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -193,5 +195,21 @@ public final class Util {
         } else if (null != notFound) {
             notFound.accept(field);
         }
+    }
+
+    /**
+     * Create a {@link ThreadFactory} that creates daemon threads that don't prevent JVM exit.
+     *
+     * @return a daemon thread factory
+     */
+    public static ThreadFactory createDaemonThreadFactory() {
+        //set up a thread to watch this
+        final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
+        //ensure thread is daemon
+        return runnable -> {
+            Thread t = defaultFactory.newThread(runnable);
+            t.setDaemon(true);
+            return t;
+        };
     }
 }

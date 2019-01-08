@@ -29,7 +29,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import static uk.gov.gchq.palisade.cache.service.impl.StreamUtil.streamEqual;
+import static uk.gov.gchq.palisade.util.TestUtil.streamEqual;
 
 public abstract class AbstractBackingStoreTest {
 
@@ -476,5 +476,33 @@ public abstract class AbstractBackingStoreTest {
         assertFalse(twoSeconds1.result.getValue().isPresent());
         assertFalse(twoSeconds2.result.getValue().isPresent());
         assertTrue(twoSeconds3.result.getValue().isPresent());
+    }
+
+    @Test
+    public void shouldNotRemoveEarlyOnShorterTTL() {
+        //Given
+        byte[] expected = new byte[]{1, 2, 3, 4};
+        impl.add("new_test8", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
+        //overwrite with longer TTL
+        impl.add("new_test8", Object.class, expected, Optional.of(Duration.of(3, ChronoUnit.SECONDS)));
+        //When
+        delay(1500);
+        SimpleCacheObject retrieve = impl.get("new_test8");
+        //Then - result should still be there
+        assertTrue(retrieve.getValue().isPresent());
+    }
+
+    @Test
+    public void shouldNotRemoveLateOnLongerTTL() {
+        //Given
+        byte[] expected = new byte[]{1, 2, 3, 4};
+        impl.add("new_test9", Object.class, expected, Optional.of(Duration.of(3, ChronoUnit.SECONDS)));
+        //overwrite with shorter TTL
+        impl.add("new_test9", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
+        //When
+        delay(1500);
+        SimpleCacheObject retrieve = impl.get("new_test8");
+        //Then - result should be gone
+        assertFalse(retrieve.getValue().isPresent());
     }
 }
