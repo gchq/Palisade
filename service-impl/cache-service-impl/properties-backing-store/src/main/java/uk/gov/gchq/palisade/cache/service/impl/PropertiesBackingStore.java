@@ -320,7 +320,7 @@ public class PropertiesBackingStore implements BackingStore {
         //error checks
         String cacheKey = BackingStore.validateAddParameters(key, valueClass, value, timeToLive);
         LOGGER.debug("Adding cache key {} of {}", cacheKey, valueClass);
-        //this isn't meant to be thread safe, but we can at least make the cache add atomic
+        //we can at least make the cache add atomic
         synchronized (this) {
             props.setProperty(cacheKey, B64_ENCODER.encodeToString(value));
             props.setProperty(makeClassKey(cacheKey), valueClass.getTypeName());
@@ -351,6 +351,7 @@ public class PropertiesBackingStore implements BackingStore {
                 try {
                     byte[] value = B64_DECODER.decode(b64Value);
                     Class<?> valueClass = Class.forName(props.getProperty(makeClassKey(cacheKey)));
+
                     return new SimpleCacheObject(valueClass, Optional.of(value));
                 } catch (Exception e) {
                     LOGGER.warn("Couldn't retrieve key {}", key, e);

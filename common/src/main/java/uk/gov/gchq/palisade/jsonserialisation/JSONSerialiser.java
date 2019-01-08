@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -211,6 +212,8 @@ public class JSONSerialiser {
 
         // Add JDK8 module for Optional
         mapper.registerModule(new Jdk8Module());
+        // Add JDK8 Time module
+        mapper.registerModule(new JavaTimeModule());
 
         mapper.registerModule(ResourceKeySerialiser.getModule());
 

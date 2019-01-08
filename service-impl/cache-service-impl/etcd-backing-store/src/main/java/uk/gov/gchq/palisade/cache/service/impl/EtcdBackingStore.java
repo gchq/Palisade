@@ -38,6 +38,15 @@ import static java.util.Objects.requireNonNull;
 
 public class EtcdBackingStore implements BackingStore {
 
+    /**
+     * Flag to indicate boolean false.
+     */
+    public static final ByteSequence FALSE_FLAG = ByteSequence.fromBytes(new byte[]{0});
+    /**
+     * Flag to indicate boolean true.
+     */
+    public static final ByteSequence TRUE_FLAG = ByteSequence.fromBytes(new byte[]{1});
+
     private Collection<String> connectionDetails;
     private Client etcdClient;
     private KV keyValueClient;
@@ -169,7 +178,7 @@ public class EtcdBackingStore implements BackingStore {
         String cacheKey = BackingStore.keyCheck(key);
         CompletableFuture<DeleteResponse> removedValue = getKeyValueClient().delete(ByteSequence.fromString(cacheKey + ".value"));
         CompletableFuture<DeleteResponse> removedClass = getKeyValueClient().delete(ByteSequence.fromString(cacheKey + ".class"));
-        removedClass.join();
+        CompletableFuture.allOf(removedClass).join();
         return (removedValue.join().getDeleted() != 0);
     }
 }

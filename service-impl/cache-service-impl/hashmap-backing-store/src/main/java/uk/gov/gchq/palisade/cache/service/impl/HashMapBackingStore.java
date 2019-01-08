@@ -68,11 +68,6 @@ public class HashMapBackingStore implements BackingStore {
                     .toString();
         }
 
-        /**
-         * Encoded form.
-         */
-        public final byte[] value;
-
         @Override
         public boolean equals(final Object o) {
             if (this == o) {
@@ -100,6 +95,11 @@ public class HashMapBackingStore implements BackingStore {
         }
 
         /**
+         * Encoded form.
+         */
+        public final byte[] value;
+
+        /**
          * Class of the value field.
          */
         public final Class<?> clazz;
@@ -114,7 +114,6 @@ public class HashMapBackingStore implements BackingStore {
             this.value = value;
             this.clazz = clazz;
         }
-
     }
 
     /**

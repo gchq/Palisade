@@ -19,26 +19,29 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Represents the basic cache entry that will be stored and retrieved from the backing store. If a store is unable to
  * get a given key then it will return an instance of this class with an empty value. No entries in this class may
  * be <code>null</code>.
- *
  */
 public class SimpleCacheObject {
-
     /**
      * The class of the object being stored in the cache. This should a @{link Class} for the standard form of
      * <code>value</code>.
      */
-    private final Class<?> valueClass;
+    private Class<?> valueClass;
     /**
      * The holder for the object being cached. This may be empty on get requests where they key couldn't be found.
      */
-    private final Optional<byte[]> value;
+    private Optional<byte[]> value;
+    /**
+     * Extra information about this entry and it's retrieval.
+     */
+    private Optional<CacheMetadata> metadata;
 
     /**
      * Create a cache object.
@@ -47,19 +50,62 @@ public class SimpleCacheObject {
      * @param value      the optional cache value, may be empty if no valid entry is present
      */
     public SimpleCacheObject(final Class<?> valueClass, final Optional<byte[]> value) {
-        Objects.requireNonNull(valueClass, "valueClass");
-        Objects.requireNonNull(value, "value");
+        requireNonNull(valueClass, "valueClass");
+        requireNonNull(value, "value");
         this.valueClass = valueClass;
         this.value = value;
+        this.metadata = Optional.empty();
     }
 
     /**
-     * Get the class of the object being cached.
+     * Set the metadata for this cache object.
      *
-     * @return the {@link Class} instance of the cached entry
+     * @param metadata the new metadata
+     * @return this object
      */
-    public Class<?> getValueClass() {
-        return valueClass;
+    public SimpleCacheObject metadata(final Optional<CacheMetadata> metadata) {
+        requireNonNull(metadata, "metadata");
+        this.metadata = metadata;
+        return this;
+    }
+
+    /**
+     * Set the metadata for this cache object.
+     *
+     * @param metadata the new metadata
+     */
+    public void setMetadata(final Optional<CacheMetadata> metadata) {
+        metadata(metadata);
+    }
+
+    /**
+     * Get the metadata about this cache entry.
+     *
+     * @return the metadata
+     */
+    public Optional<CacheMetadata> getMetadata() {
+        return metadata;
+    }
+
+    /**
+     * Set the cache entry.
+     *
+     * @param value the new cache entry
+     * @return this object
+     */
+    public SimpleCacheObject value(final Optional<byte[]> value) {
+        requireNonNull(value, "value");
+        this.value = value;
+        return this;
+    }
+
+    /**
+     * Set the cache entry.
+     *
+     * @param value the new cache entry
+     */
+    public void setValue(final Optional<byte[]> value) {
+        value(value);
     }
 
     /**
@@ -71,12 +117,22 @@ public class SimpleCacheObject {
         return value;
     }
 
+    /**
+     * Get the class of the object being cached.
+     *
+     * @return the {@link Class} instance of the cached entry
+     */
+    public Class<?> getValueClass() {
+        return valueClass;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("valueClass", valueClass)
                 .append("value", value)
+                .append("metadata", metadata)
                 .toString();
     }
 
@@ -95,15 +151,16 @@ public class SimpleCacheObject {
         return new EqualsBuilder()
                 .append(valueClass, that.valueClass)
                 .append(value, that.value)
+                .append(metadata, that.metadata)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(13, 29)
-                .appendSuper(super.hashCode())
                 .append(valueClass)
                 .append(value)
+                .append(metadata)
                 .toHashCode();
     }
 }
