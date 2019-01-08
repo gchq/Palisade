@@ -496,9 +496,9 @@ public abstract class AbstractBackingStoreTest {
     public void shouldNotRemoveLateOnLongerTTL() {
         //Given
         byte[] expected = new byte[]{1, 2, 3, 4};
-        impl.add("new_test8", Object.class, expected, Optional.of(Duration.of(3, ChronoUnit.SECONDS)));
+        impl.add("new_test9", Object.class, expected, Optional.of(Duration.of(3, ChronoUnit.SECONDS)));
         //overwrite with shorter TTL
-        impl.add("new_test8", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
+        impl.add("new_test9", Object.class, expected, Optional.of(Duration.of(1, ChronoUnit.SECONDS)));
         //When
         delay(1500);
         SimpleCacheObject retrieve = impl.get("new_test8");
