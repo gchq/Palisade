@@ -307,6 +307,7 @@ public class SimpleCacheService implements CacheService {
         SimpleCacheObject localRetrieve = localObjects.get(baseKey);
         if (localRetrieve != null) {
             LOGGER.debug("Retrieved from local cache {}", baseKey);
+            localRetrieve.getMetadata().ifPresent(metadata -> metadata.setWasRetrievedLocally(true));
             return localRetrieve;
         } else {
             LOGGER.debug("-> Backing store get {}", baseKey);
@@ -314,17 +315,14 @@ public class SimpleCacheService implements CacheService {
             if (remoteRetrieve.getValue().isPresent()) {
                 LOGGER.debug("-> Backing store retrieved {}", baseKey);
 
-                SimpleCacheObject populated = CacheMetadata.populateMetaData(remoteRetrieve);
+                CacheMetadata.populateMetaData(remoteRetrieve);
 
                 //should this be cached?
-                if (populated.metadata().get().canBeRetrievedLocally()) {
-                    localObjects.put(baseKey, new SimpleCacheObject(populated.getValueClass(),
-                            populated.getValue(),
-                            Optional.of(populated.metadata().get().retrievedLocally())));
+                if (remoteRetrieve.getMetadata().get().canBeRetrievedLocally()) {
+                    localObjects.put(baseKey, remoteRetrieve);
                     //set up a timer to remove it after the max TTL has elapsed
                     REMOVAL_TIMER.schedule(() -> localObjects.remove(baseKey), localCacheTTL.toMillis(), TimeUnit.MILLISECONDS);
                 }
-                return populated;
             } else {
                 LOGGER.debug("-> Backing store failed to get {}", baseKey);
             }

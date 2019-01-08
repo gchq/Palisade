@@ -19,8 +19,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Represents the basic cache entry that will be stored and retrieved from the backing store. If a store is unable to
@@ -28,36 +29,53 @@ import java.util.Optional;
  * be <code>null</code>.
  */
 public class SimpleCacheObject {
-
     /**
      * The class of the object being stored in the cache. This should a @{link Class} for the standard form of
      * <code>value</code>.
      */
-    private final Class<?> valueClass;
+    private Class<?> valueClass;
     /**
      * The holder for the object being cached. This may be empty on get requests where they key couldn't be found.
      */
-    private final Optional<byte[]> value;
-
+    private Optional<byte[]> value;
     /**
      * Extra information about this entry and it's retrieval.
      */
-    private final Optional<CacheMetadata> metadata;
+    private Optional<CacheMetadata> metadata;
 
     /**
      * Create a cache object.
      *
      * @param valueClass the type of the value being cached
      * @param value      the optional cache value, may be empty if no valid entry is present
-     * @param metadata   information about the cache entry
      */
-    public SimpleCacheObject(final Class<?> valueClass, final Optional<byte[]> value, final Optional<CacheMetadata> metadata) {
-        Objects.requireNonNull(valueClass, "valueClass");
-        Objects.requireNonNull(value, "value");
-        Objects.requireNonNull(metadata, "metadata");
+    public SimpleCacheObject(final Class<?> valueClass, final Optional<byte[]> value) {
+        requireNonNull(valueClass, "valueClass");
+        requireNonNull(value, "value");
         this.valueClass = valueClass;
         this.value = value;
+        this.metadata = Optional.empty();
+    }
+
+    /**
+     * Set the metadata for this cache object.
+     *
+     * @param metadata the new metadata
+     * @return this object
+     */
+    public SimpleCacheObject metadata(final Optional<CacheMetadata> metadata) {
+        requireNonNull(metadata, "metadata");
         this.metadata = metadata;
+        return this;
+    }
+
+    /**
+     * Set the metadata for this cache object.
+     *
+     * @param metadata the new metadata
+     */
+    public void setMetadata(final Optional<CacheMetadata> metadata) {
+        metadata(metadata);
     }
 
     /**
@@ -65,17 +83,29 @@ public class SimpleCacheObject {
      *
      * @return the metadata
      */
-    public Optional<CacheMetadata> metadata() {
+    public Optional<CacheMetadata> getMetadata() {
         return metadata;
     }
 
     /**
-     * Get the class of the object being cached.
+     * Set the cache entry.
      *
-     * @return the {@link Class} instance of the cached entry
+     * @param value the new cache entry
+     * @return this object
      */
-    public Class<?> getValueClass() {
-        return valueClass;
+    public SimpleCacheObject value(final Optional<byte[]> value) {
+        requireNonNull(value, "value");
+        this.value = value;
+        return this;
+    }
+
+    /**
+     * Set the cache entry.
+     *
+     * @param value the new cache entry
+     */
+    public void setValue(final Optional<byte[]> value) {
+        value(value);
     }
 
     /**
@@ -85,6 +115,15 @@ public class SimpleCacheObject {
      */
     public Optional<byte[]> getValue() {
         return value;
+    }
+
+    /**
+     * Get the class of the object being cached.
+     *
+     * @return the {@link Class} instance of the cached entry
+     */
+    public Class<?> getValueClass() {
+        return valueClass;
     }
 
     @Override

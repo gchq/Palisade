@@ -35,7 +35,7 @@ public class CacheMetadata {
     /**
      * If true, then this cache entry has been retrieved from a local cache.
      */
-    private final boolean wasRetrievedLocally;
+    private boolean wasRetrievedLocally;
 
     /**
      * If true, then this cache entry can be stored in a local cache.
@@ -45,11 +45,10 @@ public class CacheMetadata {
     /**
      * Create a new metadata object.
      *
-     * @param wasRetrievedLocally if the most recent retrieval came from the local cache or not
-     * @param canRetrieveLocally  whether the corresponding entry can be safely cached locally
+     * @param canRetrieveLocally whether the corresponding entry can be safely cached locally
      */
-    public CacheMetadata(final boolean wasRetrievedLocally, final boolean canRetrieveLocally) {
-        this.wasRetrievedLocally = wasRetrievedLocally;
+    public CacheMetadata(final boolean canRetrieveLocally) {
+        this.wasRetrievedLocally = false;
         this.canRetrieveLocally = canRetrieveLocally;
     }
 
@@ -72,17 +71,16 @@ public class CacheMetadata {
     }
 
     /**
-     * Creates a new cache object with populated metadata based on the value byte array in the given cache object. The new
-     * cache object will have a populated metadata object and a new value byte array with the metadata removed.
+     * Populates the cache metadata for the given entry. This will replace the value array and the metadata object inside
+     * the cache object.
      *
      * @param remoteRetrieve the cache object from the backing store
-     * @return a new cache object
      * @throws IllegalStateException if the metadata is already populated in {@code remoteRetrieve}, or if no cache
      *                               value is present
      */
-    public static SimpleCacheObject populateMetaData(final SimpleCacheObject remoteRetrieve) {
+    public static void populateMetaData(final SimpleCacheObject remoteRetrieve) {
         requireNonNull(remoteRetrieve, "remoteRetrieve");
-        if (remoteRetrieve.metadata().isPresent()) {
+        if (remoteRetrieve.getMetadata().isPresent()) {
             throw new IllegalStateException("metadata already present");
         }
 
@@ -90,17 +88,20 @@ public class CacheMetadata {
         //remove the metadata from array
         byte[] value = Arrays.copyOfRange(withMeta, 1, withMeta.length);
 
-        CacheMetadata metadata = new CacheMetadata(false, withMeta[0] == 1);
-        return new SimpleCacheObject(remoteRetrieve.getValueClass(), Optional.of(value), Optional.of(metadata));
+        CacheMetadata metadata = new CacheMetadata(withMeta[0] == 1);
+        remoteRetrieve.setMetadata(Optional.of(metadata));
+        remoteRetrieve.setValue(Optional.of(value));
     }
 
     /**
-     * Create a new metadata object with the {@code wasRetrievedLocally} flag set to true.
+     * Sets the flag for whether the associated entry has been locally retrieved.
      *
-     * @return a new metadata object
+     * @param wasRetrievedLocally how was the most recent retrieval done
+     * @return this object
      */
-    public CacheMetadata retrievedLocally() {
-        return new CacheMetadata(true, this.canRetrieveLocally);
+    public CacheMetadata setWasRetrievedLocally(final boolean wasRetrievedLocally) {
+        this.wasRetrievedLocally = wasRetrievedLocally;
+        return this;
     }
 
     /**

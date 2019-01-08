@@ -192,7 +192,7 @@ public class HashMapBackingStore implements BackingStore {
         String cacheKey = BackingStore.keyCheck(key);
         LOGGER.debug("Getting from cache: {}", cacheKey);
         final CachedPair result = cache.getOrDefault(cacheKey, new CachedPair(null, Object.class));
-        return new SimpleCacheObject(result.clazz, Optional.ofNullable(result.value), Optional.empty());
+        return new SimpleCacheObject(result.clazz, Optional.ofNullable(result.value));
     }
 
     @Override
