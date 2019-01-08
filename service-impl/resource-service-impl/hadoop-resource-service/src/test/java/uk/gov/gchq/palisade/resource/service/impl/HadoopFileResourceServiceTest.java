@@ -278,7 +278,7 @@ public class HadoopFileResourceServiceTest {
                 "    \"@id\" : 2,\n" +
                 "    \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService\",\n" +
                 "    \"backingStore\" : {\n" +
-                "      \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.HeartbeatTestBackingStore\",\n" +
+                "      \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore\",\n" +
                 "      \"useStatic\" : true\n" +
                 "    },\n" +
                 "    \"codecs\" : { },\n" +
