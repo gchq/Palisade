@@ -20,9 +20,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
 import uk.gov.gchq.palisade.cache.service.CacheService;
 
 import java.time.Duration;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static java.util.Objects.nonNull;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -195,5 +197,27 @@ public class HeartbeatTest {
         heart.start();
         //Then
         fail("exception expected");
+    }
+
+    @Test
+    public void schedulerShouldTerminateOnGC() throws Exception {
+        //Given
+        heart.cacheService(mockCache);
+        heart.serviceClass(StubService.class);
+        //When
+        heart.start();
+        ScheduledExecutorService scheduler = heart.getExecutor();
+        //null out reference
+        heart = null;
+        //Trigger manual gc
+        System.gc();
+        long time = System.currentTimeMillis() + 2000;
+
+        //Then - wait a limited amount of time for scheduler to stop
+        while (System.currentTimeMillis() < time && !scheduler.isTerminated()) {
+            Thread.sleep(50);
+        }
+
+        assertTrue("Scheduler failed to terminate after heartbeat was GC'd", scheduler.isTerminated());
     }
 }

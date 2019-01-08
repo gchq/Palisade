@@ -106,7 +106,6 @@ public class HashMapBackingStore implements BackingStore {
             return new ToStringBuilder(this)
                     .append("value", "\"" + new String(value) + "\"")
                     .append("clazz", clazz)
-                    .append("locallyCacheable", locallyCacheable)
                     .toString();
         }
 
@@ -125,7 +124,6 @@ public class HashMapBackingStore implements BackingStore {
             return new EqualsBuilder()
                     .append(value, that.value)
                     .append(clazz, that.clazz)
-                    .append(locallyCacheable, that.locallyCacheable)
                     .isEquals();
         }
 
@@ -134,7 +132,6 @@ public class HashMapBackingStore implements BackingStore {
             return new HashCodeBuilder(17, 37)
                     .append(value)
                     .append(clazz)
-                    .append(locallyCacheable)
                     .toHashCode();
         }
 

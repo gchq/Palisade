@@ -21,11 +21,13 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.service.Service;
 
+import java.lang.ref.WeakReference;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.isNull;
@@ -75,7 +77,7 @@ public class Heartbeat {
     /**
      * Create daemonised heartbeat thread.
      */
-    private final ScheduledExecutorService heart = Executors.newSingleThreadScheduledExecutor(Util.createDaemonThreadFactory());
+    private final ScheduledExecutorService heart;
 
     /**
      * The heartbeat handle.
@@ -88,6 +90,10 @@ public class Heartbeat {
     public Heartbeat() {
         this.heartRate = HeartUtil.DEFAULT_HEARTBEAT_DURATION;
         this.instanceName = HeartUtil.createDefaultName();
+        heart = Executors.newSingleThreadScheduledExecutor(Util.createDaemonThreadFactory());
+        if (heart instanceof ScheduledThreadPoolExecutor) {
+            ((ScheduledThreadPoolExecutor) heart).setRemoveOnCancelPolicy(true);
+        }
     }
 
     /**
@@ -279,6 +285,57 @@ public class Heartbeat {
     }
 
     /**
+     * Get the thread executor.
+     *
+     * @return heartbeat scheduler
+     */
+    ScheduledExecutorService getExecutor() {
+        return heart;
+    }
+
+    /**
+     * Beat class implemented as separate class from Heartbeat to prevent any strong references to the containing
+     * {@link Heartbeat} instance. This allows the {@link Heartbeat} instance to be garbage collected and to be detected
+     * by the code below and terminate the beating thread. Otherwise, the beat thread carries on indefinitely if it is not
+     * manually stopped by the client, even after the {@link Heartbeat} instance is eligible for collection (causing a memory leak).
+     */
+    private static class Beat implements Runnable {
+        /**Weak reference to the heartbeat, used for GC detection.*/
+        private final WeakReference<Heartbeat> heart;
+        private final CacheService localCache;
+        private final AddCacheRequest<byte[]> cacheRequest;
+        private final ScheduledExecutorService scheduler;
+
+        Beat(final Heartbeat heartbeat) {
+            this.heart = new WeakReference<>(heartbeat);
+            this.localCache = heartbeat.getCacheService();
+            this.scheduler = heartbeat.getExecutor();
+            //create the request that we can reuse
+            cacheRequest = new AddCacheRequest<>()
+                    .service(heartbeat.getServiceClass())
+                    .value(DUMMY_DATA)
+                    .timeToLive(Optional.of(heartbeat.getHeartBeat()
+                            //multiply the heart rate by the TTL ratio to make a single heart beat last longer in cache than
+                            //the beat duration, thus an instance is allowed to "miss" a some beats before it will be thought
+                            //of as terminated
+                            .multipliedBy(HeartUtil.TIME_TO_LIVE_RATIO)))
+                    .locallyCacheable(false)
+                    .key(HeartUtil.makeKey(heartbeat.getInstanceName()));
+        }
+
+        public void run() {
+            //if heart is still alive, i.e. has not been garbage collected
+            if (nonNull(heart.get())) {
+                //send heartbeat
+                localCache.add(cacheRequest);
+            } else {
+                //else terminate this scheduler
+                scheduler.shutdownNow();
+            }
+        }
+    }
+
+    /**
      * Start sending heartbeats to the cache service. All needed parameters must be set before this method can be complete
      * successfully. Exceptions will be thrown for unset items. Once started, most fields in this class cannot be changed until
      * {@link Heartbeat#stop()} is called.
@@ -289,25 +346,9 @@ public class Heartbeat {
         //validate parameters
         validateState();
 
-        //create the request that we can reuse
-        final AddCacheRequest<byte[]> cacheRequest = new AddCacheRequest<>()
-                .service(getServiceClass())
-                .value(DUMMY_DATA)
-                .timeToLive(Optional.of(getHeartBeat()
-                        //multiply the heart rate by the TTL ratio to make a single heart beat last longer in cache than
-                        //the beat duration, thus an instance is allowed to "miss" a some beats before it will be thought
-                        //of as terminated
-                        .multipliedBy(HeartUtil.TIME_TO_LIVE_RATIO)))
-                .locallyCacheable(false)
-                .key(HeartUtil.makeKey(getInstanceName()));
-
-        final CacheService localCache = getCacheService();
-
-        //the actual heartbeat
-        Runnable beat = () -> localCache.add(cacheRequest);
-
         //start the beat
-        this.futureBeat = heart.scheduleWithFixedDelay(beat, 0, getHeartBeat().toMillis(), TimeUnit.MILLISECONDS);
+        this.futureBeat = heart.scheduleWithFixedDelay(new Beat(this), 0,
+                getHeartBeat().toMillis(), TimeUnit.MILLISECONDS);
     }
 
     /**

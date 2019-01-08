@@ -16,11 +16,10 @@
 
 package uk.gov.gchq.palisade.cache.service.impl;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.Util;
 
 import java.time.Duration;
@@ -53,72 +52,6 @@ public class HeartbeatTestBackingStore implements BackingStore {
      */
     private static final ScheduledExecutorService REMOVAL_TIMER = Executors.newSingleThreadScheduledExecutor(Util.createDaemonThreadFactory());
 
-    public HeartbeatTestBackingStore() {
-    }
-
-    /**
-     * Simple POJO for pairing together the object's class with the encoded form of the object.
-     */
-    private static class CachedPair {
-        @Override
-        public String toString() {
-            return new ToStringBuilder(this)
-                    .append("value", "\"" + new String(value) + "\"")
-                    .append("clazz", clazz)
-                    .append("locallyCacheable", locallyCacheable)
-                    .toString();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            CachedPair that = (CachedPair) o;
-
-            return new EqualsBuilder()
-                    .append(value, that.value)
-                    .append(clazz, that.clazz)
-                    .append(locallyCacheable, that.locallyCacheable)
-                    .isEquals();
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder(17, 37)
-                    .append(value)
-                    .append(clazz)
-                    .append(locallyCacheable)
-                    .toHashCode();
-        }
-
-        /**
-         * Encoded form.
-         */
-        public final byte[] value;
-
-        /**
-         * Class of the value field.
-         */
-        public final Class<?> clazz;
-
-        /**
-         * Create a cache entry pair.
-         *
-         * @param value encoded object
-         * @param clazz Java class object
-         */
-        CachedPair(final byte[] value, final Class<?> clazz) {
-            this.value = value;
-            this.clazz = clazz;
-        }
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -129,9 +62,9 @@ public class HeartbeatTestBackingStore implements BackingStore {
 
     @Override
     public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
-        String cacheKey = validateAddParameters(key, valueClass, value, timeToLive);
+        String cacheKey = BackingStore.validateAddParameters(key, valueClass, value, timeToLive);
         LOGGER.debug("Adding to cache key {} of class {}", key, valueClass);
-        cache.put(cacheKey, new CachedPair(value, valueClass));
+        cache.put(cacheKey, new Object());
         /*Here we set up a simple timer to deal with the removal of the item from the cache if a duration is present
          *This uses a single timer to remove elements, this is fine for this example, but in production we would want
          *something more performant.

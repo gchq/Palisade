@@ -19,6 +19,6 @@ public class HashMapBackingStoreTest extends AbstractBackingStoreTest {
 
     @Override
     public BackingStore createBackingStore() {
-        return new HeartbeatTestBackingStore(false);
+        return new HashMapBackingStore(false);
     }
 }

@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.config.service.impl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
@@ -69,7 +70,7 @@ public class SimpleConfigServiceTest {
         scs = new SimpleConfigService(
                 new SimpleCacheService()
                         .backingStore(
-                                new HeartbeatTestBackingStore(false)
+                                new HashMapBackingStore(false)
                         )
         );
         scs.getCache().add(new AddCacheRequest<ServiceConfiguration>()
@@ -96,7 +97,7 @@ public class SimpleConfigServiceTest {
         ConfigurationService localConfigService = new SimpleConfigService(
                 new SimpleCacheService()
                         .backingStore(
-                                new HeartbeatTestBackingStore(false)
+                                new HashMapBackingStore(false)
                         )
         );
         GetConfigRequest req = new GetConfigRequest();

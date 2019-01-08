@@ -50,6 +50,19 @@ public class Stethoscope {
     }
 
     /**
+     * Convenience method for creating a {@link Stethoscope} that can listen to an existing {@link Heartbeat}.
+     *
+     * @param heartbeat the heartbeat to listen to
+     * @return a stethoscope
+     */
+    public static Stethoscope thatListensTo(final Heartbeat heartbeat) {
+        requireNonNull(heartbeat, "heartbeat");
+        return new Stethoscope()
+                .cacheService(heartbeat.getCacheService())
+                .serviceClass(heartbeat.getServiceClass());
+    }
+
+    /**
      * Set the cache service used as the co-ordination mechanism.
      *
      * @param cacheService the cache service to send messages to

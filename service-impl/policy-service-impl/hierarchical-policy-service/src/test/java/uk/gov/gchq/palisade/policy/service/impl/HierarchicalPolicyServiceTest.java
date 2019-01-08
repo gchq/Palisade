@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.policy.HasSensitiveAuthRule;
 import uk.gov.gchq.palisade.policy.HasTestingJustification;
@@ -44,7 +45,7 @@ import static org.junit.Assert.assertTrue;
 public class HierarchicalPolicyServiceTest {
 
     private HierarchicalPolicyService policyService;
-    private static final SimpleCacheService cacheService = new SimpleCacheService().backingStore(new HeartbeatTestBackingStore());
+    private static final SimpleCacheService cacheService = new SimpleCacheService().backingStore(new HashMapBackingStore());
     private static final User testUser = new User().userId("testUser");
     private final SystemResource systemResource = createTestSystemResource();
     private final DirectoryResource directoryResource = createTestDirectoryResource();
