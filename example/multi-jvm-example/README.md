@@ -111,12 +111,13 @@ You should see 6 containers:
 
 ```
 CONTAINER ID        IMAGE                                                COMMAND             CREATED             STATUS              PORTS                    NAMES
-27e121f284c3        multi-jvm-example-docker-services_policy-service     "catalina.sh run"   30 minutes ago      Up 10 seconds       0.0.0.0:8081->8080/tcp   policy-service
-01f13c6350d6        multi-jvm-example-docker-services_data-service       "catalina.sh run"   30 minutes ago      Up 8 seconds        0.0.0.0:8084->8080/tcp   data-service
-f4d7e07b8412        multi-jvm-example-docker-services_palisade-service   "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8080->8080/tcp   palisade-service
-c291ff79eecc        multi-jvm-example-docker-services_resource-service   "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8082->8080/tcp   resource-service
-1c16c50a6e2d        multi-jvm-example-docker-services_user-service       "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8083->8080/tcp   user-service
-831f5b3a86a3        multi-jvm-example-docker-services_config-service     "catalina.sh run"   30 minutes ago      Up 9 seconds        0.0.0.0:8085->8080/tcp   config-service
+c23a409e29ed        palisade-example_palisade-service   "catalina.sh run"        3 seconds ago       Up 1 second         8080/tcp            palisade-service
+b437e1be5d32        palisade-example_policy-service     "catalina.sh run"        3 seconds ago       Up 1 second         8080/tcp            policy-service
+5d17713a67ca        palisade-example_config-service     "catalina.sh run"        3 seconds ago       Up 1 second         8080/tcp            config-service
+c86bd8543baf        palisade-example_resource-service   "catalina.sh run"        3 seconds ago       Up 1 second         8080/tcp            resource-service
+81bccfcce56a        palisade-example_data-service       "catalina.sh run"        3 seconds ago       Up 1 second         8080/tcp            data-service
+70a2a1f69908        palisade-example_user-service       "catalina.sh run"        3 seconds ago       Up 2 seconds        8080/tcp            user-service
+c0b6cce34df8        quay.io/coreos/etcd                 "/usr/local/bin/etcd…"   3 seconds ago       Up 2 seconds        2379-2380/tcp       etcd
 ```
 
 3. Run the example
@@ -128,6 +129,8 @@ For local Tomcat:
 ```
 
 For Docker:
+
+This script will not run if the `dockerComposeUp.sh` script has not been run.
 
 ```bash
  ./example/multi-jvm-example/scripts/runDocker.sh

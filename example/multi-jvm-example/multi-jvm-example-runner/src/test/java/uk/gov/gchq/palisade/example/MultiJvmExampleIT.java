@@ -24,21 +24,28 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
+import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
+import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleFileUtil;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
+import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
+import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
+import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -84,8 +91,15 @@ public class MultiJvmExampleIT {
         configServer = new EmbeddedHttpServer("http://localhost:8085/config/v1", new uk.gov.gchq.palisade.config.service.impl.ApplicationConfigV1());
         configServer.startServer();
 
-        configService = ExampleConfigurator.setupMultiJVMConfigurationService(Collections.emptyList(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+        configService = ExampleConfigurator.setupMultiJVMConfigurationService(
+                new ProxyRestPolicyService("http://localhost:8081/policy"),
+                new ProxyRestUserService("http://localhost:8083/user"),
+                new ProxyRestResourceService("http://localhost:8082/resource"),
+                new ProxyRestPalisadeService("http://localhost:8080/palisade"),
+                new SimpleCacheService().backingStore(new HashMapBackingStore(true)),
+                new ProxyRestConfigService("http://localhost:8085/config"),
+                new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class)
+        );
     }
 
     @AfterClass

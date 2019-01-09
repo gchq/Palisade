@@ -17,7 +17,7 @@
 
 <web-app metadata-complete="false" version="3.1">
 
-    <display-name>Initial Configuration REST</display-name>
+    <display-name>Configuration REST</display-name>
 
     <servlet>
         <servlet-name>REST v1</servlet-name>

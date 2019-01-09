@@ -21,16 +21,26 @@ import io.etcd.jetcd.launcher.junit.EtcdClusterResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
+import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
+import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
+import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
+import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
+import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
+import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Objects.nonNull;
 
 public class MultiJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
@@ -48,6 +58,7 @@ public class MultiJvmExample {
 
     public void run(final String sourceFile) throws Exception {
         EtcdClusterResource etcd = null;
+        EtcdBackingStore store = null;
         try {
             etcd = new EtcdClusterResource("test-etcd", 1);
             etcd.cluster().start();
@@ -55,10 +66,17 @@ public class MultiJvmExample {
                     .stream()
                     .map(URI::toString)
                     .collect(Collectors.toList());
+            store = new EtcdBackingStore().connectionDetails(etcdEndpointURLs);
             //this will write an initial configuration
-            final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpointURLs,
-                    Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
-
+            final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(
+                    new ProxyRestPolicyService("http://localhost:8081/policy"),
+                    new ProxyRestUserService("http://localhost:8083/user"),
+                    new ProxyRestResourceService("http://localhost:8082/resource"),
+                    new ProxyRestPalisadeService("http://localhost:8080/palisade"),
+                    new SimpleCacheService().backingStore(store),
+                    new ProxyRestConfigService("http://localhost:8085/config"),
+                    new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class)
+            );
             final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
@@ -74,8 +92,11 @@ public class MultiJvmExample {
             LOGGER.info("Bob got back: ");
             bobResults.map(Object::toString).forEach(LOGGER::info);
         } finally {
-            if (etcd != null) {
+            if (nonNull(etcd)) {
                 etcd.cluster().close();
+            }
+            if (nonNull(store)) {
+                store.close();
             }
         }
     }
