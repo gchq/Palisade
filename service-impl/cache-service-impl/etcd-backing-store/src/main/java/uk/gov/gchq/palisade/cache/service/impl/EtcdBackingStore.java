@@ -27,6 +27,9 @@ import com.coreos.jetcd.options.GetOption;
 import com.coreos.jetcd.options.PutOption;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -37,7 +40,7 @@ import java.util.stream.Stream;
 import static java.util.Objects.requireNonNull;
 
 public class EtcdBackingStore implements BackingStore {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(EtcdBackingStore.class);
     /**
      * Flag to indicate boolean false.
      */

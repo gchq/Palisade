@@ -35,6 +35,16 @@
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>${project.parent.groupId}</groupId>-->
+                    <!--<artifactId>hadoop-data-service</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<groupId>${project.parent.groupId}</groupId>-->
+                    <!--<artifactId>hadoop-resource-service</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>

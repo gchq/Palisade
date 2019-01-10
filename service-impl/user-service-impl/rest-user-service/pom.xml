@@ -84,6 +84,7 @@
             <version>${jersey.version}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>

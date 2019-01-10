@@ -140,7 +140,9 @@ public class Configurator {
             //configure it
             instance.applyConfigFrom(adapted);
             return instance;
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
+            throw e;
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             throw new IllegalStateException("couldn't create service class " + serviceClass, e);
         }
     }

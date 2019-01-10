@@ -21,6 +21,7 @@ import io.etcd.jetcd.launcher.junit.EtcdClusterResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
@@ -68,16 +69,19 @@ public class MultiJvmExample {
                     .collect(Collectors.toList());
             store = new EtcdBackingStore().connectionDetails(etcdEndpointURLs);
             //this will write an initial configuration
-            final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(
+            final ConfigurationService configService = new ProxyRestConfigService("http://localhost:8085/config");
+            final CacheService cache = new SimpleCacheService().backingStore(store);
+            ExampleConfigurator.setupMultiJVMConfigurationService(
                     new ProxyRestPolicyService("http://localhost:8081/policy"),
                     new ProxyRestUserService("http://localhost:8083/user"),
                     new ProxyRestResourceService("http://localhost:8082/resource"),
                     new ProxyRestPalisadeService("http://localhost:8080/palisade"),
-                    new SimpleCacheService().backingStore(store),
-                    new ProxyRestConfigService("http://localhost:8085/config"),
-                    new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class)
+                    cache,
+                    configService,
+                    new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class),
+                    cache
             );
-            final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
+            final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
             LOGGER.info("");
