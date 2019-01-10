@@ -11,10 +11,12 @@ import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
+import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
+import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
@@ -59,7 +61,8 @@ public class MultiJvmDockerExampleIT {
             CacheService dockerCacheService = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singleton("http://etcd:2379"), false));
 
             // When
-            example.run(Optional.of(sc), config, dockerCacheService, cache);
+            example.run(Optional.of(sc), config, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class),
+                    dockerCacheService, cache);
 
             // Then - no exceptions
         } finally {

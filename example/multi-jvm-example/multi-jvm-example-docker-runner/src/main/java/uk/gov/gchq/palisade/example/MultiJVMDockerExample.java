@@ -33,6 +33,7 @@ import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
+import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
@@ -58,7 +59,9 @@ public class MultiJVMDockerExample {
         try {
             store = new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"));
             SimpleCacheService cache = new SimpleCacheService().backingStore(store);
-            run(Optional.empty(), new ProxyRestConfigService("http://config-service:8080/config"), cache, cache);
+            run(Optional.empty(), new ProxyRestConfigService("http://config-service:8080/config"),
+                    new ProxyRestConnectionDetail().url("http://data-service:8080/data").serviceClass(ProxyRestDataService.class),
+                    cache, cache);
         } finally {
             if (nonNull(store)) {
                 store.close();
@@ -66,9 +69,11 @@ public class MultiJVMDockerExample {
         }
     }
 
-    void run(final Optional<ServiceConfiguration> clientConfig, final ConfigurationService configService, final CacheService dockerCacheService, final CacheService localCacheService) throws Exception {
+    void run(final Optional<ServiceConfiguration> clientConfig, final ConfigurationService configService, final ConnectionDetail dataServiceConnection,
+             final CacheService dockerCacheService, final CacheService localCacheService) throws Exception {
         requireNonNull(clientConfig, "clientConfig");
         requireNonNull(configService, "configService");
+        requireNonNull(dataServiceConnection, "dataServiceConnection");
         requireNonNull(dockerCacheService, "dockerCacheService");
         requireNonNull(localCacheService, "localCacheService");
         //this will write an initial configuration
@@ -79,7 +84,7 @@ public class MultiJVMDockerExample {
                 new ProxyRestPalisadeService("http://palisade-service:8080/palisade"),
                 dockerCacheService,
                 configService,
-                new ProxyRestConnectionDetail().url("http://data-service:8080/data").serviceClass(ProxyRestDataService.class),
+                dataServiceConnection,
                 localCacheService
         );
         //override the client configuration
