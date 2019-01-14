@@ -7,11 +7,12 @@ import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
-import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
+import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
+import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
@@ -72,12 +73,12 @@ public class MultiJvmDockerExampleIT {
         }
     }
 
-    // @Test
+    @Test
     public void shouldReadAsAlice() throws Exception {
         // Given
-        final ConfigurationService ics = getConfigurationService();
-        final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+        final ConfigurationService configurationService = getConfigurationService();
+        final ConfiguredClientServices ccs = new ConfiguredClientServices(configurationService);
+        final ExampleSimpleClient client = new ExampleSimpleClient(ccs, FILE);
 
         // When
         final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
@@ -95,19 +96,49 @@ public class MultiJvmDockerExampleIT {
     }
 
     private ConfigurationService getConfigurationService() {
-        //TODO fix
-//        return ExampleConfigurator.setupMultiJVMConfigurationService(Collections.singletonList("http://localhost:2379"),
-//                Optional.empty(),
-//                Optional.of(new ProxyRestPolicyService("http://policy-service:8080/policy")),
-//                Optional.of(new ProxyRestUserService("http://user-service:8080/user")),
-//                Optional.of(new ProxyRestResourceService("http://resource-service:8080/resource")),
-//                Optional.of(new ProxyRestPalisadeService("http://palisade-service:8080/palisade")),
-//                Optional.of(new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"), false)))
-//        );
-        return null;
+        EtcdBackingStore store = null;
+        try {
+            store = new EtcdBackingStore().connectionDetails(Collections.singletonList("http://localhost:2379"));
+            AuditService audit = new LoggerAuditService();
+            PolicyService policy = new ProxyRestPolicyService("http://localhost:8081/policy");
+            UserService user = new ProxyRestUserService("http://localhost:8083/user");
+            ResourceService resource = new ProxyRestResourceService("http://localhost:8082/resource");
+            PalisadeService palisade = new ProxyRestPalisadeService("http://localhost:8080/palisade");
+            CacheService cache = new SimpleCacheService().backingStore(store);
+            ConfigurationService config = new ProxyRestConfigService("http://localhost:8085/config");
+            final ServiceConfiguration sc = new ServiceConfiguration();
+
+            //each service to write their configuration into the initial configuration
+            Collection<Service> services = Stream.of(audit, user, resource, policy, palisade, cache, config).collect(Collectors.toList());
+            services.forEach(service -> service.recordCurrentConfigTo(sc));
+
+            CacheService dockerCacheService = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singleton("http://etcd:2379"), false));
+
+            ExampleConfigurator.setupMultiJVMConfigurationService(
+                    new ProxyRestPolicyService("http://policy-service:8080/policy"),
+                    new ProxyRestUserService("http://user-service:8080/user"),
+                    new ProxyRestResourceService("http://resource-service:8080/resource"),
+                    new ProxyRestPalisadeService("http://palisade-service:8080/palisade"),
+                    dockerCacheService,
+                    new ProxyRestConfigService("http://localhost:8085/config"),
+                    new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class),
+                    cache
+            );
+
+            //override the client configuration
+            config.add((AddConfigRequest) new AddConfigRequest()
+                    .config(sc)
+                    .service(Optional.empty())).join();
+
+            return config;
+        } finally {
+            if (nonNull(store)) {
+                store.close();
+            }
+        }
     }
 
-    // @Test
+    @Test
     public void shouldReadAsBob() throws Exception {
         // Given
         final ConfigurationService ics = getConfigurationService();

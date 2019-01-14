@@ -227,7 +227,7 @@ public final class ExampleConfigurator {
     /**
      * Set up the example connection details for the Hadoop resource service.
      *
-     * @param cache                the cache service
+     * @param cache                the cache service to write details to
      * @param exampleObjConnection connection details for the example resource
      */
     private static void configureResourceConnectionDetails(final CacheService cache, final ConnectionDetail exampleObjConnection) {

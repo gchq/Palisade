@@ -91,6 +91,7 @@ public class MultiJVMDockerExample {
         clientConfig.ifPresent(config -> configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(config)
                 .service(Optional.empty()))
+                .join()
         );
         final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
