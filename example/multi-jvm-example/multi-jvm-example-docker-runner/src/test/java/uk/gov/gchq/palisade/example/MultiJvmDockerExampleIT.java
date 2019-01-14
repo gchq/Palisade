@@ -2,6 +2,7 @@ package uk.gov.gchq.palisade.example;
 
 import org.junit.Assert;
 import org.junit.Test;
+
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
