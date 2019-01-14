@@ -57,11 +57,10 @@ public class MultiJvmDockerExampleIT {
             Collection<Service> services = Stream.of(audit, user, resource, policy, palisade, cache, config).collect(Collectors.toList());
             services.forEach(service -> service.recordCurrentConfigTo(sc));
 
-            final MultiJVMDockerExample example = new MultiJVMDockerExample();
-
             CacheService dockerCacheService = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singleton("http://etcd:2379"), false));
 
             // When
+            final MultiJVMDockerExample example = new MultiJVMDockerExample();
             example.run(Optional.of(sc), config, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class),
                     dockerCacheService, cache);
 
