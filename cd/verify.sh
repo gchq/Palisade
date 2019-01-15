@@ -12,7 +12,6 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Starting the multi-jvm-example containerised"
     ./example/multi-jvm-example/scripts/dockerComposeUp.sh
     #Sleep to ensure all containers are up
-    sleep 2m
     echo "Running the example application"
     OUTPUT=`./example/multi-jvm-example/scripts/runDocker.sh`
     echo "Output is: $OUTPUT"
