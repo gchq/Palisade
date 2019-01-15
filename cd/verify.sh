@@ -22,6 +22,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     mvn javadoc:aggregate -q
 fi
 
+
 exit $result
 
 
