@@ -23,6 +23,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.exception.Error;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.exception.PalisadeRuntimeException;
@@ -43,10 +44,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.NoSuchElementException;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 public abstract class ProxyRestService implements Service {
@@ -107,7 +106,7 @@ public abstract class ProxyRestService implements Service {
      *
      * @param retryMax the maximum number of attempts
      * @return this object
-     * @throws IllegalArgumentException if {@code retryMax} < 1
+     * @throws IllegalArgumentException if {@code retryMax} is less than 1
      */
     public ProxyRestService retryMax(final int retryMax) {
         if (retryMax < 1) {
@@ -121,7 +120,7 @@ public abstract class ProxyRestService implements Service {
      * Set the number of attempts this service will make to contact the REST service.
      *
      * @param retryMax the maximum number of attempts
-     * @throws IllegalArgumentException if {@code retryMax} < 1
+     * @throws IllegalArgumentException if {@code retryMax} is less than 1
      */
     public void setRetryMax(final int retryMax) {
         retryMax(retryMax);
@@ -225,62 +224,6 @@ public abstract class ProxyRestService implements Service {
         return getBaseUrlWithVersion();
     }
 
-    /**
-     * Carries out the given operation a set number of times in case of failure. The given function will be called and the
-     * result returned if successful. If the function throws an exception, then the function is tried again after a pause.
-     * If {@code retryCount} attempts fail, then a {@link RuntimeException} is thrown with the most recent cause.
-     *
-     * @param function   the function to run
-     * @param retryCount the maximum number of attempts
-     * @param pause      the pause time between failure
-     * @param <R>        the return type
-     * @return object of type {@code R} from {@code function}
-     * @throws IllegalArgumentException if {@code retryCount} < 1 or {@code pause} is negative or less than the minimum
-     * @throws RuntimeException         if all attempts to execute {@code function} fail
-     */
-    private static <R> R retryThunker(final Callable<R> function, final int retryCount, final Duration pause) {
-        requireNonNull(function, "function");
-        if (retryCount < 1) {
-            throw new IllegalArgumentException("retryCount must be >=1");
-        }
-        checkPauseTime(pause);
-
-        RuntimeException lastCause = null;
-        int count = 0;
-        long wait = pause.toMillis();
-
-        //loop with a count
-        while (count < retryCount) {
-            try {
-                return function.call();
-            } catch (Throwable t) {
-                //wrap if checked
-                if (t instanceof RuntimeException) {
-                    lastCause = (RuntimeException) t;
-                } else {
-                    lastCause = new RuntimeException(t);
-                }
-            }
-
-            //failed so increment count and retry
-            count++;
-            try {
-                if (count < retryCount) {
-                    Thread.sleep(wait);
-                }
-            } catch (InterruptedException e) {
-                //ignore
-            }
-        }
-
-        //wrap the exception if it is checked
-        if (isNull(lastCause)) {
-            //shouldn't happen
-            throw new RuntimeException("root cause unknown");
-        }
-        throw lastCause;
-    }
-
     protected <O> CompletableFuture<O> doPostAsync(final String endpoint, final Object body, final TypeReference<O> outputType) {
         return CompletableFuture.supplyAsync(() -> doPost(endpoint, body, outputType));
     }
@@ -314,7 +257,7 @@ public abstract class ProxyRestService implements Service {
     }
 
     protected <O> O doPost(final URL url, final String jsonBody, final TypeReference<O> outputType) {
-        return retryThunker(() -> {
+        return Util.retryThunker(() -> {
             final O responseObj;
             try {
                 final Invocation.Builder request = createRequest(jsonBody, url);
@@ -330,7 +273,7 @@ public abstract class ProxyRestService implements Service {
     }
 
     protected <O> O doPost(final URL url, final String jsonBody, final Class<O> outputType) {
-        return retryThunker(() -> {
+        return Util.retryThunker(() -> {
             final O responseObj;
 
             final Invocation.Builder request = createRequest(jsonBody, url);
@@ -363,7 +306,7 @@ public abstract class ProxyRestService implements Service {
     }
 
     protected <O> O doPut(final URL url, final String jsonBody, final Class<O> outputType) {
-        return retryThunker(() -> {
+        return Util.retryThunker(() -> {
             final O responseObj;
             try {
                 final Invocation.Builder request = createRequest(jsonBody, url);
