@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+FILE=$2
 OUT_PATH=$1
 
 if [[ $# -lt 1 ]]
@@ -7,9 +10,12 @@ then
     OUT_PATH='/tmp/palisade-mapreduce-example/output'
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+if [[ $# -lt 2 ]]
+then
+    FILE="$DIR/../../resources/exampleObj_file1.txt"
+fi
 
-java -cp example/mapreduce-example/mapreduce-example-runner/target/mapreduce-example-runner-*-shaded.jar uk.gov.gchq.palisade.example.MapReduceExample "$DIR/../../resources/exampleObj_file1.txt" "$OUT_PATH"
+java -cp example/mapreduce-example/mapreduce-example-runner/target/mapreduce-example-runner-*-shaded.jar uk.gov.gchq.palisade.example.MapReduceExample "$FILE" "$OUT_PATH"
 
 if [[ $? -eq 0 ]]
 then
