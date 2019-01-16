@@ -23,7 +23,3 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
 fi
 
 exit $result
-
-
-
-
