@@ -32,6 +32,7 @@ import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
 import static java.util.Objects.nonNull;
@@ -121,13 +122,13 @@ public class SimpleDataService implements DataService {
         requireNonNull(config, "config");
         String serialisedPalisade = config.getOrDefault(PALISADE_IMPL_KEY, null);
         if (nonNull(serialisedPalisade)) {
-            palisadeService = JSONSerialiser.deserialise(serialisedPalisade.getBytes(JSONSerialiser.UTF8), PalisadeService.class);
+            palisadeService = JSONSerialiser.deserialise(serialisedPalisade.getBytes(StandardCharsets.UTF_8), PalisadeService.class);
         } else {
             throw new NoConfigException("no service specified in configuration");
         }
         String serialisedReader = config.getOrDefault(READER_IMPL_KEY, null);
         if (nonNull(serialisedReader)) {
-            reader = JSONSerialiser.deserialise(serialisedReader.getBytes(JSONSerialiser.UTF8), DataReader.class);
+            reader = JSONSerialiser.deserialise(serialisedReader.getBytes(StandardCharsets.UTF_8), DataReader.class);
         } else {
             throw new NoConfigException("no service specified in configuration");
         }
@@ -137,9 +138,9 @@ public class SimpleDataService implements DataService {
     public void recordCurrentConfigTo(final ServiceConfiguration config) {
         requireNonNull(config, "config");
         config.put(DataService.class.getTypeName(), getClass().getTypeName());
-        String serialised = new String(JSONSerialiser.serialise(palisadeService), JSONSerialiser.UTF8);
+        String serialised = new String(JSONSerialiser.serialise(palisadeService), StandardCharsets.UTF_8);
         config.put(PALISADE_IMPL_KEY, serialised);
-        String serialisedReader = new String(JSONSerialiser.serialise(reader), JSONSerialiser.UTF8);
+        String serialisedReader = new String(JSONSerialiser.serialise(reader), StandardCharsets.UTF_8);
         config.put(READER_IMPL_KEY, serialisedReader);
     }
 

@@ -1,4 +1,4 @@
-From tomcat:8.0-jre8-alpine as data-service
+From tomcat:8-jre11 as data-service
 
 ADD bin/rest-data-service/ /usr/local/tomcat/webapps/data
 ADD conf/dataConfig.json /usr/local/tomcat/webapps/data/WEB-INF/

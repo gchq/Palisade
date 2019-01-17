@@ -6,67 +6,79 @@ Apache Avro (org.apache.avro:avro:1.8.2):
 - Apache License, Version 2.0
 
 
-Apache Commons (org.apache.commons:commons-lang3:3.3.2, org.apache.commons:commons-jcs-core:2.1, commons-io:commons-io:2.4):
+Apache Commons (org.apache.commons:commons-lang3:3.8.1, commons-io:commons-io:2.6):
 
 - Apache License, Version 2.0
 
 
-Apache Hadoop (org.apache.hadoop:hadoop-common:2.6.5,
-org.apache.hadoop:hadoop-client:2.6.5,
-org.apache.hadoop:hadoop-mapreduce-client-core:2.6.5):
+Apache Hadoop (org.apache.hadoop:hadoop-common:2.9.2,
+org.apache.hadoop:hadoop-client:2.9.2,
+org.apache.hadoop:hadoop-mapreduce-client-core:2.9.2,
+org.apache.hadoop:hadoop-aws:2.9.2):
 
 - Apache License, Version 2.0
 
 
-Commons IO (commons-io:commons-io:2.4)
+Commons IO (commons-io:commons-io:2.6)
 
 - Apache License, Version 2.0
 
 
-Json4S (org.json4s:json4s-core_2.10:3.2.11, org.json4s:json4s-ext_2.10:3.2.11,
-org.json4s.jackson:json4s-jackson_2.10:3.2.11, org.json4s:json4s-native_2.10:3.2.11,
-org.json4s:json4s-ast_2.10:3.2.11):
+Swagger (io.swagger:-jersey2-jaxrs:1.5.21):
 
 - Apache License, Version 2.0
 
 
-Swagger (io.swagger:-jersey2-jaxrs:1.5.15):
+FasterXML Jackson (com.fasterxml.jackson.core:jackson-annotations:2.9.8,
+com.fasterxml.jackson.core:jackson-core:2.9.8, com.fasterxml.jackson.core:jackson-databind:2.9.8,
+com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.8,
+com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.8,
+com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.9.8,
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.8,
+com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.8):
 
 - Apache License, Version 2.0
 
 
-FasterXML Jackson (com.fasterxml.jackson.core:jackson-annotations:2.6.5,
-com.fasterxml.jackson.core:jackson-core:2.6.5, com.fasterxml.jackson.core:jackson-databind:2.6.5,
-com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.6.5,
-com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.6.5,
-com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.6.5):
+Guava (com.google.guava:guava:27.0.1-jre):
 
 - Apache License, Version 2.0
 
 
-Guava (com.google.guava:guava:13.0.1):
-
-- Apache License, Version 2.0
-
-
-Java Assist (org.javassist:javassist:3.18.0)
+Java Assist (org.javassist:javassist:3.24.1-GA)
 
 - Apache License, Version 2.0
 - Mozilla Public License 1.1
 
 
-Jersey (org.glassfish.jersey.core:jersey-server:2.25, org.glassfish.jersey.containers:jersey-container-servlet:2.25,
-org.glassfish.jersey.media:jersey-media-multipart:2.25, org.glassfish.jersey.media:jersey-media-json-jackson:2.25,
-org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.25,
-org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.25)
+Jersey (org.glassfish.jersey.core:jersey-server:2.27, org.glassfish.jersey.containers:jersey-container-servlet:2.27,
+org.glassfish.jersey.media:jersey-media-multipart:2.27, org.glassfish.jersey.media:jersey-media-json-jackson:2.27,
+org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.27,
+org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.27,
+org.glassfish.jersey.inject:jersey-hk2:2.27)
 
 - Common Development and Distribution License 1.0
 - GNU General Public License 2.0
 
 
-Javax Servlet (javax.servlet:java.servlet-api:3.1.0)
+Javax Servlet (javax.servlet:java.servlet-api:4.0.1)
 
 - CDDL + GPLv2 with classpath exception
+
+
+JavaBeans Activation Framework API JAR (javax.activation:javax-activation-api:1.2.0)
+
+- CDDL + GPLv2 with classpath exception
+
+
+JAXB API (javax.xml.bind:jaxb-api:2.2.8)
+
+- CDDL + GPLv2 with classpath exception
+
+
+JCIP Annotations (com.github.stephenc.jcip:jcip-annotations:1.0-1)
+
+- Apache License, Version 2.0
 
 
 Junit (junit:junit:4.12):
@@ -89,7 +101,7 @@ Netty (io.netty:netty:jar:3.6.2.Final)
 - Apache License, Version 2.0
 
 
-Reflections (org.reflections:reflections:0.9.10)
+Reflections (org.reflections:reflections:0.9.1)
 
 - WTFPL
 
@@ -99,30 +111,25 @@ SLF4J (org.slf4j:slf4j-api:1.7.25, org.slf4j:slf4j-log4j12:1.7.25)
 - MIT License
 
 
-Checkstyle (org.apache.maven.plugins:maven-checkstyle-plugin:2.17):
+SpotBugs (com.github.spotbugs:spotbugs-maven-plugin:3.1.10):
 
 - GNU Lesser General Public License
 
 
-MOJO FindBugs Maven Plugin (org.codehaus.mojo:findbugs-maven-plugin:3.0.1):
+Checkstyle (org.apache.maven.plugins:maven-checkstyle-plugin:3.0.0):
+
+- GNU Lesser General Public License
+
+
+Maven war plugin (org.apache.maven.plugins:maven-war-plugin:3.2.2):
 
 - Apache License, Version 2.0
 
-
-FindBugs (com.google.code.findbugs:annotations:3.0.1, com.google.code.findbugs:jsr305:3.0.1):
-
-- GNU Lesser Public License
-
-
-Maven war plugin (org.apache.maven.plugins:maven-war-plugin:3.0.0):
-
-- Apache License, Version 2.0
-
-Maven Plugins (org.apache.maven.plugins:maven-compiler-plugin:3.7.0,
-org.apache.maven.plugins:maven-failsafe-plugin:2.18.1,
-org.apache.maven.plugins:maven-jar-plugin:2.4,
+Maven Plugins (org.apache.maven.plugins:maven-compiler-plugin:3.8.0,
+org.apache.maven.plugins:maven-failsafe-plugin:2.22.1,
+org.apache.maven.plugins:maven-jar-plugin:3.1.1,
 org.apache.maven.plugins:maven-javadoc-plugin:3.0.1,
-org.apache.maven.plugins:maven-surefire-plugin:2.19.1,
+org.apache.maven.plugins:maven-surefire-plugin:2.22.1,
 org.apache.maven.plugins:maven-shade-plugin:3.1.1,
 org.apache.maven.plugins:maven-dependency-plugin:2.10)
 
@@ -134,14 +141,14 @@ Exec Maven Plugin (org.codehaus.mojo:exec-maven-plugin:1.2.1)
 - Apache License, Version 2.0
 
 
-Tomcat Maven Plugin (org.apache.tomcat.maven:tomcat7-maven-plugin:2.0)
+Fabric8 Docker Maven Plugin (io.fabric8:docker-maven-plugin:0.28.0)
 
 - Apache License, Version 2.0
 
 
-Scala Library (org.scala-lang:scala-library:2.11.8)
+Tomcat Maven Plugin (org.apache.tomcat.maven:tomcat7-maven-plugin:2.0)
 
-- BSD 3-Clause License
+- Apache License, Version 2.0
 
 
 Jetcd (com.coreos:jetcd-core:0.0.2)

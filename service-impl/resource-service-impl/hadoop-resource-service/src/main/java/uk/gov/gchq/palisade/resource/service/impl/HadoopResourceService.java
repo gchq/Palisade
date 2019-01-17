@@ -57,6 +57,7 @@ import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -179,7 +180,7 @@ public class HadoopResourceService implements ResourceService {
         //make this into a map
         Map<String, String> confMap = null;
         if (nonNull(serialisedConfig)) {
-            confMap = JSONSerialiser.deserialise(serialisedConfig.getBytes(JSONSerialiser.UTF8), Map.class);
+            confMap = JSONSerialiser.deserialise(serialisedConfig.getBytes(StandardCharsets.UTF_8), Map.class);
         }
         //make this into a config, confMap may be null at this point
         Configuration newConf = createConfig(confMap);
@@ -192,7 +193,7 @@ public class HadoopResourceService implements ResourceService {
         //extract cache
         String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
         if (nonNull(serialisedCache)) {
-            cacheService = JSONSerialiser.deserialise(serialisedCache.getBytes(JSONSerialiser.UTF8), CacheService.class);
+            cacheService = JSONSerialiser.deserialise(serialisedCache.getBytes(StandardCharsets.UTF_8), CacheService.class);
         } else {
             throw new NoConfigException("no cache service specified in configuration");
         }
@@ -203,9 +204,9 @@ public class HadoopResourceService implements ResourceService {
         requireNonNull(config, "config");
         config.put(ResourceService.class.getTypeName(), getClass().getTypeName());
         Map<String, String> confMap = getConf();
-        String serialisedConf = new String(JSONSerialiser.serialise(confMap), JSONSerialiser.UTF8);
+        String serialisedConf = new String(JSONSerialiser.serialise(confMap), StandardCharsets.UTF_8);
         config.put(HADOOP_CONF_STRING, serialisedConf);
-        String serialisedCache = new String(JSONSerialiser.serialise(cacheService), JSONSerialiser.UTF8);
+        String serialisedCache = new String(JSONSerialiser.serialise(cacheService), StandardCharsets.UTF_8);
         config.put(CACHE_IMPL_KEY, serialisedCache);
     }
 
