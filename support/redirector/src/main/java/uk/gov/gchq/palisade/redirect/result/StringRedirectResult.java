@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.impl;
+package uk.gov.gchq.palisade.redirect.result;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -22,35 +22,31 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import uk.gov.gchq.palisade.redirect.RedirectionResult;
 
-import java.net.URL;
-
 import static java.util.Objects.requireNonNull;
 
 /**
- * A redirection result that redirects clients to a different URL.
+ * The result of a redirection request. Instances of this class contain all the information necessary to redirect a client
+ * request to a Palisade service that is based on a string endpoint.
  */
-public class URLRedirectResult implements RedirectionResult<URL> {
+public class StringRedirectResult implements RedirectionResult<String> {
     /**
-     * The URL being redirected to.
+     * Where the request should be re-directed to.
      */
-    private final URL destination;
+    private final String destination;
 
     /**
-     * Create a new redirection based on a URL.
+     * Create a new redirection result from the given address.
      *
-     * @param destination new destination for the request
+     * @param destination address of destination service
      */
-    public URLRedirectResult(final URL destination) {
+    public StringRedirectResult(final String destination) {
         requireNonNull(destination, "destination");
         this.destination = destination;
     }
 
     @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .appendSuper(super.toString())
-                .append("destination", destination)
-                .toString();
+    public String getRedirectResult() {
+        return destination;
     }
 
     @Override
@@ -63,7 +59,7 @@ public class URLRedirectResult implements RedirectionResult<URL> {
             return false;
         }
 
-        URLRedirectResult that = (URLRedirectResult) o;
+        StringRedirectResult that = (StringRedirectResult) o;
 
         return new EqualsBuilder()
                 .append(getRedirectResult(), that.getRedirectResult())
@@ -72,13 +68,16 @@ public class URLRedirectResult implements RedirectionResult<URL> {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(7, 31)
+        return new HashCodeBuilder(7, 23)
                 .append(getRedirectResult())
                 .toHashCode();
     }
 
     @Override
-    public URL getRedirectResult() {
-        return destination;
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("destination", destination)
+                .toString();
     }
 }

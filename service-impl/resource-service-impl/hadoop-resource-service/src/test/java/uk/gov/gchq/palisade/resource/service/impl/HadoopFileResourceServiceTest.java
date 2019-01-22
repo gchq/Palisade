@@ -273,12 +273,12 @@ public class HadoopFileResourceServiceTest {
         final byte[] serialise = JSONSerialiser.serialise(service, true);
         final String expected = "{\n" +
                 "  \"@id\" : 1,\n" +
-                "  \"class\" : \"uk.gov.gchq.palisade.resource.service.impl.HadoopResourceService\",\n" +
+                "  \"class\" : \"uk.gov.gchq.palisade.resource.service.result.HadoopResourceService\",\n" +
                 "  \"cacheService\" : {\n" +
                 "    \"@id\" : 2,\n" +
-                "    \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService\",\n" +
+                "    \"class\" : \"uk.gov.gchq.palisade.cache.service.result.SimpleCacheService\",\n" +
                 "    \"backingStore\" : {\n" +
-                "      \"class\" : \"uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore\",\n" +
+                "      \"class\" : \"uk.gov.gchq.palisade.cache.service.result.HashMapBackingStore\",\n" +
                 "      \"useStatic\" : true\n" +
                 "    },\n" +
                 "    \"codecs\" : { },\n" +

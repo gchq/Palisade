@@ -143,7 +143,7 @@
                                 <!-- Here you could override the Data service implementing class-->
                                 <!--
                                 <uk.gov.gchq.palisade.data.service.DataService>
-                                    uk.gov.gchq.palisade.data.service.impl.SimpleDataService
+                                    uk.gov.gchq.palisade.data.service.result.SimpleDataService
                                 </uk.gov.gchq.palisade.data.service.DataService>
                                 -->
                                 <palisade.error-mode.debug>

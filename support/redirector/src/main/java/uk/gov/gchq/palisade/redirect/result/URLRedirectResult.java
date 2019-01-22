@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.impl;
+package uk.gov.gchq.palisade.redirect.result;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -22,45 +22,35 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import uk.gov.gchq.palisade.redirect.RedirectionResult;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
+import java.net.URL;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * The result of a redirection request. Instances of this class contain all the information necessary to redirect a client
- * request to a Palisade service that is based on a hostname/port pair endpoint..
+ * A redirection result that redirects clients to a different URL.
  */
-public class InetRedirectResult implements RedirectionResult<SocketAddress> {
+public class URLRedirectResult implements RedirectionResult<URL> {
     /**
-     * Where the request should be re-directed to.
+     * The URL being redirected to.
      */
-    private final SocketAddress destination;
+    private final URL destination;
 
     /**
-     * Create a new redirection result from the given host and port.
+     * Create a new redirection based on a URL.
      *
-     * @param hostName the host name
-     * @param port     the port number
+     * @param destination new destination for the request
      */
-    public InetRedirectResult(final String hostName, final int port) {
-        this(new InetSocketAddress(hostName, port));
-        requireNonNull(hostName);
-    }
-
-    /**
-     * Create a new redirection result from the given address.
-     *
-     * @param destination address of destination service
-     */
-    public InetRedirectResult(final SocketAddress destination) {
+    public URLRedirectResult(final URL destination) {
         requireNonNull(destination, "destination");
         this.destination = destination;
     }
 
     @Override
-    public SocketAddress getRedirectResult() {
-        return destination;
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("destination", destination)
+                .toString();
     }
 
     @Override
@@ -73,7 +63,7 @@ public class InetRedirectResult implements RedirectionResult<SocketAddress> {
             return false;
         }
 
-        InetRedirectResult that = (InetRedirectResult) o;
+        URLRedirectResult that = (URLRedirectResult) o;
 
         return new EqualsBuilder()
                 .append(getRedirectResult(), that.getRedirectResult())
@@ -82,16 +72,13 @@ public class InetRedirectResult implements RedirectionResult<SocketAddress> {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(7, 23)
+        return new HashCodeBuilder(7, 31)
                 .append(getRedirectResult())
                 .toHashCode();
     }
 
     @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .appendSuper(super.toString())
-                .append("destination", destination)
-                .toString();
+    public URL getRedirectResult() {
+        return destination;
     }
 }
