@@ -146,7 +146,7 @@ public class AvroSerialiserTest {
         // Then
         JsonAssert.assertEquals(String.format("{%n" +
                 "  \"domainClass\" : \"java.lang.Integer\",%n" +
-                "  \"class\" : \"uk.gov.gchq.palisade.data.service.result.serialiser.AvroSerialiser\"%n" +
+                "  \"class\" : \"uk.gov.gchq.palisade.data.service.impl.serialiser.AvroSerialiser\"%n" +
                 "}").getBytes(), json);
         assertEquals(AvroSerialiser.class, deserialised.getClass());
         assertEquals(serialiser.getDomainClass(), ((AvroSerialiser) deserialised).getDomainClass());

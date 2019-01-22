@@ -14,7 +14,7 @@ import org.apache.avro.message.SchemaStore;
 @org.apache.avro.specific.AvroGenerated
 public class TestObj extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = 7843905661986499514L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"TestObj\",\"namespace\":\"uk.gov.gchq.palisade.data.service.result.serialiser\",\"fields\":[{\"name\":\"fieldStr1\",\"type\":\"string\"},{\"name\":\"fieldInt\",\"type\":[\"int\",\"null\"]},{\"name\":\"fieldStr2\",\"type\":[\"string\",\"null\"]}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"TestObj\",\"namespace\":\"uk.gov.gchq.palisade.data.service.impl.serialiser\",\"fields\":[{\"name\":\"fieldStr1\",\"type\":\"string\"},{\"name\":\"fieldInt\",\"type\":[\"int\",\"null\"]},{\"name\":\"fieldStr2\",\"type\":[\"string\",\"null\"]}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
