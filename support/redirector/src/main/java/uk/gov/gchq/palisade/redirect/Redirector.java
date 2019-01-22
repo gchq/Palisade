@@ -40,5 +40,5 @@ public interface Redirector<T> {
      * @return a redirection result
      * @throws NoInstanceException if the redirector could not find any suitable service instance to redirect to
      */
-    RedirectionResult<T> determineRedirection(final Method method, final Object... args) throws NoInstanceException;
+    RedirectionResult<T> redirectionFor(final Method method, final Object... args) throws NoInstanceException;
 }

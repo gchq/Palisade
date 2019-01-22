@@ -37,7 +37,7 @@ public class SimpleRandomRedirector extends DefaultRedirector<String> {
      * This redirector redirects all requests randomly to a live instance.
      */
     @Override
-    public RedirectionResult<String> determineRedirection(final Method method, final Object... args) throws NoInstanceException {
+    public RedirectionResult<String> redirectionFor(final Method method, final Object... args) throws NoInstanceException {
         //get list of live services
         List<String> liveInstances = getScope().auscultate().collect(Collectors.toList());
 

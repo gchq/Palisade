@@ -66,19 +66,19 @@ public class URLRedirectResult implements RedirectionResult<URL> {
         URLRedirectResult that = (URLRedirectResult) o;
 
         return new EqualsBuilder()
-                .append(getRedirectResult(), that.getRedirectResult())
+                .append(get(), that.get())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(7, 31)
-                .append(getRedirectResult())
+                .append(get())
                 .toHashCode();
     }
 
     @Override
-    public URL getRedirectResult() {
+    public URL get() {
         return destination;
     }
 }

@@ -45,7 +45,7 @@ public class StringRedirectResult implements RedirectionResult<String> {
     }
 
     @Override
-    public String getRedirectResult() {
+    public String get() {
         return destination;
     }
 
@@ -62,14 +62,14 @@ public class StringRedirectResult implements RedirectionResult<String> {
         StringRedirectResult that = (StringRedirectResult) o;
 
         return new EqualsBuilder()
-                .append(getRedirectResult(), that.getRedirectResult())
+                .append(get(), that.get())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(7, 23)
-                .append(getRedirectResult())
+                .append(get())
                 .toHashCode();
     }
 

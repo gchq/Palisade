@@ -17,7 +17,6 @@
 package uk.gov.gchq.palisade.redirect.impl;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -68,7 +67,7 @@ public class SimpleRandomRedirectorTest {
                 .redirectionClass(NoLiveService.class);
 
         //When
-        redirect.determineRedirection(addMethod, request);
+        redirect.redirectionFor(addMethod, request);
 
         //Then
         fail("exception expected");
@@ -86,7 +85,7 @@ public class SimpleRandomRedirectorTest {
         RedirectionResult<String> expected = new StringRedirectResult("test_instance");
 
         //When
-        RedirectionResult<String> actual = redirect.determineRedirection(addMethod, request);
+        RedirectionResult<String> actual = redirect.redirectionFor(addMethod, request);
 
         //Then
         assertThat(actual, is(equalTo(expected)));
