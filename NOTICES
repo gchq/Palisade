@@ -91,6 +91,11 @@ Koryphe (uk.gov.gchq.koryphe:koryphe:1.5.0):
 - Apache License, Version 2.0
 
 
+Minio (https://github.com/minio/minio)
+
+- Apache License, Version 2.0
+
+
 Mockito (org.mockito:mockito-all:1.10.19):
 
 - MIT License

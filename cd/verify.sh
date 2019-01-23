@@ -11,8 +11,8 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     mvn install -q -B -V
     echo "Starting the multi-jvm-example containerised"
     ./example/multi-jvm-example/scripts/dockerComposeUp.sh
-    #Sleep to ensure all containers are up
-    sleep 2m
+    # Sleep to allow containers to start
+    sleep 5s
     echo "Running the example application"
     OUTPUT=`./example/multi-jvm-example/scripts/runDocker.sh`
     echo "Output is: $OUTPUT"
