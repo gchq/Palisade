@@ -1,6 +1,7 @@
 package uk.gov.gchq.palisade.example;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
@@ -37,6 +38,13 @@ import java.util.stream.Stream;
 import static java.util.Objects.nonNull;
 import static uk.gov.gchq.palisade.example.MultiJVMDockerExample.FILE;
 
+
+/**
+ * All tests in this suite disabled following resolution of gh-221. The docker container example is designed to be run inside a
+ * docker container, but the integration tests currently do not. Therefore, to make the configuration code simpler, this
+ * integration test has been disabled. The Docker examples are still run and verified by CI as part of the code review process.
+ */
+@Ignore
 public class MultiJvmDockerExampleIT {
 
     @Test
