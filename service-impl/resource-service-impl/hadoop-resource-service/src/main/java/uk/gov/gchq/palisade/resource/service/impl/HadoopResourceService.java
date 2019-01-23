@@ -451,10 +451,10 @@ public class HadoopResourceService implements ResourceService {
         @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
         private final Map<String, ConnectionDetail> dataType = new HashMap<>();
 
-        ConnectionDetailStorage() {
+        public ConnectionDetailStorage() {
         }
 
-        ConnectionDetailStorage(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
+        public ConnectionDetailStorage(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
             if (nonNull(dataFormat)) {
                 this.dataFormat.putAll(dataFormat);
                 this.dataFormat.values().removeIf(Objects::isNull);

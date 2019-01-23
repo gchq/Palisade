@@ -33,7 +33,7 @@
         <level value="WARN"/>
     </logger>
     <root>
-        <priority value="debug"></priority>
+        <priority value="warn"></priority>
         <appender-ref ref="console"></appender-ref>
     </root>
 </log4j:configuration>

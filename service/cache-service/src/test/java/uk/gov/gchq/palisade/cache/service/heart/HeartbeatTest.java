@@ -211,11 +211,12 @@ public class HeartbeatTest {
         heart = null;
         //Trigger manual gc
         System.gc();
-        long time = System.currentTimeMillis() + 2000;
+        long time = System.currentTimeMillis() + 5000;
 
         //Then - wait a limited amount of time for scheduler to stop
         while (System.currentTimeMillis() < time && !scheduler.isTerminated()) {
             Thread.sleep(50);
+            System.gc();
         }
 
         assertTrue("Scheduler failed to terminate after heartbeat was GC'd", scheduler.isTerminated());
