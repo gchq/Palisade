@@ -30,6 +30,7 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -108,7 +109,7 @@ public class SimpleCacheService implements CacheService {
         //extract cache
         String serialised = config.getOrDefault(STORE_IMPL_KEY, null);
         if (nonNull(serialised)) {
-            store = JSONSerialiser.deserialise(serialised.getBytes(JSONSerialiser.UTF8), BackingStore.class);
+            store = JSONSerialiser.deserialise(serialised.getBytes(StandardCharsets.UTF_8), BackingStore.class);
         } else {
             throw new NoConfigException("no backing store specified in configuration");
         }
@@ -121,7 +122,7 @@ public class SimpleCacheService implements CacheService {
     public void recordCurrentConfigTo(final ServiceConfiguration config) {
         requireNonNull(config, "config");
         config.put(CacheService.class.getTypeName(), getClass().getTypeName());
-        String serialisedCache = new String(JSONSerialiser.serialise(store), JSONSerialiser.UTF8);
+        String serialisedCache = new String(JSONSerialiser.serialise(store), StandardCharsets.UTF_8);
         config.put(STORE_IMPL_KEY, serialisedCache);
         config.put(MAX_LOCAL_TTL_KEY, maxLocalTTL.toString());
     }

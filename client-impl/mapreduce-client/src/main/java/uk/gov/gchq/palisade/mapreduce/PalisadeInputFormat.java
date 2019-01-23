@@ -31,6 +31,7 @@ import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -216,7 +217,7 @@ public class PalisadeInputFormat<V> extends InputFormat<LeafResource, V> {
         Objects.requireNonNull(request, "request");
         List<RegisterDataRequest> reqs = getDataRequests(context);
         reqs.add(request);
-        context.getConfiguration().set(REGISTER_REQUESTS_KEY, new String(JSONSerialiser.serialise(reqs.toArray(new RegisterDataRequest[0])), JSONSerialiser.UTF8));
+        context.getConfiguration().set(REGISTER_REQUESTS_KEY, new String(JSONSerialiser.serialise(reqs.toArray(new RegisterDataRequest[0])), StandardCharsets.UTF_8));
     }
 
     /**
@@ -310,7 +311,7 @@ public class PalisadeInputFormat<V> extends InputFormat<LeafResource, V> {
         Objects.requireNonNull(conf, "conf");
         Objects.requireNonNull(serialiser, "serialiser");
         conf.set(SERIALISER_CLASSNAME_KEY, serialiser.getClass().getName());
-        conf.set(SERLIALISER_CONFIG_KEY, new String(JSONSerialiser.serialise(serialiser), JSONSerialiser.UTF8));
+        conf.set(SERLIALISER_CONFIG_KEY, new String(JSONSerialiser.serialise(serialiser), StandardCharsets.UTF_8));
     }
 
     /**

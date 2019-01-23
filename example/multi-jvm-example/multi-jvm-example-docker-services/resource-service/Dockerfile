@@ -1,4 +1,4 @@
-From tomcat:8.0-jre8-alpine
+From tomcat:8-jre11
 
 ADD docker/bin/rest-resource-service /usr/local/tomcat/webapps/resource/
 ADD docker/setenv.sh /usr/local/tomcat/bin/

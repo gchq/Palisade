@@ -41,6 +41,7 @@ import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
@@ -94,7 +95,7 @@ public class HierarchicalPolicyService implements PolicyService {
         //extract cache
         String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
         if (nonNull(serialisedCache)) {
-            cacheService = JSONSerialiser.deserialise(serialisedCache.getBytes(JSONSerialiser.UTF8), CacheService.class);
+            cacheService = JSONSerialiser.deserialise(serialisedCache.getBytes(StandardCharsets.UTF_8), CacheService.class);
         } else {
             throw new NoConfigException("no cache service specified in configuration");
         }
@@ -104,7 +105,7 @@ public class HierarchicalPolicyService implements PolicyService {
     public void recordCurrentConfigTo(final ServiceConfiguration config) {
         requireNonNull(config, "config");
         config.put(PolicyService.class.getTypeName(), getClass().getTypeName());
-        String serialisedCache = new String(JSONSerialiser.serialise(cacheService), JSONSerialiser.UTF8);
+        String serialisedCache = new String(JSONSerialiser.serialise(cacheService), StandardCharsets.UTF_8);
         config.put(CACHE_IMPL_KEY, serialisedCache);
     }
 
