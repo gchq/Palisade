@@ -78,8 +78,7 @@ public class MultiJvmExample {
                     new ProxyRestPalisadeService("http://localhost:8080/palisade"),
                     cache,
                     configService,
-                    new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class),
-                    cache
+                    new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class)
             );
             final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
             final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);

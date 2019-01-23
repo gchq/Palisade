@@ -103,8 +103,7 @@ public class MultiJvmExampleIT {
                 new ProxyRestPalisadeService("http://localhost:8080/palisade"),
                 cache,
                 configService,
-                new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class),
-                cache
+                new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class)
         );
     }
 

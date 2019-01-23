@@ -114,7 +114,6 @@ public final class ExampleConfigurator {
      * @param cacheService               the {@link CacheService} that services should be told to use once they start
      * @param configService              the {@link ConfigurationService} that services should use
      * @param dataServerConnectionDetail the details on where the data server is located
-     * @param localCacheService          the {@link CacheService} that is accessible from the client
      */
     public static void setupMultiJVMConfigurationService(final PolicyService policyService,
                                                          final UserService userService,
@@ -122,8 +121,7 @@ public final class ExampleConfigurator {
                                                          final PalisadeService palisadeService,
                                                          final CacheService cacheService,
                                                          final ConfigurationService configService,
-                                                         final ConnectionDetail dataServerConnectionDetail,
-                                                         final CacheService localCacheService) {
+                                                         final ConnectionDetail dataServerConnectionDetail) {
         requireNonNull(policyService, "policyService can not be null");
         requireNonNull(userService, "userService can not be null");
         requireNonNull(resourceService, "resourceService can not be null");
@@ -131,7 +129,6 @@ public final class ExampleConfigurator {
         requireNonNull(cacheService, "cacheService can not be null");
         requireNonNull(configService, "configService can not be null");
         requireNonNull(dataServerConnectionDetail, "dataServerConnectionDetail can not be null");
-        requireNonNull(localCacheService, "localCacheService can not be null");
 
         AuditService audit = createAuditService(cacheService);
         Collection<Service> services = Stream.of(audit, userService, resourceService, policyService, palisadeService, cacheService).collect(Collectors.toList());
@@ -149,7 +146,7 @@ public final class ExampleConfigurator {
         writeConfiguration(configService, remotePolicy, PolicyService.class);
 
         HadoopResourceService remoteResource = createResourceService(cacheService);
-        configureResourceConnectionDetails(localCacheService, dataServerConnectionDetail);
+        configureResourceConnectionDetails(cacheService, dataServerConnectionDetail);
         writeConfiguration(configService, remoteResource, ResourceService.class);
 
         try {
