@@ -41,7 +41,7 @@ To run the example following the steps (from the root of the project):
 mvn clean install -P example
 ```
 
-2. Run the example
+2. Run the example using a file from the local file system
 ```bash
  ./example/mapreduce-example/scripts/run.sh [output_path]
 ```
@@ -49,3 +49,12 @@ mvn clean install -P example
 The shell script will use a default path under `/tmp` if no path is provided.
 
 This just runs the java class: uk.gov.gchq.palisade.example.MapReduceExample. You can just run this class directly in your IDE.
+
+3. Run the example using a file from a S3 bucket (hosted on a S3 server in a local Docker container)
+```bash
+./example/mapreduce-example/scripts/runS3.sh
+```
+
+The shell script will start a Docker container running a minio S3 server and upload a file into a S3 bucket on the server.
+The script will then call the `run.sh` script above, but use the s3a:// scheme so that Palisade will retrieve the file
+from the S3 server. Finally, the Docker containers are terminated.

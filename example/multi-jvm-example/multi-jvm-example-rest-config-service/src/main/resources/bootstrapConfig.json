@@ -7,6 +7,7 @@
     "backingStore" : {
       "class" : "uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore"
     },
-    "codecs" : { }
+    "codecs" : { },
+    "maximumLocalCacheDuration" : 300.000000000
   }
 }
