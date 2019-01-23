@@ -54,10 +54,10 @@ public abstract class ProxyRestService implements Service {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyRestService.class);
     private static final String URL_CONF_KEY_SUFFIX = ".proxy.rest.url";
     private static final String NUM_RETRIES_KEY = ".proxy.retry.max";
-    private static final String RETRY_WAIT_TIME = ".proxy.retry.pause";
+    private static final String RETRY_WAIT_TIME_KEY = ".proxy.retry.pause";
     private static final Duration DEFAULT_RETRY_TIME = Duration.ofSeconds(10);
     private static final Duration MINIMUM_RETRY_TIME = Duration.ofSeconds(1);
-    private static final int DEFAULT_RETRY_COUNT = 1;
+    private static final int DEFAULT_RETRY_COUNT = 3;
     private String baseUrl;
     private String baseUrlWithVersion;
     private Duration retryPauseTime = DEFAULT_RETRY_TIME;
@@ -187,7 +187,7 @@ public abstract class ProxyRestService implements Service {
             String base = config.get(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX);
             baseUrl(base);
 
-            Duration retryPause = Duration.parse(config.get(this.getClass().getTypeName() + RETRY_WAIT_TIME));
+            Duration retryPause = Duration.parse(config.get(this.getClass().getTypeName() + RETRY_WAIT_TIME_KEY));
             retryPauseTime(retryPause);
 
             int retryMaxCount = Integer.parseInt(config.get(this.getClass().getTypeName() + NUM_RETRIES_KEY));
@@ -203,7 +203,7 @@ public abstract class ProxyRestService implements Service {
         config.put(getServiceClass().getTypeName(), getClass().getTypeName());
         config.put(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX, this.baseUrl);
         config.put(this.getClass().getTypeName() + NUM_RETRIES_KEY, String.valueOf(this.retryMax));
-        config.put(this.getClass().getTypeName() + RETRY_WAIT_TIME, this.retryPauseTime.toString());
+        config.put(this.getClass().getTypeName() + RETRY_WAIT_TIME_KEY, this.retryPauseTime.toString());
     }
 
     protected abstract Class<? extends Service> getServiceClass();
