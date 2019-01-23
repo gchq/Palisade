@@ -31,8 +31,6 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class DefaultRedirector<T> implements Redirector<T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRedirector.class);
-
     /**
      * The cache service to use for heartbeats.
      */

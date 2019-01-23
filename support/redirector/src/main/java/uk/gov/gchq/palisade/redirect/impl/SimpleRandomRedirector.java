@@ -16,6 +16,8 @@
 
 package uk.gov.gchq.palisade.redirect.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.redirect.RedirectionResult;
 import uk.gov.gchq.palisade.redirect.exception.NoInstanceException;
 import uk.gov.gchq.palisade.redirect.result.StringRedirectResult;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
  * given service at random to redirect a request to.
  */
 public class SimpleRandomRedirector extends DefaultRedirector<String> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleRandomRedirector.class);
 
     /**
      * {@inheritDoc}
@@ -45,6 +48,7 @@ public class SimpleRandomRedirector extends DefaultRedirector<String> {
         Collections.shuffle(liveInstances);
         return liveInstances
                 .stream()
+                .peek(destination -> LOGGER.debug("Call to \"{}\" being redirected to {}", method.getDeclaringClass().getTypeName() + "." + method.getName(), destination))
                 .findFirst()
                 .map(StringRedirectResult::new)
                 .orElseThrow(() -> new NoInstanceException("no live instances of " + super.getRedirectionClass() + " could be found"));
