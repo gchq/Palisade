@@ -8,6 +8,7 @@
       "class" : "uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore",
       "connectionDetails" : ["http://etcd:2379"]
     },
-    "codecs" : { }
+    "codecs" : { },
+    "maximumLocalCacheDuration" : 300.000000000
   }
 }

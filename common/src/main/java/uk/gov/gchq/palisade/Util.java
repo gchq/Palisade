@@ -21,22 +21,32 @@ import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.util.FieldGetter;
 import uk.gov.gchq.palisade.util.FieldSetter;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * Common utility methods.
  */
 public final class Util {
+    /**
+     * Minimum retry time to wait between attempts.
+     */
+    public static final Duration MIN_DURATION_PAUSE = Duration.ofSeconds(1);
+
     private Util() {
     }
 
@@ -211,5 +221,69 @@ public final class Util {
             t.setDaemon(true);
             return t;
         };
+    }
+
+    /**
+     * Carries out the given operation a set number of times in case of failure. The given function will be called and the
+     * result returned if successful. If the function throws an exception, then the function is tried again after a pause.
+     * If {@code retryCount} attempts fail, then a {@link RuntimeException} is thrown with the most recent cause.
+     *
+     * @param function   the function to run
+     * @param retryCount the maximum number of attempts
+     * @param pause      the pause time between failure
+     * @param <R>        the return type
+     * @return object of type {@code R} from {@code function}
+     * @throws IllegalArgumentException if {@code retryCount} less than 1 or {@code pause} is negative or less than the
+     *                                  minimum required time
+     * @throws RuntimeException         if all attempts to execute {@code function} fail
+     */
+    public static <R> R retryThunker(final Callable<R> function, final int retryCount, final Duration pause) {
+        requireNonNull(function, "function");
+        requireNonNull(pause, "pause");
+        if (retryCount < 1) {
+            throw new IllegalArgumentException("retryCount must be >=1");
+        }
+        if (pause.isNegative()) {
+            throw new IllegalArgumentException("pause time cannot be negative");
+        }
+        if (MIN_DURATION_PAUSE.compareTo(pause) > 0) {
+            throw new IllegalArgumentException("pause time must be at least " + MIN_DURATION_PAUSE.toMillis() + " ms");
+        }
+
+
+        RuntimeException lastCause = null;
+        int count = 0;
+        long wait = pause.toMillis();
+
+        //loop with a count
+        while (count < retryCount) {
+            try {
+                return function.call();
+            } catch (Throwable t) {
+                //wrap if checked
+                if (t instanceof RuntimeException) {
+                    lastCause = (RuntimeException) t;
+                } else {
+                    lastCause = new RuntimeException(t);
+                }
+            }
+
+            //failed so increment count and retry
+            count++;
+            try {
+                if (count < retryCount) {
+                    Thread.sleep(wait);
+                }
+            } catch (InterruptedException e) {
+                //ignore
+            }
+        }
+
+        //wrap the exception if it is checked
+        if (isNull(lastCause)) {
+            //shouldn't happen
+            throw new RuntimeException("root cause unknown");
+        }
+        throw lastCause;
     }
 }
