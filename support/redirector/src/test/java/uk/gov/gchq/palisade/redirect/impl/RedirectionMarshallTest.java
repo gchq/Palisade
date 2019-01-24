@@ -61,24 +61,7 @@ interface NotAService {
 
 public class RedirectionMarshallTest {
 
-    @Test
-    public void shouldReturnSafeInstances() throws Exception {
-        //Given - nothing
-        //When
-        //Then
-        assertEquals(null, RedirectionMarshall.safeReturnTypeFor(PrimitiveService.class.getDeclaredMethod("voidMethod")));
-        assertEquals(Boolean.FALSE, RedirectionMarshall.safeReturnTypeFor(PrimitiveService.class.getDeclaredMethod("booleanMethod")));
-        assertEquals(Byte.valueOf((byte) 0), RedirectionMarshall.safeReturnTypeFor(PrimitiveService.class.getDeclaredMethod("byteMethod")));
-        assertEquals(Character.valueOf((char) 0), RedirectionMarshall.safeReturnTypeFor(PrimitiveService.class.getDeclaredMethod("charMethod")));
-        assertEquals(Short.valueOf((short) 0), RedirectionMarshall.safeReturnTypeFor(PrimitiveService.class.getDeclaredMethod("shortMethod")));
-        assertEquals(Integer.valueOf(0), RedirectionMarshall.safeReturnTypeFor(PrimitiveService.class.getDeclaredMethod("intMethod")));
-        assertEquals(Long.valueOf(0), RedirectionMarshall.safeReturnTypeFor(PrimitiveService.class.getDeclaredMethod("longMethod")));
-        assertEquals(Double.valueOf(0), RedirectionMarshall.safeReturnTypeFor(PrimitiveService.class.getDeclaredMethod("doubleMethod")));
-        assertEquals(Float.valueOf(0), RedirectionMarshall.safeReturnTypeFor(PrimitiveService.class.getDeclaredMethod("floatMethod")));
-        assertEquals(null, RedirectionMarshall.safeReturnTypeFor(PrimitiveService.class.getDeclaredMethod("objectMethod")));
-    }
-
-    @Test(expected = IllegalStateException.class)
+     @Test(expected = IllegalStateException.class)
     public void throwOnNoResultPassed() {
         //Given - nothing
         RedirectionMarshall<?> test = new RedirectionMarshall<>(Mockito.mock(Redirector.class));
