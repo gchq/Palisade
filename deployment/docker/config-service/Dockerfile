@@ -1,4 +1,4 @@
-From tomcat:8.0-jre8-alpine as config-service
+From tomcat:8-jre11 as config-service
 
 ADD bin/rest-config-service/ /usr/local/tomcat/webapps/config
 ADD conf/bootstrapConfig.json /usr/local/tomcat/webapps/config/WEB-INF/

@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ConfigConsts;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
@@ -135,14 +136,12 @@ public class Configurator {
             Class<S> classImpl = (Class<S>) Class.forName(servClass).asSubclass(Service.class);
 
             //create it
-            S instance = classImpl.newInstance();
+            S instance = classImpl.getDeclaredConstructor().newInstance();
 
             //configure it
             instance.applyConfigFrom(adapted);
             return instance;
-        } catch (NoSuchElementException e) {
-            throw new IllegalStateException(e);
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException | NoSuchElementException e) {
             throw new IllegalStateException("couldn't create service class " + serviceClass, e);
         }
     }

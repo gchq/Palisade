@@ -1,4 +1,4 @@
-From tomcat:8.0-jre8-alpine
+From tomcat:8-jre11 as resource-service
 
 ADD bin/rest-resource-service /usr/local/tomcat/webapps/resource/
 ADD bin/configRest.json /usr/local/tomcat/webapps/resource/WEB-INF/

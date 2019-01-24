@@ -46,7 +46,7 @@ import static org.junit.Assert.assertEquals;
 public class AvroSerialiserTest {
 
     public static final int INPUT_SIZE = 100;
-    public static final Integer[] INPUT = IntStream.range(0, INPUT_SIZE).mapToObj(Integer::new).toArray((a) -> new Integer[INPUT_SIZE]);
+    public static final Integer[] INPUT = IntStream.range(0, INPUT_SIZE).mapToObj(Integer::valueOf).toArray((a) -> new Integer[INPUT_SIZE]);
 
     @Test
     public void shouldConsistentlyPass() throws IOException {

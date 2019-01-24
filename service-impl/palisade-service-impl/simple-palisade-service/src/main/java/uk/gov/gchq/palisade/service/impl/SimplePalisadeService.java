@@ -47,6 +47,7 @@ import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -108,7 +109,7 @@ public class SimplePalisadeService implements PalisadeService {
         requireNonNull(serviceClass, "serviceClass");
         String serialised = config.getOrDefault(key, null);
         if (nonNull(serialised)) {
-            return JSONSerialiser.deserialise(serialised.getBytes(JSONSerialiser.UTF8), serviceClass);
+            return JSONSerialiser.deserialise(serialised.getBytes(StandardCharsets.UTF_8), serviceClass);
         } else {
             throw new NoConfigException("no service specified in configuration for class " + serviceClass.getTypeName());
         }
@@ -136,7 +137,7 @@ public class SimplePalisadeService implements PalisadeService {
         requireNonNull(config, "config");
         requireNonNull(service, "service");
         requireNonNull(key, "key");
-        String serialised = new String(JSONSerialiser.serialise(service), JSONSerialiser.UTF8);
+        String serialised = new String(JSONSerialiser.serialise(service), StandardCharsets.UTF_8);
         config.put(key, serialised);
     }
 

@@ -4,7 +4,7 @@ WORKDIR /app
 RUN git clone https://github.com/gchq/Palisade.git
 WORKDIR /app/Palisade
 
-FROM maven:3.5-jdk-8-alpine as build
+FROM maven:3.6-jdk-11-slim as build
 
 WORKDIR /app
 COPY --from=clone /app/Palisade /app

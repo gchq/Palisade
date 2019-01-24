@@ -47,11 +47,23 @@
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${jersey.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId>
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>${glassfish.hk2.version}</version>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId>
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.glassfish.hk2</groupId>

@@ -19,13 +19,13 @@ package uk.gov.gchq.palisade.jsonserialisation;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializer;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import uk.gov.gchq.palisade.UserId;
 
 import java.io.IOException;
 
-public class UserIdKeySerialiser extends StdKeySerializer {
+public class UserIdKeySerialiser extends StdSerializer<UserId> {
     public static SimpleModule getModule() {
         final SimpleModule module = new SimpleModule();
         module.addKeyDeserializer(UserId.class, new UserIdKeyDeserialiser());
@@ -33,8 +33,12 @@ public class UserIdKeySerialiser extends StdKeySerializer {
         return module;
     }
 
+    public UserIdKeySerialiser() {
+        super(UserId.class);
+    }
+
     @Override
-    public void serialize(final Object value, final JsonGenerator g, final SerializerProvider provider) throws IOException {
+    public void serialize(final UserId value, final JsonGenerator g, final SerializerProvider provider) throws IOException {
         g.writeFieldName(new String(JSONSerialiser.serialise(value)));
     }
 }
