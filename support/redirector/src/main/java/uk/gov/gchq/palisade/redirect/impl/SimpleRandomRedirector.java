@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.redirect.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.redirect.RedirectionResult;
 import uk.gov.gchq.palisade.redirect.exception.NoInstanceException;
 import uk.gov.gchq.palisade.redirect.result.StringRedirectResult;

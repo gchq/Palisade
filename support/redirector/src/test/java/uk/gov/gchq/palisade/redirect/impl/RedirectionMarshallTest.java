@@ -16,29 +16,17 @@
 
 package uk.gov.gchq.palisade.redirect.impl;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.cache.service.heart.HeartUtil;
-import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.redirect.RedirectionMarshall;
-import uk.gov.gchq.palisade.redirect.RedirectionResult;
 import uk.gov.gchq.palisade.redirect.Redirector;
-import uk.gov.gchq.palisade.redirect.exception.NoInstanceException;
 import uk.gov.gchq.palisade.redirect.result.StringRedirectResult;
 import uk.gov.gchq.palisade.service.Service;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
-
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 interface PrimitiveService extends Service {
     void voidMethod();
@@ -60,6 +48,12 @@ interface PrimitiveService extends Service {
     float floatMethod();
 
     Object objectMethod();
+}
+
+interface SimpleService extends Service {
+    boolean method(int a);
+
+    boolean method(int a, double b);
 }
 
 interface NotAService {
@@ -108,14 +102,14 @@ public class RedirectionMarshallTest {
     public void shouldNotThrowErrorWhenRedirectingMethods() {
         //Given
         Redirector<String> mock = Mockito.mock(Redirector.class);
-        when(mock.redirectionFor(any(),any())).thenReturn(new StringRedirectResult("test_destination"));
+        when(mock.redirectionFor(any(), any())).thenReturn(new StringRedirectResult("test_destination"));
 
         RedirectionMarshall<String> marshall = new RedirectionMarshall<>(mock);
         PrimitiveService service = marshall.createProxyFor(PrimitiveService.class);
 
         //When
         //Then
-        //FIXME assertEquals("test_destination", marshall.redirect(service.voidMethod()));
+        assertEquals("test_destination", marshall.redirect(() -> service.voidMethod()));
         assertEquals("test_destination", marshall.redirect(service.booleanMethod()));
         assertEquals("test_destination", marshall.redirect(service.byteMethod()));
         assertEquals("test_destination", marshall.redirect(service.charMethod()));
@@ -127,9 +121,19 @@ public class RedirectionMarshallTest {
         assertEquals("test_destination", marshall.redirect(service.objectMethod()));
     }
 
-    //tests needed
-    /*
-      should give an accurate redirect
-     */
+    @Test
+    public void shouldAccuratelyRedirect() {
+        //Given
+        Redirector<String> mock = Mockito.mock(Redirector.class);
+        when(mock.redirectionFor(any(), anyInt())).thenReturn(new StringRedirectResult("single_param_dest"));
+        when(mock.redirectionFor(any(), anyInt(), anyDouble())).thenReturn(new StringRedirectResult("double_param_dest"));
 
+        RedirectionMarshall<String> marshall = new RedirectionMarshall<>(mock);
+        SimpleService service = marshall.createProxyFor(SimpleService.class);
+
+        //When
+        //Then
+        assertEquals("single_param_dest", marshall.redirect(service.method(5)));
+        assertEquals("double_param_dest", marshall.redirect(service.method(5, 6.0d)));
+    }
 }

@@ -53,17 +53,24 @@ public class RedirectionMarshall<T> {
             if (isNull(result)) {
                 throw new IllegalStateException("no redirection result is present, was a valid method call made via the object returned from createProxyFor() from this instance?");
             }
+            LOGGER.debug("Redirection destination {}", result.get());
             return result.get();
         } finally {
             recentRedirect.remove();
         }
     }
 
+    public T redirect(final Runnable call) {
+        call.run();
+        return redirect((Object) null);
+    }
+
     private Object delegateRedirection(final Object proxy, final Method method, final Object... args) throws Throwable {
+        //work out where to send this request
         RedirectionResult<T> result = redirector.redirectionFor(method, args);
         //stash this result
         recentRedirect.set(result);
-        //Don't care about the result
+        //Don't care about the actual method result
         return safeReturnTypeFor(method);
     }
 
@@ -86,6 +93,7 @@ public class RedirectionMarshall<T> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <S extends Service> S createProxyFor(final Class<S> redirectClass) {
         requireNonNull(redirectClass, "redirectClass");
         if (!Service.class.isAssignableFrom(redirectClass)) {
