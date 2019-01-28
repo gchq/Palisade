@@ -16,8 +16,14 @@
 
 package uk.gov.gchq.palisade.redirect;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import uk.gov.gchq.palisade.redirect.exception.NoInstanceException;
 import uk.gov.gchq.palisade.redirect.exception.RedirectionFailedException;
+import uk.gov.gchq.palisade.resource.impl.FileResource;
 
 import java.lang.reflect.Method;
 
@@ -29,6 +35,12 @@ import java.lang.reflect.Method;
  *
  * @param <T> the type of result that the redirector can respond with
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "class"
+)
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 public interface Redirector<T> {
 
     /**
@@ -46,4 +58,14 @@ public interface Redirector<T> {
      * employ internal synchronization mechanisms to allow thread-safe access.
      */
     RedirectionResult<T> redirectionFor(final Method method, final Object... args) throws NoInstanceException, RedirectionFailedException;
+
+    @JsonGetter("class")
+    default String _getClass() {
+        return getClass().getName();
+    }
+
+    @JsonSetter("class")
+    default void _setClass(final String className) {
+        // do nothing.
+    }
 }
