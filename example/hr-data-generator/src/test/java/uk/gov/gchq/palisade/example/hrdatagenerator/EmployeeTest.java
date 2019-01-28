@@ -16,10 +16,12 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 
+import java.io.File;
 import java.util.Random;
 
 public class EmployeeTest {
@@ -37,7 +39,11 @@ public class EmployeeTest {
 
     @Test
     public void generateData() {
-        CreateData.main(new String[]{".data", "50", "1"});
+        try {
+            CreateData.main(new String[]{".data", "50", "1"});
+        } finally {
+            FileUtils.deleteQuietly(new File(".data"));
+        }
     }
 
 }

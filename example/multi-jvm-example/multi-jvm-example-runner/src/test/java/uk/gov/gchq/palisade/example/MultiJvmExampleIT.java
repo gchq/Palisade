@@ -93,7 +93,7 @@ public class MultiJvmExampleIT {
         configServer = new EmbeddedHttpServer("http://localhost:8085/config/v1", new uk.gov.gchq.palisade.config.service.impl.ApplicationConfigV1());
         configServer.startServer();
 
-        configService = new ProxyRestConfigService("http://localhost:8085/config");
+        configService = singleRetry(new ProxyRestConfigService("http://localhost:8085/config"));
 
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
 
@@ -108,7 +108,8 @@ public class MultiJvmExampleIT {
         );
     }
 
-    private static <S> S singleRetry(final ProxyRestService proxy) {
+    @SuppressWarnings("unchecked")
+    public static <S> S singleRetry(final ProxyRestService proxy) {
         return (S) proxy.retryMax(1);
     }
 
