@@ -19,6 +19,8 @@ package uk.gov.gchq.palisade.data.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.heart.Heartbeat;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.reader.DataReader;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
@@ -56,11 +58,15 @@ public class SimpleDataService implements DataService {
 
     private static final String PALISADE_IMPL_KEY = "sds.svc.palisade.svc";
     private static final String READER_IMPL_KEY = "sds.svc.reader.svc";
+    private static final String CACHE_IMPL_KEY = "sds.svc.cache.svc";
 
     private PalisadeService palisadeService;
     private DataReader reader;
+    private CacheService cache;
+    private final Heartbeat heartbeat;
 
     public SimpleDataService() {
+        heartbeat = new Heartbeat().serviceClass(SimpleDataService.class);
     }
 
     public SimpleDataService palisadeService(final PalisadeService palisadeService) {
@@ -75,9 +81,23 @@ public class SimpleDataService implements DataService {
         return this;
     }
 
+    public SimpleDataService cacheService(final CacheService cacheService) {
+        requireNonNull(cacheService, "The cache service cannot be set to null.");
+        this.cache = cacheService;
+        //changing cache service...
+        heartbeat.stop();
+        heartbeat.cacheService(this.cache);
+        heartbeat.start();
+        return this;
+    }
+
     @Override
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         requireNonNull(request, "The request cannot be null.");
+        //check that we have an active heartbeat before serving request
+        if (!heartbeat.isBeating()) {
+            throw new IllegalStateException("data service is not sending heartbeats! Can't send data. Has the cache service been configured?");
+        }
         LOGGER.debug("Creating async read: {}", request);
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Starting to read: {}", request);
@@ -85,7 +105,7 @@ public class SimpleDataService implements DataService {
                     .requestId(request.getRequestId())
                     .resource(request.getResource());
             LOGGER.debug("Calling palisade service with: {}", getConfig);
-            final DataRequestConfig config = palisadeService.getDataRequestConfig(getConfig).join();
+            final DataRequestConfig config = getPalisadeService().getDataRequestConfig(getConfig).join();
             LOGGER.debug("Palisade service returned: {}", config);
 
             final DataReaderRequest readerRequest = new DataReaderRequest()
@@ -95,7 +115,7 @@ public class SimpleDataService implements DataService {
                     .rules(config.getRules().get(request.getResource()));
 
             LOGGER.debug("Calling reader with: {}", readerRequest);
-            final DataReaderResponse readerResult = reader.read(readerRequest);
+            final DataReaderResponse readerResult = getReader().read(readerRequest);
             LOGGER.debug("Reader returned: {}", readerResult);
 
             final ReadResponse response = new ReadResponse();
@@ -113,7 +133,6 @@ public class SimpleDataService implements DataService {
     }
 
     public void setPalisadeService(final PalisadeService palisadeService) {
-        requireNonNull(palisadeService, "The palisade service cannot be set to null.");
         palisadeService(palisadeService);
     }
 
@@ -122,15 +141,21 @@ public class SimpleDataService implements DataService {
         requireNonNull(config, "config");
         String serialisedPalisade = config.getOrDefault(PALISADE_IMPL_KEY, null);
         if (nonNull(serialisedPalisade)) {
-            palisadeService = JSONSerialiser.deserialise(serialisedPalisade.getBytes(StandardCharsets.UTF_8), PalisadeService.class);
+            setPalisadeService(JSONSerialiser.deserialise(serialisedPalisade.getBytes(StandardCharsets.UTF_8), PalisadeService.class));
         } else {
             throw new NoConfigException("no service specified in configuration");
         }
         String serialisedReader = config.getOrDefault(READER_IMPL_KEY, null);
         if (nonNull(serialisedReader)) {
-            reader = JSONSerialiser.deserialise(serialisedReader.getBytes(StandardCharsets.UTF_8), DataReader.class);
+            setReader(JSONSerialiser.deserialise(serialisedReader.getBytes(StandardCharsets.UTF_8), DataReader.class));
         } else {
             throw new NoConfigException("no service specified in configuration");
+        }
+        String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
+        if (nonNull(serialisedCache)) {
+            setCacheService(JSONSerialiser.deserialise(serialisedCache.getBytes(StandardCharsets.UTF_8), CacheService.class));
+        } else {
+            throw new NoConfigException("no cache specified in configuration");
         }
     }
 
@@ -138,10 +163,12 @@ public class SimpleDataService implements DataService {
     public void recordCurrentConfigTo(final ServiceConfiguration config) {
         requireNonNull(config, "config");
         config.put(DataService.class.getTypeName(), getClass().getTypeName());
-        String serialised = new String(JSONSerialiser.serialise(palisadeService), StandardCharsets.UTF_8);
+        String serialised = new String(JSONSerialiser.serialise(getPalisadeService()), StandardCharsets.UTF_8);
         config.put(PALISADE_IMPL_KEY, serialised);
         String serialisedReader = new String(JSONSerialiser.serialise(reader), StandardCharsets.UTF_8);
         config.put(READER_IMPL_KEY, serialisedReader);
+        String serialisedCache = new String(JSONSerialiser.serialise(cache), StandardCharsets.UTF_8);
+        config.put(CACHE_IMPL_KEY, serialisedCache);
     }
 
     public DataReader getReader() {
@@ -150,7 +177,15 @@ public class SimpleDataService implements DataService {
     }
 
     public void setReader(final DataReader reader) {
-        requireNonNull(reader, "The reader cannot be set to null.");
         reader(reader);
+    }
+
+    public CacheService getCacheService() {
+        requireNonNull(cache, "The cache service has not been set.");
+        return cache;
+    }
+
+    public void setCacheService(final CacheService cacheService) {
+        cacheService(cacheService);
     }
 }

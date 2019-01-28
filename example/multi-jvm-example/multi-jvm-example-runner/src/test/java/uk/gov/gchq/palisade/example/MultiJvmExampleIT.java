@@ -38,6 +38,7 @@ import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
+import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
@@ -97,14 +98,18 @@ public class MultiJvmExampleIT {
         CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
 
         ExampleConfigurator.setupMultiJVMConfigurationService(
-                new ProxyRestPolicyService("http://localhost:8081/policy"),
-                new ProxyRestUserService("http://localhost:8083/user"),
-                new ProxyRestResourceService("http://localhost:8082/resource"),
-                new ProxyRestPalisadeService("http://localhost:8080/palisade"),
+                singleRetry(new ProxyRestPolicyService("http://localhost:8081/policy")),
+                singleRetry(new ProxyRestUserService("http://localhost:8083/user")),
+                singleRetry(new ProxyRestResourceService("http://localhost:8082/resource")),
+                singleRetry(new ProxyRestPalisadeService("http://localhost:8080/palisade")),
                 cache,
                 configService,
                 new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class)
         );
+    }
+
+    private static <S> S singleRetry(final ProxyRestService proxy) {
+        return (S) proxy.retryMax(1);
     }
 
     @AfterClass

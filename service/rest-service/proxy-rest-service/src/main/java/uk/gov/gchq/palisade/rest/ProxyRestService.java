@@ -55,7 +55,7 @@ public abstract class ProxyRestService implements Service {
     private static final String URL_CONF_KEY_SUFFIX = ".proxy.rest.url";
     private static final String NUM_RETRIES_KEY = ".proxy.retry.max";
     private static final String RETRY_WAIT_TIME_KEY = ".proxy.retry.pause";
-    private static final Duration DEFAULT_RETRY_TIME = Duration.ofSeconds(10);
+    private static final Duration DEFAULT_RETRY_TIME = Duration.ofSeconds(5);
     private static final Duration MINIMUM_RETRY_TIME = Duration.ofSeconds(1);
     private static final int DEFAULT_RETRY_COUNT = 3;
     private String baseUrl;
