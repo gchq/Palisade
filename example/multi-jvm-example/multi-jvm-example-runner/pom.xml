@@ -79,6 +79,11 @@
             <artifactId>config-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>etcd-backing-store</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
         <!-- Added for jetcd-launcher -->
         <dependency>
             <groupId>junit</groupId>
@@ -228,7 +233,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.2.1</version>
+                        <version>${exec.plugin.version}</version>
                         <executions>
                             <execution>
                                 <phase>test</phase>
@@ -251,7 +256,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>${maven-shade-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.Util;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.file.ClosedWatchServiceException;
@@ -216,18 +218,10 @@ public class PropertiesBackingStore implements BackingStore {
      */
     private void createWatch(final Path configPath) {
         requireNonNull(configPath, "configPath");
-        //set up a thread to watch this
-        final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
-        //ensure thread is daemon
-        ThreadFactory daemonise = runnable -> {
-            Thread t = defaultFactory.newThread(runnable);
-            t.setDaemon(true);
-            return t;
-        };
+        ThreadFactory daemonise = Util.createDaemonThreadFactory();
         ExecutorService singleThread = Executors.newSingleThreadExecutor(daemonise);
         singleThread.submit(new WatchFile(this, configPath));
     }
-
 
     /**
      * The file path to where this backing store is storing the cache.
@@ -321,7 +315,7 @@ public class PropertiesBackingStore implements BackingStore {
         //error checks
         String cacheKey = BackingStore.validateAddParameters(key, valueClass, value, timeToLive);
         LOGGER.debug("Adding cache key {} of {}", cacheKey, valueClass);
-        //this isn't meant to be thread safe, but we can at least make the cache add atomic
+        //we can at least make the cache add atomic
         synchronized (this) {
             props.setProperty(cacheKey, B64_ENCODER.encodeToString(value));
             props.setProperty(makeClassKey(cacheKey), valueClass.getTypeName());
@@ -352,6 +346,7 @@ public class PropertiesBackingStore implements BackingStore {
                 try {
                     byte[] value = B64_DECODER.decode(b64Value);
                     Class<?> valueClass = Class.forName(props.getProperty(makeClassKey(cacheKey)));
+
                     return new SimpleCacheObject(valueClass, Optional.of(value));
                 } catch (Exception e) {
                     LOGGER.warn("Couldn't retrieve key {}", key, e);
@@ -361,6 +356,22 @@ public class PropertiesBackingStore implements BackingStore {
                 //key not found
                 return new SimpleCacheObject(Object.class, Optional.empty());
             }
+        }
+    }
+
+    @Override
+    public boolean remove(final String key) {
+        String cacheKey = BackingStore.keyCheck(key);
+        //perform first check to ensure we don't return true on a value that should have expired
+        update(false);
+        synchronized (this) {
+            boolean present = props.containsKey(cacheKey);
+            if (present) {
+                removeKey(cacheKey);
+                update(true);
+            }
+            LOGGER.debug("Cache key remove of {} possible {}", cacheKey, present);
+            return present;
         }
     }
 

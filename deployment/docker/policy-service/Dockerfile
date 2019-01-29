@@ -1,4 +1,4 @@
-From tomcat:8.0-jre8-alpine
+From tomcat:8-jre11 as policy-service
 
 ADD bin/rest-policy-service /usr/local/tomcat/webapps/policy/
 ADD bin/configRest.json /usr/local/tomcat/webapps/policy/WEB-INF/

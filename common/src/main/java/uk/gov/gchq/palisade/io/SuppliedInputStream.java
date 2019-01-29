@@ -16,13 +16,12 @@
 
 package uk.gov.gchq.palisade.io;
 
-import org.apache.commons.lang3.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 import static java.util.Objects.isNull;
@@ -85,7 +84,7 @@ public class SuppliedInputStream extends InputStream {
             if (end) {
                 LOGGER.debug("Reached the end of the buffer");
             } else {
-                LOGGER.debug("Loaded {} bytes {}", bytesCount, new String(bytes, 0, bytesCount, Charset.forName(CharEncoding.UTF_8)));
+                LOGGER.debug("Loaded {} bytes {}", bytesCount, new String(bytes, 0, bytesCount, StandardCharsets.UTF_8));
             }
         }
     }

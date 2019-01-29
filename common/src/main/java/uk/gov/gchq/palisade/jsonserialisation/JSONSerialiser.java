@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -80,10 +81,6 @@ public class JSONSerialiser {
 
     public static final String STRICT_JSON = "palisade.serialiser.json.strict";
     public static final boolean STRICT_JSON_DEFAULT = true;
-    /**
-     * Charset for serialising data.
-     */
-    public static final Charset UTF8 = Charset.forName("UTF-8");
     private static final String STRICT_JSON_DEFAULT_STR = Boolean.toString(STRICT_JSON_DEFAULT);
 
     public static final String FILTER_FIELDS_BY_NAME = "filterFieldsByName";
@@ -169,8 +166,9 @@ public class JSONSerialiser {
         final String jsonSerialiserClass = System.getProperty(JSON_SERIALISER_CLASS_KEY, DEFAULT_SERIALISER_CLASS_NAME);
         final JSONSerialiser newInstance;
         try {
-            newInstance = Class.forName(jsonSerialiserClass).asSubclass(JSONSerialiser.class).newInstance();
-        } catch (final InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            newInstance = Class.forName(jsonSerialiserClass).asSubclass(JSONSerialiser.class).getDeclaredConstructor().newInstance();
+        } catch (final InstantiationException | IllegalAccessException | InvocationTargetException
+                | NoSuchMethodException | ClassNotFoundException e) {
             throw new IllegalArgumentException("Property " + JSON_SERIALISER_CLASS_KEY + " must be set to a class that is a sub class of " + JSONSerialiser.class.getName() + ". This class is not valid: " + jsonSerialiserClass, e);
         }
 
@@ -180,8 +178,9 @@ public class JSONSerialiser {
         for (final String factoryClass : factoryClasses) {
             final JSONSerialiserModules factory;
             try {
-                factory = Class.forName(factoryClass).asSubclass(JSONSerialiserModules.class).newInstance();
-            } catch (final InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                factory = Class.forName(factoryClass).asSubclass(JSONSerialiserModules.class).getDeclaredConstructor().newInstance();
+            } catch (final InstantiationException | IllegalAccessException | InvocationTargetException
+                    | NoSuchMethodException | ClassNotFoundException e) {
                 throw new IllegalArgumentException("Property " + JSON_SERIALISER_MODULES + " must be set to a csv of classes that are a sub class of " + JSONSerialiserModules.class.getName() + ". These classes are not valid: " + factoryClass, e);
             }
             final List<Module> modules = factory.getModules();
@@ -211,6 +210,8 @@ public class JSONSerialiser {
 
         // Add JDK8 module for Optional
         mapper.registerModule(new Jdk8Module());
+        // Add JDK8 Time module
+        mapper.registerModule(new JavaTimeModule());
 
         mapper.registerModule(ResourceKeySerialiser.getModule());
 

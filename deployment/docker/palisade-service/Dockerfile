@@ -1,4 +1,4 @@
-From tomcat:8.0-jre8-alpine as palisade-service
+From tomcat:8-jre11 as palisade-service
 
 ADD bin/rest-palisade-service /usr/local/tomcat/webapps/palisade
 ADD bin/configRest.json /usr/local/tomcat/webapps/palisade/WEB-INF/

@@ -1,4 +1,4 @@
-From tomcat:8.0-jre8-alpine
+From tomcat:8-jre11 as user-service
 
 ADD docker/bin/rest-user-service /usr/local/tomcat/webapps/user/
 ADD docker/setenv.sh /usr/local/tomcat/bin/

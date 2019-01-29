@@ -17,8 +17,6 @@ services:
        context: data-service
        dockerfile: ../../../deployment/docker/data-service/Dockerfile
      container_name: data-service
-     ports:
-        - 8084:8080
      depends_on:
         - stage-build
    config-service:
@@ -26,8 +24,6 @@ services:
           context: config-service
           dockerfile: ../../../deployment/docker/config-service/Dockerfile
         container_name: config-service
-        ports:
-           - 8085:8080
         depends_on:
            - stage-build
    user-service:
@@ -35,8 +31,6 @@ services:
        context: user-service
        dockerfile: ../../../deployment/docker/user-service/Dockerfile
      container_name: user-service
-     ports:
-        - 8083:8080
      depends_on:
         - stage-build
    resource-service:
@@ -44,8 +38,6 @@ services:
        context: resource-service
        dockerfile: ../../../deployment/docker/resource-service/Dockerfile
      container_name: resource-service
-     ports:
-        - 8082:8080
      depends_on:
         - stage-build
    policy-service:
@@ -53,8 +45,6 @@ services:
        context: policy-service
        dockerfile: ../../../deployment/docker/policy-service/Dockerfile
      container_name: policy-service
-     ports:
-        - 8081:8080
      depends_on:
         - stage-build
    palisade-service:
@@ -62,8 +52,6 @@ services:
        context: palisade-service
        dockerfile: ../../../deployment/docker/palisade-service/Dockerfile
      container_name: palisade-service
-     ports:
-        - 8080:8080
      depends_on:
         - stage-build
         - policy-service

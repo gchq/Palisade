@@ -150,7 +150,7 @@ public final class Error {
         }
 
         try {
-            return exceptionClass.newInstance();
+            return exceptionClass.getDeclaredConstructor().newInstance();
         } catch (final Exception e) {
             // ignore
         }

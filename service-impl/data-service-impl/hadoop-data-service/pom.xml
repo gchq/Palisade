@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
@@ -98,6 +99,10 @@
                     <groupId>io.netty</groupId>
                     <artifactId>netty</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.github.stephenc.jcip</groupId>
+                    <artifactId>jcip-annotations</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -144,6 +149,10 @@
                 <exclusion>
                     <groupId>io.netty</groupId>
                     <artifactId>netty</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.stephenc.jcip</groupId>
+                    <artifactId>jcip-annotations</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -214,7 +223,8 @@
                                 <configuration>
                                     <sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
                                     <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
-                                    <testSourceDirectory>${project.basedir}/src/test/resources/avro</testSourceDirectory>
+                                    <testSourceDirectory>${project.basedir}/src/test/resources/avro
+                                    </testSourceDirectory>
                                     <testOutputDirectory>${project.basedir}/src/test/java</testOutputDirectory>
                                 </configuration>
                             </execution>
