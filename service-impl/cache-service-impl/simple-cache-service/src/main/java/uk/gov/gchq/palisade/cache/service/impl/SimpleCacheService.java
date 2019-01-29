@@ -109,7 +109,7 @@ public class SimpleCacheService implements CacheService {
         //extract cache
         String serialised = config.getOrDefault(STORE_IMPL_KEY, null);
         if (nonNull(serialised)) {
-            store = JSONSerialiser.deserialise(serialised.getBytes(StandardCharsets.UTF_8), BackingStore.class);
+            setBackingStore(JSONSerialiser.deserialise(serialised.getBytes(StandardCharsets.UTF_8), BackingStore.class));
         } else {
             throw new NoConfigException("no backing store specified in configuration");
         }

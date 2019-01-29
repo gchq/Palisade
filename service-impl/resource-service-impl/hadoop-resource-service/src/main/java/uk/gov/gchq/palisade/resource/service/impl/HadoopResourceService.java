@@ -183,17 +183,15 @@ public class HadoopResourceService implements ResourceService {
             confMap = JSONSerialiser.deserialise(serialisedConfig.getBytes(StandardCharsets.UTF_8), Map.class);
         }
         //make this into a config, confMap may be null at this point
-        Configuration newConf = createConfig(confMap);
-        this.conf = newConf;
         try {
-            this.fileSystem = FileSystem.get(this.conf);
+            setConf(confMap);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         //extract cache
         String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
         if (nonNull(serialisedCache)) {
-            cacheService = JSONSerialiser.deserialise(serialisedCache.getBytes(StandardCharsets.UTF_8), CacheService.class);
+            setCacheService(JSONSerialiser.deserialise(serialisedCache.getBytes(StandardCharsets.UTF_8), CacheService.class));
         } else {
             throw new NoConfigException("no cache service specified in configuration");
         }

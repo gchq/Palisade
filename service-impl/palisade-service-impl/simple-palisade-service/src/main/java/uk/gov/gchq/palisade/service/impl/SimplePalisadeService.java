@@ -85,11 +85,11 @@ public class SimplePalisadeService implements PalisadeService {
     @Override
     public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
         requireNonNull(config, "config");
-        auditService = getFromConfig(config, AUDIT_IMPL_KEY, AuditService.class);
-        policyService = getFromConfig(config, POLICY_IMPL_KEY, PolicyService.class);
-        userService = getFromConfig(config, USER_IMPL_KEY, UserService.class);
-        resourceService = getFromConfig(config, RESOURCE_IMPL_KEY, ResourceService.class);
-        cacheService = getFromConfig(config, CACHE_IMPL_KEY, CacheService.class);
+        setAuditService(getFromConfig(config, AUDIT_IMPL_KEY, AuditService.class));
+        setPolicyService(getFromConfig(config, POLICY_IMPL_KEY, PolicyService.class));
+        setUserService(getFromConfig(config, USER_IMPL_KEY, UserService.class));
+        setResourceService(getFromConfig(config, RESOURCE_IMPL_KEY, ResourceService.class));
+        setCacheService(getFromConfig(config, CACHE_IMPL_KEY, CacheService.class));
     }
 
     /**
