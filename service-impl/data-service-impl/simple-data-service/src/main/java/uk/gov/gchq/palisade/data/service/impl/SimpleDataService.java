@@ -122,13 +122,13 @@ public class SimpleDataService implements DataService {
         requireNonNull(config, "config");
         String serialisedPalisade = config.getOrDefault(PALISADE_IMPL_KEY, null);
         if (nonNull(serialisedPalisade)) {
-            palisadeService = JSONSerialiser.deserialise(serialisedPalisade.getBytes(StandardCharsets.UTF_8), PalisadeService.class);
+            setPalisadeService(JSONSerialiser.deserialise(serialisedPalisade.getBytes(StandardCharsets.UTF_8), PalisadeService.class));
         } else {
             throw new NoConfigException("no service specified in configuration");
         }
         String serialisedReader = config.getOrDefault(READER_IMPL_KEY, null);
         if (nonNull(serialisedReader)) {
-            reader = JSONSerialiser.deserialise(serialisedReader.getBytes(StandardCharsets.UTF_8), DataReader.class);
+            setReader(JSONSerialiser.deserialise(serialisedReader.getBytes(StandardCharsets.UTF_8), DataReader.class));
         } else {
             throw new NoConfigException("no service specified in configuration");
         }
