@@ -60,7 +60,7 @@ public class RestConfigServiceV1IT {
     public static void beforeClass() throws IOException {
         //start the server
         System.setProperty(RestConfigServiceV1.BOOTSTRAP_CONFIG, "mockBootstrapConfig.json");
-        proxy = new ProxyRestConfigService("http://localhost:8085/config");
+        proxy = (ProxyRestConfigService) new ProxyRestConfigService("http://localhost:8085/config").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
