@@ -148,9 +148,9 @@ public class RedirectionMarshall<T> {
      * the proxy and the retrieval of the redirection. This method calls the redirector object and passes in the method
      * and parameters to be redirected. It then stores the result in a thread local object for later retrieval.
      *
-     * @param proxy  ignored, the proxy instance
+     * @param proxy  the proxy instance that intercepted this request, specified by {@link java.lang.reflect.InvocationHandler}
      * @param method the actual method to be redirected
-     * @param args   the method argumentse
+     * @param args   the method arguments
      * @return a dummy object
      * @throws Throwable to comply with interface
      */

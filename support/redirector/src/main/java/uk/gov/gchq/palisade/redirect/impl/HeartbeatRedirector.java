@@ -26,7 +26,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * A base redirector class that can be used to implement other redirectors.
  */
-public abstract class DefaultRedirector<T> implements Redirector<T> {
+public abstract class HeartbeatRedirector<T> implements Redirector<T> {
 
     /**
      * The cache service to use for heartbeats.
@@ -46,7 +46,7 @@ public abstract class DefaultRedirector<T> implements Redirector<T> {
     /**
      * Constructor for empty instance.
      */
-    public DefaultRedirector() {
+    public HeartbeatRedirector() {
         scope = new Stethoscope();
     }
 
@@ -56,7 +56,7 @@ public abstract class DefaultRedirector<T> implements Redirector<T> {
      * @param cacheService the cache service
      * @return this object
      */
-    public DefaultRedirector cacheService(final CacheService cacheService) {
+    public HeartbeatRedirector cacheService(final CacheService cacheService) {
         requireNonNull(cacheService, "cacheService");
         this.cache = cacheService;
         scope.cacheService(cache);
@@ -88,7 +88,7 @@ public abstract class DefaultRedirector<T> implements Redirector<T> {
      * @param redirectClass the type of redirection service
      * @return this object
      */
-    public DefaultRedirector redirectionClass(final Class<? extends Service> redirectClass) {
+    public HeartbeatRedirector redirectionClass(final Class<? extends Service> redirectClass) {
         requireNonNull(redirectClass, "redirectClass");
         this.redirectClass = redirectClass;
         scope.serviceClass(redirectClass);
