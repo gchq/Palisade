@@ -85,8 +85,7 @@ public final class DistributedServicesConfigurator extends ServicesConfigurator 
         if (args.length > 1) {
             List<String> etcdEndpoints = Arrays.asList(args[0].split(","));
             return new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(etcdEndpoints));
-        }
-        else {
+        } else {
             LOGGER.error("Failed to create the Configuration for the cache service due to missing the 1st argument, " +
                     "which should be a comma separated list of etcd client endpoints");
             return null;

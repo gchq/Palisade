@@ -325,7 +325,7 @@ public class ServicesConfigurator {
             Configuration conf = createHadoopConfiguration();
             HadoopDataReader reader = new HadoopDataReader().conf(conf);
             reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
-            return new SimpleDataService().reader(reader).palisadeService(createPalisadeServiceForClients(new String[0]));
+            return new SimpleDataService().reader(reader).palisadeService(createPalisadeServiceForClients(args));
         } catch (final IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
             return null;

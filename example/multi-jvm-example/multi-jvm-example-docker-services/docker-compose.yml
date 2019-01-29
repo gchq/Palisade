@@ -21,6 +21,11 @@ services:
         - http://0.0.0.0:2380
         - -initial-cluster
         - etcd=http://etcd:2380
+   config-service:
+      build: config-service
+      container_name: config-service
+   configure-services:
+      build: configure-services
    data-service:
       build: data-service
       container_name: data-service
@@ -40,6 +45,4 @@ services:
    palisade-service:
       build: palisade-service
       container_name: palisade-service
-   config-service:
-      build: config-service
-      container_name: config-service
+

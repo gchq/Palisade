@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.example.config.DistributedServicesConfigurator;
 import uk.gov.gchq.palisade.rest.RestUtil;
 
 import java.io.File;
@@ -39,7 +38,7 @@ public class MultiJVMDockerExample {
 
     public void run() throws Exception {
         //this will write an initial configuration
-        DistributedServicesConfigurator.main(new String[]{"http://etcd:2379", "http://localhost:8080/palisade", "http://localhost:8081/policy", "http://localhost:8082/resource", "http://localhost:8083/user", "http://localhost:8084/data", "http://localhost:8085/config"});
+//        DistributedServicesConfigurator.main(new String[]{"http://etcd:2379", "http://palisade-service:8080/palisade", "http://policy-service:8080/policy", "http://resource-service:8080/resource", "http://user-service:8080/user", "http://data-service:8080/data", "http://config-service:8080/config"});
         ConfigurationService configService = RestUtil.createService(ExampleSimpleClient.class, "configRest.json", ConfigurationService.class);
         final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
