@@ -44,7 +44,7 @@ public class RestUserServiceV1IT {
     @BeforeClass
     public static void beforeClass() throws IOException {
         RestUserServiceV1.setDefaultDelegate(new MockUserService());
-        proxy = new ProxyRestUserService("http://localhost:8083/user");
+        proxy = (ProxyRestUserService) new ProxyRestUserService("http://localhost:8083/user").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }

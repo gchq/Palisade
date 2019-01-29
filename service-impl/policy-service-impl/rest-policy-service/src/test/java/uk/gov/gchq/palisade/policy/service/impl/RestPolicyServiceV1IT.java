@@ -63,7 +63,7 @@ public class RestPolicyServiceV1IT {
     @BeforeClass
     public static void beforeClass() throws IOException {
         RestPolicyServiceV1.setDefaultDelegate(new MockPolicyService());
-        proxy = new ProxyRestPolicyService("http://localhost:8081/policy");
+        proxy = (ProxyRestPolicyService) new ProxyRestPolicyService("http://localhost:8081/policy").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
