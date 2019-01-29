@@ -59,6 +59,9 @@ import static java.util.Objects.requireNonNull;
  *
  *          ...
  *
+ *          //optionally, we can set a host that originated the request for the next request
+ *          marshall.host("localhost");
+ *
  *          //to redirect a void method, we use a slightly different syntax:
  *          StringRedirectionResult result = marshall.redirect(() -> fake.someVoidMethod(5));
  *          ...
@@ -80,6 +83,12 @@ public class RedirectionMarshall<T> {
      * a {@link ThreadLocal} to protect against clashes.
      */
     private final ThreadLocal<RedirectionResult<T>> recentRedirect = new ThreadLocal<>();
+
+    /**
+     * Stores the hostname/address for the client making the call. This may be optionally set and can be used as a hint
+     * by redirectors when routing a request.
+     */
+    private final ThreadLocal<String> recentHost = new ThreadLocal<>();
 
     /**
      * Create a marshall.
@@ -123,6 +132,7 @@ public class RedirectionMarshall<T> {
             return result.get();
         } finally {
             recentRedirect.remove();
+            recentHost.remove();
         }
     }
 
@@ -144,6 +154,24 @@ public class RedirectionMarshall<T> {
     }
 
     /**
+     * Set the originating host for the incoming request. This is an optional operation and can be used by redirectors
+     * as a hint for redirecting. The host field is cleared when {@link RedirectionMarshall#redirect(Object)} (or a variant)
+     * is called.
+     *
+     * @param host the hostname/address that originated the request
+     * @return this object
+     * @throws IllegalArgumentException if {@code host} is {@code null} or empty
+     */
+    public RedirectionMarshall<T> host(final String host) {
+        requireNonNull(host, "host");
+        if (host.trim().isEmpty()) {
+            throw new IllegalArgumentException("host cannot be empty");
+        }
+        recentHost.set(host);
+        return this;
+    }
+
+    /**
      * The {@link java.lang.reflect.InvocationHandler} for all proxy instances. This method provides the "glue" between
      * the proxy and the retrieval of the redirection. This method calls the redirector object and passes in the method
      * and parameters to be redirected. It then stores the result in a thread local object for later retrieval.
@@ -156,7 +184,7 @@ public class RedirectionMarshall<T> {
      */
     private Object delegateRedirection(final Object proxy, final Method method, final Object... args) throws Throwable {
         //work out where to send this request
-        RedirectionResult<T> result = redirector.redirectionFor(method, args);
+        RedirectionResult<T> result = redirector.redirectionFor(recentHost.get(), method, args);
         //stash this result
         recentRedirect.set(result);
         //Don't care about the actual method result

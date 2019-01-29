@@ -21,9 +21,9 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import uk.gov.gchq.palisade.redirect.exception.NoInstanceException;
 import uk.gov.gchq.palisade.redirect.exception.RedirectionFailedException;
-import uk.gov.gchq.palisade.resource.impl.FileResource;
 
 import java.lang.reflect.Method;
 
@@ -41,6 +41,7 @@ import java.lang.reflect.Method;
         property = "class"
 )
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@FunctionalInterface
 public interface Redirector<T> {
 
     /**
@@ -48,6 +49,7 @@ public interface Redirector<T> {
      * any Palisade service, then it carries both a reference to the original method called as well all the
      * accompanying arguments.
      *
+     * @param host   the host name that originated this request (IF KNOWN: this parameter may be {@code null})
      * @param method the API method that was called originally by the client
      * @param args   the arguments to that request
      * @return a redirection result
@@ -57,7 +59,7 @@ public interface Redirector<T> {
      * must be safe for use in this way. Ideally, it should be stateless, idempotent with zero side-effects. Otherwise, it must
      * employ internal synchronization mechanisms to allow thread-safe access.
      */
-    RedirectionResult<T> redirectionFor(final Method method, final Object... args) throws NoInstanceException, RedirectionFailedException;
+    RedirectionResult<T> redirectionFor(final String host, final Method method, final Object... args) throws NoInstanceException, RedirectionFailedException;
 
     @JsonGetter("class")
     default String _getClass() {

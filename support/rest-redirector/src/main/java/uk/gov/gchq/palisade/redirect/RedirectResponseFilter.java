@@ -19,12 +19,20 @@ package uk.gov.gchq.palisade.redirect;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import java.io.IOException;
 
+@Provider
 public class RedirectResponseFilter implements ContainerResponseFilter {
     @Override
-    public void filter(final ContainerRequestContext containerRequestContext, final ContainerResponseContext containerResponseContext) throws IOException {
-
+    public void filter(final ContainerRequestContext cr1, final ContainerResponseContext cr2) throws IOException {
+        /*the proxied response of null or similar will probably have caused an JSON encoding error in the processing chain
+        so we can remove the response body
+         */
+        cr2.setStatusInfo(Response.Status.TEMPORARY_REDIRECT);
+        cr2.setEntity(null);
     }
 }

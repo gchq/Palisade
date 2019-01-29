@@ -90,6 +90,24 @@
             <version>${jersey.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>uk.gov.gchq.palisade</groupId>
+            <artifactId>proxy-rest-config-service</artifactId>
+            <version>0.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.gov.gchq.palisade</groupId>
+            <artifactId>multi-jvm-example-rest-config-service</artifactId>
+            <version>0.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>uk.gov.gchq.palisade</groupId>
+            <artifactId>rest-config-service</artifactId>
+            <version>0.2.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>

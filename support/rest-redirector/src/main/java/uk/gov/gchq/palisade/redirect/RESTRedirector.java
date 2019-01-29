@@ -45,9 +45,9 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
 
     private Class<? extends Service> redirectionClass;
 
-    private Redirector<URL> redirector;
+    private Redirector<String> redirector;
 
-    private final RedirectionMarshall<URL> marshall;
+    private final RedirectionMarshall<String> marshall;
 
     public RESTRedirector() {
         this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
@@ -80,11 +80,11 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
             throw new RuntimeException("can't find constructor (Service) for " + restImplementationClass.getTypeName(), e);
         }
         //create the response filter to handle the redirect
-
-        //TODO: make the response filter that will catch the errors and send a 307
+        RedirectResponseFilter foc=new RedirectResponseFilter();
+        register(foc);
     }
 
-    RESTRedirector(Class<? extends Service> restImplementationClass, Class<? extends Service> redirectionClass, Redirector<URL> redirector) {
+    RESTRedirector(Class<? extends Service> restImplementationClass, Class<? extends Service> redirectionClass, Redirector<String> redirector) {
         this.restImplementationClass = restImplementationClass;
         this.redirectionClass = redirectionClass;
         this.redirector = redirector;
@@ -128,17 +128,17 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
         config.put(REST_IMPL_CLASS_KEY, restImplementationClass.getTypeName());
     }
 
-    public RESTRedirector redirector(final Redirector<URL> redirector) {
+    public RESTRedirector redirector(final Redirector<String> redirector) {
         requireNonNull(redirector, "redirector");
         this.redirector = redirector;
         return this;
     }
 
-    public void setRedirector(final Redirector<URL> redirector) {
+    public void setRedirector(final Redirector<String> redirector) {
         redirector(redirector);
     }
 
-    public Redirector<URL> getRedirector() {
+    public Redirector<String> getRedirector() {
         requireNonNull(redirector, "redirector must be set to non null");
         return redirector;
     }
