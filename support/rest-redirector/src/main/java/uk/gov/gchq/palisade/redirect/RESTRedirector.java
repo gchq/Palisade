@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.redirect;
 
+import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +28,22 @@ import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
+@Provider
 public class RESTRedirector extends AbstractApplicationConfigV1 implements Service {
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTRedirector.class);
 
@@ -60,6 +70,14 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
         configureRedirection();
     }
 
+    RESTRedirector(Class<? extends Service> restImplementationClass, Class<? extends Service> redirectionClass, Redirector<String> redirector) {
+        this.restImplementationClass = restImplementationClass;
+        this.redirectionClass = redirectionClass;
+        this.redirector = redirector;
+        this.marshall = new RedirectionMarshall<>(getRedirector());
+        configureRedirection();
+    }
+
     private void selfConfigure(final String serviceConfigPath) {
         ServiceConfiguration conf = RestUtil.retrieveConfig(RESTRedirector.class, serviceConfigPath, RESTRedirector.class);
         ServiceConfiguration overridden = Configurator.applyOverrides(conf, REDIRECTOR_KEY, REDIRECTION_CLASS_KEY);
@@ -76,20 +94,38 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
             Service restImpl = getRestImplementationClass().getConstructor(getRedirectionClass()).newInstance(service);
             //register that with javax.ws.rs API
             register(restImpl);
+            register(Fee.class);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException("can't find constructor (Service) for " + restImplementationClass.getTypeName(), e);
         }
-        //create the response filter to handle the redirect
-        RedirectResponseFilter foc=new RedirectResponseFilter();
-        register(foc);
+        //register ourselves as a filtering provider
     }
 
-    RESTRedirector(Class<? extends Service> restImplementationClass, Class<? extends Service> redirectionClass, Redirector<String> redirector) {
-        this.restImplementationClass = restImplementationClass;
-        this.redirectionClass = redirectionClass;
-        this.redirector = redirector;
-        this.marshall = new RedirectionMarshall<>(getRedirector());
-        configureRedirection();
+    @Provider
+    public static class Fee implements DynamicFeature {
+
+        @Override
+        public void configure(ResourceInfo resourceInfo, FeatureContext featureContext) {
+            System.err.println("configure");
+            featureContext.register(Foo.class);
+        }
+    }
+
+    @Provider
+    public static class Foo implements ContainerRequestFilter, ContainerResponseFilter {
+
+
+        @Override
+        public void filter(ContainerRequestContext request) throws IOException {
+            //called before a request is made
+            System.err.println("incoming");
+        }
+
+        @Override
+        public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
+            System.err.println("outgoing request");
+        }
+
     }
 
     @Override
