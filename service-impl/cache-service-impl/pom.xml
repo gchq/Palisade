@@ -29,7 +29,6 @@
         <module>simple-cache-service</module>
         <module>hashmap-backing-store</module>
         <module>properties-backing-store</module>
-        <module>jetcd-launcher</module>
         <module>etcd-backing-store</module>
     </modules>
 
