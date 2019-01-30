@@ -95,7 +95,7 @@ public class HierarchicalPolicyService implements PolicyService {
         //extract cache
         String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
         if (nonNull(serialisedCache)) {
-            cacheService = JSONSerialiser.deserialise(serialisedCache.getBytes(StandardCharsets.UTF_8), CacheService.class);
+            setCacheService(JSONSerialiser.deserialise(serialisedCache.getBytes(StandardCharsets.UTF_8), CacheService.class));
         } else {
             throw new NoConfigException("no cache service specified in configuration");
         }
