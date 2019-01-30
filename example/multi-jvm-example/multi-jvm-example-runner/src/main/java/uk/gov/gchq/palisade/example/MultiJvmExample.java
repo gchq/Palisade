@@ -38,7 +38,6 @@ import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
@@ -63,10 +62,7 @@ public class MultiJvmExample {
         try {
             etcd = new EtcdClusterResource("test-etcd", 1);
             etcd.cluster().start();
-            List<String> etcdEndpointURLs = etcd.cluster().getClientEndpoints()
-                    .stream()
-                    .map(URI::toString)
-                    .collect(Collectors.toList());
+            List<URI> etcdEndpointURLs = etcd.cluster().getClientEndpoints();
             store = new EtcdBackingStore().connectionDetails(etcdEndpointURLs);
             //this will write an initial configuration
             final ConfigurationService configService = new ProxyRestConfigService("http://localhost:8085/config");

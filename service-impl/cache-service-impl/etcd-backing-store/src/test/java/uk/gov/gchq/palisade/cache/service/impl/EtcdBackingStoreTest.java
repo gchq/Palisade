@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 public class EtcdBackingStoreTest extends AbstractBackingStoreTest {
 
     private static EtcdClusterResource etcd;
-    private static List<String> clientEndpoints;
+    private static List<URI> clientEndpoints;
     private EtcdBackingStore etcdBackingStore;
 
     @BeforeClass
@@ -41,8 +41,7 @@ public class EtcdBackingStoreTest extends AbstractBackingStoreTest {
         // tests require docker to be installed
         etcd = new EtcdClusterResource("test-etcd", 1);
         etcd.cluster().start();
-        List<URI> clientEndpointURIs = etcd.cluster().getClientEndpoints();
-        clientEndpoints = clientEndpointURIs.stream().map(URI::toString).collect(Collectors.toList());
+        clientEndpoints = etcd.cluster().getClientEndpoints();
     }
 
     @Override
