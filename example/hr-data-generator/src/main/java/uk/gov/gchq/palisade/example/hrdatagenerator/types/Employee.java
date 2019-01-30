@@ -20,6 +20,7 @@ import org.ajbrown.namemachine.Name;
 import org.ajbrown.namemachine.NameGenerator;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.example.hrdatagenerator.utils.DateHelper;
 
 import java.util.Random;
@@ -27,7 +28,7 @@ import java.util.Random;
 public class Employee {
     private static final NameGenerator NAME_GENERATOR = new NameGenerator();
 
-    private int uid;
+    private UserId uid;
     private Name name;
     private String dateOfBirth;
     private PhoneNumber[] contactNumbers;
@@ -53,19 +54,19 @@ public class Employee {
         return employee;
     }
 
-    private static int generateUID(final Random random) {
-        return random.nextInt();
+    public static UserId generateUID(final Random random) {
+        return new UserId().id(String.valueOf(random.nextInt(Integer.MAX_VALUE)));
     }
 
     private static String generateTaxCode() {
         return "11500L";
     }
 
-    public int getUid() {
+    public UserId getUid() {
         return uid;
     }
 
-    public void setUid(final int uid) {
+    public void setUid(final UserId uid) {
         this.uid = uid;
     }
 

@@ -47,14 +47,10 @@ public class Manager {
 
     public static Manager generate(final Random random, final String managerType) {
         Manager manager = new Manager();
-        manager.setUid(generateUID(random));
+        manager.setUid(Employee.generateUID(random));
         manager.setManagerType(managerType);
 
         return manager;
-    }
-
-    private static UserId generateUID(final Random random) {
-        return new UserId().id(String.valueOf(random.nextInt()));
     }
 
     public String getManagerType() {

@@ -33,12 +33,12 @@ public class DutyOfCareRule implements Rule<Employee> {
     }
 
     private Boolean isManager(Manager[] managers, UserId userId) {
-        if (managers.equals(null)) {
+        if (managers == null) {
             return false;
         }
 
         for (Manager manager:managers) {
-            if (manager.getUid() == userId) {
+            if (manager.getUid().equals(userId)) {
                 return true;
             }
         }
@@ -71,7 +71,7 @@ public class DutyOfCareRule implements Rule<Employee> {
 
         if (roles.contains("HR") & purpose.equals("Duty of Care")) {
             return record;
-        } else if (isManager(managers, userId) == Boolean.TRUE) {
+        } else if (isManager(managers, userId).equals(Boolean.TRUE)) {
             return record;
         } else {
             return redactRecord(record);
