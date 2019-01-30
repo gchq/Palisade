@@ -21,6 +21,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,6 +52,6 @@ public class SimpleStringSerialiserTest {
         final InputStream result = serialiser.serialise(input);
 
         // Then
-        assertEquals(Arrays.asList("line1", "line2"), IOUtils.readLines(result));
+        assertEquals(Arrays.asList("line1", "line2"), IOUtils.readLines(result, StandardCharsets.UTF_8));
     }
 }

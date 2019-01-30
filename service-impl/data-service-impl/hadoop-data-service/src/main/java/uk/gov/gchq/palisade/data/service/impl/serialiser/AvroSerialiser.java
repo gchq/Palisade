@@ -25,7 +25,6 @@ import org.apache.avro.io.DatumWriter;
 import org.apache.avro.reflect.ReflectData;
 import org.apache.avro.reflect.ReflectDatumReader;
 import org.apache.avro.reflect.ReflectDatumWriter;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +40,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -71,13 +71,10 @@ public class AvroSerialiser<O> implements Serialiser<O> {
 
     @Override
     public Stream<O> deserialise(final InputStream input) {
-        DataFileStream<O> in = null;
-        try {
-            in = new DataFileStream<>(input, new ReflectDatumReader<>(domainClass));
+        try (DataFileStream<O> in = new DataFileStream<>(input, new ReflectDatumReader<>(domainClass))) {
             return StreamSupport.stream(in.spliterator(), false);
         } catch (final Exception e) {
             LOGGER.debug("Closing streams");
-            IOUtils.closeQuietly(in);
             throw new RuntimeException("Unable to deserialise object, failed to read input bytes", e);
         }
     }
@@ -135,7 +132,13 @@ public class AvroSerialiser<O> implements Serialiser<O> {
 
         private <T> T onError(final Closeable closeable, final String errorMsg, final Exception e) {
             LOGGER.debug("Closing streams");
-            IOUtils.closeQuietly(closeable);
+            if (nonNull(closeable)) {
+                try {
+                    closeable.close();
+                } catch (Exception ignored) {
+
+                }
+            }
             throw new RuntimeException(errorMsg, e);
         }
     }

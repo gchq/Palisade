@@ -23,6 +23,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.exception.Error;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.exception.PalisadeRuntimeException;
@@ -41,6 +42,7 @@ import javax.ws.rs.core.Response.Status.Family;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 
@@ -51,8 +53,15 @@ public abstract class ProxyRestService implements Service {
     public static final String VERSION = "v1";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyRestService.class);
     private static final String URL_CONF_KEY_SUFFIX = ".proxy.rest.url";
+    private static final String NUM_RETRIES_KEY = ".proxy.retry.max";
+    private static final String RETRY_WAIT_TIME_KEY = ".proxy.retry.pause";
+    private static final Duration DEFAULT_RETRY_TIME = Duration.ofSeconds(5);
+    private static final Duration MINIMUM_RETRY_TIME = Duration.ofSeconds(1);
+    private static final int DEFAULT_RETRY_COUNT = 3;
     private String baseUrl;
     private String baseUrlWithVersion;
+    private Duration retryPauseTime = DEFAULT_RETRY_TIME;
+    private int retryMax = DEFAULT_RETRY_COUNT;
     private Client client;
 
     public ProxyRestService() {
@@ -92,12 +101,97 @@ public abstract class ProxyRestService implements Service {
         return baseUrlWithVersion;
     }
 
+    /**
+     * Set the number of attempts this service will make to contact the REST service.
+     *
+     * @param retryMax the maximum number of attempts
+     * @return this object
+     * @throws IllegalArgumentException if {@code retryMax} is less than 1
+     */
+    public ProxyRestService retryMax(final int retryMax) {
+        if (retryMax < 1) {
+            throw new IllegalArgumentException("retryMax must be >=1");
+        }
+        this.retryMax = retryMax;
+        return this;
+    }
+
+    /**
+     * Set the number of attempts this service will make to contact the REST service.
+     *
+     * @param retryMax the maximum number of attempts
+     * @throws IllegalArgumentException if {@code retryMax} is less than 1
+     */
+    public void setRetryMax(final int retryMax) {
+        retryMax(retryMax);
+    }
+
+    /**
+     * Get the maximum number of connection retry attempts.
+     *
+     * @return the maximum number of attempts
+     */
+    public int getRetryMax() {
+        return retryMax;
+    }
+
+    /**
+     * Set the time to wait between retrying connection attempts.
+     *
+     * @param retryPauseTime the time between attempts
+     * @return this object
+     * @throws IllegalArgumentException if the pause time is less than {@link ProxyRestService#MINIMUM_RETRY_TIME}
+     */
+    public ProxyRestService retryPauseTime(final Duration retryPauseTime) {
+        requireNonNull(retryPauseTime, "retryPauseTime");
+        checkPauseTime(retryPauseTime);
+        this.retryPauseTime = retryPauseTime;
+        return this;
+    }
+
+    /**
+     * Checks the given duration meets minimum requirements.
+     *
+     * @param pauseTime the candidateTime
+     * @throws IllegalArgumentException if  {@code pauseTime } is negative or less than the {@link ProxyRestService#MINIMUM_RETRY_TIME}
+     */
+    private static void checkPauseTime(final Duration pauseTime) {
+        if (pauseTime.isNegative() || MINIMUM_RETRY_TIME.compareTo(pauseTime) > 0) {
+            throw new IllegalArgumentException("retryPauseTime must be at least " + MINIMUM_RETRY_TIME.toMillis() + " ms");
+        }
+    }
+
+    /**
+     * Set the time to wait between retrying connection attempts.
+     *
+     * @param retryPauseTime the time between attempts
+     * @throws IllegalArgumentException if the pause time is less than {@link ProxyRestService#MINIMUM_RETRY_TIME}
+     */
+    public void setRetryPauseTime(final Duration retryPauseTime) {
+        retryPauseTime(retryPauseTime);
+    }
+
+    /**
+     * Get the delay between attempts.
+     *
+     * @return the wait time
+     */
+    public Duration getRetryPauseTime() {
+        return retryPauseTime;
+    }
+
     @Override
     public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
         requireNonNull(config, "config");
         try {
             String base = config.get(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX);
             baseUrl(base);
+
+            Duration retryPause = Duration.parse(config.get(this.getClass().getTypeName() + RETRY_WAIT_TIME_KEY));
+            retryPauseTime(retryPause);
+
+            int retryMaxCount = Integer.parseInt(config.get(this.getClass().getTypeName() + NUM_RETRIES_KEY));
+            retryMax(retryMaxCount);
         } catch (NoSuchElementException e) {
             throw new NoConfigException(e);
         }
@@ -108,6 +202,8 @@ public abstract class ProxyRestService implements Service {
         requireNonNull(config, "config");
         config.put(getServiceClass().getTypeName(), getClass().getTypeName());
         config.put(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX, this.baseUrl);
+        config.put(this.getClass().getTypeName() + NUM_RETRIES_KEY, String.valueOf(this.retryMax));
+        config.put(this.getClass().getTypeName() + RETRY_WAIT_TIME_KEY, this.retryPauseTime.toString());
     }
 
     protected abstract Class<? extends Service> getServiceClass();
@@ -161,32 +257,36 @@ public abstract class ProxyRestService implements Service {
     }
 
     protected <O> O doPost(final URL url, final String jsonBody, final TypeReference<O> outputType) {
-        final O responseObj;
-        try {
-            final Invocation.Builder request = createRequest(jsonBody, url);
-            final Response response = request.post(Entity.json(jsonBody));
-            responseObj = handleResponse(response, outputType);
-        } catch (final Exception e) {
-            LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
-            throw e;
-        }
-        LOGGER.debug("Request to {} was successful", url);
-        return responseObj;
+        return Util.retryThunker(() -> {
+            final O responseObj;
+            try {
+                final Invocation.Builder request = createRequest(jsonBody, url);
+                final Response response = request.post(Entity.json(jsonBody));
+                responseObj = handleResponse(response, outputType);
+            } catch (final Exception e) {
+                LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
+                throw e;
+            }
+            LOGGER.debug("Request to {} was successful", url);
+            return responseObj;
+        }, getRetryMax(), getRetryPauseTime());
     }
 
     protected <O> O doPost(final URL url, final String jsonBody, final Class<O> outputType) {
-        final O responseObj;
+        return Util.retryThunker(() -> {
+            final O responseObj;
 
-        final Invocation.Builder request = createRequest(jsonBody, url);
-        try {
-            final Response response = request.post(Entity.json(jsonBody));
-            responseObj = handleResponse(response, outputType);
-        } catch (final Exception e) {
-            LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
-            throw e;
-        }
-        LOGGER.debug("Request to {} was successful", url);
-        return responseObj;
+            final Invocation.Builder request = createRequest(jsonBody, url);
+            try {
+                final Response response = request.post(Entity.json(jsonBody));
+                responseObj = handleResponse(response, outputType);
+            } catch (final Exception e) {
+                LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
+                throw e;
+            }
+            LOGGER.debug("Request to {} was successful", url);
+            return responseObj;
+        }, getRetryMax(), getRetryPauseTime());
     }
 
     protected <O> CompletableFuture<O> doPutAsync(final String endpoint, final Object body, final Class<O> outputType) {
@@ -206,18 +306,20 @@ public abstract class ProxyRestService implements Service {
     }
 
     protected <O> O doPut(final URL url, final String jsonBody, final Class<O> outputType) {
-        final O responseObj;
-        try {
-            final Invocation.Builder request = createRequest(jsonBody, url);
-            final Response response;
-            response = request.put(Entity.json(jsonBody));
-            responseObj = handleResponse(response, outputType);
-        } catch (final Exception e) {
-            LOGGER.debug("Request to {} failed", url);
-            throw e;
-        }
-        LOGGER.debug("Request to {} was successful", url);
-        return responseObj;
+        return Util.retryThunker(() -> {
+            final O responseObj;
+            try {
+                final Invocation.Builder request = createRequest(jsonBody, url);
+                final Response response;
+                response = request.put(Entity.json(jsonBody));
+                responseObj = handleResponse(response, outputType);
+            } catch (final Exception e) {
+                LOGGER.debug("Request to {} failed", url);
+                throw e;
+            }
+            LOGGER.debug("Request to {} was successful", url);
+            return responseObj;
+        }, getRetryMax(), getRetryPauseTime());
     }
 
     protected Invocation.Builder createRequest(final String body, final URL url) {
@@ -330,6 +432,8 @@ public abstract class ProxyRestService implements Service {
         return new EqualsBuilder()
                 .append(baseUrl, that.baseUrl)
                 .append(client, that.client)
+                .append(retryMax, that.retryMax)
+                .append(retryPauseTime, that.retryPauseTime)
                 .isEquals();
     }
 
@@ -338,6 +442,8 @@ public abstract class ProxyRestService implements Service {
         return new HashCodeBuilder(7, 23)
                 .append(baseUrl)
                 .append(client)
+                .append(retryMax)
+                .append(retryPauseTime)
                 .toHashCode();
     }
 
@@ -346,6 +452,8 @@ public abstract class ProxyRestService implements Service {
         return new ToStringBuilder(this)
                 .append("baseUrl", baseUrl)
                 .append("client", client)
+                .append("retryMax", retryMax)
+                .append("retryPauseTime", retryPauseTime)
                 .toString();
     }
 }

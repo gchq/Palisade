@@ -30,6 +30,7 @@
         <module>client-impl</module>
         <module>library</module>
         <module>example</module>
+        <module>support</module>
     </modules>
 
     <developers>
@@ -49,51 +50,53 @@
 
     <properties>
         <!-- Versions -->
-        <java.version>1.8</java.version>
+        <java.version>8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <jar.plugin.version>2.4</jar.plugin.version>
-        <compiler.plugin.verson>3.7.0</compiler.plugin.verson>
+        <jar.plugin.version>3.1.1</jar.plugin.version>
+        <compiler.plugin.version>3.8.0</compiler.plugin.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
         <slf4j.api.version>1.7.25</slf4j.api.version>
-        <slf4j.simple.version>1.6.4</slf4j.simple.version>
-        <dependency.plugin.version>2.10</dependency.plugin.version>
-        <jackson.version>2.9.7</jackson.version>
-        <maven-war-plugin.version>3.0.0</maven-war-plugin.version>
-        <apache.commons.version>3.3.2</apache.commons.version>
-        <guava.version>26.0-jre</guava.version>
-        <commons-io.version>2.4</commons-io.version>
-        <commons-lang3.version>3.3.2</commons-lang3.version>
-        <jersey.version>2.25</jersey.version>
-        <glassfish.hk2.version>2.5.0-b30</glassfish.hk2.version>
-        <servlet-api.version>3.1.0</servlet-api.version>
-        <grizzly.version>2.3.28</grizzly.version>
-        <hadoop.version>2.8.5</hadoop.version>
+        <slf4j.simple.version>1.7.25</slf4j.simple.version>
+        <dependency.plugin.version>3.1.1</dependency.plugin.version>
+        <jackson.version>2.9.8</jackson.version>
+        <maven-war-plugin.version>3.2.2</maven-war-plugin.version>
+        <maven-shade-plugin.version>3.1.1</maven-shade-plugin.version>
+        <exec.plugin.version>1.2.1</exec.plugin.version>
+        <guava.version>27.0.1-jre</guava.version>
+        <commons-io.version>2.6</commons-io.version>
+        <commons-lang3.version>3.8.1</commons-lang3.version>
+        <jersey.version>2.27</jersey.version>
+        <glassfish.hk2.version>2.5.0</glassfish.hk2.version>
+        <glassfish.hk2.javax.inject.version>2.4.0</glassfish.hk2.javax.inject.version>
+        <servlet-api.version>4.0.1</servlet-api.version>
+        <grizzly.version>2.4.3.1</grizzly.version>
+        <hadoop.version>2.9.2</hadoop.version>
         <avro.version>1.8.2</avro.version>
         <koryphe.version>1.5.0</koryphe.version>
-        <jetcd.version>0.0.2</jetcd.version>
+        <jetcd.version>0.3.0</jetcd.version>
         <protobuf.version>3.5.1</protobuf.version>
-        <docker.maven.version>0.26.1</docker.maven.version>
-        <json4s.version>3.2.11</json4s.version>
-        <swagger.version>1.5.15</swagger.version>
-        <javassist.version>3.19.0-GA</javassist.version>
-        <scala.minor.version>2.11.8</scala.minor.version>
-        <commons-io.version>2.4</commons-io.version>
-        <reflections.version>0.9.10</reflections.version>
+        <docker.maven.version>0.28.0</docker.maven.version>
+        <swagger.version>1.5.21</swagger.version>
+        <javassist.version>3.24.1-GA</javassist.version>
+        <reflections.version>0.9.11</reflections.version>
+        <jaxb.api.version>2.2.8</jaxb.api.version>
+        <javax.activation.version>1.2.0</javax.activation.version>
 
         <!-- Testing properties -->
         <junit.version>4.12</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
         <mockito.version>1.10.19</mockito.version>
-        <surefire.plugin.version>2.19.1</surefire.plugin.version>
-        <failsafe.version>2.18.1</failsafe.version>
+        <surefire.plugin.version>2.22.1</surefire.plugin.version>
+        <failsafe.version>2.22.1</failsafe.version>
         <skip.surefire.tests>false</skip.surefire.tests>
         <skip.failsafe.tests>false</skip.failsafe.tests>
         <checkstyle.phase>test</checkstyle.phase>
-        <findbugs.phase>test</findbugs.phase>
-        <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
-        <findbugs.plugin.version>3.0.1</findbugs.plugin.version>
-        <testcontainers.version>1.9.1</testcontainers.version>
+        <spotbugs.phase>test</spotbugs.phase>
+        <checkstyle.plugin.version>3.0.0</checkstyle.plugin.version>
+        <spotbugs.plugin.version>3.1.10</spotbugs.plugin.version>
+        <jcip.annotations.version>1.0-1</jcip.annotations.version>
+        <testcontainers.version>1.10.5</testcontainers.version>
         <surefireArgLine/>
         <failsafeArgLine/>
         <exclude.tests/>
@@ -143,14 +146,25 @@
             <version>${guava.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>${findbugs.plugin.version}</version>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb.api.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${findbugs.plugin.version}</version>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+            <version>${javax.activation.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stephenc.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+            <version>${jcip.annotations.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${spotbugs.plugin.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -174,7 +188,7 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <findbugs.phase>none</findbugs.phase>
+                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -184,7 +198,7 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>test</checkstyle.phase>
-                <findbugs.phase>test</findbugs.phase>
+                <spotbugs.phase>test</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -193,7 +207,7 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>false</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <findbugs.phase>none</findbugs.phase>
+                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -202,7 +216,7 @@
                 <skip.surefire.tests>false</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <findbugs.phase>none</findbugs.phase>
+                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -212,7 +226,7 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <findbugs.phase>none</findbugs.phase>
+                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
 
@@ -223,10 +237,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler.plugin.verson}</version>
+                <version>${compiler.plugin.version}</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <compilerArgument>-Xlint:deprecation</compilerArgument>
                 </configuration>
             </plugin>
             <plugin>
@@ -332,36 +347,46 @@
                     </execution>
                 </executions>
             </plugin>
+
+
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${findbugs.plugin.version}</version>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs.plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs</artifactId>
+                        <version>${spotbugs.plugin.version}</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
-                    <effort>Low</effort>
+
+                    <effort>default</effort>
                     <threshold>Low</threshold>
                     <xmlOutput>true</xmlOutput>
-                    <findbugsXmlOutputDirectory>
-                        ${project.build.directory}/findbugs
-                    </findbugsXmlOutputDirectory>
+                    <xmlOutputDirectory>
+                        ${project.build.directory}/spotbugs
+                    </xmlOutputDirectory>
                     <excludeFilterFile>
-                        code-style/findbugs-exclude.xml
+                        code-style/spotbugs-exclude.xml
                     </excludeFilterFile>
                     <onlyAnalyze>uk.gov.gchq.palisade.*</onlyAnalyze>
                 </configuration>
                 <executions>
                     <execution>
                         <id>analyze-compile</id>
-                        <phase>${findbugs.phase}</phase>
+                        <phase>${spotbugs.phase}</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
                         <configuration>
-                            <effort>Low</effort>
+                            <effort>default</effort>
                             <threshold>Low</threshold>
                             <xmlOutput>true</xmlOutput>
-                            <findbugsXmlOutputDirectory>
-                                ${project.build.directory}/findbugs
-                            </findbugsXmlOutputDirectory>
+                            <xmlOutputDirectory>
+                                ${project.build.directory}/spotbugs
+                            </xmlOutputDirectory>
                         </configuration>
                     </execution>
                 </executions>

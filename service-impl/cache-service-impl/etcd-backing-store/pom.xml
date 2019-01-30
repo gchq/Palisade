@@ -38,7 +38,7 @@
             <type>test-jar</type>
         </dependency>
         <dependency>
-            <groupId>com.coreos</groupId>
+            <groupId>io.etcd</groupId>
             <artifactId>jetcd-core</artifactId>
             <version>${jetcd.version}</version>
         </dependency>
@@ -48,10 +48,22 @@
             <version>${protobuf.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.parent.groupId}</groupId>
+            <groupId>io.etcd</groupId>
             <artifactId>jetcd-launcher</artifactId>
+            <version>${jetcd.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>common</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 

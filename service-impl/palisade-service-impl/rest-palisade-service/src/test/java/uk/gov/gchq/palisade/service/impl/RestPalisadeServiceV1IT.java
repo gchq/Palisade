@@ -59,7 +59,7 @@ public class RestPalisadeServiceV1IT {
     @BeforeClass
     public static void beforeClass() throws IOException {
         RestPalisadeServiceV1.setDefaultDelegate(new MockPalisadeService());
-        proxy = new ProxyRestPalisadeService("http://localhost:8080/palisade");
+        proxy = (ProxyRestPalisadeService) new ProxyRestPalisadeService("http://localhost:8080/palisade").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }

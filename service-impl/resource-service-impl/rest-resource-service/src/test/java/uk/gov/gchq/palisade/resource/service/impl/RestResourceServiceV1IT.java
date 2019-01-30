@@ -50,7 +50,7 @@ public class RestResourceServiceV1IT {
     @BeforeClass
     public static void beforeClass() throws IOException {
         RestResourceServiceV1.setDefaultDelegate(new MockResourceService());
-        proxy = new ProxyRestResourceService("http://localhost:8082/resource");
+        proxy = (ProxyRestResourceService) new ProxyRestResourceService("http://localhost:8082/resource").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
