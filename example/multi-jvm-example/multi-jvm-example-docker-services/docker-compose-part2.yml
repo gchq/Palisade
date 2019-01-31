@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+  configure-services:
+    build: configure-services
+    container_name: configure-services
+    networks:
+      - palisade_network
+    command: /tmp/waitForHost.sh http://config-service:8080/config/v1/status java -cp /tmp/example-model-*-shaded.jar uk.gov.gchq.palisade.example.config.DistributedServicesConfigurator http://etcd:2379 http://palisade-service:8080/palisade http://policy-service:8080/policy http://resource-service:8080/resource http://user-service:8080/user http://data-service:8080/data http://config-service:8080/config
+  data-service:
+    build: data-service
+    container_name: data-service
+    networks:
+      - palisade_network
+    volumes:
+      - "../../resources:/data"
+    depends_on:
+    - configure-services
+  policy-service:
+    build: policy-service
+    container_name: policy-service
+    networks:
+      - palisade_network
+    depends_on:
+      - configure-services
+  resource-service:
+    build: resource-service
+    container_name: resource-service
+    networks:
+      - palisade_network
+    volumes:
+      - "../../resources:/data"
+    depends_on:
+      - configure-services
+  user-service:
+    build: user-service
+    container_name: user-service
+    networks:
+      - palisade_network
+    depends_on:
+      - configure-services
+  palisade-service:
+    build: palisade-service
+    container_name: palisade-service
+    networks:
+      - palisade_network
+    depends_on:
+      - configure-services
+
+networks:
+  palisade_network:
+    external:
+      name: palisade_example_palisade_network

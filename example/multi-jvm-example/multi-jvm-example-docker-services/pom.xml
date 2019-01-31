@@ -248,7 +248,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.basedir}/configure-services/docker</outputDirectory>
+                            <outputDirectory>${project.basedir}/configure-services/docker/bin</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -269,7 +269,7 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>./configure-services/docker</directory>
+                            <directory>./configure-services/docker/bin</directory>
                             <includes>
                                 <include>example-model-*-shaded.jar</include>
                             </includes>

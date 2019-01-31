@@ -40,10 +40,12 @@ import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Convenience class for setting the default config for the various Palisade micro-services
@@ -52,7 +54,7 @@ import java.util.Map;
  * It is expected to be run after the config service has been started but before
  * the other services are started.
  */
-public final class DistributedServicesConfigurator extends ServicesConfigurator {
+public class DistributedServicesConfigurator extends ServicesConfigurator {
     protected static final Logger LOGGER = LoggerFactory.getLogger(DistributedServicesConfigurator.class);
 
     public static void main(final String[] args) {
@@ -74,7 +76,14 @@ public final class DistributedServicesConfigurator extends ServicesConfigurator 
         if (args.length > 6) {
             return true;
         } else {
-            LOGGER.error("error");
+            LOGGER.error("error not enough arguments have been provided. The following arguments are required:\n" +
+                    "1. a csv of the etcd endpoints\n" +
+                    "2. the client url for the palisade service\n" +
+                    "3. the client url for the policy service\n" +
+                    "4. the client url for the resource service\n" +
+                    "5. the client url for the user service\n" +
+                    "6. the client url for the data service\n" +
+                    "7. the client url for the config service");
             return false;
         }
 
@@ -83,7 +92,7 @@ public final class DistributedServicesConfigurator extends ServicesConfigurator 
     @Override
     protected CacheService createCacheService(final String[] args) {
         if (args.length > 1) {
-            List<String> etcdEndpoints = Arrays.asList(args[0].split(","));
+            List<URI> etcdEndpoints = Arrays.stream(args[0].split(",")).map(URI::create).collect(Collectors.toList());
             return new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(etcdEndpoints));
         } else {
             LOGGER.error("Failed to create the Configuration for the cache service due to missing the 1st argument, " +

@@ -53,9 +53,11 @@ import uk.gov.gchq.palisade.user.service.impl.SimpleUserService;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -170,7 +172,7 @@ public class ServicesConfigurator {
     }
 
     protected CacheService createCacheService(final String[] args) {
-        return new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Stream.of("http://localhost:2379").collect(Collectors.toList())));
+        return new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList(URI.create("http://localhost:2379"))));
     }
 
     protected AuditService createAuditService(final String[] args) {
