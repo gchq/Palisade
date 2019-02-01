@@ -24,8 +24,11 @@ import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.config.ServicesConfigurator;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.util.StreamUtil;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.stream.Stream;
 
@@ -33,7 +36,9 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
     private final String file;
 
     public static void main(final String[] args) {
-        ConfiguredClientServices cs = new ConfiguredClientServices(RestUtil.createService(ExampleSimpleClient.class, RestUtil.CONFIG_SERVICE_PATH, ConfigurationService.class));
+        final InputStream stream = StreamUtil.openStream(ExampleSimpleClient.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
+        ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         new ExampleSimpleClient(cs, args[0]);
     }
 

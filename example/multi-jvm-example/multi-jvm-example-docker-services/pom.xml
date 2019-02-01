@@ -13,6 +13,7 @@
 
     <build>
         <plugins>
+            <!--Copy Config Rest JSON files-->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.0.2</version>
@@ -102,9 +103,43 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-config-json-configure-example</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>./configure-example/docker/bin</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <filtering>false</filtering>
+                                    <include>configRest.json</include>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-config-json-client</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>./client/docker/bin</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <filtering>false</filtering>
+                                    <include>configRest.json</include>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
-
+            <!--Unpack War files-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -238,11 +273,12 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--Copy Required Resources-->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-example-model</id>
+                        <id>copy-example-model-for-service-config</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -260,6 +296,44 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-example-model-for-example-config</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/configure-example/docker/bin</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>../../example-model/target</directory>
+                                    <includes>
+                                        <include>example-model-*-shaded.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-example-runner</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/client/docker/bin</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>../multi-jvm-example-docker-runner/target</directory>
+                                    <includes>
+                                        <include>multi-jvm-example-docker-runner-*-shaded.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <!-- Clean Configuration -->
@@ -268,6 +342,20 @@
                 <version>2.4.1</version>
                 <configuration>
                     <filesets>
+                        <fileset>
+                            <directory>./client/docker/bin</directory>
+                            <includes>
+                                <include>multi-jvm-example-docker-runner-*-shaded.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>./configure-example/docker/bin</directory>
+                            <includes>
+                                <include>example-model-*-shaded.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
                         <fileset>
                             <directory>./configure-services/docker/bin</directory>
                             <includes>
@@ -319,31 +407,43 @@
                         </fileset>
                         <!-- Remove the config service file -->
                         <fileset>
-                            <directory>./resource-service/docker</directory>
+                            <directory>./resource-service/docker/bin</directory>
                             <includes>
                                 <include>configRest.json</include>
                             </includes>
                         </fileset>
                         <fileset>
-                            <directory>./user-service/docker</directory>
+                            <directory>./user-service/docker/bin</directory>
                             <includes>
                                 <include>configRest.json</include>
                             </includes>
                         </fileset>
                         <fileset>
-                            <directory>./policy-service/docker</directory>
+                            <directory>./policy-service/docker/bin</directory>
                             <includes>
                                 <include>configRest.json</include>
                             </includes>
                         </fileset>
                         <fileset>
-                            <directory>./palisade-service/docker</directory>
+                            <directory>./palisade-service/docker/bin</directory>
                             <includes>
                                 <include>configRest.json</include>
                             </includes>
                         </fileset>
                         <fileset>
-                            <directory>./data-service/docker</directory>
+                            <directory>./data-service/docker/bin</directory>
+                            <includes>
+                                <include>configRest.json</include>
+                            </includes>
+                        </fileset>
+                        <fileset>
+                            <directory>./configure-example/docker/bin</directory>
+                            <includes>
+                                <include>configRest.json</include>
+                            </includes>
+                        </fileset>
+                        <fileset>
+                            <directory>./client/docker/bin</directory>
                             <includes>
                                 <include>configRest.json</include>
                             </includes>

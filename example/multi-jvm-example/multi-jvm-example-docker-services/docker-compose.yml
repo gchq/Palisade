@@ -1,0 +1,114 @@
+version: "3"
+
+services:
+  etcd:
+    container_name: etcd
+    image: quay.io/coreos/etcd
+    networks:
+      - palisade_network
+    command:
+      - /usr/local/bin/etcd
+      - -name
+      - etcd
+      - --data-dir
+      - /tmp/etcd_data
+      - -advertise-client-urls
+      - http://etcd:2379
+      - -listen-client-urls
+      - http://0.0.0.0:2379
+      - -initial-advertise-peer-urls
+      - http://etcd:2380
+      - -listen-peer-urls
+      - http://0.0.0.0:2380
+      - -initial-cluster
+      - etcd=http://etcd:2380
+  config-service:
+    build: config-service
+    container_name: config-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://config-service:8080/config/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - etcd
+  configure-services:
+    build: configure-services
+    container_name: configure-services
+    networks:
+      - palisade_network
+    command: /tmp/waitForHost.sh http://config-service:8080/config/v1/status java -cp /tmp/example-model-*-shaded.jar uk.gov.gchq.palisade.example.config.DistributedServicesConfigurator http://etcd:2379 http://palisade-service:8080/palisade http://policy-service:8080/policy http://resource-service:8080/resource http://user-service:8080/user http://data-service:8080/data http://config-service:8080/config
+  data-service:
+    build: data-service
+    container_name: data-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://data-service:8080/data/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - "../../resources:/data"
+    depends_on:
+      - configure-services
+  policy-service:
+    build: policy-service
+    container_name: policy-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://policy-service:8080/policy/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - configure-services
+  resource-service:
+    build: resource-service
+    container_name: resource-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://resource-service:8080/resource/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - "../../resources:/data"
+    depends_on:
+      - configure-services
+  user-service:
+    build: user-service
+    container_name: user-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://user-service:8080/user/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - configure-services
+  palisade-service:
+    build: palisade-service
+    container_name: palisade-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://palisade-service:8080/palisade/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - configure-services
+  configure-example:
+    build: configure-example
+    container_name: configure-example
+    networks:
+      - palisade_network
+
+networks:
+  palisade_network:

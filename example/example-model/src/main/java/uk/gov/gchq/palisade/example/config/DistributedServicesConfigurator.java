@@ -86,7 +86,6 @@ public class DistributedServicesConfigurator extends ServicesConfigurator {
                     "7. the client url for the config service");
             return false;
         }
-
     }
 
     @Override

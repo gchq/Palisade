@@ -102,9 +102,10 @@ public class ServicesConfigurator {
             PolicyService policyClient = createPolicyServiceForClients(args);
             PalisadeService palisadeClient = createPalisadeServiceForClients(args);
             DataService dataClient = createDataServiceForClients(args);
+            CacheService cacheClient = createCacheService(args);
 
             // add the config for the clients to the config service
-            Collection<Service> services = Stream.of(configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient).collect(Collectors.toList());
+            Collection<Service> services = Stream.of(configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
             writeClientConfiguration(configClient, services);
 
             // write the config for the user service to the config service
@@ -327,7 +328,7 @@ public class ServicesConfigurator {
             Configuration conf = createHadoopConfiguration();
             HadoopDataReader reader = new HadoopDataReader().conf(conf);
             reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
-            return new SimpleDataService().reader(reader).palisadeService(createPalisadeServiceForClients(args));
+            return new SimpleDataService().reader(reader).palisadeService(createPalisadeServiceForClients(args)).cacheService(createCacheService(args));
         } catch (final IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
             return null;

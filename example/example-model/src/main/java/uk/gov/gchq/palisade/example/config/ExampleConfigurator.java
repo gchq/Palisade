@@ -28,12 +28,12 @@ import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.ExampleObj;
-import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
 import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
 import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
 import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.tuple.TupleRule;
@@ -44,7 +44,9 @@ import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
+import uk.gov.gchq.palisade.util.StreamUtil;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -63,7 +65,9 @@ public final class ExampleConfigurator {
     private final String file;
 
     public static void main(final String[] args) {
-        ConfiguredClientServices cs = new ConfiguredClientServices(RestUtil.createService(ExampleSimpleClient.class, RestUtil.CONFIG_SERVICE_PATH, ConfigurationService.class));
+        final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
+        ConfiguredClientServices cs = new ConfiguredClientServices(configService);
         new ExampleConfigurator(cs, args[0]);
     }
 

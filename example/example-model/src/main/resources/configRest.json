@@ -1,5 +1,0 @@
-{
-  "@id" : 1,
-  "class" : "uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService",
-  "baseUrl" : "http://config-service:8080/config"
-}
