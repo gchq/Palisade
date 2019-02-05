@@ -34,6 +34,7 @@ import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Collections;
 import java.util.stream.Stream;
 
@@ -51,7 +52,7 @@ public class MultiJVMDockerExample {
     private void run() throws Exception {
         EtcdBackingStore store = null;
         try {
-            store = new EtcdBackingStore().connectionDetails(Collections.singletonList("http://etcd:2379"));
+            store = new EtcdBackingStore().connectionDetails(Collections.singletonList(URI.create("http://etcd:2379")));
             SimpleCacheService cache = new SimpleCacheService().backingStore(store);
             ConfigurationService configService = new ProxyRestConfigService("http://config-service:8080/config");
             //this will write an initial configuration

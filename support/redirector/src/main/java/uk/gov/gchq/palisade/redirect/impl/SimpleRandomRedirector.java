@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * An example redirector that should not be used in production! This simple redirector just picks a live instance of the
  * given service at random to redirect a request to.
  */
-public class SimpleRandomRedirector extends DefaultRedirector<String> {
+public class SimpleRandomRedirector extends HeartbeatRedirector<String> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleRandomRedirector.class);
 
     /**

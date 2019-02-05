@@ -59,9 +59,12 @@ import static java.util.Objects.requireNonNull;
  *
  *          ...
  *
+ * <<<<<<< HEAD
  *          //optionally, we can set a host that originated the request for the next request
  *          marshall.host("localhost");
  *
+ * =======
+ * >>>>>>> develop
  *          //to redirect a void method, we use a slightly different syntax:
  *          StringRedirectionResult result = marshall.redirect(() -> fake.someVoidMethod(5));
  *          ...
@@ -85,12 +88,15 @@ public class RedirectionMarshall<T> {
     private final ThreadLocal<RedirectionResult<T>> recentRedirect = new ThreadLocal<>();
 
     /**
+     * <<<<<<< HEAD
      * Stores the hostname/address for the client making the call. This may be optionally set and can be used as a hint
      * by redirectors when routing a request.
      */
     private final ThreadLocal<String> recentHost = new ThreadLocal<>();
 
     /**
+     * =======
+     * >>>>>>> develop
      * Create a marshall.
      *
      * @param redirector the redirector for requests on this marshall
@@ -176,9 +182,9 @@ public class RedirectionMarshall<T> {
      * the proxy and the retrieval of the redirection. This method calls the redirector object and passes in the method
      * and parameters to be redirected. It then stores the result in a thread local object for later retrieval.
      *
-     * @param proxy  ignored, the proxy instance
+     * @param proxy  the proxy instance that intercepted this request, specified by {@link java.lang.reflect.InvocationHandler}
      * @param method the actual method to be redirected
-     * @param args   the method argumentse
+     * @param args   the method arguments
      * @return a dummy object
      * @throws Throwable to comply with interface
      */

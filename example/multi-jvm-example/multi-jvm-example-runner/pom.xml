@@ -60,9 +60,9 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.parent.groupId}</groupId>
+            <groupId>io.etcd</groupId>
             <artifactId>jetcd-launcher</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${jetcd.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>

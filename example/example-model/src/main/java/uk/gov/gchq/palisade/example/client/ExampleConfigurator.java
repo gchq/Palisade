@@ -218,7 +218,7 @@ public final class ExampleConfigurator {
      * @return a data service
      */
     private static SimpleDataService createDataService(final CacheService cache, final PalisadeService palisade, final DataReader reader) {
-        return new SimpleDataService().palisadeService(palisade).reader(reader);
+        return new SimpleDataService().palisadeService(palisade).reader(reader).cacheService(cache);
     }
 
     /**
