@@ -116,7 +116,7 @@
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-grizzly2-http</artifactId>
+            <artifactId>jersey-container-grizzly2-servlet</artifactId>
             <version>${jersey.version}</version>
             <scope>test</scope>
         </dependency>

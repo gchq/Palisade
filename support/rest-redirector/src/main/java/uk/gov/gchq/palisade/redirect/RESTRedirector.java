@@ -16,7 +16,7 @@
 
 package uk.gov.gchq.palisade.redirect;
 
-import org.glassfish.hk2.api.ServiceLocatorFactory;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,23 +28,22 @@ import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.ext.Provider;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
-@Provider
-public class RESTRedirector extends AbstractApplicationConfigV1 implements Service {
+public class RESTRedirector extends AbstractApplicationConfigV1 implements Service, ContainerRequestFilter, ContainerResponseFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTRedirector.class);
 
     private static final String REDIRECTOR_KEY = "rest.redirect.redirector";
@@ -88,44 +87,66 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
     private void configureRedirection() {
         //manufacture the delegate
         Service service = marshall.createProxyFor(getRedirectionClass());
-        //now create the REST implementation and set the delegate
+        //register the original implementation class as a resource
+        register(getRestImplementationClass());
+        //register the binder that will instantiate it
+        register(new ServiceBinder(service, getRedirectionClass()));
+        //register ourselves as a response filter
+        register(this);
+    }
+
+    @Context
+    private HttpServletRequest servletRequest;
+
+    @Override
+    public void filter(final ContainerRequestContext requestContext) throws IOException {
+        if (servletRequest != null) {
+            String remHost = servletRequest.getRemoteHost();
+            String destination = requestContext.getUriInfo().getAbsolutePath().toString();
+            LOGGER.debug("Received request from {} to {}", remHost, destination);
+            //set in the marshall
+            marshall.host(remHost);
+        } else {
+            LOGGER.warn("No host information available on incoming request");
+        }
+    }
+
+    @Override
+    public void filter(final ContainerRequestContext requestContext, final ContainerResponseContext responseContext) throws IOException {
         try {
-            //try to find the constructor that takes the redirection class as a delegate and create it
-            Service restImpl = getRestImplementationClass().getConstructor(getRedirectionClass()).newInstance(service);
-            //register that with javax.ws.rs API
-            register(restImpl);
-            register(Fee.class);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("can't find constructor (Service) for " + restImplementationClass.getTypeName(), e);
-        }
-        //register ourselves as a filtering provider
-    }
-
-    @Provider
-    public static class Fee implements DynamicFeature {
-
-        @Override
-        public void configure(ResourceInfo resourceInfo, FeatureContext featureContext) {
-            System.err.println("configure");
-            featureContext.register(Foo.class);
+            //the original request will have failed, so we throw it away and set a new response
+            responseContext.setEntity(null);
+            //set the response to HTTP 307 Temporary Redirect
+            responseContext.setStatusInfo(Response.Status.TEMPORARY_REDIRECT);
+            //set new location
+            URI original = requestContext.getUriInfo().getAbsolutePath();
+            URI location = new URI(original.getScheme(), original.getUserInfo(), marshall.redirect((Object) null), original.getPort(),
+                    original.getPath(), original.getQuery(), original.getFragment());
+            responseContext.getHeaders().putSingle("Location", location.toString());
+            LOGGER.debug("Redirection occurred, issuing 307 TEMPORARY_REDIRECT to {}", location.toString());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    @Provider
-    public static class Foo implements ContainerRequestFilter, ContainerResponseFilter {
+    private static class ServiceBinder extends AbstractBinder {
 
+        private final Service serviceDelegate;
 
-        @Override
-        public void filter(ContainerRequestContext request) throws IOException {
-            //called before a request is made
-            System.err.println("incoming");
+        //TODO fix generic bound on this
+        private final Class bindingClass;
+
+        public ServiceBinder(final Service delegate, final Class<? extends Service> bindingClass) {
+            requireNonNull(delegate, "delegate");
+            requireNonNull(bindingClass, "bindingClass");
+            this.serviceDelegate = delegate;
+            this.bindingClass = bindingClass;
         }
 
         @Override
-        public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
-            System.err.println("outgoing request");
+        protected void configure() {
+            bind(serviceDelegate).to(bindingClass);
         }
-
     }
 
     @Override

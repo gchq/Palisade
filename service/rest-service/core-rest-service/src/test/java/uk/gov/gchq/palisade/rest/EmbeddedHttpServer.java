@@ -17,14 +17,16 @@
 package uk.gov.gchq.palisade.rest;
 
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.servlet.ServletRegistration;
+import org.glassfish.grizzly.servlet.WebappContext;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-
 import java.io.IOException;
 import java.net.URI;
 
@@ -43,7 +45,17 @@ public class EmbeddedHttpServer {
 
     public void startServer() throws IOException {
         if (null == server) {
-            server = GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUrl), config);
+            URI uri = URI.create(baseUrl);
+            server = GrizzlyHttpServerFactory.createHttpServer(uri);
+            ServletContainer container = new ServletContainer(config);
+
+            WebappContext context = new WebappContext("PalisadeEmbeddedServer", uri.getPath());
+            ServletRegistration registration = context.addServlet(container.getClass().getName(), container);
+
+            registration.addMapping("/*");
+            context.deploy(server);
+
+//            server = GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUrl), config);
             LOGGER.debug("Started http server {}", baseUrl);
         }
     }

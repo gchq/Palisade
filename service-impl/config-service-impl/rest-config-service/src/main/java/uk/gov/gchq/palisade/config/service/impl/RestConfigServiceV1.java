@@ -32,6 +32,7 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -63,6 +64,7 @@ public class RestConfigServiceV1 implements ConfigurationService {
         this(createService(serviceConfigPath));
     }
 
+    @Inject
     public RestConfigServiceV1(final ConfigurationService delegate) {
         this.delegate = delegate;
     }

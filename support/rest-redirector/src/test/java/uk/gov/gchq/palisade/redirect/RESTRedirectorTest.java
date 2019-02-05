@@ -16,9 +16,6 @@
 
 package uk.gov.gchq.palisade.redirect;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import uk.gov.gchq.palisade.cache.service.heart.Heartbeat;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
@@ -34,23 +31,20 @@ import java.util.Optional;
 
 public class RESTRedirectorTest {
 
-
     private static ProxyRestConfigService proxy;
     private static EmbeddedHttpServer server;
 
-    @Test
-    public void main() throws Exception {
+    public static void main(String... args) throws Exception {
         try {
             SimpleCacheService scs = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
             Redirector<String> urlRedirector = new SimpleRandomRedirector().cacheService(scs).redirectionClass(ConfigurationService.class);
             //start a fake config service heartbeat
-            Heartbeat beat = new Heartbeat().cacheService(scs).serviceClass(ConfigurationService.class).instanceName("test_instance");
+            Heartbeat beat = new Heartbeat().cacheService(scs).serviceClass(ConfigurationService.class).instanceName("test-instance");
             beat.start();
 
             proxy = (ProxyRestConfigService) new ProxyRestConfigService("http://localhost:8080/palisade").retryMax(1);
             server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new RESTRedirector(RestConfigServiceV1.class, ConfigurationService.class, urlRedirector));
             server.startServer();
-
             proxy.add((AddConfigRequest) new AddConfigRequest().config(new ServiceConfiguration().put("test1", "test2")).service(Optional.empty())).join();
         } catch (Throwable t) {
             t.printStackTrace();
@@ -58,5 +52,4 @@ public class RESTRedirectorTest {
             server.stopServer();
         }
     }
-
 }
