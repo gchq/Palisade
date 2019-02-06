@@ -56,9 +56,7 @@ public final class RestUtil {
      * @see Configurator#createFromConfig(Class, uk.gov.gchq.palisade.service.request.ServiceConfiguration, String...)
      */
     public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass, final String... overridable) {
-        //create config service object
-        final InputStream stream = StreamUtil.openStream(resolverClass, configDetailsPath);
-        ConfigurationService service = JSONSerialiser.deserialise(stream, ConfigurationService.class);
+        ConfigurationService service = createConfigServiceFromPath(resolverClass, configDetailsPath);
         //get the config for this service, try repeatedly until we get a valid configuration
         while (true) {
             try {
@@ -75,6 +73,23 @@ public final class RestUtil {
     }
 
     /**
+     * Create a {@link ConfigurationService} from the JSON serialised form. Attempts to create the service by loading the given
+     * path either from the classpath or from a file system path. If this succeeds then the service instance is created by
+     * de-serialising it from the JSON in the opened file.
+     *
+     * @param resolverClass     the class to resolve the file against when searching in the classpath
+     * @param configDetailsPath the path to the configuration file
+     * @return a configuration service instance
+     * @see Class#getResourceAsStream(String)
+     * @see StreamUtil#openStream(Class, String)
+     */
+    public static ConfigurationService createConfigServiceFromPath(final Class<?> resolverClass, final String configDetailsPath) {
+        //create config service object
+        final InputStream stream = StreamUtil.openStream(resolverClass, configDetailsPath);
+        return JSONSerialiser.deserialise(stream, ConfigurationService.class);
+    }
+
+    /**
      * Retrieve the {@link ServiceConfiguration} for the named service class. This method will attempt to load
      * the {@link ConfigurationService} class details from the given path. Once this has been instantiated, it
      * will repeatedly call the configuration service trying to get the details for the given service.
@@ -87,8 +102,7 @@ public final class RestUtil {
      */
     public static ServiceConfiguration retrieveConfig(final Class<?> resolverClass, final String configDetailsPath, final Class<? extends Service> serviceClass) {
         //create config service object
-        final InputStream stream = StreamUtil.openStream(resolverClass, configDetailsPath);
-        ConfigurationService service = JSONSerialiser.deserialise(stream, ConfigurationService.class);
+        ConfigurationService service = createConfigServiceFromPath(resolverClass, configDetailsPath);
         //get the config for this service, try repeatedly until we get a valid configuration
         while (true) {
             try {

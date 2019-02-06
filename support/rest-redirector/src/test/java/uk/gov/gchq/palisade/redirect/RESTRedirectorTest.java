@@ -52,4 +52,9 @@ public class RESTRedirectorTest {
             server.stopServer();
         }
     }
+
+    //tests to write
+    //should redirect to a known place
+    //should set host correctly
+
 }

@@ -56,20 +56,12 @@ public class RestConfigServiceV1 implements ConfigurationService {
 
     private static ConfigurationService configService;
 
-    public RestConfigServiceV1() {
-        this(System.getProperty(BOOTSTRAP_CONFIG));
-    }
-
-    public RestConfigServiceV1(final String serviceConfigPath) {
-        this(createService(serviceConfigPath));
-    }
-
     @Inject
     public RestConfigServiceV1(final ConfigurationService delegate) {
         this.delegate = delegate;
     }
 
-    private static synchronized ConfigurationService createService(final String serviceConfigPath) {
+    static synchronized ConfigurationService createService(final String serviceConfigPath) {
         if (configService == null) {
             //create the configuration service from the initial bootstrap information
             final InputStream stream = StreamUtil.openStream(RestConfigServiceV1.class, serviceConfigPath);

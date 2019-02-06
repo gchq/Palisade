@@ -16,7 +16,6 @@
 
 package uk.gov.gchq.palisade.redirect;
 
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +23,7 @@ import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
@@ -58,6 +58,9 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
 
     private final RedirectionMarshall<String> marshall;
 
+    @Context
+    private HttpServletRequest servletRequest;
+
     public RESTRedirector() {
         this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
     }
@@ -84,6 +87,7 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
         applyConfigFrom(overridden);
     }
 
+    @SuppressWarnings("unchecked")
     private void configureRedirection() {
         //manufacture the delegate
         Service service = marshall.createProxyFor(getRedirectionClass());
@@ -91,16 +95,13 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
         register(getRestImplementationClass());
         //register the binder that will instantiate it
         register(new ServiceBinder(service, getRedirectionClass()));
-        //register ourselves as a response filter
+        //register ourselves as request and response filter
         register(this);
     }
 
-    @Context
-    private HttpServletRequest servletRequest;
-
     @Override
     public void filter(final ContainerRequestContext requestContext) throws IOException {
-        if (servletRequest != null) {
+        if (nonNull(servletRequest)) {
             String remHost = servletRequest.getRemoteHost();
             String destination = requestContext.getUriInfo().getAbsolutePath().toString();
             LOGGER.debug("Received request from {} to {}", remHost, destination);
@@ -120,32 +121,13 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
             responseContext.setStatusInfo(Response.Status.TEMPORARY_REDIRECT);
             //set new location
             URI original = requestContext.getUriInfo().getAbsolutePath();
+            //construct URI from components of the original
             URI location = new URI(original.getScheme(), original.getUserInfo(), marshall.redirect((Object) null), original.getPort(),
                     original.getPath(), original.getQuery(), original.getFragment());
             responseContext.getHeaders().putSingle("Location", location.toString());
-            LOGGER.debug("Redirection occurred, issuing 307 TEMPORARY_REDIRECT to {}", location.toString());
+            LOGGER.debug("Redirection occurred, issuing {} {} to {}", Response.Status.TEMPORARY_REDIRECT.getStatusCode(), Response.Status.TEMPORARY_REDIRECT.getReasonPhrase(), location.toString());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static class ServiceBinder extends AbstractBinder {
-
-        private final Service serviceDelegate;
-
-        //TODO fix generic bound on this
-        private final Class bindingClass;
-
-        public ServiceBinder(final Service delegate, final Class<? extends Service> bindingClass) {
-            requireNonNull(delegate, "delegate");
-            requireNonNull(bindingClass, "bindingClass");
-            this.serviceDelegate = delegate;
-            this.bindingClass = bindingClass;
-        }
-
-        @Override
-        protected void configure() {
-            bind(serviceDelegate).to(bindingClass);
         }
     }
 
