@@ -23,27 +23,71 @@ import java.util.Locale;
 
 public class Address {
     private static final Faker FAKER = new Faker(new Locale("en-GB"));
-    private String fullAddress;
+    private String streetAddressNumber;
+    private String streetName;
+    private String city;
+    private String state;
+    private String zipCode;
 
     public static Address generate() {
         Address address = new Address();
-        String fullAddress = FAKER.address().fullAddress();
-        address.setFullAddress(fullAddress);
+        com.github.javafaker.Address fakeAddress = FAKER.address();
+        address.setStreetAddressNumber(fakeAddress.streetAddressNumber());
+        address.setStreetName(fakeAddress.streetName());
+        address.setCity(fakeAddress.city());
+        address.setState(fakeAddress.state());
+        address.setZipCode(fakeAddress.zipCode());
         return address;
     }
 
-    public String getFullAddress() {
-        return fullAddress;
+    public String getStreetAddressNumber() {
+        return streetAddressNumber;
     }
 
-    public void setFullAddress(final String fullAddress) {
-        this.fullAddress = fullAddress;
+    public void setStreetAddressNumber( String streetAddressNumber ) {
+        this.streetAddressNumber = streetAddressNumber;
+    }
+
+    public String getStreetName() {
+        return streetName;
+    }
+
+    public void setStreetName( String streetName ) {
+        this.streetName = streetName;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity( String city ) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState( String state ) {
+        this.state = state;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode( String zipCode ) {
+        this.zipCode = zipCode;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("fullAddress", fullAddress)
+                .append("streetAddressNumber", streetAddressNumber)
+                .append("streetName", streetName)
+                .append("city", city)
+                .append("state", state)
+                .append("zipCode", zipCode)
                 .toString();
     }
 }
