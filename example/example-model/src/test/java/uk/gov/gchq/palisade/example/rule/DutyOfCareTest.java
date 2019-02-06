@@ -16,9 +16,6 @@
 
 package uk.gov.gchq.palisade.example.rule;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
@@ -26,16 +23,10 @@ import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Manager;
 
-import java.lang.reflect.Array;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Random;
 
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class DutyOfCareTest {
 
