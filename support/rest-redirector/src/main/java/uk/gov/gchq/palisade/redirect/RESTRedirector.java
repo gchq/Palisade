@@ -35,6 +35,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -364,7 +365,6 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      * Set the Palisade REST service end point. This is the REST endpoint class type that must extend from the redirection class type.
      *
      * @param restImplementationClass the REST end point class type
-     * @return this object
      * @see RESTRedirector#setRedirectionClass(Class)
      */
     public void setRestImplementationClass(final Class<T> restImplementationClass) {

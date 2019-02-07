@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.rest;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+
 import uk.gov.gchq.palisade.service.Service;
 
 import static java.util.Objects.requireNonNull;
@@ -28,11 +29,22 @@ import static java.util.Objects.requireNonNull;
  * @param <S> the Palisade service subtype
  */
 public class ServiceBinder<S extends Service> extends AbstractBinder {
-
+    /**
+     * The {@link Service} instance that will be injected into a constructor upon creation.
+     */
     private final S serviceDelegate;
 
+    /**
+     * The class that the service delegate implements, usually this should be the specific Palisade {@link Service} sub-type.
+     */
     private final Class<S> bindingClass;
 
+    /**
+     * Create a service binder.
+     *
+     * @param delegate     the object to inject
+     * @param bindingClass the service type
+     */
     public ServiceBinder(final S delegate, final Class<S> bindingClass) {
         requireNonNull(delegate, "delegate");
         requireNonNull(bindingClass, "bindingClass");
@@ -40,6 +52,9 @@ public class ServiceBinder<S extends Service> extends AbstractBinder {
         this.bindingClass = bindingClass;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void configure() {
         bind(serviceDelegate).to(bindingClass);

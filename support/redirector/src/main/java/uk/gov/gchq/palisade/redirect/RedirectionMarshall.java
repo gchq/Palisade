@@ -24,7 +24,10 @@ import uk.gov.gchq.palisade.service.Service;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import static java.util.Objects.*;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+
 
 /**
  * A marshall co-ordinates the redirection of requests to a Palisade {@link Service} using a {@link Redirector} that
