@@ -55,6 +55,19 @@ import static java.util.Objects.requireNonNull;
  * {@literal @}
  * public RestSomeService(final SomeService delegate) {...}
  * }</pre>
+ * <p>
+ * <p>
+ * The working of this class is a little complex so the flow of a request is as follows:
+ * <ol>
+ * <li>Client makes REST API call to this redirector.</li>
+ * <li>The call is received and the pre-request filter will capture the host name of the client.</li>
+ * <li>The servlet container will send it to the REST implementation class resource.</li>
+ * <li>The REST resource will send the call to its delegate which we will have set as the redirection proxy.</li>
+ * <li>The proxy will receive the call and trigger the redirector logic to be called {@see RedirectionMarshall}</li>
+ * <li>The proxy call will return null or 0 as appropriate.</li>
+ * <li>The servlet container will call post-request filter which will retrieve the host to redirect to from the marshall.</li>
+ * <li>The post-request filter will change the response code to a TEMPORARY_REDIRECT 307 and set the Location header.</li>
+ * </ol>
  *
  * @param <S> the type of Palisade service being redirected
  * @param <T> the class type that implements S
