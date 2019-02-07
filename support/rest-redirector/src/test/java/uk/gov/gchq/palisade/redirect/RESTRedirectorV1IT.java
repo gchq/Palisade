@@ -108,7 +108,7 @@ public class RESTRedirectorV1IT {
         //create a redirector
         redirector = (TestSimpleRandomRedirector) new TestSimpleRandomRedirector().cacheService(cache).redirectionClass(DummyService.class);
         //make the redirection server
-        server = new EmbeddedHttpServer(BASE_URL, new RESTRedirector(RestDummyService.class, DummyService.class, redirector));
+        server = new EmbeddedHttpServer(BASE_URL, new RESTRedirector<DummyService, RestDummyService>(DummyService.class, RestDummyService.class, redirector));
         server.startServer();
     }
 

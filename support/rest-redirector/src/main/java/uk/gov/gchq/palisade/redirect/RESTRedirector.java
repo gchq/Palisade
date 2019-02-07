@@ -35,7 +35,6 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -43,64 +42,145 @@ import java.nio.charset.StandardCharsets;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
-public class RESTRedirector extends AbstractApplicationConfigV1 implements Service, ContainerRequestFilter, ContainerResponseFilter {
+/**
+ * This class implements the REST protocol version of redirection for Palisade services. Using the redirector module, it is
+ * able to redirect incoming calls to any REST call on any Palisade service by issuing an HTTP 307 TEMPORARY REDIRECTION
+ * to the desired server. The proxy REST client will then transparently redirect to the actual service location.
+ * <p>
+ * The REST end point for Palisade that is being re-directed MUST have a constructor of the following form that all actual
+ * calls are delegated to:
+ *
+ * <pre> {@code
+ *
+ * {@literal @}
+ * public RestSomeService(final SomeService delegate) {...}
+ * }</pre>
+ *
+ * @param <S> the type of Palisade service being redirected
+ * @param <T> the class type that implements S
+ */
+public class RESTRedirector<S extends Service, T extends S> extends AbstractApplicationConfigV1 implements Service, ContainerRequestFilter, ContainerResponseFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTRedirector.class);
 
+    /**
+     * Configuration key for the redirector instance.
+     */
     private static final String REDIRECTOR_KEY = "rest.redirect.redirector";
+    /**
+     * Configuration key for the class type for the Palisade service being redirected.
+     */
     private static final String REDIRECTION_CLASS_KEY = "rest.redirect.class";
+    /**
+     * Configuration key for the class type that implements the REST end point for this service.
+     */
     private static final String REST_IMPL_CLASS_KEY = "rest.redirect.rest_impl.class";
 
-    private Class<? extends Service> restImplementationClass;
+    /**
+     * The Palisade REST service type endpoint for the service type being redirected.
+     */
+    private Class<T> restImplementationClass;
+    /**
+     * The class type being redirected. This should be a Palisade {@link Service} class.
+     */
+    private Class<S> redirectionClass;
 
-    private Class<? extends Service> redirectionClass;
-
+    /**
+     * The redirector that contains the redirection business logic.
+     */
     private Redirector<String> redirector;
 
+    /**
+     * The marshall that creates the proxy and handles the actual redirection.
+     */
     private final RedirectionMarshall<String> marshall;
 
+    /**
+     * This is injected by the servlet container e.g. Jersey/HK2 when a REST API call is made. This is used to extract
+     * the host name of the client so we can pass it to the redirector.
+     */
     @Context
     private HttpServletRequest servletRequest;
 
+    /**
+     * Create a redirector from a configuration service which will be contacted via data stored in a {@link uk.gov.gchq.palisade.config.service.ConfigurationService}.
+     *
+     * @see RestUtil]#CONFIG_SERVICE_PATH
+     */
     public RESTRedirector() {
         this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
     }
 
+    /**
+     * Create a redirector from a configuration service which will be contacted via data stored in the given path.
+     *
+     * @param serviceConfigPath the path to load the {@link uk.gov.gchq.palisade.config.service.ConfigurationService} from
+     */
     public RESTRedirector(final String serviceConfigPath) {
+        requireNonNull(serviceConfigPath, "serviceConfigPath");
         selfConfigure(serviceConfigPath);
         //now make our proxy delegate, give it to the correct rest service and then register that with the resourceconfig
         marshall = new RedirectionMarshall<>(getRedirector());
         configureRedirection();
     }
 
-    RESTRedirector(Class<? extends Service> restImplementationClass, Class<? extends Service> redirectionClass, Redirector<String> redirector) {
-        this.restImplementationClass = restImplementationClass;
+    /**
+     * Package private constructor for testing.
+     *
+     * @param redirectionClass        the class type being redirected
+     * @param restImplementationClass the REST implementation class for the redirection class
+     * @param redirector              the redirector instance
+     */
+    RESTRedirector(final Class<S> redirectionClass, final Class<T> restImplementationClass, final Redirector<String> redirector) {
+        requireNonNull(redirectionClass, "redirectionClass");
+        requireNonNull(restImplementationClass, "restImplementationClass");
+        requireNonNull(redirector, "redirector");
         this.redirectionClass = redirectionClass;
+        this.restImplementationClass = restImplementationClass;
         this.redirector = redirector;
         this.marshall = new RedirectionMarshall<>(getRedirector());
         configureRedirection();
     }
 
+    /**
+     * Load our configuration. This will create a {@link uk.gov.gchq.palisade.config.service.ConfigurationService} from
+     * the JSON serialised version in the path and then try to load the configuration from it. All configuration keys
+     * may be overridden by system properties.
+     *
+     * @param serviceConfigPath the path to load the JSON from
+     */
     private void selfConfigure(final String serviceConfigPath) {
         ServiceConfiguration conf = RestUtil.retrieveConfig(RESTRedirector.class, serviceConfigPath, RESTRedirector.class);
-        ServiceConfiguration overridden = Configurator.applyOverrides(conf, REDIRECTOR_KEY, REDIRECTION_CLASS_KEY);
+        ServiceConfiguration overridden = Configurator.applyOverrides(conf, REDIRECTOR_KEY, REDIRECTION_CLASS_KEY, REST_IMPL_CLASS_KEY);
         //self configure
         applyConfigFrom(overridden);
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Set up the redirection system. This must create the redirection proxy from the {@link RedirectionMarshall} and then
+     * set this to be injected into the REST implementation end point when it is created, so that the proxy becomes
+     * the object called by the REST end point. As Jersey will create the REST end point via dependency injection
+     * we register a {@link ServiceBinder} to ensure the redirection proxy is injected into the constructor.
+     */
     private void configureRedirection() {
         //manufacture the delegate
-        Service service = marshall.createProxyFor(getRedirectionClass());
+        S service = marshall.createProxyFor(getRedirectionClass());
         //register the original implementation class as a resource
         register(getRestImplementationClass());
         //register the binder that will instantiate it
-        register(new ServiceBinder(service, getRedirectionClass()));
+        register(new ServiceBinder<>(service, getRedirectionClass()));
         //register ourselves as request and response filter
         register(this);
     }
 
+    /**
+     * This is the pre-request filter. This is called by Jersey before calling the REST API method in the REST endpoint.
+     * We intercept this purely so we can grab the client hostname making the call. This information is set in the marshall
+     * so that when the redirector is called, the client hostname is available to it.
+     *
+     * @param requestContext the servlet request information
+     */
     @Override
-    public void filter(final ContainerRequestContext requestContext) throws IOException {
+    public void filter(final ContainerRequestContext requestContext) {
         if (nonNull(servletRequest)) {
             String remHost = servletRequest.getRemoteHost();
             String destination = requestContext.getUriInfo().getAbsolutePath().toString();
@@ -112,8 +192,18 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
         }
     }
 
+    /**
+     * This is the post-request filter. This is called by Jersey after the call to the REST API method has been made.
+     * Here is where we implement the actual redirection behaviour for HTTP. If the marshall states that a redirection
+     * has occurred (but not been retrieved) we replace the response body with {@code null} and send an HTTP 307 back
+     * to the client and set the location to the new hostname as given by the marshall. Otherwise, we just pass back
+     * the original response so things like 404 and everything else get passed back correctly.
+     *
+     * @param requestContext  the servlet request information
+     * @param responseContext the servlet response information
+     */
     @Override
-    public void filter(final ContainerRequestContext requestContext, final ContainerResponseContext responseContext) throws IOException {
+    public void filter(final ContainerRequestContext requestContext, final ContainerResponseContext responseContext) {
         if (marshall.isRedirectPending()) {
             try {
                 //the original request will have failed, so we throw it away and set a new response
@@ -125,6 +215,7 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
                 //construct URI from components of the original
                 URI location = new URI(original.getScheme(), original.getUserInfo(), marshall.redirect((Object) null), original.getPort(),
                         original.getPath(), original.getQuery(), original.getFragment());
+                //set location header
                 responseContext.getHeaders().putSingle("Location", location.toString());
                 LOGGER.debug("Redirection occurred, issuing {} {} to {}", Response.Status.TEMPORARY_REDIRECT.getStatusCode(), Response.Status.TEMPORARY_REDIRECT.getReasonPhrase(), location.toString());
             } catch (URISyntaxException e) {
@@ -133,6 +224,9 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
         requireNonNull(config, "config");
@@ -145,14 +239,18 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
         try {
             String serialisedRedirectClass = config.getOrDefault(REDIRECTION_CLASS_KEY, null);
             if (nonNull(serialisedRedirectClass)) {
-                setRedirectionClass(Class.forName(serialisedRedirectClass).asSubclass(Service.class));
+                @SuppressWarnings("unchecked")
+                Class<S> deClassRedirect = (Class<S>) Class.forName(serialisedRedirectClass);
+                setRedirectionClass(deClassRedirect);
             } else {
                 throw new NoConfigException("no redirect service class specified in configuration");
             }
 
             String serialisedRestImplClass = config.getOrDefault(REST_IMPL_CLASS_KEY, null);
             if (nonNull(serialisedRestImplClass)) {
-                setRestImplementationClass(Class.forName(serialisedRestImplClass).asSubclass(Service.class));
+                @SuppressWarnings("unchecked")
+                Class<T> deClassRedirectImpl = (Class<T>) Class.forName(serialisedRedirectClass);
+                setRestImplementationClass(deClassRedirectImpl);
             } else {
                 throw new NoConfigException("no service class specified in configuration");
             }
@@ -161,6 +259,9 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void recordCurrentConfigTo(final ServiceConfiguration config) {
         requireNonNull(config, "config");
@@ -169,47 +270,100 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
         config.put(REST_IMPL_CLASS_KEY, restImplementationClass.getTypeName());
     }
 
+    /**
+     * Set the redirector. This is the object that contains the actual business logic for redirection.
+     *
+     * @param redirector the new redirector
+     * @return this object
+     */
     public RESTRedirector redirector(final Redirector<String> redirector) {
         requireNonNull(redirector, "redirector");
         this.redirector = redirector;
         return this;
     }
 
+    /**
+     * Set the redirector. This is the object that contains the actual business logic for redirection.
+     *
+     * @param redirector the new redirector
+     */
     public void setRedirector(final Redirector<String> redirector) {
         redirector(redirector);
     }
 
+    /**
+     * Get the current redirector.
+     *
+     * @return the redirector
+     */
     public Redirector<String> getRedirector() {
         requireNonNull(redirector, "redirector must be set to non null");
         return redirector;
     }
 
-    public RESTRedirector redirectionClass(final Class<? extends Service> redirectionClass) {
+    /**
+     * Set the redirection class. This is the class type of the Palisade {@link Service} that is being redirected
+     * by this REST redirector.
+     *
+     * @param redirectionClass the redirection class type
+     * @return this object
+     */
+    public RESTRedirector redirectionClass(final Class<S> redirectionClass) {
         requireNonNull(redirectionClass, "redirectionClass");
         this.redirectionClass = redirectionClass;
         return this;
     }
 
-    public void setRedirectionClass(final Class<? extends Service> redirectionClass) {
+    /**
+     * Set the redirection class. This is the class type of the Palisade {@link Service} that is being redirected
+     * by this REST redirector.
+     *
+     * @param redirectionClass the redirection class type
+     */
+    public void setRedirectionClass(final Class<S> redirectionClass) {
         redirectionClass(redirectionClass);
     }
 
-    public Class<? extends Service> getRedirectionClass() {
+    /**
+     * Get the redirection class type for the Palisade service being redirected.
+     *
+     * @return the class type being redirected
+     */
+    public Class<S> getRedirectionClass() {
         requireNonNull(redirectionClass, "redirectionClass must be set to non null");
         return redirectionClass;
     }
 
-    public RESTRedirector restImplementationClass(final Class<? extends Service> restImplementationClass) {
+    /**
+     * Set the Palisade REST service end point. This is the REST endpoint class type that must extend from the redirection class type.
+     *
+     * @param restImplementationClass the REST end point class type
+     * @return this object
+     * @see RESTRedirector#setRedirectionClass(Class)
+     */
+    public RESTRedirector restImplementationClass(final Class<T> restImplementationClass) {
         requireNonNull(restImplementationClass, "restImplementationClass");
         this.restImplementationClass = restImplementationClass;
         return this;
     }
 
-    public void setRestImplementationClass(final Class<? extends Service> restImplementationClass) {
+    /**
+     * Set the Palisade REST service end point. This is the REST endpoint class type that must extend from the redirection class type.
+     *
+     * @param restImplementationClass the REST end point class type
+     * @return this object
+     * @see RESTRedirector#setRedirectionClass(Class)
+     */
+    public void setRestImplementationClass(final Class<T> restImplementationClass) {
         restImplementationClass(restImplementationClass);
     }
 
-    public Class<? extends Service> getRestImplementationClass() {
+    /**
+     * Get the Palisde REST service end point.
+     *
+     * @return the REST end point class type
+     */
+    public Class<T> getRestImplementationClass() {
         requireNonNull(restImplementationClass, "restImplementationClass must be set to non null");
         return restImplementationClass;
     }
