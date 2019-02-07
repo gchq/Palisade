@@ -39,8 +39,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import static java.util.Objects.nonNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
 
 public class RESTRedirectorV1IT {
     /**

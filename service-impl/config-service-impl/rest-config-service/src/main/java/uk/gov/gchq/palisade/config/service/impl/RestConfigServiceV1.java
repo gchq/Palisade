@@ -42,6 +42,7 @@ import javax.ws.rs.Produces;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/")
@@ -58,6 +59,7 @@ public class RestConfigServiceV1 implements ConfigurationService {
 
     @Inject
     public RestConfigServiceV1(final ConfigurationService delegate) {
+        requireNonNull(delegate, "delegate");
         this.delegate = delegate;
     }
 
