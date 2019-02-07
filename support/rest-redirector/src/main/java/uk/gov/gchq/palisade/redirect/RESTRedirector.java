@@ -114,20 +114,22 @@ public class RESTRedirector extends AbstractApplicationConfigV1 implements Servi
 
     @Override
     public void filter(final ContainerRequestContext requestContext, final ContainerResponseContext responseContext) throws IOException {
-        try {
-            //the original request will have failed, so we throw it away and set a new response
-            responseContext.setEntity(null);
-            //set the response to HTTP 307 Temporary Redirect
-            responseContext.setStatusInfo(Response.Status.TEMPORARY_REDIRECT);
-            //set new location
-            URI original = requestContext.getUriInfo().getAbsolutePath();
-            //construct URI from components of the original
-            URI location = new URI(original.getScheme(), original.getUserInfo(), marshall.redirect((Object) null), original.getPort(),
-                    original.getPath(), original.getQuery(), original.getFragment());
-            responseContext.getHeaders().putSingle("Location", location.toString());
-            LOGGER.debug("Redirection occurred, issuing {} {} to {}", Response.Status.TEMPORARY_REDIRECT.getStatusCode(), Response.Status.TEMPORARY_REDIRECT.getReasonPhrase(), location.toString());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+        if (marshall.isRedirectPending()) {
+            try {
+                //the original request will have failed, so we throw it away and set a new response
+                responseContext.setEntity(null);
+                //set the response to HTTP 307 Temporary Redirect
+                responseContext.setStatusInfo(Response.Status.TEMPORARY_REDIRECT);
+                //set new location
+                URI original = requestContext.getUriInfo().getAbsolutePath();
+                //construct URI from components of the original
+                URI location = new URI(original.getScheme(), original.getUserInfo(), marshall.redirect((Object) null), original.getPort(),
+                        original.getPath(), original.getQuery(), original.getFragment());
+                responseContext.getHeaders().putSingle("Location", location.toString());
+                LOGGER.debug("Redirection occurred, issuing {} {} to {}", Response.Status.TEMPORARY_REDIRECT.getStatusCode(), Response.Status.TEMPORARY_REDIRECT.getReasonPhrase(), location.toString());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
