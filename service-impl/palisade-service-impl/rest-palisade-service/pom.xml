@@ -96,12 +96,6 @@
             <version>${jersey.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
-            <artifactId>grizzly-http-servlet</artifactId>
-            <version>${grizzly.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
