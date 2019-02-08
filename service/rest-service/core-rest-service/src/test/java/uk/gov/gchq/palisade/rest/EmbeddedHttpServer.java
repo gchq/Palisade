@@ -55,7 +55,6 @@ public class EmbeddedHttpServer {
             registration.addMapping("/*");
             context.deploy(server);
 
-//            server = GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUrl), config);
             LOGGER.debug("Started http server {}", baseUrl);
         }
     }
