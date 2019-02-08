@@ -51,13 +51,6 @@
             <classifier>classes</classifier>
         </dependency>
         <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>core-rest-service</artifactId>
-            <version>${project.parent.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-grizzly2-servlet</artifactId>
             <version>${jersey.version}</version>
