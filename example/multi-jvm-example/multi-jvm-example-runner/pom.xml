@@ -84,6 +84,12 @@
             <artifactId>etcd-backing-store</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <!-- Added for jetcd-launcher -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
 
         <!-- Test dependencies -->
 
