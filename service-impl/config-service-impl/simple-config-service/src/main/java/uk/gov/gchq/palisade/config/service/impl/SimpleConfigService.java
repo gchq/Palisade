@@ -116,7 +116,7 @@ public class SimpleConfigService implements ConfigurationService {
             ServiceConfiguration selfConfig = getServiceConfig(ConfigurationService.class);
             applyConfigFrom(selfConfig);
         } catch (NoConfigException e) {
-            LOGGER.debug("No auxiliary configuration available. Probably not an error!", e);
+            LOGGER.debug("No auxiliary configuration available. Probably not an error!");
         }
     }
 
