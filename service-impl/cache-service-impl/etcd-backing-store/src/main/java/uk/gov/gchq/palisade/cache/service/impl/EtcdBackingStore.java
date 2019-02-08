@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -54,7 +55,7 @@ public class EtcdBackingStore implements BackingStore {
     /**
      * Default charset
      */
-    public static final Charset UTF8 = Charset.forName("UTF-8");
+    public static final Charset UTF8 = StandardCharsets.UTF_8;
 
     private Collection<URI> connectionDetails;
     private Client etcdClient;
