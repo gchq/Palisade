@@ -198,8 +198,10 @@ public class PropertiesBackingStore implements BackingStore {
                         break;
                     }
                 }
+            } catch (NoSuchFileException e) {
+                LOGGER.error("Error while watching, no such file {}", watchPath);
             } catch (ClosedWatchServiceException | IOException | InterruptedException e) {
-                LOGGER.error("Error while watching {}", watchPath, e);
+                LOGGER.error("Error while watching {} due to {}", watchPath, e);
             } finally {
                 if (watched != null) {
                     watched.cancel();
