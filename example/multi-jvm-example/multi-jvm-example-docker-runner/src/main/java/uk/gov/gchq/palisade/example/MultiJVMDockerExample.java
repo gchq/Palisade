@@ -56,7 +56,7 @@ public class MultiJVMDockerExample {
         }
 
         final ConfiguredClientServices cs = clientServices;
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+        final ExampleSimpleClient client = new ExampleSimpleClient(cs.getPalisadeService());
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");

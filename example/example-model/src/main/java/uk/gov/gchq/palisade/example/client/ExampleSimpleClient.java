@@ -16,20 +16,20 @@
 
 package uk.gov.gchq.palisade.example.client;
 
-import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.config.ServicesConfigurator;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
+import uk.gov.gchq.palisade.service.PalisadeService;
 
 import java.net.URI;
 import java.util.stream.Stream;
 
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
 
-    public ExampleSimpleClient(final ServicesFactory services, final String file) {
-        super(services, new ExampleObjSerialiser());
+    public ExampleSimpleClient(final PalisadeService palisadeService) {
+        super(palisadeService, new ExampleObjSerialiser());
     }
 
     public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
