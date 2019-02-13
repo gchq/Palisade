@@ -28,6 +28,8 @@ services:
     container_name: configure-services
     networks:
       - palisade_network
+    depends_on:
+      - config-service
   data-service:
     build: data-service
     container_name: data-service

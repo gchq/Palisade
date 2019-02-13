@@ -20,16 +20,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.audit.service.AuditService;
-import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
-import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
-import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.data.service.DataService;
-import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.impl.reader.HadoopDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
@@ -37,27 +31,20 @@ import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.HadoopResourceService;
-import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
-import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
 import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
 import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.user.service.UserService;
-import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 import uk.gov.gchq.palisade.user.service.impl.SimpleUserService;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -65,11 +52,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Convenience class for setting the default config for the various Palisade micro-services
  * which assumes all services are being deployed locally using the standard port.
- *
+ * <p>
  * It is expected to be run after the config service has been started but before
  * the other services are started.
  */
@@ -78,63 +66,44 @@ public class ServicesConfigurator {
     protected static final String HADOOP_CONF_PATH = "HADOOP_CONF_PATH";
     public static final String RESOURCE_TYPE = "exampleObj";
 
-    /**
-     * This is the main method which will run through all the services and set the
-     * config for each of those services in the config service ready to bootstrap
-     * the micro services when they are started.
-     *
-     * @param args Provides a means to pass in arguments into the method
-     */
-    public static void main(final String[] args) {
-        new ServicesConfigurator(args);
-    }
+    private final ClientServices clientServices;
 
-    public ServicesConfigurator(final String[] args) {
-        if (validateArguments(args)) {
-            LOGGER.info("Starting to set the service configurations.");
+    public ServicesConfigurator(final ClientServices clientServices) {
+        requireNonNull(clientServices, "clientServices");
+        LOGGER.info("Starting to set the service configurations.");
+        this.clientServices = clientServices;
 
-            // create the client config service
-            ConfigurationService configClient = createConfigServiceForClients(args);
+        // create the client config service
+        ConfigurationService configClient = clientServices.createConfigService();
 
-            // create the other client service
-            UserService userClient = createUserServiceForClients(args);
-            ResourceService resourceClient = createResourceServiceForClients(args);
-            PolicyService policyClient = createPolicyServiceForClients(args);
-            PalisadeService palisadeClient = createPalisadeServiceForClients(args);
-            DataService dataClient = createDataServiceForClients(args);
-            CacheService cacheClient = createCacheService(args);
+        // create the other client service
+        UserService userClient = clientServices.createUserService();
+        ResourceService resourceClient = clientServices.createResourceService();
+        PolicyService policyClient = clientServices.createPolicyService();
+        PalisadeService palisadeClient = clientServices.createPalisadeService();
+        DataService dataClient = clientServices.createDataService();
+        CacheService cacheClient = clientServices.createCacheService();
 
-            // add the config for the clients to the config service
-            Collection<Service> services = Stream.of(configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
-            writeClientConfiguration(configClient, services);
+        // add the config for the clients to the config service
+        Collection<Service> services = Stream.of(configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
+        writeClientConfiguration(configClient, services);
 
-            // write the config for the user service to the config service
-            writeServerConfiguration(configClient, createUserServiceForServer(args), UserService.class);
+        // write the config for the user service to the config service
+        writeServerConfiguration(configClient, createUserServiceForServer(), UserService.class);
 
-            // write the config for the resource service to the config service
-            writeServerConfiguration(configClient, createResourceServiceForServer(args), ResourceService.class);
+        // write the config for the resource service to the config service
+        writeServerConfiguration(configClient, createResourceServiceForServer(), ResourceService.class);
 
-            // write the config for the policy service to the config service
-            writeServerConfiguration(configClient, createPolicyServiceForServer(args), PolicyService.class);
+        // write the config for the policy service to the config service
+        writeServerConfiguration(configClient, createPolicyServiceForServer(), PolicyService.class);
 
-            // write the config for the palisade service to the config service
-            writeServerConfiguration(configClient, createPalisadeServiceForServer(args), PalisadeService.class);
+        // write the config for the palisade service to the config service
+        writeServerConfiguration(configClient, createPalisadeServiceForServer(), PalisadeService.class);
 
-            // write the config for the data service to the config service
-            writeServerConfiguration(configClient, createDataServiceForServer(args), DataService.class);
+        // write the config for the data service to the config service
+        writeServerConfiguration(configClient, createDataServiceForServer(), DataService.class);
 
-            LOGGER.info("Finished setting the service configurations.");
-        }
-    }
-
-    /**
-     * Used to validate the arguments into the main method
-     *
-     * @param args arguments to be passed into the main method
-     * @return true if the correct number of arguments are present
-     */
-    protected boolean validateArguments(final String[] args) {
-        return true;
+        LOGGER.info("Finished setting the service configurations.");
     }
 
     /**
@@ -172,58 +141,26 @@ public class ServicesConfigurator {
                 .service(Optional.of(serviceClass))).join();
     }
 
-    protected CacheService createCacheService(final String[] args) {
-        return new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(Collections.singletonList(URI.create("http://localhost:2379"))));
-    }
-
-    protected AuditService createAuditService(final String[] args) {
-        return new LoggerAuditService();
-    }
-
-    /**
-     * A method for creating the Config service that a client (any of the other
-     * types of services) would use to connect to the Config service
-     *
-     * @param args  Provides a means to pass in arguments into the method
-     * @return a Configuration service that the client would use to talk to the config service server
-     */
-    protected ConfigurationService createConfigServiceForClients(final String[] args) {
-        return new ProxyRestConfigService("http://localhost:8085/config");
-    }
-
     /**
      * A method for creating a user service as it would be configured as a standalone micro-service (server)
      *
-     * @param args  Provides a means to pass in arguments into the method
      * @return a user service as it would be configured as a standalone micro-service (server)
      */
-    protected UserService createUserServiceForServer(final String[] args) {
-        return new SimpleUserService().cacheService(createCacheService(args));
-    }
-
-    /**
-     * A method for creating the user service that a client (any of the other
-     * types of services) would use to connect to the user service
-     *
-     * @param args  Provides a means to pass in arguments into the method
-     * @return a user service that the client would use to talk to the user service server
-     */
-    protected UserService createUserServiceForClients(final String[] args) {
-        return new ProxyRestUserService("http://localhost:8083/user");
+    protected UserService createUserServiceForServer() {
+        return new SimpleUserService().cacheService(clientServices.createCacheService());
     }
 
     /**
      * A method for creating a resource service as it would be configured as a standalone micro-service (server)
      *
-     * @param args  Provides a means to pass in arguments into the method
      * @return a resource service as it would be configured as a standalone micro-service (server)
      */
-    protected ResourceService createResourceServiceForServer(final String[] args) {
+    protected ResourceService createResourceServiceForServer() {
         try {
             Configuration conf = createHadoopConfiguration();
-            HadoopResourceService resource = new HadoopResourceService().conf(conf).cacheService(createCacheService(args));
+            HadoopResourceService resource = new HadoopResourceService().conf(conf).cacheService(clientServices.createCacheService());
             final Map<String, ConnectionDetail> dataType = new HashMap<>();
-            dataType.put(RESOURCE_TYPE, new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class));
+            dataType.put(RESOURCE_TYPE, clientServices.createDataServiceConnectionDetail());
             resource.connectionDetail(null, dataType);
             return resource;
         } catch (IOException e) {
@@ -260,89 +197,42 @@ public class ServicesConfigurator {
     }
 
     /**
-     * A method for creating the resource service that a client (any of the other
-     * types of services) would use to connect to the resource service
-     *
-     * @param args  Provides a means to pass in arguments into the method
-     * @return a resource service that the client would use to talk to the resource service server
-     */
-    protected ResourceService createResourceServiceForClients(final String[] args) {
-        return new ProxyRestResourceService("http://localhost:8082/resource");
-    }
-
-    /**
      * A method for creating a policy service as it would be configured as a standalone micro-service (server)
      *
-     * @param args  Provides a means to pass in arguments into the method
      * @return a policy service as it would be configured as a standalone micro-service (server)
      */
-    protected PolicyService createPolicyServiceForServer(final String[] args) {
-        return new HierarchicalPolicyService().cacheService(createCacheService(args));
-    }
-
-    /**
-     * A method for creating the policy service that a client (any of the other
-     * types of services) would use to connect to the policy service
-     *
-     * @param args  Provides a means to pass in arguments into the method
-     * @return a policy service that the client would use to talk to the policy service server
-     */
-    protected PolicyService createPolicyServiceForClients(final String[] args) {
-        return new ProxyRestPolicyService("http://localhost:8081/policy");
+    protected PolicyService createPolicyServiceForServer() {
+        return new HierarchicalPolicyService().cacheService(clientServices.createCacheService());
     }
 
     /**
      * A method for creating a palisade service as it would be configured as a standalone micro-service (server)
      *
-     * @param args  Provides a means to pass in arguments into the method
      * @return a palisade service as it would be configured as a standalone micro-service (server)
      */
-    protected PalisadeService createPalisadeServiceForServer(final String[] args) {
+    protected PalisadeService createPalisadeServiceForServer() {
         return new SimplePalisadeService()
-                .cacheService(createCacheService(args))
-                .policyService(createPolicyServiceForClients(args))
-                .resourceService(createResourceServiceForClients(args))
-                .userService(createUserServiceForClients(args))
-                .auditService(createAuditService(args));
-    }
-
-    /**
-     * A method for creating the palisade service that a client (any of the other
-     * types of services) would use to connect to the palisade service
-     *
-     * @param args  Provides a means to pass in arguments into the method
-     * @return a palisade service that the client would use to talk to the palisade service server
-     */
-    protected PalisadeService createPalisadeServiceForClients(final String[] args) {
-        return new ProxyRestPalisadeService("http://localhost:8080/palisade");
+                .cacheService(clientServices.createCacheService())
+                .policyService(clientServices.createPolicyService())
+                .resourceService(clientServices.createResourceService())
+                .userService(clientServices.createUserService())
+                .auditService(clientServices.createAuditService());
     }
 
     /**
      * A method for creating a data service as it would be configured as a standalone micro-service (server)
      *
-     * @param args  Provides a means to pass in arguments into the method
      * @return a data service as it would be configured as a standalone micro-service (server)
      */
-    protected DataService createDataServiceForServer(final String[] args) {
+    protected DataService createDataServiceForServer() {
         try {
             Configuration conf = createHadoopConfiguration();
             HadoopDataReader reader = new HadoopDataReader().conf(conf);
             reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
-            return new SimpleDataService().reader(reader).palisadeService(createPalisadeServiceForClients(args)).cacheService(createCacheService(args));
+            return new SimpleDataService().reader(reader).palisadeService(clientServices.createPalisadeService()).cacheService(clientServices.createCacheService());
         } catch (final IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
             return null;
         }
-    }
-
-    /**
-     * A method for creating the data service that a client (any of the other
-     * types of services) would use to connect to the data service
-     *
-     * @param args  Provides a means to pass in arguments into the method
-     * @return a data service that the client would use to talk to the data service server
-     */
-    protected DataService createDataServiceForClients(final String[] args) {
-        return new ProxyRestDataService("http://localhost:8084/data");
     }
 }

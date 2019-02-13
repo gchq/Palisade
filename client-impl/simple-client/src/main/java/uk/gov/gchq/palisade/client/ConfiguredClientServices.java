@@ -104,8 +104,7 @@ public class ConfiguredClientServices implements ServicesFactory {
     }
 
     protected AuditService createAuditService() {
-        return null;
-//        return Configurator.createFromConfig(AuditService.class, config);
+        return Configurator.createFromConfig(AuditService.class, config);
     }
 
     protected PolicyService createPolicyService() {
