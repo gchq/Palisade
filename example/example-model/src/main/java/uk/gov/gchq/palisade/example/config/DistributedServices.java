@@ -18,12 +18,14 @@ package uk.gov.gchq.palisade.example.config;
 
 /**
  * Convenience class for setting the default config for the various Palisade micro-services
- * which assumes all services are being deployed locally using the standard port.
+ * which assumes all services are being deployed according to the given arguments.
  * <p>
  * It is expected to be run after the config service has been started but before
  * the other services are started.
  */
-public class DistributedServices {
+public final class DistributedServices {
+    private DistributedServices() {
+    }
 
     public static void main(final String[] args) {
         new ServicesConfigurator(new ClientServices(args));

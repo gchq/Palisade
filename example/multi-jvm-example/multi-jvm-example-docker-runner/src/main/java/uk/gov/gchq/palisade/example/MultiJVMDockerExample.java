@@ -22,8 +22,10 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.service.request.ConfigConsts;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.File;
@@ -42,7 +44,18 @@ public class MultiJVMDockerExample {
     public void run() throws Exception {
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
+        ConfiguredClientServices clientServices = null;
+
+        while (clientServices == null) {
+            try {
+                clientServices = new ConfiguredClientServices(configService);
+            } catch (NoConfigException e) {
+                LOGGER.warn("No client configuration present, waiting...");
+                Thread.sleep(ConfigConsts.DELAY);
+            }
+        }
+
+        final ConfiguredClientServices cs = clientServices;
         final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
 
         LOGGER.info("");

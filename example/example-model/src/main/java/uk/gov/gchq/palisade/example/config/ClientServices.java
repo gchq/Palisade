@@ -68,7 +68,7 @@ public class ClientServices {
      * @param args arguments to be passed into the main method
      * @return true if the correct number of arguments are present
      */
-    protected boolean validateArguments(final String[] args) {
+    private boolean validateArguments(final String[] args) {
         if (args.length > 6) {
             return true;
         } else {

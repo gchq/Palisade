@@ -16,9 +16,16 @@
 
 package uk.gov.gchq.palisade.example.config;
 
-public class LocalServices {
+/**
+ * Convenience class for setting the default config for the various Palisade micro-services
+ * which assumes all services are being deployed locally using the standard port.
+ * <p>
+ * It is expected to be run after the config service has been started but before
+ * the other services are started.
+ */
+public final class LocalServices {
 
-    public final static String[] LOCAL_ARGS = {"http://localhost:2379",
+    public static final String[] LOCAL_ARGS = {"http://localhost:2379",
             "http://localhost:8080/palisade",
             "http://localhost:8081/policy",
             "http://localhost:8082/resource",
@@ -26,6 +33,9 @@ public class LocalServices {
             "http://localhost:8084/data",
             "http://localhost:8085/config"
     };
+
+    private LocalServices() {
+    }
 
     /**
      * This is the main method which will run through all the services and set the

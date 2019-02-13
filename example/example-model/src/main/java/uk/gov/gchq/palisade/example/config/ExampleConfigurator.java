@@ -64,6 +64,11 @@ public final class ExampleConfigurator {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExampleConfigurator.class);
     private final String file;
 
+    /**
+     * Establishes policies and details for the examples and writes these into the configuration service.
+     *
+     * @param args command line arguments
+     */
     public static void main(final String[] args) {
         final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);

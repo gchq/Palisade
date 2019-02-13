@@ -51,12 +51,6 @@
             <artifactId>etcd-backing-store</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-docker-services</artifactId>
-            <version>${project.parent.version}</version>
-            <type>pom</type>
-        </dependency>
 
         <!-- Test dependencies -->
 

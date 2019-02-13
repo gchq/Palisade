@@ -45,7 +45,6 @@ public class ConfiguredClientServices implements ServicesFactory {
     public ConfiguredClientServices(final ConfigurationService configService) {
         requireNonNull(configService, "configService");
         this.configService = configService;
-
         this.config = new Configurator(configService).retrieveConfig(Optional.empty());
         this.resourceService = createResourceService();
         this.auditService = createAuditService();

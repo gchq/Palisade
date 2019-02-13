@@ -32,6 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -261,6 +262,11 @@ public class Configurator {
             } catch (TimeoutException e) {
                 LOGGER.debug("Timed out getting configuration for {}", serviceClass.getClass());
                 continue;
+            } catch (CompletionException e) {
+                //this should be rethrown
+                if (e.getCause() instanceof NoConfigException) {
+                    throw (NoConfigException) e.getCause();
+                }
             }
         }
 

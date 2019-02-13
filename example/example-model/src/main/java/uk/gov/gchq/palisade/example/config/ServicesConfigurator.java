@@ -20,6 +20,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
@@ -77,6 +78,7 @@ public class ServicesConfigurator {
         ConfigurationService configClient = clientServices.createConfigService();
 
         // create the other client service
+        AuditService auditService = clientServices.createAuditService();
         UserService userClient = clientServices.createUserService();
         ResourceService resourceClient = clientServices.createResourceService();
         PolicyService policyClient = clientServices.createPolicyService();
@@ -85,7 +87,7 @@ public class ServicesConfigurator {
         CacheService cacheClient = clientServices.createCacheService();
 
         // add the config for the clients to the config service
-        Collection<Service> services = Stream.of(configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
+        Collection<Service> services = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
         writeClientConfiguration(configClient, services);
 
         // write the config for the user service to the config service
