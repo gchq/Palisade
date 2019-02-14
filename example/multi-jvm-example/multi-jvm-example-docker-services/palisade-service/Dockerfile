@@ -1,4 +1,4 @@
-From tomcat:8-jre11
+From tomcat:8-jre11-slim
 
 ADD docker/bin/rest-palisade-service /usr/local/tomcat/webapps/palisade/
 ADD docker/setenv.sh /usr/local/tomcat/bin/

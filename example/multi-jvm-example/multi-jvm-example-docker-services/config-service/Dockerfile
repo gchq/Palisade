@@ -1,4 +1,4 @@
-From tomcat:8-jre11
+From tomcat:8-jre11-slim
 
 ADD docker/bin/rest-config-service/ /usr/local/tomcat/webapps/config
 ADD docker/setenv.sh /usr/local/tomcat/bin/
