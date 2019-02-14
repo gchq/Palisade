@@ -35,7 +35,7 @@
 //
 //import uk.gov.gchq.palisade.Context;
 //import uk.gov.gchq.palisade.UserId;
-//import uk.gov.gchq.palisade.client.ConfiguredClientServices;
+//import uk.gov.gchq.palisade.example.config.ConfiguredServices;
 //import uk.gov.gchq.palisade.client.ServicesFactory;
 //import uk.gov.gchq.palisade.config.service.ConfigurationService;
 //import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
@@ -125,7 +125,7 @@
 //
 //        //configure the Palisade input format on an example client
 //        final ConfigurationService ics = new ServicesConfigurator(new String[0]);
-//        final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
+//        final ConfiguredServices cs = new ConfiguredServices(ics);
 //        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 //
 //        // Edit the configuration of the Palisade requests below here
