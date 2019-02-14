@@ -1,4 +1,4 @@
-From tomcat:8-jre11-slim
+From tomcat:8-jre8-alpine
 
 ADD docker/bin/rest-data-service/ /usr/local/tomcat/webapps/data
 ADD docker/setenv.sh /usr/local/tomcat/bin/
