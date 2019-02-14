@@ -33,7 +33,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.RestUtil;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 
 import javax.ws.rs.Consumes;

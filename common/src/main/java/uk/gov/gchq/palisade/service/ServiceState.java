@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.service.request;
+package uk.gov.gchq.palisade.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -39,7 +39,7 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * This class may contain {@code null} values.
  */
-public class ServiceConfiguration {
+public class ServiceState {
 
     /**
      * The map of configuration data.
@@ -50,7 +50,7 @@ public class ServiceConfiguration {
     /**
      * Create empty configuration.
      */
-    public ServiceConfiguration() {
+    public ServiceState() {
     }
 
     /**
@@ -70,7 +70,7 @@ public class ServiceConfiguration {
      * @param map the map to copy
      * @return this object
      */
-    public ServiceConfiguration putAll(final Map<String, String> map) {
+    public ServiceState putAll(final Map<String, String> map) {
         requireNonNull(map, "map");
         //filter out any null keys
         map.entrySet()
@@ -87,7 +87,7 @@ public class ServiceConfiguration {
      * @param value the configuration value, maybe {@code null}
      * @return this object
      */
-    public ServiceConfiguration put(final String key, final String value) {
+    public ServiceState put(final String key, final String value) {
         requireNonNull(key, "key");
         configMap.put(key, value);
         return this;
@@ -131,7 +131,7 @@ public class ServiceConfiguration {
             return false;
         }
 
-        ServiceConfiguration that = (ServiceConfiguration) o;
+        ServiceState that = (ServiceState) o;
 
         return new EqualsBuilder()
                 .append(configMap, that.configMap)

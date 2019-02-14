@@ -16,8 +16,10 @@
 
 package uk.gov.gchq.palisade.exception;
 
+import uk.gov.gchq.palisade.service.ServiceState;
+
 /**
- * An exception thrown when a request is made for an {@link uk.gov.gchq.palisade.service.request.ServiceConfiguration} that is
+ * An exception thrown when a request is made for an {@link ServiceState} that is
  * not present, or could not be found.
  */
 public class NoConfigException extends PalisadeRuntimeException {

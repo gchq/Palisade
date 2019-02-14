@@ -27,7 +27,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFor
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;

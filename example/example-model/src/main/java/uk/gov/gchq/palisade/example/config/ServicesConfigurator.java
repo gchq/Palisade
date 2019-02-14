@@ -34,9 +34,9 @@ import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.HadoopResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.Service;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.impl.SimplePalisadeService;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.SimpleUserService;
 
@@ -67,9 +67,9 @@ public class ServicesConfigurator {
     protected static final String HADOOP_CONF_PATH = "HADOOP_CONF_PATH";
     public static final String RESOURCE_TYPE = "exampleObj";
 
-    private final ClientServices clientServices;
+    private final ProxyServicesFactory clientServices;
 
-    public ServicesConfigurator(final ClientServices clientServices) {
+    public ServicesConfigurator(final ProxyServicesFactory clientServices) {
         requireNonNull(clientServices, "clientServices");
         LOGGER.info("Starting to set the service configurations.");
         this.clientServices = clientServices;
@@ -116,7 +116,7 @@ public class ServicesConfigurator {
      * @param services      collection of services to write to the configuration service
      */
     private void writeClientConfiguration(final ConfigurationService configService, final Collection<Service> services) {
-        ServiceConfiguration initial = new ServiceConfiguration();
+        ServiceState initial = new ServiceState();
 
         //each service to write their configuration into the initial configuration
         services.forEach(service -> service.recordCurrentConfigTo(initial));
@@ -136,7 +136,7 @@ public class ServicesConfigurator {
      * @param serviceClass  the type of Palisade service
      */
     private void writeServerConfiguration(final ConfigurationService configService, final Service service, final Class<? extends Service> serviceClass) {
-        ServiceConfiguration config = new ServiceConfiguration();
+        ServiceState config = new ServiceState();
         service.recordCurrentConfigTo(config);
         configService.add((AddConfigRequest) new AddConfigRequest()
                 .config(config)

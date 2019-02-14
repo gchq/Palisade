@@ -26,7 +26,7 @@ import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.*;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
 import java.io.IOException;

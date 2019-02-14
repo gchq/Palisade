@@ -26,8 +26,8 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.ConfigConsts;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.ConfigConsts;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.File;
@@ -50,7 +50,7 @@ public class MultiJVMDockerExample {
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
-        ServiceConfiguration clientConfig = null;
+        ServiceState clientConfig = null;
         int times = 0;
         while (isNull(clientConfig) && times < 5) {
             try {

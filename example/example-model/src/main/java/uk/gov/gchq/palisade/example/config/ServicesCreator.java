@@ -22,18 +22,18 @@ import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.user.service.UserService;
 
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
-public class ConfiguredServices {
+public class ServicesCreator {
 
     private final ConfigurationService configService;
 
-    private final ServiceConfiguration config;
+    private final ServiceState config;
 
     private final ResourceService resourceService;
     private final AuditService auditService;
@@ -42,7 +42,7 @@ public class ConfiguredServices {
     private final CacheService cacheService;
     private final PalisadeService palisadeService;
 
-    public ConfiguredServices(final ConfigurationService configService) {
+    public ServicesCreator(final ConfigurationService configService) {
         requireNonNull(configService, "configService");
         this.configService = configService;
         this.config = new Configurator(configService).retrieveConfig(Optional.empty());

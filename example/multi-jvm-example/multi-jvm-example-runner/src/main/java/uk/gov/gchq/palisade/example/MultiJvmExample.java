@@ -19,7 +19,7 @@
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 //
-//import uk.gov.gchq.palisade.example.config.ConfiguredServices;
+//import uk.gov.gchq.palisade.example.config.ServicesCreator;
 //import uk.gov.gchq.palisade.config.service.ConfigurationService;
 //import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 //import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
@@ -49,7 +49,7 @@
 //        final InputStream stream = StreamUtil.openStream(MultiJvmExample.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
 //        ConfigurationService service = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 //
-//        final ConfiguredServices cs = new ConfiguredServices(service);
+//        final ServicesCreator cs = new ServicesCreator(service);
 //        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 //
 //        LOGGER.info("");

@@ -38,12 +38,12 @@ import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
@@ -83,7 +83,7 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     @Override
-    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
         requireNonNull(config, "config");
         setAuditService(getFromConfig(config, AUDIT_IMPL_KEY, AuditService.class));
         setPolicyService(getFromConfig(config, POLICY_IMPL_KEY, PolicyService.class));
@@ -93,7 +93,7 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     /**
-     * Given an {@link ServiceConfiguration} object, this will create an instance of the given service. The {@code key} gives the
+     * Given an {@link ServiceState} object, this will create an instance of the given service. The {@code key} gives the
      * name of the serialised form inside the configuration object.
      *
      * @param config       the configuration for this Palisade service
@@ -103,7 +103,7 @@ public class SimplePalisadeService implements PalisadeService {
      * @return a created service
      * @throws NoConfigException if the required configuration item could not be found
      */
-    private static <S extends Service> S getFromConfig(final ServiceConfiguration config, final String key, final Class<S> serviceClass) throws NoConfigException {
+    private static <S extends Service> S getFromConfig(final ServiceState config, final String key, final Class<S> serviceClass) throws NoConfigException {
         requireNonNull(config, "config");
         requireNonNull(key, "key");
         requireNonNull(serviceClass, "serviceClass");
@@ -116,7 +116,7 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     @Override
-    public void recordCurrentConfigTo(final ServiceConfiguration config) {
+    public void recordCurrentConfigTo(final ServiceState config) {
         requireNonNull(config, "config");
         config.put(PalisadeService.class.getTypeName(), getClass().getTypeName());
         storeInConfig(config, auditService, AUDIT_IMPL_KEY);
@@ -133,7 +133,7 @@ public class SimplePalisadeService implements PalisadeService {
      * @param service the service to store
      * @param key     the key name
      */
-    private static void storeInConfig(final ServiceConfiguration config, final Service service, final String key) {
+    private static void storeInConfig(final ServiceState config, final Service service, final String key) {
         requireNonNull(config, "config");
         requireNonNull(service, "service");
         requireNonNull(key, "key");

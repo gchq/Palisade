@@ -39,7 +39,7 @@ import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.rule.Rules;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -90,7 +90,7 @@ public class HierarchicalPolicyService implements PolicyService {
     }
 
     @Override
-    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
         requireNonNull(config, "config");
         //extract cache
         String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
@@ -102,7 +102,7 @@ public class HierarchicalPolicyService implements PolicyService {
     }
 
     @Override
-    public void recordCurrentConfigTo(final ServiceConfiguration config) {
+    public void recordCurrentConfigTo(final ServiceState config) {
         requireNonNull(config, "config");
         config.put(PolicyService.class.getTypeName(), getClass().getTypeName());
         String serialisedCache = new String(JSONSerialiser.serialise(cacheService), StandardCharsets.UTF_8);
