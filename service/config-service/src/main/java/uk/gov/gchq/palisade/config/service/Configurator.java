@@ -18,10 +18,10 @@ package uk.gov.gchq.palisade.config.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.ConfigConsts;
 import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.lang.reflect.InvocationTargetException;

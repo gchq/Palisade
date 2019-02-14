@@ -32,10 +32,10 @@ import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
-import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
