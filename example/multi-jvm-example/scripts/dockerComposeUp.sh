@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 set -e
-
-docker-compose -f ./example/multi-jvm-example/multi-jvm-example-docker-services/docker-compose.yml -p palisade_example up -d --build
+docker-compose --no-ansi -f ./example/multi-jvm-example/multi-jvm-example-docker-services/docker-compose.yml -p example up -d --build
