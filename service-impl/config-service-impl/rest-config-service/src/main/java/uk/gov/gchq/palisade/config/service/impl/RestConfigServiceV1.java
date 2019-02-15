@@ -32,6 +32,7 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -41,6 +42,7 @@ import javax.ws.rs.Produces;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/")
@@ -55,19 +57,13 @@ public class RestConfigServiceV1 implements ConfigurationService {
 
     private static ConfigurationService configService;
 
-    public RestConfigServiceV1() {
-        this(System.getProperty(BOOTSTRAP_CONFIG));
-    }
-
-    public RestConfigServiceV1(final String serviceConfigPath) {
-        this(createService(serviceConfigPath));
-    }
-
+    @Inject
     public RestConfigServiceV1(final ConfigurationService delegate) {
+        requireNonNull(delegate, "delegate");
         this.delegate = delegate;
     }
 
-    private static synchronized ConfigurationService createService(final String serviceConfigPath) {
+    static synchronized ConfigurationService createService(final String serviceConfigPath) {
         if (configService == null) {
             //create the configuration service from the initial bootstrap information
             final InputStream stream = StreamUtil.openStream(RestConfigServiceV1.class, serviceConfigPath);
