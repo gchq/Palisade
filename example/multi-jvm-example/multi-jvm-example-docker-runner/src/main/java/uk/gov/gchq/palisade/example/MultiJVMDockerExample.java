@@ -52,7 +52,7 @@ public class MultiJVMDockerExample {
 
         ServiceState clientConfig = null;
         int times = 0;
-        while (isNull(clientConfig) && times < 5) {
+        while (isNull(clientConfig) && times < 30) {
             try {
                 clientConfig = new Configurator(configService).retrieveConfig(Optional.empty());
             } catch (NoConfigException e) {
