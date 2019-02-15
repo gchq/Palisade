@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.client;
+package uk.gov.gchq.palisade.example.util;
 
 import org.apache.commons.io.FileUtils;
 

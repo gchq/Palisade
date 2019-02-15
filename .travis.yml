@@ -6,7 +6,6 @@ cache:
 dist: trusty
 jdk:
   - oraclejdk8
-sudo: false
 
 services:
   - docker
