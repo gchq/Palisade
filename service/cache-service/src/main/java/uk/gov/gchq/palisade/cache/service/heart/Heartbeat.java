@@ -40,6 +40,9 @@ import static java.util.Objects.requireNonNull;
  * current instances of service A to find out where it can send a request. This is particularly useful for service
  * discovery and load balancing.
  * <p>
+ * When this heartbeat gets garbage collected the thread sending beats automatically terminates. Thus, the heart instance
+ * must be kept live to keep beating.
+ * <p>
  * This relies on the time to live feature provided by a {@link CacheService} to register a running instance.
  * <p>
  * Most parameters cannot be changed whilst the heartbeats are being sent.
@@ -300,7 +303,9 @@ public class Heartbeat {
      * manually stopped by the client, even after the {@link Heartbeat} instance is eligible for collection (causing a memory leak).
      */
     private static class Beat implements Runnable {
-        /**Weak reference to the heartbeat, used for GC detection.*/
+        /**
+         * Weak reference to the heartbeat, used for GC detection.
+         */
         private final WeakReference<Heartbeat> heart;
         private final CacheService localCache;
         private final AddCacheRequest<byte[]> cacheRequest;

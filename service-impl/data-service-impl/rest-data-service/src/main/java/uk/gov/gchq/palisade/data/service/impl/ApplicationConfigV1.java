@@ -16,6 +16,9 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
+import uk.gov.gchq.palisade.data.service.DataService;
+import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 
 public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
@@ -25,5 +28,8 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
 
     public ApplicationConfigV1() {
         super(RESOURCES);
+        //make sure we can inject the service instance
+        DataService delegate = RestDataServiceV1.createService(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        register(new ServiceBinder<DataService>(delegate, DataService.class));
     }
 }
