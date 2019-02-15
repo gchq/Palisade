@@ -41,7 +41,7 @@ public class SimpleRandomRedirector extends HeartbeatRedirector<String> {
      * This redirector redirects all requests randomly to a live instance.
      */
     @Override
-    public RedirectionResult<String> redirectionFor(final Method method, final Object... args) throws NoInstanceException {
+    public RedirectionResult<String> redirectionFor(final String host, final Method method, final Object... args) throws NoInstanceException {
         //get list of live services
         List<String> liveInstances = getScope().auscultate().collect(Collectors.toList());
 
@@ -49,7 +49,7 @@ public class SimpleRandomRedirector extends HeartbeatRedirector<String> {
         Collections.shuffle(liveInstances);
         return liveInstances
                 .stream()
-                .peek(destination -> LOGGER.debug("Call to \"{}\" being redirected to {}", method.getDeclaringClass().getTypeName() + "." + method.getName(), destination))
+                .peek(destination -> LOGGER.debug("Call from host {} to \"{}\" being redirected to {}", host, method.getDeclaringClass().getTypeName() + "." + method.getName(), destination))
                 .findFirst()
                 .map(StringRedirectResult::new)
                 .orElseThrow(() -> new NoInstanceException("no live instances of " + super.getRedirectionClass() + " could be found"));
