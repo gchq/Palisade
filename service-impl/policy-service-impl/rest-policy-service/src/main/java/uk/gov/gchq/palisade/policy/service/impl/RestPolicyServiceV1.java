@@ -34,6 +34,7 @@ import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.rest.RestUtil;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -55,19 +56,13 @@ public class RestPolicyServiceV1 implements PolicyService {
 
     private static PolicyService policyService;
 
-    public RestPolicyServiceV1() {
-        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
-    }
-
-    public RestPolicyServiceV1(final String serviceConfigPath) {
-        this(createService(serviceConfigPath));
-    }
-
+    @Inject
     public RestPolicyServiceV1(final PolicyService delegate) {
+        requireNonNull(delegate, "delegate");
         this.delegate = delegate;
     }
 
-    private static synchronized PolicyService createService(final String serviceConfigPath) {
+    static synchronized PolicyService createService(final String serviceConfigPath) {
         if (policyService == null) {
             policyService = RestUtil.createService(RestPolicyServiceV1.class, serviceConfigPath, PolicyService.class);
         }

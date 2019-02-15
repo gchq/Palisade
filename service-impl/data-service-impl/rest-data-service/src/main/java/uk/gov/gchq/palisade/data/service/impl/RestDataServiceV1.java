@@ -29,6 +29,7 @@ import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.rest.RestUtil;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -57,19 +58,13 @@ public class RestDataServiceV1 implements DataService {
 
     private static DataService dataService;
 
-    public RestDataServiceV1() {
-        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
-    }
-
-    public RestDataServiceV1(final String serviceConfigPath) {
-        this(createService(serviceConfigPath));
-    }
-
+    @Inject
     public RestDataServiceV1(final DataService delegate) {
+        requireNonNull(delegate, "delegate");
         this.delegate = delegate;
     }
 
-    private static synchronized DataService createService(final String serviceConfigPath) {
+    static synchronized DataService createService(final String serviceConfigPath) {
         if (dataService == null) {
             //note that here we specifically allow the DataService implementing class to be overridden from a system property
             dataService = RestUtil.createService(RestDataServiceV1.class, serviceConfigPath, DataService.class, DataService.class.getTypeName());

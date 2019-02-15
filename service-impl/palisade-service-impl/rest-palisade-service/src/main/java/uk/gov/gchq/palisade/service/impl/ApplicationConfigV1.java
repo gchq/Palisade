@@ -16,7 +16,10 @@
 
 package uk.gov.gchq.palisade.service.impl;
 
+import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
+import uk.gov.gchq.palisade.service.PalisadeService;
 
 public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
     private static final Class<?>[] RESOURCES = new Class<?>[]{
@@ -25,5 +28,8 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
 
     public ApplicationConfigV1() {
         super(RESOURCES);
+        //make sure we can inject the service instance
+        PalisadeService delegate = RestPalisadeServiceV1.createService(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        register(new ServiceBinder<PalisadeService>(delegate, PalisadeService.class));
     }
 }
