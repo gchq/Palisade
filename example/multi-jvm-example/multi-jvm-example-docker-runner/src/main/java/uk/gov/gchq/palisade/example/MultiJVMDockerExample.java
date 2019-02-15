@@ -67,7 +67,7 @@ public class MultiJVMDockerExample {
         }
 
         PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
-        
+
         final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 
         LOGGER.info("");

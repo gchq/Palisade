@@ -22,7 +22,7 @@ import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.user.service.UserService;
 
 import java.util.Optional;
@@ -33,7 +33,7 @@ public class ConfiguredServices {
 
     private final ConfigurationService configService;
 
-    private final ServiceConfiguration config;
+    private final ServiceState config;
 
     private final ResourceService resourceService;
     private final AuditService auditService;
