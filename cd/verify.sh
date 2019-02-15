@@ -14,7 +14,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     # Sleep to allow containers to start
     sleep 5s
     echo "Running the example application"
-    OUTPUT=`./example/multi-jvm-example/scripts/runDocker.sh`
+    OUTPUT=`./example/multi-jvm-example/scripts/runDocker.sh | tee /dev/tty`
     echo "Output is: $OUTPUT"
     validate_example_output "$OUTPUT"
     result=$?
