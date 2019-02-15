@@ -15,6 +15,8 @@
  */
 package uk.gov.gchq.palisade.rest;
 
+import java.time.Duration;
+
 /**
  * Utility class providing constants for the Palisade REST API.
  */
@@ -48,6 +50,11 @@ public final class ServiceConstants {
         final String apiVersion = System.getProperty(SystemProperty.REST_API_VERSION, SystemProperty.CORE_VERSION);
         PALISADE_MEDIA_TYPE = "palisade.v" + apiVersion.charAt(0) + "; format=json";
     }
+
+    /**
+     * Timeout for retrieving a configuration from the configuration service.
+     */
+    public static final Duration CONFIG_TIMEOUT = Duration.ofSeconds(10);
 
     private ServiceConstants() {
         // Empty constructor to prevent instantiation.
