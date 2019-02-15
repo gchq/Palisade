@@ -1,4 +1,4 @@
-FROM openjdk:8-alpine
+FROM openjdk:8-jre-alpine
 
 RUN apk add --no-cache curl
 ADD docker/bin/example-model-*-shaded.jar /tmp/
