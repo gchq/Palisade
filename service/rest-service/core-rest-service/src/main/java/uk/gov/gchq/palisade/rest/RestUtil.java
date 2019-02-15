@@ -44,7 +44,7 @@ public final class RestUtil {
      * Attempts to create the configured {@link Service}. This method provides the boot strapping for the REST services
      * to instantiate their services to which they delegate the actual implementations. This method will attempt to load
      * the {@link ConfigurationService} class details from the given path. Once this has been instantiated, it
-     * will repeatedly call the configuration service trying to get the name of the actual implementing class for the
+     * will call the configuration service trying to get the name of the actual implementing class for the
      * given service and then configure it.
      *
      * @param resolverClass     the class to resolve the {@code configDetailsPath} against
@@ -53,23 +53,13 @@ public final class RestUtil {
      * @param overridable       list of regular expressions for keys that can be overridden from system properties
      * @param <S>               type of service being returned
      * @return an instantiated configured service
+     * @throws NoConfigException if the configuration service could not find any configuration
      * @see Configurator#createFromConfig(Class, uk.gov.gchq.palisade.service.request.ServiceConfiguration, String...)
      */
-    public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass, final String... overridable) {
+    public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass, final String... overridable) throws NoConfigException {
         ConfigurationService service = createConfigServiceFromPath(resolverClass, configDetailsPath);
         //get the config for this service, try repeatedly until we get a valid configuration
-        while (true) {
-            try {
-                return new Configurator(service).retrieveConfigAndCreate(serviceClass, overridable);
-            } catch (NoConfigException e) {
-                LOGGER.warn("Failed to get valid configuration for {}", serviceClass.getTypeName(), e);
-                try {
-                    Thread.sleep(ConfigConsts.DELAY);
-                } catch (InterruptedException ignore) {
-                    //ignore
-                }
-            }
-        }
+        return new Configurator(service).retrieveConfigAndCreate(serviceClass, ServiceConstants.CONFIG_TIMEOUT, overridable);
     }
 
     /**
