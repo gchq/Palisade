@@ -38,18 +38,18 @@ import java.util.stream.Stream;
 public class SimpleClient<T> {
     private final Serialiser<T> serialiser;
 
-    private final PalisadeService palisadeServices;
+    private final PalisadeService palisadeService;
 
     public SimpleClient(final PalisadeService palisadeService, final Serialiser<T> serialiser) {
         Objects.requireNonNull(palisadeService, "palisade service must be provided");
-        this.palisadeServices = palisadeService;
+        this.palisadeService = palisadeService;
         Objects.requireNonNull(serialiser, "serialiser cannot be null");
         this.serialiser = serialiser;
     }
 
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String justification) {
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
-        final DataRequestResponse dataRequestResponse = palisadeServices.registerDataRequest(dataRequest).join();
+        final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
