@@ -28,6 +28,6 @@ public final class DistributedServices {
     }
 
     public static void main(final String[] args) {
-        new ServicesConfigurator(new ClientServices(args));
+        new ServicesConfigurator(new ProxyServicesFactory(args));
     }
 }

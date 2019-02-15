@@ -26,7 +26,7 @@ import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -162,8 +162,8 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      * @param serviceConfigPath the path to load the JSON from
      */
     private void selfConfigure(final String serviceConfigPath) {
-        ServiceConfiguration conf = RestUtil.retrieveConfig(RESTRedirector.class, serviceConfigPath, RESTRedirector.class);
-        ServiceConfiguration overridden = Configurator.applyOverrides(conf, REDIRECTOR_KEY, REDIRECTION_CLASS_KEY, REST_IMPL_CLASS_KEY);
+        ServiceState conf = RestUtil.retrieveConfig(RESTRedirector.class, serviceConfigPath, RESTRedirector.class);
+        ServiceState overridden = Configurator.applyOverrides(conf, REDIRECTOR_KEY, REDIRECTION_CLASS_KEY, REST_IMPL_CLASS_KEY);
         //self configure
         applyConfigFrom(overridden);
     }
@@ -241,7 +241,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      * {@inheritDoc}
      */
     @Override
-    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
         requireNonNull(config, "config");
         String serialisedRedirect = config.getOrDefault(REDIRECTOR_KEY, null);
         if (nonNull(serialisedRedirect)) {
@@ -276,7 +276,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      * {@inheritDoc}
      */
     @Override
-    public void recordCurrentConfigTo(final ServiceConfiguration config) {
+    public void recordCurrentConfigTo(final ServiceState config) {
         requireNonNull(config, "config");
         config.put(REDIRECTOR_KEY, new String(JSONSerialiser.serialise(redirector), StandardCharsets.UTF_8));
         config.put(REDIRECTION_CLASS_KEY, redirectionClass.getTypeName());

@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.resource.service.impl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import uk.gov.gchq.palisade.data.service.impl.MockDataService;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -26,7 +27,7 @@ import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.*;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
 import java.io.IOException;

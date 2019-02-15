@@ -70,17 +70,17 @@ public final class ExampleConfigurator {
     public static void main(final String[] args) {
         final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-        ConfiguredServices cs = new ConfiguredServices(configService);
+        ServicesCreator cs = new ServicesCreator(configService);
         new ExampleConfigurator(cs, args[0]);
     }
 
-    public ExampleConfigurator(final ConfiguredServices services, final String file) {
+    public ExampleConfigurator(final ServicesCreator services, final String file) {
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(file);
         this.file = absoluteFileURI.toString();
         initialiseExample(services);
     }
 
-    private void initialiseExample(final ConfiguredServices services) {
+    private void initialiseExample(final ServicesCreator services) {
         // The user authorisation owner or sys admin needs to add the user
         final UserService userService = services.getUserService();
 

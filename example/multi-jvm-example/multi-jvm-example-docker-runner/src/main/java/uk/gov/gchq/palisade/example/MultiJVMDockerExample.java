@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
@@ -26,8 +27,7 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.ConfigConsts;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.File;
@@ -50,7 +50,7 @@ public class MultiJVMDockerExample {
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
-        ServiceConfiguration clientConfig = null;
+        ServiceState clientConfig = null;
         int times = 0;
         while (isNull(clientConfig) && times < 30) {
             try {
@@ -67,6 +67,7 @@ public class MultiJVMDockerExample {
         }
 
         PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
+
         final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 
         LOGGER.info("");

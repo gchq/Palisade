@@ -29,7 +29,7 @@ import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import javax.inject.Inject;
@@ -75,13 +75,13 @@ public class RestConfigServiceV1 implements ConfigurationService {
 
     @POST
     @Path("/get")
-    @ApiOperation(value = "Gets the config in a ServiceConfiguration",
-            response = ServiceConfiguration.class)
+    @ApiOperation(value = "Gets the config in a ServiceState",
+            response = ServiceState.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    public ServiceConfiguration getSync(
+    public ServiceState getSync(
             @ApiParam(value = "The request") final GetConfigRequest request) {
         LOGGER.debug("Invoking get: {}", request);
         return get(request).join();
@@ -89,7 +89,7 @@ public class RestConfigServiceV1 implements ConfigurationService {
 
     @PUT
     @Path("/add")
-    @ApiOperation(value = "Adds the config from this ServiceConfiguration",
+    @ApiOperation(value = "Adds the config from this ServiceState",
             response = Boolean.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -102,7 +102,7 @@ public class RestConfigServiceV1 implements ConfigurationService {
     }
 
     @Override
-    public CompletableFuture<ServiceConfiguration> get(final GetConfigRequest request) {
+    public CompletableFuture<ServiceState> get(final GetConfigRequest request) {
         return delegate.get(request);
     }
 

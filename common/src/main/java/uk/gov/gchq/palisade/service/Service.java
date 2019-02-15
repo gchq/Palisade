@@ -26,7 +26,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.request.Request;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -35,7 +34,7 @@ import java.util.concurrent.CompletableFuture;
  * <p>
  * The only requirement is that there is a process method, used to process all requests that are passed to a service.
  * <p>
- * The {@link Service#applyConfigFrom(ServiceConfiguration)} method should implemented so that the class can be configured with an
+ * The {@link Service#applyConfigFrom(ServiceState)} method should implemented so that the class can be configured with an
  * initial configuration.
  */
 @JsonPropertyOrder(value = {"class"}, alphabetic = true)
@@ -61,7 +60,7 @@ public interface Service {
      * @param config the configuration
      * @throws NoConfigException if some required element of the configuration is not present
      */
-    default void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
+    default void applyConfigFrom(final ServiceState config) throws NoConfigException {
         //does nothing by default
     }
 
@@ -73,7 +72,7 @@ public interface Service {
      *
      * @param config the configuration to place initial configuration information into
      */
-    default void recordCurrentConfigTo(final ServiceConfiguration config) {
+    default void recordCurrentConfigTo(final ServiceState config) {
         //does nothing by default
     }
 

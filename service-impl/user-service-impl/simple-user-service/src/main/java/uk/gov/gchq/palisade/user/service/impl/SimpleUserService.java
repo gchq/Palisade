@@ -26,7 +26,7 @@ import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.exception.NoSuchUserIdException;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
@@ -57,7 +57,7 @@ public class SimpleUserService implements UserService {
     }
 
     @Override
-    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
         requireNonNull(config, "config");
         //extract cache
         String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
@@ -69,7 +69,7 @@ public class SimpleUserService implements UserService {
     }
 
     @Override
-    public void recordCurrentConfigTo(final ServiceConfiguration config) {
+    public void recordCurrentConfigTo(final ServiceState config) {
         requireNonNull(config, "config");
         config.put(UserService.class.getTypeName(), getClass().getTypeName());
         String serialisedCache = new String(JSONSerialiser.serialise(cacheService), StandardCharsets.UTF_8);

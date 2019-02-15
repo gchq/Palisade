@@ -45,6 +45,6 @@ public final class LocalServices {
      * @param args Provides a means to pass in arguments into the method
      */
     public static void main(final String[] args) {
-        new ServicesConfigurator(new ClientServices(LOCAL_ARGS));
+        new ServicesConfigurator(new ProxyServicesFactory(LOCAL_ARGS));
     }
 }

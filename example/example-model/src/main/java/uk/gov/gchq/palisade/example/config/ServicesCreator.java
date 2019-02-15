@@ -29,7 +29,7 @@ import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
-public class ConfiguredServices {
+public class ServicesCreator {
 
     private final ConfigurationService configService;
 
@@ -42,7 +42,7 @@ public class ConfiguredServices {
     private final CacheService cacheService;
     private final PalisadeService palisadeService;
 
-    public ConfiguredServices(final ConfigurationService configService) {
+    public ServicesCreator(final ConfigurationService configService) {
         requireNonNull(configService, "configService");
         this.configService = configService;
         this.config = new Configurator(configService).retrieveConfig(Optional.empty());

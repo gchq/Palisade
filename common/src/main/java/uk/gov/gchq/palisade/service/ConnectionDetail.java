@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.service.request;
+package uk.gov.gchq.palisade.service;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-
-import uk.gov.gchq.palisade.service.Service;
 
 /**
  * A High level API for passing details of how to connect to a resource

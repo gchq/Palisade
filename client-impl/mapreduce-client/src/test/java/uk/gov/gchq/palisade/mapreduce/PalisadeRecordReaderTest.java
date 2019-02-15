@@ -30,7 +30,7 @@ import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.StubResource;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 

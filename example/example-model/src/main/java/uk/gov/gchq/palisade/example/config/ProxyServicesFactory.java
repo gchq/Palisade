@@ -32,10 +32,10 @@ import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
 import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
@@ -49,12 +49,12 @@ import static java.util.Objects.requireNonNull;
 /**
  * Creates services based on default ports for services for the examples.
  */
-public class ClientServices {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientServices.class);
+public class ProxyServicesFactory {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyServicesFactory.class);
 
     private final String[] args;
 
-    public ClientServices(final String[] args) {
+    public ProxyServicesFactory(final String[] args) {
         requireNonNull(args, "args");
         if (!validateArguments(args)) {
             throw new IllegalArgumentException("example arguments invalid. See log.");

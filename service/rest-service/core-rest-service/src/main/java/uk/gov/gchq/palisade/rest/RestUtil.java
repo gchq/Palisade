@@ -18,13 +18,13 @@ package uk.gov.gchq.palisade.rest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ConfigConsts;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.InputStream;
@@ -54,7 +54,7 @@ public final class RestUtil {
      * @param <S>               type of service being returned
      * @return an instantiated configured service
      * @throws NoConfigException if the configuration service could not find any configuration
-     * @see Configurator#createFromConfig(Class, uk.gov.gchq.palisade.service.request.ServiceConfiguration, String...)
+     * @see Configurator#createFromConfig(Class, uk.gov.gchq.palisade.service.ServiceState, String...)
      */
     public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass, final String... overridable) throws NoConfigException {
         ConfigurationService service = createConfigServiceFromPath(resolverClass, configDetailsPath);
@@ -80,7 +80,7 @@ public final class RestUtil {
     }
 
     /**
-     * Retrieve the {@link ServiceConfiguration} for the named service class. This method will attempt to load
+     * Retrieve the {@link uk.gov.gchq.palisade.service.ServiceState} for the named service class. This method will attempt to load
      * the {@link ConfigurationService} class details from the given path. Once this has been instantiated, it
      * will repeatedly call the configuration service trying to get the details for the given service.
      *
@@ -90,7 +90,7 @@ public final class RestUtil {
      * @return the service configuration for a class
      * @see Configurator#retrieveConfig(Optional)
      */
-    public static ServiceConfiguration retrieveConfig(final Class<?> resolverClass, final String configDetailsPath, final Class<? extends Service> serviceClass) {
+    public static ServiceState retrieveConfig(final Class<?> resolverClass, final String configDetailsPath, final Class<? extends Service> serviceClass) {
         //create config service object
         ConfigurationService service = createConfigServiceFromPath(resolverClass, configDetailsPath);
         //get the config for this service, try repeatedly until we get a valid configuration

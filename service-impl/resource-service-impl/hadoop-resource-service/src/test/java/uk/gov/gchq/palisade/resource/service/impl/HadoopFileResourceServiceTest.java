@@ -26,9 +26,9 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
-import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ServiceState;
+import uk.gov.gchq.palisade.service.SimpleConnectionDetail;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -191,7 +191,7 @@ public class HadoopFileResourceServiceTest {
     @Test
     public void shouldBeEqualAfterConfigure() {
         //given
-        ServiceConfiguration is = new ServiceConfiguration();
+        ServiceState is = new ServiceState();
         hadoopService.recordCurrentConfigTo(is);
 
         //when
