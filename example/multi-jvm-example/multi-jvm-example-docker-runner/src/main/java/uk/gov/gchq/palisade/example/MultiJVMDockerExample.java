@@ -19,18 +19,23 @@ package uk.gov.gchq.palisade.example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
+import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.ConfigConsts;
+import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.stream.Stream;
+
+import static java.util.Objects.isNull;
 
 public class MultiJVMDockerExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiJVMDockerExample.class);
@@ -44,19 +49,25 @@ public class MultiJVMDockerExample {
     public void run() throws Exception {
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-        ConfiguredClientServices clientServices = null;
 
-        while (clientServices == null) {
+        ServiceConfiguration clientConfig = null;
+        int times = 0;
+        while (isNull(clientConfig) && times < 30) {
             try {
-                clientServices = new ConfiguredClientServices(configService);
+                clientConfig = new Configurator(configService).retrieveConfig(Optional.empty());
             } catch (NoConfigException e) {
                 LOGGER.warn("No client configuration present, waiting...");
                 Thread.sleep(ConfigConsts.DELAY);
+                times++;
             }
         }
 
-        final ConfiguredClientServices cs = clientServices;
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, FILE);
+        if (isNull(clientConfig)) {
+            throw new RuntimeException("Couldn't retrieve client configuration. Is configuration service running?");
+        }
+
+        PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
+        final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");

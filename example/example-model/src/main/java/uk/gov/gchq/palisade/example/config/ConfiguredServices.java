@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.client;
+package uk.gov.gchq.palisade.example.config;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
@@ -29,7 +29,7 @@ import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
-public class ConfiguredClientServices implements ServicesFactory {
+public class ConfiguredServices {
 
     private final ConfigurationService configService;
 
@@ -42,7 +42,7 @@ public class ConfiguredClientServices implements ServicesFactory {
     private final CacheService cacheService;
     private final PalisadeService palisadeService;
 
-    public ConfiguredClientServices(final ConfigurationService configService) {
+    public ConfiguredServices(final ConfigurationService configService) {
         requireNonNull(configService, "configService");
         this.configService = configService;
         this.config = new Configurator(configService).retrieveConfig(Optional.empty());
@@ -54,32 +54,26 @@ public class ConfiguredClientServices implements ServicesFactory {
         this.palisadeService = createPalisadeService();
     }
 
-    @Override
     public ResourceService getResourceService() {
         return resourceService;
     }
 
-    @Override
     public AuditService getAuditService() {
         return auditService;
     }
 
-    @Override
     public PolicyService getPolicyService() {
         return policyService;
     }
 
-    @Override
     public UserService getUserService() {
         return userService;
     }
 
-    @Override
     public CacheService getCacheService() {
         return cacheService;
     }
 
-    @Override
     public PalisadeService getPalisadeService() {
         return palisadeService;
     }
@@ -89,7 +83,6 @@ public class ConfiguredClientServices implements ServicesFactory {
      *
      * @return the configuration service instance that was passed on construction
      */
-    @Override
     public ConfigurationService getConfigService() {
         return configService;
     }

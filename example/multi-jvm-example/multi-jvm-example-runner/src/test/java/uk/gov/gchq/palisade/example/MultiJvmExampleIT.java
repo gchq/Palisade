@@ -44,7 +44,7 @@
 //import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 //import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
 //import uk.gov.gchq.palisade.config.service.impl.RestConfigServiceV1;
-//import uk.gov.gchq.palisade.client.ConfiguredClientServices;
+//import uk.gov.gchq.palisade.example.config.ConfiguredServices;
 //import uk.gov.gchq.palisade.config.service.ConfigurationService;
 //import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 //import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
@@ -175,7 +175,7 @@
 //    @Test
 //    public void shouldReadAsAlice() throws Exception {
 //        // Given
-//        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
+//        final ConfiguredServices cs = new ConfiguredServices(configService);
 //        final ExampleSimpleClient client = new ExampleSimpleClient(cs, TEMP_DESTINATION);
 //
 //        // When
@@ -196,7 +196,7 @@
 //    @Test
 //    public void shouldReadAsBob() throws Exception {
 //        // Given
-//        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
+//        final ConfiguredServices cs = new ConfiguredServices(configService);
 //        final ExampleSimpleClient client = new ExampleSimpleClient(cs, TEMP_DESTINATION);
 //
 //        // When
@@ -215,7 +215,7 @@
 //    @Test
 //    public void proxyServiceShouldReturnActualExceptionThrownByUnderlyingService() throws Exception {
 //        // Given
-//        final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
+//        final ConfiguredServices cs = new ConfiguredServices(configService);
 //        final ExampleSimpleClient client = new ExampleSimpleClient(cs, TEMP_DESTINATION);
 //
 //        // When / Then

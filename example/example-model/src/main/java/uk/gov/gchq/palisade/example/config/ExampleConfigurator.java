@@ -24,8 +24,6 @@ import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
 import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
 import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.client.ConfiguredClientServices;
-import uk.gov.gchq.palisade.client.ServicesFactory;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
@@ -72,17 +70,17 @@ public final class ExampleConfigurator {
     public static void main(final String[] args) {
         final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-        ConfiguredClientServices cs = new ConfiguredClientServices(configService);
+        ConfiguredServices cs = new ConfiguredServices(configService);
         new ExampleConfigurator(cs, args[0]);
     }
 
-    public ExampleConfigurator(final ServicesFactory services, final String file) {
+    public ExampleConfigurator(final ConfiguredServices services, final String file) {
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(file);
         this.file = absoluteFileURI.toString();
         initialiseExample(services);
     }
 
-    private void initialiseExample(final ServicesFactory services) {
+    private void initialiseExample(final ConfiguredServices services) {
         // The user authorisation owner or sys admin needs to add the user
         final UserService userService = services.getUserService();
 
