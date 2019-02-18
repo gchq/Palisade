@@ -138,7 +138,7 @@
                                 </palisade.rest.config.path>
                                 <!-- Here you could override configuration details for the REST redirector service -->
                                 <!--<rest.redirect.redirector>
-                                    &lt;!&ndash; Class that performs implements the redirecton logic &ndash;&gt;
+                                    &lt;!&ndash; Class that performs implements the redirection logic &ndash;&gt;
                                     uk.gov.gchq.palisade.redirect.impl.SimpleRandomRedirector
                                 </rest.redirect.redirector>
                                 <rest.redirect.class>
