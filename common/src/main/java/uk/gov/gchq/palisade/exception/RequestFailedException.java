@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.gov.gchq.palisade.exception;
 
-import uk.gov.gchq.palisade.service.ServiceState;
-
 /**
- * An exception thrown when a request is made for an {@link ServiceState} that is
- * not present, or could not be found.
+ * An abstract exception thrown by Palisade components when unable to satisfy a particular {@link uk.gov.gchq.palisade.service.request.Request}.
+ * Exception sub-classes should specify more detailed reasons.
  */
-public class NoConfigException extends RequestFailedException {
+public abstract class RequestFailedException extends PalisadeRuntimeException {
 
-    public NoConfigException(final String e) {
+    public RequestFailedException(final String e) {
         super(e);
     }
 
-    public NoConfigException(final Throwable cause) {
+    public RequestFailedException(final Throwable cause) {
         super(cause);
     }
 
-    public NoConfigException(final String e, final Throwable cause) {
+    public RequestFailedException(final String e, final Throwable cause) {
         super(e, cause);
     }
 }
