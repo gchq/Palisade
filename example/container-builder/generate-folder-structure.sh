@@ -9,6 +9,7 @@ if [ "$1" == "clean" ]
       rm -rf ./resource-service/bin/
       rm -rf ./user-service/bin/
       rm -rf ./config-service/bin/
+      rm -rf ./rest-redirector/bin/
 fi
 
 echo "Creating bin directories of services"
@@ -18,4 +19,5 @@ mkdir -p ./palisade-service/bin/rest-palisade-service
 mkdir -p ./policy-service/bin/rest-policy-service
 mkdir -p ./resource-service/bin/rest-resource-service
 mkdir -p ./user-service/bin/rest-user-service
-mkdir -p ./user-service/bin/rest-config-service
+mkdir -p ./config-service/bin/rest-config-service
+mkdir -p ./rest-redirector/bin/rest-redirector

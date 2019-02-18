@@ -17,7 +17,7 @@
 
 <web-app metadata-complete="false" version="3.1">
 
-    <display-name>Resource REST</display-name>
+    <display-name>REST Redirector</display-name>
 
     <servlet>
         <servlet-name>REST v1</servlet-name>

@@ -15,40 +15,36 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>multi-jvm-example</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </parent>
-    <artifactId>multi-jvm-example-rest-data-service</artifactId>
+    <artifactId>multi-jvm-example-rest-redirector</artifactId>
     <packaging>war</packaging>
 
     <properties>
-        <standalone-path />
+        <standalone-path/>
         <standalone-port>8080</standalone-port>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-model</artifactId>
+            <artifactId>redirector</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>rest-redirector</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hadoop-data-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>proxy-rest-palisade-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>rest-data-service</artifactId>
+            <artifactId>rest-redirector</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
@@ -88,7 +84,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.parent.groupId}</groupId>
-                                    <artifactId>rest-data-service</artifactId>
+                                    <artifactId>rest-redirector</artifactId>
                                     <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <overWrite>false</overWrite>
@@ -115,7 +111,7 @@
 
     <profiles>
         <profile>
-            <id>multi-jvm-example-rest-data-service</id>
+            <id>multi-jvm-example-rest-redirector</id>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
@@ -140,12 +136,19 @@
                                     <!-- This file exists in the docker-services module -->
                                     configRest.json
                                 </palisade.rest.config.path>
-                                <!-- Here you could override the Data service implementing class-->
-                                <!--
-                                <uk.gov.gchq.palisade.data.service.DataService>
-                                    uk.gov.gchq.palisade.data.service.impl.SimpleDataService
-                                </uk.gov.gchq.palisade.data.service.DataService>
-                                -->
+                                <!-- Here you could override configuration details for the REST redirector service -->
+                                <!--<rest.redirect.redirector>
+                                    &lt;!&ndash; Class that performs implements the redirecton logic &ndash;&gt;
+                                    uk.gov.gchq.palisade.redirect.impl.SimpleRandomRedirector
+                                </rest.redirect.redirector>
+                                <rest.redirect.class>
+                                    &lt;!&ndash; Class type for the Palisade service being redirected &ndash;&gt;
+                                    uk.gov.gchq.palisade.data.service.DataService
+                                </rest.redirect.class>
+                                <rest.redirect.rest_impl.class>
+                                    &lt;!&ndash; Class type that implements the REST end point for this service &ndash;&gt;
+                                    uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1
+                                </rest.redirect.rest_impl.class>-->
                                 <palisade.error-mode.debug>
                                     true
                                 </palisade.error-mode.debug>

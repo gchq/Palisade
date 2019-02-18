@@ -80,7 +80,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      */
     private static final String REDIRECTOR_KEY = "rest.redirect.redirector";
     /**
-     * Configuration key for the class type for the Palisade service being redirected.
+     * Configuration key for the (probably an interface) class type for the Palisade service being redirected.
      */
     private static final String REDIRECTION_CLASS_KEY = "rest.redirect.class";
     /**
