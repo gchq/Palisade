@@ -29,6 +29,7 @@ import uk.gov.gchq.palisade.rest.filter.OriginFilter;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
+
 import java.net.URI;
 import java.util.EnumSet;
 

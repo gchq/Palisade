@@ -145,6 +145,17 @@
             <artifactId>core</artifactId>
             <version>${koryphe.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>rest-redirector</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>rest-data-service</artifactId>
+            <version>${project.parent.version}</version>
+            <classifier>classes</classifier>
+        </dependency>
     </dependencies>
 
     <build>

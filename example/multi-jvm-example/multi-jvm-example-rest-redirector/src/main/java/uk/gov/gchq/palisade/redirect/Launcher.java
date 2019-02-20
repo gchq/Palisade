@@ -21,9 +21,12 @@ import uk.gov.gchq.palisade.rest.SystemProperty;
 /**
  * Contains the main method to launch a redirector.
  */
-public class Launcher {
+public final class Launcher {
 
-    public static void main(String[] args) throws Exception {
+    private Launcher() {
+    }
+
+    public static void main(final String[] args) throws Exception {
         //Create a REST Redirector which will cause it to launch and attmept to connect to the configuration service.
         RESTRedirector<?, ?> redirectService = new RESTRedirector<>();
         //read the base path from the system property

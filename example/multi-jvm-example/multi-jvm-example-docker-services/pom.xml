@@ -17,6 +17,11 @@
             <artifactId>multi-jvm-example-docker-runner</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>multi-jvm-example-rest-redirector</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
