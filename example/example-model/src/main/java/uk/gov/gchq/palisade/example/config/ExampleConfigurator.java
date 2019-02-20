@@ -70,6 +70,7 @@ public final class ExampleConfigurator {
     public static void main(final String[] args) {
         final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
+
         ServicesCreator cs = new ServicesCreator(configService);
         new ExampleConfigurator(cs, args[0]);
     }

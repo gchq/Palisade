@@ -20,6 +20,19 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     result=$?
     echo "Stopping the multi-jvm-example containers"
     ./example/multi-jvm-example/scripts/dockerComposeDown.sh
+    echo "Starting the multi-jvm-example"
+    ./example/multi-jvm-example/scripts/buildServices.sh
+    ./example/multi-jvm-example/scripts/startAllServices.sh
+    # Sleep to allow containers to start
+    sleep 5s
+    echo "Running the example application"
+    OUTPUT=`./example/multi-jvm-example/scripts/run.sh | tee /dev/tty`
+    echo "Output is: $OUTPUT"
+    validate_example_output "$OUTPUT"
+    result=$?
+    echo "Stopping the multi-jvm-example"
+    ./example/multi-jvm-example/scripts/stopAllServices.sh
+
     echo "Compiling javadoc"
     mvn javadoc:aggregate -q
 fi
