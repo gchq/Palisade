@@ -32,7 +32,6 @@ public class ZipCodeMaskingRule implements Rule<Employee> {
     }
 
     private Employee maskRecord(final Employee maskedRecord) {
-
         Address address = maskedRecord.getAddress();
         String zipCode = address.getZipCode();
         String zipCodeRedacted = zipCode.substring(0, zipCode.length() - 1) + "*";

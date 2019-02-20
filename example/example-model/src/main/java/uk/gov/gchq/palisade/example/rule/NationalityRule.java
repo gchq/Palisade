@@ -47,7 +47,7 @@ public class NationalityRule implements Rule<Employee> {
         Set<String> roles = user.getRoles();
         String purpose = context.getJustification();
 
-        if (roles.contains(Role.HR) & purpose.equals(Purpose.STAFF_REPORT)) {
+        if (roles.contains(Role.HR.name()) & purpose.equals(Purpose.STAFF_REPORT.name())) {
             return record;
         }
         return redactRecord(record);
