@@ -143,7 +143,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      * @param restImplementationClass the REST implementation class for the redirection class
      * @param redirector              the redirector instance
      */
-    RESTRedirector(final Class<S> redirectionClass, final Class<T> restImplementationClass, final Redirector<String> redirector) {
+    public RESTRedirector(final Class<S> redirectionClass, final Class<T> restImplementationClass, final Redirector<String> redirector) {
         requireNonNull(redirectionClass, "redirectionClass");
         requireNonNull(restImplementationClass, "restImplementationClass");
         requireNonNull(redirector, "redirector");
@@ -262,7 +262,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
             String serialisedRestImplClass = config.getOrDefault(REST_IMPL_CLASS_KEY, null);
             if (nonNull(serialisedRestImplClass)) {
                 @SuppressWarnings("unchecked")
-                Class<T> deClassRedirectImpl = (Class<T>) Class.forName(serialisedRedirectClass);
+                Class<T> deClassRedirectImpl = (Class<T>) Class.forName(serialisedRestImplClass);
                 setRestImplementationClass(deClassRedirectImpl);
             } else {
                 throw new NoConfigException("no service class specified in configuration");

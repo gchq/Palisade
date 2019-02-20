@@ -108,5 +108,13 @@ services:
       - user-service
       - resource-service
       - policy-service
+#  rest-redirector:
+#    build: rest-redirector
+#    container_name: rest-redirector
+#    networks:
+#      - palisade_network
+#    depends_on:
+#      - config-service
+#      - data-service
 networks:
   palisade_network:

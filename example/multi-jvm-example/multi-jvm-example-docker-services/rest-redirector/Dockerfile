@@ -1,7 +1,8 @@
-From tomcat:8-jre8-alpine
+FROM openjdk:8-jre-alpine
 
 RUN apk add --no-cache curl
-ADD docker/bin/rest-redirector /usr/local/tomcat/webapps/redirector/
-ADD docker/setenv.sh /usr/local/tomcat/bin/
-ADD docker/bin/configRest.json /usr/local/tomcat/webapps/redirector/WEB-INF/
+COPY docker/bin/multi-jvm-example-rest-redirector-*-shaded.jar /multi-jvm-example-rest-redirector/
+ADD docker/bin/configRest.json /multi-jvm-example-rest-redirector/
 
+ENTRYPOINT ["java"]
+CMD ["-cp", "/multi-jvm-example-rest-director/*", "-Dpalisade.rest.basePath=http://localhost:8080/alter/this/path", "-Dpalisade.rest.config.path=/multi-jvm-example-rest-redirector/configRest.json", "uk.gov.gchq.palisade.redirect.Launcher"]
