@@ -51,7 +51,6 @@ public class ZipCodeMaskingTest {
         assertEquals(testZipCode.charAt(testZipCode.length() - 1), actualZipCode.charAt(actualZipCode.length() - 1));
         assertNull(actualStreetNum);
         assertNull(actualStreetName);
-
     }
 
     @Test
@@ -61,9 +60,7 @@ public class ZipCodeMaskingTest {
         // When
         Employee actual = ZIP_CODE_MASKING_RULE.apply(TEST_EMPLOYEE, TEST_USER_NOT_ESTATES, STAFF_REPORT_CONTEXT);
 
-
         // Then
         assertEquals(TEST_EMPLOYEE, actual);
-
     }
 }

@@ -59,7 +59,6 @@ public class NationalityTest {
 
         // Then
         assertNull(actual.getNationality());
-
     }
 
     @Test
@@ -71,7 +70,6 @@ public class NationalityTest {
 
         // Then
         assertNull(actual.getNationality());
-
     }
 
     @Test
@@ -83,6 +81,5 @@ public class NationalityTest {
 
         // Then
         assertNull(actual.getNationality());
-
     }
 }
