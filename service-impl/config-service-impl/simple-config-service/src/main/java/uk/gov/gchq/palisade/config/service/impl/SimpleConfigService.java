@@ -29,7 +29,7 @@ import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -67,13 +67,13 @@ public class SimpleConfigService implements ConfigurationService {
     }
 
     @Override
-    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
         requireNonNull(config, "config cannot be null");
         LOGGER.debug("Configure called: no-op");
     }
 
     @Override
-    public void recordCurrentConfigTo(final ServiceConfiguration config) {
+    public void recordCurrentConfigTo(final ServiceState config) {
         requireNonNull(config, "config cannot be null");
         LOGGER.debug("Write configuration called: no-op");
     }
@@ -113,10 +113,10 @@ public class SimpleConfigService implements ConfigurationService {
     public void configureSelfFromConfig() {
         try {
             LOGGER.debug("Getting auxiliary configuration from cache");
-            ServiceConfiguration selfConfig = getServiceConfig(ConfigurationService.class);
+            ServiceState selfConfig = getServiceConfig(ConfigurationService.class);
             applyConfigFrom(selfConfig);
         } catch (NoConfigException e) {
-            LOGGER.debug("No auxiliary configuration available", e);
+            LOGGER.debug("No auxiliary configuration available. Probably not an error!");
         }
     }
 
@@ -124,7 +124,7 @@ public class SimpleConfigService implements ConfigurationService {
      * {@inheritDoc}
      */
     @Override
-    public CompletableFuture<ServiceConfiguration> get(final GetConfigRequest request) throws NoConfigException {
+    public CompletableFuture<ServiceState> get(final GetConfigRequest request) throws NoConfigException {
         requireNonNull(request, "request");
         if (request.getService().isPresent()) { //has a Service requested some config?
             return CompletableFuture.completedFuture(request.getService().map(this::getServiceConfig).get());
@@ -142,7 +142,7 @@ public class SimpleConfigService implements ConfigurationService {
     public CompletableFuture<Boolean> add(final AddConfigRequest request) {
         requireNonNull(request, "request");
         final Optional<Class<? extends Service>> clazz = request.getService();
-        final AddCacheRequest<ServiceConfiguration> addRequest = new AddCacheRequest<>()
+        final AddCacheRequest<ServiceState> addRequest = new AddCacheRequest<>()
                 .service(ConfigurationService.class)
                 .value(request.getConfig());
         //are we setting anonymous config
@@ -162,8 +162,8 @@ public class SimpleConfigService implements ConfigurationService {
      * @return the client configuration
      * @throws NoConfigException if no client configuration could be found
      */
-    private ServiceConfiguration getAnonymousConfig() throws NoConfigException {
-        CompletableFuture<Optional<ServiceConfiguration>> cachedObject = cache.get(new GetCacheRequest<ServiceConfiguration>()
+    private ServiceState getAnonymousConfig() throws NoConfigException {
+        CompletableFuture<Optional<ServiceState>> cachedObject = cache.get(new GetCacheRequest<ServiceState>()
                 .service(ConfigurationService.class)
                 .key(ANONYMOUS_CONFIG_KEY));
         return cachedObject.join().orElseThrow(() -> new NoConfigException("no initial configuration could be found"));
@@ -179,22 +179,22 @@ public class SimpleConfigService implements ConfigurationService {
      * @return the service configuration
      * @throws NoConfigException if no configuration could be found
      */
-    private ServiceConfiguration getServiceConfig(final Class<? extends Service> clazz) throws NoConfigException {
+    private ServiceState getServiceConfig(final Class<? extends Service> clazz) throws NoConfigException {
         requireNonNull(clazz, "clazz");
         //first can we find anything for this class specifically?
-        final GetCacheRequest<ServiceConfiguration> serviceRequest = new GetCacheRequest<>()
+        final GetCacheRequest<ServiceState> serviceRequest = new GetCacheRequest<>()
                 .service(ConfigurationService.class)
                 .key(clazz.getTypeName());
-        Optional<ServiceConfiguration> result = cache.get(serviceRequest).join();
+        Optional<ServiceState> result = cache.get(serviceRequest).join();
         //if we get an object back, then return it
         if (result.isPresent()) {
             return result.get();
         }
         //make a call for the generic object
-        final GetCacheRequest<ServiceConfiguration> genericRequest = new GetCacheRequest<>()
+        final GetCacheRequest<ServiceState> genericRequest = new GetCacheRequest<>()
                 .service(ConfigurationService.class)
                 .key(Service.class.getTypeName());
-        Optional<ServiceConfiguration> genericResult = cache.get(genericRequest).join();
+        Optional<ServiceState> genericResult = cache.get(genericRequest).join();
         if (genericResult.isPresent()) {
             return genericResult.get();
         } else {

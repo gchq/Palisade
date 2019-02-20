@@ -30,9 +30,9 @@ import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
@@ -137,7 +137,7 @@ public class SimpleDataService implements DataService {
     }
 
     @Override
-    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
         requireNonNull(config, "config");
         String serialisedPalisade = config.getOrDefault(PALISADE_IMPL_KEY, null);
         if (nonNull(serialisedPalisade)) {
@@ -160,7 +160,7 @@ public class SimpleDataService implements DataService {
     }
 
     @Override
-    public void recordCurrentConfigTo(final ServiceConfiguration config) {
+    public void recordCurrentConfigTo(final ServiceState config) {
         requireNonNull(config, "config");
         config.put(DataService.class.getTypeName(), getClass().getTypeName());
         String serialised = new String(JSONSerialiser.serialise(getPalisadeService()), StandardCharsets.UTF_8);

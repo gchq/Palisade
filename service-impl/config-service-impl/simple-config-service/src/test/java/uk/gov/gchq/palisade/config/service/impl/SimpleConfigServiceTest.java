@@ -26,7 +26,7 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.util.Optional;
 
@@ -37,19 +37,19 @@ public class SimpleConfigServiceTest {
 
     private static SimpleConfigService scs;
 
-    private static ServiceConfiguration clientConfig = new ServiceConfiguration()
+    private static ServiceState clientConfig = new ServiceState()
             .put("test1_client", "value1_client")
             .put("test2_client", "value2_client");
 
-    private static ServiceConfiguration genericService = new ServiceConfiguration()
+    private static ServiceState genericService = new ServiceState()
             .put("test1_generic", "value1_generic")
             .put("test2_generic", "value2_generic");
 
-    private static ServiceConfiguration serviceClass1 = new ServiceConfiguration()
+    private static ServiceState serviceClass1 = new ServiceState()
             .put("test1_service1", "value1_service1")
             .put("test2_service1", "value2_service1");
 
-    private static ServiceConfiguration serviceClass2 = new ServiceConfiguration()
+    private static ServiceState serviceClass2 = new ServiceState()
             .put("test1_service2", "value1_service2")
             .put("test2_service2", "value2_service2");
 
@@ -73,19 +73,19 @@ public class SimpleConfigServiceTest {
                                 new HashMapBackingStore(false)
                         )
         );
-        scs.getCache().add(new AddCacheRequest<ServiceConfiguration>()
+        scs.getCache().add(new AddCacheRequest<ServiceState>()
                 .service(ConfigurationService.class)
                 .key(SimpleConfigService.ANONYMOUS_CONFIG_KEY)
                 .value(clientConfig)).join();
-        scs.getCache().add(new AddCacheRequest<ServiceConfiguration>()
+        scs.getCache().add(new AddCacheRequest<ServiceState>()
                 .service(ConfigurationService.class)
                 .key(Dummy1.class.getTypeName())
                 .value(serviceClass1)).join();
-        scs.getCache().add(new AddCacheRequest<ServiceConfiguration>()
+        scs.getCache().add(new AddCacheRequest<ServiceState>()
                 .service(ConfigurationService.class)
                 .key(Dummy2.class.getTypeName())
                 .value(serviceClass2)).join();
-        scs.getCache().add(new AddCacheRequest<ServiceConfiguration>()
+        scs.getCache().add(new AddCacheRequest<ServiceState>()
                 .service(ConfigurationService.class)
                 .key(Service.class.getTypeName())
                 .value(genericService)).join();
@@ -112,7 +112,7 @@ public class SimpleConfigServiceTest {
         //Given
         GetConfigRequest req = new GetConfigRequest();
         //When
-        ServiceConfiguration actual = scs.get(req).join();
+        ServiceState actual = scs.get(req).join();
         //Then
         assertEquals(clientConfig, actual);
     }
@@ -122,7 +122,7 @@ public class SimpleConfigServiceTest {
         //Given
         GetConfigRequest req = new GetConfigRequest().service(Optional.of(Dummy1.class));
         //When
-        ServiceConfiguration actual = scs.get(req).join();
+        ServiceState actual = scs.get(req).join();
         //Then
         assertEquals(serviceClass1, actual);
     }
@@ -132,7 +132,7 @@ public class SimpleConfigServiceTest {
         //Given
         GetConfigRequest req = new GetConfigRequest().service(Optional.of(Dummy2.class));
         //When
-        ServiceConfiguration actual = scs.get(req).join();
+        ServiceState actual = scs.get(req).join();
         //Then
         assertEquals(serviceClass2, actual);
     }
@@ -142,7 +142,7 @@ public class SimpleConfigServiceTest {
         //Given
         GetConfigRequest req = new GetConfigRequest().service(Optional.of(NotInCache.class));
         //When
-        ServiceConfiguration actual = scs.get(req).join();
+        ServiceState actual = scs.get(req).join();
         //Then
         assertEquals(genericService, actual);
     }
@@ -150,14 +150,14 @@ public class SimpleConfigServiceTest {
     @Test
     public void shouldPutAndRetrieveConfig() {
         //Given
-        ServiceConfiguration expected = serviceClass2;
+        ServiceState expected = serviceClass2;
         AddConfigRequest request = (AddConfigRequest) new AddConfigRequest()
                 .config(expected)
                 .service(Optional.of(CacheAddTest.class));
         scs.add(request);
         //When
         GetConfigRequest req = new GetConfigRequest().service(Optional.of(CacheAddTest.class));
-        ServiceConfiguration actual = scs.get(req).join();
+        ServiceState actual = scs.get(req).join();
         //Then
         assertEquals(expected, actual);
     }

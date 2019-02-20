@@ -67,7 +67,7 @@ public class SimpleRandomRedirectorTest {
                 .redirectionClass(NoLiveService.class);
 
         //When
-        redirect.redirectionFor(addMethod, request);
+        redirect.redirectionFor(null, addMethod, request);
 
         //Then
         fail("exception expected");
@@ -85,7 +85,7 @@ public class SimpleRandomRedirectorTest {
         RedirectionResult<String> expected = new StringRedirectResult("test_instance");
 
         //When
-        RedirectionResult<String> actual = redirect.redirectionFor(addMethod, request);
+        RedirectionResult<String> actual = redirect.redirectionFor(null, addMethod, request);
 
         //Then
         assertThat(actual, is(equalTo(expected)));

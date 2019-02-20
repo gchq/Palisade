@@ -35,7 +35,7 @@ import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
+import uk.gov.gchq.palisade.service.SimpleConnectionDetail;
 
 import java.io.IOException;
 import java.util.HashMap;

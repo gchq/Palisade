@@ -28,5 +28,6 @@
 
     <modules>
         <module>redirector</module>
+        <module>rest-redirector</module>
     </modules>
 </project>

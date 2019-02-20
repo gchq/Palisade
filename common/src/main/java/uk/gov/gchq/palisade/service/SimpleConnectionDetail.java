@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.service.request;
+package uk.gov.gchq.palisade.service;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
@@ -23,7 +23,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.service.Service;
 
 import static java.util.Objects.requireNonNull;
 

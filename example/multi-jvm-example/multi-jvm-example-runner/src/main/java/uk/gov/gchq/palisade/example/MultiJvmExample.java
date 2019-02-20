@@ -13,90 +13,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package uk.gov.gchq.palisade.example;
-
-import io.etcd.jetcd.launcher.junit.EtcdClusterResource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
-import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
-import uk.gov.gchq.palisade.client.ConfiguredClientServices;
-import uk.gov.gchq.palisade.config.service.ConfigurationService;
-import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
-import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
-import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
-import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
-import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
-
-import java.net.URI;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static java.util.Objects.nonNull;
-
-public class MultiJvmExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
-
-    public static void main(final String[] args) throws Exception {
-        if (args.length < 1) {
-            System.out.printf("Usage: %s file\n", MultiJvmExample.class.getTypeName());
-            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
-            System.exit(1);
-        }
-
-        String sourceFile = args[0];
-        new MultiJvmExample().run(sourceFile);
-    }
-
-    public void run(final String sourceFile) throws Exception {
-        EtcdClusterResource etcd = null;
-        EtcdBackingStore store = null;
-        try {
-            etcd = new EtcdClusterResource("test-etcd", 1);
-            etcd.cluster().start();
-            List<URI> etcdEndpointURLs = etcd.cluster().getClientEndpoints();
-            store = new EtcdBackingStore().connectionDetails(etcdEndpointURLs);
-            //this will write an initial configuration
-            final ConfigurationService configService = new ProxyRestConfigService("http://localhost:8085/config");
-            final CacheService cache = new SimpleCacheService().backingStore(store);
-            ExampleConfigurator.setupMultiJVMConfigurationService(
-                    new ProxyRestPolicyService("http://localhost:8081/policy"),
-                    new ProxyRestUserService("http://localhost:8083/user"),
-                    new ProxyRestResourceService("http://localhost:8082/resource"),
-                    new ProxyRestPalisadeService("http://localhost:8080/palisade"),
-                    cache,
-                    configService,
-                    new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class)
-            );
-            final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
-            final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
-
-            LOGGER.info("");
-            LOGGER.info("Alice is reading file1...");
-            final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
-            LOGGER.info("Alice got back: ");
-            aliceResults.map(Object::toString).forEach(LOGGER::info);
-
-            LOGGER.info("");
-            LOGGER.info("Bob is reading file1...");
-            final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
-            LOGGER.info("Bob got back: ");
-            bobResults.map(Object::toString).forEach(LOGGER::info);
-        } finally {
-            if (nonNull(etcd)) {
-                etcd.cluster().close();
-            }
-            if (nonNull(store)) {
-                store.close();
-            }
-        }
-    }
-}
+//
+//package uk.gov.gchq.palisade.example;
+//
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+//
+//import uk.gov.gchq.palisade.example.config.ServicesCreator;
+//import uk.gov.gchq.palisade.config.service.ConfigurationService;
+//import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+//import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+//import uk.gov.gchq.palisade.rest.RestUtil;
+//import uk.gov.gchq.palisade.util.StreamUtil;
+//
+//import java.io.InputStream;
+//import java.util.stream.Stream;
+//
+//public class MultiJvmExample {
+//    private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
+//
+//    public static void main(final String[] args) throws Exception {
+//        if (args.length < 1) {
+//            System.out.printf("Usage: %s file\n", MultiJvmExample.class.getTypeName());
+//            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
+//            System.exit(1);
+//        }
+//
+//        String sourceFile = args[0];
+//        new MultiJvmExample().run(sourceFile);
+//    }
+//
+//    public void run(final String sourceFile) throws Exception {
+//        //create config service object
+//        System.setProperty("palisade.rest.config.path","/configRest.json");
+//        final InputStream stream = StreamUtil.openStream(MultiJvmExample.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+//        ConfigurationService service = JSONSerialiser.deserialise(stream, ConfigurationService.class);
+//
+//        final ServicesCreator cs = new ServicesCreator(service);
+//        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
+//
+//        LOGGER.info("");
+//        LOGGER.info("Alice is reading file1...");
+//        final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
+//        LOGGER.info("Alice got back: ");
+//        aliceResults.map(Object::toString).forEach(LOGGER::info);
+//
+//        LOGGER.info("");
+//        LOGGER.info("Bob is reading file1...");
+//        final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
+//        LOGGER.info("Bob got back: ");
+//        bobResults.map(Object::toString).forEach(LOGGER::info);
+//
+//    }
+//}
