@@ -24,19 +24,7 @@
         <version>0.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>multi-jvm-example-rest-redirector</artifactId>
-    <!-- Here you could override configuration details for the REST redirector service -->
-    <!--<rest.redirect.redirector>
-        &lt;!&ndash; Class that performs implements the redirection logic &ndash;&gt;
-        uk.gov.gchq.palisade.redirect.impl.SimpleRandomRedirector
-    </rest.redirect.redirector>
-    <rest.redirect.class>
-        &lt;!&ndash; Class type for the Palisade service being redirected &ndash;&gt;
-        uk.gov.gchq.palisade.data.service.DataService
-    </rest.redirect.class>
-    <rest.redirect.rest_impl.class>
-        &lt;!&ndash; Class type that implements the REST end point for this service &ndash;&gt;
-        uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1
-    </rest.redirect.rest_impl.class>-->
+
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
