@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.data.service.DataService;
+import uk.gov.gchq.palisade.data.service.exception.NoCapacityException;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 
@@ -42,7 +43,7 @@ public class MockDataService implements DataService {
     }
 
     @Override
-    public CompletableFuture<ReadResponse> read(final ReadRequest request) {
+    public CompletableFuture<ReadResponse> read(final ReadRequest request) throws NoCapacityException {
         return mock.read(request);
     }
 

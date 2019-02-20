@@ -24,8 +24,10 @@ import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.data.service.DataService;
+import uk.gov.gchq.palisade.data.service.exception.NoCapacityException;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
+import uk.gov.gchq.palisade.exception.RequestFailedException;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
@@ -41,12 +43,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class RestDataServiceV1IT {
 
     private static ProxyRestDataService proxy;
     private static EmbeddedHttpServer server;
+
+    private static final SystemResource sysResource = new SystemResource().id("File");
+    private static final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
+    private static final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);
 
     @BeforeClass
     public static void beforeClass() throws IOException {
@@ -69,11 +77,8 @@ public class RestDataServiceV1IT {
         final DataService dataService = Mockito.mock(DataService.class);
         MockDataService.setMock(dataService);
 
-        final SystemResource sysResource = new SystemResource().id("File");
-        final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
         final byte[] data = "value1\nvalue2".getBytes();
         final InputStream dataStream = new ByteArrayInputStream(data);
-        final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);
 
         final ReadResponse expectedResult = new ReadResponse().data(dataStream).message("some message");
         final CompletableFuture futureExpectedResult = CompletableFuture.completedFuture(expectedResult);
@@ -94,10 +99,6 @@ public class RestDataServiceV1IT {
         final DataService dataService = Mockito.mock(DataService.class);
         MockDataService.setMock(dataService);
 
-        final SystemResource sysResource = new SystemResource().id("File");
-        final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
-        final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);
-
         final String message = "some message";
         given(dataService.read(request)).willThrow(new IllegalArgumentException(message));
 
@@ -112,6 +113,24 @@ public class RestDataServiceV1IT {
             assertEquals(message, e.getCause().getMessage());
         } catch (final IllegalArgumentException e) {
             assertEquals(message, e.getMessage());
+        }
+    }
+
+    @Test(expected = NoCapacityException.class)
+    public void throwNoCapacityException() {
+        //Given
+        final DataService dataService = Mockito.mock(DataService.class);
+        MockDataService.setMock(dataService);
+
+        given(dataService.read(request)).willThrow(new NoCapacityException("cannot serve request"));
+
+        //When / Then
+        try {
+            ReadResponse response = proxy.read(request).join();
+
+            fail("Exception expected");
+        } catch (CompletionException e) {
+            throw (RequestFailedException) e.getCause();
         }
     }
 }
