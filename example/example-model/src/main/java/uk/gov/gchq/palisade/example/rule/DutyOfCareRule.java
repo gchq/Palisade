@@ -32,7 +32,7 @@ public class DutyOfCareRule implements Rule<Employee> {
     public DutyOfCareRule() {
     }
 
-    private Boolean isManager(Manager[] managers, UserId userId) {
+    private Boolean isManager(final Manager[] managers, final UserId userId) {
         if (managers == null) {
             return false;
         }
@@ -51,12 +51,12 @@ public class DutyOfCareRule implements Rule<Employee> {
         return false;
     }
 
-    private Employee redactRecord(Employee redactedRecord) {
+    private Employee redactRecord(final Employee redactedRecord) {
         redactedRecord.setContactNumbers(null);
         return redactedRecord;
     }
 
-    public Employee apply(Employee record, User user, Context context) {
+    public Employee apply(final Employee record, final User user, final Context context) {
 
         if (null == record) {
             return null;

@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import uk.gov.gchq.palisade.UserId;
 
 import java.util.Random;

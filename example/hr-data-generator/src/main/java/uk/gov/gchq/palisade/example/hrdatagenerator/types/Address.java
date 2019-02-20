@@ -44,7 +44,7 @@ public class Address {
         return streetAddressNumber;
     }
 
-    public void setStreetAddressNumber( String streetAddressNumber ) {
+    public void setStreetAddressNumber(final String streetAddressNumber) {
         this.streetAddressNumber = streetAddressNumber;
     }
 
@@ -52,7 +52,7 @@ public class Address {
         return streetName;
     }
 
-    public void setStreetName( String streetName ) {
+    public void setStreetName(final String streetName) {
         this.streetName = streetName;
     }
 
@@ -60,7 +60,7 @@ public class Address {
         return city;
     }
 
-    public void setCity( String city ) {
+    public void setCity(final String city) {
         this.city = city;
     }
 
@@ -68,7 +68,7 @@ public class Address {
         return state;
     }
 
-    public void setState( String state ) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -76,7 +76,7 @@ public class Address {
         return zipCode;
     }
 
-    public void setZipCode( String zipCode ) {
+    public void setZipCode(final String zipCode) {
         this.zipCode = zipCode;
     }
 
