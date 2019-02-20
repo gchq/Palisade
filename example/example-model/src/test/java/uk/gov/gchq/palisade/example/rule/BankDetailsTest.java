@@ -19,6 +19,8 @@ package uk.gov.gchq.palisade.example.rule;
 import org.junit.Test;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.example.common.Purpose;
+import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.BankDetails;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Nationality;
@@ -32,12 +34,9 @@ public class BankDetailsTest {
 
     private static final Employee TEST_EMPLOYEE = Employee.generate(new Random(1));
     private static final User TEST_USER_NOT_PAYROLL = new User().roles("Not Payroll"); // Role not in Payroll
-    private static final User TEST_USER_PAYROLL = new User().roles("Payroll"); // Role in Payroll
-
-
-
+    private static final User TEST_USER_PAYROLL = new User().roles(Role.PAYROLL.name()); // Role in Payroll
     private static final BankDetailsRule BANK_DETAILS_RULE = new BankDetailsRule();
-    private static final Context SALARY_CONTEXT = new Context().justification("Salary");
+    private static final Context SALARY_CONTEXT = new Context().justification(Purpose.SALARY.name());
     private static final Context NOT_SALARY_CONTEXT = new Context().justification("Not Salary");
 
     @Test
@@ -61,7 +60,6 @@ public class BankDetailsTest {
 
         // Then
         assertNull(actual.getBankDetails());
-
     }
 
     @Test
@@ -73,7 +71,6 @@ public class BankDetailsTest {
 
         // Then
         assertNull(actual.getBankDetails());
-
     }
 
     @Test
@@ -85,6 +82,5 @@ public class BankDetailsTest {
 
         // Then
         assertNull(actual.getBankDetails());
-
     }
 }

@@ -148,7 +148,7 @@
         <dependency>
             <groupId>uk.gov.gchq.palisade</groupId>
             <artifactId>hr-data-generator</artifactId>
-            <version>0.2.1-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

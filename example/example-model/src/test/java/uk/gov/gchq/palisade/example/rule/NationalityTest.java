@@ -19,6 +19,8 @@ package uk.gov.gchq.palisade.example.rule;
 import org.junit.Test;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.example.common.Purpose;
+import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Nationality;
 
@@ -31,12 +33,9 @@ public class NationalityTest {
 
     private static final Employee TEST_EMPLOYEE = Employee.generate(new Random(1));
     private static final User TEST_USER_NOT_HR = new User().roles("Not HR"); // Role not in HR
-    private static final User TEST_USER_HR = new User().roles("HR"); // Role is HR
-
-
-
+    private static final User TEST_USER_HR = new User().roles(Role.HR.name()); // Role is HR
     private static final NationalityRule NATIONALITY_RULE = new NationalityRule();
-    private static final Context STAFF_REPORT_CONTEXT = new Context().justification("Staff Report");
+    private static final Context STAFF_REPORT_CONTEXT = new Context().justification(Purpose.STAFF_REPORT.name());
     private static final Context NOT_STAFF_REPORT_CONTEXT = new Context().justification("Not Staff Report");
 
     @Test

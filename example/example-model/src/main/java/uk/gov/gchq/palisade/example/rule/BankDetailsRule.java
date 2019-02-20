@@ -18,18 +18,18 @@ package uk.gov.gchq.palisade.example.rule;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.example.common.Purpose;
+import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.rule.Rule;
 
-import java.util.Objects;
 import java.util.Set;
 
+import static java.util.Objects.requireNonNull;
+
 public class BankDetailsRule implements Rule<Employee> {
-
-
     public BankDetailsRule() {
     }
-
 
     private Employee redactRecord(final Employee redactedRecord) {
         redactedRecord.setBankDetails((null));
@@ -37,17 +37,16 @@ public class BankDetailsRule implements Rule<Employee> {
     }
 
     public Employee apply(final Employee record, final User user, final Context context) {
-
         if (null == record) {
             return null;
         }
 
-        Objects.requireNonNull(user);
-        Objects.requireNonNull(context);
+        requireNonNull(user);
+        requireNonNull(context);
         Set<String> roles = user.getRoles();
         String purpose = context.getJustification();
 
-        if (roles.equals("Payroll") & purpose.equals("Salary")) {
+        if (roles.equals(Role.PAYROLL) & purpose.equals(Purpose.SALARY)) {
             return record;
         }
         return redactRecord(record);
