@@ -13,4 +13,4 @@ ${DIR}/startPalisadeService.sh &
 ${DIR}/startPolicyService.sh &
 ${DIR}/startResourceService.sh &
 ${DIR}/startUserService.sh &
-${DIR}/waitForHost.sh http://localhost:8081/policy/v1/status ${DIR}/waitForHost.sh http://localhost:8082/resource/v1/status ${DIR}/waitForHost.sh http://localhost:8083/user/v1/status ${DIR}/configureExamples.sh &
+${DIR}/waitForHost.sh http://localhost:8081/policy/v1/status ${DIR}/waitForHost.sh http://localhost:8082/resource/v1/status ${DIR}/waitForHost.sh http://localhost:8083/user/v1/status ${DIR}/configureExamples.sh
