@@ -25,33 +25,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     ./example/multi-jvm-example/scripts/dockerCleanSystem.sh
 
     echo "Starting the multi-jvm-example"
-    while ! ls example/multi-jvm-example/multi-jvm-example-rest-config-service/target/multi-jvm-example-rest-config-service-*-executable.jar 1> /dev/null 2>&1 ; do
-        echo "Cannot find example/multi-jvm-example/multi-jvm-example-rest-config-service/target/multi-jvm-example-rest-config-service-*-executable.jar, sleeping for 1 second to wait for build services to finish"
-        sleep 1
-    done
-    while ! ls example/multi-jvm-example/multi-jvm-example-rest-data-service/target/multi-jvm-example-rest-data-service-*-executable.jar 1> /dev/null 2>&1 ; do
-        echo "Cannot find example/multi-jvm-example/multi-jvm-example-rest-data-service/target/multi-jvm-example-rest-data-service-*-executable.jar, sleeping for 1 second to wait for build services to finish"
-        sleep 1
-    done
-    while ! ls example/multi-jvm-example/multi-jvm-example-rest-palisade-service/target/multi-jvm-example-rest-palisade-service-*-executable.jar 1> /dev/null 2>&1 ; do
-        echo "Cannot find example/multi-jvm-example/multi-jvm-example-rest-palisade-service/target/multi-jvm-example-rest-palisade-service-*-executable.jar, sleeping for 1 second to wait for build services to finish"
-        sleep 1
-    done
-    while ! ls example/multi-jvm-example/multi-jvm-example-rest-policy-service/target/multi-jvm-example-rest-policy-service-*-executable.jar 1> /dev/null 2>&1 ; do
-        echo "Cannot find example/multi-jvm-example/multi-jvm-example-rest-policy-service/target/multi-jvm-example-rest-policy-service-*-executable.jar, sleeping for 1 second to wait for build services to finish"
-        sleep 1
-    done
-    while ! ls example/multi-jvm-example/multi-jvm-example-rest-resource-service/target/multi-jvm-example-rest-resource-service-*-executable.jar 1> /dev/null 2>&1 ; do
-        echo "Cannot find example/multi-jvm-example/multi-jvm-example-rest-resource-service/target/multi-jvm-example-rest-resource-service-*-executable.jar, sleeping for 1 second to wait for build services to finish"
-        sleep 1
-    done
-    while ! ls example/multi-jvm-example/multi-jvm-example-rest-user-service/target/multi-jvm-example-rest-user-service-*-executable.jar 1> /dev/null 2>&1 ; do
-        echo "Cannot find example/multi-jvm-example/multi-jvm-example-rest-user-service/target/multi-jvm-example-rest-user-service-*-executable.jar, sleeping for 1 second to wait for build services to finish"
-        sleep 1
-    done
     ./example/multi-jvm-example/scripts/startAllServices.sh
-    # Sleep to allow services to start
-    sleep 30s
     echo "Running the example application"
     OUTPUT=`./example/multi-jvm-example/scripts/run.sh | tee /dev/tty`
     echo "Output is: $OUTPUT"
@@ -64,8 +38,10 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     mvn javadoc:aggregate -q
 fi
 if [ ${container_result} -eq 0 ] && [ ${multi_jvm_result} -eq 0 ]; then
+    echo "exit 0"
     exit 0
 else
+    echo "exit 1"
     exit 1
 fi
 
