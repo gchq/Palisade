@@ -22,7 +22,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     validate_example_output "$OUTPUT"
     container_result=$?
     echo "Stopping the multi-jvm-example containers"
-    ./example/multi-jvm-example/scripts/dockerCleanSystem.sh
+    echo "y" | ./example/multi-jvm-example/scripts/dockerCleanSystem.sh
 
     echo "Starting the multi-jvm-example"
     ./example/multi-jvm-example/scripts/startAllServices.sh
