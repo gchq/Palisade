@@ -105,7 +105,12 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
     /**
      * The marshall that creates the proxy and handles the actual redirection.
      */
-    private RedirectionMarshall<String> marshall;
+    private final RedirectionMarshall<String> marshall;
+
+    /**
+     * Has configuration already occurred?
+     */
+    private boolean configured;
 
     /**
      * This is injected by the servlet container e.g. Jersey/HK2 when a REST API call is made. This is used to extract
@@ -175,6 +180,11 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      * we register a {@link ServiceBinder} to ensure the redirection proxy is injected into the constructor.
      */
     private void configureRedirection() {
+        //check we haven't already tried this
+        if (configured) {
+            throw new IllegalStateException("already configured");
+        }
+        configured = true;
         //manufacture the delegate
         S service = marshall.createProxyFor(getRedirectionClass());
         //register the original implementation class as a resource
@@ -270,8 +280,6 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
         } catch (ClassNotFoundException e) {
             throw new NoConfigException("can't create class object", e);
         }
-        this.marshall = new RedirectionMarshall<>(getRedirector());
-        configureRedirection();
     }
 
     /**
