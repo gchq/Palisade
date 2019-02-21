@@ -22,7 +22,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     validate_example_output "$OUTPUT"
     container_result=$?
     echo "Stopping the multi-jvm-example containers"
-    ./example/multi-jvm-example/scripts/dockerComposeDown.sh
+    ./example/multi-jvm-example/scripts/dockerCleanSystem.sh
 
     echo "Starting the multi-jvm-example"
     while ! ls example/multi-jvm-example/multi-jvm-example-rest-config-service/target/multi-jvm-example-rest-config-service-*-executable.jar 1> /dev/null 2>&1 ; do
