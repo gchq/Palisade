@@ -105,7 +105,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
     /**
      * The marshall that creates the proxy and handles the actual redirection.
      */
-    private final RedirectionMarshall<String> marshall;
+    private RedirectionMarshall<String> marshall;
 
     /**
      * This is injected by the servlet container e.g. Jersey/HK2 when a REST API call is made. This is used to extract
@@ -270,6 +270,8 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
         } catch (ClassNotFoundException e) {
             throw new NoConfigException("can't create class object", e);
         }
+        this.marshall = new RedirectionMarshall<>(getRedirector());
+        configureRedirection();
     }
 
     /**
