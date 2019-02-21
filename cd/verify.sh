@@ -4,7 +4,6 @@
 
 set -e
 
-result=0
 container_result=0
 multi_jvm_result=0
 
@@ -64,10 +63,10 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Compiling javadoc"
     mvn javadoc:aggregate -q
 fi
-if [ ${container_result} -eq 1 ] && [ ${multi_jvm_result} -eq 1 ]; then
-    exit 1
-else
+if [ ${container_result} -eq 0 ] && [ ${multi_jvm_result} -eq 0 ]; then
     exit 0
+else
+    exit 1
 fi
 
 
