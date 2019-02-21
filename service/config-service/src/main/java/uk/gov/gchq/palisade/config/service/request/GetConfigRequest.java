@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  * that there may be additional authentication/authorisation constraints placed upon requestees. This means that for
  * example, a client may not be able to request configuration details for a particular service.
  */
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE,setterVisibility = JsonAutoDetect.Visibility.NONE,fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class GetConfigRequest extends Request {
 
     /**
@@ -67,6 +67,8 @@ public class GetConfigRequest extends Request {
 
     /**
      * Get the service class as a string to avoid needing to create the {@link Class} object.
+     *
+     * @return the service class name as a string
      */
     public Optional<String> getServiceAsString() {
         return serviceClassName;
