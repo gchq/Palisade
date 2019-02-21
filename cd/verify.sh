@@ -51,7 +51,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     done
     ./example/multi-jvm-example/scripts/startAllServices.sh
     # Sleep to allow services to start
-    sleep 5s
+    sleep 30s
     echo "Running the example application"
     OUTPUT=`./example/multi-jvm-example/scripts/run.sh | tee /dev/tty`
     echo "Output is: $OUTPUT"
