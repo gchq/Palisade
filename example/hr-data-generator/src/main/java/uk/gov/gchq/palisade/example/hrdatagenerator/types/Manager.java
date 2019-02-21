@@ -18,10 +18,12 @@ package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import uk.gov.gchq.palisade.UserId;
+
 import java.util.Random;
 
 public class Manager {
-    private int uid;
+    private UserId uid;
     private Manager[] manager;
     private String managerType;
 
@@ -46,15 +48,10 @@ public class Manager {
 
     public static Manager generate(final Random random, final String managerType) {
         Manager manager = new Manager();
-        manager.setUid(generateUID(random));
+        manager.setUid(Employee.generateUID(random));
         manager.setManagerType(managerType);
 
         return manager;
-    }
-
-
-    private static int generateUID(final Random random) {
-        return random.nextInt();
     }
 
     public String getManagerType() {
@@ -65,11 +62,11 @@ public class Manager {
         this.managerType = managerType;
     }
 
-    public int getUid() {
+    public UserId getUid() {
         return uid;
     }
 
-    public void setUid(final int uid) {
+    public void setUid(final UserId uid) {
         this.uid = uid;
     }
 
