@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export DIR=example/multi-jvm-example/scripts
+export DIR=example/example-services/multi-jvm-example/scripts
 
 ${DIR}/stopAllServices.sh > /dev/null 2>&1
 

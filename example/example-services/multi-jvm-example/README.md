@@ -48,7 +48,7 @@ The services can be started within Docker containers or ran within a local Tomca
 To run them in them in a local Tomcat, firstly build the executable jars:
 
 ```bash
- ./example/multi-jvm-example/scripts/buildServices.sh
+ ./example/example-services/multi-jvm-example/scripts/buildServices.sh
 ```
 
 Either start them all in a single terminal using:
@@ -58,24 +58,34 @@ Either start them all in a single terminal using:
  Or for better logging and understanding of what is going on you can 
  run REST service in 6 separate terminals. This way the logs for each
  service are split up.
+ First start up the etcd service
 ```bash
-  ./example/multi-jvm-example/scripts/startResourceService.sh
+ ./example/example-services/multi-jvm-example/scripts/startETCD.sh
+```
+ The config service should be started first, as the other services depend on it
+```bash
+  ./example/example-services//multi-jvm-example/scripts/startConfigService.sh
 ```
 ```bash
-  ./example/multi-jvm-example/scripts/startPolicyService.sh
+  ./example/example-services//multi-jvm-example/scripts/configureServices.sh                    // then populate the config service with the example services configuration
+```
+Then the six Palisade services
+```bash
+  ./example/example-services/multi-jvm-example/scripts/startResourceService.sh
 ```
 ```bash
-  ./example/multi-jvm-example/scripts/startUserService.sh
+  ./example/example-services/multi-jvm-example/scripts/startPolicyService.sh
 ```
 ```bash
-  ./example/multi-jvm-example/scripts/startPalisadeService.sh
+  ./example/example-services/multi-jvm-example/scripts/startUserService.sh
 ```
 ```bash
-  ./example/multi-jvm-example/scripts/startDataService.sh
+  ./example/example-services//multi-jvm-example/scripts/startPalisadeService.sh
 ```
 ```bash
-  ./example/multi-jvm-example/scripts/startConfigService.sh
+  ./example/example-services//multi-jvm-example/scripts/startDataService.sh
 ```
+
 You will need to wait until all the REST services have successfully started in tomcat. 
 You should see 6 messages like:
 ```
@@ -125,7 +135,7 @@ c0b6cce34df8        quay.io/coreos/etcd                 "/usr/local/bin/etcd…"
 For local Tomcat:
 
 ```bash
- ./example/multi-jvm-example/scripts/run.sh
+ ./example/example-services/multi-jvm-example/scripts/run.sh
 ```
 
 For Docker:
