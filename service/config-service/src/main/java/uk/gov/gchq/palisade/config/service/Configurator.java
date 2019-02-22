@@ -251,22 +251,20 @@ public class Configurator {
                     config = service.get(request).join();
                 }
 
-            } catch (InterruptedException | ExecutionException | CancellationException e) {
+            } catch (CompletionException | InterruptedException | ExecutionException | CancellationException e) {
                 LOGGER.warn("Error while retrieving configuration for {}", serviceClass, e);
+                //this should be rethrown immediately
+                if (e.getCause() instanceof NoConfigException) {
+                    throw (NoConfigException) e.getCause();
+                }
                 //keep trying after short delay
                 try {
                     Thread.sleep(ConfigConsts.DELAY);
                 } catch (InterruptedException ignore) {
                 }
-                continue;
+
             } catch (TimeoutException e) {
                 LOGGER.debug("Timed out getting configuration for {}", serviceClass.getClass());
-                continue;
-            } catch (CompletionException e) {
-                //this should be rethrown
-                if (e.getCause() instanceof NoConfigException) {
-                    throw (NoConfigException) e.getCause();
-                }
             }
         }
 

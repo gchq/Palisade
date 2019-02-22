@@ -16,6 +16,10 @@
 
 package uk.gov.gchq.palisade.redirect.impl;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.heart.Stethoscope;
 import uk.gov.gchq.palisade.redirect.Redirector;
@@ -70,6 +74,45 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
      */
     public void setCacheService(final CacheService cacheService) {
         cacheService(cacheService);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        HeartbeatRedirector<?> that = (HeartbeatRedirector<?>) o;
+
+        return new EqualsBuilder()
+                .append(cache, that.cache)
+                .append(redirectClass, that.redirectClass)
+                .append(getScope(), that.getScope())
+                .isEquals();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append(super.toString())
+                .append("cache", cache)
+                .append("redirectClass", redirectClass)
+                .append("scope", scope)
+                .toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(11, 37)
+                .appendSuper(super.hashCode())
+                .append(cache)
+                .append(redirectClass)
+                .append(getScope())
+                .toHashCode();
     }
 
     /**

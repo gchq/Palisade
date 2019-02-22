@@ -25,11 +25,14 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.data.service.DataService;
+import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.impl.reader.HadoopDataReader;
 import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
+import uk.gov.gchq.palisade.redirect.RESTRedirector;
+import uk.gov.gchq.palisade.redirect.impl.SimpleRandomRedirector;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.HadoopResourceService;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
@@ -104,6 +107,9 @@ public class ServicesConfigurator {
 
         // write the config for the data service to the config service
         writeServerConfiguration(configClient, createDataServiceForServer(), DataService.class);
+
+        // write the rest redirection for the data service redirection to the config service
+        writeServerConfiguration(configClient, createRESTRedirectorForServer(), RESTRedirector.class);
 
         LOGGER.info("Finished setting the service configurations.");
     }
@@ -236,5 +242,14 @@ public class ServicesConfigurator {
             LOGGER.error(e.getLocalizedMessage(), e);
             return null;
         }
+    }
+
+    /**
+     * A method for creating a user service as it would be configured as a standalone micro-service (server)
+     *
+     * @return a user service as it would be configured as a standalone micro-service (server)
+     */
+    protected RESTRedirector createRESTRedirectorForServer() {
+        return new RESTRedirector(DataService.class, RestDataServiceV1.class, new SimpleRandomRedirector().redirectionClass(SimpleDataService.class).cacheService(clientServices.createCacheService()));
     }
 }
