@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -88,15 +89,20 @@ public class ProxyServicesFactory {
         return new ProxyRestConnectionDetail().url(args[5]).serviceClass(ProxyRestDataService.class);
     }
 
+    private CacheService cacheService;
+
     public CacheService createCacheService() {
-        if (args.length > 1) {
-            List<URI> etcdEndpoints = Arrays.stream(args[0].split(",")).map(URI::create).collect(Collectors.toList());
-            return new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(etcdEndpoints));
-        } else {
-            LOGGER.error("Failed to create the Configuration for the cache service due to missing the 1st argument, " +
-                    "which should be a comma separated list of etcd client endpoints");
-            throw new RuntimeException("failed to create CacheService due to no etcd endpoints specified");
+        if (isNull(cacheService)) {
+            if (args.length > 1) {
+                List<URI> etcdEndpoints = Arrays.stream(args[0].split(",")).map(URI::create).collect(Collectors.toList());
+                cacheService = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(etcdEndpoints));
+            } else {
+                LOGGER.error("Failed to create the Configuration for the cache service due to missing the 1st argument, " +
+                        "which should be a comma separated list of etcd client endpoints");
+                throw new RuntimeException("failed to create CacheService due to no etcd endpoints specified");
+            }
         }
+        return cacheService;
     }
 
     public AuditService createAuditService() {

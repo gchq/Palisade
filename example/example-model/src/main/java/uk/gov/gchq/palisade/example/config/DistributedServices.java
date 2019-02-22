@@ -16,6 +16,9 @@
 
 package uk.gov.gchq.palisade.example.config;
 
+import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
+
 /**
  * Convenience class for setting the default config for the various Palisade micro-services
  * which assumes all services are being deployed according to the given arguments.
@@ -28,6 +31,12 @@ public final class DistributedServices {
     }
 
     public static void main(final String[] args) {
-        new ServicesConfigurator(new ProxyServicesFactory(args));
+        ProxyServicesFactory factory=new ProxyServicesFactory(args);
+        new ServicesConfigurator(factory);
+
+        CacheService cs=factory.createCacheService();
+        if (cs instanceof SimpleCacheService) {
+            ((SimpleCacheService)cs).getBackingStore().close();
+        }
     }
 }
