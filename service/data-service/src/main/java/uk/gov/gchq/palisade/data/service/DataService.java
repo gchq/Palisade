@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service;
 
+import uk.gov.gchq.palisade.data.service.exception.NoCapacityException;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.service.Service;
@@ -42,7 +43,9 @@ public interface DataService extends Service {
      * resources or a subset of the resources that the palisade service responded
      * with in the {@link uk.gov.gchq.palisade.service.request.DataRequestResponse}.
      * This method will only work if the client has already registered the data
-     * request with the palisade service.
+     * request with the palisade service. If the data service is unable to serve the
+     * request due to not having the resources to do so, or if it is currently
+     * serving too many requests then it may throw a {@link NoCapacityException}.
      *
      * @param request The {@link ReadRequest} that came from registering the
      *                request with the palisade service. The request can be
@@ -51,8 +54,10 @@ public interface DataService extends Service {
      * @return a {@link CompletableFuture} {@link ReadResponse} containing the
      * {@link java.io.InputStream} of data and/or a message (error/warning/info) to be
      * returned to the client.
+     * @throws NoCapacityException if the data service is unable to serve this request due to
+     *                             workload issues or lack of capacity
      */
-    CompletableFuture<ReadResponse> read(final ReadRequest request);
+    CompletableFuture<ReadResponse> read(final ReadRequest request) throws NoCapacityException;
 
     @Override
     default CompletableFuture<?> process(final Request request) {

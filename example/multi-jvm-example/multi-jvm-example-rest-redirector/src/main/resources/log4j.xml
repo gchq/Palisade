@@ -23,17 +23,8 @@
             <param name="ConversionPattern" value="%c{3} %p %x - %m%n"/>
         </layout>
     </appender>
-    <logger name="io.swagger.converter">
-        <level value="WARN"/>
-    </logger>
-    <logger name="io.swagger">
-        <level value="WARN"/>
-    </logger>
-    <logger name="org.reflections">
-        <level value="WARN"/>
-    </logger>
     <root>
-        <priority value="warn"></priority>
+        <priority value="info"></priority>
         <appender-ref ref="console"></appender-ref>
     </root>
 </log4j:configuration>

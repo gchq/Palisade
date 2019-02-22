@@ -22,7 +22,7 @@ import uk.gov.gchq.palisade.service.ServiceState;
  * An exception thrown when a request is made for an {@link ServiceState} that is
  * not present, or could not be found.
  */
-public class NoConfigException extends PalisadeRuntimeException {
+public class NoConfigException extends RequestFailedException {
 
     public NoConfigException(final String e) {
         super(e);
