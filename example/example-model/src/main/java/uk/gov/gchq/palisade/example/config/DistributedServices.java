@@ -31,12 +31,12 @@ public final class DistributedServices {
     }
 
     public static void main(final String[] args) {
-        ProxyServicesFactory factory=new ProxyServicesFactory(args);
+        ProxyServicesFactory factory = new ProxyServicesFactory(args);
         new ServicesConfigurator(factory);
 
-        CacheService cs=factory.createCacheService();
+        CacheService cs = factory.createCacheService();
         if (cs instanceof SimpleCacheService) {
-            ((SimpleCacheService)cs).getBackingStore().close();
+            ((SimpleCacheService) cs).getBackingStore().close();
         }
     }
 }
