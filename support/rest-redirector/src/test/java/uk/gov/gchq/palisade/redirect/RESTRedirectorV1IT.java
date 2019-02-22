@@ -28,6 +28,7 @@ import uk.gov.gchq.palisade.redirect.exception.NoInstanceException;
 import uk.gov.gchq.palisade.redirect.impl.SimpleRandomRedirector;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.service.Service;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -40,6 +41,7 @@ import java.net.URL;
 
 import static java.util.Objects.nonNull;
 import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class RESTRedirectorV1IT {
@@ -98,6 +100,7 @@ public class RESTRedirectorV1IT {
     private static Heartbeat beat;
     private static TestSimpleRandomRedirector redirector;
     private static EmbeddedHttpServer server;
+    private static RESTRedirector<DummyService, RestDummyService> restInstance;
 
     @BeforeClass
     public static void setup() throws IOException {
@@ -108,7 +111,8 @@ public class RESTRedirectorV1IT {
         //create a redirector
         redirector = (TestSimpleRandomRedirector) new TestSimpleRandomRedirector().cacheService(cache).redirectionClass(DummyService.class);
         //make the redirection server
-        server = new EmbeddedHttpServer(BASE_URL, new RESTRedirector<DummyService, RestDummyService>(DummyService.class, RestDummyService.class, redirector));
+        restInstance = new RESTRedirector<>(DummyService.class, RestDummyService.class, redirector);
+        server = new EmbeddedHttpServer(BASE_URL, restInstance);
         server.startServer();
     }
 
@@ -197,5 +201,22 @@ public class RESTRedirectorV1IT {
         } finally {
             url.disconnect();
         }
+    }
+
+    @Test
+    public void shouldConfigureCorrectly() throws Exception {
+        //Given
+        ServiceState state=new ServiceState();
+
+        //When
+        restInstance.recordCurrentConfigTo(state);
+
+        //deliberately configure badly
+        RESTRedirector<?,?> recoveredInstance=new RESTRedirector(Service.class,Service.class,new SimpleRandomRedirector());
+        recoveredInstance.applyConfigFrom(state);
+
+        //Then
+        assertEquals(restInstance.getRedirectionClass(),recoveredInstance.getRedirectionClass());
+        assertEquals(restInstance.getRestImplementationClass(),recoveredInstance.getRestImplementationClass());
     }
 }

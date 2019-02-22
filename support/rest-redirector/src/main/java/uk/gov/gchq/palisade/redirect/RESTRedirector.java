@@ -80,7 +80,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      */
     private static final String REDIRECTOR_KEY = "rest.redirect.redirector";
     /**
-     * Configuration key for the class type for the Palisade service being redirected.
+     * Configuration key for the (probably an interface) class type for the Palisade service being redirected.
      */
     private static final String REDIRECTION_CLASS_KEY = "rest.redirect.class";
     /**
@@ -106,6 +106,11 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      * The marshall that creates the proxy and handles the actual redirection.
      */
     private final RedirectionMarshall<String> marshall;
+
+    /**
+     * Has configuration already occurred?
+     */
+    private boolean configured;
 
     /**
      * This is injected by the servlet container e.g. Jersey/HK2 when a REST API call is made. This is used to extract
@@ -143,7 +148,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      * @param restImplementationClass the REST implementation class for the redirection class
      * @param redirector              the redirector instance
      */
-    RESTRedirector(final Class<S> redirectionClass, final Class<T> restImplementationClass, final Redirector<String> redirector) {
+    public RESTRedirector(final Class<S> redirectionClass, final Class<T> restImplementationClass, final Redirector<String> redirector) {
         requireNonNull(redirectionClass, "redirectionClass");
         requireNonNull(restImplementationClass, "restImplementationClass");
         requireNonNull(redirector, "redirector");
@@ -175,6 +180,11 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      * we register a {@link ServiceBinder} to ensure the redirection proxy is injected into the constructor.
      */
     private void configureRedirection() {
+        //check we haven't already tried this
+        if (configured) {
+            throw new IllegalStateException("already configured");
+        }
+        configured = true;
         //manufacture the delegate
         S service = marshall.createProxyFor(getRedirectionClass());
         //register the original implementation class as a resource
@@ -262,7 +272,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
             String serialisedRestImplClass = config.getOrDefault(REST_IMPL_CLASS_KEY, null);
             if (nonNull(serialisedRestImplClass)) {
                 @SuppressWarnings("unchecked")
-                Class<T> deClassRedirectImpl = (Class<T>) Class.forName(serialisedRedirectClass);
+                Class<T> deClassRedirectImpl = (Class<T>) Class.forName(serialisedRestImplClass);
                 setRestImplementationClass(deClassRedirectImpl);
             } else {
                 throw new NoConfigException("no service class specified in configuration");

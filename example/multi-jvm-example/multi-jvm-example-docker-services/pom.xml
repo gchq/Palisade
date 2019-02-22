@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -14,6 +15,11 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>multi-jvm-example-docker-runner</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>multi-jvm-example-rest-redirector</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
@@ -145,6 +151,23 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-config-json-rest-redirector</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>./rest-redirector/docker/bin</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <filtering>false</filtering>
+                                    <include>configRest.json</include>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-example-model-for-service-config</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -196,6 +219,25 @@
                                     <directory>../multi-jvm-example-docker-runner/target</directory>
                                     <includes>
                                         <include>multi-jvm-example-docker-runner-*-shaded.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-rest-redirector</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/rest-redirector/docker/bin</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>../multi-jvm-example-rest-redirector/target</directory>
+                                    <includes>
+                                        <include>multi-jvm-example-rest-redirector-*-shaded.jar</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -365,6 +407,13 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
+                            <directory>./rest-redirector/docker/bin</directory>
+                            <includes>
+                                <include>multi-jvm-example-rest-redirector-*-shaded.jar</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
                             <directory>./user-service/docker/bin/rest-user-service</directory>
                             <includes>
                                 <include>**</include>
@@ -439,6 +488,12 @@
                         </fileset>
                         <fileset>
                             <directory>./configure-example/docker/bin</directory>
+                            <includes>
+                                <include>configRest.json</include>
+                            </includes>
+                        </fileset>
+                        <fileset>
+                            <directory>./rest-redirector/docker/bin</directory>
                             <includes>
                                 <include>configRest.json</include>
                             </includes>

@@ -146,6 +146,17 @@
             <version>${koryphe.version}</version>
         </dependency>
         <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>rest-redirector</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>rest-data-service</artifactId>
+            <version>${project.parent.version}</version>
+            <classifier>classes</classifier>
+        </dependency>
+        <dependency>
             <groupId>uk.gov.gchq.palisade</groupId>
             <artifactId>hr-data-generator</artifactId>
             <version>${project.parent.version}</version>
@@ -182,7 +193,8 @@
                         </filter>
                     </filters>
                     <transformers>
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                     </transformers>
                 </configuration>
             </plugin>
