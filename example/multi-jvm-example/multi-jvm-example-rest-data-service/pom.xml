@@ -137,7 +137,7 @@
                                     ${standalone-path}
                                 </palisade.rest.basePath>
                                 <palisade.rest.config.path>
-                                    <!-- This file exists in the example-model module -->
+                                    <!-- This file exists in the docker-services module -->
                                     configRest.json
                                 </palisade.rest.config.path>
                                 <!-- Here you could override the Data service implementing class-->
