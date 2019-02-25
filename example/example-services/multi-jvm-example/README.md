@@ -45,7 +45,7 @@ mvn clean install -P example
 
 The services can be started within Docker containers or ran within a local Tomcat.
 
-To run them in them in a local Tomcat, firstly build the executable jars:
+To run them in a local Tomcat, firstly build the executable jars:
 
 ```bash
  ./example/example-services/multi-jvm-example/scripts/buildServices.sh
@@ -53,23 +53,24 @@ To run them in them in a local Tomcat, firstly build the executable jars:
 
 Either start them all in a single terminal using:
 ```bash
- ./example/multi-jvm-example/scripts/startAllServices.sh
+ ./example/example-services//multi-jvm-example/scripts/startAllServices.sh
 ```
- Or for better logging and understanding of what is going on you can 
- run REST service in 6 separate terminals. This way the logs for each
+Or for better logging and understanding of what is going on you can
+ run REST service in separate terminals. This way the logs for each
  service are split up.
- First start up the etcd service
+First start up the etcd service
 ```bash
  ./example/example-services/multi-jvm-example/scripts/startETCD.sh
 ```
- The config service should be started first, as the other services depend on it
+The config service should be started next, as the other services depend on it
 ```bash
   ./example/example-services//multi-jvm-example/scripts/startConfigService.sh
 ```
+Then configure the services
 ```bash
-  ./example/example-services//multi-jvm-example/scripts/configureServices.sh                    // then populate the config service with the example services configuration
+  ./example/example-services/multi-jvm-example/scripts/configureServices.sh
 ```
-Then the six Palisade services
+Then the rermaining Palisade services
 ```bash
   ./example/example-services/multi-jvm-example/scripts/startResourceService.sh
 ```
@@ -80,10 +81,10 @@ Then the six Palisade services
   ./example/example-services/multi-jvm-example/scripts/startUserService.sh
 ```
 ```bash
-  ./example/example-services//multi-jvm-example/scripts/startPalisadeService.sh
+  ./example/example-services/multi-jvm-example/scripts/startPalisadeService.sh
 ```
 ```bash
-  ./example/example-services//multi-jvm-example/scripts/startDataService.sh
+  ./example/example-services/multi-jvm-example/scripts/startDataService.sh
 ```
 
 You will need to wait until all the REST services have successfully started in tomcat. 
@@ -96,6 +97,14 @@ INFO: Starting ProtocolHandler ["http-bio-8083"]
 INFO: Starting ProtocolHandler ["http-bio-8084"]
 INFO: Starting ProtocolHandler ["http-bio-8085"]
 ```
+
+
+Then populate the examplke data - so that the examples will have something to query
+```bash
+  ./example/example-services/multi-jvm-example/scripts/configureExamples.sh
+```
+
+
 
 To run them in Docker:
 

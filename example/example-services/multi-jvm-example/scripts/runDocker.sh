@@ -7,5 +7,5 @@ if [[ $(grep -c example_palisade <(echo $NETWORKS)) -lt 1 ]]; then
     exit 1
 fi
 
-docker build -t multi-jvm-example-docker-runner ./example/multi-jvm-example/multi-jvm-example-docker-services/client/
+docker build -t multi-jvm-example-docker-runner ./example/example-services/multi-jvm-example/multi-jvm-example-docker-services/client/
 docker run --network=example_palisade_network --rm multi-jvm-example-docker-runner
