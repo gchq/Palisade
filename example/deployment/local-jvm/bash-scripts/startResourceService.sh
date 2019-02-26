@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-. ./example/deployment/multi-use/bash-scripts/setScriptPath.sh
+. ./example/deployment/local-jvm/bash-scripts/setScriptPath.sh
 java -jar $MULTIJVMEXAMPLE/multi-jvm-example-rest-resource-service/target/multi-jvm-example-rest-resource-service-*-executable.jar \
                 -httpPort=8082 \
                 -extractDirectory=.extract/Resource \

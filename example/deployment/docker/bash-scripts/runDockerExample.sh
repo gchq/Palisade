@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-. ./example/deployment/multi-use/bash-scripts/setScriptPath.sh
+. ./example/deployment/local-jvm/bash-scripts/setScriptPath.sh
 
 # Check that the required network is present
 NETWORKS=$(docker network ls -f 'name=example_palisade' --format '{{.Name}}')

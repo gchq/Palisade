@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-. ./example/deployment/multi-use/bash-scripts/setScriptPath.sh
+. ./example/deployment/local-jvm/bash-scripts/setScriptPath.sh
 java -jar $MULTIJVMEXAMPLE/multi-jvm-example-rest-user-service/target/multi-jvm-example-rest-user-service-*-executable.jar \
                 -httpPort=8083 \
                 -extractDirectory=.extract/User \

@@ -20,35 +20,34 @@ The policies and users have been hardcoded in class: uk.gov.gchq.palisade.exampl
 
 Policy have defined the following rules:
 
-    - Age off - the timestamp must be greater than 12
+   - Age off - the timestamp must be greater than 12
 
-    - Visibility - the user must have the correct level of authorisation to for the visibility label
+   - Visibility - the user must have the correct level of authorisation to for the visibility label
 
-    - Property redaction - if the user does not have the 'admin' role the 'property' field should be redacted
+   - Property redaction - if the user does not have the 'admin' role the 'property' field should be redacted
   
 The example will be run with 2 users:
 
-    - Alice is an admin and can see both public and private records
+   - Alice is an admin and can see both public and private records
 
-    - Bob is a standard user, who can only see public records
+   - Bob is a standard user, who can only see public records
 
 When you run the example you will see the data has been redacted accordingly.
 
 To run the example following the steps (from the root of the project):
 
-1. Compile the code  
-
- ```bash
- mvn clean install -P example
- ```
+1. Compile the code
+```bash
+mvn clean install -P example
+```
  
-1.  Firstly build the executable jars
+2.  Build the executable jars
 
  ```bash
    ./example/deployment/multi-use/bash-scripts/buildServices.sh
  ```
 
-1. Start the REST services
+3. Start the REST services
 
 
 Either start them all in a single terminal using:
@@ -106,7 +105,7 @@ Then populate the example data - so that the examples will have something to que
 ```
 
 
-1. Run the example
+4. Run the example
 
 ```bash
   ./example/deployment/local-jvm/bash-scripts/runLocalJVMExample.sh
@@ -115,7 +114,7 @@ Then populate the example data - so that the examples will have something to que
 
 This just runs the java class: uk.gov.gchq.palisade.example.MultiJvmExample. You can just run this class directly in your IDE.
 
-1. Stop the REST services
+5. Stop the REST services
 
 ```bash
   ./example/deployment/local-jvm/bash-scripts/stopAllServices.sh
