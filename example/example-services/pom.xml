@@ -35,7 +35,7 @@
             <modules>
                 <module>hr-data-generator</module>
                 <module>example-model</module>
-                <module>multi-jvm-example</module>
+                <module>rest-example</module>
                 <module>mapreduce-example</module>
             </modules>
         </profile>
@@ -44,7 +44,7 @@
             <modules>
                 <module>hr-data-generator</module>
                 <module>example-model</module>
-                <module>multi-jvm-example</module>
+                <module>rest-example</module>
                 <module>mapreduce-example</module>
             </modules>
         </profile>
@@ -53,7 +53,7 @@
             <modules>
                 <module>hr-data-generator</module>
                 <module>example-model</module>
-                <module>multi-jvm-example</module>
+                <module>rest-example</module>
                 <module>mapreduce-example</module>
             </modules>
         </profile>

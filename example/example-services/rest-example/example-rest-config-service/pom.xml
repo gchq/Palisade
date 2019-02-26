@@ -19,10 +19,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>multi-jvm-example</artifactId>
+        <artifactId>rest-example</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </parent>
-    <artifactId>multi-jvm-example-rest-resource-service</artifactId>
+    <artifactId>example-rest-config-service</artifactId>
     <packaging>war</packaging>
 
     <properties>
@@ -33,27 +33,32 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hadoop-resource-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
             <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>etcd-backing-store</artifactId>
+            <artifactId>simple-cache-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>proxy-rest-data-service</artifactId>
+            <artifactId>hashmap-backing-store</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>rest-resource-service</artifactId>
+            <artifactId>simple-config-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>rest-redirector</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>rest-config-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
@@ -93,7 +98,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.parent.groupId}</groupId>
-                                    <artifactId>rest-resource-service</artifactId>
+                                    <artifactId>rest-config-service</artifactId>
                                     <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <overWrite>false</overWrite>
@@ -120,7 +125,7 @@
 
     <profiles>
         <profile>
-            <id>multi-jvm-example-rest-resource-service</id>
+            <id>example-rest-config-service</id>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
@@ -141,10 +146,9 @@
                                 <palisade.rest.basePath>
                                     ${standalone-path}
                                 </palisade.rest.basePath>
-                                <palisade.rest.config.path>
-                                    <!-- This file exists in the docker-services module -->
-                                    configRest.json
-                                </palisade.rest.config.path>
+                                <palisade.rest.bootstrap.path>
+                                    ${project.build.outputDirectory}/bootstrapConfig.json
+                                </palisade.rest.bootstrap.path>
                                 <palisade.error-mode.debug>
                                     true
                                 </palisade.error-mode.debug>

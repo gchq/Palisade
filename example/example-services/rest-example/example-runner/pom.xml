@@ -19,10 +19,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>multi-jvm-example</artifactId>
+        <artifactId>rest-example</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </parent>
-    <artifactId>multi-jvm-example-runner</artifactId>
+    <artifactId>example-runner</artifactId>
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -95,42 +95,42 @@
 
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-rest-data-service</artifactId>
+            <artifactId>example-rest-data-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-rest-palisade-service</artifactId>
+            <artifactId>example-rest-palisade-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-rest-policy-service</artifactId>
+            <artifactId>example-rest-policy-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-rest-config-service</artifactId>
+            <artifactId>example-rest-config-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-rest-user-service</artifactId>
+            <artifactId>example-rest-user-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-rest-resource-service</artifactId>
+            <artifactId>example-rest-resource-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
@@ -227,7 +227,7 @@
 
     <profiles>
         <profile>
-            <id>multi-jvm-example</id>
+            <id>rest-example</id>
             <build>
                 <plugins>
                     <plugin>

@@ -36,18 +36,18 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 
-public class MultiJvmExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
+public class RestExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestExample.class);
 
     public static void main(final String[] args) throws Exception {
         if (args.length < 1) {
-            System.out.printf("Usage: %s file\n", MultiJvmExample.class.getTypeName());
+            System.out.printf("Usage: %s file\n", RestExample.class.getTypeName());
             System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
             System.exit(1);
         }
 
         String sourceFile = args[0];
-        new MultiJvmExample().run(sourceFile);
+        new RestExample().run(sourceFile);
     }
 
     public void run(final String sourceFile) throws Exception {

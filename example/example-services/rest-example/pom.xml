@@ -22,20 +22,20 @@
         <artifactId>example</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </parent>
-    <artifactId>multi-jvm-example</artifactId>
+    <artifactId>rest-example</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>multi-jvm-example-rest-palisade-service</module>
-        <module>multi-jvm-example-rest-config-service</module>
-        <module>multi-jvm-example-rest-policy-service</module>
-        <module>multi-jvm-example-rest-resource-service</module>
-        <module>multi-jvm-example-rest-user-service</module>
-        <module>multi-jvm-example-rest-data-service</module>
-        <module>multi-jvm-example-rest-redirector</module>
-        <module>multi-jvm-example-docker-services</module>
-        <module>multi-jvm-example-docker-runner</module>
-        <module>multi-jvm-example-runner</module>
+        <module>example-rest-palisade-service</module>
+        <module>example-rest-config-service</module>
+        <module>example-rest-policy-service</module>
+        <module>example-rest-resource-service</module>
+        <module>example-rest-user-service</module>
+        <module>example-rest-data-service</module>
+        <module>example-rest-redirector</module>
+        <module>example-docker-services</module>
+        <module>example-docker-runner</module>
+        <module>example-runner</module>
     </modules>
 
     <build>

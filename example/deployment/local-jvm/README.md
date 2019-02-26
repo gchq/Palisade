@@ -44,7 +44,7 @@ mvn clean install -P example
 2.  Build the executable jars
 
  ```bash
-   ./example/deployment/multi-use/bash-scripts/buildServices.sh
+   ./example/deployment/local-jvm/bash-scripts/buildServices.sh
  ```
 
 3. Start the REST services

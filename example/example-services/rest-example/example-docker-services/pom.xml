@@ -4,22 +4,22 @@
 
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>multi-jvm-example</artifactId>
+        <artifactId>rest-example</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>multi-jvm-example-docker-services</artifactId>
+    <artifactId>example-docker-services</artifactId>
     <packaging>pom</packaging>
 
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-docker-runner</artifactId>
+            <artifactId>example-docker-runner</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>multi-jvm-example-rest-redirector</artifactId>
+            <artifactId>example-rest-redirector</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
@@ -216,9 +216,9 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>../multi-jvm-example-docker-runner/target</directory>
+                                    <directory>../example-docker-runner/target</directory>
                                     <includes>
-                                        <include>multi-jvm-example-docker-runner-*-shaded.jar</include>
+                                        <include>example-docker-runner-*-shaded.jar</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -235,9 +235,9 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>../multi-jvm-example-rest-redirector/target</directory>
+                                    <directory>../example-rest-redirector/target</directory>
                                     <includes>
-                                        <include>multi-jvm-example-rest-redirector-*-shaded.jar</include>
+                                        <include>example-rest-redirector-*-shaded.jar</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -261,7 +261,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.parent.groupId}</groupId>
-                                    <artifactId>multi-jvm-example-rest-palisade-service</artifactId>
+                                    <artifactId>example-rest-palisade-service</artifactId>
                                     <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
@@ -282,7 +282,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.parent.groupId}</groupId>
-                                    <artifactId>multi-jvm-example-rest-data-service</artifactId>
+                                    <artifactId>example-rest-data-service</artifactId>
                                     <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
@@ -303,7 +303,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.parent.groupId}</groupId>
-                                    <artifactId>multi-jvm-example-rest-policy-service</artifactId>
+                                    <artifactId>example-rest-policy-service</artifactId>
                                     <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
@@ -324,7 +324,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.parent.groupId}</groupId>
-                                    <artifactId>multi-jvm-example-rest-resource-service</artifactId>
+                                    <artifactId>example-rest-resource-service</artifactId>
                                     <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
@@ -345,7 +345,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.parent.groupId}</groupId>
-                                    <artifactId>multi-jvm-example-rest-user-service</artifactId>
+                                    <artifactId>example-rest-user-service</artifactId>
                                     <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
@@ -366,7 +366,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.parent.groupId}</groupId>
-                                    <artifactId>multi-jvm-example-rest-config-service</artifactId>
+                                    <artifactId>example-rest-config-service</artifactId>
                                     <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
@@ -388,7 +388,7 @@
                         <fileset>
                             <directory>./client/docker/bin</directory>
                             <includes>
-                                <include>multi-jvm-example-docker-runner-*-shaded.jar</include>
+                                <include>example-docker-runner-*-shaded.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
@@ -409,7 +409,7 @@
                         <fileset>
                             <directory>./rest-redirector/docker/bin</directory>
                             <includes>
-                                <include>multi-jvm-example-rest-redirector-*-shaded.jar</include>
+                                <include>example-rest-redirector-*-shaded.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>

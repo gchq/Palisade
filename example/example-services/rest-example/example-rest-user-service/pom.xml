@@ -19,10 +19,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>multi-jvm-example</artifactId>
+        <artifactId>rest-example</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </parent>
-    <artifactId>multi-jvm-example-rest-data-service</artifactId>
+    <artifactId>example-rest-user-service</artifactId>
     <packaging>war</packaging>
 
     <properties>
@@ -33,22 +33,17 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
+            <artifactId>simple-user-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>hadoop-data-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>proxy-rest-palisade-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>rest-data-service</artifactId>
+            <artifactId>rest-user-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
@@ -88,7 +83,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.parent.groupId}</groupId>
-                                    <artifactId>rest-data-service</artifactId>
+                                    <artifactId>rest-user-service</artifactId>
                                     <version>${project.parent.version}</version>
                                     <type>war</type>
                                     <overWrite>false</overWrite>
@@ -115,7 +110,7 @@
 
     <profiles>
         <profile>
-            <id>multi-jvm-example-rest-data-service</id>
+            <id>example-rest-user-service</id>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
@@ -140,12 +135,6 @@
                                     <!-- This file exists in the docker-services module -->
                                     configRest.json
                                 </palisade.rest.config.path>
-                                <!-- Here you could override the Data service implementing class-->
-                                <!--
-                                <uk.gov.gchq.palisade.data.service.DataService>
-                                    uk.gov.gchq.palisade.data.service.impl.SimpleDataService
-                                </uk.gov.gchq.palisade.data.service.DataService>
-                                -->
                                 <palisade.error-mode.debug>
                                     true
                                 </palisade.error-mode.debug>

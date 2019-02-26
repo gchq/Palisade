@@ -3,6 +3,5 @@
 PWD=$(pwd)
 export DOCKERBASHSCRIPTS=$PWD/example/deployment/docker/bash-scripts
 export LOCALJVMBASHSCRIPTS=$PWD/example/deployment/local-jvm/bash-scripts
-export MULTIUSEBASHSCRIPTS=$PWD/example/deployment/multi-use/bash-scripts
-export MULTIJVMEXAMPLE=$PWD/example/example-services/multi-jvm-example
+export RESTEXAMPLE=$PWD/example/example-services/rest-example
 export EXAMPLESERVICES=$PWD/example/example-services/
