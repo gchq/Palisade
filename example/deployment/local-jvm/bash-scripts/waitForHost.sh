@@ -1,4 +1,5 @@
 #!/bin/sh
+# wait for a service to respond - allows services that are dependant upon others to wait for them
 
 set -e
 

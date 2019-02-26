@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-export DIR=example/example-services/multi-jvm-example/scripts
+export DIR=example/deployment/local-jvm/bash-scripts
 
 ${DIR}/stopAllServices.sh > /dev/null 2>&1
 
 # deploy etcd
 ${DIR}/startETCD.sh &
+
+#start services
 ${DIR}/waitForHost.sh localhost:2379/health ${DIR}/startConfigService.sh &
 ${DIR}/waitForHost.sh http://localhost:8085/config/v1/status ${DIR}/configureServices.sh
 ${DIR}/startPolicyService.sh &

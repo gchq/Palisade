@@ -1,4 +1,4 @@
-# Multiple JVM Example
+# Docker Example
 
 This example demonstrates 2 different users querying a database over a REST api. 
 
@@ -43,81 +43,16 @@ mvn clean install -P example
 
 2. Start the REST services
 
-The services can be started within Docker containers or run within a local Tomcat.
-
-To run them in a local Tomcat, firstly build the executable jars:
-
-```bash
- ./example/example-services/multi-jvm-example/scripts/buildServices.sh
-```
-
-Either start them all in a single terminal using:
-```bash
- ./example/example-services//multi-jvm-example/scripts/startAllServices.sh
-```
-Or for better logging and understanding of what is going on you can
- run REST service in separate terminals. This way the logs for each
- service are split up.
-First start up the etcd service
-```bash
- ./example/example-services/multi-jvm-example/scripts/startETCD.sh
-```
-The config service should be started next, as the other services depend on it
-```bash
-  ./example/example-services//multi-jvm-example/scripts/startConfigService.sh
-```
-Then configure the services
-```bash
-  ./example/example-services/multi-jvm-example/scripts/configureServices.sh
-```
-Then the rermaining Palisade services
-```bash
-  ./example/example-services/multi-jvm-example/scripts/startResourceService.sh
-```
-```bash
-  ./example/example-services/multi-jvm-example/scripts/startPolicyService.sh
-```
-```bash
-  ./example/example-services/multi-jvm-example/scripts/startUserService.sh
-```
-```bash
-  ./example/example-services/multi-jvm-example/scripts/startPalisadeService.sh
-```
-```bash
-  ./example/example-services/multi-jvm-example/scripts/startDataService.sh
-```
-
-You will need to wait until all the REST services have successfully started in tomcat. 
-You should see 6 messages like:
-```
-INFO: Starting ProtocolHandler ["http-bio-8080"]
-INFO: Starting ProtocolHandler ["http-bio-8081"]
-INFO: Starting ProtocolHandler ["http-bio-8082"]
-INFO: Starting ProtocolHandler ["http-bio-8083"]
-INFO: Starting ProtocolHandler ["http-bio-8084"]
-INFO: Starting ProtocolHandler ["http-bio-8085"]
-```
-
-
-Then populate the example data - so that the examples will have something to query
-```bash
-  ./example/example-services/multi-jvm-example/scripts/configureExamples.sh
-```
-
-
-
-To run them in Docker:
-
 If you have made changes to the code since you last built the docker containers then you will need to run:
 
 *NOTE* This will clean all stopped docker services, requiring them to be rebuilt when you next want to start them up. 
 ```bash
-  ./example/example-services/multi-jvm-example/scripts/dockerCleanSystem.sh
+ ./example/deployment/docker/bash-scripts/dockerCleanSystem.sh
 ```
 
 Then you can start up the docker containers:
 ```bash
-  ./example/example-services/multi-jvm-example/scripts/dockerComposeUp.sh
+ ./example/deployment/docker/bash-scripts/dockerComposeUp.sh
 ```
 
 You can check the containers are available:
@@ -126,7 +61,7 @@ You can check the containers are available:
   docker ps
 ```
 
-You should see 6 containers:
+You should see 6 containers:     ??? I see 9 containers ???
 
 ```
 CONTAINER ID        IMAGE                                                COMMAND             CREATED             STATUS              PORTS                    NAMES
@@ -141,33 +76,18 @@ c0b6cce34df8        quay.io/coreos/etcd                 "/usr/local/bin/etcd…"
 
 3. Run the example
 
-For local Tomcat:
-
-```bash
- ./example/example-services/multi-jvm-example/scripts/runLocalJVMExample.sh
-```
-
-For Docker:
-
 This script will not run if the `dockerComposeUp.sh` script has not been run.
 
 ```bash
- ./example/example-services/multi-jvm-example/scripts/runDockerExample.sh
+  ./example/deployment/docker/bash-scripts/runDockerExample.sh
 ```
 
 
-This just runs the java class: uk.gov.gchq.palisade.example.MultiJvmExample (or uk.gov.gchq.palisade.example.multi-jvm-example-docker-runner). You can just run this class directly in your IDE.
+This just runs the java class: uk.gov.gchq.palisade.example.multi-jvm-example-docker-runner. You can just run this class directly in your IDE.
 
 4. Stop the REST services
 
-For local Tomcat:
 
 ```bash
- ./example/example-services/multi-jvm-example/scripts/stopAllServices.sh
-```
-
-For Docker:
-
-```bash
- ./example/example-services/multi-jvm-example/scripts/dockerComposeDown.sh
+ ./example/deployment/docker/bash-scripts/dockerComposeDown.sh
 ```
