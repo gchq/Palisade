@@ -59,27 +59,29 @@ If required, Palisade allows an organisation to use centralised services which e
 ![Palisade Overview](doc/img/Palisade_overview.jpg)
 
 
-## Getting started
-
 ### Prerequisites
 1. git
 1. maven
-1. if running the docker based examples: docker and docker-compose
+1. docker
+1. if running the docker based examples: docker-compose
+
+## Getting started
 
 To get started, clone the Palisade repo: 
 
 `git clone https://github.com/gchq/Palisade.git`
 
-We have three simple examples that demonstrate the automated auditing and policy rule enforcement when users read some data.
+We have some simple examples that demonstrate the automated auditing and policy rule enforcement when users read some data.
 These example should provide a good start to understanding how Palisade works.
+1. A local JVM Rest based example
 1. A docker based example that will run on the local machine
-1. An Aws EMR based example
-1. An Azure HDInsight example
-1. ?????also Rest based example ????
+1. An Aws EMR based example (coming soon)
+1. An Azure HDInsight example (coming soon)
 
-* To run the REST based example follow this guide: [multi-jvm-example](example/multi-jvm-example/README.md)
 
-* To run the local map-reduce example follow this guide: [map-reduce-example](example/mapreduce-example/README.md)
+* To run the REST based example follow this guide: [local-jvm-rest](example/deployment/local-jvm/README.md)
+
+* To run the docker based example follow this guide: [docker](example/deployment/docker/README.md)
 
 For more details about the code structure see the [Developer Guide](doc/developer-guide/developer_guide.md)
 
