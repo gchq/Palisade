@@ -1,5 +1,7 @@
 # MapReduce Example
 
+`This example is deprecated in favour of the AWS EMR and Azure HDInsight examples, which are coming soon`
+
 This example demonstrates using the MapReduce client for Palisade and shows a MapReduce job that makes requests for 2 different users querying a database. The results are passed into the map task in the MapReduce job.
 
 The example data is a text file which can be found in the example-model module and has the following records:
