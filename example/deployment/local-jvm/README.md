@@ -2,6 +2,8 @@
 
 This example demonstrates 2 different users querying a database over a REST api. 
 
+`updating example to use a generated HR dataset`
+
 The example data is a text file which can be found in the example-model module and has the following records:
 
 | Property      | Visibility           | Timestamp  |

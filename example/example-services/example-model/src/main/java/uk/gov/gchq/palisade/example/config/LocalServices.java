@@ -25,7 +25,8 @@ package uk.gov.gchq.palisade.example.config;
  */
 public final class LocalServices {
 
-    public static final String[] LOCAL_ARGS = {"http://localhost:2379",
+    public static final String[] LOCAL_ARGS = {
+            "http://localhost:2379",                // ETCD
             "http://localhost:8080/palisade",
             "http://localhost:8081/policy",
             "http://localhost:8082/resource",
