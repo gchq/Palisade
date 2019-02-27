@@ -62,7 +62,7 @@ If required, Palisade allows an organisation to use centralised services which e
 ### Prerequisites
 1. git
 1. maven
-1. docker
+1. to run any of the examples: docker
 1. if running the docker based examples: docker-compose
 
 ## Getting started
