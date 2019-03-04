@@ -113,7 +113,7 @@ public class SimpleConfigService implements ConfigurationService {
     public void configureSelfFromConfig() {
         try {
             LOGGER.debug("Getting auxiliary configuration from cache");
-            ServiceState selfConfig = getServiceConfig(ConfigurationService.class);
+            ServiceState selfConfig = getServiceConfig(ConfigurationService.class.getTypeName());
             applyConfigFrom(selfConfig);
         } catch (NoConfigException e) {
             LOGGER.debug("No auxiliary configuration available. Probably not an error!");
@@ -126,8 +126,8 @@ public class SimpleConfigService implements ConfigurationService {
     @Override
     public CompletableFuture<ServiceState> get(final GetConfigRequest request) throws NoConfigException {
         requireNonNull(request, "request");
-        if (request.getService().isPresent()) { //has a Service requested some config?
-            return CompletableFuture.completedFuture(request.getService().map(this::getServiceConfig).get());
+        if (request.getServiceAsString().isPresent()) { //has a Service requested some config?
+            return CompletableFuture.completedFuture(request.getServiceAsString().map(this::getServiceConfig).get());
         } else { //grab the anonymous client config
             return CompletableFuture.completedFuture(getAnonymousConfig());
         }
@@ -141,13 +141,13 @@ public class SimpleConfigService implements ConfigurationService {
      */
     public CompletableFuture<Boolean> add(final AddConfigRequest request) {
         requireNonNull(request, "request");
-        final Optional<Class<? extends Service>> clazz = request.getService();
+        final Optional<String> clazz = request.getServiceAsString();
         final AddCacheRequest<ServiceState> addRequest = new AddCacheRequest<>()
                 .service(ConfigurationService.class)
                 .value(request.getConfig());
         //are we setting anonymous config
         if (clazz.isPresent()) {
-            addRequest.key(clazz.get().getTypeName());
+            addRequest.key(clazz.get());
         } else {
             addRequest.key(ANONYMOUS_CONFIG_KEY);
         }
@@ -179,12 +179,12 @@ public class SimpleConfigService implements ConfigurationService {
      * @return the service configuration
      * @throws NoConfigException if no configuration could be found
      */
-    private ServiceState getServiceConfig(final Class<? extends Service> clazz) throws NoConfigException {
+    private ServiceState getServiceConfig(final String clazz) throws NoConfigException {
         requireNonNull(clazz, "clazz");
         //first can we find anything for this class specifically?
         final GetCacheRequest<ServiceState> serviceRequest = new GetCacheRequest<>()
                 .service(ConfigurationService.class)
-                .key(clazz.getTypeName());
+                .key(clazz);
         Optional<ServiceState> result = cache.get(serviceRequest).join();
         //if we get an object back, then return it
         if (result.isPresent()) {
