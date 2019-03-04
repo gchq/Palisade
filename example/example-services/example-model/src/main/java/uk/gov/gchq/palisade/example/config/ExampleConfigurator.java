@@ -87,7 +87,7 @@ public final class ExampleConfigurator {
         final User alice = new User()
                 .userId("Alice")
                 .auths("public", "private")
-                .roles("user", "admin");
+                .roles("HR", "PAYROLL");
 
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest().user(alice)
@@ -97,7 +97,7 @@ public final class ExampleConfigurator {
                         new User()
                                 .userId("Bob")
                                 .auths("public")
-                                .roles("user")
+                                .roles("ESTATES")
                 )
         );
 
@@ -110,11 +110,11 @@ public final class ExampleConfigurator {
         // Using Custom Rule implementations - without Koryphe
         final SetResourcePolicyRequest customPolicies =
                 new SetResourcePolicyRequest()
-                        .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
+                        .resource(new FileResource().id(file).type("Employee").serialisedFormat("avro").parent(getParent(file)))
                         .policy(new Policy<ExampleObj>()
                                 .owner(alice)
                                 .recordLevelRule(
-                                        "1-visibility",
+                                        "1-bankdetails",
                                         new IsExampleObjVisible()
                                 )
                                 .recordLevelRule(
