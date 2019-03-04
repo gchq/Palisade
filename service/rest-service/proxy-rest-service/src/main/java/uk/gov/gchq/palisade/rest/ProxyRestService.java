@@ -261,7 +261,7 @@ public abstract class ProxyRestService implements Service {
             final O responseObj;
             try {
                 final Invocation.Builder request = createRequest(jsonBody, url);
-                final Response response = request.post(Entity.json(jsonBody));
+                final Response response = Util.logConnectionFailed(() -> request.post(Entity.json(jsonBody)), url);
                 responseObj = handleResponse(response, outputType);
             } catch (final Exception e) {
                 LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
@@ -278,7 +278,7 @@ public abstract class ProxyRestService implements Service {
 
             final Invocation.Builder request = createRequest(jsonBody, url);
             try {
-                final Response response = request.post(Entity.json(jsonBody));
+                final Response response = Util.logConnectionFailed(() -> request.post(Entity.json(jsonBody)), url);
                 responseObj = handleResponse(response, outputType);
             } catch (final Exception e) {
                 LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
@@ -311,7 +311,7 @@ public abstract class ProxyRestService implements Service {
             try {
                 final Invocation.Builder request = createRequest(jsonBody, url);
                 final Response response;
-                response = request.put(Entity.json(jsonBody));
+                response = Util.logConnectionFailed(() -> request.put(Entity.json(jsonBody)), url);
                 responseObj = handleResponse(response, outputType);
             } catch (final Exception e) {
                 LOGGER.debug("Request to {} failed", url);
