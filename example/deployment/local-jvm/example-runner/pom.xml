@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>rest-example</artifactId>
+        <artifactId>local-jvm</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>example-runner</artifactId>
