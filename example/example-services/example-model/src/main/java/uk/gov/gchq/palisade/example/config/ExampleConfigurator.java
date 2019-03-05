@@ -118,7 +118,7 @@ public final class ExampleConfigurator {
                                         new IsExampleObjVisible()
                                 )
                                 .recordLevelRule(
-                                        "2-ageOff",
+                                        "2-dutyofcare",
                                         new IsExampleObjRecent(12L)
                                 )
                                 .recordLevelRule(

@@ -36,7 +36,6 @@
                 <module>hr-data-generator</module>
                 <module>example-model</module>
                 <module>rest-example</module>
-                <module>mapreduce-example</module>
             </modules>
         </profile>
         <profile>
@@ -45,7 +44,6 @@
                 <module>hr-data-generator</module>
                 <module>example-model</module>
                 <module>rest-example</module>
-                <module>mapreduce-example</module>
             </modules>
         </profile>
         <profile>
@@ -54,7 +52,6 @@
                 <module>hr-data-generator</module>
                 <module>example-model</module>
                 <module>rest-example</module>
-                <module>mapreduce-example</module>
             </modules>
         </profile>
 
