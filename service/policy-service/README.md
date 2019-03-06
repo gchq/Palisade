@@ -8,7 +8,7 @@ The core API for the policy service.
 
 The responsibilities of the policy service is to provide the set of rules
 (filters or transformations) that need to be applied to each resource that
-has been requested, based the user and justification.
+has been requested, based the user and purpose.
 
 **Note:** A resource could be a file, stream, directory or even the system
 resource (policies added to the system resource would be applied globally).

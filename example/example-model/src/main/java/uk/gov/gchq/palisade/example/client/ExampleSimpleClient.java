@@ -142,10 +142,10 @@ public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
         CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
     }
 
-    public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
+    public Stream<ExampleObj> read(final String filename, final String userId, final String purpose) {
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(filename);
         String absoluteFile = absoluteFileURI.toString();
-        return super.read(absoluteFile, ExampleConfigurator.RESOURCE_TYPE, userId, justification);
+        return super.read(absoluteFile, ExampleConfigurator.RESOURCE_TYPE, userId, purpose);
     }
 
     public static ParentResource getParent(final String fileURL) {

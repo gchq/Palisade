@@ -48,7 +48,7 @@ import static java.util.Objects.nonNull;
  *     new TupleRule<>(select("Record.visibility", "User.auths"), new IsVisible())
  * </pre>
  * @param <T> The type of the record. In normal cases the raw data will be deserialised
- *            by the record reader before being passed to the {@link TupleRule#apply(Object, User, Justification)}.
+ *            by the record reader before being passed to the {@link TupleRule#apply(Object, User, Purpose)}.
  */
 public class TupleRule<T> implements Rule<T> {
     private TupleAdaptedFunction<String, ?, ?> function;

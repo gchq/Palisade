@@ -2,8 +2,8 @@
 #### Must have
 * Can use a data access policy that is local, centralised corporately, or mix of both.
 * Can use attributes about users to apply policies, with that user data being local, centralised corporately, or a mix of both.
-* Can use attributes about justification for data access to apply policies, with that justification data being local, centralised corporately, or a mix of both.
-* Policies can apply a list of rules, where a rule is a function on the record/resource, user and justification.
+* Can use attributes about purpose for data access to apply policies, with that purpose data being local, centralised corporately, or a mix of both.
+* Policies can apply a list of rules, where a rule is a function on the record/resource, user and purpose.
 * Data can only be accessed via the approved mechanism.
 * Request for data, and request completion status is logged for auditing centrally or locally (preferably without logging 1000s of times for each analytic's request, for example if you had 1000 mappers reading in parallel).
 * Be able to write data behind Palisade in a way that minimises effort by user.
