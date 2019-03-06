@@ -40,8 +40,8 @@ public class DutyOfCareTest {
     private static final User TEST_USER5 = new User().userId(new UserId().id("1")).roles("Not HR"); // Not in chain and HR
     private static final Manager[] managers = TEST_EMPLOYEE.getManager();
     private static final DutyOfCareRule DUTY_OF_CARE_RULE = new DutyOfCareRule();
-    private static final Context DUTY_OF_CARE_CONTEXT = new Context().justification(Purpose.DUTY_OF_CARE.name());
-    private static final Context NOT_DUTY_OF_CARE_CONTEXT = new Context().justification("Not Duty of Care");
+    private static final Context DUTY_OF_CARE_CONTEXT = new Context().purpose(Purpose.DUTY_OF_CARE.name());
+    private static final Context NOT_DUTY_OF_CARE_CONTEXT = new Context().purpose("Not Duty of Care");
 
     @Test
     public void shouldNotRedactForStartOfManagerInChain() {

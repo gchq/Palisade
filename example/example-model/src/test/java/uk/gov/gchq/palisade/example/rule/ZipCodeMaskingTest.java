@@ -33,7 +33,7 @@ public class ZipCodeMaskingTest {
     private static final User TEST_USER_NOT_ESTATES = new User().roles("Not Estates"); // Role not in HR
     private static final User TEST_USER_ESTATES = new User().roles(Role.ESTATES.name()); // Role is HR
     private static final ZipCodeMaskingRule ZIP_CODE_MASKING_RULE = new ZipCodeMaskingRule();
-    private static final Context STAFF_REPORT_CONTEXT = new Context().justification(Purpose.STAFF_REPORT.name());
+    private static final Context STAFF_REPORT_CONTEXT = new Context().purpose(Purpose.STAFF_REPORT.name());
 
     @Test
     public void shouldRedactForEstate() {

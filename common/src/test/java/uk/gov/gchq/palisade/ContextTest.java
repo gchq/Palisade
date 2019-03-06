@@ -27,7 +27,7 @@ public class ContextTest {
 
     @Before
     public void setUp() throws Exception {
-        testObject = new Context().justification("justification1");
+        testObject = new Context().purpose("purpose1");
     }
 
     @Test
@@ -46,7 +46,7 @@ public class ContextTest {
         Context deserialise = JSONSerialiser.deserialise(
                 "{\n" +
                 "  \"contents\" : {\n" +
-                "    \"justification\" : \"justification1\"\n" +
+                "    \"purpose\" : \"purpose1\"\n" +
                 "  }\n" +
                 "}", Context.class);
         //then

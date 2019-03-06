@@ -166,10 +166,10 @@ public class MapReduceExample extends Configured implements Tool {
      * @param filename      example filename
      * @param resourceType  the example resource type
      * @param userId        the example user id
-     * @param justification the example justification
+     * @param justification the example purpose
      */
     public static void addDataRequest(final JobContext context, final String filename, final String resourceType, final String userId, final String justification) {
-        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().purpose(justification));
         PalisadeInputFormat.addDataRequest(context, dataRequest);
     }
 

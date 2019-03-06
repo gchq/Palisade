@@ -35,8 +35,8 @@ public class NationalityTest {
     private static final User TEST_USER_NOT_HR = new User().roles("Not HR"); // Role not in HR
     private static final User TEST_USER_HR = new User().roles(Role.HR.name()); // Role is HR
     private static final NationalityRule NATIONALITY_RULE = new NationalityRule();
-    private static final Context STAFF_REPORT_CONTEXT = new Context().justification(Purpose.STAFF_REPORT.name());
-    private static final Context NOT_STAFF_REPORT_CONTEXT = new Context().justification("Not Staff Report");
+    private static final Context STAFF_REPORT_CONTEXT = new Context().purpose(Purpose.STAFF_REPORT.name());
+    private static final Context NOT_STAFF_REPORT_CONTEXT = new Context().purpose("Not Staff Report");
 
     @Test
     public void shouldNotRedactForHRAndStaffReport() {

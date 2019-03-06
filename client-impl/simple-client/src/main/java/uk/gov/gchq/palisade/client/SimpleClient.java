@@ -46,8 +46,8 @@ public class SimpleClient<T> {
         this.serialiser = serialiser;
     }
 
-    public Stream<T> read(final String filename, final String resourceType, final String userId, final String justification) {
-        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
+    public Stream<T> read(final String filename, final String resourceType, final String userId, final String purpose) {
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
         final DataRequestResponse dataRequestResponse = getServicesFactory().getPalisadeService().registerDataRequest(dataRequest).join();
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {

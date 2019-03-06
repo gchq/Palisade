@@ -30,18 +30,18 @@ import java.util.concurrent.CompletableFuture;
  * The core API for the policy service.
  * The responsibilities of the policy service is to provide the set of rules
  * (filters or transformations) that need to be applied to each resource that
- * has been requested, based the user and justification.
+ * has been requested, based the user and purpose.
  * Note that a resource could be a file, stream, directory or even the system
  * resource (policies added to the system resource would be applied globally).
  */
 public interface PolicyService extends Service {
     /**
      * This method is used to find out if the given user is allowed to access
-     * the resource given their justification. This is where any resource level
+     * the resource given their purpose. This is where any resource level
      * access controls are enforced.
      *
      * @param request a {@link CanAccessRequest} containing the user requesting
-     *                the data, the justification of why they want the data and
+     *                the data, the purpose of why they want the data and
      *                collection of resource's containing that data.
      * @return a {@link CanAccessResponse} which contains a collection of the
      * resources that the user is allowed access too.
@@ -54,7 +54,7 @@ public interface PolicyService extends Service {
      * of resources that the user has requested access too.
      *
      * @param request a {@link GetPolicyRequest} containing the user requesting
-     *                the data, a justification for why they want the data and a
+     *                the data, a purpose for why they want the data and a
      *                list of the resources the user wants access too.
      * @return a {@link MultiPolicy} containing the mapping of resource to {@link Policy}
      */

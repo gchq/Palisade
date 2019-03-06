@@ -51,7 +51,7 @@ public class RestPalisadeServiceV1IT {
     private static final SystemResource sysResource = new SystemResource().id("file");
     private static final FileResource fileResource1 = new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource);
     private static final User user = new User().userId("user01").roles("role1", "role2").auths("auth1", "auth2");
-    private static final Context context = new Context().justification("justification1");
+    private static final Context context = new Context().purpose("justification1");
     private static final RequestId requestId = new RequestId().id("id1");
     private static ProxyRestPalisadeService proxy;
     private static EmbeddedHttpServer server;
