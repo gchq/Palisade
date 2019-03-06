@@ -29,6 +29,7 @@ import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.util.StreamUtil;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -42,7 +43,7 @@ public class RestExample {
     public static void main(final String[] args) throws Exception {
         if (args.length < 1) {
             System.out.printf("Usage: %s file\n", RestExample.class.getTypeName());
-            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
+            System.out.println("\nfile\tfile containing serialised Employee instances to read");
             System.exit(1);
         }
 
@@ -76,13 +77,13 @@ public class RestExample {
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");
-        final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
+        final Stream<Employee> aliceResults = client.read(sourceFile, "Alice", "Payroll");
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Bob is reading file1...");
-        final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
+        final Stream<Employee> bobResults = client.read(sourceFile, "Bob", "Payroll");
         LOGGER.info("Bob got back: ");
         bobResults.map(Object::toString).forEach(LOGGER::info);
 

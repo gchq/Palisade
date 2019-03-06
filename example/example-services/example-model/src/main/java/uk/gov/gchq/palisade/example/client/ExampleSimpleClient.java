@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
 
     public ExampleSimpleClient(final PalisadeService palisadeService) {
-        super(palisadeService, new ExampleObjSerialiser());
+        super(palisadeService, new AvroSerialiser());
     }
 
     public Stream<ExampleObj> read(final String filename, final String userId, final String justification) {
