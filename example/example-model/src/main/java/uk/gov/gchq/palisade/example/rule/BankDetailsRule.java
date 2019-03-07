@@ -32,7 +32,7 @@ public class BankDetailsRule implements Rule<Employee> {
     }
 
     private Employee redactRecord(final Employee redactedRecord) {
-        redactedRecord.setBankDetails((null));
+        redactedRecord.setBankDetails(null);
         return redactedRecord;
     }
 

@@ -211,7 +211,7 @@ public class HeartbeatTest {
         heart = null;
         //Trigger manual gc
         System.gc();
-        long time = System.currentTimeMillis() + 5000;
+        long time = System.currentTimeMillis() + 10000;
 
         //Then - wait a limited amount of time for scheduler to stop
         while (System.currentTimeMillis() < time && !scheduler.isTerminated()) {

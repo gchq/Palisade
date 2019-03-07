@@ -16,31 +16,25 @@
 
 package uk.gov.gchq.palisade.example;
 
-import io.etcd.jetcd.launcher.junit.EtcdClusterResource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
-import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
-import uk.gov.gchq.palisade.client.ConfiguredClientServices;
+import uk.gov.gchq.palisade.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
-import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
-import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
-import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
+import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
-import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
-import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
+import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.ServiceState;
+import uk.gov.gchq.palisade.util.StreamUtil;
 
-import java.net.URI;
-import java.util.List;
+import java.io.InputStream;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
 public class MultiJvmExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiJvmExample.class);
@@ -57,46 +51,40 @@ public class MultiJvmExample {
     }
 
     public void run(final String sourceFile) throws Exception {
-        EtcdClusterResource etcd = null;
-        EtcdBackingStore store = null;
-        try {
-            etcd = new EtcdClusterResource("test-etcd", 1);
-            etcd.cluster().start();
-            List<URI> etcdEndpointURLs = etcd.cluster().getClientEndpoints();
-            store = new EtcdBackingStore().connectionDetails(etcdEndpointURLs);
-            //this will write an initial configuration
-            final ConfigurationService configService = new ProxyRestConfigService("http://localhost:8085/config");
-            final CacheService cache = new SimpleCacheService().backingStore(store);
-            ExampleConfigurator.setupMultiJVMConfigurationService(
-                    new ProxyRestPolicyService("http://localhost:8081/policy"),
-                    new ProxyRestUserService("http://localhost:8083/user"),
-                    new ProxyRestResourceService("http://localhost:8082/resource"),
-                    new ProxyRestPalisadeService("http://localhost:8080/palisade"),
-                    cache,
-                    configService,
-                    new ProxyRestConnectionDetail().url("http://localhost:8084/data").serviceClass(ProxyRestDataService.class)
-            );
-            final ConfiguredClientServices cs = new ConfiguredClientServices(configService);
-            final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
+        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
-            LOGGER.info("");
-            LOGGER.info("Alice is reading file1...");
-            final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
-            LOGGER.info("Alice got back: ");
-            aliceResults.map(Object::toString).forEach(LOGGER::info);
-
-            LOGGER.info("");
-            LOGGER.info("Bob is reading file1...");
-            final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
-            LOGGER.info("Bob got back: ");
-            bobResults.map(Object::toString).forEach(LOGGER::info);
-        } finally {
-            if (nonNull(etcd)) {
-                etcd.cluster().close();
-            }
-            if (nonNull(store)) {
-                store.close();
+        ServiceState clientConfig = null;
+        int times = 0;
+        while (isNull(clientConfig) && times < 30) {
+            try {
+                clientConfig = new Configurator(configService).retrieveConfig(Optional.empty());
+            } catch (NoConfigException e) {
+                LOGGER.warn("No client configuration present, waiting...");
+                Thread.sleep(ConfigConsts.DELAY);
+                times++;
             }
         }
+
+        if (isNull(clientConfig)) {
+            throw new RuntimeException("Couldn't retrieve client configuration. Is configuration service running?");
+        }
+
+        PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
+
+        final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
+
+        LOGGER.info("");
+        LOGGER.info("Alice is reading file1...");
+        final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
+        LOGGER.info("Alice got back: ");
+        aliceResults.map(Object::toString).forEach(LOGGER::info);
+
+        LOGGER.info("");
+        LOGGER.info("Bob is reading file1...");
+        final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
+        LOGGER.info("Bob got back: ");
+        bobResults.map(Object::toString).forEach(LOGGER::info);
+
     }
 }

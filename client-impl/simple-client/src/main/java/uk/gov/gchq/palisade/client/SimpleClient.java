@@ -23,7 +23,8 @@ import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
@@ -37,15 +38,15 @@ import java.util.stream.Stream;
 public class SimpleClient<T> {
     private final Serialiser<T> serialiser;
 
-    private final ServicesFactory services;
+    private final PalisadeService palisadeService;
 
-    public SimpleClient(final ServicesFactory services, final Serialiser<T> serialiser) {
-        Objects.requireNonNull(services, "services factory must be provided");
-        this.services = services;
+    public SimpleClient(final PalisadeService palisadeService, final Serialiser<T> serialiser) {
+        Objects.requireNonNull(palisadeService, "palisade service must be provided");
+        this.palisadeService = palisadeService;
         Objects.requireNonNull(serialiser, "serialiser cannot be null");
         this.serialiser = serialiser;
     }
-
+  
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String purpose) {
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
         final DataRequestResponse dataRequestResponse = getServicesFactory().getPalisadeService().registerDataRequest(dataRequest).join();
@@ -72,7 +73,4 @@ public class SimpleClient<T> {
         return serialiser;
     }
 
-    public ServicesFactory getServicesFactory() {
-        return services;
-    }
 }

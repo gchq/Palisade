@@ -98,7 +98,6 @@ public class DutyOfCareTest {
         assertNull(actual.getContactNumbers());
     }
 
-
     @Test
     public void shouldRedactForEndManagerInChainNotDutyOfCare() {
         // Given - Nothing
@@ -131,7 +130,4 @@ public class DutyOfCareTest {
         // Then
         assertNull(actual.getContactNumbers());
     }
-
-
-
 }

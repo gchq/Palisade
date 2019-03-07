@@ -22,7 +22,7 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.time.Duration;
 import java.util.NoSuchElementException;
@@ -50,12 +50,12 @@ public class ConfiguratorTest {
 
     public static class NoConfigureTestService implements TestService {
         @Override
-        public void applyConfigFrom(ServiceConfiguration config) throws NoConfigException {
+        public void applyConfigFrom(ServiceState config) throws NoConfigException {
             throw new NoSuchElementException("test");
         }
     }
 
-    private static ServiceConfiguration testConfig;
+    private static ServiceState testConfig;
     private static final String KEY1 = "key1";
     private static final String KEY2 = "key2";
     private static final String VALUE1 = "value1";
@@ -64,7 +64,7 @@ public class ConfiguratorTest {
 
     @BeforeClass
     public static void setupConfig() {
-        testConfig = new ServiceConfiguration();
+        testConfig = new ServiceState();
         testConfig.put(KEY1, VALUE1);
         testConfig.put(KEY2, VALUE2);
     }
@@ -81,7 +81,7 @@ public class ConfiguratorTest {
     @Test(expected = IllegalStateException.class)
     public void throwClassCantBeConfigured() {
         //Given
-        ServiceConfiguration conf = new ServiceConfiguration()
+        ServiceState conf = new ServiceState()
                 .put(TestService.class.getTypeName(), NoConfigureTestService.class.getTypeName());
 
         //When
@@ -94,7 +94,7 @@ public class ConfiguratorTest {
     @Test(expected = IllegalStateException.class)
     public void throwNoClassSpecified() {
         //Given
-        ServiceConfiguration conf = new ServiceConfiguration();
+        ServiceState conf = new ServiceState();
 
         //When
         TestService t = Configurator.createFromConfig(TestService.class, conf);
@@ -106,7 +106,7 @@ public class ConfiguratorTest {
     @Test
     public void shouldCreateInstance() {
         //Given
-        ServiceConfiguration conf = new ServiceConfiguration()
+        ServiceState conf = new ServiceState()
                 .put(TestService.class.getTypeName(), TestServiceImpl.class.getTypeName());
 
         //When
@@ -123,7 +123,7 @@ public class ConfiguratorTest {
         when(mock.get(any(GetConfigRequest.class))).thenThrow(NoConfigException.class);
 
         //When
-        ServiceConfiguration s = new Configurator(mock).retrieveConfig(Optional.of(TestService.class));
+        ServiceState s = new Configurator(mock).retrieveConfig(Optional.of(TestService.class));
 
         //Then
         fail("exception expected");
@@ -132,14 +132,14 @@ public class ConfiguratorTest {
     @Test
     public void shouldGetConfig() {
         //Given
-        ServiceConfiguration cfg = new ServiceConfiguration()
+        ServiceState cfg = new ServiceState()
                 .put(TestService.class.getTypeName(), TestServiceImpl.class.getTypeName());
 
         ConfigurationService mock = Mockito.mock(ConfigurationService.class);
         when(mock.get(any(GetConfigRequest.class))).thenReturn(CompletableFuture.completedFuture(cfg));
 
         //When
-        ServiceConfiguration ret = new Configurator(mock).retrieveConfig(Optional.of(TestService.class));
+        ServiceState ret = new Configurator(mock).retrieveConfig(Optional.of(TestService.class));
 
         //Then
         assertThat(ret, is(equalTo(cfg)));
@@ -179,7 +179,7 @@ public class ConfiguratorTest {
     public void shouldBeSameWhenNoneMatch() {
         //Given - nothing
         //When
-        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, "no match");
+        ServiceState actual = Configurator.applyOverrides(testConfig, "no match");
         //Then
         assertEquals(testConfig.getConfig().size(), actual.getConfig().size());
         assertEquals(testConfig, actual);
@@ -190,7 +190,7 @@ public class ConfiguratorTest {
         //Given
         System.clearProperty(KEY1);
         //When
-        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, KEY1);
+        ServiceState actual = Configurator.applyOverrides(testConfig, KEY1);
         //Then
         assertEquals(testConfig.getConfig().size(), actual.getConfig().size());
         assertEquals(testConfig, actual);
@@ -200,11 +200,11 @@ public class ConfiguratorTest {
     public void shouldChangeWhenPresent() {
         //Given
         System.setProperty(KEY2, VALUE3);
-        ServiceConfiguration expected = new ServiceConfiguration();
+        ServiceState expected = new ServiceState();
         expected.put(KEY1, VALUE1);
         expected.put(KEY2, VALUE3);
         //When
-        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, KEY2);
+        ServiceState actual = Configurator.applyOverrides(testConfig, KEY2);
         System.clearProperty(KEY2);
         //Then
         assertEquals(expected.getConfig().size(), actual.getConfig().size());
@@ -216,7 +216,7 @@ public class ConfiguratorTest {
         //Given
         System.setProperty(KEY2, VALUE3);
         //When
-        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, KEY1);
+        ServiceState actual = Configurator.applyOverrides(testConfig, KEY1);
         System.clearProperty(KEY2);
         //Then
         assertEquals(testConfig.getConfig().size(), actual.getConfig().size());
@@ -228,7 +228,7 @@ public class ConfiguratorTest {
         //Given
         System.setProperty(KEY1, VALUE3);
         //When
-        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, "");
+        ServiceState actual = Configurator.applyOverrides(testConfig, "");
         System.clearProperty(KEY1);
         //Then
         assertEquals(testConfig.getConfig().size(), actual.getConfig().size());
@@ -239,11 +239,11 @@ public class ConfiguratorTest {
     public void shouldChangeOnWildcard() {
         //Given
         System.setProperty(KEY2, VALUE3);
-        ServiceConfiguration expected = new ServiceConfiguration();
+        ServiceState expected = new ServiceState();
         expected.put(KEY1, VALUE1);
         expected.put(KEY2, VALUE3);
         //When
-        ServiceConfiguration actual = Configurator.applyOverrides(testConfig, KEY2);
+        ServiceState actual = Configurator.applyOverrides(testConfig, KEY2);
         System.clearProperty(KEY2);
         //Then
         assertEquals(expected.getConfig().size(), actual.getConfig().size());
