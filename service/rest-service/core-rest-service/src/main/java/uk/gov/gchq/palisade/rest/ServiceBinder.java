@@ -51,6 +51,7 @@ public class ServiceBinder extends AbstractBinder {
      *
      * @param delegate     the object to inject
      * @param bindingClass the service type
+     * @param <S>          the service type being bound
      */
     public <S extends Service> ServiceBinder(final S delegate, final Class<S> bindingClass) {
         requireNonNull(delegate, "delegate");
@@ -64,6 +65,7 @@ public class ServiceBinder extends AbstractBinder {
      *
      * @param service      the instance to inject
      * @param serviceClass the class to bind the instance to
+     * @param <S>          the service type being bound
      * @return this object
      * @throws ClassCastException if {@code service} is not an instance of {@code serviceClass}
      */
