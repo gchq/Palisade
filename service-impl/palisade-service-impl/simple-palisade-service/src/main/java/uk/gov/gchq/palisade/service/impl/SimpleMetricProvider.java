@@ -33,6 +33,10 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * The class that provides metrics on the SimplePalisadeService. The cache service is used to find any metrics for the Palisade service.
+ * This has to be co-ordinated via the cache to account for multiple Palisade service instances working in parallel.
+ */
 public class SimpleMetricProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleMetricProvider.class);
     /**
