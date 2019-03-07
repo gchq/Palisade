@@ -31,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.Objects.requireNonNull;
 
 /**
- * This class is used to request whether a user can access a resource for a given purpose.
+ * This class is used to request whether a user can access a resource for a given context.
  */
 public class CanAccessRequest extends Request {
     private User user;
