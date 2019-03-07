@@ -54,7 +54,8 @@ public interface PolicyService extends Service {
      * of resources that the user has requested access too.
      *
      * @param request a {@link GetPolicyRequest} containing the user requesting
-     *                the data, a purpose for why they want the data and a
+          *                the data, the query time context containing environmental
+          *                variables such as why they want the data and
      *                list of the resources the user wants access too.
      * @return a {@link MultiPolicy} containing the mapping of resource to {@link Policy}
      */
