@@ -16,6 +16,9 @@
 
 package uk.gov.gchq.palisade.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
@@ -23,6 +26,7 @@ import uk.gov.gchq.palisade.service.PalisadeMetricProvider;
 import uk.gov.gchq.palisade.service.PalisadeService;
 
 public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationConfigV1.class);
     private static final Class<?>[] RESOURCES = new Class<?>[]{
             RestPalisadeServiceV1.class
     };
@@ -33,10 +37,13 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
         PalisadeService delegate = RestPalisadeServiceV1.createService(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ServiceBinder binder = new ServiceBinder(delegate, PalisadeService.class);
         register(binder);
-        //if delegate support metrics, then register support
-        if (delegate instanceof PalisadeMetricProvider) {
+        //optionally register a metric provider
+        try {
+            PalisadeMetricProvider providerDelegate = RestPalisadeMetricProviderV1.createService(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
             register(RestPalisadeMetricProviderV1.class);
-            binder.register((PalisadeMetricProvider) delegate, PalisadeMetricProvider.class);
+            binder.register(providerDelegate, PalisadeMetricProvider.class);
+        } catch (Exception e) {
+            LOGGER.warn("Can't instantiate metrics provider", e);
         }
     }
 }

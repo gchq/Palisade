@@ -42,7 +42,7 @@ public class MockPalisadeMetricProvider implements PalisadeMetricProvider {
 
     @Override
     public CompletableFuture<Map<String, String>> getMetrics(final GetMetricRequest request) {
-        return null;
+        return mock.getMetrics(request);
     }
 
     @Override
