@@ -28,7 +28,7 @@ import uk.gov.gchq.palisade.User;
  */
 public interface PredicateRule<T> extends Rule<T> {
     /**
-     * Applies the rule logic to test whether a record should be redacted based on the user and purpose.
+     * Applies the rule logic to test whether a record should be redacted based on the user and context.
      *
      * @param record        the record to be checked.
      * @param user          the user
