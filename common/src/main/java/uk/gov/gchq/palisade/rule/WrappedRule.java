@@ -79,7 +79,7 @@ public class WrappedRule<T> implements Rule<T> {
 
     /**
      * Constructs a {@link WrappedRule} with a given simple predicate rule to apply.
-     * Note - using this means your rule will not be given the User or Purpose.
+     * Note - using this means your rule will not be given the User or Context.
      *
      * @param predicate the simple {@link Predicate} rule to wrap.
      */
