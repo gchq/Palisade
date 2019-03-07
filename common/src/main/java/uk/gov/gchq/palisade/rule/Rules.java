@@ -130,7 +130,7 @@ public class Rules<T> {
 
     /**
      * Adds a simple predicate rule that just takes the record and returns true or false. Note - using this means your
-     * rule will not be given the User or Purpose.
+     * rule will not be given the User or Context.
      *
      * @param id   the unique rule id
      * @param rule the simple predicate rule
