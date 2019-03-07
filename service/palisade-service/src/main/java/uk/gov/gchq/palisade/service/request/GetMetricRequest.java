@@ -41,6 +41,8 @@ import static java.util.Objects.requireNonNull;
  * "hello*" matches "hello.metric1" and "hello.metric2"
  * <p>
  * "*hello" matches "server1.metric.hello" and "server2.metric.hello"
+ *
+ * @see uk.gov.gchq.palisade.service.CommonMetrics
  */
 public class GetMetricRequest extends Request {
     private final List<String> patternFilter = new ArrayList<>();
