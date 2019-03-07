@@ -46,7 +46,7 @@ public class SimpleClient<T> {
         Objects.requireNonNull(serialiser, "serialiser cannot be null");
         this.serialiser = serialiser;
     }
-  
+
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String purpose) {
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
