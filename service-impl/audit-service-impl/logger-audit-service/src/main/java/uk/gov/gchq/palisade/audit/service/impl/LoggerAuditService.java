@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -56,14 +56,14 @@ public class LoggerAuditService implements AuditService {
     }
 
     @Override
-    public void recordCurrentConfigTo(final ServiceConfiguration config) {
+    public void recordCurrentConfigTo(final ServiceState config) {
         requireNonNull(config, "config");
         config.put(AuditService.class.getTypeName(), getClass().getTypeName());
         LOGGER.debug("Wrote configuration data: no-op");
     }
 
     @Override
-    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
         requireNonNull(config, "config");
         LOGGER.debug("Read configuration data: no-op");
     }

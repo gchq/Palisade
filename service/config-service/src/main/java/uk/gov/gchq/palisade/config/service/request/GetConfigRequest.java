@@ -15,6 +15,7 @@
  */
 package uk.gov.gchq.palisade.config.service.request;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -33,28 +34,44 @@ import static java.util.Objects.requireNonNull;
  * that there may be additional authentication/authorisation constraints placed upon requestees. This means that for
  * example, a client may not be able to request configuration details for a particular service.
  */
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class GetConfigRequest extends Request {
 
     /**
      * The service for the configuration being requested.
      */
-    private Optional<Class<? extends Service>> service;
+    private Optional<String> serviceClassName;
 
     /**
      * Create an empty request.
      */
     public GetConfigRequest() {
-        service = Optional.empty();
+        serviceClassName = Optional.empty();
     }
 
     /**
      * Get the service requesting configuration.
      *
-     * @return the optional service
+     * @return the optional serviceClassName
      */
     public Optional<Class<? extends Service>> getService() {
         //never null
-        return service;
+        return serviceClassName.map(name -> {
+            try {
+                return Class.forName(name).asSubclass(Service.class);
+            } catch (ClassNotFoundException e) {
+                throw new NoClassDefFoundError(e.getLocalizedMessage());
+            }
+        });
+    }
+
+    /**
+     * Get the service class as a string to avoid needing to create the {@link Class} object.
+     *
+     * @return the service class name as a string
+     */
+    public Optional<String> getServiceAsString() {
+        return serviceClassName;
     }
 
     /**
@@ -69,12 +86,12 @@ public class GetConfigRequest extends Request {
     /**
      * Set the {@link Service} that is requesting configuration.
      *
-     * @param service an optional {@link Service}
+     * @param serviceClassName an optional {@link Service}
      * @return this object
      */
-    public GetConfigRequest service(final Optional<Class<? extends Service>> service) {
-        requireNonNull(service, "service");
-        this.service = service;
+    public GetConfigRequest service(final Optional<Class<? extends Service>> serviceClassName) {
+        requireNonNull(serviceClassName, "serviceClassName");
+        this.serviceClassName = serviceClassName.map(Class::getTypeName);
         return this;
     }
 
@@ -82,7 +99,7 @@ public class GetConfigRequest extends Request {
     public int hashCode() {
         return new HashCodeBuilder(17, 41)
                 .appendSuper(super.hashCode())
-                .append(service)
+                .append(serviceClassName)
                 .toHashCode();
     }
 
@@ -90,7 +107,7 @@ public class GetConfigRequest extends Request {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("service", service)
+                .append("serviceClassName", serviceClassName)
                 .toString();
     }
 
@@ -108,7 +125,7 @@ public class GetConfigRequest extends Request {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(service, that.service)
+                .append(serviceClassName, that.serviceClassName)
                 .isEquals();
     }
 }

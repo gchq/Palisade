@@ -65,6 +65,7 @@ public class EtcdBackingStore implements BackingStore {
     public EtcdBackingStore() {
     }
 
+    @Override
     public void close() {
         if (null != keyValueClient) {
             keyValueClient.close();

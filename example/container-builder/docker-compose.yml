@@ -12,6 +12,7 @@ services:
         - "./resource-service/:/resource-vol"
         - "./user-service/:/user-vol"
         - "./config-service/:/config-vol"
+        - "./rest-redirector/:/redirector-vol"
    data-service:
      build:
        context: data-service
@@ -59,3 +60,12 @@ services:
         - user-service
         - data-service
         - config-service
+   rest-redirector:
+     build:
+       context: rest-redirector
+       dockerfile: ../../../deployment/docker/rest-redirector/Dockerfile
+     container_name: rest-redirector
+     depends_on:
+       - stage-build
+       - config-service
+       - data-service

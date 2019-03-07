@@ -33,7 +33,7 @@ import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -83,7 +83,7 @@ public class RestConfigServiceV1IT {
         given(configService.get(request)).willThrow(new NoConfigException("No configuration has been set!"));
         // When
         try {
-            final ServiceConfiguration result = proxy.get(request).join();
+            final ServiceState result = proxy.get(request).join();
         } catch (CompletionException e) {
             throw e.getCause();
         }
@@ -99,12 +99,12 @@ public class RestConfigServiceV1IT {
 
         final GetConfigRequest request = new GetConfigRequest().service(Optional.empty());
 
-        ServiceConfiguration expected = new ServiceConfiguration().put("test_key", "test_value");
+        ServiceState expected = new ServiceState().put("test_key", "test_value");
 
         given(configService.get(request)).willReturn(CompletableFuture.completedFuture(expected));
 
         // When
-        final ServiceConfiguration result = proxy.get(request).join();
+        final ServiceState result = proxy.get(request).join();
 
         // Then
         assertEquals(expected, result);
@@ -119,12 +119,12 @@ public class RestConfigServiceV1IT {
 
         final GetConfigRequest request = new GetConfigRequest().service(Optional.empty());
 
-        ServiceConfiguration expected = new ServiceConfiguration().put("some_important_key", "some_important_value");
+        ServiceState expected = new ServiceState().put("some_important_key", "some_important_value");
 
         given(configService.get(request)).willReturn(CompletableFuture.completedFuture(expected));
 
         // When
-        final ServiceConfiguration result = proxy.get(request).join();
+        final ServiceState result = proxy.get(request).join();
 
         // Then
         assertEquals(expected, result);
@@ -137,7 +137,7 @@ public class RestConfigServiceV1IT {
         final ConfigurationService configService = Mockito.mock(ConfigurationService.class);
         MockConfigurationService.setMock(configService);
 
-        ServiceConfiguration expected = new ServiceConfiguration();
+        ServiceState expected = new ServiceState();
 
         final AddConfigRequest request = (AddConfigRequest) new AddConfigRequest().config(expected).service(Optional.empty());
 

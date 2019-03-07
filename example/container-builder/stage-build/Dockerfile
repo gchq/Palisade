@@ -15,6 +15,5 @@ ENTRYPOINT cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-data-serv
            cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-policy-service/target/multi-jvm-example-rest-policy-service-*/* /policy-vol/bin/rest-policy-service/; \
            cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-resource-service/target/multi-jvm-example-rest-resource-service-*/* /resource-vol/bin/rest-resource-service/; \
            cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-user-service/target/multi-jvm-example-rest-user-service-*/* /user-vol/bin/rest-user-service/
-           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-config-service/target/multi-jvm-example-rest-config-service-*/* /user-vol/bin/rest-config-service/
-
-
+           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-config-service/target/multi-jvm-example-rest-config-service-*/* /config-vol/bin/rest-config-service/
+           cp -r /app/example/multi-jvm-example/multi-jvm-example-rest-redirector/target/multi-jvm-example-rest-redirector-*/* /redirector-vol/bin/rest-redirector/

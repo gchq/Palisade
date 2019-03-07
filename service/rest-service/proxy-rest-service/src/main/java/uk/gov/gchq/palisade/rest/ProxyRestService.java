@@ -29,7 +29,7 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.exception.PalisadeRuntimeException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -181,7 +181,7 @@ public abstract class ProxyRestService implements Service {
     }
 
     @Override
-    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
         requireNonNull(config, "config");
         try {
             String base = config.get(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX);
@@ -198,7 +198,7 @@ public abstract class ProxyRestService implements Service {
     }
 
     @Override
-    public void recordCurrentConfigTo(final ServiceConfiguration config) {
+    public void recordCurrentConfigTo(final ServiceState config) {
         requireNonNull(config, "config");
         config.put(getServiceClass().getTypeName(), getClass().getTypeName());
         config.put(this.getClass().getTypeName() + URL_CONF_KEY_SUFFIX, this.baseUrl);
@@ -261,7 +261,7 @@ public abstract class ProxyRestService implements Service {
             final O responseObj;
             try {
                 final Invocation.Builder request = createRequest(jsonBody, url);
-                final Response response = request.post(Entity.json(jsonBody));
+                final Response response = Util.logConnectionFailed(() -> request.post(Entity.json(jsonBody)), url);
                 responseObj = handleResponse(response, outputType);
             } catch (final Exception e) {
                 LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
@@ -278,7 +278,7 @@ public abstract class ProxyRestService implements Service {
 
             final Invocation.Builder request = createRequest(jsonBody, url);
             try {
-                final Response response = request.post(Entity.json(jsonBody));
+                final Response response = Util.logConnectionFailed(() -> request.post(Entity.json(jsonBody)), url);
                 responseObj = handleResponse(response, outputType);
             } catch (final Exception e) {
                 LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
@@ -311,7 +311,7 @@ public abstract class ProxyRestService implements Service {
             try {
                 final Invocation.Builder request = createRequest(jsonBody, url);
                 final Response response;
-                response = request.put(Entity.json(jsonBody));
+                response = Util.logConnectionFailed(() -> request.put(Entity.json(jsonBody)), url);
                 responseObj = handleResponse(response, outputType);
             } catch (final Exception e) {
                 LOGGER.debug("Request to {} failed", url);
