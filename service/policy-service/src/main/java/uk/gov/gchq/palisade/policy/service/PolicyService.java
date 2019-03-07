@@ -41,7 +41,8 @@ public interface PolicyService extends Service {
      * access controls are enforced.
      *
      * @param request a {@link CanAccessRequest} containing the user requesting
-     *                the data, the purpose of why they want the data and
+     *                the data, the query time context containing environmental
+     *                variables such as why they want the data and
      *                collection of resource's containing that data.
      * @return a {@link CanAccessResponse} which contains a collection of the
      * resources that the user is allowed access too.
