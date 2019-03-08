@@ -28,7 +28,7 @@ public class UtilTest {
     @Test
     public void shouldUpdateRecord() throws Exception {
         //given
-        final Rules<String> rules = new Rules<String>().rule("r1", (record, user, purpose) -> "fromRule");
+        final Rules<String> rules = new Rules<String>().rule("r1", (record, user, context) -> "fromRule");
         //when
         final String actual1 = applyRulesToRecord("String", null, null, rules);
         assertEquals("fromRule", actual1);
