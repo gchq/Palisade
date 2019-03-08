@@ -53,7 +53,7 @@ public class UtilTest {
         final Stream<String> stream = Lists.newArrayList("one", "two").stream();
         final Rules<String> rules = new Rules<String>()
                 .rule("r2", (record, user, context) -> record.concat("2ndRule"))
-                .rule("r3", (record, user, purpose) -> record.concat("3rdRule"));
+                .rule("r3", (record, user, context) -> record.concat("3rdRule"));
         //when
         final List<String> result = Util.applyRulesToStream(stream, null, null, rules).collect(Collectors.toList());
         //then
