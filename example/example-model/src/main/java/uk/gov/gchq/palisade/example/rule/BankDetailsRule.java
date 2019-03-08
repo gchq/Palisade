@@ -44,7 +44,7 @@ public class BankDetailsRule implements Rule<Employee> {
         requireNonNull(user);
         requireNonNull(context);
         Set<String> roles = user.getRoles();
-        String purpose = context.getJustification();
+        String purpose = context.getPurpose();
 
         if (roles.equals(Role.PAYROLL.name()) & purpose.equals(Purpose.SALARY.name())) {
             return record;

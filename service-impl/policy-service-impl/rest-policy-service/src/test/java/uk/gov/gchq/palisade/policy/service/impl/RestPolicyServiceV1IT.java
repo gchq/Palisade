@@ -81,7 +81,7 @@ public class RestPolicyServiceV1IT {
         final PolicyService policyService = Mockito.mock(PolicyService.class);
         MockPolicyService.setMock(policyService);
 
-        final Context context = new Context().justification("justification1");
+        final Context context = new Context().purpose("purpose1");
         final CanAccessRequest request = new CanAccessRequest().resources(Collections.singletonList(fileResource1)).user(user).context(context);
 
         given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(new CanAccessResponse().canAccessResources(Collections.singletonList(fileResource1))));
@@ -100,7 +100,7 @@ public class RestPolicyServiceV1IT {
         final PolicyService policyService = Mockito.mock(PolicyService.class);
         MockPolicyService.setMock(policyService);
 
-        final Context context = new Context().justification("justification1");
+        final Context context = new Context().purpose("purpose1");
         final GetPolicyRequest request = new GetPolicyRequest().user(user).context(context).resources(Arrays.asList(fileResource1, fileResource2));
 
         final Map<LeafResource, Policy> policies = new HashMap<>();

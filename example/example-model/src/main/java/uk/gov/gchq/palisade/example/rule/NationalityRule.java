@@ -45,7 +45,7 @@ public class NationalityRule implements Rule<Employee> {
         requireNonNull(user);
         requireNonNull(context);
         Set<String> roles = user.getRoles();
-        String purpose = context.getJustification();
+        String purpose = context.getPurpose();
 
         if (roles.contains(Role.HR.name()) & purpose.equals(Purpose.STAFF_REPORT.name())) {
             return record;

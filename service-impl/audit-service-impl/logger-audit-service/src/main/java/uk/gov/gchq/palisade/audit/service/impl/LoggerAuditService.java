@@ -44,7 +44,7 @@ public class LoggerAuditService implements AuditService {
         requireNonNull(request, "The audit request can not be null.");
         final String msg = "'" + request.getUser().getUserId().getId()
                 + "' accessed '" + request.getResource().getId()
-                + "' for '" + request.getContext().getJustification()
+                + "' for '" + request.getContext().getPurpose()
                 + "' and it was processed using '" + request.getHowItWasProcessed() + "'";
 
         if (null != request.getException()) {
