@@ -28,7 +28,8 @@ import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.impl.reader.HadoopDataReader;
-import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
+import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
 import uk.gov.gchq.palisade.redirect.RESTRedirector;
@@ -68,7 +69,7 @@ import static java.util.Objects.requireNonNull;
 public class ServicesConfigurator {
     protected static final Logger LOGGER = LoggerFactory.getLogger(ServicesConfigurator.class);
     protected static final String HADOOP_CONF_PATH = "HADOOP_CONF_PATH";
-    public static final String RESOURCE_TYPE = "exampleObj";
+    public static final String RESOURCE_TYPE = "Employee";
 
     private final ProxyServicesFactory clientServices;
 
@@ -236,7 +237,7 @@ public class ServicesConfigurator {
         try {
             Configuration conf = createHadoopConfiguration();
             HadoopDataReader reader = new HadoopDataReader().conf(conf);
-            reader.addSerialiser(RESOURCE_TYPE, new ExampleObjSerialiser());
+            reader.addSerialiser(RESOURCE_TYPE, new AvroSerialiser<>(Employee.class));
             return new SimpleDataService().reader(reader).palisadeService(clientServices.createPalisadeService()).cacheService(clientServices.createCacheService());
         } catch (final IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
