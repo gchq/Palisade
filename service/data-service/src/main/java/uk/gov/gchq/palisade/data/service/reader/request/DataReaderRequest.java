@@ -157,7 +157,7 @@ public class DataReaderRequest extends Request {
                 .appendSuper(super.toString())
                 .append("resource", resource)
                 .append("user", user)
-                .append("purpose", context)
+                .append("context", context)
                 .append("rules", rules)
                 .toString();
     }
