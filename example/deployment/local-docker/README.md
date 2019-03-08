@@ -47,12 +47,12 @@ If you have made changes to the code since you last built the docker containers 
 
 *NOTE* This will clean all stopped docker services, requiring them to be rebuilt when you next want to start them up. 
 ```bash
- ./example/deployment/docker/bash-scripts/dockerCleanSystem.sh
+ ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh
 ```
 
 Then you can start up the docker containers:
 ```bash
- ./example/deployment/docker/bash-scripts/dockerComposeUp.sh
+ ./example/deployment/local-docker/bash-scripts/dockerComposeUp.sh
 ```
 
 You can check the containers are available:
@@ -61,25 +61,17 @@ You can check the containers are available:
   docker ps
 ```
 
-You should see 6 containers:     ??? I see 9 containers ???
+You should see a number of containers:
 
-```
-CONTAINER ID        IMAGE                                                COMMAND             CREATED             STATUS              PORTS                    NAMES
-c23a409e29ed        palisade-example_palisade-service   "catalina.sh run"        3 seconds ago       Up 1 second         8080/tcp            palisade-service
-b437e1be5d32        palisade-example_policy-service     "catalina.sh run"        3 seconds ago       Up 1 second         8080/tcp            policy-service
-5d17713a67ca        palisade-example_config-service     "catalina.sh run"        3 seconds ago       Up 1 second         8080/tcp            config-service
-c86bd8543baf        palisade-example_resource-service   "catalina.sh run"        3 seconds ago       Up 1 second         8080/tcp            resource-service
-81bccfcce56a        palisade-example_data-service       "catalina.sh run"        3 seconds ago       Up 1 second         8080/tcp            data-service
-70a2a1f69908        palisade-example_user-service       "catalina.sh run"        3 seconds ago       Up 2 seconds        8080/tcp            user-service
-c0b6cce34df8        quay.io/coreos/etcd                 "/usr/local/bin/etcd…"   3 seconds ago       Up 2 seconds        2379-2380/tcp       etcd
-```
+![Output from docker ps](./DockerPSScreenshot.png?raw=true "Output from docker ps")
+
 
 3. Run the example
 
 This script will not run if the `dockerComposeUp.sh` script has not been run.
 
 ```bash
-  ./example/deployment/docker/bash-scripts/runDockerExample.sh
+  ./example/deployment/local-docker/bash-scripts/runDockerExample.sh
 ```
 
 
@@ -89,5 +81,5 @@ This just runs the java class: uk.gov.gchq.palisade.example.multi-jvm-example-do
 
 
 ```bash
- ./example/deployment/docker/bash-scripts/dockerComposeDown.sh
+ ./example/deployment/local-docker/bash-scripts/dockerComposeDown.sh
 ```
