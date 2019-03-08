@@ -130,7 +130,7 @@ public class Rules<T> {
 
     /**
      * Adds a simple predicate rule that just takes the record and returns true or false. Note - using this means your
-     * rule will not be given the User or Justification.
+     * rule will not be given the User or Context.
      *
      * @param id   the unique rule id
      * @param rule the simple predicate rule
@@ -145,7 +145,7 @@ public class Rules<T> {
 
     /**
      * Adds a simple function rule that just takes the record and returns a modified record or null if the record should
-     * be fully redacted. Note - using this means your rule will not be given the User or Justification.
+     * be fully redacted. Note - using this means your rule will not be given the User or Context.
      *
      * @param id   the unique rule id
      * @param rule the simple function rule

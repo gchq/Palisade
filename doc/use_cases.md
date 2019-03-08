@@ -8,7 +8,7 @@ To do that we would want the user to start the job off by running the following:
 
 ```java
 spark.readStream
-    .option("justification", "example justification")
+    .option("purpose", "example purpose")
     .format("uk.gov.gchq.palisade")
     .load("data_set")
     .select("colA", "colB")
@@ -17,7 +17,7 @@ spark.readStream
 
 We would expect that Spark would create a filter to be pushed down to the data reader that says it only wants "colA" and "colB".
 
-The Spark client for Palisade would create a user (based on who is running the command) and take the resource, justification and filter to register a data request with the Palisade service. Then the Spark client would then take the response of that request and split the list of resources over the number of executors Spark is running and get each executor to request access to the subset of resources assigned to that executor.
+The Spark client for Palisade would create a user (based on who is running the command) and take the resource, purpose and filter to register a data request with the Palisade service. Then the Spark client would then take the response of that request and split the list of resources over the number of executors Spark is running and get each executor to request access to the subset of resources assigned to that executor.
 
 The data service receives the request for data and passes that request to the palisade service to validate the request and to get the data access policies that apply to those resources. Then the data service can read the resource applying the column selection (columns requested plus any columns required to apply the policy) then apply the policies, transform the data so only the two requested columns are returned and then stream the data back to the executor that made the request.
 
@@ -28,7 +28,7 @@ Therefore as far as the user is concerned they just had to add the option and us
 ## Integrating Palisade with Alluxio
 
 Given that Alluxio already has connectors that allows it to sit between data processing technologies and the data storage technologies; it would be great to hook into Alluxio to apply the Palisade services just before Alluxio feeds the data back to the data processing technology.
-This would make the Palisade integration transparent to the user (except getting the justification passed through).
+This would make the Palisade integration transparent to the user (except getting the purpose passed through).
 
 ## Using the 'cat' command line tool
 It should be possible to use command line tools like 'cat' to be able to view files that are being protected by Palisade. 

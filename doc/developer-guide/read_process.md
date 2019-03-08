@@ -5,7 +5,7 @@
 1. The user makes use of a plug-in (client code) for the data processing technology that they are using which makes it almost invisible to them that they are actually querying data via Palisade.
 
 2. For a distributed workflow that client code will usually be made up of a driver component and an executor/mapper component. The driver component starts by registering the data request with the 
-palisade service, stating the resources/alias mapping to resources that they want to query, along with a user id and any required context such as a justification for querying the data.
+palisade service, stating the resources/alias mapping to resources that they want to query, along with a user id and any required context such as a purpose for querying the data.
 
 3. The palisade service receives that request, authenticates the user and then sends a message to the audit service to log the request.
 

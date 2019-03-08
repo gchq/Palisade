@@ -51,7 +51,7 @@ public interface DataReader {
      *
      * @param request {@link DataReaderRequest} containing the resource to be
      *                read, rules to be applied, the user requesting the data
-     *                and the justification for accessing the data.
+     *                and the purpose for accessing the data.
      * @return a {@link DataReaderRequest} that contains the stream of data.
      * @throws NoCapacityException if the data reader is unable to serve this request due to
      *                             workload issues or lack of capacity

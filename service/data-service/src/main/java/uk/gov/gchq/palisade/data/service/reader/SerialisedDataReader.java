@@ -78,7 +78,7 @@ public abstract class SerialisedDataReader implements DataReader {
      *
      * @param request {@link DataReaderRequest} containing the resource to be
      *                read, rules to be applied, the user requesting the data
-     *                and the justification for accessing the data.
+     *                and the purpose for accessing the data.
      * @return a {@link DataReaderResponse} containing the stream of data
      * read to be streamed back to the client
      */
