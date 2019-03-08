@@ -38,7 +38,7 @@ public class UtilTest {
     public void shouldUpdateRecordFromAllRules() throws Exception {
         //given
         final Rules<String> rules = new Rules<String>()
-                .rule("r1", (record, user, purpose) -> "fromRule")
+                .rule("r1", (record, user, context) -> "fromRule")
                 .rule("r2", (record, user, purpose) -> record.concat("2ndRule"));
         //when
         final String actual1 = applyRulesToRecord("String", null, null, rules);
