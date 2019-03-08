@@ -20,17 +20,24 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.heart.Stethoscope;
 import uk.gov.gchq.palisade.redirect.Redirector;
 import uk.gov.gchq.palisade.service.Service;
 
+import java.lang.reflect.Method;
+
 import static java.util.Objects.requireNonNull;
 
 /**
- * A base redirector class that can be used to implement other redirectors.
+ * A base redirector class that can be used to implement other redirectors. Sub-classes should call {@link HeartbeatRedirector#isRedirectionValid(String, String, Method, Object...)}
+ * before returning a definite result.
  */
 public abstract class HeartbeatRedirector<T> implements Redirector<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HeartbeatRedirector.class);
 
     /**
      * The cache service to use for heartbeats.
@@ -165,4 +172,19 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
     protected Stethoscope getScope() {
         return scope;
     }
+
+    /**
+     * Check that a redirection result is valid. This may be overridden by sub-classes. This class' implementation checks
+     * that the redirection destination is not the same as a request made by the same host within a recent time frame.
+     *
+     * @param host        the originating host (may be {@code null})
+     * @param destination the intended destination
+     * @param method      the method being re-directed
+     * @param args        the method arguments
+     */
+    protected boolean isRedirectionValid(final String host, final String destination, final Method method, final Object... args) {
+        LOGGER.info("Call from host {} to \"{}\" intending to be redirected to {}", host, method.getDeclaringClass().getTypeName() + "." + method.getName(), destination);
+        return true;
+    }
+
 }

@@ -16,9 +16,6 @@
 
 package uk.gov.gchq.palisade.redirect;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import uk.gov.gchq.palisade.service.Service;
 
 import java.lang.reflect.Method;
@@ -79,7 +76,6 @@ import static java.util.Objects.requireNonNull;
  * @param <T> the return type of the redirector
  */
 public class RedirectionMarshall<T> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RedirectionMarshall.class);
 
     /**
      * The object that contains the logic on how to redirect requests.
@@ -136,7 +132,6 @@ public class RedirectionMarshall<T> {
             if (isNull(result)) {
                 throw new IllegalStateException("no redirection result is present, was a valid method call made via the object returned from createProxyFor() from this instance?");
             }
-            LOGGER.debug("Redirection destination {}", result.get());
             return result.get();
         } finally {
             recentRedirect.remove();
