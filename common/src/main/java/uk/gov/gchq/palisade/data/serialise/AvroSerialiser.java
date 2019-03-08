@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.data.service.impl.serialiser;
+package uk.gov.gchq.palisade.data.serialise;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,7 +28,6 @@ import org.apache.avro.reflect.ReflectDatumWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.io.Bytes;
 import uk.gov.gchq.palisade.io.BytesOutputStream;
 import uk.gov.gchq.palisade.io.BytesSuppliedInputStream;
