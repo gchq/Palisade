@@ -224,7 +224,7 @@ public class HierarchicalPolicyServiceTest {
 
         final Policy newPolicy = new Policy()
                 .owner(testUser)
-                .resourceLevelPredicateRule("Purpose is testing", (resource, user, purpose) -> purpose.getPurpose().equals("testing"));
+                .resourceLevelPredicateRule("Purpose is testing", (resource, user, context) -> context.getPurpose().equals("testing"));
 
         // When
         final CompletableFuture<Boolean> setPolicyResult = policyService.setTypePolicy(
