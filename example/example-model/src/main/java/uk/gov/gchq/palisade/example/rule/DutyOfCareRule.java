@@ -69,7 +69,7 @@ public class DutyOfCareRule implements Rule<Employee> {
         UserId userId = user.getUserId();
         Manager[] managers = record.getManager();
 
-        if (roles.contains(Role.HR) & purpose.equals(Purpose.DUTY_OF_CARE)) {
+        if (roles.contains(Role.HR.name()) & purpose.equals(Purpose.DUTY_OF_CARE.name())) {
             return record;
         } else if (isManager(managers, userId).equals(Boolean.TRUE)) {
             return record;
