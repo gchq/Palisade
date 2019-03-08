@@ -112,6 +112,12 @@ public interface BackingStore {
     Stream<String> list(final String prefix);
 
     /**
+     * Closes the backing store. This method must be idempotent.
+     */
+    default void close() {
+    }
+
+    /**
      * Check the provided key is not empty.
      *
      * @param key the backing store key

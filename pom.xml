@@ -29,8 +29,8 @@
         <module>service-impl</module>
         <module>client-impl</module>
         <module>library</module>
-        <module>example/example-services</module>
         <module>support</module>
+        <module>example</module>
     </modules>
 
     <developers>

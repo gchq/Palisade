@@ -1,0 +1,120 @@
+version: "3"
+
+services:
+  etcd:
+    build: etcd
+    container_name: etcd
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://etcd:2379/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    networks:
+      - palisade_network
+  config-service:
+    build: config-service
+    container_name: config-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://config-service:8080/config/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - etcd
+  configure-services:
+    build: configure-services
+    container_name: configure-services
+    networks:
+      - palisade_network
+    depends_on:
+      - config-service
+  data-service:
+    build: data-service
+    container_name: data-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://data-service:8080/data/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - "../../../resources:/data"
+    depends_on:
+      - config-service
+      - palisade-service
+  policy-service:
+    build: policy-service
+    container_name: policy-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://policy-service:8080/policy/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - config-service
+  resource-service:
+    build: resource-service
+    container_name: resource-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://resource-service:8080/resource/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - "../../../resources:/data"
+    depends_on:
+      - config-service
+  user-service:
+    build: user-service
+    container_name: user-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://user-service:8080/user/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - config-service
+  palisade-service:
+    build: palisade-service
+    container_name: palisade-service
+    networks:
+      - palisade_network
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://palisade-service:8080/palisade/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - config-service
+      - user-service
+      - resource-service
+      - policy-service
+  configure-example:
+    build: configure-example
+    container_name: configure-example
+    networks:
+      - palisade_network
+    depends_on:
+      - config-service
+      - user-service
+      - resource-service
+      - policy-service
+  rest-redirector:
+    build: rest-redirector
+    container_name: rest-redirector
+    networks:
+      - palisade_network
+    depends_on:
+      - config-service
+      - data-service
+networks:
+  palisade_network:

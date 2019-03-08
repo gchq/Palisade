@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 
-export DIR=example/deployment/local-jvm/bash-scripts
+export LOCAL_JVM_SCRIPTS=example/deployment/local-jvm/bash-scripts
+export GENERIC_SCRIPTS=example/deployment/bash-scripts
 
-${DIR}/stopAllServices.sh > /dev/null 2>&1
+${LOCAL_JVM_SCRIPTS}/stopAllServices.sh > /dev/null 2>&1
 
 # deploy etcd
-${DIR}/startETCD.sh &
+${LOCAL_JVM_SCRIPTS}/startETCD.sh &
 
 #start services
-${DIR}/waitForHost.sh localhost:2379/health ${DIR}/startConfigService.sh &
-${DIR}/waitForHost.sh http://localhost:8085/config/v1/status ${DIR}/configureServices.sh
-${DIR}/startPolicyService.sh &
-${DIR}/startResourceService.sh &
-${DIR}/startUserService.sh &
-${DIR}/startPalisadeService.sh &
-${DIR}/startDataService.sh &
-${DIR}/waitForHost.sh http://localhost:8081/policy/v1/status ${DIR}/waitForHost.sh http://localhost:8082/resource/v1/status ${DIR}/waitForHost.sh http://localhost:8083/user/v1/status ${DIR}/configureExamples.sh
+${GENERIC_SCRIPTS}/waitForHost.sh localhost:2379/health ${LOCAL_JVM_SCRIPTS}/startConfigService.sh &
+${GENERIC_SCRIPTS}/waitForHost.sh http://localhost:8085/config/v1/status ${LOCAL_JVM_SCRIPTS}/configureServices.sh
+${LOCAL_JVM_SCRIPTS}/startPolicyService.sh &
+${LOCAL_JVM_SCRIPTS}/startResourceService.sh &
+${LOCAL_JVM_SCRIPTS}/startUserService.sh &
+${LOCAL_JVM_SCRIPTS}/startPalisadeService.sh &
+${LOCAL_JVM_SCRIPTS}/startDataService.sh &
+${GENERIC_SCRIPTS}/waitForHost.sh http://localhost:8081/policy/v1/status ${GENERIC_SCRIPTS}/waitForHost.sh http://localhost:8082/resource/v1/status ${GENERIC_SCRIPTS}/waitForHost.sh http://localhost:8083/user/v1/status ${LOCAL_JVM_SCRIPTS}/configureExamples.sh

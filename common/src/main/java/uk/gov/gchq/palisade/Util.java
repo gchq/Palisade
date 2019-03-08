@@ -16,11 +16,15 @@
 
 package uk.gov.gchq.palisade;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.rule.Rule;
 import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.util.FieldGetter;
 import uk.gov.gchq.palisade.util.FieldSetter;
 
+import java.net.URL;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,6 +46,8 @@ import static java.util.Objects.requireNonNull;
  * Common utility methods.
  */
 public final class Util {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
+
     /**
      * Minimum retry time to wait between attempts.
      */
@@ -285,5 +291,24 @@ public final class Util {
             throw new RuntimeException("root cause unknown");
         }
         throw lastCause;
+    }
+
+    /**
+     * Captures an exception thrown while running the given function and writes the cause to the log. This is especially
+     * useful during connection refused errors as they do not give the host information in their stack trace.
+     *
+     * @param func    the function to protect
+     * @param address the address being contacted
+     * @param <V>     the return type of the function
+     * @return dependent on {@code func}
+     * @throws Exception any exception thrown by {@code func}
+     */
+    public static <V> V logConnectionFailed(final Callable<V> func, final URL address) throws Exception {
+        try {
+            return func.call();
+        } catch (Exception e) {
+            LOGGER.error("Call to failed to {} due to {}", address.toString(), e.getMessage());
+            throw e;
+        }
     }
 }
