@@ -122,7 +122,7 @@ public class DataRequestConfig extends Request {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("user", user)
-                .append("purpose", context)
+                .append("context", context)
                 .append("rules", rules)
                 .toString();
     }
