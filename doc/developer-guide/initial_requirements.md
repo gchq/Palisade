@@ -3,7 +3,7 @@
 * Can use a data access policy that is local, centralised corporately, or mix of both.
 * Can use attributes about users to apply policies, with that user data being local, centralised corporately, or a mix of both.
 * Can use attributes about the query time context of the data access to apply policies, with that context attributes being supplied by the user, client or palisade service. Examples of attributes in the context include, purpose for the query, system the data is being accessed from, geo-location of where the user is accessing the data from or time of day the query is being run.
-* Policies can apply a list of rules, where a rule is a function on the record/resource, user and purpose.
+* Policies can apply a list of rules, where a rule is a function on the record/resource, user and context.
 * Data can only be accessed via the approved mechanism.
 * Request for data, and request completion status is logged for auditing centrally or locally (preferably without logging 1000s of times for each analytic's request, for example if you had 1000 mappers reading in parallel).
 * Be able to write data behind Palisade in a way that minimises effort by user.
