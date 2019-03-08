@@ -39,7 +39,7 @@ public class UtilTest {
         //given
         final Rules<String> rules = new Rules<String>()
                 .rule("r1", (record, user, context) -> "fromRule")
-                .rule("r2", (record, user, purpose) -> record.concat("2ndRule"));
+                .rule("r2", (record, user, context) -> record.concat("2ndRule"));
         //when
         final String actual1 = applyRulesToRecord("String", null, null, rules);
         //then
