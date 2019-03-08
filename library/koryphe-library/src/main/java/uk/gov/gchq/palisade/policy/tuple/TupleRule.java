@@ -42,13 +42,13 @@ import static java.util.Objects.nonNull;
 @JsonPropertyOrder(value = {"class", "selection", "function", "predicate", "projection"}, alphabetic = true)
 /**
  * A {@link TupleRule} is helper implementation of {@link Rule} that uses
- * {@link PalisadeTuple} to wrap the record, user and justification into a
+ * {@link PalisadeTuple} to wrap the record, user and purpose into a
  * tuple. This allows users to write rules such as:
  * <pre>
  *     new TupleRule<>(select("Record.visibility", "User.auths"), new IsVisible())
  * </pre>
  * @param <T> The type of the record. In normal cases the raw data will be deserialised
- *            by the record reader before being passed to the {@link TupleRule#apply(Object, User, Justification)}.
+ *            by the record reader before being passed to the {@link TupleRule#apply(Object, User, Context)}.
  */
 public class TupleRule<T> implements Rule<T> {
     private TupleAdaptedFunction<String, ?, ?> function;
