@@ -185,7 +185,7 @@ public class AuditRequest extends Request {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("justification", context)
+                .append("purpose", context)
                 .append("user", user)
                 .append("resource", resource)
                 .append("howItWasProcessed", howItWasProcessed)
