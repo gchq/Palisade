@@ -130,7 +130,7 @@ public class RegisterDataRequest extends Request {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("userId", userId)
-                .append("purpose", context)
+                .append("context", context)
                 .append("resourceId", resourceId)
                 .toString();
     }
