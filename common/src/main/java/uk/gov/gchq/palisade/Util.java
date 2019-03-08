@@ -116,21 +116,50 @@ public final class Util {
         return input;
     }
 
+    /**
+     * Creates a new map from a collection of map entries. A new map instance is created.
+     *
+     * @param entries the entries to add to the new map
+     * @param <K>     the map key type
+     * @param <V>     the map value type
+     * @return a new map
+     */
     public static <K, V> Map<K, V> newHashMap(final Collection<Entry<K, V>> entries) {
+        requireNonNull(entries);
         final Map<K, V> map = new HashMap<>(entries.size());
         entries.forEach(e -> map.put(e.getKey(), e.getValue()));
         return map;
     }
 
+    /**
+     * Applies a collection of rules to a record stream.
+     *
+     * @param records record stream
+     * @param user    user the records are being processed for
+     * @param context the additional context
+     * @param rules   rules collection
+     * @param <T>     record type
+     * @return filtered stream
+     */
     public static <T> Stream<T> applyRulesToStream(final Stream<T> records, final User user, final Context context, final Rules<T> rules) {
         Objects.requireNonNull(records);
-        if (null == rules || rules.getRules().isEmpty()) {
+        if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
             return records;
         }
 
         return records.map(record -> applyRulesToRecord(record, user, context, rules)).filter(record -> null != record);
     }
 
+    /**
+     * Applies a collection of rules to a record.
+     *
+     * @param record  record to filter
+     * @param user    user the record is being procesed for
+     * @param context the additional context
+     * @param rules   rules collection
+     * @param <T>     record type
+     * @return filtered record
+     */
     public static <T> T applyRulesToRecord(final T record, final User user, final Context context, final Rules<T> rules) {
         if (null == rules || rules.getRules().isEmpty()) {
             return record;
