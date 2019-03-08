@@ -35,10 +35,42 @@ import static java.util.Objects.requireNonNull;
  * microservice classes.
  */
 public class ServiceBinder extends AbstractBinder {
+
+    /**
+     * Wrapper class since if the service being bound is a proxy, we need to intercept the equals and hashcode.
+     *
+     * @param <T> object being wrapped
+     */
+    private static class Wrapper<T> {
+        public final T wrapped;
+
+        public Wrapper(final T wrapped) {
+            this.wrapped = wrapped;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Wrapper<?> wrapper = (Wrapper<?>) o;
+
+            return this.wrapped == wrapper;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(wrapped);
+        }
+    }
+
     /**
      * The map of which instances to bind to which classes when asked to configure.
      */
-    private final Map<Service, List<Class<? extends Service>>> bindMap = new HashMap<>();
+    private final Map<Wrapper<? extends Service>, List<Class<? extends Service>>> bindMap = new HashMap<>();
 
     /**
      * Create an empty service binder.
@@ -75,7 +107,8 @@ public class ServiceBinder extends AbstractBinder {
         if (!serviceClass.isInstance(service)) {
             throw new ClassCastException(service.getClass() + " is not an instance of " + serviceClass.getTypeName());
         }
-        bindMap.computeIfAbsent(service, key -> new ArrayList<>()).add(serviceClass);
+        Wrapper<S> wrapObject = new Wrapper<>(service);
+        bindMap.computeIfAbsent(wrapObject, key -> new ArrayList<>()).add(serviceClass);
         return this;
     }
 
@@ -90,7 +123,7 @@ public class ServiceBinder extends AbstractBinder {
                                 clazz -> {
                                     @SuppressWarnings("unchecked")
                                     Class<Service> cc = (Class<Service>) clazz;
-                                    bind(entry.getKey()).to(cc);
+                                    bind(entry.getKey().wrapped).to(cc);
                                 }
                         )
                 );
