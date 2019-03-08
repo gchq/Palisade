@@ -48,7 +48,7 @@ public interface UserService extends Service {
 
     /**
      * Adds the contained user to the {@link UserService}. The given request will contain the {@link User} which should
-     * be fully populated with all the necessary roles and justifications.
+     * be fully populated with all the necessary attributes about the user such as roles and authorisations.
      *
      * @param request the request specifying the user with details to add
      * @return a {@link CompletableFuture} which will complete as ${@code true} once the user has been added
