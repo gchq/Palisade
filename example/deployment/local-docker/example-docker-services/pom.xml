@@ -11,6 +11,19 @@
     <artifactId>example-docker-services</artifactId>
     <packaging>pom</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>example-docker-runner</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>example-rest-redirector-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <!--Copy Config Rest JSON files-->
