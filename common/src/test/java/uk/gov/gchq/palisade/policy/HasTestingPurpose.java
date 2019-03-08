@@ -6,10 +6,10 @@ import uk.gov.gchq.palisade.rule.Rule;
 
 import java.io.Serializable;
 
-public class HasTestingJustification<T> implements Serializable, Rule<T> {
+public class HasTestingPurpose<T> implements Serializable, Rule<T> {
     @Override
     public T apply(final T record, final User user, final Context context) {
-        if (context.getJustification().equalsIgnoreCase("testing")) {
+        if (context.getPurpose().equalsIgnoreCase("testing")) {
             return record;
         } else {
             return null;

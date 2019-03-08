@@ -23,14 +23,13 @@ import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.BankDetails;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
-import uk.gov.gchq.palisade.example.hrdatagenerator.types.Nationality;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class BankDetailsTest {
+public class BankDetailsRulesTest {
 
     private static final Employee TEST_EMPLOYEE = Employee.generate(new Random(1));
     private static final User TEST_USER_NOT_PAYROLL = new User().roles("Not Payroll"); // Role not in Payroll
