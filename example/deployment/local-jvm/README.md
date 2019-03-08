@@ -95,7 +95,7 @@ INFO: Starting ProtocolHandler ["http-bio-8084"]
 INFO: Starting ProtocolHandler ["http-bio-8085"]
 ```
 
-Then populate the example data - so that the examples will have something to query
+Then populate Palisade with the rules for the example data
 ```bash
   ./example/deployment/local-jvm/bash-scripts/configureExamples.sh
 ```

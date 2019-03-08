@@ -61,7 +61,7 @@ You can check the containers are available:
   docker ps
 ```
 
-You should see 8 containers that will say around and 2 others will disappear once complete (configure-services, configure example):
+You should see 8 containers that will stay around and 2 others will disappear once complete (configure-services, configure example):
 
 ```
 CONTAINER ID        IMAGE                      COMMAND                  CREATED             STATUS                 PORTS               NAMES
@@ -90,5 +90,5 @@ This just runs the java class: uk.gov.gchq.palisade.example.multi-jvm-example-do
 
 
 ```bash
- ./example/deployment/docker/bash-scripts/dockerComposeDown.sh
+ ./example/deployment/local-docker/bash-scripts/dockerComposeDown.sh
 ```
