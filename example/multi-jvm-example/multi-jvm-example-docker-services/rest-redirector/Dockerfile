@@ -5,4 +5,4 @@ COPY docker/bin/multi-jvm-example-rest-redirector-*-shaded.jar /multi-jvm-exampl
 ADD docker/bin/configRest.json /multi-jvm-example-rest-redirector/
 
 ENTRYPOINT ["java"]
-CMD ["-cp", "/multi-jvm-example-rest-redirector/*", "-Dpalisade.rest.basePath=http://localhost:8080/data/v1", "-Dpalisade.rest.config.path=/multi-jvm-example-rest-redirector/configRest.json", "uk.gov.gchq.palisade.redirect.Launcher"]
+CMD ["-cp", "/multi-jvm-example-rest-redirector/*", "-Dpalisade.rest.basePath=http://0.0.0.0:8080/data/v1", "-Dpalisade.rest.config.path=/multi-jvm-example-rest-redirector/configRest.json", "uk.gov.gchq.palisade.redirect.Launcher"]
