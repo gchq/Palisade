@@ -42,14 +42,11 @@ mvn clean install -P example
 ```
  
 2.  Build the executable jars
-
  ```bash
    ./example/deployment/local-jvm/bash-scripts/buildServices.sh
  ```
 
 3. Start the REST services
-
-
 Either start them all in a single terminal using:
 ```bash
   ./example/deployment/local-jvm/bash-scripts/startAllServices.sh
@@ -98,24 +95,19 @@ INFO: Starting ProtocolHandler ["http-bio-8084"]
 INFO: Starting ProtocolHandler ["http-bio-8085"]
 ```
 
-
 Then populate the example data - so that the examples will have something to query
 ```bash
   ./example/deployment/local-jvm/bash-scripts/configureExamples.sh
 ```
 
-
 4. Run the example
-
 ```bash
   ./example/deployment/local-jvm/bash-scripts/runLocalJVMExample.sh
 ```
 
-
 This just runs the java class: uk.gov.gchq.palisade.example.MultiJvmExample. You can just run this class directly in your IDE.
 
 5. Stop the REST services
-
 ```bash
   ./example/deployment/local-jvm/bash-scripts/stopAllServices.sh
 ```
