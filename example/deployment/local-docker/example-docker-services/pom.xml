@@ -178,7 +178,7 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>../../example-model/target</directory>
+                                    <directory>../../../example-model/target</directory>
                                     <includes>
                                         <include>example-model-*-shaded.jar</include>
                                     </includes>
@@ -197,7 +197,7 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>../../example-model/target</directory>
+                                    <directory>../../../example-model/target</directory>
                                     <includes>
                                         <include>example-model-*-shaded.jar</include>
                                     </includes>
@@ -235,9 +235,9 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>../example-rest-redirector/target</directory>
+                                    <directory>../../../example-services/example-rest-redirector-service/target</directory>
                                     <includes>
-                                        <include>example-rest-redirector-*-shaded.jar</include>
+                                        <include>example-rest-redirector-service-*-shaded.jar</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -409,7 +409,7 @@
                         <fileset>
                             <directory>./rest-redirector/docker/bin</directory>
                             <includes>
-                                <include>example-rest-redirector-*-shaded.jar</include>
+                                <include>example-rest-redirector-service-*-shaded.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
