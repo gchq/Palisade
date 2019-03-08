@@ -44,7 +44,7 @@ public class ServiceBinder extends AbstractBinder {
     private static class Wrapper<T> {
         public final T wrapped;
 
-        public Wrapper(final T wrapped) {
+        Wrapper(final T wrapped) {
             this.wrapped = wrapped;
         }
 
@@ -54,7 +54,9 @@ public class ServiceBinder extends AbstractBinder {
                 return true;
             }
 
-            if (o == null || getClass() != o.getClass()) return false;
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
 
             Wrapper<?> wrapper = (Wrapper<?>) o;
 
