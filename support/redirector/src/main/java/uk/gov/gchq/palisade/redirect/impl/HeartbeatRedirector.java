@@ -273,6 +273,6 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
                 .key(generateHostKey(host, method))
                 .service(HeartbeatRedirector.class);
         Optional<String> result = getCacheService().get(request).join();
-        return !(result.isPresent() && result.equals(destination));
+        return !(result.isPresent() && result.get().equals(destination));
     }
 }

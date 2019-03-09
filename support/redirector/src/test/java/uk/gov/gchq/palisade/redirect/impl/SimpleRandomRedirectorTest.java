@@ -30,12 +30,14 @@ import uk.gov.gchq.palisade.redirect.result.StringRedirectResult;
 import uk.gov.gchq.palisade.service.Service;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -92,6 +94,75 @@ public class SimpleRandomRedirectorTest {
         RedirectionResult<String> actual = redirect.redirectionFor(null, addMethod, request);
 
         //Then
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    public static class SimpleRandomRedirectorControllable extends SimpleRandomRedirector {
+        @Override
+        protected boolean isRedirectionValid(String host, String destination, Method method, Object... args) {
+            return valid;
+        }
+
+        @Override
+        protected String getIntendedDestination(List<String> liveInstances) {
+            count++;
+            return "test_instance_2";
+        }
+
+        public boolean valid;
+        public int count;
+    }
+
+    @Test
+    public void shouldPickOtherInstance() {
+        //Given
+        when(mockCache.list(any())).thenReturn(CompletableFuture.completedFuture(Stream.of(HeartUtil.makeKey("test_instance"), HeartUtil.makeKey("test_instance_2"))));
+        when(mockCache.get(any(GetCacheRequest.class))).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
+        when(mockCache.add(any(AddCacheRequest.class))).thenReturn(CompletableFuture.completedFuture(Boolean.TRUE));
+
+        SimpleRandomRedirectorControllable redirect = new SimpleRandomRedirectorControllable();
+        redirect.cacheService(mockCache)
+                .redirectionClass(TestService.class);
+
+        redirect.count = 0;
+        redirect.valid = false;
+
+        RedirectionResult<String> expected = new StringRedirectResult("test_instance_2");
+
+        //When
+        RedirectionResult<String> actual = redirect.redirectionFor(null, addMethod, request);
+
+        //Then
+        //since we always return "invalid" for the choice, then the redirector should try again
+        assertEquals(2, redirect.count);
+        //we should get this since the method is overridden above
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+
+    @Test
+    public void shouldPickSameInstance() {
+        //Given
+        when(mockCache.list(any())).thenReturn(CompletableFuture.completedFuture(Stream.of(HeartUtil.makeKey("test_instance_2"))));
+        when(mockCache.get(any(GetCacheRequest.class))).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
+        when(mockCache.add(any(AddCacheRequest.class))).thenReturn(CompletableFuture.completedFuture(Boolean.TRUE));
+
+        SimpleRandomRedirectorControllable redirect = new SimpleRandomRedirectorControllable();
+        redirect.cacheService(mockCache)
+                .redirectionClass(TestService.class);
+
+        redirect.count = 0;
+        redirect.valid = false;
+
+        RedirectionResult<String> expected = new StringRedirectResult("test_instance_2");
+
+        //When
+        RedirectionResult<String> actual = redirect.redirectionFor(null, addMethod, request);
+
+        //Then
+        //since we always return "invalid" for the choice but there is only one option, this should only be called once
+        assertEquals(1, redirect.count);
+        //we should get this since the method is overridden above
         assertThat(actual, is(equalTo(expected)));
     }
 }

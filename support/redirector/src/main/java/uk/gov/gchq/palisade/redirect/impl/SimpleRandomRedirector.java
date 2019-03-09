@@ -68,7 +68,7 @@ public class SimpleRandomRedirector extends HeartbeatRedirector<String> {
      * @return a random choice
      * @throws NoInstanceException if there are no live instances
      */
-    private String getIntendedDestination(final List<String> liveInstances) {
+    protected String getIntendedDestination(final List<String> liveInstances) {
         Collections.shuffle(liveInstances);
         return liveInstances
                 .stream()
