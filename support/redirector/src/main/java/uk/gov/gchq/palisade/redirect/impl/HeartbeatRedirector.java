@@ -243,7 +243,7 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
                 .service(HeartbeatRedirector.class)
                 .value(destination)
                 .timeToLive(Optional.of(redirectCacheTime));
-        cache.add(request).join();
+        getCacheService().add(request).join();
     }
 
     /**
@@ -272,7 +272,7 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
         final GetCacheRequest<String> request = new GetCacheRequest<>()
                 .key(generateHostKey(host, method))
                 .service(HeartbeatRedirector.class);
-        Optional<String> result = cache.get(request).join();
+        Optional<String> result = getCacheService().get(request).join();
         return !(result.isPresent() && result.equals(destination));
     }
 }
