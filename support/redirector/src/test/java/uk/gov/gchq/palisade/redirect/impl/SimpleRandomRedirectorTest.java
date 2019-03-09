@@ -23,12 +23,14 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.heart.HeartUtil;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.redirect.RedirectionResult;
 import uk.gov.gchq.palisade.redirect.exception.NoInstanceException;
 import uk.gov.gchq.palisade.redirect.result.StringRedirectResult;
 import uk.gov.gchq.palisade.service.Service;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -77,6 +79,8 @@ public class SimpleRandomRedirectorTest {
     public void shouldReturnLiveInstance() {
         //Given
         when(mockCache.list(any())).thenReturn(CompletableFuture.completedFuture(Stream.of(HeartUtil.makeKey("test_instance"))));
+        when(mockCache.get(any(GetCacheRequest.class))).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
+        when(mockCache.add(any(AddCacheRequest.class))).thenReturn(CompletableFuture.completedFuture(Boolean.TRUE));
 
         SimpleRandomRedirector redirect = new SimpleRandomRedirector();
         redirect.cacheService(mockCache)

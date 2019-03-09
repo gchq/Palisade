@@ -41,14 +41,38 @@ public class SimpleRandomRedirector extends HeartbeatRedirector<String> {
         //get list of live services
         List<String> liveInstances = getScope().auscultate().collect(Collectors.toList());
 
-        //TODO get result and check it is valid, if not try again, if it is still bad then return it anyway
+        String intendedDestination = getIntendedDestination(liveInstances);
 
-        //randomize and return
+        //check result
+        if (!isRedirectionValid(host, intendedDestination, method, args)) {
+            //if not valid then try again
+            liveInstances.remove(intendedDestination);
+
+            //check we still have alternatives
+            if (!liveInstances.isEmpty()) {
+                //if not then just pick again
+                intendedDestination = getIntendedDestination(liveInstances);
+            } else {
+                //we have no choice
+            }
+        }
+
+        logRedirect(host, intendedDestination, method, args);
+        return new StringRedirectResult(intendedDestination);
+    }
+
+    /**
+     * Pick a random list element.
+     *
+     * @param liveInstances list of live instances to redirect to
+     * @return a random choice
+     * @throws NoInstanceException if there are no live instances
+     */
+    private String getIntendedDestination(final List<String> liveInstances) {
         Collections.shuffle(liveInstances);
         return liveInstances
                 .stream()
                 .findFirst()
-                .map(StringRedirectResult::new)
                 .orElseThrow(() -> new NoInstanceException("no live instances of " + super.getRedirectionClass() + " could be found"));
     }
 }

@@ -25,10 +25,14 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.heart.Stethoscope;
+import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
+import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.redirect.Redirector;
 import uk.gov.gchq.palisade.service.Service;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -38,6 +42,16 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class HeartbeatRedirector<T> implements Redirector<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(HeartbeatRedirector.class);
+
+    /**
+     * Default length of time to cache where a redirection went.
+     */
+    private static final Duration DEFAULT_REDIRECT_MEM = Duration.ofSeconds(20);
+
+    /**
+     * Amount of time to hold redirection destinations in cache.
+     */
+    private Duration redirectCacheTime = DEFAULT_REDIRECT_MEM;
 
     /**
      * The cache service to use for heartbeats.
@@ -83,6 +97,43 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
         cacheService(cacheService);
     }
 
+    /**
+     * Set the amount of time to cache redirections for in the cache so that repeated calls from the same host for
+     * the same method can avoid being sent to the same cache service.
+     *
+     * @param cacheTime the amount of time to cache redirections for
+     * @return this object
+     * @throws IllegalArgumentException if {@code cacheTime} is negative
+     */
+    public HeartbeatRedirector<T> redirectCacheTime(final Duration cacheTime) {
+        requireNonNull(cacheTime, "cacheTime");
+        if (cacheTime.isNegative()) {
+            throw new IllegalArgumentException("cache time cannot be negative");
+        }
+        this.redirectCacheTime = cacheTime;
+        return this;
+    }
+
+    /**
+     * Set the amount of time to cache redirections for in the cache so that repeated calls from the same host for
+     * the same method can avoid being sent to the same cache service.
+     *
+     * @param cacheTime the amount of time to cache redirections for
+     * @throws IllegalArgumentException if {@code cacheTime} is negative
+     */
+    public void setRedirectCacheTime(final Duration cacheTime) {
+        redirectCacheTime(cacheTime);
+    }
+
+    /**
+     * Get the amount of time to hold redirection destinations in the cache
+     *
+     * @return the cache duration
+     */
+    public Duration getRedirectCacheTime() {
+        return redirectCacheTime;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -99,6 +150,7 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
                 .append(cache, that.cache)
                 .append(redirectClass, that.redirectClass)
                 .append(getScope(), that.getScope())
+                .append(getRedirectCacheTime(), that.getRedirectCacheTime())
                 .isEquals();
     }
 
@@ -109,6 +161,7 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
                 .append("cache", cache)
                 .append("redirectClass", redirectClass)
                 .append("scope", scope)
+                .append("redirectCacheTime", redirectCacheTime)
                 .toString();
     }
 
@@ -119,6 +172,7 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
                 .append(cache)
                 .append(redirectClass)
                 .append(getScope())
+                .append(getRedirectCacheTime())
                 .toHashCode();
     }
 
@@ -174,17 +228,51 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
     }
 
     /**
+     * Log a redirection. This will insert a short lived item into the cache to note where the request has been redirected
+     * to.
+     *
+     * @param host        the originating host (may be {@code null})
+     * @param destination the destination
+     * @param method      the method being redirected
+     * @param args        the method arguments
+     */
+    protected void logRedirect(final String host, final String destination, final Method method, final Object... args) {
+        LOGGER.info("Call from host {} to \"{}\" being redirected to {}", host, generateHostKey(method.getDeclaringClass().getTypeName(), method), destination);
+        final AddCacheRequest<String> request = new AddCacheRequest<>()
+                .key(generateHostKey(host, method))
+                .service(HeartbeatRedirector.class)
+                .value(destination)
+                .timeToLive(Optional.of(redirectCacheTime));
+        cache.add(request).join();
+    }
+
+    /**
+     * Create cache key.
+     *
+     * @param host   originating host
+     * @param method method name
+     * @return cache key
+     */
+    private static String generateHostKey(final String host, final Method method) {
+        return host + ":" + method.getName();
+    }
+
+    /**
      * Check that a redirection result is valid. This may be overridden by sub-classes. This class' implementation checks
      * that the redirection destination is not the same as a request made by the same host within a recent time frame.
      *
      * @param host        the originating host (may be {@code null})
      * @param destination the intended destination
-     * @param method      the method being re-directed
+     * @param method      the method being redirected
      * @param args        the method arguments
+     * @return true if the intended destination is not the same as where the redirection went before
      */
     protected boolean isRedirectionValid(final String host, final String destination, final Method method, final Object... args) {
-        LOGGER.info("Call from host {} to \"{}\" intending to be redirected to {}", host, method.getDeclaringClass().getTypeName() + "." + method.getName(), destination);
-        return true;
+        //check the cache
+        final GetCacheRequest<String> request = new GetCacheRequest<>()
+                .key(generateHostKey(host, method))
+                .service(HeartbeatRedirector.class);
+        Optional<String> result = cache.get(request).join();
+        return !(result.isPresent() && result.equals(destination));
     }
-
 }
