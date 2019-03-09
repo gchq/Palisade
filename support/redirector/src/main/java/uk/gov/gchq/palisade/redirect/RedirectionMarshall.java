@@ -82,6 +82,32 @@ public class RedirectionMarshall<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedirectionMarshall.class);
 
     /**
+     * Method reference for hashCode.
+     */
+    private static final Method HASH_CODE_OBJECT;
+
+    /**
+     * Method reference for equals.
+     */
+    private static final Method EQUALS_OBJECT;
+
+    static {
+        Method hashCode = null;
+        Method equals = null;
+        try {
+            hashCode = Object.class.getMethod("hashCode");
+        } catch (NoSuchMethodException e) {
+        }
+        try {
+            equals = Object.class.getMethod("equals", Object.class);
+        } catch (NoSuchMethodException e) {
+
+        }
+        HASH_CODE_OBJECT = hashCode;
+        EQUALS_OBJECT = equals;
+    }
+
+    /**
      * The object that contains the logic on how to redirect requests.
      */
     private final Redirector<T> redirector;
@@ -202,6 +228,11 @@ public class RedirectionMarshall<T> {
      * @throws Throwable to comply with interface
      */
     private Object delegateRedirection(final Object proxy, final Method method, final Object... args) throws Throwable {
+        if (method.equals(HASH_CODE_OBJECT)) {
+            return this.hashCode();
+        } else if (method.equals(EQUALS_OBJECT) && args.length > 0) {
+            return proxy == args[0];
+        }
         //work out where to send this request
         RedirectionResult<T> result = redirector.redirectionFor(recentHost.get(), method, args);
         //stash this result
