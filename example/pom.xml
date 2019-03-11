@@ -33,28 +33,28 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <module>hr-data-generator</module>
                 <module>example-model</module>
-                <module>multi-jvm-example</module>
-                <module>mapreduce-example</module>
+                <module>hr-data-generator</module>
+                <module>example-services</module>
+                <module>deployment</module>
             </modules>
         </profile>
         <profile>
             <id>example</id>
             <modules>
-                <module>hr-data-generator</module>
                 <module>example-model</module>
-                <module>multi-jvm-example</module>
-                <module>mapreduce-example</module>
+                <module>hr-data-generator</module>
+                <module>example-services</module>
+                <module>deployment</module>
             </modules>
         </profile>
         <profile>
             <id>integration-test</id>
             <modules>
-                <module>hr-data-generator</module>
                 <module>example-model</module>
-                <module>multi-jvm-example</module>
-                <module>mapreduce-example</module>
+                <module>hr-data-generator</module>
+                <module>example-services</module>
+                <module>deployment</module>
             </modules>
         </profile>
 

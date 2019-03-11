@@ -16,7 +16,6 @@
 
 package uk.gov.gchq.palisade.service.impl;
 
-
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.mockito.Mockito;
 
