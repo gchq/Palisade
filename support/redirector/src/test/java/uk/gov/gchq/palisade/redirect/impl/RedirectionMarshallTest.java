@@ -156,4 +156,43 @@ public class RedirectionMarshallTest {
         //the second redirection should not have had the host set
         order.verify(mock).redirectionFor(eq(null), any(), any());
     }
+
+    @Test
+    public void shouldProxyEquals() {
+        //Given
+        Redirector<String> mock = Mockito.mock(Redirector.class);
+        when(mock.redirectionFor(any(), any(), anyInt())).thenReturn(new StringRedirectResult("test_destination"));
+
+        RedirectionMarshall<String> marshall = new RedirectionMarshall<>(mock);
+        SimpleService service = marshall.createProxyFor(SimpleService.class);
+        SimpleService service2 = marshall.createProxyFor(SimpleService.class);
+
+        //When
+        boolean compareDifferent = service.equals(service2);
+        boolean compareSelf = service.equals(service);
+
+        //Then
+        assertFalse(compareDifferent);
+        assertTrue(compareSelf);
+    }
+
+    @Test
+    public void shouldProxyHashCode() {
+        //Given
+        Redirector<String> mock = Mockito.mock(Redirector.class);
+        when(mock.redirectionFor(any(), any(), anyInt())).thenReturn(new StringRedirectResult("test_destination"));
+
+        RedirectionMarshall<String> marshall = new RedirectionMarshall<>(mock);
+        SimpleService service = marshall.createProxyFor(SimpleService.class);
+        SimpleService service2 = marshall.createProxyFor(SimpleService.class);
+
+        //When
+        int result = service.hashCode();
+        int result2 = service2.hashCode();
+        int result3 = marshall.hashCode();
+
+        //Then
+        assertEquals(result, result2);
+        assertEquals(result2, result3);
+    }
 }

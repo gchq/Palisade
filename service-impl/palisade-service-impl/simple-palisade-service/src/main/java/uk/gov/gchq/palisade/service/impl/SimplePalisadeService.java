@@ -37,20 +37,25 @@ import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.PalisadeMetricProvider;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
+import uk.gov.gchq.palisade.service.request.GetMetricRequest;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
+import uk.gov.gchq.palisade.service.request.Request;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -64,14 +69,21 @@ import static java.util.Objects.requireNonNull;
  * should check the resources requested in getDataRequestConfig are the same or a subset of the resources passed in in
  * registerDataRequest. </p>
  */
-public class SimplePalisadeService implements PalisadeService {
+public class SimplePalisadeService implements PalisadeService, PalisadeMetricProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplePalisadeService.class);
-
+    //Cache keys
+    public static final String RES_COUNT_KEY = "res_count_";
+    //Configuration keys
     public static final String AUDIT_IMPL_KEY = "palisade.svc.audit.svc";
     public static final String POLICY_IMPL_KEY = "palisade.svc.policy.svc";
     public static final String USER_IMPL_KEY = "palisade.svc.user.svc";
     public static final String RESOURCE_IMPL_KEY = "palisade.svc.resource.svc";
     public static final String CACHE_IMPL_KEY = "palisade.svc.cache.svc";
+
+    /**
+     * Duration for how long the count of resources requested should live in the cache.
+     */
+    public static final Duration COUNT_PERSIST_DURATION = Duration.ofMinutes(10);
 
     private AuditService auditService;
     private PolicyService policyService;
@@ -213,7 +225,7 @@ public class SimplePalisadeService implements PalisadeService {
                 .thenApply(multiPolicy -> ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
                 .thenAccept(multiPolicy -> {
                     audit(request, futureUser.join(), multiPolicy);
-                    cache(request, futureUser.join(), requestId, multiPolicy);
+                    cache(request, futureUser.join(), requestId, multiPolicy, futureResources.join().size());
                 }).thenApply(t -> {
                     final DataRequestResponse response = new DataRequestResponse().requestId(requestId).resources(futureResources.join());
                     LOGGER.debug("Responding with: {}", response);
@@ -244,7 +256,7 @@ public class SimplePalisadeService implements PalisadeService {
         }
     }
 
-    private void cache(final RegisterDataRequest request, final User user, final RequestId requestId, final MultiPolicy multiPolicy) {
+    private void cache(final RegisterDataRequest request, final User user, final RequestId requestId, final MultiPolicy multiPolicy, final int resCount) {
         final AddCacheRequest<DataRequestConfig> cacheRequest = new AddCacheRequest<>()
                 .key(requestId.getId())
                 .value(new DataRequestConfig()
@@ -258,6 +270,13 @@ public class SimplePalisadeService implements PalisadeService {
         if (null == success || !success) {
             throw new CompletionException(new RuntimeException("Failed to cache request: " + request));
         }
+        //set a quick count of how many resources are needed for this request
+        final AddCacheRequest<byte[]> resourceCountRequest = new AddCacheRequest<>()
+                .key(RES_COUNT_KEY + requestId.getId() + "_" + resCount)
+                .value(new byte[1])
+                .timeToLive(Optional.of(COUNT_PERSIST_DURATION))
+                .service(this.getClass());
+        cacheService.add(resourceCountRequest).join();
     }
 
     @Override
@@ -277,6 +296,24 @@ public class SimplePalisadeService implements PalisadeService {
                     LOGGER.debug("Got cache: {}", value);
                     return value;
                 });
+    }
+
+    @Override
+    public CompletableFuture<Map<String, String>> getMetrics(final GetMetricRequest request) {
+        requireNonNull(request, "request");
+        return CompletableFuture.completedFuture(new SimpleMetricProvider(getCacheService())
+                .computeMetrics(request.getFilters()));
+    }
+
+    @Override
+    public CompletableFuture<?> process(final Request request) {
+        //first try one parent interface
+        try {
+            return PalisadeService.super.process(request);
+        } catch (IllegalArgumentException e) {
+            //that failed try the other
+            return PalisadeMetricProvider.super.process(request);
+        }
     }
 
     private RuntimeException createCacheException(final String id) {

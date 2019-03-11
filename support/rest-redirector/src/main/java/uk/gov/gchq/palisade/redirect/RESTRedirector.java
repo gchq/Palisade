@@ -190,7 +190,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
         //register the original implementation class as a resource
         register(getRestImplementationClass());
         //register the binder that will instantiate it
-        register(new ServiceBinder<>(service, getRedirectionClass()));
+        register(new ServiceBinder(service, getRedirectionClass()));
         //register ourselves as request and response filter
         register(this);
     }
