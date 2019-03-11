@@ -207,7 +207,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
         if (nonNull(servletRequest)) {
             String remHost = servletRequest.getRemoteHost();
             String destination = requestContext.getUriInfo().getAbsolutePath().toString();
-            LOGGER.info("Received request from {} to {}", remHost, destination);
+            LOGGER.debug("Received request from {} to {}", remHost, destination);
             //set in the marshall
             marshall.host(remHost);
         } else {
@@ -240,7 +240,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
                         original.getPath(), original.getQuery(), original.getFragment());
                 //set location header
                 responseContext.getHeaders().putSingle("Location", location.toString());
-                LOGGER.info("Redirection occurred, issuing {} {} to {}", Response.Status.TEMPORARY_REDIRECT.getStatusCode(), Response.Status.TEMPORARY_REDIRECT.getReasonPhrase(), location.toString());
+                LOGGER.debug("Redirection occurred, issuing {} {} to {}", Response.Status.TEMPORARY_REDIRECT.getStatusCode(), Response.Status.TEMPORARY_REDIRECT.getReasonPhrase(), location.toString());
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }
