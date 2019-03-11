@@ -10,29 +10,29 @@ multi_jvm_result=0
 if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Building Palisade code: mvn install -q -B -V"
     mvn install -q -B -V
-    ./example/multi-jvm-example/scripts/buildServices.sh
+    ./example/deployment/local-jvm/bash-scripts/buildServices.sh
 
-    echo "Starting the multi-jvm-example containerised"
-    ./example/multi-jvm-example/scripts/dockerComposeUp.sh
+    echo "Starting the local-docker-example containers"
+    ./example/deployment/local-docker/bash-scripts/dockerComposeUp.sh
     # Sleep to allow containers to start
     sleep 5s
     echo "Running the example application"
-    OUTPUT=`./example/multi-jvm-example/scripts/runDocker.sh | tee /dev/tty`
+    OUTPUT=`./example/deployment/local-docker/bash-scripts/runDockerExample.sh | tee /dev/tty`
     echo "Output is: $OUTPUT"
     validate_example_output "$OUTPUT"
     container_result=$?
-    echo "Stopping the multi-jvm-example containers"
-    echo "y" | ./example/multi-jvm-example/scripts/dockerCleanSystem.sh
+    echo "Stopping the local-docker-example containers"
+    echo "y" | ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh
 
-    echo "Starting the multi-jvm-example"
-    ./example/multi-jvm-example/scripts/startAllServices.sh
+    echo "Starting the local-jvm-example"
+    ./example/deployment/local-jvm/bash-scripts/startAllServices.sh
     echo "Running the example application"
-    OUTPUT=`./example/multi-jvm-example/scripts/run.sh | tee /dev/tty`
+    OUTPUT=`./example/deployment/local-jvm/bash-scripts/runLocalJVMExample.sh | tee /dev/tty`
     echo "Output is: $OUTPUT"
     validate_example_output "$OUTPUT"
     multi_jvm_result=$?
-    echo "Stopping the multi-jvm-example"
-    ./example/multi-jvm-example/scripts/stopAllServices.sh
+    echo "Stopping the local-jvm-example"
+    ./example/deployment/local-jvm/bash-scripts/stopAllServices.sh
 
     echo "Compiling javadoc"
     mvn javadoc:aggregate -q
