@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.rest.RestUtil;
@@ -72,13 +73,13 @@ public class RestDockerExample {
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");
-        final Stream<ExampleObj> aliceResults = client.read(FILE, "Alice", "Payroll");
+        final Stream<Employee> aliceResults = client.read(FILE, "Alice", "Payroll");
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Bob is reading file1...");
-        final Stream<ExampleObj> bobResults = client.read(FILE, "Bob", "Payroll");
+        final Stream<Employee> bobResults = client.read(FILE, "Bob", "Payroll");
         LOGGER.info("Bob got back: ");
         bobResults.map(Object::toString).forEach(LOGGER::info);
     }

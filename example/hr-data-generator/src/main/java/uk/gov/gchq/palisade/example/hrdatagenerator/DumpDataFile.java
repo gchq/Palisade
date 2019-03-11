@@ -18,15 +18,14 @@ package uk.gov.gchq.palisade.example.hrdatagenerator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.gchq.palisade.data.service.impl.serialiser.AvroSerialiser;
-import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
-import uk.gov.gchq.palisade.io.BytesSuppliedInputStream;
 
-import java.io.*;
-import java.lang.reflect.Array;
+import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

@@ -24,11 +24,11 @@ import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
+import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.impl.reader.HadoopDataReader;
-import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
@@ -69,7 +69,7 @@ import static java.util.Objects.requireNonNull;
 public class ServicesConfigurator {
     protected static final Logger LOGGER = LoggerFactory.getLogger(ServicesConfigurator.class);
     protected static final String HADOOP_CONF_PATH = "HADOOP_CONF_PATH";
-    public static final String RESOURCE_TYPE = "Employee";
+    public static final String RESOURCE_TYPE = "exampleEmployee";
 
     private final ProxyServicesFactory clientServices;
 
