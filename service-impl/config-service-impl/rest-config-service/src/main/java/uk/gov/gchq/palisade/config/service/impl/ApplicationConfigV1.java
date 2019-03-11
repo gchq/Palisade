@@ -29,7 +29,7 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
         super(RESOURCES);
         //make sure we can inject the service instance
         ConfigurationService delegate = RestConfigServiceV1.createService(System.getProperty(RestConfigServiceV1.BOOTSTRAP_CONFIG));
-        register(new ServiceBinder<ConfigurationService>(delegate, ConfigurationService.class));
+        register(new ServiceBinder(delegate, ConfigurationService.class));
     }
 
 }

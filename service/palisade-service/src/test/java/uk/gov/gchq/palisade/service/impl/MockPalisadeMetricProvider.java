@@ -20,36 +20,29 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.request.DataRequestConfig;
-import uk.gov.gchq.palisade.service.request.DataRequestResponse;
-import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
-import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
+import uk.gov.gchq.palisade.service.PalisadeMetricProvider;
+import uk.gov.gchq.palisade.service.request.GetMetricRequest;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class MockPalisadeService implements PalisadeService {
-    private static PalisadeService mock = Mockito.mock(PalisadeService.class);
+public class MockPalisadeMetricProvider implements PalisadeMetricProvider {
+    private static PalisadeMetricProvider mock = Mockito.mock(PalisadeMetricProvider.class);
 
-    public static PalisadeService getMock() {
+    public static PalisadeMetricProvider getMock() {
         return mock;
     }
 
-    public static void setMock(final PalisadeService mock) {
+    public static void setMock(final PalisadeMetricProvider mock) {
         if (null == mock) {
-            MockPalisadeService.mock = Mockito.mock(PalisadeService.class);
+            MockPalisadeMetricProvider.mock = Mockito.mock(PalisadeMetricProvider.class);
         }
-        MockPalisadeService.mock = mock;
+        MockPalisadeMetricProvider.mock = mock;
     }
 
     @Override
-    public CompletableFuture<DataRequestResponse> registerDataRequest(final RegisterDataRequest request) {
-        return mock.registerDataRequest(request);
-    }
-
-    @Override
-    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final GetDataRequestConfig request) {
-        return mock.getDataRequestConfig(request);
+    public CompletableFuture<Map<String, String>> getMetrics(final GetMetricRequest request) {
+        return mock.getMetrics(request);
     }
 
     @Override
@@ -67,7 +60,7 @@ public class MockPalisadeService implements PalisadeService {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(43, 47)
+        return new HashCodeBuilder(13, 17)
                 .toHashCode();
     }
 
