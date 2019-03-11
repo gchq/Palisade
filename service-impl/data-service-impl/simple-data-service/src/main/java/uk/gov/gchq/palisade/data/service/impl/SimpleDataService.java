@@ -149,7 +149,7 @@ public class SimpleDataService implements DataService {
         if (nonNull(serialisedReader)) {
             setReader(JSONSerialiser.deserialise(serialisedReader.getBytes(StandardCharsets.UTF_8), DataReader.class));
         } else {
-            throw new NoConfigException("no service specified in configuration");
+            throw new NoConfigException("no reader specified in configuration");
         }
         String serialisedCache = config.getOrDefault(CACHE_IMPL_KEY, null);
         if (nonNull(serialisedCache)) {

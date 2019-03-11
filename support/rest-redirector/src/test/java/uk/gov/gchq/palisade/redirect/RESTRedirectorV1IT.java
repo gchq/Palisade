@@ -59,6 +59,7 @@ public class RESTRedirectorV1IT {
      */
     @Path("/")
     public static class RestDummyService implements DummyService {
+
         private final DummyService delegate;
 
         @Inject
@@ -85,6 +86,7 @@ public class RESTRedirectorV1IT {
      * Extension to the simple redirector that stores the host name the request came from so we can retrieve it afterwards.
      */
     public static class TestSimpleRandomRedirector extends SimpleRandomRedirector {
+
         @Override
         public RedirectionResult<String> redirectionFor(final String host, final Method method, final Object... args) throws NoInstanceException {
             RedirectionResult<String> ret = super.redirectionFor(host, method, args);
@@ -93,9 +95,11 @@ public class RESTRedirectorV1IT {
         }
 
         public String host;
+
     }
 
     private static final String BASE_URL = "http://localhost:8080";
+
     private static CacheService cache;
     private static Heartbeat beat;
     private static TestSimpleRandomRedirector redirector;
@@ -206,17 +210,17 @@ public class RESTRedirectorV1IT {
     @Test
     public void shouldConfigureCorrectly() throws Exception {
         //Given
-        ServiceState state=new ServiceState();
+        ServiceState state = new ServiceState();
 
         //When
         restInstance.recordCurrentConfigTo(state);
 
         //deliberately configure badly
-        RESTRedirector<?,?> recoveredInstance=new RESTRedirector(Service.class,Service.class,new SimpleRandomRedirector());
+        RESTRedirector<?, ?> recoveredInstance = new RESTRedirector(Service.class, Service.class, new SimpleRandomRedirector());
         recoveredInstance.applyConfigFrom(state);
 
         //Then
-        assertEquals(restInstance.getRedirectionClass(),recoveredInstance.getRedirectionClass());
-        assertEquals(restInstance.getRestImplementationClass(),recoveredInstance.getRestImplementationClass());
+        assertEquals(restInstance.getRedirectionClass(), recoveredInstance.getRedirectionClass());
+        assertEquals(restInstance.getRestImplementationClass(), recoveredInstance.getRestImplementationClass());
     }
 }
