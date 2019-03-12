@@ -29,7 +29,7 @@ public final class DumpData {
     private DumpData() {
     }
 
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws Exception {
         if (args.length < 1) {
             LOGGER.error("This method needs at least one argument. The file path of the file to dump");
         } else {

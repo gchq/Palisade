@@ -138,7 +138,7 @@ public final class ExampleConfigurator {
 
 //        // Using Koryphe's functions/predicates
 //        final SetResourcePolicyRequest koryphePolicies = new SetResourcePolicyRequest()
-//                .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
+//                .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
 //                .policy(new Policy<ExampleObj>()
 //                        .owner(alice)
 //                        .recordLevelRule(

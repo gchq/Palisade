@@ -16,7 +16,7 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
-import org.ajbrown.namemachine.Name;
+//import org.ajbrown.namemachine.Name;
 import org.ajbrown.namemachine.NameGenerator;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -29,7 +29,7 @@ public class Employee {
     private static final NameGenerator NAME_GENERATOR = new NameGenerator();
 
     private UserId uid;
-    private Name name;
+    private String name;
     private String dateOfBirth;
     private PhoneNumber[] contactNumbers;
     private EmergencyContact[] emergencyContacts;
@@ -42,7 +42,7 @@ public class Employee {
     public static Employee generate(final Random random) {
         Employee employee = new Employee();
         employee.setUid(generateUID(random));
-        employee.setName(NAME_GENERATOR.generateName());
+        employee.setName(NAME_GENERATOR.generateName().toString()); // wew are storing name as a string not a Name
         employee.setDateOfBirth(DateHelper.generateDateOfBirth(random));
         employee.setContactNumbers(PhoneNumber.generateMany(random));
         employee.setEmergencyContacts(EmergencyContact.generateMany(random, NAME_GENERATOR));
@@ -70,11 +70,11 @@ public class Employee {
         this.uid = uid;
     }
 
-    public Name getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(final Name name) {
+    public void setName(final String name) {
         this.name = name;
     }
 

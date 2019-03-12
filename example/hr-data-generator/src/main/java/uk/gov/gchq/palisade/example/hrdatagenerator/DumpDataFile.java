@@ -34,7 +34,7 @@ public final class DumpDataFile {
     private final File inputFile;
     private static final Logger LOGGER = LoggerFactory.getLogger(DumpData.class);
 
-    public DumpDataFile(final File inputFile) {
+    public DumpDataFile(final File inputFile) throws Exception {
         this.inputFile = inputFile;
 
         try {
@@ -44,7 +44,7 @@ public final class DumpDataFile {
             Stream<Employee> output = employeeAvroSerialiser.deserialise(in);
 //            List<T> results = l.stream().filter(…).collect(Collectors.toList());
             List<Employee> stuff = output.collect(Collectors.toList());
-//            LOGGER.info(stuff.toString());
+            LOGGER.info(stuff.toString());
 //            String out = new String(output.toString());
 //            LOGGER.info(out);
 //           for (Employee i: (Iterable<Employee>) output::iterator) {
@@ -57,6 +57,7 @@ public final class DumpDataFile {
         } catch (Exception e) {
 //            System.out.println("Caught exception: " + e.getMessage());
             LOGGER.info("Caught exception: " + e.getMessage());
+            throw e;
         }
 //        return Boolean.TRUE;
     }
