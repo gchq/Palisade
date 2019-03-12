@@ -1,6 +1,8 @@
 # Examples
 
+This module contains all the example specific modules:
 
-- The example-services directory includes some simple examples that demonstrate the automated auditing and policy rule enforcement when users read some data.
-      See: [example-services](example-services/README.md)
-- The deployment directory includes scripts to aid in deploying the examples
+- hr-data-generator, which can create a fake sample dataset based around possible data that a company might hold about its employees.
+- example-model, contains all the deployment agnostic example code such as the rules and example configuration.
+- example-services, contains all the example JVM REST based services
+- deployment, contains all the deployment specific code and scripts

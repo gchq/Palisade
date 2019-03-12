@@ -63,7 +63,6 @@ If required, Palisade allows an organisation to use centralised services which e
 1. git
 1. maven
 1. to run any of the examples: docker
-1. if running the docker based examples: docker-compose
 
 ## Getting started
 
@@ -79,9 +78,9 @@ These example should provide a good start to understanding how Palisade works.
 1. An Azure HDInsight example (coming soon)
 
 
-* To run the REST based example follow this guide: [local-jvm-rest](example/deployment/local-jvm/README.md)
+* To run the JVM REST based example follow this guide: [Local JVM](example/deployment/local-jvm/README.md)
 
-* To run the docker based example follow this guide: [docker](example/deployment/docker/README.md)
+* To run the docker REST based example follow this guide: [Local Docker](example/deployment/local-docker/README.md)
 
 For more details about the code structure see the [Developer Guide](doc/developer-guide/developer_guide.md)
 
