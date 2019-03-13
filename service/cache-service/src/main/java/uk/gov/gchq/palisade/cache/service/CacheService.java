@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 
 /**
  * The core API for the cache service. The purpose of the cache service is to store the information that the various
- * services will require. For exaple, you might have multiple instances of the palisade service running and the
+ * services will require. For example, you might have multiple instances of the palisade service running and the
  * registration request (from <code>registerDataRequest</code>) might go to a different palisade service to the
  * getDataRequestConfig() call. The data in the cache should be maintained by a time to live value rather than removing
  * after the get request as any scalable deployment would likely make multiple requests to the cache due to many data
