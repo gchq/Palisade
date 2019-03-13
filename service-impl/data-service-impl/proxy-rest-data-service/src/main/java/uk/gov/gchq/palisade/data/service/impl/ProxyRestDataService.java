@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.data.service.DataService;
+import uk.gov.gchq.palisade.data.service.exception.NoCapacityException;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
@@ -28,12 +29,25 @@ import uk.gov.gchq.palisade.service.Service;
 import javax.ws.rs.core.Response;
 
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 public class ProxyRestDataService extends ProxyRestService implements DataService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyRestDataService.class);
 
+    /**
+     * Data service requests should make several requests in the presence of a redirector.
+     */
+    private static final int DATA_SERVICE_RETRIES = 10;
+
+    /**
+     * Wait this amount between successive requests.
+     */
+    private static final Duration DATA_SERVICE_WAIT = Duration.ofSeconds(10);
+
     public ProxyRestDataService() {
+        retryMax(DATA_SERVICE_RETRIES);
+        retryPauseTime(DATA_SERVICE_WAIT);
     }
 
     @Override
@@ -49,7 +63,12 @@ public class ProxyRestDataService extends ProxyRestService implements DataServic
     @Override
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         LOGGER.debug("Invoking REST read: " + request);
-        final CompletableFuture<Response> futureResponse = doPostAsync("read/chunked", request, Response.class);
-        return futureResponse.thenApply(r -> new ReadResponse().data(r.readEntity(InputStream.class)));
+        try {
+            final CompletableFuture<Response> futureResponse = doPostAsync("read/chunked", request, Response.class);
+            return futureResponse.thenApply(r -> new ReadResponse().data(r.readEntity(InputStream.class)));
+        } catch (NoCapacityException e) {
+            LOGGER.warn("Palisade instance has no capacity to process data request on available data services.");
+            throw e;
+        }
     }
 }
