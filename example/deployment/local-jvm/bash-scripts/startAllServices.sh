@@ -6,7 +6,10 @@ export GENERIC_SCRIPTS=example/deployment/bash-scripts
 ${LOCAL_JVM_SCRIPTS}/stopAllServices.sh > /dev/null 2>&1
 
 # deploy etcd
-${LOCAL_JVM_SCRIPTS}/startETCD.sh &
+${LOCAL_JVM_SCRIPTS}/startETCD.sh
+if [[ $? -ne 0 ]]; then
+    exit;
+fi
 
 #start services
 ${GENERIC_SCRIPTS}/waitForHost.sh localhost:2379/health ${LOCAL_JVM_SCRIPTS}/startConfigService.sh &

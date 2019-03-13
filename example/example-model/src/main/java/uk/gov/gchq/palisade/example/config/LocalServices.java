@@ -16,6 +16,9 @@
 
 package uk.gov.gchq.palisade.example.config;
 
+import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
+
 /**
  * Convenience class for setting the default config for the various Palisade micro-services
  * which assumes all services are being deployed locally using the standard port.
@@ -45,6 +48,12 @@ public final class LocalServices {
      * @param args Provides a means to pass in arguments into the method
      */
     public static void main(final String[] args) {
-        new ServicesConfigurator(new ProxyServicesFactory(LOCAL_ARGS));
+        ProxyServicesFactory factory = new ProxyServicesFactory(LOCAL_ARGS);
+        new ServicesConfigurator(factory);
+
+        CacheService cs = factory.createCacheService();
+        if (cs instanceof SimpleCacheService) {
+            ((SimpleCacheService) cs).getBackingStore().close();
+        }
     }
 }
