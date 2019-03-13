@@ -51,24 +51,7 @@ public class RestExample {
     }
 
     public void run(final String sourceFile) throws Exception {
-        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
-        ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-
-        ServiceState clientConfig = null;
-        int times = 0;
-        while (isNull(clientConfig) && times < 30) {
-            try {
-                clientConfig = new Configurator(configService).retrieveConfig(Optional.empty());
-            } catch (NoConfigException e) {
-                LOGGER.warn("No client configuration present, waiting...");
-                Thread.sleep(ConfigConsts.DELAY);
-                times++;
-            }
-        }
-
-        if (isNull(clientConfig)) {
-            throw new RuntimeException("Couldn't retrieve client configuration. Is configuration service running?");
-        }
+        ServiceState clientConfig = RestUtil.createConfiguratorFromSystemVariable();
 
         PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
 
