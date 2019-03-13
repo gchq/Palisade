@@ -42,7 +42,7 @@ public class Employee {
     public static Employee generate(final Random random) {
         Employee employee = new Employee();
         employee.setUid(generateUID(random));
-        employee.setName(NAME_GENERATOR.generateName().toString()); // wew are storing name as a string not a Name
+        employee.setName(NAME_GENERATOR.generateName().toString()); // we are storing name as a string not a Name
         employee.setDateOfBirth(DateHelper.generateDateOfBirth(random));
         employee.setContactNumbers(PhoneNumber.generateMany(random));
         employee.setEmergencyContacts(EmergencyContact.generateMany(random, NAME_GENERATOR));

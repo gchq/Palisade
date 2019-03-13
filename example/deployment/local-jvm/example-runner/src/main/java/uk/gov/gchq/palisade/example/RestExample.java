@@ -78,7 +78,7 @@ public class RestExample {
 
         LOGGER.info("");
         LOGGER.info("Alice is reading file1...");
-        final Stream<Employee> aliceResults = client.read(sourceFile, "Alice", "Payroll");
+        final Stream<Employee> aliceResults = client.read(sourceFile, "Alice", "SALARY");
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 

@@ -88,7 +88,7 @@ public final class ExampleConfigurator {
 
         final User alice = new User()
                 .userId("Alice")
-                .auths("public", "private")
+//                .auths("public", "private")
                 .roles("HR", "PAYROLL");
 
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
@@ -98,7 +98,7 @@ public final class ExampleConfigurator {
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
-                                .auths("public")
+//                                .auths("public")
                                 .roles("ESTATES")
                 )
         );

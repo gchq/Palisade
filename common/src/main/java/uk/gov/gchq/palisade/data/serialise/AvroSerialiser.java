@@ -70,7 +70,7 @@ public class AvroSerialiser<O> implements Serialiser<O> {
 
     @Override
     public Stream<O> deserialise(final InputStream input) {
-        try (DataFileStream<O> in = new DataFileStream<>(input, new ReflectDatumReader<>(domainClass))) {
+        try (DataFileStream<O> in = new DataFileStream<>(input, new ReflectDatumReader<>(schema))) {
             return StreamSupport.stream(in.spliterator(), false);
         } catch (final Exception e) {
             LOGGER.debug("Closing streams");
