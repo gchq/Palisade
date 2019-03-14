@@ -18,25 +18,17 @@ package uk.gov.gchq.palisade.example.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import uk.gov.gchq.koryphe.impl.function.If;
-//import uk.gov.gchq.koryphe.impl.function.SetValue;
-//import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
-//import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
-//import uk.gov.gchq.koryphe.impl.predicate.Not;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
-//import uk.gov.gchq.palisade.example.ExampleObj;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.rule.BankDetailsRule;
-//import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
-//import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
-//import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
-//import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
+import uk.gov.gchq.palisade.example.rule.DutyOfCareRule;
+import uk.gov.gchq.palisade.example.rule.NationalityRule;
+import uk.gov.gchq.palisade.example.rule.ZipCodeMaskingRule;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
-//import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -55,6 +47,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.StreamSupport;
 
 import static java.util.Objects.isNull;
+
+//import uk.gov.gchq.koryphe.impl.function.If;
+//import uk.gov.gchq.koryphe.impl.function.SetValue;
+//import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
+//import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
+//import uk.gov.gchq.koryphe.impl.predicate.Not;
+//import uk.gov.gchq.palisade.example.ExampleObj;
+//import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
+//import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
+//import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
+//import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
+//import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 
 /**
  * Convenience class for the examples to configure the users and data access policies for the example.
@@ -116,17 +120,22 @@ public final class ExampleConfigurator {
                         .policy(new Policy<Employee>()
                                 .owner(alice)
                                 .recordLevelRule(
-                                        "1-bankdetails",
-                                        new BankDetailsRule()       // change to new BankDetailsRule()
+                                        "1-Bank_Details",
+                                        new BankDetailsRule()
                                 )
-//                                .recordLevelRule(
-//                                        "2-dutyofcare",
-//                                        new IsExampleObjRecent(12L)
-//                                )
-//                                .recordLevelRule(
-//                                        "3-redactProperty",
-//                                        new RedactExampleObjProperty()
-//                                )
+                                .recordLevelRule(
+                                        "2-DUTY_OF_CARE",
+                                        new DutyOfCareRule()
+                                )
+                                .recordLevelRule(
+                                        "3-Nationality",
+                                        new NationalityRule()
+                                )
+                                .recordLevelRule(
+                                        "3-Address Masking",
+                                        new ZipCodeMaskingRule()
+                                )
+
                         );
 
         final CompletableFuture<Boolean> policyStatus = services.getPolicyService().setResourcePolicy(

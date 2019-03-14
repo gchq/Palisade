@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class HasSensitiveAuthRule<T> implements Serializable, Rule<T> {
     @Override
     public T apply(final T record, final User user, final Context context) {
-        if (user.getAuths().contains("Sensitive"))
+        if (user.getAuths().contains("Sensitive")) {
             return record;
         } else {
             return null;

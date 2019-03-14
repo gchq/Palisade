@@ -77,16 +77,33 @@ public class RestExample {
         final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 
         LOGGER.info("");
-        LOGGER.info("Alice is reading file1...");
+        LOGGER.info("Alice is reading the Employee file with a justification/purpose of SALARY...");
         final Stream<Employee> aliceResults = client.read(sourceFile, "Alice", "SALARY");
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
-        LOGGER.info("Bob is reading file1...");
-        final Stream<Employee> bobResults = client.read(sourceFile, "Bob", "Payroll");
-        LOGGER.info("Bob got back: ");
-        bobResults.map(Object::toString).forEach(LOGGER::info);
+        LOGGER.info("Alice is reading the Employee file with a justification/purpose of DUTY_OF_CARE...");
+        final Stream<Employee> aliceResults2 = client.read(sourceFile, "Alice", "DUTY_OF_CARE");
+        LOGGER.info("Alice got back: ");
+        aliceResults2.map(Object::toString).forEach(LOGGER::info);
 
+        LOGGER.info("");
+        LOGGER.info("Alice is reading the Employee file with a justification/purpose of STAFF_REPORT...");
+        final Stream<Employee> aliceResults3 = client.read(sourceFile, "Alice", "STAFF_REPORT");
+        LOGGER.info("Alice got back: ");
+        aliceResults3.map(Object::toString).forEach(LOGGER::info);
+
+        LOGGER.info("");
+        LOGGER.info("Bob is reading the Employee file with a justification/purpose of DUTY_OF_CARE...");
+        final Stream<Employee> bobResults1 = client.read(sourceFile, "Bob", "DUTY_OF_CARE");
+        LOGGER.info("Bob got back: ");
+        bobResults1.map(Object::toString).forEach(LOGGER::info);
+
+        LOGGER.info("");
+        LOGGER.info("Bob is reading the Employee file with a justification/purpose that is empty...");
+        final Stream<Employee> bobResults2 = client.read(sourceFile, "Bob", "");
+        LOGGER.info("Bob got back: ");
+        bobResults2.map(Object::toString).forEach(LOGGER::info);
     }
 }

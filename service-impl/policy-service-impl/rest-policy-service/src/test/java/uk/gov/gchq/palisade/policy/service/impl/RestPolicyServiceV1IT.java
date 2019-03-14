@@ -54,7 +54,6 @@ public class RestPolicyServiceV1IT {
     private static final FileResource fileResource1 = new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource);
     private static final FileResource fileResource2 = new FileResource().id("file2").type("type1").serialisedFormat("format1").parent(sysResource);
     private static final User user = new User().userId("user01").roles("role1", "role2").auths("auth1", "auth2");
-    private static final User user = new User().userId("user01").roles("role1", "role2");
 
 
     private static ProxyRestPolicyService proxy;
