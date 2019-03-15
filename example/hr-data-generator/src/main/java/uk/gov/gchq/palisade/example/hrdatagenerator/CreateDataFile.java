@@ -16,8 +16,10 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator;
 
+import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Manager;
 import uk.gov.gchq.palisade.io.BytesSuppliedInputStream;
 
 import java.io.File;
@@ -42,8 +44,24 @@ public final class CreateDataFile implements Callable<Boolean> {
     public Boolean call() {
         try {
             int bufferSize = 32;
+            Stream<Employee> employeeStream;
             AvroSerialiser<Employee> employeeAvroSerialiser = new AvroSerialiser<>(Employee.class);
-            Stream<Employee> employeeStream = generateStreamOfEmployees();
+            // Need one Employee whose manager has a UID of Bob
+            Employee firstEmployee = Employee.generate(random);
+            Manager[] managers = firstEmployee.getManager();
+            Manager lineManager = managers[0];
+            UserId lineManagerUid = lineManager.getUid();
+            lineManagerUid.setId("Bob");
+            lineManager.setUid(lineManagerUid);
+            managers[0] = lineManager;
+            firstEmployee.setManager(managers);
+            Stream<Employee> firstEmployeeStream = Stream.of(firstEmployee);
+            if (numberOfEmployees > 1) {
+                Stream<Employee> moreEmployeesStream = generateStreamOfEmployees();
+                employeeStream = employeeStream = Stream.concat(firstEmployeeStream, moreEmployeesStream);
+            } else {
+                employeeStream = firstEmployeeStream;
+            }
             BytesSuppliedInputStream in = (BytesSuppliedInputStream) employeeAvroSerialiser.serialise(employeeStream);
             outputFile.getParentFile().mkdirs();
             OutputStream out = new FileOutputStream(outputFile);
@@ -63,7 +81,7 @@ public final class CreateDataFile implements Callable<Boolean> {
     }
 
     private Stream<Employee> generateStreamOfEmployees() {
-        return Stream.generate(() -> Employee.generate(random)).limit(numberOfEmployees);
+        return Stream.generate(() -> Employee.generate(random)).limit(numberOfEmployees - 1);
     }
 
 }
