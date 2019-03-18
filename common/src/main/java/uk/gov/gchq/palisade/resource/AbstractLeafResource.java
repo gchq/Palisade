@@ -23,7 +23,7 @@ import uk.gov.gchq.palisade.ToStringBuilder;
 
 import java.util.Objects;
 
-public abstract class AbstractLeafResource extends AbstractResource implements LeafResource {
+public abstract class AbstractLeafResource extends AbstractResource implements LeafResource, ChildResource {
 
     private String type;
     private String serialisedFormat;
