@@ -29,6 +29,8 @@ import static java.util.Objects.requireNonNull;
  * This class is used to wrap all the information that the user needs to supply
  * to the palisade service to register the data access request.
  */
+
+
 public class RegisterDataRequest extends Request {
     private UserId userId;
     private Context context;
@@ -47,6 +49,7 @@ public class RegisterDataRequest extends Request {
         this.userId = userId;
         return this;
     }
+
 
     /**
      * @param resourceId an identifier for the resource or data set to access
@@ -85,6 +88,7 @@ public class RegisterDataRequest extends Request {
     public void setUserId(final UserId userId) {
         userId(userId);
     }
+
 
     public Context getContext() {
         requireNonNull(context, "The context has not been set");
