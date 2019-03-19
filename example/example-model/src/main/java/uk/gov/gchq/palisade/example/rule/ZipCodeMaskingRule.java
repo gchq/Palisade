@@ -18,9 +18,12 @@ package uk.gov.gchq.palisade.example.rule;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Address;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Manager;
 import uk.gov.gchq.palisade.rule.Rule;
 
 import java.util.Objects;
@@ -42,16 +45,58 @@ public class ZipCodeMaskingRule implements Rule<Employee> {
         return maskedRecord;
     }
 
+    private Employee maskZipCode(final Employee maskedRecord) {
+        Address address = maskedRecord.getAddress();
+        address.setZipCode(null);
+        return maskedRecord;
+    }
+
+    private Boolean isManager(final Manager[] managers, final UserId userId) {
+        if (managers == null) {
+            return false;
+        }
+
+        for (Manager manager:managers) {
+            if (manager.getUid().equals(userId)) {
+                return true;
+            }
+        }
+
+        for (Manager manager:managers) {
+            if (isManager(manager.getManager(), userId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Employee apply(final Employee record, final User user, final Context context) {
         if (null == record) {
             return null;
         }
         Objects.requireNonNull(user);
+        Objects.requireNonNull(context);
+        UserId userId = user.getUserId();
+        Manager[] managers = record.getManager();
         Set<String> roles = user.getRoles();
+        String purpose = context.getPurpose();
+
+        if (roles.contains(Role.HR.name())) {
+            return record;
+        }
+
+        if ((isManager(managers, userId).equals(Boolean.TRUE)) & purpose.equals(Purpose.DUTY_OF_CARE.name())) {
+            return record;
+        }
 
         if (roles.contains(Role.ESTATES.name())) {
             return maskRecord(record);
+        } else {
+            return maskZipCode(maskRecord(record));
         }
-        return record;
     }
 }
+
+
+
+
