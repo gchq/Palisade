@@ -31,3 +31,9 @@ bin/
 _book
 node_modules
 .extract/
+.project
+.project/
+.settings
+.settings/
+.classpath
+.classpath/

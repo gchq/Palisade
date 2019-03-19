@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.audit.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.AuditType;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
@@ -39,6 +40,7 @@ import static java.util.Objects.requireNonNull;
 public class AuditRequest extends Request {
     private Context context;
     private User user;
+    private AuditType auditType;
     private LeafResource resource;
     private String howItWasProcessed;
     private Exception exception;
@@ -49,7 +51,7 @@ public class AuditRequest extends Request {
 
     /**
      * @param context {@link Context} is the reason for the
-     *                      user accessing the resource
+     *                user accessing the resource
      * @return the {@link AuditRequest}
      */
     public AuditRequest context(final Context context) {
@@ -66,6 +68,16 @@ public class AuditRequest extends Request {
     public AuditRequest user(final User user) {
         requireNonNull(user, "The user cannot be set to null.");
         this.user = user;
+        return this;
+    }
+
+    /**
+     * @param auditType {@link Context} is the type of the request access
+     * @return the {@link AuditRequest}
+     */
+    public AuditRequest auditType(final AuditType auditType) {
+        requireNonNull(auditType, "The audit type cannot be null");
+        this.auditType = auditType;
         return this;
     }
 
@@ -120,13 +132,22 @@ public class AuditRequest extends Request {
         user(user);
     }
 
+    public AuditType getAuditType() {
+        requireNonNull(auditType, "The audit type cannot be null");
+        return auditType;
+    }
+
+    public void setAuditType(final AuditType auditType) {
+        this.auditType = auditType;
+    }
+
     public LeafResource getResource() {
         requireNonNull(resource, "The resource have not been set.");
         return resource;
     }
 
     public String getHowItWasProcessed() {
-        requireNonNull(howItWasProcessed, "The how it was processed message has not been set.");
+        //This is acceptable being null
         return howItWasProcessed;
     }
 
@@ -152,17 +173,15 @@ public class AuditRequest extends Request {
         if (this == o) {
             return true;
         }
-
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         final AuditRequest that = (AuditRequest) o;
-
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(context, that.context)
                 .append(user, that.user)
+                .append(auditType, that.auditType)
                 .append(resource, that.resource)
                 .append(howItWasProcessed, that.howItWasProcessed)
                 .append(exception, that.exception)
@@ -175,6 +194,7 @@ public class AuditRequest extends Request {
                 .appendSuper(super.hashCode())
                 .append(context)
                 .append(user)
+                .append(auditType)
                 .append(resource)
                 .append(howItWasProcessed)
                 .append(exception)
@@ -187,6 +207,7 @@ public class AuditRequest extends Request {
                 .appendSuper(super.toString())
                 .append("purpose", context)
                 .append("user", user)
+                .append("auditType", auditType)
                 .append("resource", resource)
                 .append("howItWasProcessed", howItWasProcessed)
                 .append("exception", exception)

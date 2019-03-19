@@ -100,13 +100,10 @@ public class RegisterDataRequest extends Request {
         if (this == o) {
             return true;
         }
-
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         final RegisterDataRequest that = (RegisterDataRequest) o;
-
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(userId, that.userId)

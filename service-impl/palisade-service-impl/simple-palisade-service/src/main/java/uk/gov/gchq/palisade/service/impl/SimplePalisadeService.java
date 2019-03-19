@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.AuditType;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
@@ -224,7 +225,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 .thenApply(t -> getPolicy(request, futureUser, futureResources))
                 .thenApply(multiPolicy -> ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
                 .thenAccept(multiPolicy -> {
-                    audit(request, futureUser.join(), multiPolicy);
+                    audit(request, futureUser.join(), multiPolicy, AuditType.DATA_REQUEST_RECEIVED);
                     cache(request, futureUser.join(), requestId, multiPolicy, futureResources.join().size());
                 }).thenApply(t -> {
                     final DataRequestResponse response = new DataRequestResponse().requestId(requestId).resources(futureResources.join());
@@ -243,11 +244,12 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 }).join();
     }
 
-    private void audit(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy) {
+    private void audit(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy, final AuditType auditType) {
         for (final Entry<LeafResource, Policy> entry : multiPolicy.getPolicies().entrySet()) {
             final AuditRequest auditRequest =
                     new AuditRequest()
                             .resource(entry.getKey())
+                            .auditType(auditType)
                             .user(user)
                             .context(request.getContext())
                             .howItWasProcessed(entry.getValue().getMessage());
