@@ -133,6 +133,7 @@ public class AuditRequest extends Request {
     }
 
     public AuditType getAuditType() {
+        requireNonNull(auditType, "The audit type cannot be null");
         return auditType;
     }
 
@@ -146,7 +147,7 @@ public class AuditRequest extends Request {
     }
 
     public String getHowItWasProcessed() {
-        requireNonNull(howItWasProcessed, "The how it was processed message has not been set.");
+        //This is acceptable being null
         return howItWasProcessed;
     }
 
