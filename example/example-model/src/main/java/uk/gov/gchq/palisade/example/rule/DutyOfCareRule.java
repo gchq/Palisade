@@ -54,6 +54,7 @@ public class DutyOfCareRule implements Rule<Employee> {
 
     private Employee redactRecord(final Employee redactedRecord) {
         redactedRecord.setContactNumbers(null);
+        redactedRecord.setEmergencyContacts(null);
         return redactedRecord;
     }
 
