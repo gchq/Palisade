@@ -71,6 +71,10 @@ public class AuditRequest extends Request {
         return this;
     }
 
+    /**
+     * @param auditType {@link Context} is the type of the request access
+     * @return the {@link AuditRequest}
+     */
     public AuditRequest auditType(final AuditType auditType) {
         requireNonNull(auditType, "The audit type cannot be null");
         this.auditType = auditType;
@@ -128,7 +132,6 @@ public class AuditRequest extends Request {
         user(user);
     }
 
-
     public AuditType getAuditType() {
         return auditType;
     }
@@ -136,7 +139,6 @@ public class AuditRequest extends Request {
     public void setAuditType(final AuditType auditType) {
         this.auditType = auditType;
     }
-
 
     public LeafResource getResource() {
         requireNonNull(resource, "The resource have not been set.");
@@ -170,13 +172,10 @@ public class AuditRequest extends Request {
         if (this == o) {
             return true;
         }
-
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         final AuditRequest that = (AuditRequest) o;
-
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(context, that.context)
