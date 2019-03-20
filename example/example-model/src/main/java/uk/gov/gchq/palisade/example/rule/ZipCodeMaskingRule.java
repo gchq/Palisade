@@ -40,15 +40,12 @@ public class ZipCodeMaskingRule implements Rule<Employee> {
         String zipCodeRedacted = zipCode.substring(0, zipCode.length() - 1) + "*";
         address.setStreetAddressNumber(null);
         address.setStreetName(null);
-        address.setCity(null);
-        address.setState(null);
         address.setZipCode(zipCodeRedacted);
         return maskedRecord;
     }
 
-    private Employee maskZipCode(final Employee maskedRecord) {
-        Address address = maskedRecord.getAddress();
-        address.setZipCode(null);
+    private Employee maskWholeAddress(final Employee maskedRecord) {
+        maskedRecord.setAddress(null);
         return maskedRecord;
     }
 
@@ -93,7 +90,7 @@ public class ZipCodeMaskingRule implements Rule<Employee> {
         if (roles.contains(Role.ESTATES.name())) {
             return maskRecord(record);
         } else {
-            return maskZipCode(maskRecord(record));
+            return maskWholeAddress(record);
         }
     }
 }

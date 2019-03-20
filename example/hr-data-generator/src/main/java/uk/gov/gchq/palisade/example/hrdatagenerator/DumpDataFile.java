@@ -38,27 +38,14 @@ public final class DumpDataFile {
         this.inputFile = inputFile;
 
         try {
-            int bufferSize = 32;
             AvroSerialiser<Employee> employeeAvroSerialiser = new AvroSerialiser<>(Employee.class);
             InputStream in = new FileInputStream(inputFile);
             Stream<Employee> output = employeeAvroSerialiser.deserialise(in);
-//            List<T> results = l.stream().filter(…).collect(Collectors.toList());
-            List<Employee> stuff = output.collect(Collectors.toList());
-            LOGGER.info(stuff.toString());
-//            String out = new String(output.toString());
-//            LOGGER.info(out);
-//           for (Employee i: (Iterable<Employee>) output::iterator) {
-//                String tax = i.getTaxCode();
-//                LOGGER.info(tax);
-//            }
-            int xyz = 44;
-
-
+            List<Employee> employees = output.collect(Collectors.toList());
+            LOGGER.info(employees.toString());
         } catch (Exception e) {
-//            System.out.println("Caught exception: " + e.getMessage());
             LOGGER.info("Caught exception: " + e.getMessage());
             throw e;
         }
-//        return Boolean.TRUE;
     }
 }

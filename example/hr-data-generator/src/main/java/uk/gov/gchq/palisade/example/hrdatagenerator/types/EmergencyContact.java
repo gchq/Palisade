@@ -34,8 +34,7 @@ public class EmergencyContact {
     public static EmergencyContact generate(final Random random, final NameGenerator nameGenerator) {
         EmergencyContact contact = new EmergencyContact();
         Name tempName = nameGenerator.generateName();
-        String name = tempName.toString();
-        contact.setContactName(name);
+        contact.setContactName(tempName.toString());
         Relation[] relations;
         if (tempName.getGender().equals(Gender.MALE)) {
             relations = MALE_RELATIONS;

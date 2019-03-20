@@ -1,4 +1,4 @@
-h#!/usr/bin/env bash
+#!/usr/bin/env bash
 
 . ./example/deployment/bash-scripts/setScriptPath.sh
 java -jar $EXAMPLESERVICES/example-rest-palisade-service/target/example-rest-palisade-service-*-executable.jar \
