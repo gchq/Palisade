@@ -107,6 +107,15 @@ public final class ExampleConfigurator {
                 )
         );
 
+        final CompletableFuture<Boolean> userEveStatus = userService.addUser(
+                new AddUserRequest().user(
+                        new User()
+                                .userId("Eve")
+//                                .auths("public")
+                                .roles("IT")
+                )
+        );
+
         // You can either implement the Rule interface for your Policy rules or
         // you can chain together combinations of Koryphe functions/predicates.
         // Both of the following policies have the same logic, but using
@@ -142,7 +151,7 @@ public final class ExampleConfigurator {
                 customPolicies
         );
         // Wait for the users and policies to be loaded
-        CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
+        CompletableFuture.allOf(userAliceStatus, userBobStatus, userEveStatus, policyStatus).join();
         LOGGER.info("The example users and data access policies have been initialised.");
 
 //        // Using Koryphe's functions/predicates
