@@ -105,5 +105,11 @@ public class RestExample {
         final Stream<Employee> bobResults2 = client.read(sourceFile, "Bob", "");
         LOGGER.info("Bob got back: ");
         bobResults2.map(Object::toString).forEach(LOGGER::info);
+
+        LOGGER.info("");
+        LOGGER.info("Eve is reading the Employee file with a purpose that is empty...");
+        final Stream<Employee> eveResults1 = client.read(sourceFile, "Eve", "");
+        LOGGER.info("Eve got back: ");
+        eveResults1.map(Object::toString).forEach(LOGGER::info);
     }
 }

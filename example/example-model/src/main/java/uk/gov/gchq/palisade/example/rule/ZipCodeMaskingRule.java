@@ -41,6 +41,7 @@ public class ZipCodeMaskingRule implements Rule<Employee> {
         address.setStreetAddressNumber(null);
         address.setStreetName(null);
         address.setCity(null);
+        address.setState(null);
         address.setZipCode(zipCodeRedacted);
         return maskedRecord;
     }
