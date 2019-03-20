@@ -141,7 +141,7 @@ public final class ExampleConfigurator {
                                         new NationalityRule()
                                 )
                                 .recordLevelRule(
-                                        "3-Address Masking",
+                                        "4-Address Masking",
                                         new ZipCodeMaskingRule()
                                 )
 

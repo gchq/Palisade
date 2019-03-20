@@ -1,32 +1,38 @@
 # Local JVM Example
 
-This example demonstrates 2 different users querying a database over a REST api. 
+This example demonstrates different users querying an avro file over a REST api running locally in JVMs.
 
-`updating example to use a generated HR dataset`
+The queried file is a generated HR dataset of Employee records. Here is the format of the Employee class:  
+    private UserId uid;  
+    private String name;  
+    private String dateOfBirth;  
+    private PhoneNumber[] contactNumbers;  
+    private EmergencyContact[] emergencyContacts;  
+    private Address address;  
+    private BankDetails bankDetails;  
+    private String taxCode;  
+    private Nationality nationality;  
+    private Manager[] manager;  
 
-The example data is a text file which can be found in the example-model module and has the following records:
-
-| Property      | Visibility           | Timestamp  |
-| ------------- | -------------------- | ---------- |
-|  item1a       |   public             | 1          |
-|  item1b       |   public             | 10         |
-|  item1c       |   public             | 20         |
-|  item1d       |   private            | 20         |
-|  item2a       |   public             | 1          |
-|  item2b       |   public             | 10         |
-|  item2c       |   public             | 20         |
-|  item2d       |   private            | 20         |
+    The manager field is an array of manager, which could potentially be nested several layers deep, in the generated example manager is nested 3 deep.
 
 
 The policies and users have been hardcoded in class: uk.gov.gchq.palisade.example.client.ExampleSimpleClient.
 
 Policy have defined the following rules:
 
-   - Age off - the timestamp must be greater than 12
+1. BankDetailsRule - The bankDetails field should be displayed if the user querying the file has the PAYROLL role and the purpose of the query is SALARY  
+   In all other cases the bankDetails field should be redacted.
 
-   - Visibility - the user must have the correct level of authorisation to for the visibility label
+1. DutyOfCareRule - this rule is concerned with the contactNumbers and emergencyContacts fields. These fields should be returnred 
+    - if the user querying the file has theh HR role and the purpose of the query is DUTY_OF_CARE
+    - also if the user querying the file is the line manager of the Employee record being queried and the purpose of the query is DUTY_OF_CARE
+   In all other cases these fiels should be redacted.
 
-   - Property redaction - if the user does not have the 'admin' role the 'property' field should be redacted
+
+1. NationalityRule -
+
+1. ZipCodeMaskingRule -
   
 The example will be run with 2 users:
 

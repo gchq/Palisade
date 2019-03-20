@@ -46,19 +46,17 @@ public final class CreateDataFile implements Callable<Boolean> {
             int bufferSize = 32;
             Stream<Employee> employeeStream;
             AvroSerialiser<Employee> employeeAvroSerialiser = new AvroSerialiser<>(Employee.class);
-            // Need one Employee whose manager has a UID of Bob
+            // Need one Employee whose manager has a UID of Bob (for examples to work)
             Employee firstEmployee = Employee.generate(random);
             Manager[] managers = firstEmployee.getManager();
-            Manager lineManager = managers[0];
-            UserId lineManagerUid = lineManager.getUid();
+            UserId lineManagerUid = managers[0].getUid();
             lineManagerUid.setId("Bob");
-            lineManager.setUid(lineManagerUid);
-            managers[0] = lineManager;
+            managers[0].setUid(lineManagerUid);
             firstEmployee.setManager(managers);
             Stream<Employee> firstEmployeeStream = Stream.of(firstEmployee);
             if (numberOfEmployees > 1) {
                 Stream<Employee> moreEmployeesStream = generateStreamOfEmployees();
-                employeeStream = employeeStream = Stream.concat(firstEmployeeStream, moreEmployeesStream);
+                employeeStream = Stream.concat(firstEmployeeStream, moreEmployeesStream);
             } else {
                 employeeStream = firstEmployeeStream;
             }
