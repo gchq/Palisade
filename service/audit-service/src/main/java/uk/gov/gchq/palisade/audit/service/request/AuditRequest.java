@@ -142,7 +142,7 @@ public class AuditRequest extends Request {
     }
 
     public LeafResource getResource() {
-        requireNonNull(resource, "The resource have not been set.");
+        //This is acceptable being null
         return resource;
     }
 

@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
+import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.util.concurrent.CompletableFuture;
@@ -42,11 +43,11 @@ public class LoggerAuditService implements AuditService {
     @Override
     public CompletableFuture<Boolean> audit(final AuditRequest request) {
         requireNonNull(request, "The audit request can not be null.");
+        Resource resource = request.getResource();
         final String msg = "'" + request.getUser().getUserId().getId()
-                + "' accessed '" + request.getResource().getId()
+                + (resource != null ? "' accessed '" + resource.getId() : "")
                 + "' for '" + request.getContext().getPurpose()
-                + "' and it was processed using '" + request.getHowItWasProcessed() + "'";
-
+                + (request.getHowItWasProcessed() != null ? "' and it was processed using '" + request.getHowItWasProcessed() + "'" : "");
         if (null != request.getException()) {
             LOGGER.error(msg + "', but an error occurred " + request.getException().getMessage(), request.getException());
         } else {
