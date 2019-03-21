@@ -6,7 +6,7 @@ The example runs several different queries by the different users, with differen
 For an overview of the example see [here](../../README.md)
 
 ### Prerequisites for running in docker 
-As well as docker running this example alse requires docker compose
+As well as docker, running this example alse requires docker compose
 
 To run the example locally in docker containers follow these steps (from the root of the project):
 

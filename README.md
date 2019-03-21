@@ -70,8 +70,8 @@ To get started, clone the Palisade repo:
 
 `git clone https://github.com/gchq/Palisade.git`
 
-We have an example that demonstrate the automated policy rule enforcement when users read some data.
-These example should provide a good start to understanding how Palisade works.
+We have examples that demonstrate the automated policy rule enforcement when users read some data.
+These examples should provide a good start to understanding how Palisade works.
 
 1. A local JVM Rest based example
 1. A docker based example that will run on the local machine
@@ -80,9 +80,9 @@ These example should provide a good start to understanding how Palisade works.
 
 For an overview of the example see [here](example/README.md)
 
-* To run the local JVM REST based example follow this guide: [Local JVM](example/deployment/local-jvm/README.md)
+To run the local JVM REST based example follow this guide: [Local JVM](example/deployment/local-jvm/README.md)
 
-* To run the local docker REST based example follow this guide: [Local Docker](example/deployment/local-docker/README.md)
+To run the local docker REST based example follow this guide: [Local Docker](example/deployment/local-docker/README.md)
 
 For more details about the code structure see the [Developer Guide](doc/developer-guide/developer_guide.md)
 
