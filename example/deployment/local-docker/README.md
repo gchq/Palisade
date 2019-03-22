@@ -35,9 +35,9 @@ You can check the containers are available:
   docker ps
 ```
 
-You should see a number of containers:
+You should see 8 containers that will stay around and 2 others will disappear once complete (configure-services, configure example):
 
-![Output from docker ps](./DockerPSScreenshot.png?raw=true "Output from docker ps")
+![Output from docker ps](../../../doc/img/DockerPSScreenshot.png?raw=true "Output from docker ps")
 
 
 3. Run the example

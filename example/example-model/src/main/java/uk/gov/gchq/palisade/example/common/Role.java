@@ -19,5 +19,6 @@ package uk.gov.gchq.palisade.example.common;
 public enum Role {
     PAYROLL,
     HR,
-    ESTATES
+    ESTATES,
+    IT
 }

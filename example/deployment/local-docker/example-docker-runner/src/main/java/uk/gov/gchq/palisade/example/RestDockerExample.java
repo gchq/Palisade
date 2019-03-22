@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
@@ -90,25 +91,25 @@ public class RestDockerExample {
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of SALARY...");
-        final Stream<Employee> aliceResults = client.read(FILE, "Alice", "SALARY");
+        final Stream<Employee> aliceResults = client.read(FILE, "Alice", Purpose.SALARY.name());
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of DUTY_OF_CARE...");
-        final Stream<Employee> aliceResults2 = client.read(FILE, "Alice", "DUTY_OF_CARE");
+        final Stream<Employee> aliceResults2 = client.read(FILE, "Alice", Purpose.DUTY_OF_CARE.name());
         LOGGER.info("Alice got back: ");
         aliceResults2.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of STAFF_REPORT...");
-        final Stream<Employee> aliceResults3 = client.read(FILE, "Alice", "STAFF_REPORT");
+        final Stream<Employee> aliceResults3 = client.read(FILE, "Alice", Purpose.STAFF_REPORT.name());
         LOGGER.info("Alice got back: ");
         aliceResults3.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Bob [ " + bob.toString() + " } is reading the Employee file with a purpose of DUTY_OF_CARE...");
-        final Stream<Employee> bobResults1 = client.read(FILE, "Bob", "DUTY_OF_CARE");
+        final Stream<Employee> bobResults1 = client.read(FILE, "Bob", Purpose.DUTY_OF_CARE.name());
         LOGGER.info("Bob got back: ");
         bobResults1.map(Object::toString).forEach(LOGGER::info);
 

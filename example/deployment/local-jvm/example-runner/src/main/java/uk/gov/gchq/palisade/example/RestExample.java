@@ -24,6 +24,8 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.common.Purpose;
+import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
@@ -38,6 +40,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
+import static uk.gov.gchq.palisade.example.common.Purpose.DUTY_OF_CARE;
 
 public class RestExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestExample.class);
@@ -77,44 +80,43 @@ public class RestExample {
 
         final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 
-        // userId(new UserId().id(userId)).context(new Context().purpose(purpose));
 
         final User alice = new User()
                 .userId("Alice")
-//                .auths("public", "private")
-                .roles("HR", "PAYROLL");
+                .auths("public", "private")
+                .roles(Role.HR.name(), Role.PAYROLL.name());
 
         final User bob = new User()
                 .userId("Bob")
-//                .auths("public")
-                .roles("ESTATES");
+                .auths("public")
+                .roles(Role.ESTATES.name());
 
         final User eve = new User()
                 .userId("Eve")
-//                .auths("public")
-                .roles("IT");
+                .auths("public")
+                .roles(Role.IT.name());
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of SALARY...");
-        final Stream<Employee> aliceResults = client.read(sourceFile, "Alice", "SALARY");
+        final Stream<Employee> aliceResults = client.read(sourceFile, "Alice", Purpose.SALARY.name());
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of DUTY_OF_CARE...");
-        final Stream<Employee> aliceResults2 = client.read(sourceFile, "Alice", "DUTY_OF_CARE");
+        final Stream<Employee> aliceResults2 = client.read(sourceFile, "Alice", Purpose.DUTY_OF_CARE.name());
         LOGGER.info("Alice got back: ");
         aliceResults2.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of STAFF_REPORT...");
-        final Stream<Employee> aliceResults3 = client.read(sourceFile, "Alice", "STAFF_REPORT");
+        final Stream<Employee> aliceResults3 = client.read(sourceFile, "Alice", Purpose.STAFF_REPORT.name());
         LOGGER.info("Alice got back: ");
         aliceResults3.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Bob [ " + bob.toString() + " } is reading the Employee file with a purpose of DUTY_OF_CARE...");
-        final Stream<Employee> bobResults1 = client.read(sourceFile, "Bob", "DUTY_OF_CARE");
+        final Stream<Employee> bobResults1 = client.read(sourceFile, "Bob", Purpose.DUTY_OF_CARE.name());
         LOGGER.info("Bob got back: ");
         bobResults1.map(Object::toString).forEach(LOGGER::info);
 

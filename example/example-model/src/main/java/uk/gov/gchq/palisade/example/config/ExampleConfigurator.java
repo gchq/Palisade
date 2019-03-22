@@ -48,18 +48,6 @@ import java.util.stream.StreamSupport;
 
 import static java.util.Objects.isNull;
 
-//import uk.gov.gchq.koryphe.impl.function.If;
-//import uk.gov.gchq.koryphe.impl.function.SetValue;
-//import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
-//import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
-//import uk.gov.gchq.koryphe.impl.predicate.Not;
-//import uk.gov.gchq.palisade.example.ExampleObj;
-//import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
-//import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
-//import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
-//import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
-//import uk.gov.gchq.palisade.policy.tuple.TupleRule;
-
 /**
  * Convenience class for the examples to configure the users and data access policies for the example.
  */
@@ -92,7 +80,7 @@ public final class ExampleConfigurator {
 
         final User alice = new User()
                 .userId("Alice")
-//                .auths("public", "private")
+                .auths("public", "private")
                 .roles("HR", "PAYROLL");
 
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
@@ -102,7 +90,7 @@ public final class ExampleConfigurator {
                 new AddUserRequest().user(
                         new User()
                                 .userId("Bob")
-//                                .auths("public")
+                                .auths("public")
                                 .roles("ESTATES")
                 )
         );
@@ -111,7 +99,7 @@ public final class ExampleConfigurator {
                 new AddUserRequest().user(
                         new User()
                                 .userId("Eve")
-//                                .auths("public")
+                                .auths("public")
                                 .roles("IT")
                 )
         );

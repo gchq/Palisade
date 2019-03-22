@@ -6,11 +6,3 @@ java -cp $PWD/example/deployment/local-jvm/example-runner/target/example-runner-
     sed $'s/Eve \[/\\\n\\\nEve \[/g' | sed $'s/,name=/\\\n\\\nname=/g'|sed $'s/,dateOfBirth=/\\\ndateOfBirth=/g'|sed $'s/,contactNumbers=/\\\ncontactNumbers=/g'| \
     sed $'s/,emergencyContacts=/\\\nemergencyContacts=/g'|sed $'s/,address=/\\\naddress=/g'|sed $'s/,bankDetails=/\\\nbankDetails=/g'| \
     sed $'s/,taxCode=/\\\ntaxCode=/g'|sed $'s/,nationality=/\\\nnationality=/g'
-
-
-
-
-
-
-
-
