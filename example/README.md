@@ -35,7 +35,7 @@ Policy have defined the following rules:
 
 1. DutyOfCareRule - This rule is concerned with the contactNumbers and emergencyContacts fields. These fields should be returned 
     - if the user querying the file has the HR role and the purpose of the query is DUTY_OF_CARE
-    - also if the user querying the file is the line manager of the Employee record being queried and the purpose of the query is DUTY_OF_CARE  
+    - if the user querying the file is the line manager of the Employee record being queried and the purpose of the query is DUTY_OF_CARE  
    In all other cases these fields should be redacted.
 
 1. NationalityRule - The natonality field should be returned if the user querying the file has the HR role and the purpose of the query is STAFF_REPORT    
