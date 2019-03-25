@@ -74,10 +74,9 @@ public class RestDockerExample {
 
         final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 
-        ExampleUsers users = new ExampleUsers();
-        final User alice  = users.getAlice();
-        final User bob = users.getBob();
-        final User eve = users.getEve();
+        final User alice  = ExampleUsers.getAlice();
+        final User bob = ExampleUsers.getBob();
+        final User eve = ExampleUsers.getEve();
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of SALARY...");
