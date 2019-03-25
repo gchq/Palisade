@@ -18,23 +18,17 @@ package uk.gov.gchq.palisade.example.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.koryphe.impl.function.If;
-import uk.gov.gchq.koryphe.impl.function.SetValue;
-import uk.gov.gchq.koryphe.impl.predicate.CollectionContains;
-import uk.gov.gchq.koryphe.impl.predicate.IsMoreThan;
-import uk.gov.gchq.koryphe.impl.predicate.Not;
-import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
-import uk.gov.gchq.palisade.example.ExampleObj;
-import uk.gov.gchq.palisade.example.rule.IsExampleObjRecent;
-import uk.gov.gchq.palisade.example.rule.IsExampleObjVisible;
-import uk.gov.gchq.palisade.example.rule.RedactExampleObjProperty;
-import uk.gov.gchq.palisade.example.rule.predicate.IsXInCollectionY;
+import uk.gov.gchq.palisade.example.common.ExampleUsers;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
+import uk.gov.gchq.palisade.example.rule.BankDetailsRule;
+import uk.gov.gchq.palisade.example.rule.DutyOfCareRule;
+import uk.gov.gchq.palisade.example.rule.NationalityRule;
+import uk.gov.gchq.palisade.example.rule.ZipCodeMaskingRule;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
-import uk.gov.gchq.palisade.policy.tuple.TupleRule;
 import uk.gov.gchq.palisade.resource.ParentResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -84,21 +78,15 @@ public final class ExampleConfigurator {
         // The user authorisation owner or sys admin needs to add the user
         final UserService userService = services.getUserService();
 
-        final User alice = new User()
-                .userId("Alice")
-                .auths("public", "private")
-                .roles("user", "admin");
-
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
-                new AddUserRequest().user(alice)
+                new AddUserRequest().user(ExampleUsers.getAlice())
         );
         final CompletableFuture<Boolean> userBobStatus = userService.addUser(
-                new AddUserRequest().user(
-                        new User()
-                                .userId("Bob")
-                                .auths("public")
-                                .roles("user")
-                )
+                new AddUserRequest().user(ExampleUsers.getBob())
+        );
+
+        final CompletableFuture<Boolean> userEveStatus = userService.addUser(
+                new AddUserRequest().user(ExampleUsers.getEve())
         );
 
         // You can either implement the Rule interface for your Policy rules or
@@ -110,56 +98,68 @@ public final class ExampleConfigurator {
         // Using Custom Rule implementations - without Koryphe
         final SetResourcePolicyRequest customPolicies =
                 new SetResourcePolicyRequest()
-                        .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
-                        .policy(new Policy<ExampleObj>()
-                                .owner(alice)
+                        .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
+                        .policy(new Policy<Employee>()
+                                .owner(ExampleUsers.getAlice())
                                 .recordLevelRule(
-                                        "1-visibility",
-                                        new IsExampleObjVisible()
+                                        "1-Bank_Details",
+                                        new BankDetailsRule()
                                 )
                                 .recordLevelRule(
-                                        "2-ageOff",
-                                        new IsExampleObjRecent(12L)
+                                        "2-DUTY_OF_CARE",
+                                        new DutyOfCareRule()
                                 )
                                 .recordLevelRule(
-                                        "3-redactProperty",
-                                        new RedactExampleObjProperty()
+                                        "3-Nationality",
+                                        new NationalityRule()
                                 )
+                                .recordLevelRule(
+                                        "4-Address Masking",
+                                        new ZipCodeMaskingRule()
+                                )
+
                         );
 
-        // Using Koryphe's functions/predicates
-        final SetResourcePolicyRequest koryphePolicies = new SetResourcePolicyRequest()
-                .resource(new FileResource().id(file).type("exampleObj").serialisedFormat("txt").parent(getParent(file)))
-                .policy(new Policy<ExampleObj>()
-                        .owner(alice)
-                        .recordLevelRule(
-                                "1-visibility",
-                                new TupleRule<ExampleObj>()
-                                        .selection("Record.visibility", "User.auths")
-                                        .predicate(new IsXInCollectionY()))
-                        .recordLevelRule(
-                                "2-ageOff",
-                                new TupleRule<ExampleObj>()
-                                        .selection("Record.timestamp")
-                                        .predicate(new IsMoreThan(12L))
-                        )
-                        .recordLevelRule(
-                                "3-redactProperty",
-                                new TupleRule<ExampleObj>()
-                                        .selection("User.roles", "Record.property")
-                                        .function(new If<>()
-                                                .predicate(0, new Not<>(new CollectionContains("admin")))
-                                                .then(1, new SetValue("redacted")))
-                                        .projection("User.roles", "Record.property")
-                        )
-                );
-
         final CompletableFuture<Boolean> policyStatus = services.getPolicyService().setResourcePolicy(
-                koryphePolicies
+                customPolicies
         );
         // Wait for the users and policies to be loaded
-        CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
+        CompletableFuture.allOf(userAliceStatus, userBobStatus, userEveStatus, policyStatus).join();
         LOGGER.info("The example users and data access policies have been initialised.");
+
+//        // Using Koryphe's functions/predicates
+//        final SetResourcePolicyRequest koryphePolicies = new SetResourcePolicyRequest()
+//                .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
+//                .policy(new Policy<ExampleObj>()
+//                        .owner(alice)
+//                        .recordLevelRule(
+//                                "1-visibility",
+//                                new TupleRule<ExampleObj>()
+//                                        .selection("Record.visibility", "User.auths")
+//                                        .predicate(new IsXInCollectionY()))
+//                        .recordLevelRule(
+//                                "2-ageOff",
+//                                new TupleRule<ExampleObj>()
+//                                        .selection("Record.timestamp")
+//                                        .predicate(new IsMoreThan(12L))
+//                        )
+//                        .recordLevelRule(
+//                                "3-redactProperty",
+//                                new TupleRule<ExampleObj>()
+//                                        .selection("User.roles", "Record.property")
+//                                        .function(new If<>()
+//                                                .predicate(0, new Not<>(new CollectionContains("admin")))
+//                                                .then(1, new SetValue("redacted")))
+//                                        .projection("User.roles", "Record.property")
+//                        )
+//                );
+//
+//        final CompletableFuture<Boolean> policyStatus = services.getPolicyService().setResourcePolicy(
+//                koryphePolicies
+//        );
+//        // Wait for the users and policies to be loaded
+//        CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
+//        LOGGER.info("The example users and data access policies have been initialised.");
     }
 
     private static ParentResource getParent(final String fileURL) {

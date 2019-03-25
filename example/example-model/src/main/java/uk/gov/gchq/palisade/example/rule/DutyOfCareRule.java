@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.example.rule;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.example.common.EmployeeUtils;
 import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
@@ -33,27 +34,9 @@ public class DutyOfCareRule implements Rule<Employee> {
     public DutyOfCareRule() {
     }
 
-    private Boolean isManager(final Manager[] managers, final UserId userId) {
-        if (managers == null) {
-            return false;
-        }
-
-        for (Manager manager:managers) {
-            if (manager.getUid().equals(userId)) {
-                return true;
-            }
-        }
-
-        for (Manager manager:managers) {
-            if (isManager(manager.getManager(), userId)) {
-                 return true;
-            }
-        }
-        return false;
-    }
-
     private Employee redactRecord(final Employee redactedRecord) {
         redactedRecord.setContactNumbers(null);
+        redactedRecord.setEmergencyContacts(null);
         return redactedRecord;
     }
 
@@ -71,7 +54,7 @@ public class DutyOfCareRule implements Rule<Employee> {
 
         if (roles.contains(Role.HR.name()) & purpose.equals(Purpose.DUTY_OF_CARE.name())) {
             return record;
-        } else if (isManager(managers, userId).equals(Boolean.TRUE)) {
+        } else if ((EmployeeUtils.isManager(managers, userId).equals(Boolean.TRUE)) & purpose.equals(Purpose.DUTY_OF_CARE.name())) {
             return record;
         } else {
             return redactRecord(record);

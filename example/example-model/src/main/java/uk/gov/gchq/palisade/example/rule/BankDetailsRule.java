@@ -33,6 +33,7 @@ public class BankDetailsRule implements Rule<Employee> {
 
     private Employee redactRecord(final Employee redactedRecord) {
         redactedRecord.setBankDetails(null);
+        redactedRecord.setTaxCode(null);
         return redactedRecord;
     }
 
@@ -46,7 +47,7 @@ public class BankDetailsRule implements Rule<Employee> {
         Set<String> roles = user.getRoles();
         String purpose = context.getPurpose();
 
-        if (roles.equals(Role.PAYROLL.name()) & purpose.equals(Purpose.SALARY.name())) {
+        if (roles.contains(Role.PAYROLL.name()) & purpose.equals(Purpose.SALARY.name())) {
             return record;
         }
         return redactRecord(record);
