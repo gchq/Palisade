@@ -18,7 +18,6 @@ package uk.gov.gchq.palisade.example.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.common.ExampleUsers;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
@@ -79,20 +78,15 @@ public final class ExampleConfigurator {
         // The user authorisation owner or sys admin needs to add the user
         final UserService userService = services.getUserService();
 
-        ExampleUsers users = new ExampleUsers();
-        final User alice  = users.getAlice();
-        final User bob = users.getBob();
-        final User eve = users.getEve();
-
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
-                new AddUserRequest().user(alice)
+                new AddUserRequest().user(ExampleUsers.getAlice())
         );
         final CompletableFuture<Boolean> userBobStatus = userService.addUser(
-                new AddUserRequest().user(users.getBob())
+                new AddUserRequest().user(ExampleUsers.getBob())
         );
 
         final CompletableFuture<Boolean> userEveStatus = userService.addUser(
-                new AddUserRequest().user(users.getEve())
+                new AddUserRequest().user(ExampleUsers.getEve())
         );
 
         // You can either implement the Rule interface for your Policy rules or
@@ -106,7 +100,7 @@ public final class ExampleConfigurator {
                 new SetResourcePolicyRequest()
                         .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
                         .policy(new Policy<Employee>()
-                                .owner(alice)
+                                .owner(ExampleUsers.getAlice())
                                 .recordLevelRule(
                                         "1-Bank_Details",
                                         new BankDetailsRule()

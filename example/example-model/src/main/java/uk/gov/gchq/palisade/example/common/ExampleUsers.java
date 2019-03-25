@@ -30,14 +30,14 @@ public final class ExampleUsers {
         return (alice);
     }
 
-    public User getBob() {
+    public static User getBob() {
         final User bob = new User().userId("Bob")
                 .auths("public")
                 .roles(Role.ESTATES.name());
         return (bob);
     }
 
-    public User getEve() {
+    public static User getEve() {
         final User eve = new User().userId("Eve")
                 .auths("public")
                 .roles(Role.IT.name());
