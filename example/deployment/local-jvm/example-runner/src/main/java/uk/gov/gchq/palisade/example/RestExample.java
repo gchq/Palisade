@@ -24,8 +24,8 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.common.ExampleUsers;
 import uk.gov.gchq.palisade.example.common.Purpose;
-import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
@@ -40,7 +40,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
-import static uk.gov.gchq.palisade.example.common.Purpose.DUTY_OF_CARE;
 
 public class RestExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestExample.class);
@@ -80,21 +79,10 @@ public class RestExample {
 
         final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 
-
-        final User alice = new User()
-                .userId("Alice")
-                .auths("public", "private")
-                .roles(Role.HR.name(), Role.PAYROLL.name());
-
-        final User bob = new User()
-                .userId("Bob")
-                .auths("public")
-                .roles(Role.ESTATES.name());
-
-        final User eve = new User()
-                .userId("Eve")
-                .auths("public")
-                .roles(Role.IT.name());
+        ExampleUsers users = new ExampleUsers();
+        final User alice  = users.getAlice();
+        final User bob = users.getBob();
+        final User eve = users.getEve();
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of SALARY...");

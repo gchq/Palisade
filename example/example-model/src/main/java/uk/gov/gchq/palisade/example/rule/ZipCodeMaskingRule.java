@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.example.rule;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.example.common.EmployeeUtils;
 import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Address;
@@ -49,25 +50,6 @@ public class ZipCodeMaskingRule implements Rule<Employee> {
         return maskedRecord;
     }
 
-    private Boolean isManager(final Manager[] managers, final UserId userId) {
-        if (managers == null) {
-            return false;
-        }
-
-        for (Manager manager:managers) {
-            if (manager.getUid().equals(userId)) {
-                return true;
-            }
-        }
-
-        for (Manager manager:managers) {
-            if (isManager(manager.getManager(), userId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public Employee apply(final Employee record, final User user, final Context context) {
         if (null == record) {
             return null;
@@ -83,7 +65,9 @@ public class ZipCodeMaskingRule implements Rule<Employee> {
             return record;
         }
 
-        if ((isManager(managers, userId).equals(Boolean.TRUE)) & purpose.equals(Purpose.DUTY_OF_CARE.name())) {
+        EmployeeUtils empUtils = new EmployeeUtils();
+
+        if ((empUtils.isManager(managers, userId).equals(Boolean.TRUE)) & purpose.equals(Purpose.DUTY_OF_CARE.name())) {
             return record;
         }
 

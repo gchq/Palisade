@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
+import uk.gov.gchq.palisade.example.common.ExampleUsers;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.rule.BankDetailsRule;
 import uk.gov.gchq.palisade.example.rule.DutyOfCareRule;
@@ -78,30 +79,20 @@ public final class ExampleConfigurator {
         // The user authorisation owner or sys admin needs to add the user
         final UserService userService = services.getUserService();
 
-        final User alice = new User()
-                .userId("Alice")
-                .auths("public", "private")
-                .roles("HR", "PAYROLL");
+        ExampleUsers users = new ExampleUsers();
+        final User alice  = users.getAlice();
+        final User bob = users.getBob();
+        final User eve = users.getEve();
 
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest().user(alice)
         );
         final CompletableFuture<Boolean> userBobStatus = userService.addUser(
-                new AddUserRequest().user(
-                        new User()
-                                .userId("Bob")
-                                .auths("public")
-                                .roles("ESTATES")
-                )
+                new AddUserRequest().user(users.getBob())
         );
 
         final CompletableFuture<Boolean> userEveStatus = userService.addUser(
-                new AddUserRequest().user(
-                        new User()
-                                .userId("Eve")
-                                .auths("public")
-                                .roles("IT")
-                )
+                new AddUserRequest().user(users.getEve())
         );
 
         // You can either implement the Rule interface for your Policy rules or
