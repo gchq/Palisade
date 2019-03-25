@@ -20,10 +20,10 @@ import uk.gov.gchq.palisade.User;
 
 public final class ExampleUsers {
 
-    public ExampleUsers() {
+    private ExampleUsers() {
     }
 
-    public User getAlice() {
+    public static User getAlice() {
         final User alice = new User().userId("Alice")
                 .auths("public", "private")
                 .roles(Role.HR.name(), Role.PAYROLL.name());

@@ -21,10 +21,10 @@ import uk.gov.gchq.palisade.example.hrdatagenerator.types.Manager;
 
 public final class EmployeeUtils {
 
-    public EmployeeUtils() {
+    private EmployeeUtils() {
     }
 
-    public Boolean isManager(final Manager[] managers, final UserId userId) {
+    public static Boolean isManager(final Manager[] managers, final UserId userId) {
         if (managers == null) {
             return false;
         }
