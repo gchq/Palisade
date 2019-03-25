@@ -341,7 +341,7 @@ public class SimpleCacheService implements CacheService {
 
         int len = request.getServiceStringForm().length();
 
-        //get from add
+        //get from cache
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("-> Backing store list {}", baseKey);
 
