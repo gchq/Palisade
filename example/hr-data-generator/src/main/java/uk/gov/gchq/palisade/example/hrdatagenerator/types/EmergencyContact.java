@@ -27,16 +27,16 @@ public class EmergencyContact {
     private static final Relation[] MALE_RELATIONS = new Relation[]{Relation.BROTHER, Relation.FATHER, Relation.GRANDFATHER, Relation.SON};
     private static final Relation[] FEMALE_RELATIONS = new Relation[]{Relation.DAUGHTER, Relation.GRANDMOTHER, Relation.MOTHER, Relation.SISTER};
 
-    private Name contactName;
+    private String contactName;
     private Relation relation;
     private PhoneNumber[] contactNumbers;
 
     public static EmergencyContact generate(final Random random, final NameGenerator nameGenerator) {
         EmergencyContact contact = new EmergencyContact();
-        Name name = nameGenerator.generateName();
-        contact.setContactName(name);
+        Name tempName = nameGenerator.generateName();
+        contact.setContactName(tempName.toString());
         Relation[] relations;
-        if (name.getGender().equals(Gender.MALE)) {
+        if (tempName.getGender().equals(Gender.MALE)) {
             relations = MALE_RELATIONS;
         } else {
             relations = FEMALE_RELATIONS;
@@ -57,12 +57,12 @@ public class EmergencyContact {
         return emergencyContacts;
     }
 
-    public Name getContactName() {
+    public String getContactName() {
 
         return contactName;
     }
 
-    public void setContactName(final Name contactName) {
+    public void setContactName(final String contactName) {
         this.contactName = contactName;
     }
 
