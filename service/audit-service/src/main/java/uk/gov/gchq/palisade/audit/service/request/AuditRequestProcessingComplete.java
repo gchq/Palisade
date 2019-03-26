@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Crown Copyright
+ * Copyright 2019 Crown Copyright
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -23,27 +22,27 @@ import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.service.request.Request;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * This is the abstract class that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
- * to be able to store an audit record. The default information is what resources
- * was being accessed.
+ * This is one of the objects that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
+ * to be able to store an audit record. This class extends {@link AuditRequest} This class
+ * is used for the indication to the Audit logs that processing has been completed.
  */
-public abstract class AuditRequest extends Request {
-    private Context context;
+public class AuditRequestProcessingComplete extends AuditRequest {
+    private User user;
+    RequestId requestId;
 
-    // no-arg constructor required
-    public AuditRequest() {
+    public AuditRequestProcessingComplete() {
     }
 
-    /**
-     * @return the {@String auditLog}
-     */
-    public abstract String constructAuditLog();
+    @Override
+    public String constructAuditLog() {
+        final String msg = "AuditRequestProcessingComplete: " + getUser().getUserId().getId()
+                + "' accessed '" + getRequestId().getId();
+        return msg;
+    }
 
     /**
      * @param <T>     {@link AuditRequest} derived class from AuditRequest used for chaining
@@ -53,18 +52,7 @@ public abstract class AuditRequest extends Request {
      */
     public <T extends AuditRequest> T context(final Context context) {
         requireNonNull(context, "The context cannot be set to null.");
-        this.context = context;
-        return (T) this;
-    }
-
-    /**
-     * @param <T> {@link AuditRequest} derived class from AuditRequest used for chaining
-     * @param ex  {@link Throwable} is the exception thrown
-     * @return the {@link AuditRequest}
-     */
-    public <T extends AuditRequest> T exception(final Throwable ex) {
-        //can be null
-        return (T) this;
+        return super.context(context);
     }
 
     /**
@@ -73,8 +61,9 @@ public abstract class AuditRequest extends Request {
      * @return the {@link AuditRequest}
      */
     public <T extends AuditRequest> T user(final User user) {
-        //can be null
-        return (T) this;
+        requireNonNull(user, "The user cannot be set to null.");
+        this.user = user;
+        return super.user(user);
     }
 
     /**
@@ -83,36 +72,19 @@ public abstract class AuditRequest extends Request {
      * @return the {@link AuditRequest}
      */
     public <T extends AuditRequest> T requestId(final RequestId requestId) {
-        //can be null
-        return (T) this;
+        requireNonNull(requestId, "The requestId cannot be set to null.");
+        this.requestId = requestId;
+        return super.user(user);
     }
 
-    /**
-     * @param <T>      {@link AuditRequest} derived class from AuditRequest used for chaining
-     * @param resource {@link LeafResource} which contains the relevant
-     *                 details about the resource being accessed
-     * @return the {@link AuditRequest}
-     */
-    public <T extends AuditRequest> T resource(final LeafResource resource) {
-        //can be null
-        return (T) this;
+    public RequestId getRequestId() {
+        requireNonNull(requestId, "The requestId has not been set.");
+        return requestId;
     }
 
-    /**
-     * @param <T>               {@link AuditRequest} derived class from AuditRequest used for chaining
-     * @param howItWasProcessed {@link String} is an explanation of what
-     *                          filtering/transformations are being applied to
-     *                          the data returned to the user
-     * @return the {@link AuditRequest}
-     */
-    public <T extends AuditRequest> T howItWasProcessed(final String howItWasProcessed) {
-        //can be null
-        return (T) this;
-    }
-
-    public Context getContext() {
-        requireNonNull(context, "The context has not been set.");
-        return context;
+    public User getUser() {
+        requireNonNull(user, "The user has not been set.");
+        return user;
     }
 
     @Override
@@ -123,18 +95,20 @@ public abstract class AuditRequest extends Request {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final AuditRequest that = (AuditRequest) o;
+        final AuditRequestProcessingComplete that = (AuditRequestProcessingComplete) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(context, that.context)
+                .append(user, that.user)
+                .append(requestId, that.requestId)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(19, 37)
+        return new HashCodeBuilder(20, 39)
                 .appendSuper(super.hashCode())
-                .append(context)
+                .append(user)
+                .append(requestId)
                 .toHashCode();
     }
 
@@ -142,7 +116,8 @@ public abstract class AuditRequest extends Request {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("purpose", context)
+                .append("user", user)
+                .append("requestId", requestId)
                 .toString();
     }
 

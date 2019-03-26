@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Crown Copyright
+ * Copyright 2019 Crown Copyright
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,37 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.Context;
-import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.service.request.Request;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * This is the abstract class that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
- * to be able to store an audit record. The default information is what resources
- * was being accessed.
+ * This is one of the objects that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
+ * to be able to store an audit record. This class extends {@link AuditRequest} This class
+ * is used for the indication to the Audit logs that processing is started.
  */
-public abstract class AuditRequest extends Request {
-    private Context context;
+public class AuditRequestProcessingStarted extends AuditRequest {
+    private User user;
+    private LeafResource leafResource;
+    private String howItWasProcessed;
 
-    // no-arg constructor required
-    public AuditRequest() {
+    public AuditRequestProcessingStarted() {
     }
 
-    /**
-     * @return the {@String auditLog}
-     */
-    public abstract String constructAuditLog();
+    @Override
+    public String constructAuditLog() {
+        final String msg = "AuditRequestProcessingStarted: " + getUser().getUserId().getId()
+                + "' accessed '" + getLeafResource().getId()
+                + "' for '" + getContext().getPurpose()
+                + "' and it was processed using '" + getHowItWasProcessed();
+        return msg;
+    }
 
     /**
      * @param <T>     {@link AuditRequest} derived class from AuditRequest used for chaining
@@ -53,18 +55,7 @@ public abstract class AuditRequest extends Request {
      */
     public <T extends AuditRequest> T context(final Context context) {
         requireNonNull(context, "The context cannot be set to null.");
-        this.context = context;
-        return (T) this;
-    }
-
-    /**
-     * @param <T> {@link AuditRequest} derived class from AuditRequest used for chaining
-     * @param ex  {@link Throwable} is the exception thrown
-     * @return the {@link AuditRequest}
-     */
-    public <T extends AuditRequest> T exception(final Throwable ex) {
-        //can be null
-        return (T) this;
+        return super.context(context);
     }
 
     /**
@@ -73,18 +64,9 @@ public abstract class AuditRequest extends Request {
      * @return the {@link AuditRequest}
      */
     public <T extends AuditRequest> T user(final User user) {
-        //can be null
-        return (T) this;
-    }
-
-    /**
-     * @param <T>       {@link AuditRequest} derived class from AuditRequest used for chaining
-     * @param requestId {@link RequestId} is the requestId for this resource
-     * @return the {@link AuditRequest}
-     */
-    public <T extends AuditRequest> T requestId(final RequestId requestId) {
-        //can be null
-        return (T) this;
+        requireNonNull(user, "The user type cannot be null");
+        this.user = user;
+        return super.user(user);
     }
 
     /**
@@ -94,8 +76,9 @@ public abstract class AuditRequest extends Request {
      * @return the {@link AuditRequest}
      */
     public <T extends AuditRequest> T resource(final LeafResource resource) {
-        //can be null
-        return (T) this;
+        requireNonNull(resource, "The leaf resource type cannot be null");
+        this.leafResource = resource;
+        return super.resource(resource);
     }
 
     /**
@@ -106,13 +89,36 @@ public abstract class AuditRequest extends Request {
      * @return the {@link AuditRequest}
      */
     public <T extends AuditRequest> T howItWasProcessed(final String howItWasProcessed) {
-        //can be null
-        return (T) this;
+        requireNonNull(user, "The howItWasProcessed type cannot be null");
+        this.howItWasProcessed = howItWasProcessed;
+        return super.howItWasProcessed(howItWasProcessed);
     }
 
-    public Context getContext() {
-        requireNonNull(context, "The context has not been set.");
-        return context;
+    public User getUser() {
+        requireNonNull(user, "The user has not been set.");
+        return user;
+    }
+
+    public void setUser(final User user) {
+        this.user = user;
+    }
+
+    public LeafResource getLeafResource() {
+        requireNonNull(leafResource, "The leafResource has not been set.");
+        return leafResource;
+    }
+
+    public void setLeafResource(final LeafResource leafResource) {
+        this.leafResource = leafResource;
+    }
+
+    public String getHowItWasProcessed() {
+        requireNonNull(howItWasProcessed, "The howItWasProcessed has not been set.");
+        return howItWasProcessed;
+    }
+
+    public void setHowItWasProcessed(final String howItWasProcessed) {
+        this.howItWasProcessed = howItWasProcessed;
     }
 
     @Override
@@ -123,18 +129,22 @@ public abstract class AuditRequest extends Request {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final AuditRequest that = (AuditRequest) o;
+        final AuditRequestProcessingStarted that = (AuditRequestProcessingStarted) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(context, that.context)
+                .append(user, that.user)
+                .append(leafResource, that.leafResource)
+                .append(howItWasProcessed, that.howItWasProcessed)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(19, 37)
+        return new HashCodeBuilder(20, 39)
                 .appendSuper(super.hashCode())
-                .append(context)
+                .append(user)
+                .append(leafResource)
+                .append(howItWasProcessed)
                 .toHashCode();
     }
 
@@ -142,7 +152,9 @@ public abstract class AuditRequest extends Request {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("purpose", context)
+                .append("user", user)
+                .append("leafResource", leafResource)
+                .append("howItWasProcessed", howItWasProcessed)
                 .toString();
     }
 
