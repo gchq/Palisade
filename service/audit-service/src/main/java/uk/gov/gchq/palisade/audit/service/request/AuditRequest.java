@@ -41,7 +41,7 @@ public abstract class AuditRequest extends Request {
     }
 
     /**
-     * @return the {@String auditLog}
+     * @return the auditLog representation of this class
      */
     public abstract String constructAuditLog();
 
