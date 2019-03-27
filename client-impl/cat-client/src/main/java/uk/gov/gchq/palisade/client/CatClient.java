@@ -74,12 +74,8 @@ public class CatClient {
                     .resource(entry.getKey());
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
-            final CompletableFuture<InputStream> futureResult = futureResponse.thenApply(
-                    response -> response.getData()
-            );
+            final CompletableFuture<InputStream> futureResult = futureResponse.thenApply(ReadResponse::getData);
             new BufferedReader(new InputStreamReader(futureResult.join())).lines().forEachOrdered(System.out::println);
-
         }
     }
-
 }
