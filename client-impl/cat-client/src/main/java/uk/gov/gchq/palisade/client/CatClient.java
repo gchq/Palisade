@@ -30,12 +30,15 @@ import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
+import java.util.concurrent.ExecutionException;
 
 public class CatClient {
 
@@ -46,7 +49,7 @@ public class CatClient {
         this.palisadeService = palisadeService;
     }
 
-    public static void main(final String[] args) throws InterruptedException {
+    public static void main(final String[] args) throws InterruptedException, ExecutionException {
         String userId = args[0];
         String filename = args[1];
         String purpose = args[2];
@@ -55,13 +58,13 @@ public class CatClient {
 
         PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
 
-        new CatClient(palisade).read(filename, userId, purpose).forEachOrdered(System.out::println);
+        new CatClient(palisade).read(filename, userId, purpose);
     }
 
-    public Stream read(final String filename, final String userId, final String purpose) {
+    private void read(final String filename, final String userId, final String purpose) throws ExecutionException, InterruptedException {
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
-        final List<CompletableFuture<Stream>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
+        final List<CompletableFuture<InputStream>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
@@ -71,13 +74,12 @@ public class CatClient {
                     .resource(entry.getKey());
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
-            final CompletableFuture<Stream> futureResult = futureResponse.thenApply(
-                    response -> (Stream) response.getData()
+            final CompletableFuture<InputStream> futureResult = futureResponse.thenApply(
+                    response -> response.getData()
             );
-            futureResults.add(futureResult);
-        }
+            new BufferedReader(new InputStreamReader(futureResult.join())).lines().forEachOrdered(System.out::println);
 
-        return futureResults.stream().flatMap(CompletableFuture::join);
+        }
     }
 
 }

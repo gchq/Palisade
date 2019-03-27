@@ -25,7 +25,6 @@
     </parent>
 
     <artifactId>core-rest-service</artifactId>
-    <packaging>war</packaging>
 
     <properties>
         <standalone-path>rest</standalone-path>
