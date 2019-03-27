@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Crown Copyright
+ * Copyright 2019 Crown Copyright
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.common;
+package uk.gov.gchq.palisade;
 
-public enum Role {
-    PAYROLL,
-    HR,
-    ESTATES,
-    IT
+public enum AuditType {
+    DATA_REQUEST_RECEIVED,
+    DATA_READ_REQUEST_FAILED,
+    DATA_READ_REQUEST_SUCCESSFUL;
 }

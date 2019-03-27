@@ -29,6 +29,7 @@ import org.junit.Test;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.util.JsonAssert;
+import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -146,7 +147,7 @@ public class AvroSerialiserTest {
         // Then
         JsonAssert.assertEquals(String.format("{%n" +
                 "  \"domainClass\" : \"java.lang.Integer\",%n" +
-                "  \"class\" : \"uk.gov.gchq.palisade.data.service.impl.serialiser.AvroSerialiser\"%n" +
+                "  \"class\" : \"uk.gov.gchq.palisade.data.serialise.AvroSerialiser\"%n" +
                 "}").getBytes(), json);
         assertEquals(AvroSerialiser.class, deserialised.getClass());
         assertEquals(serialiser.getDomainClass(), ((AvroSerialiser) deserialised).getDomainClass());

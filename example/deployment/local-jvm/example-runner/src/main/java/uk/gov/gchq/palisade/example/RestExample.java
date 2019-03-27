@@ -20,15 +20,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.ConfigConsts;
+import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.common.ExampleUsers;
+import uk.gov.gchq.palisade.example.common.Purpose;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.util.StreamUtil;
+
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -42,7 +47,7 @@ public class RestExample {
     public static void main(final String[] args) throws Exception {
         if (args.length < 1) {
             System.out.printf("Usage: %s file\n", RestExample.class.getTypeName());
-            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
+            System.out.println("\nfile\tfile containing serialised Employee instances to read");
             System.exit(1);
         }
 
@@ -57,17 +62,44 @@ public class RestExample {
 
         final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 
+        final User alice  = ExampleUsers.getAlice();
+        final User bob = ExampleUsers.getBob();
+        final User eve = ExampleUsers.getEve();
+
         LOGGER.info("");
-        LOGGER.info("Alice is reading file1...");
-        final Stream<ExampleObj> aliceResults = client.read(sourceFile, "Alice", "Payroll");
+        LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of SALARY...");
+        final Stream<Employee> aliceResults = client.read(sourceFile, "Alice", Purpose.SALARY.name());
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
-        LOGGER.info("Bob is reading file1...");
-        final Stream<ExampleObj> bobResults = client.read(sourceFile, "Bob", "Payroll");
-        LOGGER.info("Bob got back: ");
-        bobResults.map(Object::toString).forEach(LOGGER::info);
+        LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of DUTY_OF_CARE...");
+        final Stream<Employee> aliceResults2 = client.read(sourceFile, "Alice", Purpose.DUTY_OF_CARE.name());
+        LOGGER.info("Alice got back: ");
+        aliceResults2.map(Object::toString).forEach(LOGGER::info);
 
+        LOGGER.info("");
+        LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of STAFF_REPORT...");
+        final Stream<Employee> aliceResults3 = client.read(sourceFile, "Alice", Purpose.STAFF_REPORT.name());
+        LOGGER.info("Alice got back: ");
+        aliceResults3.map(Object::toString).forEach(LOGGER::info);
+
+        LOGGER.info("");
+        LOGGER.info("Bob [ " + bob.toString() + " } is reading the Employee file with a purpose of DUTY_OF_CARE...");
+        final Stream<Employee> bobResults1 = client.read(sourceFile, "Bob", Purpose.DUTY_OF_CARE.name());
+        LOGGER.info("Bob got back: ");
+        bobResults1.map(Object::toString).forEach(LOGGER::info);
+
+        LOGGER.info("");
+        LOGGER.info("Bob [ " + bob.toString() + " } is reading the Employee file with a purpose that is empty...");
+        final Stream<Employee> bobResults2 = client.read(sourceFile, "Bob", "");
+        LOGGER.info("Bob got back: ");
+        bobResults2.map(Object::toString).forEach(LOGGER::info);
+
+        LOGGER.info("");
+        LOGGER.info("Eve [ " + eve.toString() + " } is reading the Employee file with a purpose that is empty...");
+        final Stream<Employee> eveResults1 = client.read(sourceFile, "Eve", "");
+        LOGGER.info("Eve got back: ");
+        eveResults1.map(Object::toString).forEach(LOGGER::info);
     }
 }

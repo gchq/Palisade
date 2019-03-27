@@ -17,22 +17,22 @@
 package uk.gov.gchq.palisade.example.client;
 
 import uk.gov.gchq.palisade.client.SimpleClient;
-import uk.gov.gchq.palisade.example.ExampleObj;
+import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.example.config.ServicesConfigurator;
-import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 import uk.gov.gchq.palisade.service.PalisadeService;
 
 import java.net.URI;
 import java.util.stream.Stream;
 
-public class ExampleSimpleClient extends SimpleClient<ExampleObj> {
+public class ExampleSimpleClient extends SimpleClient<Employee> {
 
     public ExampleSimpleClient(final PalisadeService palisadeService) {
-        super(palisadeService, new ExampleObjSerialiser());
+        super(palisadeService, new AvroSerialiser<>(Employee.class));
     }
 
-    public Stream<ExampleObj> read(final String filename, final String userId, final String purpose) {
+    public Stream<Employee> read(final String filename, final String userId, final String purpose) {
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(filename);
         String absoluteFile = absoluteFileURI.toString();
         return super.read(absoluteFile, ServicesConfigurator.RESOURCE_TYPE, userId, purpose);
