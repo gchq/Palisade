@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class CatClient {
 
@@ -49,7 +48,7 @@ public class CatClient {
         this.palisadeService = palisadeService;
     }
 
-    public static void main(final String[] args) throws InterruptedException, ExecutionException {
+    public static void main(final String[] args) throws InterruptedException {
         String userId = args[0];
         String filename = args[1];
         String purpose = args[2];
@@ -61,7 +60,7 @@ public class CatClient {
         new CatClient(palisade).read(filename, userId, purpose);
     }
 
-    private void read(final String filename, final String userId, final String purpose) throws ExecutionException, InterruptedException {
+    private void read(final String filename, final String userId, final String purpose) {
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
         final List<CompletableFuture<InputStream>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());

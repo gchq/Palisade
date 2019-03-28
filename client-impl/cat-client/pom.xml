@@ -49,6 +49,7 @@
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>core-rest-service</artifactId>
             <version>${project.parent.version}</version>
+            <classifier>classes</classifier>
             <scope>compile</scope>
         </dependency>
         <dependency>
