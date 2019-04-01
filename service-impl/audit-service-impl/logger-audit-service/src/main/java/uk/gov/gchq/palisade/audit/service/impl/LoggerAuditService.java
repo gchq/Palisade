@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.AuditRequestWithException;
+import uk.gov.gchq.palisade.audit.service.request.ExceptionAuditRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.ServiceState;
 
@@ -44,7 +44,7 @@ public class LoggerAuditService implements AuditService {
     public CompletableFuture<Boolean> audit(final AuditRequest request) {
         requireNonNull(request, "The audit request can not be null.");
         final String msg = request.constructAuditLog();
-        if (request instanceof AuditRequestWithException) {
+        if (request instanceof ExceptionAuditRequest) {
             LOGGER.error(msg);
         } else {
             LOGGER.info(msg);

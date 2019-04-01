@@ -18,7 +18,6 @@ package uk.gov.gchq.palisade.audit.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -30,68 +29,53 @@ import static java.util.Objects.requireNonNull;
  * to be able to store an audit record. This class extends {@link AuditRequest} This class
  * is used for the indication to the Audit logs that processing is started.
  */
-public class AuditRequestProcessingStarted extends AuditRequest {
+public class ProcessingStartedAuditRequest extends AuditRequestWithContext {
     private User user;
     private LeafResource leafResource;
     private String howItWasProcessed;
 
-    public AuditRequestProcessingStarted() {
+    public ProcessingStartedAuditRequest() {
     }
 
     @Override
     public String constructAuditLog() {
-        final String msg = "AuditRequestProcessingStarted: " + getUser().getUserId().getId()
+        final String msg = super.constructAuditLog() + "AuditRequestProcessingStarted: " + user.toString()
                 + "' accessed '" + getLeafResource().getId()
-                + "' for '" + getContext().getPurpose()
                 + "' and it was processed using '" + getHowItWasProcessed();
         return msg;
     }
 
     /**
-     * @param <T>     {@link AuditRequest} derived class from AuditRequest used for chaining
-     * @param context {@link Context} is the reason for the
-     *                user accessing the resource
-     * @return the {@link AuditRequest}
-     */
-    public <T extends AuditRequest> T context(final Context context) {
-        requireNonNull(context, "The context cannot be set to null.");
-        return super.context(context);
-    }
-
-    /**
-     * @param <T>  {@link AuditRequest} derived class from AuditRequest used for chaining
      * @param user {@link User} is the user for this resource
      * @return the {@link AuditRequest}
      */
-    public <T extends AuditRequest> T user(final User user) {
+    public ProcessingStartedAuditRequest user(final User user) {
         requireNonNull(user, "The user type cannot be null");
         this.user = user;
-        return super.user(user);
+        return this;
     }
 
     /**
-     * @param <T>      {@link AuditRequest} derived class from AuditRequest used for chaining
      * @param resource {@link LeafResource} which contains the relevant
      *                 details about the resource being accessed
      * @return the {@link AuditRequest}
      */
-    public <T extends AuditRequest> T resource(final LeafResource resource) {
+    public ProcessingStartedAuditRequest resource(final LeafResource resource) {
         requireNonNull(resource, "The leaf resource type cannot be null");
         this.leafResource = resource;
-        return super.resource(resource);
+        return this;
     }
 
     /**
-     * @param <T>               {@link AuditRequest} derived class from AuditRequest used for chaining
      * @param howItWasProcessed {@link String} is an explanation of what
      *                          filtering/transformations are being applied to
      *                          the data returned to the user
      * @return the {@link AuditRequest}
      */
-    public <T extends AuditRequest> T howItWasProcessed(final String howItWasProcessed) {
+    public ProcessingStartedAuditRequest howItWasProcessed(final String howItWasProcessed) {
         requireNonNull(user, "The howItWasProcessed type cannot be null");
         this.howItWasProcessed = howItWasProcessed;
-        return super.howItWasProcessed(howItWasProcessed);
+        return this;
     }
 
     public User getUser() {
@@ -129,7 +113,7 @@ public class AuditRequestProcessingStarted extends AuditRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final AuditRequestProcessingStarted that = (AuditRequestProcessingStarted) o;
+        final ProcessingStartedAuditRequest that = (ProcessingStartedAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(user, that.user)

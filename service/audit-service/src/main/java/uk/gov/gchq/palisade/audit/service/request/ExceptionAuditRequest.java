@@ -18,9 +18,7 @@ package uk.gov.gchq.palisade.audit.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.User;
 
 import static java.util.Objects.requireNonNull;
 
@@ -29,56 +27,30 @@ import static java.util.Objects.requireNonNull;
  * to be able to store an audit record. This class extends {@link AuditRequest} This class
  * is used for the indication to the Audit logs that an exception has been received.
  */
-public class AuditRequestWithException extends AuditRequest {
+public class ExceptionAuditRequest extends AuditRequestWithContext {
     private Throwable exception;
-    private User user;
 
-    public AuditRequestWithException() {
+    public ExceptionAuditRequest() {
     }
 
     @Override
     public String constructAuditLog() {
-        final String msg = "AuditRequestWithException: " + getUser().getUserId().getId()
+        final String msg = "" + super.constructAuditLog() + "AuditRequestWithException: "
                 + "' generated an exception '" + exception.getMessage();
         return msg;
     }
 
-    public void setException(final Throwable exception) {
-        this.exception = exception;
-    }
 
     /**
-     * @param <T>     {@link AuditRequest} derived class from AuditRequest used for chaining
-     * @param context {@link Context} is the reason for the
-     *                user accessing the resource
-     * @return the {@link AuditRequest}
+     * @param ex {@link Throwable} is the type of the exception while processing
+     * @return the {@link ExceptionAuditRequest}
      */
-    public <T extends AuditRequest> T context(final Context context) {
-        requireNonNull(context, "The context cannot be set to null.");
-        return super.context(context);
-    }
-
-    /**
-     * @param <T> {@link AuditRequest} derived class from AuditRequest used for chaining
-     * @param ex  {@link Throwable} is the type of the exception while processing
-     * @return the {@link AuditRequestWithException}
-     */
-    public <T extends AuditRequest> T exception(final Throwable ex) {
+    public ExceptionAuditRequest exception(final Throwable ex) {
         requireNonNull(exception, "The exception type cannot be null");
         this.exception = exception;
-        return super.exception(ex);
+        return this;
     }
 
-    /**
-     * @param <T>  {@link AuditRequest} derived class from AuditRequest used for chaining
-     * @param user {@link User} is the User performing the processing
-     * @return the {@link AuditRequestWithException}
-     */
-    public <T extends AuditRequest> T user(final User user) {
-        requireNonNull(user, "The user type cannot be null");
-        this.user = user;
-        return super.user(user);
-    }
 
     @Override
     public boolean equals(final Object o) {
@@ -88,11 +60,10 @@ public class AuditRequestWithException extends AuditRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final AuditRequestWithException that = (AuditRequestWithException) o;
+        final ExceptionAuditRequest that = (ExceptionAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(exception, that.exception)
-                .append(user, that.user)
                 .isEquals();
     }
 
@@ -101,7 +72,6 @@ public class AuditRequestWithException extends AuditRequest {
         return new HashCodeBuilder(20, 39)
                 .appendSuper(super.hashCode())
                 .append(exception)
-                .append(user)
                 .toHashCode();
     }
 
@@ -110,7 +80,6 @@ public class AuditRequestWithException extends AuditRequest {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("exception", exception)
-                .append("user", user)
                 .toString();
     }
 
@@ -118,10 +87,4 @@ public class AuditRequestWithException extends AuditRequest {
         requireNonNull(exception, "The exception type cannot be null");
         return exception;
     }
-
-    public User getUser() {
-        requireNonNull(user, "The user type cannot be null");
-        return user;
-    }
-
 }

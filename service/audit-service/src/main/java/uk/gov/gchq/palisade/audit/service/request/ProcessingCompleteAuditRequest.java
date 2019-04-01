@@ -18,37 +18,24 @@ package uk.gov.gchq.palisade.audit.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * This is one of the objects that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
  * to be able to store an audit record. This class extends {@link AuditRequest} This class
- * is used for the indication to the Audit logs that a processing request has been received.
+ * is used for the indication to the Audit logs that processing has been completed.
  */
-public class AuditRequestReceived extends AuditRequest {
+public class ProcessingCompleteAuditRequest extends AuditRequestWithContext {
 
-    public AuditRequestReceived() {
+    public ProcessingCompleteAuditRequest() {
     }
 
     @Override
     public String constructAuditLog() {
-        final String msg = "AuditRequestReceived: " + getContext().toString();
+        final String msg = "" + super.constructAuditLog() + "ProcessingCompleteAuditRequest: ";
         return msg;
     }
 
-    /**
-     * @param <T>     {@link AuditRequest} derived class from AuditRequest used for chaining
-     * @param context {@link Context} is the reason for the
-     *                user accessing the resource
-     * @return the {@link AuditRequest}
-     */
-    public <T extends AuditRequest> T context(final Context context) {
-        requireNonNull(context, "The context cannot be set to null.");
-        return super.context(context);
-    }
 
     @Override
     public boolean equals(final Object o) {
@@ -58,7 +45,7 @@ public class AuditRequestReceived extends AuditRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final AuditRequestReceived that = (AuditRequestReceived) o;
+        final ProcessingCompleteAuditRequest that = (ProcessingCompleteAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .isEquals();
