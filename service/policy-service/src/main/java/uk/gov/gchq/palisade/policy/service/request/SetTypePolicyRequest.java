@@ -18,8 +18,10 @@ package uk.gov.gchq.palisade.policy.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -72,6 +74,18 @@ public class SetTypePolicyRequest extends Request {
 
     public void setPolicy(final Policy policy) {
         policy(policy);
+    }
+
+    @JsonIgnore
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+        throw new ForbiddenException("Should not call SetTypePolicyRequest.setOriginalRequestId()");
+    }
+
+    @JsonIgnore
+    @Override
+    public String getOriginalRequestId() {
+        throw new ForbiddenException("Should not call SetTypePolicyRequest.getOriginalRequestId()");
     }
 
     @Override

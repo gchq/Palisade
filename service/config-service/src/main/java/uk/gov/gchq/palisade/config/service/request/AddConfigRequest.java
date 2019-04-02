@@ -20,6 +20,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.ServiceState;
 
 import static java.util.Objects.requireNonNull;
@@ -78,14 +79,14 @@ public class AddConfigRequest extends GetConfigRequest {
     @JsonIgnore
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
+        throw new ForbiddenException("Should not call AddConfigRequest.setOriginalRequestId()");
     }
 
     @JsonIgnore
     @Override
     public String getOriginalRequestId() {
-        return "not used";
+        throw new ForbiddenException("Should not call AddConfigRequest.getOriginalRequestId()");
     }
-
 
     @Override
     public String toString() {

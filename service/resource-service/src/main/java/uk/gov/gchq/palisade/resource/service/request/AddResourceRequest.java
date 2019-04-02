@@ -18,8 +18,10 @@ package uk.gov.gchq.palisade.resource.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
@@ -64,6 +66,22 @@ public class AddResourceRequest extends Request {
 
     public void setResource(final LeafResource resource) {
         resource(resource);
+    }
+
+    @JsonIgnore
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+        ForbiddenException forbiddenException = new ForbiddenException("Should not call AddResourceRequest.setOriginalRequestId()");
+        forbiddenException.printStackTrace();
+        throw forbiddenException;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getOriginalRequestId() {
+        ForbiddenException forbiddenException = new ForbiddenException("Should not call AddResourceRequest.getOriginalRequestId()");
+        forbiddenException.printStackTrace();
+        throw forbiddenException;
     }
 
     public ConnectionDetail getConnectionDetail() {

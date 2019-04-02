@@ -182,7 +182,9 @@ public class HadoopFileResourceServiceTest {
         ), simpleType);
 
         //when
-        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hadoopService.getResourcesByType(new GetResourcesByTypeRequest().type(TYPE_VALUE));
+        GetResourcesByTypeRequest getResourcesByTypeRequest = new GetResourcesByTypeRequest().type(TYPE_VALUE);
+        getResourcesByTypeRequest.setOriginalRequestId("test shouldGetResourcesByType");
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hadoopService.getResourcesByType(getResourcesByTypeRequest);
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -221,7 +223,9 @@ public class HadoopFileResourceServiceTest {
         ), simpleType);
 
         //when
-        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hadoopService.getResourcesBySerialisedFormat(new GetResourcesBySerialisedFormatRequest().serialisedFormat(FORMAT_VALUE));
+        GetResourcesBySerialisedFormatRequest getResourcesBySerialisedFormatRequest = new GetResourcesBySerialisedFormatRequest().serialisedFormat(FORMAT_VALUE);
+        getResourcesBySerialisedFormatRequest.setOriginalRequestId("test shouldGetResourcesByFormat");
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hadoopService.getResourcesBySerialisedFormat(getResourcesBySerialisedFormatRequest);
 
         //then
         assertEquals(expected, resourcesById.join());
@@ -244,7 +248,9 @@ public class HadoopFileResourceServiceTest {
                 )
         ), simpleType);
         //when
-        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hadoopService.getResourcesByResource(new GetResourcesByResourceRequest().resource(new DirectoryResource().id("file:///" + id)));
+        GetResourcesByResourceRequest getResourcesByResourceRequest = new GetResourcesByResourceRequest().resource(new DirectoryResource().id("file:///" + id));
+        getResourcesByResourceRequest.setOriginalRequestId("test shouldGetResourcesByResource");
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hadoopService.getResourcesByResource(getResourcesByResourceRequest);
 
         //then
         assertEquals(expected, resourcesById.join());

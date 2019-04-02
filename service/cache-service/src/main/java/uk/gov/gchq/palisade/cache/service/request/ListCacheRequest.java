@@ -15,6 +15,9 @@
  */
 package uk.gov.gchq.palisade.cache.service.request;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.Service;
 
 /**
@@ -75,5 +78,17 @@ public class ListCacheRequest extends CacheRequest {
     public ListCacheRequest service(final Class<? extends Service> service) {
         super.service(service);
         return this;
+    }
+
+    @JsonIgnore
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+        throw new ForbiddenException("Should not call ListCacheRequest.setOriginalRequestId()");
+    }
+
+    @JsonIgnore
+    @Override
+    public String getOriginalRequestId() {
+        throw new ForbiddenException("Should not call ListCacheRequest.getOriginalRequestId()");
     }
 }

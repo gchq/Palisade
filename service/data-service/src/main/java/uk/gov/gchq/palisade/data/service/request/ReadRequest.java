@@ -18,9 +18,11 @@ package uk.gov.gchq.palisade.data.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -63,6 +65,19 @@ public class ReadRequest extends Request {
     public void setResource(final LeafResource resource) {
         resource(resource);
     }
+
+    @JsonIgnore
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+        throw new ForbiddenException("Should not call ReadRequest.setOriginalRequestId()");
+    }
+
+    @JsonIgnore
+    @Override
+    public String getOriginalRequestId() {
+        throw new ForbiddenException("Should not call ReadRequest.getOriginalRequestId()");
+    }
+
 
     @Override
     public boolean equals(final Object o) {

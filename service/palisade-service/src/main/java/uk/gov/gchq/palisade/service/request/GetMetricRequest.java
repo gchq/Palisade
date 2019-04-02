@@ -19,7 +19,9 @@ package uk.gov.gchq.palisade.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.MetricsProviderUtil;
 
 import java.util.ArrayList;
@@ -28,10 +30,10 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 
 /**
- * A request sent to retrieve details on the Palisade system itself. The request should be send along with a list of whitelist
+ * A request sent to retrieve details on the Palisade system itself. The request should be sent along with a list of whitelist
  * filters which specify which metrics to fetch. Filters may use a simple wildcard facility where a single '*' character
  * may be present at either the start OR end of a filter. This filter will then match any metric name that starts or ends
- * with the rest of the filter as appropriate. There may be only one wilcard used per filter and it cannot occur in the middle
+ * with the rest of the filter as appropriate. There may be only one wildcard used per filter and it cannot occur in the middle
  * of a filter.
  * <p>
  * Examples:
@@ -111,6 +113,19 @@ public class GetMetricRequest extends Request {
         List<String> filterList = new ArrayList<>(patternFilter);
         return filterList;
     }
+
+    @JsonIgnore
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+        throw new ForbiddenException("Should not call GetMetricRequest.setOriginalRequestId()");
+    }
+
+    @JsonIgnore
+    @Override
+    public String getOriginalRequestId() {
+        throw new ForbiddenException("Should not call GetMetricRequest.getOriginalRequestId()");
+    }
+
 
     @Override
     public boolean equals(final Object o) {

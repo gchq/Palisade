@@ -18,7 +18,9 @@ package uk.gov.gchq.palisade.cache.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.Service;
 
 import java.time.Duration;
@@ -62,6 +64,18 @@ public class AddCacheRequest<V> extends CacheRequest {
     private boolean locallyCacheable;
 
     public AddCacheRequest() {
+    }
+
+    @JsonIgnore
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+        throw new ForbiddenException("Should not call AddCacheRequest.setOriginalRequestId()");
+    }
+
+    @JsonIgnore
+    @Override
+    public String getOriginalRequestId() {
+        throw new ForbiddenException("Should not call AddCacheRequest.getOriginalRequestId()");
     }
 
     /**

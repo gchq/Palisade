@@ -31,11 +31,11 @@ import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.service.SimpleConnectionDetail;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -103,6 +103,7 @@ public class RestPalisadeServiceV1IT {
                 .user(user)
                 .context(context)
                 .rules(rulesMap);
+        expectedResult.setOriginalRequestId("test");
         given(palisadeService.getDataRequestConfig(getDataRequestConfig))
                 .willReturn(CompletableFuture.completedFuture(expectedResult));
 
