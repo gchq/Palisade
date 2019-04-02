@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.config.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.gov.gchq.palisade.service.ServiceState;
 
@@ -73,6 +74,18 @@ public class AddConfigRequest extends GetConfigRequest {
     public void setConfig(final ServiceState config) {
         config(config);
     }
+
+    @JsonIgnore
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+    }
+
+    @JsonIgnore
+    @Override
+    public String getOriginalRequestId() {
+        return "not used";
+    }
+
 
     @Override
     public String toString() {

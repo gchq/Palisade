@@ -263,9 +263,9 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     new ProcessingStartedAuditRequest();
             auditRequestProcessingStarted.resource(entry.getKey()).user(user)
                     .howItWasProcessed(entry.getValue().getMessage())
-                    .context(request.getContext())
-                    .userId(request.getUserId())
-                    .resourceId(request.getResourceId())
+                    .context(request.getContext(), ProcessingStartedAuditRequest.class)
+                    .userId(request.getUserId(), ProcessingStartedAuditRequest.class)
+                    .resourceId(request.getResourceId(), ProcessingStartedAuditRequest.class)
                     .id(request.getId())
                     .originalRequestId(request.getOriginalRequestId());
             LOGGER.debug("Auditing: {}", auditRequestProcessingStarted);
@@ -275,9 +275,9 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
 
     private void auditRequestReceived(final RegisterDataRequest request) {
         final RequestReceivedAuditRequest requestReceivedAuditRequest = new RequestReceivedAuditRequest();
-        requestReceivedAuditRequest.context(request.getContext())
-                .userId(request.getUserId())
-                .resourceId(request.getResourceId())
+        requestReceivedAuditRequest.context(request.getContext(), RequestReceivedAuditRequest.class)
+                .userId(request.getUserId(), RequestReceivedAuditRequest.class)
+                .resourceId(request.getResourceId(), RequestReceivedAuditRequest.class)
                 .id(request.getId())
                 .originalRequestId(request.getOriginalRequestId());
         auditService.audit(requestReceivedAuditRequest);
@@ -287,9 +287,9 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         final ExceptionAuditRequest auditRequestWithException = new ExceptionAuditRequest();
         auditRequestWithException
                 .exception(ex)
-                .context(request.getContext())
-                .userId(request.getUserId())
-                .resourceId(request.getResourceId())
+                .context(request.getContext(), ExceptionAuditRequest.class)
+                .userId(request.getUserId(), ExceptionAuditRequest.class)
+                .resourceId(request.getResourceId(), ExceptionAuditRequest.class)
                 .id(request.getId())
                 .originalRequestId(request.getOriginalRequestId());
         LOGGER.debug("Error handling: " + ex.getMessage());

@@ -43,33 +43,39 @@ public abstract class AuditRequestWithContext extends AuditRequest {
 
     /**
      * @param context {@link Context} is the reason for the user accessing the resource
+     * @param type    the derived return type to perform the cast upon
+     * @param <T>     return type derived from AuditRequestWithContext
      * @return the {@link AuditRequestWithContext}
      */
-    public AuditRequestWithContext context(final Context context) {
+    public <T extends AuditRequestWithContext> T context(final Context context, final Class<T> type) {
         requireNonNull(context, "The context cannot be set to null.");
         this.context = context;
-        return this;
+        return type.cast(this);
     }
 
 
     /**
      * @param userId the userId associated with this auditRequest
+     * @param type   the derived return type to perform the cast upon
+     * @param <T>    return type derived from AuditRequestWithContext
      * @return the {@link AuditRequestWithContext}
      */
-    public AuditRequestWithContext userId(final UserId userId) {
+    public <T extends AuditRequestWithContext> T userId(final UserId userId, final Class<T> type) {
         requireNonNull(userId, "The userId cannot be set to null.");
         this.userId = userId;
-        return this;
+        return type.cast(this);
     }
 
     /**
      * @param resourceId is the resourceId for the resource
+     * @param type       the derived return type to perform the cast upon
+     * @param <T>        return type derived from AuditRequestWithContext
      * @return the {@link AuditRequestWithContext}
      */
-    public AuditRequestWithContext resourceId(final String resourceId) {
+    public <T extends AuditRequestWithContext> T resourceId(final String resourceId, final Class<T> type) {
         requireNonNull(resourceId, "The resourceId cannot be set to null.");
         this.resourceId = resourceId;
-        return this;
+        return type.cast(this);
     }
 
     public AuditRequestWithContext() {
