@@ -74,8 +74,7 @@ public abstract class Request {
         requireNonNull(originalRequestId, "The originalRequestId type cannot be null");
         return originalRequestId;
     }
-
-
+    
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
