@@ -36,9 +36,6 @@ public abstract class Request {
 
     public Request() {
         id(UUID.randomUUID().toString());
-        originalRequestId = new String(id); //for the moment just default originalRequestId to id - this will need to
-        // be set for all services - for example Beat will need to set this to a unique identifer representing the particular Beat
-        // use a new instance rather than pointing to the original
     }
 
 

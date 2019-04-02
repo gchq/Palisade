@@ -16,9 +16,9 @@
 
 package uk.gov.gchq.palisade.resource.service.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
@@ -31,6 +31,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * This class is used to request that details about a resource is added to the {@link uk.gov.gchq.palisade.resource.service.ResourceService}.
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class AddResourceRequest extends Request {
     private LeafResource resource;
     private ConnectionDetail connectionDetail;
@@ -68,7 +69,6 @@ public class AddResourceRequest extends Request {
         resource(resource);
     }
 
-    @JsonIgnore
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
         ForbiddenException forbiddenException = new ForbiddenException("Should not call AddResourceRequest.setOriginalRequestId()");
@@ -76,7 +76,6 @@ public class AddResourceRequest extends Request {
         throw forbiddenException;
     }
 
-    @JsonIgnore
     @Override
     public String getOriginalRequestId() {
         ForbiddenException forbiddenException = new ForbiddenException("Should not call AddResourceRequest.getOriginalRequestId()");
