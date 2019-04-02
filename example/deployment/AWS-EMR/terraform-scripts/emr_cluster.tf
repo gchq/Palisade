@@ -2,7 +2,7 @@ resource "aws_emr_cluster" "palisade_cluster" {
   name          = "${var.cluster_name}"
   release_label = "${var.release_label}"
   applications  = "${var.apps_to_install}"
-  service_role  = "${aws_iam_role.EMR_DefaultRolePalisade.id}"
+  service_role  = "${aws_iam_role.EMR_DefaultRole_Palisade.id}"
   log_uri       = "s3://${aws_s3_bucket.s3_bucket.bucket}/logs/"
 
   tags {
@@ -16,8 +16,8 @@ resource "aws_emr_cluster" "palisade_cluster" {
     key_name                          = "${var.key_name}"
     #subnet_id                         = "${aws_subnet.emr_subnet.id}"
     subnet_id                         = "${var.subnet_id}"
-    emr_managed_master_security_group = "${aws_security_group.emr_allow_all.id}"
-    emr_managed_slave_security_group  = "${aws_security_group.emr_allow_all.id}"
+    emr_managed_master_security_group = "${aws_security_group.palisade_allow_all.id}"
+    emr_managed_slave_security_group  = "${aws_security_group.palisade_allow_all.id}"
   }
 
   instance_group {
@@ -36,5 +36,5 @@ resource "aws_emr_cluster" "palisade_cluster" {
 
 resource "aws_iam_instance_profile" "emr_profile" {
   name = "emr_profile"
-  role = "${aws_iam_role.EMR_EC2_DefaultRolePalisade.id}"
+  role = "${aws_iam_role.EMR_EC2_DefaultRole_Palisade.id}"
 }
