@@ -1,0 +1,66 @@
+variable "project" {
+  default = "Palisade Example"
+}
+
+variable "owner" {
+  default = "Unknown"
+}
+
+variable "aws_region" {     
+    default = "eu-west-1" 
+} 
+
+variable "aws_access_key" {} 
+
+variable "aws_secret_key" {}
+
+variable "bucket_name" {}
+
+variable "key_name" {}
+
+variable "vpc_id" {}
+
+variable "vpc_cidr_block" {
+  default = "168.31.0.0/16"
+}
+
+variable "subnet_id" {}
+
+variable "subnet_cidr_block" {
+  default = "168.31.0.0/20"
+}
+
+variable "cluster_name" {
+  default = "PalisadeExample"
+}
+
+variable "release_label" {
+  default = "emr-5.16.0"
+}
+
+variable "apps_to_install" {
+  #type = list(string)
+  default = [
+  "Hadoop",
+  "Zookeeper",
+  "JupyterHub",
+  "Ganglia",
+  "Spark"
+  ]
+}
+
+variable "master_instance_type" {
+  default = "m4.xlarge"
+}
+
+variable "core_instance_type" {
+  default = "m4.large"
+}
+
+variable "master_instance_count" {
+  default = "1"
+}
+
+variable "core_instance_count" {
+  default = "3"
+}
