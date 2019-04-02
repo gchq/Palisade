@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 
@@ -63,10 +64,12 @@ public abstract class Request {
         return id;
     }
 
+    @JsonIgnore
     public void setOriginalRequestId(final String originalRequestId) {
         this.originalRequestId = originalRequestId;
     }
 
+    @JsonIgnore
     public String getOriginalRequestId() {
         requireNonNull(originalRequestId, "The originalRequestId type cannot be null");
         return originalRequestId;
