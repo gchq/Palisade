@@ -14,7 +14,7 @@ resource "aws_emr_cluster" "palisade_cluster" {
   ec2_attributes {
     instance_profile                  = "${aws_iam_instance_profile.emr_profile.id}"
     key_name                          = "${var.key_name}"
-    #subnet_id                         = "${aws_subnet.emr_subnet.id}"
+    #subnet_id                         = "${aws_subnet.palisade_subnet.id}"
     subnet_id                         = "${var.subnet_id}"
     emr_managed_master_security_group = "${aws_security_group.palisade_allow_all.id}"
     emr_managed_slave_security_group  = "${aws_security_group.palisade_allow_all.id}"
@@ -31,6 +31,18 @@ resource "aws_emr_cluster" "palisade_cluster" {
     instance_type  = "${var.core_instance_type}"
     instance_count = "${var.core_instance_count}"
   }
+
+  bootstrap_action {
+    path = "s3://elasticmapreduce/bootstrap-actions/run-if"
+    name = "runif"
+    args = ["instance.isMaster=true", "echo running on master node"]
+  }
+
+#  bootstrap_action {
+#    name = "bootstrap-master-script"
+#    path = "s3://${aws_s3_bucket_object.emr_bootstrap_script.bucket}/${aws_s3_bucket_object.emr_bootstrap_script.key}"
+#    args = [ "--install-boto --install-bluetalon ${data.terraform_remote_state.gep.bluetalon_private_ip} ${data.terraform_remote_state.gep.bluetalon_private_ip} --debug --efs-dns ${aws_efs_mount_target.gep_emr_efs_mount_az1.dns_name} --efs-mount /test" ]
+#  }
 
 }
 

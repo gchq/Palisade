@@ -18,6 +18,8 @@ variable "bucket_name" {}
 
 variable "key_name" {}
 
+variable "pem_file" {}
+
 variable "vpc_id" {}
 
 variable "vpc_cidr_block" {
@@ -39,7 +41,7 @@ variable "release_label" {
 }
 
 variable "apps_to_install" {
-  #type = list(string)
+  type = "list"
   default = [
   "Hadoop",
   "Zookeeper",
