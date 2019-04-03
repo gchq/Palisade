@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -54,10 +55,12 @@ public class SimpleClient<T> {
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
+            final String uuid = UUID.randomUUID().toString();
 
             final ReadRequest readRequest = new ReadRequest()
                     .requestId(dataRequestResponse.getRequestId())
                     .resource(entry.getKey());
+            readRequest.setOriginalRequestId(uuid);
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(

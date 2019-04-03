@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -207,7 +208,11 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
         final ConnectionDetail conDetails = entry.getValue();
         final DataService service = conDetails.createService();
         //lodge request with the data service
-        final CompletableFuture<ReadResponse> futureResponse = service.read(new ReadRequest().requestId(resourceDetails.getRequestId()).resource(resource));
+        final String uuid = UUID.randomUUID().toString();
+        ReadRequest readRequest = new ReadRequest().requestId(resourceDetails.getRequestId()).resource(resource);
+        readRequest.setOriginalRequestId(uuid);
+
+        final CompletableFuture<ReadResponse> futureResponse = service.read(readRequest);
         errResource = resource;
         //when this future completes, we should have an iterator of things once we deserialise
         itemIt = futureResponse.thenApply(response -> serialiser.deserialise(response.getData()).iterator())
