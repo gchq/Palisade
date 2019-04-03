@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.data.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.heart.Heartbeat;
 import uk.gov.gchq.palisade.data.service.DataService;
@@ -60,11 +61,20 @@ public class SimpleDataService implements DataService {
     private static final String PALISADE_IMPL_KEY = "sds.svc.palisade.svc";
     private static final String READER_IMPL_KEY = "sds.svc.reader.svc";
     private static final String CACHE_IMPL_KEY = "sds.svc.cache.svc";
+    private static final String AUDIT_IMPL_KEY = "sds.svc.audit.svc";
 
     private PalisadeService palisadeService;
     private DataReader reader;
     private CacheService cache;
     private final Heartbeat heartbeat;
+    private AuditService auditService;
+
+    public SimpleDataService auditService(final AuditService auditService) {
+        requireNonNull(auditService, "The audit service cannot be set to null.");
+        this.auditService = auditService;
+        return this;
+    }
+
 
     public SimpleDataService() {
         heartbeat = new Heartbeat().serviceClass(SimpleDataService.class);
@@ -91,6 +101,7 @@ public class SimpleDataService implements DataService {
         heartbeat.start();
         return this;
     }
+
 
     @Override
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
@@ -132,14 +143,6 @@ public class SimpleDataService implements DataService {
         });
     }
 
-    public PalisadeService getPalisadeService() {
-        requireNonNull(palisadeService, "The palisade service has not been set.");
-        return palisadeService;
-    }
-
-    public void setPalisadeService(final PalisadeService palisadeService) {
-        palisadeService(palisadeService);
-    }
 
     @Override
     public void applyConfigFrom(final ServiceState config) throws NoConfigException {
@@ -162,6 +165,13 @@ public class SimpleDataService implements DataService {
         } else {
             throw new NoConfigException("no cache specified in configuration");
         }
+        String serialisedAudit = config.getOrDefault(AUDIT_IMPL_KEY, null);
+        if (nonNull(serialisedAudit)) {
+            setAuditService(JSONSerialiser.deserialise(serialisedAudit.getBytes(StandardCharsets.UTF_8), AuditService.class));
+        } else {
+            throw new NoConfigException("no audit specified in configuration");
+        }
+
     }
 
     @Override
@@ -174,6 +184,9 @@ public class SimpleDataService implements DataService {
         config.put(READER_IMPL_KEY, serialisedReader);
         String serialisedCache = new String(JSONSerialiser.serialise(cache), StandardCharsets.UTF_8);
         config.put(CACHE_IMPL_KEY, serialisedCache);
+        String serialisedAudit = new String(JSONSerialiser.serialise(auditService), StandardCharsets.UTF_8);
+        config.put(AUDIT_IMPL_KEY, serialisedAudit);
+
     }
 
     public DataReader getReader() {
@@ -192,5 +205,23 @@ public class SimpleDataService implements DataService {
 
     public void setCacheService(final CacheService cacheService) {
         cacheService(cacheService);
+    }
+
+    public PalisadeService getPalisadeService() {
+        requireNonNull(palisadeService, "The palisade service has not been set.");
+        return palisadeService;
+    }
+
+    public void setPalisadeService(final PalisadeService palisadeService) {
+        palisadeService(palisadeService);
+    }
+
+    public AuditService getAuditService() {
+        requireNonNull(auditService, "The audit service has not been set.");
+        return auditService;
+    }
+
+    public void setAuditService(final AuditService auditService) {
+        auditService(auditService);
     }
 }
