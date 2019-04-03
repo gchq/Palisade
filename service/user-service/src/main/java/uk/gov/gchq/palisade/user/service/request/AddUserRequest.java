@@ -16,10 +16,10 @@
 
 package uk.gov.gchq.palisade.user.service.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
@@ -31,6 +31,7 @@ import static java.util.Objects.requireNonNull;
  * An {@code AddUserRequest} is a {@link Request} that is passed to the {@link uk.gov.gchq.palisade.user.service.UserService}
  * to add a {@link User}.
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class AddUserRequest extends Request {
     private User user;
 
@@ -55,13 +56,11 @@ public class AddUserRequest extends Request {
         user(user);
     }
 
-    @JsonIgnore
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
         throw new ForbiddenException("Should not call AddUserRequest.setOriginalRequestId()");
     }
 
-    @JsonIgnore
     @Override
     public String getOriginalRequestId() {
         throw new ForbiddenException("Should not call AddUserRequest.getOriginalRequestId()");

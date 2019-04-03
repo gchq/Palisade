@@ -16,10 +16,10 @@
 
 package uk.gov.gchq.palisade.service.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.MetricsProviderUtil;
@@ -46,6 +46,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @see uk.gov.gchq.palisade.service.CommonMetrics
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class GetMetricRequest extends Request {
     private final List<String> patternFilter = new ArrayList<>();
 
@@ -114,13 +115,11 @@ public class GetMetricRequest extends Request {
         return filterList;
     }
 
-    @JsonIgnore
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
         throw new ForbiddenException("Should not call GetMetricRequest.setOriginalRequestId()");
     }
 
-    @JsonIgnore
     @Override
     public String getOriginalRequestId() {
         throw new ForbiddenException("Should not call GetMetricRequest.getOriginalRequestId()");

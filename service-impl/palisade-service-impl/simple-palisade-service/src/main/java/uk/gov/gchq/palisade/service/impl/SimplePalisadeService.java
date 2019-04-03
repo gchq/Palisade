@@ -337,7 +337,6 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         // TODO: need to validate that the user is actually requesting the correct info.
         // extract resources from request and check they are a subset of the original RegisterDataRequest resources
         final GetCacheRequest<DataRequestConfig> cacheRequest = new GetCacheRequest<>().key(request.getRequestId().getId()).service(this.getClass());
-        cacheRequest.setOriginalRequestId(request.getOriginalRequestId());
         LOGGER.debug("Getting cached data: {}", cacheRequest);
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {

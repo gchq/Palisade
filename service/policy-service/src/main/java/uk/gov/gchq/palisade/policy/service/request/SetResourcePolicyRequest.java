@@ -16,9 +16,9 @@
 
 package uk.gov.gchq.palisade.policy.service.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
@@ -33,6 +33,7 @@ import static java.util.Objects.requireNonNull;
  * That resource may be signifying a file, stream, directory or the system
  * (policy is applied to all requests to the Palisade system).
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class SetResourcePolicyRequest extends Request {
     private Resource resource;
     private Policy policy;
@@ -80,16 +81,16 @@ public class SetResourcePolicyRequest extends Request {
     }
 
 
-    @JsonIgnore
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
         throw new ForbiddenException("Should not call SetResourcePolicyRequest.setOriginalRequestId()");
     }
 
-    @JsonIgnore
     @Override
     public String getOriginalRequestId() {
-        throw new ForbiddenException("Should not call SetResourcePolicyRequest.getOriginalRequestId()");
+        ForbiddenException forbiddenException = new ForbiddenException("Should not call SetResourcePolicyRequest.getOriginalRequestId()");
+        forbiddenException.printStackTrace();
+        throw forbiddenException;
     }
 
 

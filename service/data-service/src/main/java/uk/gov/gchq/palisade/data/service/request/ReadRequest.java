@@ -16,9 +16,10 @@
 
 package uk.gov.gchq.palisade.data.service.request;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
@@ -32,6 +33,8 @@ import static java.util.Objects.requireNonNull;
  * This class is used to send a request to the
  * {@link uk.gov.gchq.palisade.data.service.DataService} to read a resource.
  */
+
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class ReadRequest extends Request {
     private RequestId requestId;
     private LeafResource resource;
@@ -66,13 +69,11 @@ public class ReadRequest extends Request {
         resource(resource);
     }
 
-    @JsonIgnore
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
         throw new ForbiddenException("Should not call ReadRequest.setOriginalRequestId()");
     }
 
-    @JsonIgnore
     @Override
     public String getOriginalRequestId() {
         throw new ForbiddenException("Should not call ReadRequest.getOriginalRequestId()");

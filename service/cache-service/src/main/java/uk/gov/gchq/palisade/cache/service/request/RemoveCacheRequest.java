@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.cache.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
@@ -27,6 +27,7 @@ import uk.gov.gchq.palisade.service.Service;
 /**
  * This class is the type of request for removing things from the cache. The service and key specify which entry to remove.
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class RemoveCacheRequest extends CacheRequest {
     public RemoveCacheRequest() {
     }
@@ -47,13 +48,11 @@ public class RemoveCacheRequest extends CacheRequest {
         return this;
     }
 
-    @JsonIgnore
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
         throw new ForbiddenException("Should not call RemoveCacheRequest.setOriginalRequestId()");
     }
 
-    @JsonIgnore
     @Override
     public String getOriginalRequestId() {
         throw new ForbiddenException("Should not call RemoveCacheRequest.getOriginalRequestId()");

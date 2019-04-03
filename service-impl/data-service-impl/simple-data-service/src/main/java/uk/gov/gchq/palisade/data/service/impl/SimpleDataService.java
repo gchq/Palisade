@@ -35,6 +35,7 @@ import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static java.util.Objects.nonNull;
@@ -95,6 +96,8 @@ public class SimpleDataService implements DataService {
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         requireNonNull(request, "The request cannot be null.");
         //check that we have an active heartbeat before serving request
+        final String originalRequestId = UUID.randomUUID().toString();
+
         if (!heartbeat.isBeating()) {
             throw new IllegalStateException("data service is not sending heartbeats! Can't send data. Has the cache service been configured?");
         }
@@ -104,7 +107,7 @@ public class SimpleDataService implements DataService {
             final GetDataRequestConfig getConfig = new GetDataRequestConfig()
                     .requestId(request.getRequestId())
                     .resource(request.getResource());
-            getConfig.setOriginalRequestId(request.getOriginalRequestId());
+            getConfig.setOriginalRequestId(originalRequestId);
             LOGGER.debug("Calling palisade service with: {}", getConfig);
             final DataRequestConfig config = getPalisadeService().getDataRequestConfig(getConfig).join();
             LOGGER.debug("Palisade service returned: {}", config);
@@ -114,7 +117,7 @@ public class SimpleDataService implements DataService {
                     .user(config.getUser())
                     .context(config.getContext())
                     .rules(config.getRules().get(request.getResource()));
-            readerRequest.setOriginalRequestId(request.getOriginalRequestId());
+            readerRequest.setOriginalRequestId(originalRequestId);
 
             LOGGER.debug("Calling reader with: {}", readerRequest);
             final DataReaderResponse readerResult = getReader().read(readerRequest);

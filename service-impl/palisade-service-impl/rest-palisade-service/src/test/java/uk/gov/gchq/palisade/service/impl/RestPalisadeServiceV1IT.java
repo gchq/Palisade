@@ -97,6 +97,7 @@ public class RestPalisadeServiceV1IT {
         MockPalisadeService.setMock(palisadeService);
 
         final GetDataRequestConfig getDataRequestConfig = new GetDataRequestConfig().requestId(requestId).resource(fileResource1);
+        getDataRequestConfig.setOriginalRequestId("shouldGetDataRequestConfig");
         final Map<LeafResource, Rules> rulesMap = new HashMap<>();
         rulesMap.put(fileResource1, new Rules().rule("testRule", new TestRule()));
         final DataRequestConfig expectedResult = new DataRequestConfig()

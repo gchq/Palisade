@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.policy.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
@@ -30,6 +30,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * This class is used in the request to set a {@link Policy} for a resource type.
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class SetTypePolicyRequest extends Request {
     private String type;
     private Policy policy;
@@ -76,13 +77,11 @@ public class SetTypePolicyRequest extends Request {
         policy(policy);
     }
 
-    @JsonIgnore
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
         throw new ForbiddenException("Should not call SetTypePolicyRequest.setOriginalRequestId()");
     }
 
-    @JsonIgnore
     @Override
     public String getOriginalRequestId() {
         throw new ForbiddenException("Should not call SetTypePolicyRequest.getOriginalRequestId()");

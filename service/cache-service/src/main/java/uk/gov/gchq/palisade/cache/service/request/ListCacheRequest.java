@@ -15,7 +15,7 @@
  */
 package uk.gov.gchq.palisade.cache.service.request;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.Service;
@@ -56,6 +56,7 @@ public class ListCacheRequest extends CacheRequest {
      * @param prefix the prefix to use for filtering
      * @return this object
      */
+    @JsonIgnoreProperties(value = {"originalRequestId"})
     public ListCacheRequest prefix(final String prefix) {
         super.key(prefix);
         return this;
@@ -80,13 +81,11 @@ public class ListCacheRequest extends CacheRequest {
         return this;
     }
 
-    @JsonIgnore
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
         throw new ForbiddenException("Should not call ListCacheRequest.setOriginalRequestId()");
     }
 
-    @JsonIgnore
     @Override
     public String getOriginalRequestId() {
         throw new ForbiddenException("Should not call ListCacheRequest.getOriginalRequestId()");
