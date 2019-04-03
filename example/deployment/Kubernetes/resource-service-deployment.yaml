@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: resource-service
+  name: resource-service
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: resource-service
+    spec:
+      containers:
+      - image: resource-service
+        livenessProbe:
+          httpGet:
+            path: /resource/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        name: resource-service
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: resource-service-claim0
+      restartPolicy: Always
+      volumes:
+      - name: resource-service-claim0
+        persistentVolumeClaim:
+          claimName: resource-service-claim0

@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: etcd
+  name: etcd
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        name: etcd
+    spec:
+      containers:
+      - image: etcd
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 2379
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        name: etcd
+        resources: {}
+      restartPolicy: Always
+status: {}

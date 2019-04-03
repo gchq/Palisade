@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: config-service
+  name: config-service
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        name: config-service
+    spec:
+      containers:
+      - image: config-service
+        livenessProbe:
+          httpGet:
+            path: /config/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        name: config-service
+        resources: {}
+      restartPolicy: Always
+status: {}

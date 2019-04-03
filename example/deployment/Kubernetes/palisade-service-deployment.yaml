@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+     name: palisade-service
+  name: palisade-service
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: palisade-service
+    spec:
+      containers:
+      - image: palisade-service
+        livenessProbe:
+          httpGet:
+            path: /palisade/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        name: palisade-service
+        resources: {}
+      restartPolicy: Always

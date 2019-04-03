@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: data-service
+  name: data-service
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: data-service
+    spec:
+      containers:
+      - image: data-service
+        livenessProbe:
+          httpGet:
+            path: /data/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        name: data-service
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: data-service-claim0
+      restartPolicy: Always
+      volumes:
+      - name: data-service-claim0
+        persistentVolumeClaim:
+          claimName: data-service-claim0

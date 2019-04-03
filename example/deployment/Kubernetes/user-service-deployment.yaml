@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: user-service
+  name: user-service
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        name: user-service
+    spec:
+      containers:
+      - image: user-service
+        livenessProbe:
+          httpGet:
+            path: /user/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        name: user-service
+        resources: {}
+      restartPolicy: Always
+status: {}

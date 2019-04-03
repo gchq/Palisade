@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: configure-services
+  name: configure-services
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        name: configure-services
+    spec:
+      containers:
+      - image: configure-services
+        name: configure-services
+        resources: {}
+      restartPolicy: Always
+status: {}
