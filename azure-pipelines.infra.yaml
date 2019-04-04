@@ -18,7 +18,7 @@ stages:
           backendAzureRmStorageAccountName: 'tfstatepalisade'
           backendAzureRmContainerName: tfstate
           backendAzureRmKey: palisade
-      steps:
+
       - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
         displayName: 'terraform plan'
         inputs:
@@ -26,7 +26,7 @@ stages:
           workingDirectory: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/terraform'
           environmentServiceName: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
           commandOptions: '-var-file dev.tfvars  -out plan'
-      steps:
+
       - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
         displayName: 'terraform apply'
         inputs:
