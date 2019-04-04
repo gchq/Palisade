@@ -1,5 +1,7 @@
 name: Palisade_Docker
 
+trigger: none
+
 stages:
 - stage: Docker_Build_and_Push 
   jobs:

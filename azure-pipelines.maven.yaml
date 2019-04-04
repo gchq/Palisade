@@ -1,5 +1,7 @@
 name: Palisade_Maven
 
+trigger: none
+
 stages:
 - stage: Maven_Build  
   jobs:
@@ -13,7 +15,7 @@ stages:
         jdkVersionOption: '1.11'
         jdkArchitectureOption: 'x64'
         goals: 'clean install'
-        
+
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: docker'
       inputs:
