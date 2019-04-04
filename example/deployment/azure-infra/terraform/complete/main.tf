@@ -11,7 +11,7 @@ module "acr" {
 
     resource_group_name = "${var.ops_resource_group_name}"
     resource_group_location = "${var.primary_region}"
-
+    acr_replica_location = "${var.secondary_region}"
 }
 
 module "vnet" {
@@ -43,5 +43,5 @@ module "aks" {
     subscription_id="${var.subscription_id}"
 
     log_analytics_workspace_id="${module.oms.oms_workspace_resource_id}"
-    vnet_subnet_id="/subscriptions/${var.subscription_id}/resourceGroups/${var.vnet_resource_group_name}/providers/Microsoft.Network/virtualNetworks/${var.vnet_network_name}/subnets/aks-subnet"
+    vnet_subnet_id="/subscriptions/${var.subscription_id}/resourceGroups/${var.vnet_resource_group_name}/providers/Microsoft.Network/virtualNetworks/${var.vnet_name}/subnets/aks-subnet"
 }
