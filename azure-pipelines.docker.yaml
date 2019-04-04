@@ -11,38 +11,47 @@ stages:
         parameters:
           imageName: client
     - job:
+      steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: config-service
     - job:
+      steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: configure-services
     - job:
+      steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: data-service
     - job:
+      steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: etcd
     - job:
+      steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: palisade-service
     - job:
+      steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: policy-service
     - job:
+      steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: resource-service
     - job:
+      steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: rest-redirector
     - job:
+      steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: user-service
