@@ -35,6 +35,7 @@ import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -43,9 +44,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class RestDataServiceV1IT {
 
@@ -58,6 +57,8 @@ public class RestDataServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
+        final String uuid = UUID.randomUUID().toString();
+        request.setOriginalRequestId((uuid));
         RestDataServiceV1.setDefaultDelegate(new MockDataService());
         proxy = (ProxyRestDataService) new ProxyRestDataService("http://localhost:8084/data").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());

@@ -236,7 +236,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 .thenApply(t -> getPolicy(request, futureUser, futureResources, uuid))
                 .thenApply(multiPolicy -> ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
                 .thenAccept(multiPolicy -> {
-                    auditProcessingStarted(request, futureUser.join(), multiPolicy, uuid);
+                    auditProcessingStarted(request, futureUser.join(), multiPolicy, requestId.getId());
                     cache(request, futureUser.join(), requestId, multiPolicy, futureResources.join().size(), uuid);
                 })
                 .thenApply(multiPolicy -> {

@@ -30,8 +30,8 @@ import static java.util.Objects.requireNonNull;
  * This makes sure each request has a unique identifier.
  */
 public abstract class Request {
-    private String id; //this is a unique ID for each individual request made between services
-    private String originalRequestId; //this Id is unique between requests
+    private String id; //this is a unique ID for each individual request made between the micro-services
+    private String originalRequestId; //this Id is unique per data access request from a user
 
 
     public Request() {
