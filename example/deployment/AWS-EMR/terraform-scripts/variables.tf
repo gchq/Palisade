@@ -32,6 +32,8 @@ variable "subnet_cidr_block" {
   default = "168.31.0.0/20"
 }
 
+variable "ingress_ip_range" {}
+
 variable "cluster_name" {
   default = "PalisadeExample"
 }

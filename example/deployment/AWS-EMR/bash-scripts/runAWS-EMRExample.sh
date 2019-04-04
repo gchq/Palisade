@@ -12,4 +12,4 @@ fi
 
 cd ./example/deployment/AWS-EMR/terraform-scripts
 terraform apply \
--var pem_file=$1
+    -var pem_file=$1

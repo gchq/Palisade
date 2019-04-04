@@ -57,21 +57,47 @@ resource "null_resource" "deploy_example" {
     ]
   }
   provisioner "file" {
-      #source = "../../../example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
-      #source = "../bash-scripts/"
-      #source = "../../../example-services/pom.xml"
-      #destination = "/home/hadoop/jars/basename(../../../example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar)"
-      #/destination = "/home/hadoop/jars/${basename(../../../example-services/pom.xml}"
-      source = "../../../example-services/example-rest-resource-service/target/"
-      destination = "/home/hadoop/jars"
-      #source = "../../../example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
-      #destination = "/home/hadoop/jars/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
+      source = "../../../example-services/example-rest-config-service/target/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
+      destination = "/home/hadoop/jars/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
+  }
+  provisioner "file" {
+      source = "../../../example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
+      destination = "/home/hadoop/jars/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
+  }
+  provisioner "file" {
+      source = "../../../example-services/example-rest-user-service/target/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
+      destination = "/home/hadoop/jars/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
+  }
+  provisioner "file" {
+      source = "../../../example-services/example-rest-policy-service/target/example-rest-policy-service-0.2.1-SNAPSHOT-executable.jar"
+      destination = "/home/hadoop/jars/example-rest-policy-service-0.2.1-SNAPSHOT-executable.jar"
+  }
+  provisioner "file" {
+      source = "../../../example-services/example-rest-palisade-service/target/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
+      destination = "/home/hadoop/jars/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
+  }
+  provisioner "file" {
+      source = "../../../example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
+      destination = "/home/hadoop/jars/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
+  }
+
+  # Deploy the Palisade config service on the EMR master
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /home/hadoop/example_logs",
+    ]
+  }
+#  provisioner "remote-exec" {
+#    inline = [
+#      #"nohup /home/hadoop/deploy_example/deployConfigService.sh > /home/hadoop/example_logs/deployConfigService.log 2>&1 &",
+#      "nohup /home/hadoop/deploy_example/deployConfigService.sh &",
+#      "sleep 90",
+#    ]
+#  }
+  provisioner "local-exec" {
+    #command = "ssh -o 'StrictHostKeyChecking no' -i ${var.aws_key_path} ec2-user@${self.public_ip} 'nohup some-command </dev/null >/dev/null 2>&1 &'"
+    command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployConfigService.sh > /home/hadoop/example_logs/deployConfigService.log 2>&1 &'"
   }
 
 
-
 }
-
-
-
-
