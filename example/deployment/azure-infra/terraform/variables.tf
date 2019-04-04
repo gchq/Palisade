@@ -16,12 +16,6 @@ variable "primary_region" {
   description = "Primary region"
 }
 
-variable "secondary_region" {
-  type        = "string"
-  description = "Secondary region"
-}
-
-
 variable "ops_resource_group_name" {
   type        = "string"
   description = "OPs resource group name"

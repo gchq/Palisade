@@ -13,8 +13,3 @@ variable "acr_sku" {
   description = "SKU for the container registry (Premium is the requirement for replication support)."
   default     = "Premium"
 }
-
-variable "acr_replica_location" {
-  type        = "string"
-  description = "Location of the container registry replica location"
-}

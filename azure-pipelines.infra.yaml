@@ -1,0 +1,37 @@
+trigger: none
+
+stages:
+- stage: Deploy_Infra
+  jobs:
+    - job:
+      steps:
+      - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+        displayName: 'terraform init'
+        inputs:
+          command: init
+          workingDirectory: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/terraform'
+          backendType: azurerm
+          backendServiceArm: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
+          ensureBackend: true
+          backendAzureRmResourceGroupName: 'tmp-tfstate'
+          backendAzureRmResourceGroupLocation: uksouth
+          backendAzureRmStorageAccountName: 'tfstatepalisade'
+          backendAzureRmContainerName: tfstate
+          backendAzureRmKey: palisade
+      steps:
+      - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+        displayName: 'terraform plan'
+        inputs:
+          command: plan
+          workingDirectory: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/terraform'
+          environmentServiceName: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
+          commandOptions: '-var-file dev.tfvars  -out plan'
+      steps:
+      - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+        displayName: 'terraform apply'
+        inputs:
+          command: apply
+          workingDirectory: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/terraform'
+          environmentServiceName: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
+          commandOptions: plan
+

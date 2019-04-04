@@ -1,5 +1,5 @@
 module "oms" {
-    source = "../oms"
+    source = "./oms"
 
     resource_group_name = "${var.ops_resource_group_name}"
     oms_location = "${var.primary_region}"
@@ -7,15 +7,14 @@ module "oms" {
 }
 
 module "acr" {
-    source = "../acr"
+    source = "./acr"
 
     resource_group_name = "${var.ops_resource_group_name}"
     resource_group_location = "${var.primary_region}"
-    acr_replica_location = "${var.secondary_region}"
 }
 
 module "vnet" {
-    source = "../vnet"
+    source = "./vnet"
 
     resource_group_name="${var.vnet_resource_group_name}"
     resource_group_location="${var.primary_region}"
@@ -23,7 +22,7 @@ module "vnet" {
 }
 
 module "ingress-ip" {
-    source = "../ingress-ip"
+    source = "./ingress-ip"
 
     resource_group_name="${var.ip_resource_group_name}"
     resource_group_location="${var.primary_region}"
@@ -31,7 +30,7 @@ module "ingress-ip" {
 }
 
 module "aks" {
-    source = "../aks"
+    source = "./aks"
 
     cluster_name="${var.aks_cluster_name}"
     dns_prefix="${var.dns_prefix}"
