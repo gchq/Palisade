@@ -1,0 +1,50 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+
+stages:
+- stage: Docker_Build_and_Push 
+  jobs:
+    - job:
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+      parameters:
+        imageName: client
+    - job:
+      - template: azure-pipelines.docker-template.yaml  
+      parameters:
+        imageName: config-service
+    - job:
+      - template: azure-pipelines.docker-template.yaml  
+      parameters:
+        imageName: configure-services
+    - job:
+      - template: azure-pipelines.docker-template.yaml  
+      parameters:
+        imageName: data-service
+    - job:
+      - template: azure-pipelines.docker-template.yaml  
+      parameters:
+        imageName: etcd
+    - job:
+      - template: azure-pipelines.docker-template.yaml  
+      parameters:
+        imageName: palisade-service
+    - job:
+      - template: azure-pipelines.docker-template.yaml  
+      parameters:
+        imageName: policy-service
+    - job:
+      - template: azure-pipelines.docker-template.yaml  
+      parameters:
+        imageName: resource-service
+    - job:
+      - template: azure-pipelines.docker-template.yaml  
+      parameters:
+        imageName: rest-redirector
+    - job:
+      - template: azure-pipelines.docker-template.yaml  
+      parameters:
+        imageName: user-service
