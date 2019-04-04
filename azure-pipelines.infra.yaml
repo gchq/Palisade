@@ -25,7 +25,7 @@ stages:
           command: plan
           workingDirectory: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/terraform'
           environmentServiceName: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
-          commandOptions: '-var-file dev.tfvars  -out plan'
+          commandOptions: '-var-file default.tfvars  -out plan'
 
       - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
         displayName: 'terraform apply'
