@@ -4,6 +4,8 @@ stages:
 - stage: Deploy_Infra
   jobs:
     - job:
+      variables: 
+      - group: project-variables
       steps:
       - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
         displayName: 'terraform init'
@@ -25,7 +27,7 @@ stages:
           command: plan
           workingDirectory: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/terraform'
           environmentServiceName: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
-          commandOptions: '-var-file default.tfvars  -out plan'
+          commandOptions: '-var-file default.tfvars -var client_id="$(client_id)"" -var client_secret="$(client_secret)" -var subscription_id="$(subscription_id)"  -out plan'
 
       - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
         displayName: 'terraform apply'
