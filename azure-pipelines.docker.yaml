@@ -5,12 +5,12 @@ trigger: none
 stages:
 - stage: Docker_Build_and_Push 
   jobs:
-    - job:
+    - job: client
       steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: client
-    - job:
+    - job: config-service
       steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
