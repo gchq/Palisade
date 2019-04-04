@@ -55,14 +55,16 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
     /**
      * Create a new input split. The given details are wrapped inside a new {@link DataRequestResponse} object.
      *
-     * @param requestId the request ID for this split
-     * @param resources the resources to be processed by this split
+     * @param requestId         the request ID for this split
+     * @param resources         the resources to be processed by this split
+     * @param originalRequestId this Id is unique per data access request from a user
      * @throws NullPointerException if anything is null
      */
-    public PalisadeInputSplit(final RequestId requestId, final Map<LeafResource, ConnectionDetail> resources) {
+    public PalisadeInputSplit(final RequestId requestId, final Map<LeafResource, ConnectionDetail> resources, final String originalRequestId) {
         Objects.requireNonNull(requestId, "requestId");
         Objects.requireNonNull(resources, "resources");
-        requestResponse = new DataRequestResponse().requestId(requestId).resources(resources);
+        Objects.requireNonNull(resources, "originalRequestId");
+        requestResponse = new DataRequestResponse().requestId(requestId).resources(resources).originalRequestId(originalRequestId);
     }
 
     /**

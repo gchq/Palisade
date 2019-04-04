@@ -199,11 +199,11 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
 
     @Override
     public CompletableFuture<DataRequestResponse> registerDataRequest(final RegisterDataRequest request) {
-        final String uuid = UUID.randomUUID().toString();
-        LOGGER.debug("Registering data request: {}", request, uuid);
-        auditRequestReceived(request, uuid);
+        final String originalRequestId = UUID.randomUUID().toString();
+        LOGGER.debug("Registering data request: {}", request, originalRequestId);
+        auditRequestReceived(request, originalRequestId);
         final GetUserRequest userRequest = new GetUserRequest().userId(request.getUserId());
-        userRequest.setOriginalRequestId(uuid);
+        userRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting user from userService: {}", userRequest);
         final CompletableFuture<User> futureUser = userService.getUser(userRequest)
                 .thenApply(user -> {
@@ -212,11 +212,11 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 })
                 .exceptionally(ex -> {
                     LOGGER.debug("Failed to get user: {}" + ex.getMessage());
-                    auditRequestReceivedException(request, uuid, ex);
+                    auditRequestReceivedException(request, originalRequestId, ex);
                     throw new RuntimeException(ex); //rethrow the exception
                 });
         final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId());
-        resourceRequest.setOriginalRequestId(uuid);
+        resourceRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting resources from resourceService: {}", resourceRequest);
         final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources = resourceService.getResourcesById(resourceRequest)
                 .thenApply(resources -> {
@@ -225,28 +225,29 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 })
                 .exceptionally(ex -> {
                     LOGGER.debug("Failed to get resources: {}" + ex.getMessage());
-                    auditRequestReceivedException(request, uuid, ex);
+                    auditRequestReceivedException(request, originalRequestId, ex);
                     throw new RuntimeException(ex); //rethrow the exception
                 });
         final RequestId requestId = new RequestId().id(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
         final DataRequestConfig config = new DataRequestConfig();
         config.setContext(request.getContext());
-        config.setOriginalRequestId(uuid);
+        config.setOriginalRequestId(originalRequestId);
         return CompletableFuture.allOf(futureUser, futureResources)
-                .thenApply(t -> getPolicy(request, futureUser, futureResources, uuid))
+                .thenApply(t -> getPolicy(request, futureUser, futureResources, originalRequestId))
                 .thenApply(multiPolicy -> ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
                 .thenAccept(multiPolicy -> {
                     auditProcessingStarted(request, futureUser.join(), multiPolicy, requestId.getId());
-                    cache(request, futureUser.join(), requestId, multiPolicy, futureResources.join().size(), uuid);
+                    cache(request, futureUser.join(), requestId, multiPolicy, futureResources.join().size(), originalRequestId);
                 })
                 .thenApply(multiPolicy -> {
-                    final DataRequestResponse response = new DataRequestResponse().requestId(requestId).resources(futureResources.join());
+                    final DataRequestResponse response = new DataRequestResponse().requestId(requestId).originalRequestId(originalRequestId).resources(futureResources.join());
+                    response.setOriginalRequestId(originalRequestId);
                     LOGGER.debug("Responding with: {}", response);
                     return response;
                 })
                 .exceptionally(ex -> {
                     LOGGER.debug("Error handling: " + ex.getMessage());
-                    auditRequestReceivedException(request, uuid, ex);
+                    auditRequestReceivedException(request, originalRequestId, ex);
                     throw new RuntimeException(ex); //rethrow the exception
                 });
     }
