@@ -13,7 +13,7 @@ steps:
   inputs:
     azureSubscription: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
     azureContainerRegistry: '{"loginServer":"marcusreg.azurecr.io", "id" : "/subscriptions/802df257-6032-4b50-884c-55cb9f074928/resourceGroups/DevOpsDemo-ContainerRegistry/providers/Microsoft.ContainerRegistry/registries/marcusreg"}'
-    dockerFile: 'example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}/Dockerfile'
+    dockerFile: 'docker/example-docker-services/${{ parameters.imageName }}/Dockerfile'
     imageName: 'client:$(Build.BuildId)'
     includeLatestTag: true
 
