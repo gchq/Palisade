@@ -1,8 +1,4 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
+name: Palisade_Maven
 
 stages:
 - stage: Maven_Build  
@@ -18,9 +14,9 @@ stages:
         jdkArchitectureOption: 'x64'
         goals: 'clean install'
 
-steps:
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: docker'
-  inputs:
-    PathtoPublish: 'example/deployment/local-docker'
+    steps:
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: docker'
+      inputs:
+        PathtoPublish: 'example/deployment/local-docker'
 
