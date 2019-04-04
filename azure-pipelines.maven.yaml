@@ -20,4 +20,5 @@ stages:
       displayName: 'Publish Artifact: docker'
       inputs:
         PathtoPublish: 'example/deployment/local-docker'
+        artifactName: docker
 
