@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
+import uk.gov.gchq.palisade.audit.service.request.ExceptionAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.heart.Heartbeat;
 import uk.gov.gchq.palisade.data.service.DataService;
@@ -101,44 +103,75 @@ public class SimpleDataService implements DataService {
         return this;
     }
 
+    private void auditReadRequestReceived(final ReadRequest request) {
+        final ReadRequestReceivedAuditRequest requestReceivedAuditRequest = new ReadRequestReceivedAuditRequest();
+        requestReceivedAuditRequest
+                .requestId(request.getRequestId())
+                .resource(request.getResource())
+                .id(request.getId())
+                .originalRequestId(request.getOriginalRequestId());
+        auditService.audit(requestReceivedAuditRequest);
+    }
+
+    private void auditRequestReceivedException(final ReadRequest request, final Throwable ex) {
+        final ExceptionAuditRequest auditRequestWithException = new ExceptionAuditRequest();
+        auditRequestWithException
+                .exception(ex)
+                .context(request.getContext(), ExceptionAuditRequest.class)
+                .userId(request.getUserId(), ExceptionAuditRequest.class)
+                .resourceId(request.getResourceId(), ExceptionAuditRequest.class)
+                .id(request.getId())
+                .originalRequestId(originalRequestId);
+        LOGGER.debug("Error handling: " + ex.getMessage());
+        auditService.audit(auditRequestWithException);
+    }
 
     @Override
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         requireNonNull(request, "The request cannot be null.");
         //check that we have an active heartbeat before serving request
 
+        auditReadRequestReceived(request);
+
         if (!heartbeat.isBeating()) {
             throw new IllegalStateException("data service is not sending heartbeats! Can't send data. Has the cache service been configured?");
         }
+
         LOGGER.debug("Creating async read: {}", request);
-        return CompletableFuture.supplyAsync(() -> {
-            LOGGER.debug("Starting to read: {}", request);
-            final GetDataRequestConfig getConfig = new GetDataRequestConfig()
-                    .requestId(request.getRequestId())
-                    .resource(request.getResource());
-            getConfig.setOriginalRequestId(request.getOriginalRequestId());
-            LOGGER.debug("Calling palisade service with: {}", getConfig);
-            final DataRequestConfig config = getPalisadeService().getDataRequestConfig(getConfig).join();
-            LOGGER.debug("Palisade service returned: {}", config);
+        return CompletableFuture
+                .supplyAsync(() -> {
+                    LOGGER.debug("Starting to read: {}", request);
+                    final GetDataRequestConfig getConfig = new GetDataRequestConfig()
+                            .requestId(request.getRequestId())
+                            .resource(request.getResource());
+                    getConfig.setOriginalRequestId(request.getOriginalRequestId());
+                    LOGGER.debug("Calling palisade service with: {}", getConfig);
+                    final DataRequestConfig config = getPalisadeService().getDataRequestConfig(getConfig).join();
+                    LOGGER.debug("Palisade service returned: {}", config);
 
-            final DataReaderRequest readerRequest = new DataReaderRequest()
-                    .resource(request.getResource())
-                    .user(config.getUser())
-                    .context(config.getContext())
-                    .rules(config.getRules().get(request.getResource()));
-            readerRequest.setOriginalRequestId(request.getOriginalRequestId());
+                    final DataReaderRequest readerRequest = new DataReaderRequest()
+                            .resource(request.getResource())
+                            .user(config.getUser())
+                            .context(config.getContext())
+                            .rules(config.getRules().get(request.getResource()));
+                    readerRequest.setOriginalRequestId(request.getOriginalRequestId());
 
-            LOGGER.debug("Calling reader with: {}", readerRequest);
-            final DataReaderResponse readerResult = getReader().read(readerRequest);
-            LOGGER.debug("Reader returned: {}", readerResult);
+                    LOGGER.debug("Calling reader with: {}", readerRequest);
+                    final DataReaderResponse readerResult = getReader().read(readerRequest);
+                    LOGGER.debug("Reader returned: {}", readerResult);
 
-            final ReadResponse response = new ReadResponse();
-            if (null != readerResult.getData()) {
-                response.data(readerResult.getData());
-            }
-            LOGGER.debug("Returning from read: {}", response);
-            return response;
-        });
+                    final ReadResponse response = new ReadResponse();
+                    if (null != readerResult.getData()) {
+                        response.data(readerResult.getData());
+                    }
+                    LOGGER.debug("Returning from read: {}", response);
+                    return response;
+                })
+                .exceptionally(ex -> {
+                    LOGGER.debug("Error handling: " + ex.getMessage());
+                    auditRequestReceivedException(request, ex);
+                    throw new RuntimeException(ex); //rethrow the exception
+                });
     }
 
 

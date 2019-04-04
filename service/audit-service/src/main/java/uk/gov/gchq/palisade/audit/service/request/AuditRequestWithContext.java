@@ -24,7 +24,7 @@ import uk.gov.gchq.palisade.UserId;
 
 import static java.util.Objects.requireNonNull;
 
-public abstract class AuditRequestWithContext extends AuditRequest {
+public abstract class AuditRequestWithContext extends c {
     private Context context;
     private UserId userId;
     private String resourceId;
