@@ -11,7 +11,7 @@ stages:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: client
-    - job: config-service
+    - job:
       displayName: config-service
       steps:
       - template: azure-pipelines.docker-template.yaml  
