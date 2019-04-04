@@ -1,12 +1,26 @@
-apiVersion: extensions/v1beta1
+kind: Service
+apiVersion: v1
+metadata:
+  name: palisade-service
+spec:
+  selector:
+    app: palisade-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---    
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-     name: palisade-service
+     app: palisade-service
   name: palisade-service
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      app:  palisade-service
   template:
     metadata:
       creationTimestamp: null

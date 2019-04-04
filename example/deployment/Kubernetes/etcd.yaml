@@ -1,16 +1,30 @@
-apiVersion: extensions/v1beta1
+kind: Service
+apiVersion: v1
+metadata:
+  app:  etcd
+spec:
+  selector:
+    app: etcd
+  ports:
+  - protocol: TCP
+    port: 2379
+    targetPort: 2379
+---    
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: etcd
+    app:  etcd
   name: etcd
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      app:  etcd
   template:
     metadata:
       labels:
-        name: etcd
+        app: etcd
     spec:
       containers:
       - image: etcd

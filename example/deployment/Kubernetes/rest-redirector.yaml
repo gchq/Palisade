@@ -1,20 +1,21 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: rest-redirector
+    app:  rest-redirector
   name: rest-redirector
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      app:  rest-redirector
   template:
     metadata:
       labels:
-        name: rest-redirector
+        app:  rest-redirector
     spec:
       containers:
       - image: rest-redirector
         name: rest-redirector
         resources: {}
       restartPolicy: Always
-status: {}

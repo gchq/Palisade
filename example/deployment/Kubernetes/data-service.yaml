@@ -1,15 +1,18 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: data-service
+    app:  data-service
   name: data-service
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app:  data-service
   template:
     metadata:
       labels:
-        name: data-service
+        app:  data-service
     spec:
       containers:
       - image: data-service

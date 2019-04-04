@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    name: data-service-claim0
+    app: data-service
   name: data-service-claim0
 spec:
   accessModes:

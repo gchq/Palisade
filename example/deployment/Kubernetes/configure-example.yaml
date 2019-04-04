@@ -1,16 +1,18 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: configure-example
+    app:  configure-example
   name: configure-example
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      app:  configure-example
   template:
     metadata:
       labels:
-        name: configure-example
+        app:  configure-example
     spec:
       containers:
       - image: configure-example

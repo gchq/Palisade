@@ -1,16 +1,30 @@
-apiVersion: extensions/v1beta1
+kind: Service
+apiVersion: v1
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---    
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: user-service
+    app: user-service
   name: user-service
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      app: user-service
   template:
     metadata:
       labels:
-        name: user-service
+        app: user-service
     spec:
       containers:
       - image: user-service
@@ -24,4 +38,3 @@ spec:
         name: user-service
         resources: {}
       restartPolicy: Always
-status: {}

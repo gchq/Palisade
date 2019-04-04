@@ -1,17 +1,30 @@
-apiVersion: extensions/v1beta1
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: policy-service
+  selector:
+    app: policy-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---    
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: policy-service
+    app: policy-service
   name: policy-service
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      app:  policy-service
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: policy-service
+        app:  policy-service
     spec:
       containers:
       - image: policy-service

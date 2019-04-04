@@ -1,4 +1,16 @@
-apiVersion: extensions/v1beta1
+kind: Service
+apiVersion: v1
+metadata:
+   app:  config-service
+spec:
+  selector:
+    app: config-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---    
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -6,11 +18,13 @@ metadata:
   name: config-service
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      app:  config-service
   template:
     metadata:
       labels:
-        name: config-service
+         app:  config-service
     spec:
       containers:
       - image: config-service

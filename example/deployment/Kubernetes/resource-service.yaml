@@ -1,15 +1,30 @@
-apiVersion: extensions/v1beta1
+kind: Service
+apiVersion: v1
+metadata:
+  name: resource-service
+spec:
+  selector:
+    app: resource-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---    
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: resource-service
+    app: resource-service
   name: resource-service
 spec:
+  selector:
+    matchLabels:
+      app: resource-service
   replicas: 1
   template:
     metadata:
       labels:
-        name: resource-service
+        app: resource-service
     spec:
       containers:
       - image: resource-service
