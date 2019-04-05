@@ -5,7 +5,7 @@ trigger: none
     - '*'
   paths:
     include:
-      - azure-pipelines.maven.yaml
+    - azure-pipelines.maven.yaml
 
 stages:
 - stage: Maven_Build  
