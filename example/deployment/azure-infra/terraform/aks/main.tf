@@ -18,6 +18,15 @@ resource "azurerm_kubernetes_cluster" "k8s-cluster-name" {
     vnet_subnet_id  = "${var.vnet_subnet_id}"
   }
 
+  network_profile {
+    network_plugin = "azure"
+    service_cidr = "${var.service_cidr}"
+    dns_service_ip = "${var.dns_ip}"
+    docker_bridge_cidr = "${var.docker_cidr}"
+  }
+  role_based_access_control {
+    enabled = true
+  }
   service_principal {
     client_id     = "${var.client_id}"
     client_secret = "${var.client_secret}"
