@@ -15,7 +15,7 @@ spec:
         app:  configure-services
     spec:
       containers:
-      - image: configure-services
+      - image: {{ .Values.image.registry }}/configure-services:{{ .Values.image.tag }}
         name: configure-services
         resources: {}
       restartPolicy: Always

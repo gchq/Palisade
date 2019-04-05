@@ -1,41 +1,41 @@
-
 kind: Service
 apiVersion: v1
 metadata:
-  name: policy-service
+  app:  etcd
+spec:
   selector:
-    app: policy-service
+    app: etcd
   ports:
   - protocol: TCP
-    port: 8080
-    targetPort: 8080
+    port: 2379
+    targetPort: 2379
 ---    
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: policy-service
-  name: policy-service
+    app:  etcd
+  name: etcd
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app:  policy-service
+      app:  etcd
   template:
     metadata:
       labels:
-        app:  policy-service
+        app: etcd
     spec:
       containers:
-      - image: policy-service
+      - image: {{ .Values.image.registry }}/etcd:{{ .Values.image.tag }}
         livenessProbe:
-          httpGet: 
-            path: /policy/v1/status
-            port: 8080
+          httpGet:
+            path: /health
+            port: 2379
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
-        name: policy-service
+        name: etcd
         resources: {}
       restartPolicy: Always
 status: {}

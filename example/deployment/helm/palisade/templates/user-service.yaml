@@ -1,41 +1,40 @@
 kind: Service
 apiVersion: v1
 metadata:
-  app:  etcd
+  name: user-service
 spec:
   selector:
-    app: etcd
+    app: user-service
   ports:
   - protocol: TCP
-    port: 2379
-    targetPort: 2379
+    port: 8080
+    targetPort: 8080
 ---    
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app:  etcd
-  name: etcd
+    app: user-service
+  name: user-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app:  etcd
+      app: user-service
   template:
     metadata:
       labels:
-        app: etcd
+        app: user-service
     spec:
       containers:
-      - image: etcd
+      - image: {{ .Values.image.registry }}/user-service:{{ .Values.image.tag }}
         livenessProbe:
           httpGet:
-            path: /health
-            port: 2379
+            path: /user/v1/status
+            port: 8080
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
-        name: etcd
+        name: user-service
         resources: {}
       restartPolicy: Always
-status: {}

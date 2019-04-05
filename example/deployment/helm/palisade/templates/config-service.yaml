@@ -27,7 +27,7 @@ spec:
          app:  config-service
     spec:
       containers:
-      - image: config-service
+      - image: {{ .Values.image.registry }}/config-service:{{ .Values.image.tag }}
         livenessProbe:
           httpGet:
             path: /config/v1/status

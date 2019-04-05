@@ -27,7 +27,7 @@ spec:
         app: resource-service
     spec:
       containers:
-      - image: resource-service
+      - image: {{ .Values.image.registry }}/resource-service:{{ .Values.image.tag }}
         livenessProbe:
           httpGet:
             path: /resource/v1/status

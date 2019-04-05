@@ -28,7 +28,7 @@ spec:
         io.kompose.service: palisade-service
     spec:
       containers:
-      - image: palisade-service
+      - image: {{ .Values.image.registry }}/palisade-service:{{ .Values.image.tag }}
         livenessProbe:
           httpGet:
             path: /palisade/v1/status

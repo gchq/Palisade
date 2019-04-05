@@ -15,7 +15,7 @@ spec:
         app:  rest-redirector
     spec:
       containers:
-      - image: rest-redirector
+      - image: {{ .Values.image.registry }}/rest-redirector:{{ .Values.image.tag }}
         name: rest-redirector
         resources: {}
       restartPolicy: Always

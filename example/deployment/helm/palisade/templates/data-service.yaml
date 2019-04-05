@@ -15,7 +15,7 @@ spec:
         app:  data-service
     spec:
       containers:
-      - image: data-service
+      - image: {{ .Values.image.registry }}/data-service:{{ .Values.image.tag }}
         livenessProbe:
           httpGet:
             path: /data/v1/status
