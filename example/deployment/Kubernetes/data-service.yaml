@@ -17,7 +17,7 @@ spec:
         app:  data-service
     spec:
       containers:
-      - image: marcusreg.azurecr.io/data-service:latest
+      - image: tmppalisadeopsuksouthacr.azurecr.io/data-service:latest
         livenessProbe:
           httpGet:
             path: /data/v1/status

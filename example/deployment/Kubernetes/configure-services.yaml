@@ -17,7 +17,7 @@ spec:
         app:  configure-services
     spec:
       containers:
-      - image: marcusreg.azurecr.io/configure-services:latest
+      - image: tmppalisadeopsuksouthacr.azurecr.io/configure-services:latest
         name: configure-services
       restartPolicy: Always
 status: {}

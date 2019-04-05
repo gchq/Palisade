@@ -32,7 +32,7 @@ spec:
     spec:
       containers: 
       - name: etcd
-        image: marcusreg.azurecr.io/etcd:latest
+        image: tmppalisadeopsuksouthacr.azurecr.io/etcd:latest
         ports:
           - containerPort: 2379
         livenessProbe:

@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: config-service
-        image: marcusreg.azurecr.io/config-service:latest
+        image: tmppalisadeopsuksouthacr.azurecr.io/config-service:latest
         ports:
           - containerPort: 8080
         livenessProbe:

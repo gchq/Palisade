@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: palisade-service
-        image: marcusreg.azurecr.io/palisade-service:latest
+        image: tmppalisadeopsuksouthacr.azurecr.io/palisade-service:latest
         ports:
           - containerPort: 8080
         livenessProbe:

@@ -17,7 +17,7 @@ spec:
         app:  rest-redirector
     spec:
       containers:
-      - image: marcusreg.azurecr.io/rest-redirector:latest
+      - image: tmppalisadeopsuksouthacr.azurecr.io/rest-redirector:latest
         name: rest-redirector
         resources: {}
       restartPolicy: Always
