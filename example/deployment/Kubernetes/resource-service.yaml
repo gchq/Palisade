@@ -42,10 +42,12 @@ spec:
           timeoutSeconds: 10
         resources: {}
         volumeMounts:
-        - mountPath: /data
-          name: resource-service-claim0
+          - name: data
+            mountPath: /data
       restartPolicy: Always
       volumes:
-      - name: resource-service-claim0
-        persistentVolumeClaim:
-          claimName: resource-service-claim0
+      - name: data
+        azureFile:
+          secretName: data-share-secret
+          shareName: data
+          readOnly: true

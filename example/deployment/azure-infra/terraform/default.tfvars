@@ -5,7 +5,7 @@ ops_resource_group_name="tmp-palisade-ops"
 
 config_share_resource_group_name="tmp-palisade-storage"
 config_share_storage_account_name="palisadestorage"
-config_share_share_name="config"
+config_share_share_name="data"
 
 ip_resource_group_name="tmp-palisade-ips"
 ip_name="palisade-ingress-ip"

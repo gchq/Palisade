@@ -29,7 +29,7 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /mnt/config
-        restartPolicy: Always
+      restartPolicy: Always
       volumes:
       - name: config
         azureFile:

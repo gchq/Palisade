@@ -18,6 +18,14 @@ spec:
     spec:
       containers:
       - image: tmppalisadeopsuksouthacr.azurecr.io/data-service:latest
+        name: data-service
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
         livenessProbe:
           httpGet:
             path: /data/v1/status
@@ -25,12 +33,13 @@ spec:
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
-        name: data-service
         volumeMounts:
-        - mountPath: /data
-          name: data-service-claim0
+          - name: data
+            mountPath: /data
       restartPolicy: Always
       volumes:
-      - name: data-service-claim0
-        persistentVolumeClaim:
-          claimName: data-service-claim0
+      - name: data
+        azureFile:
+          secretName: data-share-secret
+          shareName: data
+          readOnly: true
