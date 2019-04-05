@@ -3,7 +3,7 @@ variable "resource_group_name" {
   description = "Resource group for the storage account"
 }
 
-variable "location" {
+variable "resource_group_location" {
   type        = "string"
   description = "Azure region for RG and storage"
 }
