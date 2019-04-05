@@ -1,5 +1,4 @@
 steps:
-- checkout: none
 - task: DownloadBuildArtifacts@0
   displayName: 'Download Build Artifacts'
   inputs:
@@ -7,15 +6,15 @@ steps:
     project: '124362e9-66a7-42ba-922e-4971f592dea1'
     pipeline: 43
     specificBuildWithTriggering: true
-    artifactName: docker
-    downloadPath: '$(System.ArtifactsDirectory)'
+    artifactName: local-docker
+    downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
 
 - task: Docker@0
   displayName: 'Build  ${{ parameters.imageName }} image'
   inputs:
     azureSubscription: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
     azureContainerRegistry: '{"loginServer":"tmppalisadeopsuksouthacr.azurecr.io", "id" : "/subscriptions/802df257-6032-4b50-884c-55cb9f074928/resourceGroups/DevOpsDemo-ContainerRegistry/providers/Microsoft.ContainerRegistry/registries/tmppalisadeopsuksouthacr"}'
-    dockerFile: '$(System.ArtifactsDirectory)/docker/example-docker-services/${{ parameters.imageName }}/Dockerfile'
+    dockerFile: '$(System.DefaultWorkingDirectory)example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}/Dockerfile'
     imageName: '${{ parameters.imageName }}:$(Build.BuildId)'
     includeLatestTag: true
 

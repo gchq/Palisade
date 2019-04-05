@@ -14,9 +14,16 @@ stages:
         jdkArchitectureOption: 'x64'
         goals: 'clean install'
 
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact: docker'
+    - task: CopyFiles@2
       inputs:
-        PathtoPublish: 'example/deployment/local-docker'
-        artifactName: docker
+        #sourceFolder: # Optional
+        contents: |
+          /example/deployment/local-docker/**/?(*.jar|*.war)
+        targetFolder: $(Build.ArtifactStagingDirectory)
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: local-docker'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/example/deployment/local-docker'
+        artifactName: local-docker
 
