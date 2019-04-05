@@ -1,12 +1,14 @@
+---
+# Source: palisade/templates/palisade-service.yaml
 kind: Service
 apiVersion: v1
 metadata:
   labels:
-    app: config-service
-  name: config-service
+    app: palisade-service
+  name:  palisade-service
 spec:
   selector:
-    app: config-service
+    app: palisade-service
   ports:
   - protocol: TCP
     port: 8080
@@ -16,28 +18,31 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    name: config-service
-  name: config-service
+     app: palisade-service
+  name: palisade-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app:  config-service
+      app:  palisade-service
   template:
     metadata:
+      creationTimestamp: null
       labels:
-         app:  config-service
+        app: palisade-service
     spec:
       containers:
-      - image: {{ .Values.image.registry }}/config-service:{{ .Values.image.tag }}
+      - name: palisade-service
+        image: marcusreg.azurecr.io/palisade-service:latest
+        ports:
+          - containerPort: 8080
         livenessProbe:
           httpGet:
-            path: /config/v1/status
+            path: /palisade/v1/status
             port: 8080
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
-        name: config-service
+        
         resources: {}
       restartPolicy: Always
-status: {}

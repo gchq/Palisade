@@ -1,3 +1,5 @@
+---
+# Source: palisade/templates/configure-services.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,8 +17,7 @@ spec:
         app:  configure-services
     spec:
       containers:
-      - image: {{ .Values.image.registry }}/configure-services:{{ .Values.image.tag }}
+      - image: marcusreg.azurecr.io/configure-services:latest
         name: configure-services
-        resources: {}
       restartPolicy: Always
 status: {}

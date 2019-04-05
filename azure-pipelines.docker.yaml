@@ -1,4 +1,13 @@
-trigger: none
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+  paths:
+    include:
+    - example/deployment/local-docker/*
+    - azure-pipelines.docker.yaml
+
 
 
 

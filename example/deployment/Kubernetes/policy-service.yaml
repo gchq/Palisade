@@ -1,10 +1,15 @@
+---
+# Source: palisade/templates/policy-service.yaml
+
 kind: Service
 apiVersion: v1
 metadata:
-  name: palisade-service
+  labels:
+    app: policy-service
+  name: policy-service
 spec:
   selector:
-    app: palisade-service
+    app: policy-service
   ports:
   - protocol: TCP
     port: 8080
@@ -14,28 +19,31 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-     app: palisade-service
-  name: palisade-service
+    app: policy-service
+  name: policy-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app:  palisade-service
+      app:  policy-service
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: palisade-service
+        app:  policy-service
     spec:
       containers:
-      - image: {{ .Values.image.registry }}/palisade-service:{{ .Values.image.tag }}
+      - image: marcusreg.azurecr.io/policy-service:latest
+        name: policy-service
+        ports:
+          - containerPort: 8080
         livenessProbe:
-          httpGet:
-            path: /palisade/v1/status
+          httpGet: 
+            path: /policy/v1/status
             port: 8080
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
-        name: palisade-service
+        
         resources: {}
       restartPolicy: Always
+status: {}

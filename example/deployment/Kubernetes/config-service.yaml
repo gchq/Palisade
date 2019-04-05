@@ -1,10 +1,14 @@
+---
+# Source: palisade/templates/config-service.yaml
 kind: Service
 apiVersion: v1
 metadata:
-  name: user-service
+  labels:
+    app: config-service
+  name: config-service
 spec:
   selector:
-    app: user-service
+    app: config-service
   ports:
   - protocol: TCP
     port: 8080
@@ -14,27 +18,31 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: user-service
-  name: user-service
+    name: config-service
+  name: config-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user-service
+      app:  config-service
   template:
     metadata:
       labels:
-        app: user-service
+         app:  config-service
     spec:
       containers:
-      - image: {{ .Values.image.registry }}/user-service:{{ .Values.image.tag }}
+      - name: config-service
+        image: marcusreg.azurecr.io/config-service:latest
+        ports:
+          - containerPort: 8080
         livenessProbe:
           httpGet:
-            path: /user/v1/status
+            path: /config/v1/status
             port: 8080
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
-        name: user-service
+        
         resources: {}
       restartPolicy: Always
+status: {}

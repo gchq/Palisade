@@ -1,13 +1,12 @@
-
+---
+# Source: palisade/templates/user-service.yaml
 kind: Service
 apiVersion: v1
 metadata:
-  labels:
-    app: policy-service
-  name: policy-service
+  name: user-service
 spec:
   selector:
-    app: policy-service
+    app: user-service
   ports:
   - protocol: TCP
     port: 8080
@@ -17,28 +16,29 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: policy-service
-  name: policy-service
+    app: user-service
+  name: user-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app:  policy-service
+      app: user-service
   template:
     metadata:
       labels:
-        app:  policy-service
+        app: user-service
     spec:
       containers:
-      - image: {{ .Values.image.registry }}/policy-service:{{ .Values.image.tag }}
+      - name: user-service
+        image: marcusreg.azurecr.io/user-service:latest
+        ports:
+          - containerPort: 8080
         livenessProbe:
-          httpGet: 
-            path: /policy/v1/status
+          httpGet:
+            path: /user/v1/status
             port: 8080
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
-        name: policy-service
         resources: {}
       restartPolicy: Always
-status: {}

@@ -1,3 +1,5 @@
+---
+# Source: palisade/templates/etcd.yaml
 kind: Service
 apiVersion: v1
 metadata:
@@ -28,16 +30,25 @@ spec:
       labels:
         app: etcd
     spec:
-      containers:
-      - image: {{ .Values.image.registry }}/etcd:{{ .Values.image.tag }}
+      containers: 
+      - name: etcd
+        image: marcusreg.azurecr.io/etcd:latest
+        ports:
+          - containerPort: 2379
         livenessProbe:
           httpGet:
             path: /health
             port: 2379
-          failureThreshold: 5
-          periodSeconds: 60
-          timeoutSeconds: 10
-        name: etcd
+          periodSeconds: 5
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 2379
+          periodSeconds: 5
+          timeoutSeconds: 5
+       
         resources: {}
+
       restartPolicy: Always
 status: {}

@@ -1,3 +1,5 @@
+---
+# Source: palisade/templates/data-service.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,7 +17,7 @@ spec:
         app:  data-service
     spec:
       containers:
-      - image: {{ .Values.image.registry }}/data-service:{{ .Values.image.tag }}
+      - image: marcusreg.azurecr.io/data-service:latest
         livenessProbe:
           httpGet:
             path: /data/v1/status
@@ -24,7 +26,6 @@ spec:
           periodSeconds: 60
           timeoutSeconds: 10
         name: data-service
-        resources: {}
         volumeMounts:
         - mountPath: /data
           name: data-service-claim0
