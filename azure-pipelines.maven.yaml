@@ -1,4 +1,11 @@
 trigger: none
+  batch: true
+  branches:
+    include:
+    - '*'
+  paths:
+    include:
+      - azure-pipelines.maven.yaml
 
 stages:
 - stage: Maven_Build  
@@ -18,7 +25,7 @@ stages:
       inputs:
         #sourceFolder: # Optional
         contents: |
-          /example/deployment/local-docker/**/?(*.jar|*.war)
+          ./example/deployment/local-docker/**/?(*.jar|*.war)
         targetFolder: $(Build.ArtifactStagingDirectory)
 
     - task: PublishBuildArtifacts@1
