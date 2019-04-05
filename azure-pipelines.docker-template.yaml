@@ -14,7 +14,7 @@ steps:
   displayName: 'Build  ${{ parameters.imageName }} image'
   inputs:
     azureSubscription: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
-    azureContainerRegistry: '{"loginServer":$(registry_dns), "id" : "/subscriptions/802df257-6032-4b50-884c-55cb9f074928/resourceGroups/DevOpsDemo-ContainerRegistry/providers/Microsoft.ContainerRegistry/registries/$(registry_name)"}'
+    azureContainerRegistry: '{"loginServer":"tmppalisadeopsuksouthacr.azurecr.io", "id" : "/subscriptions/802df257-6032-4b50-884c-55cb9f074928/resourceGroups/DevOpsDemo-ContainerRegistry/providers/Microsoft.ContainerRegistry/registries/tmppalisadeopsuksouthacr"}'
     dockerFile: '$(System.ArtifactsDirectory)/docker/example-docker-services/${{ parameters.imageName }}/Dockerfile'
     imageName: '${{ parameters.imageName }}:$(Build.BuildId)'
     includeLatestTag: true
@@ -23,7 +23,7 @@ steps:
   displayName: 'Push ${{ parameters.imageName }} image'
   inputs:
     azureSubscription: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
-    azureContainerRegistry: '{"loginServer":"$(registry_dns)", "id" : "/subscriptions/802df257-6032-4b50-884c-55cb9f074928/resourceGroups/DevOpsDemo-ContainerRegistry/providers/Microsoft.ContainerRegistry/registries/$(registry_name)"}'
+    azureContainerRegistry: '{"loginServer":"tmppalisadeopsuksouthacr.azurecr.io", "id" : "/subscriptions/802df257-6032-4b50-884c-55cb9f074928/resourceGroups/DevOpsDemo-ContainerRegistry/providers/Microsoft.ContainerRegistry/registries/tmppalisadeopsuksouthacr"}'
     action: 'Push an image'
     imageName: '${{ parameters.imageName }}:$(Build.BuildId)'
     includeLatestTag: true
