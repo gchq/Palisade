@@ -21,6 +21,14 @@ module "vnet" {
     network_name="${var.vnet_name}"
 }
 
+module "config_share" {
+    source = "./fileshare"
+
+    resource_group_name="${var.config_share_resource_group_name}"
+    resource_group_location="${var.primary_region}"
+    storage_account_name="${var.config_share_storage_account_name}"
+    share_name="${var.config_share_share_name}"
+}
 module "ingress-ip" {
     source = "./ingress-ip"
 

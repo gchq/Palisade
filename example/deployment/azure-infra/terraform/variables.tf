@@ -1,3 +1,4 @@
+
 variable "client_id" {
   type        = "string"
   description = "Client ID of service principal."
@@ -24,6 +25,20 @@ variable "ops_resource_group_name" {
 variable "oms_sku" {
   type        = "string"
   description = "OMS SKU"
+}
+
+
+variable "config_share_resource_group_name" {
+  type        = "string"
+  description = "Config share resource group name"
+}
+variable "config_share_storage_account_name" {
+  type        = "string"
+  description = "Config share storage account name"
+}
+variable "config_share_share_name" {
+  type        = "string"
+  description = "Config share name"
 }
 
 variable "ip_resource_group_name" {
