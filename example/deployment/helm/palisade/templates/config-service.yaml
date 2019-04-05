@@ -1,7 +1,9 @@
 kind: Service
 apiVersion: v1
 metadata:
-   app:  config-service
+  labels:
+    app: config-service
+  name: config-service
 spec:
   selector:
     app: config-service

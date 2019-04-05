@@ -2,7 +2,10 @@
 kind: Service
 apiVersion: v1
 metadata:
+  labels:
+    app: policy-service
   name: policy-service
+spec:
   selector:
     app: policy-service
   ports:

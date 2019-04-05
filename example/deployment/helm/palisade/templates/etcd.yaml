@@ -1,7 +1,9 @@
 kind: Service
 apiVersion: v1
 metadata:
-  app:  etcd
+  labels:
+    app:  etcd
+  name: etcd
 spec:
   selector:
     app: etcd

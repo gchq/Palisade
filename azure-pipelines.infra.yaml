@@ -45,6 +45,17 @@ stages:
           environmentServiceName: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
           commandOptions: plan
 
+      - task: Kubernetes@1  
+        displayName: 'Helm RBAC'
+        inputs:
+          azureSubscriptionEndpoint: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
+          azureResourceGroup: 'tmp-palisade-aks'
+          kubernetesCluster: 'palisade-aks'
+          command: apply
+          useConfigurationFile: true
+          configuration: '$(System.DefaultWorkingDirectory)/example/deployment/helm/helm-rbac.yaml'
+          versionSpec: 1.7.0
+
       
       - task: HelmDeploy@0
         displayName: 'helm init'
