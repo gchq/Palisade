@@ -1,4 +1,12 @@
-trigger: none
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+  paths:
+    include:
+    - example/deployment/azure-infra/terraform/*
+    - azure-pipelines.infra.yaml
 
 stages:
 - stage: Deploy_Infra
@@ -36,4 +44,14 @@ stages:
           workingDirectory: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/terraform'
           environmentServiceName: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
           commandOptions: plan
+
+      
+      - task: HelmDeploy@0
+        displayName: 'helm init'
+        inputs:
+          azureSubscription: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
+          azureResourceGroup: 'tmp-palisade-aks'
+          kubernetesCluster: 'palisade-aks'
+          command: init
+          arguments: ' --upgrade'
 
