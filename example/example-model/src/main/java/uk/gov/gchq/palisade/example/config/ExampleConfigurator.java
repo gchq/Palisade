@@ -164,7 +164,7 @@ public final class ExampleConfigurator {
 
     private static ParentResource getParent(final String fileURL) {
         URI normalised = ExampleFileUtil.convertToFileURI(fileURL);
-        //this should only be applied to things that start with file:/// not other types of URL
+        //this should only be applied to URLs have a schema of file:// not other types of URL
         if (normalised.getScheme().equals(FileSystems.getDefault().provider().getScheme())) {
             Path current = Paths.get(normalised);
             Path parent = current.getParent();
