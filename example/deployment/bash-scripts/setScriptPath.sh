@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # sets up the different paths for calling deployment scripts
-PWD=$(pwd)
-export DOCKERBASHSCRIPTS=$PWD/example/deployment/local-docker/bash-scripts
-export LOCALJVMBASHSCRIPTS=$PWD/example/deployment/local-jvm/bash-scripts
-export EXAMPLESERVICES=$PWD/example/example-services
-export EXAMPLE=$PWD/example
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+# Find example directory and normalise
+export EXAMPLE="$(cd "$DIR/../.." >/dev/null && pwd -P)"
+export DOCKERBASHSCRIPTS="$EXAMPLE/deployment/local-docker/bash-scripts"
+export LOCALJVMBASHSCRIPTS="$EXAMPLE/deployment/local-jvm/bash-scripts"
+export EXAMPLESERVICES="$EXAMPLE/example-services"
