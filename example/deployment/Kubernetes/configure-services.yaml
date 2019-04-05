@@ -19,5 +19,22 @@ spec:
       containers:
       - image: tmppalisadeopsuksouthacr.azurecr.io/configure-services:latest
         name: configure-services
-      restartPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        volumeMounts:
+          - name: config
+            mountPath: /mnt/config
+        restartPolicy: Always
+      volumes:
+      - name: config
+        azureFile:
+          secretName: config-share-secret
+          shareName: config
+          readOnly: true
+          
 status: {}
