@@ -63,5 +63,5 @@ stages:
           azureResourceGroup: 'tmp-palisade-aks'
           kubernetesCluster: 'palisade-aks'
           command: init
-          arguments: ' --upgrade'
+          arguments: ' --upgrade --service-account tiller'
 
