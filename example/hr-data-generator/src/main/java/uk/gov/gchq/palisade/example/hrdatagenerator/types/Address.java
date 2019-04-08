@@ -16,14 +16,11 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
-import com.github.javafaker.Faker;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
 
 public class Address {
-    private static ThreadLocal<Faker> faker = new ThreadLocal<>();
-    private static ThreadLocal<Random> currentRandom = new ThreadLocal<>();
 
     private String streetAddressNumber;
     private String streetName;
