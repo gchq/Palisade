@@ -1,5 +1,3 @@
-trigger: none
-
 stages:
 - stage: Deploy_Palisade
   jobs:
