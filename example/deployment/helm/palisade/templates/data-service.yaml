@@ -1,0 +1,45 @@
+---
+# Source: palisade/templates/data-service.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app:  data-service
+  name: data-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  data-service
+  template:
+    metadata:
+      labels:
+        app:  data-service
+    spec:
+      containers:
+      - image: tmppalisadeopsuksouthacr.azurecr.io/data-service:latest
+        name: data-service
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /data/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        volumeMounts:
+          - name: data
+            mountPath: /data
+      restartPolicy: Always
+      volumes:
+      - name: data
+        azureFile:
+          secretName: data-share-secret
+          shareName: data
+          readOnly: true
