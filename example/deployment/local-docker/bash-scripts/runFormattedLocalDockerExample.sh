@@ -11,8 +11,4 @@ if [[ $(grep -c example_palisade <(echo $NETWORKS)) -lt 1 ]]; then
 fi
 
 docker build -t example-docker-runner "$EXAMPLE/deployment/local-docker/example-docker-services/client/"
-docker run --network=example_palisade_network --rm example-docker-runner  | sed $'s/Alice \[/\\\n\\\nAlice \[/g'| \
-    sed $'s/Bob \[/\\\n\\\nBob \[/g' | sed $'s/Eve \[/\\\n\\\nEve \[/g' | sed $'s/,name=/\\\n\\\nname=/g'| \
-    sed $'s/,dateOfBirth=/\\\ndateOfBirth=/g'|sed $'s/,contactNumbers=/\\\ncontactNumbers=/g'| \
-    sed $'s/,emergencyContacts=/\\\nemergencyContacts=/g'| \sed $'s/,address=/\\\naddress=/g'| \
-    sed $'s/,bankDetails=/\\\nbankDetails=/g'|sed $'s/,taxCode=/\\\ntaxCode=/g'|sed $'s/,nationality=/\\\nnationality=/g'
+docker run --network=example_palisade_network --rm example-docker-runner | $EXAMPLE/deployment/bash-scripts/formatOutput.sh
