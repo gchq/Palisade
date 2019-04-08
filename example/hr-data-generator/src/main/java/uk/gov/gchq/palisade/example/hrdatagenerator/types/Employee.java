@@ -16,7 +16,8 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
-import org.ajbrown.namemachine.NameGenerator;
+import com.github.javafaker.Faker;
+import com.github.javafaker.Name;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import uk.gov.gchq.palisade.UserId;
@@ -25,7 +26,6 @@ import uk.gov.gchq.palisade.example.hrdatagenerator.utils.DateHelper;
 import java.util.Random;
 
 public class Employee {
-    private static final NameGenerator NAME_GENERATOR = new NameGenerator();
 
     private UserId uid;
     private String name;
@@ -40,12 +40,14 @@ public class Employee {
 
     public static Employee generate(final Random random) {
         Employee employee = new Employee();
+        Faker faker = ThreadLocalFaker.getFaker(random);
         employee.setUid(generateUID(random));
-        employee.setName(NAME_GENERATOR.generateName().toString()); // we are storing name as a string not a Name
+        Name employeeName = faker.name();
+        employee.setName(employeeName.firstName() + " " + employeeName.lastName()); // we are storing name as a string not a Name
         employee.setDateOfBirth(DateHelper.generateDateOfBirth(random));
         employee.setContactNumbers(PhoneNumber.generateMany(random));
-        employee.setEmergencyContacts(EmergencyContact.generateMany(random, NAME_GENERATOR));
-        employee.setAddress(Address.generate());
+        employee.setEmergencyContacts(EmergencyContact.generateMany(faker, random));
+        employee.setAddress(Address.generate(random));
         employee.setBankDetails(BankDetails.generate(random));
         employee.setTaxCode(generateTaxCode());
         employee.setNationality(Nationality.generate(random));

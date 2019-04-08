@@ -31,7 +31,6 @@ public class EmployeeTest {
     public void generateEmployee() {
         long startTime = System.currentTimeMillis();
         Random random = new Random(0);
-        Address.setRandom(random);
         for (int i = 0; i < 100; i++) {
             Employee t = Employee.generate(random);
         }

@@ -19,38 +19,27 @@ package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 import com.github.javafaker.Faker;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Locale;
 import java.util.Random;
 
-import static java.util.Objects.requireNonNull;
-
 public class Address {
-    private static Faker faker = null;
+    private static ThreadLocal<Faker> faker = new ThreadLocal<>();
+    private static ThreadLocal<Random> currentRandom = new ThreadLocal<>();
+
     private String streetAddressNumber;
     private String streetName;
     private String city;
     private String state;
     private String zipCode;
 
-    public static Address generate() {
+    public static Address generate(final Random random) {
         Address address = new Address();
-        com.github.javafaker.Address fakeAddress = getFaker().address();
+        com.github.javafaker.Address fakeAddress = ThreadLocalFaker.getFaker(random).address();
         address.setStreetAddressNumber(fakeAddress.streetAddressNumber());
         address.setStreetName(fakeAddress.streetName());
         address.setCity(fakeAddress.city());
         address.setState(fakeAddress.state());
         address.setZipCode(fakeAddress.zipCode());
         return address;
-    }
-
-    private static synchronized Faker getFaker() {
-        requireNonNull(faker, "can't create addresses, have you called setRandom()?");
-        return faker;
-    }
-
-    public static synchronized void setRandom(final Random random) {
-        requireNonNull(random, "random");
-        faker = new Faker(new Locale("en-GB"), random);
     }
 
     public String getStreetAddressNumber() {
