@@ -19,7 +19,7 @@ stages:
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.11'
         jdkArchitectureOption: 'x64'
-        goals: 'clean install'
+        goals: 'clean install -P quick'
 
     - task: CopyFiles@2
       inputs:
@@ -32,4 +32,3 @@ stages:
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)/example/deployment/local-docker'
         artifactName: local-docker
-
