@@ -17,7 +17,7 @@ stages:
   jobs:
     - job:
       variables: 
-      - group: project-variables
+      - group: Palisade-azure
       steps:
       - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
         displayName: 'terraform init'
