@@ -1,3 +1,7 @@
+variables:
+  azure-dir: example/deployment/Azure-AKS
+  devops-dir: $(azure-dir)/devops-pipelines
+
 trigger:
   batch: true
   branches:
@@ -5,8 +9,8 @@ trigger:
     - '*'
   paths:
     include:
-    - example/deployment/azure-infra/terraform/*
-    - azure-pipelines.infra.yaml
+    - example/deployment/Azure-AKS/terraform/*
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.infra.yaml
 
 stages:
 - stage: Deploy_Infra
@@ -19,7 +23,7 @@ stages:
         displayName: 'terraform init'
         inputs:
           command: init
-          workingDirectory: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/terraform'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
           backendType: azurerm
           backendServiceArm: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
           ensureBackend: true
@@ -33,15 +37,15 @@ stages:
         displayName: 'terraform plan'
         inputs:
           command: plan
-          workingDirectory: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/terraform'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
           environmentServiceName: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
-          commandOptions: '-var-file default.tfvars -var client_id=$(sp_id) -var client_secret=$(sp_pass) -var subscription_id=$(subscription_id)  -out plan'
+          commandOptions: '-var-file default.tfvars -var client_id=$(terraform_sp_app_id) -var client_secret=$(terraform_sp_pass) -var subscription_id=$(subscription_id)  -out plan'
 
       - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
         displayName: 'terraform apply'
         inputs:
           command: apply
-          workingDirectory: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/terraform'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
           environmentServiceName: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
           commandOptions: plan
 
@@ -53,7 +57,7 @@ stages:
           kubernetesCluster: 'palisade-aks'
           command: apply
           useConfigurationFile: true
-          configuration: '$(System.DefaultWorkingDirectory)/example/deployment/azure-infra/k8s/'
+          configuration: '$(System.DefaultWorkingDirectory)/$(azure-dir)/k8s/'
           checkLatest: true
 
       - task: HelmDeploy@0

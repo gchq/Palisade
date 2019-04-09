@@ -1,0 +1,49 @@
+---
+# Source: palisade/templates/policy-service.yaml
+
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: policy-service
+  name: policy-service
+spec:
+  selector:
+    app: policy-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---    
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: policy-service
+  name: policy-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  policy-service
+  template:
+    metadata:
+      labels:
+        app:  policy-service
+    spec:
+      containers:
+      - image: tmppalisadeopsuksouthacr.azurecr.io/policy-service:latest
+        name: policy-service
+        ports:
+          - containerPort: 8080
+        livenessProbe:
+          httpGet: 
+            path: /policy/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        
+        resources: {}
+      restartPolicy: Always
+status: {}
