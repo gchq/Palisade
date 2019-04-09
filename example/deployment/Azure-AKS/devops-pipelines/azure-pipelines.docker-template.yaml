@@ -5,7 +5,7 @@ steps:
   displayName: 'Download Build Artifacts'
   inputs:
     buildType: specific
-    project: '124362e9-66a7-42ba-922e-4971f592dea1'
+    project: '$(System.TeamProjectId)'
     pipeline: 43
     specificBuildWithTriggering: true
     artifactName: local-docker
