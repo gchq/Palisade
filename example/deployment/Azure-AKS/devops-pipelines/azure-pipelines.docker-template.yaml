@@ -6,7 +6,7 @@ steps:
   inputs:
     buildType: specific
     project: '$(System.TeamProjectId)'
-    pipeline: 43
+    pipeline: '$(Build.TriggeredBy.BuildId)'
     specificBuildWithTriggering: true
     artifactName: local-docker
     downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
