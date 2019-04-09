@@ -6,15 +6,15 @@ trigger:
   paths:
     include:
     - example/deployment/local-docker/*
-    - azure-pipelines.docker.yaml
-    - azure-pipelines.docker-template.yaml
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker.yaml
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
 
 
 
 stages:
 - stage: Docker_Build_and_Push
   variables: 
-      - group: project-variables
+      - group: Palisade-azure
   jobs:
     - job:
       displayName: client
