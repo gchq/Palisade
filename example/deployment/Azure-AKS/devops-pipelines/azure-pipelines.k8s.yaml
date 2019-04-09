@@ -1,0 +1,18 @@
+stages:
+- stage: Deploy_Palisade
+  jobs:
+    - job:
+      variables: 
+      - group: project-variables
+      steps:
+      - task: HelmDeploy@0
+        displayName: 'helm upgrade'
+        inputs:
+          azureSubscription: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
+          azureResourceGroup: 'tmp-palisade-aks'
+          kubernetesCluster: 'palisade-aks'
+          command: upgrade
+          chartType: FilePath
+          chartPath: example/deployment/helm/palisade
+          releaseName: palisade
+          overrideValues: 'image.registry=$(registry_dns),image.tag=$(Build.TriggeredBy.BuildId)'

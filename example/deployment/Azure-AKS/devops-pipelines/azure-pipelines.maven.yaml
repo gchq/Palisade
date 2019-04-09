@@ -1,0 +1,35 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+  paths:
+    include:
+    - azure-pipelines.maven.yaml
+
+stages:
+- stage: Maven_Build  
+  jobs:
+  - job:
+    steps:
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.11'
+        jdkArchitectureOption: 'x64'
+        goals: 'clean install'
+
+    - task: CopyFiles@2
+      inputs:
+        #sourceFolder: # Optional
+        contents: example/deployment/local-docker/**/?(*.jar|*.war|configRest.json)
+        targetFolder: $(Build.ArtifactStagingDirectory)
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: local-docker'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/example/deployment/local-docker'
+        artifactName: local-docker
+
