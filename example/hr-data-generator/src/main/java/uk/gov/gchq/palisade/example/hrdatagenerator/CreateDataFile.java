@@ -77,7 +77,7 @@ public final class CreateDataFile implements Callable<Boolean> {
         final long countWrite = numberOfEmployees / 10;
         return Stream.generate(() -> {
             long count = counter.incrementAndGet();
-            if (count % countWrite == 0 || count % 1_000_000 == 0) {
+            if ((numberOfEmployees > 1_000_000 && countWrite > 0 && count % countWrite == 0) || count % 1_000_000 == 0) {
                 System.err.printf("Thread %s has written %d records.%n", Thread.currentThread().getName(), count);
             }
             return Employee.generate(random);
