@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
+import com.github.javafaker.Faker;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
@@ -28,9 +29,9 @@ public class Address {
     private String state;
     private String zipCode;
 
-    public static Address generate(final Random random) {
+    public static Address generate(final Faker faker, final Random random) {
         Address address = new Address();
-        com.github.javafaker.Address fakeAddress = ThreadLocalFaker.getFaker(random).address();
+        com.github.javafaker.Address fakeAddress = faker.address();
         address.setStreetAddressNumber(fakeAddress.streetAddressNumber());
         address.setStreetName(fakeAddress.streetName());
         address.setCity(fakeAddress.city());
