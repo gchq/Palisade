@@ -42,7 +42,7 @@ public final class CreateDataFile implements Callable<Boolean> {
     }
 
     public Boolean call() {
-        try {
+        try (OutputStream out = new FileOutputStream(outputFile)) {
             int bufferSize = 32;
             Stream<Employee> employeeStream;
             AvroSerialiser<Employee> employeeAvroSerialiser = new AvroSerialiser<>(Employee.class);
@@ -62,7 +62,6 @@ public final class CreateDataFile implements Callable<Boolean> {
             }
             BytesSuppliedInputStream in = (BytesSuppliedInputStream) employeeAvroSerialiser.serialise(employeeStream);
             outputFile.getParentFile().mkdirs();
-            OutputStream out = new FileOutputStream(outputFile);
             byte[] buffer = new byte[bufferSize];
             int dataAvailable = in.read(buffer);
             while (dataAvailable > 0) {
@@ -74,6 +73,8 @@ public final class CreateDataFile implements Callable<Boolean> {
                 dataAvailable = in.read(buffer);
             }
         } catch (final Exception ignore) {
+            System.err.println(ignore);
+            ignore.printStackTrace();
         }
         return Boolean.TRUE;
     }
