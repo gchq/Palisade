@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Random;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 public final class CreateDataFile implements Callable<Boolean> {
@@ -72,7 +73,15 @@ public final class CreateDataFile implements Callable<Boolean> {
     }
 
     private Stream<Employee> generateStreamOfEmployees() {
-        return Stream.generate(() -> Employee.generate(random)).limit(numberOfEmployees - 1);
+        final AtomicLong counter = new AtomicLong(0);
+        final long countWrite = numberOfEmployees / 10;
+        return Stream.generate(() -> {
+            long count = counter.incrementAndGet();
+            if (count % countWrite == 0) {
+                System.err.printf("Thread %s has written %d records.%n", Thread.currentThread().getName(), count);
+            }
+            return Employee.generate(random);
+        }).limit(numberOfEmployees - 1);
     }
 
 }
