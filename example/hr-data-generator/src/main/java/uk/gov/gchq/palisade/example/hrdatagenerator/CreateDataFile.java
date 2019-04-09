@@ -64,9 +64,8 @@ public final class CreateDataFile implements Callable<Boolean> {
             outputFile.getParentFile().mkdirs();
             IOUtils.copy(in,out);
 
-        } catch (final Exception ignore) {
-            System.err.println(ignore);
-            ignore.printStackTrace();
+        } catch (final Exception error) {
+            error.printStackTrace();
         }
         return Boolean.TRUE;
     }
