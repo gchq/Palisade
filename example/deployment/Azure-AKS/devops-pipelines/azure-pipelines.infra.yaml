@@ -38,7 +38,7 @@ stages:
         inputs:
           command: plan
           workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
-          environmentServiceName: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
+          environmentServiceName: 'Palisade ($(subscription_id))'
           commandOptions: '-var-file default.tfvars -var client_id=$(terraform_sp_app_id) -var client_secret=$(terraform_sp_pass) -var subscription_id=$(subscription_id)  -out plan'
 
       - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
