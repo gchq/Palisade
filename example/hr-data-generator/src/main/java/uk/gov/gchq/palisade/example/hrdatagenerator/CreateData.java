@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.example.hrdatagenerator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.gchq.palisade.Util;
 
 import java.io.File;
 import java.util.Arrays;
@@ -45,7 +46,7 @@ public final class CreateData {
                 numberOfThreads = Integer.parseInt(args[3]);
             }
             long startTime = System.currentTimeMillis();
-            ExecutorService executors = Executors.newFixedThreadPool(numberOfThreads);
+            ExecutorService executors = Executors.newFixedThreadPool(numberOfThreads, Util.createDaemonThreadFactory());
             CreateDataFile[] tasks = new CreateDataFile[numberOfFiles];
             long employeesPerFile = numberOfEmployees / numberOfFiles;
             for (int i = 0; i < numberOfFiles; i++) {
