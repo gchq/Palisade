@@ -154,7 +154,7 @@ public final class Util {
      * Applies a collection of rules to a record.
      *
      * @param record  record to filter
-     * @param user    user the record is being procesed for
+     * @param user    user the record is being processed for
      * @param context the additional context
      * @param rules   rules collection
      * @param <T>     record type
