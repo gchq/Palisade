@@ -20,16 +20,17 @@ import java.util.GregorianCalendar;
 import java.util.Random;
 
 public final class DateHelper {
-    private static final GregorianCalendar GREGORIAN_CALENDAR = new GregorianCalendar();
+    private static final ThreadLocal<GregorianCalendar> GREGORIAN_CALENDAR = ThreadLocal.withInitial(() -> new GregorianCalendar());
 
     private DateHelper() {
     }
 
     public static String generateDateOfBirth(final Random random) {
+        GregorianCalendar localCalendar = GREGORIAN_CALENDAR.get();
         int year = 1800 + random.nextInt(100);
-        GREGORIAN_CALENDAR.set(GREGORIAN_CALENDAR.YEAR, year);
-        int dayOfYear = random.nextInt(GREGORIAN_CALENDAR.getActualMaximum(GREGORIAN_CALENDAR.DAY_OF_YEAR));
-        GREGORIAN_CALENDAR.set(GREGORIAN_CALENDAR.DAY_OF_YEAR, dayOfYear);
-        return GREGORIAN_CALENDAR.get(GREGORIAN_CALENDAR.DAY_OF_MONTH) + "/" + GREGORIAN_CALENDAR.get(GREGORIAN_CALENDAR.MONTH) + "/" + year;
+        localCalendar.set(localCalendar.YEAR, year);
+        int dayOfYear = random.nextInt(localCalendar.getActualMaximum(localCalendar.DAY_OF_YEAR));
+        localCalendar.set(localCalendar.DAY_OF_YEAR, dayOfYear);
+        return localCalendar.get(localCalendar.DAY_OF_MONTH) + "/" + localCalendar.get(localCalendar.MONTH) + "/" + year;
     }
 }
