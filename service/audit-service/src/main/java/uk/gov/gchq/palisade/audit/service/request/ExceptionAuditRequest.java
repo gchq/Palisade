@@ -33,14 +33,6 @@ public class ExceptionAuditRequest extends AuditRequestWithContext {
     public ExceptionAuditRequest() {
     }
 
-    @Override
-    public String constructAuditLog() {
-        final String msg = "" + super.constructAuditLog() + "AuditRequestWithException: "
-                + "' generated an exception '" + exception.getMessage();
-        return msg;
-    }
-
-
     /**
      * @param ex {@link Throwable} is the type of the exception while processing
      * @return the {@link ExceptionAuditRequest}

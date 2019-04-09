@@ -31,13 +31,6 @@ public class ProcessingCompleteAuditRequest extends AuditRequestWithContext {
     }
 
     @Override
-    public String constructAuditLog() {
-        final String msg = "" + super.constructAuditLog() + "ProcessingCompleteAuditRequest: ";
-        return msg;
-    }
-
-
-    @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;

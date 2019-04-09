@@ -67,7 +67,6 @@ public class AddCacheRequest<V> extends CacheRequest {
      */
     private boolean locallyCacheable;
 
-
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
         throw new ForbiddenException("Should not call AddCacheRequest.setOriginalRequestId()");

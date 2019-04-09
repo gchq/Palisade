@@ -33,18 +33,6 @@ public abstract class AuditRequestWithContext extends AuditRequest {
     }
 
     /**
-     * @return the auditLog representation of this class
-     */
-    @Override
-    public String constructAuditLog() {
-        return "" + " 'userId' " + getUserId().getId()
-                + " 'purpose' " + getContext().getPurpose()
-                + "' resourceId '" + getResourceId()
-                + "' id '" + getId()
-                + "' originalRequestId '" + getOriginalRequestId();
-    }
-
-    /**
      * @param context {@link Context} is the reason for the user accessing the resource
      * @param type    the derived return type to perform the cast upon
      * @param <T>     return type derived from AuditRequestWithContext
