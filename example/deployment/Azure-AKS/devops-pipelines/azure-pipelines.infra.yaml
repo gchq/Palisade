@@ -25,7 +25,7 @@ stages:
           command: init
           workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
           backendType: azurerm
-          backendServiceArm: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
+          backendServiceArm: 'palisade_rm'
           ensureBackend: true
           backendAzureRmResourceGroupName: 'tmp-tfstate'
           backendAzureRmResourceGroupLocation: uksouth
