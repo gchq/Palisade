@@ -69,7 +69,7 @@ public class ExceptionAuditRequest extends AuditRequestWithContext {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(20, 39)
+        return new HashCodeBuilder(27, 39)
                 .appendSuper(super.hashCode())
                 .append(exception)
                 .toHashCode();

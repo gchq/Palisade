@@ -63,10 +63,10 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
     public PalisadeInputSplit(final RequestId requestId, final Map<LeafResource, ConnectionDetail> resources, final String originalRequestId) {
         Objects.requireNonNull(requestId, "requestId");
         Objects.requireNonNull(resources, "resources");
-        Objects.requireNonNull(resources, "originalRequestId");
+        Objects.requireNonNull(originalRequestId, "originalRequestId");
         requestResponse = new DataRequestResponse().requestId(requestId).resources(resources).originalRequestId(originalRequestId);
     }
-    
+
     /**
      * Create a new input split. The request response is stored inside this input split.
      *

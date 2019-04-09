@@ -29,6 +29,9 @@ public abstract class AuditRequestWithContext extends AuditRequest {
     private UserId userId;
     private String resourceId;
 
+    public AuditRequestWithContext() {
+    }
+
     /**
      * @return the auditLog representation of this class
      */
@@ -78,9 +81,6 @@ public abstract class AuditRequestWithContext extends AuditRequest {
         return type.cast(this);
     }
 
-    public AuditRequestWithContext() {
-    }
-
     public Context getContext() {
         requireNonNull(context, "The context has not been set.");
         return context;
@@ -115,7 +115,7 @@ public abstract class AuditRequestWithContext extends AuditRequest {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(20, 39)
+        return new HashCodeBuilder(29, 39)
                 .appendSuper(super.hashCode())
                 .append(context)
                 .append(userId)

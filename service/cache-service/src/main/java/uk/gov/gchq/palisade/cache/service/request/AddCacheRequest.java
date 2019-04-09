@@ -49,6 +49,9 @@ import java.util.Optional;
 @JsonIgnoreProperties(value = {"originalRequestId"})
 public class AddCacheRequest<V> extends CacheRequest {
 
+    public AddCacheRequest() {
+    }
+
     /**
      * An empty optional indicates no time to live specified.
      */
@@ -64,9 +67,6 @@ public class AddCacheRequest<V> extends CacheRequest {
      */
     private boolean locallyCacheable;
 
-    @JsonIgnoreProperties(value = {"originalRequestId"})
-    public AddCacheRequest() {
-    }
 
     @Override
     public void setOriginalRequestId(final String originalRequestId) {
