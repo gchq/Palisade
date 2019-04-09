@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator;
 
+import org.apache.commons.io.IOUtils;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
@@ -43,7 +44,6 @@ public final class CreateDataFile implements Callable<Boolean> {
 
     public Boolean call() {
         try (OutputStream out = new FileOutputStream(outputFile)) {
-            int bufferSize = 32;
             Stream<Employee> employeeStream;
             AvroSerialiser<Employee> employeeAvroSerialiser = new AvroSerialiser<>(Employee.class);
             // Need one Employee whose manager has a UID of Bob (for examples to work)
@@ -62,16 +62,8 @@ public final class CreateDataFile implements Callable<Boolean> {
             }
             BytesSuppliedInputStream in = (BytesSuppliedInputStream) employeeAvroSerialiser.serialise(employeeStream);
             outputFile.getParentFile().mkdirs();
-            byte[] buffer = new byte[bufferSize];
-            int dataAvailable = in.read(buffer);
-            while (dataAvailable > 0) {
-                if (dataAvailable > bufferSize) {
-                    out.write(buffer);
-                } else {
-                    out.write(buffer, 0, dataAvailable);
-                }
-                dataAvailable = in.read(buffer);
-            }
+            IOUtils.copy(in,out);
+
         } catch (final Exception ignore) {
             System.err.println(ignore);
             ignore.printStackTrace();
