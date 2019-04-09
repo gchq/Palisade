@@ -19,7 +19,6 @@ package uk.gov.gchq.palisade.example.hrdatagenerator;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import uk.gov.gchq.palisade.example.hrdatagenerator.types.Address;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 
 import java.io.File;

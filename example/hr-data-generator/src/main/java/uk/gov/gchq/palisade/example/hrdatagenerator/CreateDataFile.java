@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.example.hrdatagenerator;
 
 import org.apache.commons.io.IOUtils;
+
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
@@ -43,6 +44,7 @@ public final class CreateDataFile implements Callable<Boolean> {
     }
 
     public Boolean call() {
+        outputFile.getParentFile().mkdirs();
         try (OutputStream out = new FileOutputStream(outputFile)) {
             Stream<Employee> employeeStream;
             AvroSerialiser<Employee> employeeAvroSerialiser = new AvroSerialiser<>(Employee.class);
@@ -60,10 +62,9 @@ public final class CreateDataFile implements Callable<Boolean> {
             } else {
                 employeeStream = firstEmployeeStream;
             }
-            BytesSuppliedInputStream in = (BytesSuppliedInputStream) employeeAvroSerialiser.serialise(employeeStream);
-            outputFile.getParentFile().mkdirs();
-            IOUtils.copy(in,out);
 
+            BytesSuppliedInputStream in = (BytesSuppliedInputStream) employeeAvroSerialiser.serialise(employeeStream);
+            IOUtils.copy(in, out);
         } catch (final Exception error) {
             error.printStackTrace();
         }
