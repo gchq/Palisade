@@ -17,8 +17,8 @@ spec:
               serviceName: palisade-service
               servicePort: 8080
     - host: data-service
-        http:
-          paths:
-              - backend:
-                serviceName: data-service
-                servicePort: 8080
+      http:
+        paths:
+          - backend:
+              serviceName: data-service
+              servicePort: 8080
