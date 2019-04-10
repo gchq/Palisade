@@ -3,7 +3,7 @@ stages:
   jobs:
     - job:
       variables: 
-      - group: project-variables
+      - group: Palisade-azure
       steps:
       - task: HelmDeploy@0
         displayName: 'helm upgrade'
