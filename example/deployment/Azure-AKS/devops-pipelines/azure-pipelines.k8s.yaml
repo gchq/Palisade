@@ -15,4 +15,4 @@ stages:
           chartType: FilePath
           chartPath: example/deployment/Azure-AKS/helm/palisade
           releaseName: palisade
-          overrideValues: 'image.registry=$(registry_dns),image.tag=$(Build.TriggeredBy.BuildId)'
+          overrideValues: 'image.registry=$(registry_dns),image.tag=latest'
