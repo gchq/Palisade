@@ -8,7 +8,7 @@ stages:
       - task: HelmDeploy@0
         displayName: 'helm upgrade'
         inputs:
-          azureSubscription: 'palisade'
+          azureSubscription: 'palisade_rm'
           azureResourceGroup: 'tmp-palisade-aks'
           kubernetesCluster: 'palisade-aks'
           command: upgrade
