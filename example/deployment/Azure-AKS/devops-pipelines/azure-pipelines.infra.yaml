@@ -70,7 +70,7 @@ stages:
               azureSubscription: 'palisade_rm'
               azureResourceGroup: 'tmp-palisade-aks'
               kubernetesCluster: 'palisade-aks'
-              namespace: default
+              namespace: ingress
               command: upgrade
               chartName: 'stable/nginx-ingress'
               releaseName: 'nginx-ingress'
