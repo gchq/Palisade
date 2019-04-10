@@ -7,16 +7,18 @@ metadata:
     app:  configure-example
   name: configure-example
 spec:
-  containers:
-  - image: palisadeacr.azurecr.io/configure-example:latest
-    name: configure-example
-    resources:
-      requests:
-        cpu: 100m
-        memory: 128Mi
-      limits:
-        cpu: 250m
-        memory: 256Mi
-    restartPolicy: Never
+  template:
+    spec:
+      containers:
+        - image: palisadeacr.azurecr.io/configure-example:latest
+          name: configure-example
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+        restartPolicy: Never
 
 status: {}

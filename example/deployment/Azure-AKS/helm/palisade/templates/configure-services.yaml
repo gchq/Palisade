@@ -7,16 +7,18 @@ metadata:
     app:  configure-services
   name: configure-services
 spec:
-  containers:
-    - image: palisadeacr.azurecr.io/configure-services:latest
-      name: configure-services
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128Mi
-        limits:
-          cpu: 250m
-          memory: 256Mi
-      restartPolicy: Never
+  template:
+    spec:
+      containers:
+        - image: palisadeacr.azurecr.io/configure-services:latest
+          name: configure-services
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+        restartPolicy: Never
 
 status: {}
