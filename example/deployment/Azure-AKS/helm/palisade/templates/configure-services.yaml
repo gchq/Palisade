@@ -17,7 +17,7 @@ spec:
         app:  configure-services
     spec:
       containers:
-      - image: tmppalisadeopsuksouthacr.azurecr.io/configure-services:latest
+      - image: palisadeacr.azurecr.io/configure-services:latest
         name: configure-services
         resources:
           requests:

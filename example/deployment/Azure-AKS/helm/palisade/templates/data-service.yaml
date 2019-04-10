@@ -33,7 +33,7 @@ spec:
         app:  data-service
     spec:
       containers:
-      - image: tmppalisadeopsuksouthacr.azurecr.io/data-service:latest
+      - image: palisadeacr.azurecr.io/data-service:latest
         name: data-service
         resources:
           requests:

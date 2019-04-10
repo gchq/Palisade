@@ -32,7 +32,7 @@ spec:
         app:  policy-service
     spec:
       containers:
-      - image: tmppalisadeopsuksouthacr.azurecr.io/policy-service:latest
+      - image: palisadeacr.azurecr.io/policy-service:latest
         name: policy-service
         ports:
           - containerPort: 8080

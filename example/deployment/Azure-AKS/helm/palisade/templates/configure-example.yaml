@@ -17,7 +17,7 @@ spec:
         app:  configure-example
     spec:
       containers:
-      - image: tmppalisadeopsuksouthacr.azurecr.io/configure-example:latest
+      - image: palisadeacr.azurecr.io/configure-example:latest
         name: configure-example
         resources:
           requests:
