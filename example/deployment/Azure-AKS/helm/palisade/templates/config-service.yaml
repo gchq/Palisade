@@ -42,6 +42,13 @@ spec:
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /config/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
         
         resources: {}
       restartPolicy: Always

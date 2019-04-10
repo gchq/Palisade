@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 AKS_PERS_RESOURCE_GROUP="tmp-palisade-storage"
 AKS_PERS_STORAGE_ACCOUNT_NAME="palisadestorage"
 
