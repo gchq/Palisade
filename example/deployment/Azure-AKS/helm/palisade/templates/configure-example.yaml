@@ -1,31 +1,21 @@
 ---
 # Source: palisade/templates/configure-example.yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   labels:
     app:  configure-example
   name: configure-example
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app:  configure-example
-  template:
-    metadata:
-      labels:
-        app:  configure-example
-    spec:
-      containers:
-      - image: palisadeacr.azurecr.io/configure-example:latest
-        name: configure-example
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 250m
-            memory: 256Mi
-      restartPolicy: Never
-          
+  containers:
+  - image: palisadeacr.azurecr.io/configure-example:latest
+    name: configure-example
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
+
 status: {}
