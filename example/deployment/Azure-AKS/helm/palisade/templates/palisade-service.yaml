@@ -36,6 +36,13 @@ spec:
         image: tmppalisadeopsuksouthacr.azurecr.io/palisade-service:latest
         ports:
           - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
         livenessProbe:
           httpGet:
             path: /palisade/v1/status
@@ -43,6 +50,11 @@ spec:
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
-        
-        resources: {}
+        readinessProbe:
+          httpGet:
+            path: /palisade/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
       restartPolicy: Always

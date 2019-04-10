@@ -65,7 +65,7 @@ stages:
             inputs:
               azureSubscription: 'palisade_rm'
               scriptPath: '$(System.DefaultWorkingDirectory)/$(azure-dir)/k8s/create_share_secret.sh'
-              arguments: "$(data_storage_rg) $(data_storage_account_name)"
+              arguments: "$(data_storage_rg) $(data_storage_account_name) palisade-aks"
 
           - task: HelmDeploy@0
             displayName: 'helm init'

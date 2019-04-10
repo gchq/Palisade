@@ -33,6 +33,13 @@ spec:
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /data/v1/status
+              port: 8080
+            failureThreshold: 5
+            periodSeconds: 60
+            timeoutSeconds: 10
         volumeMounts:
           - name: data
             mountPath: /data
