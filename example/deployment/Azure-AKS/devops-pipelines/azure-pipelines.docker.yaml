@@ -38,8 +38,8 @@ stages:
       displayName: configure-example
       steps:
       - template: azure-pipelines.docker-template.yaml
-       parameters:
-         imageName: configure-example
+        parameters:
+          imageName: configure-example
     - job:
       steps:
       - template: azure-pipelines.docker-template.yaml  
