@@ -49,6 +49,12 @@ stages:
               environmentServiceName: 'palisade_rm'
               commandOptions: plan
 
+          - task: HelmInstaller@0
+            displayName: 'Install Helm'
+            inputs:
+              helmVersion: 2.13.0
+              kubectlVersion: 1.14.0
+
           - task: Kubernetes@1
             displayName: 'K8s RBAC Accounts'
             inputs:
