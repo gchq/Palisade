@@ -8,11 +8,11 @@ stages:
       - task: HelmDeploy@0
         displayName: 'helm upgrade'
         inputs:
-          azureSubscription: 'Demos (802df257-6032-4b50-884c-55cb9f074928)'
+          azureSubscription: 'palisade'
           azureResourceGroup: 'tmp-palisade-aks'
           kubernetesCluster: 'palisade-aks'
           command: upgrade
           chartType: FilePath
-          chartPath: example/deployment/helm/palisade
+          chartPath: example/deployment/Azure-AKS/helm/palisade
           releaseName: palisade
           overrideValues: 'image.registry=$(registry_dns),image.tag=$(Build.TriggeredBy.BuildId)'

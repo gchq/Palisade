@@ -6,66 +6,73 @@ trigger:
   batch: true
   branches:
     include:
-    - '*'
+      - '*'
   paths:
     include:
-    - example/deployment/Azure-AKS/terraform/*
-    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.infra.yaml
+      - example/deployment/Azure-AKS/terraform/*
+      - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.infra.yaml
 
 stages:
-- stage: Deploy_Infra
-  jobs:
-    - job:
-      variables: 
-      - group: Palisade-azure
-      steps:
-      - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
-        displayName: 'terraform init'
-        inputs:
-          command: init
-          workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
-          backendType: azurerm
-          backendServiceArm: 'palisade_rm'
-          ensureBackend: true
-          backendAzureRmResourceGroupName: 'tmp-tfstate'
-          backendAzureRmResourceGroupLocation: uksouth
-          backendAzureRmStorageAccountName: 'tfstatepalisade'
-          backendAzureRmContainerName: tfstate
-          backendAzureRmKey: palisade
+  - stage: Deploy_Infra
+    jobs:
+      - job:
+        variables:
+          - group: Palisade-azure
+        steps:
+          - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+            displayName: 'terraform init'
+            inputs:
+              command: init
+              workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
+              backendType: azurerm
+              backendServiceArm: 'palisade_rm'
+              ensureBackend: true
+              backendAzureRmResourceGroupName: 'tmp-tfstate'
+              backendAzureRmResourceGroupLocation: uksouth
+              backendAzureRmStorageAccountName: 'tfstatepalisade'
+              backendAzureRmContainerName: tfstate
+              backendAzureRmKey: palisade
 
-      - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
-        displayName: 'terraform plan'
-        inputs:
-          command: plan
-          workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
-          environmentServiceName: 'palisade_rm'
-          commandOptions: '-var-file default.tfvars -var client_id=$(terraform_sp_app_id) -var client_secret=$(terraform_sp_pass) -var subscription_id=$(subscription_id)  -out plan'
+          - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+            displayName: 'terraform plan'
+            inputs:
+              command: plan
+              workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
+              environmentServiceName: 'palisade_rm'
+              commandOptions: '-var-file default.tfvars -var client_id=$(terraform_sp_app_id) -var client_secret=$(terraform_sp_pass) -var subscription_id=$(subscription_id)  -out plan'
 
-      - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
-        displayName: 'terraform apply'
-        inputs:
-          command: apply
-          workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
-          environmentServiceName: 'palisade_rm'
-          commandOptions: plan
+          - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
+            displayName: 'terraform apply'
+            inputs:
+              command: apply
+              workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
+              environmentServiceName: 'palisade_rm'
+              commandOptions: plan
 
-      - task: Kubernetes@1  
-        displayName: 'K8s RBAC Accounts'
-        inputs:
-          azureSubscriptionEndpoint: 'palisade_rm'
-          azureResourceGroup: 'tmp-palisade-aks'
-          kubernetesCluster: 'palisade-aks'
-          command: apply
-          useConfigurationFile: true
-          configuration: '$(System.DefaultWorkingDirectory)/$(azure-dir)/k8s/'
-          checkLatest: true
+          - task: Kubernetes@1
+            displayName: 'K8s RBAC Accounts'
+            inputs:
+              azureSubscriptionEndpoint: 'palisade_rm'
+              azureResourceGroup: 'tmp-palisade-aks'
+              kubernetesCluster: 'palisade-aks'
+              command: apply
+              useConfigurationFile: true
+              configuration: '$(System.DefaultWorkingDirectory)/$(azure-dir)/k8s/'
+              checkLatest: true
 
-      - task: HelmDeploy@0
-        displayName: 'helm init'
-        inputs:
-          azureSubscription: 'palisade_rm'
-          azureResourceGroup: 'tmp-palisade-aks'
-          kubernetesCluster: 'palisade-aks'
-          command: init
-          arguments: ' --upgrade --service-account tiller'
+          - task: AzureCLI@1
+            displayName: 'Create share secret within k8'
+            inputs:
+              azureSubscription: 'palisade_rm'
+              scriptPath: '$(System.DefaultWorkingDirectory)/$(azure-dir)/k8s/create_share_secret.sh'
+              arguments: "$(data_storage_rg) $(data_storage_account_name)"
+
+          - task: HelmDeploy@0
+            displayName: 'helm init'
+            inputs:
+              azureSubscription: 'palisade_rm'
+              azureResourceGroup: 'tmp-palisade-aks'
+              kubernetesCluster: 'palisade-aks'
+              command: init
+              arguments: ' --upgrade --service-account tiller'
 
