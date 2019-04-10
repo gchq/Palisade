@@ -19,7 +19,7 @@ stages:
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.11'
         jdkArchitectureOption: 'x64'
-        goals: 'clean install -P quick'
+        goals: 'clean install -P example'
 
     - task: CopyFiles@2
       inputs:
