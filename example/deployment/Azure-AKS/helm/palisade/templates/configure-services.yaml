@@ -1,31 +1,22 @@
 ---
 # Source: palisade/templates/configure-services.yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   labels:
     app:  configure-services
   name: configure-services
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app:  configure-services
-  template:
-    metadata:
-      labels:
-        app:  configure-services
-    spec:
-      containers:
-      - image: palisadeacr.azurecr.io/configure-services:latest
-        name: configure-services
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 250m
-            memory: 256Mi
+  containers:
+    - image: palisadeacr.azurecr.io/configure-services:latest
+      name: configure-services
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 250m
+          memory: 256Mi
       restartPolicy: Never
-          
+
 status: {}
