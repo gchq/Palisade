@@ -27,16 +27,11 @@ import uk.gov.gchq.palisade.service.request.Request;
  * to be able to store an audit record. The default information is what resources
  * was being accessed.
  */
-public abstract class AuditRequest extends Request {
+public class AuditRequest extends Request {
 
     // no-arg constructor required
     public AuditRequest() {
     }
-
-    /**
-     * @return the auditLog representation of this class
-     */
-    public abstract String constructAuditLog();
 
 
     @Override

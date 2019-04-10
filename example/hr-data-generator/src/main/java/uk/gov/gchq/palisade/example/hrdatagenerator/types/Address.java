@@ -19,19 +19,19 @@ package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 import com.github.javafaker.Faker;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Locale;
+import java.util.Random;
 
 public class Address {
-    private static final Faker FAKER = new Faker(new Locale("en-GB"));
+
     private String streetAddressNumber;
     private String streetName;
     private String city;
     private String state;
     private String zipCode;
 
-    public static Address generate() {
+    public static Address generate(final Faker faker, final Random random) {
         Address address = new Address();
-        com.github.javafaker.Address fakeAddress = FAKER.address();
+        com.github.javafaker.Address fakeAddress = faker.address();
         address.setStreetAddressNumber(fakeAddress.streetAddressNumber());
         address.setStreetName(fakeAddress.streetName());
         address.setCity(fakeAddress.city());

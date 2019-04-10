@@ -39,6 +39,7 @@ import static java.util.Objects.requireNonNull;
 public class DataRequestResponse {
     private RequestId requestId;
     private Map<LeafResource, ConnectionDetail> resources;
+    private String originalRequestId; //this Id is unique per data access request from a user
 
     public DataRequestResponse() {
     }
@@ -74,6 +75,12 @@ public class DataRequestResponse {
         return this;
     }
 
+    public DataRequestResponse originalRequestId(final String originalRequestId) {
+        requireNonNull(originalRequestId, "The originalRequestId cannot be null.");
+        this.originalRequestId = originalRequestId;
+        return this;
+    }
+
     public void setResources(final Map<LeafResource, ConnectionDetail> resources) {
         resources(resources);
     }
@@ -81,6 +88,15 @@ public class DataRequestResponse {
     public Map<LeafResource, ConnectionDetail> getResources() {
         requireNonNull(resources, "The Resources have not been set.");
         return resources;
+    }
+
+    public void setOriginalRequestId(final String originalRequestId) {
+        this.originalRequestId = originalRequestId;
+    }
+
+    public String getOriginalRequestId() {
+        requireNonNull(originalRequestId, "The originalRequestId type cannot be null");
+        return originalRequestId;
     }
 
     @Override
@@ -98,6 +114,7 @@ public class DataRequestResponse {
         return new EqualsBuilder()
                 .append(requestId, that.requestId)
                 .append(resources, that.resources)
+                .append(originalRequestId, that.originalRequestId)
                 .isEquals();
     }
 
@@ -106,6 +123,7 @@ public class DataRequestResponse {
         return new HashCodeBuilder(17, 67)
                 .append(requestId)
                 .append(resources)
+                .append(originalRequestId)
                 .toHashCode();
     }
 

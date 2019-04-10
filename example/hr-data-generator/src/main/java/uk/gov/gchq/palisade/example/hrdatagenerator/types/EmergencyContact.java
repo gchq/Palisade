@@ -16,43 +16,32 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
-import org.ajbrown.namemachine.Gender;
-import org.ajbrown.namemachine.Name;
-import org.ajbrown.namemachine.NameGenerator;
+import com.github.javafaker.Faker;
+import com.github.javafaker.Name;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
 
 public class EmergencyContact {
-    private static final Relation[] MALE_RELATIONS = new Relation[]{Relation.BROTHER, Relation.FATHER, Relation.GRANDFATHER, Relation.SON};
-    private static final Relation[] FEMALE_RELATIONS = new Relation[]{Relation.DAUGHTER, Relation.GRANDMOTHER, Relation.MOTHER, Relation.SISTER};
-
     private String contactName;
     private Relation relation;
     private PhoneNumber[] contactNumbers;
 
-    public static EmergencyContact generate(final Random random, final NameGenerator nameGenerator) {
+    public static EmergencyContact generate(final Faker faker, final Random random) {
         EmergencyContact contact = new EmergencyContact();
-        Name tempName = nameGenerator.generateName();
-        contact.setContactName(tempName.toString());
-        Relation[] relations;
-        if (tempName.getGender().equals(Gender.MALE)) {
-            relations = MALE_RELATIONS;
-        } else {
-            relations = FEMALE_RELATIONS;
-        }
-
-        contact.setRelation(relations[random.nextInt(3)]);
+        Name tempName = faker.name();
+        contact.setContactName(tempName.firstName() + " " + tempName.lastName());
+        contact.setRelation(Relation.values()[random.nextInt(Relation.values().length)]);
         contact.setContactNumbers(PhoneNumber.generateMany(random));
         return contact;
     }
 
-    public static EmergencyContact[] generateMany(final Random random, final NameGenerator nameGenerator) {
+    public static EmergencyContact[] generateMany(final Faker faker, final Random random) {
         int numberOfExtraContacts = random.nextInt(4);
         EmergencyContact[] emergencyContacts = new EmergencyContact[numberOfExtraContacts + 1];
-        emergencyContacts[0] = EmergencyContact.generate(random, nameGenerator);
+        emergencyContacts[0] = EmergencyContact.generate(faker, random);
         for (int i = 1; i <= numberOfExtraContacts; i++) {
-            emergencyContacts[i] = EmergencyContact.generate(random, nameGenerator);
+            emergencyContacts[i] = EmergencyContact.generate(faker, random);
         }
         return emergencyContacts;
     }

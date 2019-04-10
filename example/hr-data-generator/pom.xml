@@ -13,11 +13,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.ajbrown</groupId>
-            <artifactId>name-machine</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>0.16</version>
@@ -31,6 +26,11 @@
             <groupId>uk.gov.gchq.palisade</groupId>
             <artifactId>hadoop-data-service</artifactId>
             <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
         </dependency>
     </dependencies>
 

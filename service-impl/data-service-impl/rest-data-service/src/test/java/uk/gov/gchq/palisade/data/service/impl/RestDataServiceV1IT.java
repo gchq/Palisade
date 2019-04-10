@@ -35,7 +35,6 @@ import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -57,8 +56,7 @@ public class RestDataServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        final String uuid = UUID.randomUUID().toString();
-        request.setOriginalRequestId((uuid));
+        request.setOriginalRequestId("id1");
         RestDataServiceV1.setDefaultDelegate(new MockDataService());
         proxy = (ProxyRestDataService) new ProxyRestDataService("http://localhost:8084/data").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());

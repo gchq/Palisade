@@ -17,12 +17,9 @@
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 public enum Relation {
-    GRANDMOTHER,
-    GRANDFATHER,
-    MOTHER,
-    FATHER,
-    BROTHER,
-    SISTER,
-    DAUGHTER,
-    SON;
+    GRANDPARENT,
+    PARENT,
+    SIBLING,
+    CHILDREN,
+    COUSIN;
 }

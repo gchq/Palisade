@@ -31,13 +31,6 @@ public class ProcessingCompleteAuditRequest extends AuditRequestWithContext {
     }
 
     @Override
-    public String constructAuditLog() {
-        final String msg = "" + super.constructAuditLog() + "ProcessingCompleteAuditRequest: ";
-        return msg;
-    }
-
-
-    @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
@@ -53,7 +46,7 @@ public class ProcessingCompleteAuditRequest extends AuditRequestWithContext {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(20, 39)
+        return new HashCodeBuilder(25, 39)
                 .appendSuper(super.hashCode())
                 .toHashCode();
     }

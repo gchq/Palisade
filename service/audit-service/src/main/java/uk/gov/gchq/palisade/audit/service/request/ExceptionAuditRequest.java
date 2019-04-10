@@ -33,14 +33,6 @@ public class ExceptionAuditRequest extends AuditRequestWithContext {
     public ExceptionAuditRequest() {
     }
 
-    @Override
-    public String constructAuditLog() {
-        final String msg = "" + super.constructAuditLog() + "AuditRequestWithException: "
-                + "' generated an exception '" + exception.getMessage();
-        return msg;
-    }
-
-
     /**
      * @param ex {@link Throwable} is the type of the exception while processing
      * @return the {@link ExceptionAuditRequest}
@@ -69,7 +61,7 @@ public class ExceptionAuditRequest extends AuditRequestWithContext {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(20, 39)
+        return new HashCodeBuilder(27, 39)
                 .appendSuper(super.hashCode())
                 .append(exception)
                 .toHashCode();

@@ -33,6 +33,7 @@ public class DataReaderResponse {
     private InputStream data;
     private String message;
 
+
     // no args constructor required
     public DataReaderResponse() {
     }
