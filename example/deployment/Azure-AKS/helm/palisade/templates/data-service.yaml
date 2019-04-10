@@ -1,4 +1,20 @@
 ---
+# Source: palisade/templates/config-service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: data-service
+  name: data-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: data-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
 # Source: palisade/templates/data-service.yaml
 apiVersion: apps/v1
 kind: Deployment
