@@ -24,7 +24,7 @@ stages:
     - task: CopyFiles@2
       inputs:
         #sourceFolder: # Optional
-        contents: example/deployment/local-docker/**/docker/bin/*
+        contents: example/deployment/local-docker/**/docker/bin/**/*
         targetFolder: $(Build.ArtifactStagingDirectory)
 
     - task: PublishBuildArtifacts@1
