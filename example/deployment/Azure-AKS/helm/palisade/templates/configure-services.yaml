@@ -10,8 +10,8 @@ spec:
   template:
     spec:
       containers:
-        - image: palisadeacr.azurecr.io/configure-services:latest
-          name: configure-services
+      - image: palisadeacr.azurecr.io/configure-services:latest
+        name: configure-services
         restartPolicy: Never
 
 status: {}
