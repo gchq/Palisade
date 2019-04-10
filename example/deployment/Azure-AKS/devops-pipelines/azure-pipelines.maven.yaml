@@ -24,7 +24,7 @@ stages:
     - task: CopyFiles@2
       inputs:
         #sourceFolder: # Optional
-        contents: example/deployment/local-docker/**/?(*.jar|*.war|configRest.json)
+        contents: example/deployment/local-docker/**/docker/bin/*
         targetFolder: $(Build.ArtifactStagingDirectory)
 
     - task: PublishBuildArtifacts@1
