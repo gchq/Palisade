@@ -26,15 +26,6 @@ spec:
           limits:
             cpu: 250m
             memory: 256Mi
-        volumeMounts:
-          - name: config
-            mountPath: /mnt/config
-      restartPolicy: Always
-      volumes:
-      - name: config
-        azureFile:
-          secretName: config-share-secret
-          shareName: config
-          readOnly: true
+      restartPolicy: Never
           
 status: {}
