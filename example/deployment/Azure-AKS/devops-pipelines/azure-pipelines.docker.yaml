@@ -29,10 +29,17 @@ stages:
         parameters:
           imageName: config-service
     - job:
+      displayName: configure-service
       steps:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: configure-services
+    - job:
+      displayName: configure-example
+      steps:
+      - template: azure-pipelines.docker-template.yaml
+       parameters:
+         imageName: configure-example
     - job:
       steps:
       - template: azure-pipelines.docker-template.yaml  
