@@ -11,6 +11,7 @@ module "acr" {
 
     resource_group_name = "${var.ops_resource_group_name}"
     resource_group_location = "${var.primary_region}"
+    acr_name = "${var.acr_name}"
 }
 
 module "vnet" {

@@ -72,3 +72,8 @@ variable "dns_prefix" {
   type        = "string"
   description = "AKS DNS prefix"
 }
+
+variable "acr_name" {
+  type        = "string"
+  description = "Name of the ACR."
+}
