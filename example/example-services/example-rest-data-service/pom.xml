@@ -149,6 +149,23 @@
                                 <palisade.error-mode.debug>
                                     true
                                 </palisade.error-mode.debug>
+                                <com.sun.management.jmxremote>
+                                </com.sun.management.jmxremote>
+                                <com.sun.management.jmxremote.authenticate>
+                                    false
+                                </com.sun.management.jmxremote.authenticate>
+                                <com.sun.management.jmxremote.ssl>
+                                    false
+                                </com.sun.management.jmxremote.ssl>
+                                <com.sun.management.jmxremote.port>
+                                    9087
+                                </com.sun.management.jmxremote.port>
+                                <com.sun.management.jmxremote.rmi.port>
+                                    9087
+                                </com.sun.management.jmxremote.rmi.port>
+                                <java.rmi.server.hostname>
+                                    N18721
+                                </java.rmi.server.hostname>
                             </systemProperties>
                         </configuration>
                         <executions>

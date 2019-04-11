@@ -34,6 +34,9 @@ import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
@@ -120,11 +123,29 @@ public class SimpleDataService implements DataService {
 
             final ReadResponse response = new ReadResponse();
             if (null != readerResult.getData()) {
-                response.data(readerResult.getData());
+                response.data(new OhNoInputStream("final input stream", readerResult.getData()));
             }
             LOGGER.debug("Returning from read: {}", response);
             return response;
         });
+    }
+
+    public static class OhNoInputStream extends FilterInputStream {
+        private final String name;
+
+        public OhNoInputStream(final String name, final InputStream d) {
+            super(d);
+            this.name = name;
+        }
+
+        @Override
+        public void close() throws IOException {
+
+            System.err.println(name + " JUST GOT CLOSED!");
+            Thread.dumpStack();
+
+            super.close();
+        }
     }
 
     public PalisadeService getPalisadeService() {

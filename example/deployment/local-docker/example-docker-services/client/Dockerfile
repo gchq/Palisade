@@ -5,4 +5,4 @@ COPY docker/bin/example-docker-runner-*-shaded.jar /example-docker-runner/
 ADD docker/bin/configRest.json /example-docker-runner/
 
 ENTRYPOINT ["java"]
-CMD ["-cp", "/example-docker-runner/*", "-Dpalisade.rest.config.path=/example-docker-runner/configRest.json", "uk.gov.gchq.palisade.example.RestDockerExample"]
+CMD ["-cp", "/example-docker-runner/*", "-Dpalisade.rest.config.path=/example-docker-runner/configRest.json", "uk.gov.gchq.palisade.example.RestDockerExample", "/data/exampleEmployee_testmed.avro"]

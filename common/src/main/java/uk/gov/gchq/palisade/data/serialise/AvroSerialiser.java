@@ -70,8 +70,13 @@ public class AvroSerialiser<O> implements Serialiser<O> {
 
     @Override
     public Stream<O> deserialise(final InputStream input) {
-        try (DataFileStream<O> in = new DataFileStream<>(input, new ReflectDatumReader<>(schema))) {
-            return StreamSupport.stream(in.spliterator(), false);
+        DataFileStream<O> in;
+        try {
+            in = new DataFileStream<>(input, new ReflectDatumReader<>(schema));
+            return StreamSupport.stream(in.spliterator(), false).onClose(() ->{
+                LOGGER.info("Unfiltered stream has been closed");
+            });
+
         } catch (final Exception e) {
             LOGGER.debug("Closing streams");
             throw new RuntimeException("Unable to deserialise object, failed to read input bytes", e);
