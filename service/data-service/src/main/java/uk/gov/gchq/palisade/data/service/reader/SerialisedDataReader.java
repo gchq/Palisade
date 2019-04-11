@@ -118,7 +118,6 @@ public abstract class SerialisedDataReader implements DataReader {
         return new DataReaderResponse().data(data);
     }
 
-
     /**
      * This is the method that connects to the data and streams the raw data
      * into the {@link SerialisedDataReader}.
