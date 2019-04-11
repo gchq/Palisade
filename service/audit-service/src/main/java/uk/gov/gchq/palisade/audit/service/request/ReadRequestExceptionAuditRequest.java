@@ -34,14 +34,6 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
     public ReadRequestExceptionAuditRequest() {
     }
 
-    @Override
-    public String constructAuditLog() {
-        final String msg = "" + "ReadRequestExceptionAuditRequest: "
-                + "' generated an exception '" + exception.getMessage();
-        return msg;
-    }
-
-
     /**
      * @param ex {@link Throwable} is the type of the exception while processing
      * @return the {@link ReadRequestExceptionAuditRequest}
