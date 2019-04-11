@@ -21,7 +21,7 @@ metadata:
     app:  etcd
   name: etcd
 spec:
-  replicas: 1
+  replicas: {{ .Values.etcd.replicas }}
   selector:
     matchLabels:
       app:  etcd
@@ -32,7 +32,8 @@ spec:
     spec:
       containers: 
       - name: etcd
-        image: palisadeacr.azurecr.io/etcd:latest
+        image: "{{ .Values.etcd.image.repository }}:{{ .Values.etcd.image.tag }}"
+        imagePullPolicy: "{{ .Values.etcd.image.pullPolicy }}"
         ports:
           - containerPort: 2379
         livenessProbe:
@@ -47,8 +48,7 @@ spec:
             port: 2379
           periodSeconds: 5
           timeoutSeconds: 5
-       
-        resources: {}
-
+        resources:
+          {{- toYaml .Values.etcd.resources | nindent 12 }}
       restartPolicy: Always
 status: {}

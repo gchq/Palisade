@@ -4,10 +4,103 @@
 
 replicaCount: 1
 
-image:
-  repository: nginx
-  tag: stable
-  pullPolicy: IfNotPresent
+config-service:
+  image:
+    pullPolicy: IfNotPresent
+    repository: palisadeacr.azurecr.io/config-service
+    tag: latest
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 0.5
+      memory: 2Gi
+  replicas: 1
+
+data-service:
+  image:
+    pullPolicy: Always
+    repository: palisadeacr.azurecr.io/data-service
+    tag: latest
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 0.5
+      memory: 10Gi
+  replicas: 1
+
+etcd:
+  image:
+    pullPolicy: IfNotPresent
+    repository: palisadeacr.azurecr.io/etcd
+    tag: latest
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 0.25
+      memory: 1Gi
+  replicas: 1
+
+palisade-service:
+  image:
+    pullPolicy: IfNotPresent
+    repository: palisadeacr.azurecr.io/palisade-service
+    tag: latest
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 0.5
+      memory: 2Gi
+  replicas: 1
+
+policy-service:
+  image:
+    pullPolicy: IfNotPresent
+    repository: palisadeacr.azurecr.io/policy-service
+    tag: latest
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 0.5
+      memory: 2Gi
+  replicas: 1
+
+resource-service:
+  image:
+    pullPolicy: IfNotPresent
+    repository: palisadeacr.azurecr.io/resource-service
+    tag: latest
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 0.5
+      memory: 2Gi
+  replicas: 1
+
+user-service:
+  image:
+    pullPolicy: IfNotPresent
+    repository: palisadeacr.azurecr.io/user-service
+    tag: latest
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 0.5
+      memory: 2Gi
+  replicas: 1
 
 nameOverride: ""
 fullnameOverride: ""

@@ -22,7 +22,7 @@ metadata:
     name: config-service
   name: config-service
 spec:
-  replicas: 1
+  replicas: {{ .Values.config-service.replicas }}
   selector:
     matchLabels:
       app:  config-service
@@ -33,7 +33,8 @@ spec:
     spec:
       containers:
       - name: config-service
-        image: palisadeacr.azurecr.io/config-service:latest
+        image: "{{ .Values.config-service.image.repository }}:{{ .Values.config-service.image.tag }}"
+        imagePullPolicy: "{{ .Values.config-service.image.pullPolicy }}"
         ports:
           - containerPort: 8080
         livenessProbe:
@@ -51,11 +52,6 @@ spec:
           periodSeconds: 60
           timeoutSeconds: 10
         resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 0.5
-            memory: 2Gi
+          {{- toYaml .Values.config-service.resources | nindent 12 }}
       restartPolicy: Always
 status: {}
