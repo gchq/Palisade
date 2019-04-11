@@ -82,9 +82,4 @@ public class BankDetailsRulesTest {
         // Then
         assertNull(actual.getBankDetails());
     }
-
-    @Test
-    public void test(){
-        System.out.println(Employee.class.getSimpleName());
-    }
 }
