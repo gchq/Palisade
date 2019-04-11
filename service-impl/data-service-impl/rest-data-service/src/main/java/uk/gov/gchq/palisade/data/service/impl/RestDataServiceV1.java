@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,14 +118,11 @@ public class RestDataServiceV1 implements DataService {
         }
 
         @Override
-        public void write(final OutputStream outputStream) throws IOException, WebApplicationException {
+        public void write(final OutputStream outputStream) {
             final ReadResponse response = futureResponse.join();
-            final InputStream stream = response.getData();
-            try {
-                for (int b = stream.read(); b >= 0; b = stream.read()) {
-                    outputStream.write(b);
-                }
-                outputStream.flush();
+
+            try (final InputStream inputStream = response.getData()) {
+                IOUtils.copy(inputStream, outputStream);
             } catch (final IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);

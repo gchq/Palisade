@@ -31,6 +31,7 @@ import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.reader.SerialisedDataReader;
 import uk.gov.gchq.palisade.resource.LeafResource;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -94,7 +95,22 @@ public class HadoopDataReader extends SerialisedDataReader {
             throw new RuntimeException("Unable to read resource: " + resource.getId(), e);
         }
 
-        return inputStream;
+        return new OhNoInputStream(inputStream);
+    }
+
+    public static class OhNoInputStream extends FilterInputStream {
+        public OhNoInputStream(final InputStream d) {
+            super(d);
+        }
+
+        @Override
+        public void close() throws IOException {
+
+            System.err.println("THIS JUST GOT CLOSED!");
+            Thread.dumpStack();
+
+            super.close();
+        }
     }
 
     public Configuration getConf() {
