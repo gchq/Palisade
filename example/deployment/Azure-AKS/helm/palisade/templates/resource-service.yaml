@@ -22,7 +22,7 @@ spec:
   selector:
     matchLabels:
       app: resource-service
-  replicas: {{ .Values.resource-service.replicas }}
+  replicas: {{ .Values.resourceservice.replicas }}
   template:
     metadata:
       labels:
@@ -30,8 +30,8 @@ spec:
     spec:
       containers:
       - name: resource-service
-        image: "{{ .Values.resource-service.image.repository }}:{{ .Values.resource-service.image.tag }}"
-        imagePullPolicy: "{{ .Values.resource-service.image.pullPolicy }}"
+        image: "{{ .Values.resourceservice.image.repository }}:{{ .Values.resourceservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.resourceservice.image.pullPolicy }}"
         ports:
           - containerPort: 8080
         livenessProbe:
@@ -52,7 +52,7 @@ spec:
           - name: data
             mountPath: /data
         resources:
-          {{- toYaml .Values.resource-service.resources | nindent 12 }}
+          {{- toYaml .Values.resourceservice.resources | nindent 12 }}
       restartPolicy: Always
       volumes:
       - name: data

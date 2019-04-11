@@ -12,5 +12,5 @@ spec:
       containers:
       - image: palisadeacr.azurecr.io/configure-example:latest
         name: configure-example
-        command: ["/tmp/waitForHost.sh", "http://policy-service:8080/policy/v1/status", "java", "-cp", "/tmp/example-model-*-shaded.jar", "-Dpalisade.rest.config.path=/tmp/configRest.json", "uk.gov.gchq.palisade.example.config.ExampleConfigurator", "/data"] // parametise data file path
+        command: ["/tmp/waitForHost.sh", "http://policy-service:8080/policy/v1/status", "java", "-cp", "/tmp/example-model-*-shaded.jar", "-Dpalisade.rest.config.path=/tmp/configRest.json", "uk.gov.gchq.palisade.example.config.ExampleConfigurator", " {{ .Values.configureexample.inputfilepath }} "]
       restartPolicy: Never

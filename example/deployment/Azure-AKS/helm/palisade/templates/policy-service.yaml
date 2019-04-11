@@ -22,7 +22,7 @@ metadata:
     app: policy-service
   name: policy-service
 spec:
-  replicas: {{ .Values.policy-service.replicas }}
+  replicas: {{ .Values.policyservice.replicas }}
   selector:
     matchLabels:
       app:  policy-service
@@ -33,8 +33,8 @@ spec:
     spec:
       containers:
       - name: policy-service
-        image: "{{ .Values.policy-service.image.repository }}:{{ .Values.policy-service.image.tag }}"
-        imagePullPolicy: "{{ .Values.policy-service.image.pullPolicy }}"
+        image: "{{ .Values.policyservice.image.repository }}:{{ .Values.policyservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.policyservice.image.pullPolicy }}"
         ports:
           - containerPort: 8080
         livenessProbe:
@@ -52,6 +52,6 @@ spec:
           periodSeconds: 60
           timeoutSeconds: 10
         resources:
-          {{- toYaml .Values.policy-service.resources | nindent 12 }}
+          {{- toYaml .Values.policyservice.resources | nindent 12 }}
       restartPolicy: Always
 status: {}

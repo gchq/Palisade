@@ -22,7 +22,7 @@ metadata:
      app: palisade-service
   name: palisade-service
 spec:
-  replicas: {{ .Values.palisade-service.replicas }}
+  replicas: {{ .Values.palisadeservice.replicas }}
   selector:
     matchLabels:
       app:  palisade-service
@@ -34,8 +34,8 @@ spec:
     spec:
       containers:
       - name: palisade-service
-        image: "{{ .Values.palisade-service.image.repository }}:{{ .Values.palisade-service.image.tag }}"
-        imagePullPolicy: "{{ .Values.palisade-service.image.pullPolicy }}"
+        image: "{{ .Values.palisadeservice.image.repository }}:{{ .Values.palisadeservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.palisadeservice.image.pullPolicy }}"
         ports:
           - containerPort: 8080
         livenessProbe:
@@ -53,5 +53,5 @@ spec:
           periodSeconds: 60
           timeoutSeconds: 10
         resources:
-          {{- toYaml .Values.palisade-service.resources | nindent 12 }}
+          {{- toYaml .Values.palisadeservice.resources | nindent 12 }}
       restartPolicy: Always

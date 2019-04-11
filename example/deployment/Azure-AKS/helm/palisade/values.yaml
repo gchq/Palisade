@@ -4,7 +4,7 @@
 
 replicaCount: 1
 
-config-service:
+configservice:
   image:
     pullPolicy: IfNotPresent
     repository: palisadeacr.azurecr.io/config-service
@@ -18,7 +18,7 @@ config-service:
       memory: 2Gi
   replicas: 1
 
-data-service:
+dataservice:
   image:
     pullPolicy: Always
     repository: palisadeacr.azurecr.io/data-service
@@ -46,7 +46,7 @@ etcd:
       memory: 1Gi
   replicas: 1
 
-palisade-service:
+palisadeservice:
   image:
     pullPolicy: IfNotPresent
     repository: palisadeacr.azurecr.io/palisade-service
@@ -60,7 +60,7 @@ palisade-service:
       memory: 2Gi
   replicas: 1
 
-policy-service:
+policyservice:
   image:
     pullPolicy: IfNotPresent
     repository: palisadeacr.azurecr.io/policy-service
@@ -74,7 +74,7 @@ policy-service:
       memory: 2Gi
   replicas: 1
 
-resource-service:
+resourceservice:
   image:
     pullPolicy: IfNotPresent
     repository: palisadeacr.azurecr.io/resource-service
@@ -88,7 +88,7 @@ resource-service:
       memory: 2Gi
   replicas: 1
 
-user-service:
+userservice:
   image:
     pullPolicy: IfNotPresent
     repository: palisadeacr.azurecr.io/user-service
@@ -101,6 +101,9 @@ user-service:
       cpu: 0.5
       memory: 2Gi
   replicas: 1
+
+configureexample:
+  inputfilepath: /data
 
 nameOverride: ""
 fullnameOverride: ""

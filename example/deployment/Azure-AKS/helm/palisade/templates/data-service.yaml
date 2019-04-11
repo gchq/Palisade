@@ -23,7 +23,7 @@ metadata:
     app:  data-service
   name: data-service
 spec:
-  replicas: {{ .Values.data-service.replicas }}
+  replicas: {{ .Values.dataservice.replicas }}
   selector:
     matchLabels:
       app:  data-service
@@ -33,8 +33,8 @@ spec:
         app:  data-service
     spec:
       containers:
-      - image: "{{ .Values.data-service.image.repository }}:{{ .Values.data-service.image.tag }}"
-        imagePullPolicy: "{{ .Values.data-service.image.pullPolicy }}"
+      - image: "{{ .Values.dataservice.image.repository }}:{{ .Values.dataservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.dataservice.image.pullPolicy }}"
         name: data-service
         livenessProbe:
           httpGet:
@@ -51,7 +51,7 @@ spec:
             periodSeconds: 60
             timeoutSeconds: 10
           resources:
-            {{- toYaml .Values.data-service.resources | nindent 12 }}
+            {{- toYaml .Values.dataservice.resources | nindent 12 }}
         volumeMounts:
           - name: data
             mountPath: /data

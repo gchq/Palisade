@@ -22,7 +22,7 @@ metadata:
     app: user-service
   name: user-service
 spec:
-  replicas: {{ .Values.user-service.replicas }}
+  replicas: {{ .Values.userservice.replicas }}
   selector:
     matchLabels:
       app:  user-service
@@ -32,8 +32,8 @@ spec:
         app:  user-service
     spec:
       containers:
-        image: "{{ .Values.user-service.image.repository }}:{{ .Values.user-service.image.tag }}"
-        imagePullPolicy: "{{ .Values.user-service.image.pullPolicy }}"
+        image: "{{ .Values.userservice.image.repository }}:{{ .Values.userservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.userservice.image.pullPolicy }}"
         name: user-service
         ports:
           - containerPort: 8080
@@ -52,6 +52,6 @@ spec:
           periodSeconds: 60
           timeoutSeconds: 10
         resources:
-          {{- toYaml .Values.user-service.resources | nindent 12 }}
+          {{- toYaml .Values.userservice.resources | nindent 12 }}
       restartuser: Always
 status: {}
