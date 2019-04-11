@@ -41,8 +41,8 @@ spec:
             cpu: 100m
             memory: 128Mi
           limits:
-            cpu: 250m
-            memory: 256Mi
+            cpu: 0.5
+            memory: 2Gi
         livenessProbe:
           httpGet: 
             path: /policy/v1/status
