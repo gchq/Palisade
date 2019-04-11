@@ -112,11 +112,11 @@ public class SimpleConfigService implements ConfigurationService {
     @Override
     public void configureSelfFromConfig() {
         try {
-            LOGGER.debug("Getting auxiliary configuration from cache");
+            LOGGER.info("Getting auxiliary configuration from cache");
             ServiceState selfConfig = getServiceConfig(ConfigurationService.class.getTypeName());
             applyConfigFrom(selfConfig);
         } catch (NoConfigException e) {
-            LOGGER.debug("No auxiliary configuration available. Probably not an error!");
+            LOGGER.info("No auxiliary configuration available. Probably not an error!");
         }
     }
 
@@ -198,7 +198,7 @@ public class SimpleConfigService implements ConfigurationService {
         if (genericResult.isPresent()) {
             return genericResult.get();
         } else {
-            throw new NoConfigException("no service configuration could be found");
+            throw new NoConfigException("no service configuration could be found for " + clazz);
         }
     }
 }
