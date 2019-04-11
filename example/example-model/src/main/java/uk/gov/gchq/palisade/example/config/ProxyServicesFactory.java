@@ -75,12 +75,13 @@ public class ProxyServicesFactory {
         } else {
             LOGGER.error("error not enough arguments have been provided. The following arguments are required:\n" +
                     "1. a csv of the etcd endpoints\n" +
-                    "2. the client url for the palisade service\n" +
-                    "3. the client url for the policy service\n" +
-                    "4. the client url for the resource service\n" +
-                    "5. the client url for the user service\n" +
-                    "6. the client url for the data service\n" +
-                    "7. the client url for the config service");
+                    "2. the internal client url for the palisade service\n" +
+                    "3. the internal client url for the policy service\n" +
+                    "4. the internal client url for the resource service\n" +
+                    "5. the internal client url for the user service\n" +
+                    "6. the internal client url for the data service\n" +
+                    "7. the internal client url for the config service\n" +
+                    "8. the external client url for the palisade service");
             return false;
         }
     }
@@ -109,12 +110,8 @@ public class ProxyServicesFactory {
         return new LoggerAuditService();
     }
 
-    public ConfigurationService createConfigService() {
-        return new ProxyRestConfigService(args[6]);
-    }
-
-    public UserService createUserService() {
-        return new ProxyRestUserService(args[4]);
+    public PalisadeService createPalisadeService() {
+        return new ProxyRestPalisadeService(args[1]);
     }
 
     public PolicyService createPolicyService() {
@@ -125,11 +122,20 @@ public class ProxyServicesFactory {
         return new ProxyRestResourceService(args[3]);
     }
 
+    public UserService createUserService() {
+        return new ProxyRestUserService(args[4]);
+    }
+
     public DataService createDataService() {
         return new ProxyRestDataService(args[5]);
     }
 
-    public PalisadeService createPalisadeService() {
-        return new ProxyRestPalisadeService(args[1]);
+    public ConfigurationService createConfigService() {
+        return new ProxyRestConfigService(args[6]);
     }
+
+    public PalisadeService createExternalPalisadeService() {
+        return new ProxyRestPalisadeService(args[7]);
+    }
+
 }
