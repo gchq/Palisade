@@ -69,7 +69,7 @@ import static java.util.Objects.requireNonNull;
 public class ServicesConfigurator {
     protected static final Logger LOGGER = LoggerFactory.getLogger(ServicesConfigurator.class);
     protected static final String HADOOP_CONF_PATH = "HADOOP_CONF_PATH";
-    public static final String RESOURCE_TYPE = "exampleEmployee";
+    public static final String RESOURCE_TYPE = "Employee";
 
     private final ProxyServicesFactory clientServices;
 

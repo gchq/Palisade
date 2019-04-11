@@ -70,7 +70,7 @@ public class ProxyServicesFactory {
      * @return true if the correct number of arguments are present
      */
     private boolean validateArguments(final String[] args) {
-        if (args.length > 6) {
+        if (args.length > 8) {
             return true;
         } else {
             LOGGER.error("error not enough arguments have been provided. The following arguments are required:\n" +
@@ -81,13 +81,14 @@ public class ProxyServicesFactory {
                     "5. the internal client url for the user service\n" +
                     "6. the internal client url for the data service\n" +
                     "7. the internal client url for the config service\n" +
-                    "8. the external client url for the palisade service");
+                    "8. the external client url for the palisade service\n" +
+                    "9. the external client url for the data service");
             return false;
         }
     }
 
     public ConnectionDetail createDataServiceConnectionDetail() {
-        return new ProxyRestConnectionDetail().url(args[5]).serviceClass(ProxyRestDataService.class);
+        return new ProxyRestConnectionDetail().url(args[8]).serviceClass(ProxyRestDataService.class);
     }
 
     private CacheService cacheService;
