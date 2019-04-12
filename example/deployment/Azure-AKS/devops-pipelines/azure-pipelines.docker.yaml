@@ -1,0 +1,82 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+  paths:
+    include:
+    - example/deployment/local-docker/*
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker.yaml
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
+
+stages:
+- stage: Docker_Build_and_Push
+  variables: 
+      - group: Palisade-azure
+  jobs:
+    - job:
+      displayName: client
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+        parameters:
+          imageName: client
+    - job:
+      displayName: config-service
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+        parameters:
+          imageName: config-service
+    - job:
+      displayName: configure-service
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+        parameters:
+          imageName: configure-services
+    - job:
+      displayName: configure-example
+      steps:
+      - template: azure-pipelines.docker-template.yaml
+        parameters:
+          imageName: configure-example
+    - job:
+      displayName: data-service
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+        parameters:
+          imageName: data-service
+    - job:
+      displayName: etcd
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+        parameters:
+          imageName: etcd
+    - job:
+      displayName: palisade-service
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+        parameters:
+          imageName: palisade-service
+    - job:
+      displayName: policy-service
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+        parameters:
+          imageName: policy-service
+    - job:
+      displayName: resource-service
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+        parameters:
+          imageName: resource-service
+    - job:
+      displayName: rest-redirector
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+        parameters:
+          imageName: rest-redirector
+    - job:
+      displayName: user-service
+      steps:
+      - template: azure-pipelines.docker-template.yaml  
+        parameters:
+          imageName: user-service

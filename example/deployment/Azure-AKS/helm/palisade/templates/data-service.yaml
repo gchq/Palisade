@@ -1,0 +1,69 @@
+---
+# Source: palisade/templates/config-service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: data-service
+  name: data-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: data-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+# Source: palisade/templates/data-service.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app:  data-service
+  name: data-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  data-service
+  template:
+    metadata:
+      labels:
+        app:  data-service
+    spec:
+      containers:
+      - image: palisadeacr.azurecr.io/data-service:latest
+        imagePullPolicy: Always
+        name: data-service
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 0.5
+            memory: 10Gi
+        livenessProbe:
+          httpGet:
+            path: /data/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /data/v1/status
+              port: 8080
+            failureThreshold: 5
+            periodSeconds: 60
+            timeoutSeconds: 10
+        volumeMounts:
+          - name: data
+            mountPath: /data
+      restartPolicy: Always
+      volumes:
+      - name: data
+        azureFile:
+          secretName: data-share-secret
+          shareName: data
+          readOnly: true

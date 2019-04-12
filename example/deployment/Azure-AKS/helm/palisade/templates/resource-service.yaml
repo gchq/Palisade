@@ -1,0 +1,66 @@
+---
+# Source: palisade/templates/resource-service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: resource-service
+spec:
+  selector:
+    app: resource-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---    
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: resource-service
+  name: resource-service
+spec:
+  selector:
+    matchLabels:
+      app: resource-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: resource-service
+    spec:
+      containers:
+      - name: resource-service
+        image: palisadeacr.azurecr.io/resource-service:latest
+        ports:
+          - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 0.5
+            memory: 2Gi
+        livenessProbe:
+          httpGet:
+            path: /resource/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /resource/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        volumeMounts:
+          - name: data
+            mountPath: /data
+      restartPolicy: Always
+      volumes:
+      - name: data
+        azureFile:
+          secretName: data-share-secret
+          shareName: data
+          readOnly: true

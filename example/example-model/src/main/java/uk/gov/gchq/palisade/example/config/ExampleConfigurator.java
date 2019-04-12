@@ -30,6 +30,7 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.resource.ParentResource;
+import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
@@ -89,6 +90,13 @@ public final class ExampleConfigurator {
                 new AddUserRequest().user(ExampleUsers.getEve())
         );
 
+        Resource resource;
+        if (file.endsWith("/")) {
+            resource = new DirectoryResource().id(file).parent(getParent(file));
+        } else {
+            resource = new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file));
+        }
+
         // You can either implement the Rule interface for your Policy rules or
         // you can chain together combinations of Koryphe functions/predicates.
         // Both of the following policies have the same logic, but using
@@ -98,7 +106,7 @@ public final class ExampleConfigurator {
         // Using Custom Rule implementations - without Koryphe
         final SetResourcePolicyRequest customPolicies =
                 new SetResourcePolicyRequest()
-                        .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
+                        .resource(resource)
                         .policy(new Policy<Employee>()
                                 .owner(ExampleUsers.getAlice())
                                 .recordLevelRule(

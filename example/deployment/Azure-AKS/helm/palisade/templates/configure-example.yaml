@@ -1,0 +1,16 @@
+---
+# Source: palisade/templates/configure-example.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app:  configure-example
+  name: configure-example
+spec:
+  template:
+    spec:
+      containers:
+      - image: palisadeacr.azurecr.io/configure-example:latest
+        name: configure-example
+        command: ["/tmp/waitForHost.sh", "http://policy-service:8080/policy/v1/status", "java", "-cp", "/tmp/example-model-*-shaded.jar", "-Dpalisade.rest.config.path=/tmp/configRest.json", "uk.gov.gchq.palisade.example.config.ExampleConfigurator", "/data"]
+      restartPolicy: Never

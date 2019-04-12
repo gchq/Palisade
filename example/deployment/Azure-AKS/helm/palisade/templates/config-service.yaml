@@ -1,0 +1,61 @@
+---
+# Source: palisade/templates/config-service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: config-service
+  name: config-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: config-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---    
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: config-service
+  name: config-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  config-service
+  template:
+    metadata:
+      labels:
+         app:  config-service
+    spec:
+      containers:
+      - name: config-service
+        image: palisadeacr.azurecr.io/config-service:latest
+        ports:
+          - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /config/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /config/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 0.5
+            memory: 2Gi
+      restartPolicy: Always
+status: {}
