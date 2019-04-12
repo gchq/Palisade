@@ -69,7 +69,7 @@ import static java.util.Objects.requireNonNull;
 public class ServicesConfigurator {
     protected static final Logger LOGGER = LoggerFactory.getLogger(ServicesConfigurator.class);
     protected static final String HADOOP_CONF_PATH = "HADOOP_CONF_PATH";
-    public static final String RESOURCE_TYPE = "exampleEmployee";
+    public static final String RESOURCE_TYPE = "Employee";
 
     private final ProxyServicesFactory clientServices;
 
@@ -91,7 +91,7 @@ public class ServicesConfigurator {
         CacheService cacheClient = clientServices.createCacheService();
 
         // add the config for the clients to the config service
-        Collection<Service> services = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
+        Collection<Service> services = Stream.of(clientServices.createExternalPalisadeService()).collect(Collectors.toList());
         writeClientConfiguration(configClient, services);
 
         // write the config for the user service to the config service
