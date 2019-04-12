@@ -25,9 +25,11 @@ import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
+import uk.gov.gchq.palisade.io.CloseActionInputStream;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.rule.Rules;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -101,8 +103,15 @@ public abstract class SerialisedDataReader implements DataReader {
                     request.getUser(),
                     request.getContext(),
                     rules
-            );
-            data = serialiser.serialise(deserialisedData);
+            ).onClose(() -> {
+                //ensure the original stream is closed as well
+                try {
+                    rawStream.close();
+                } catch (IOException ignored) {
+                }
+            });
+            //make sure we close the streams
+            data = new CloseActionInputStream(serialiser.serialise(deserialisedData), deserialisedData::close);
         }
 
         return new DataReaderResponse().data(data);
