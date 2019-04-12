@@ -25,10 +25,10 @@ import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
+import uk.gov.gchq.palisade.io.CloseActionInputStream;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.rule.Rules;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -104,37 +104,18 @@ public abstract class SerialisedDataReader implements DataReader {
                     request.getContext(),
                     rules
             ).onClose(() -> {
-                LOGGER.info("Filtered stream as been closed");
+                //ensure the original stream is closed as well
                 try {
                     rawStream.close();
                 } catch (IOException ignored) {
                 }
             });
-            data = new ClosingInputStream(serialiser.serialise(deserialisedData), deserialisedData::close);
+            //make sure we close the streams
+            data = new CloseActionInputStream(serialiser.serialise(deserialisedData), deserialisedData::close);
         }
 
         return new DataReaderResponse().data(data);
     }
-
-    public static class ClosingInputStream extends FilterInputStream {
-        private final Runnable closeAction;
-
-        public ClosingInputStream(final InputStream underlyingStream, final Runnable closeAction) {
-            super(underlyingStream);
-            requireNonNull(closeAction, "closeAction");
-            this.closeAction = closeAction;
-        }
-
-        @Override
-        public void close() throws IOException {
-            try {
-                super.close();
-            } finally {
-                closeAction.run();
-            }
-        }
-    }
-
 
     /**
      * This is the method that connects to the data and streams the raw data

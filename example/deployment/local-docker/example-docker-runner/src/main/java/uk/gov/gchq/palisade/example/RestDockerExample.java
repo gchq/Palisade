@@ -47,13 +47,14 @@ public class RestDockerExample {
     protected static final String FILE = new File("/data/exampleEmployee_file0.avro").getAbsolutePath();
 
     public static void main(final String[] args) throws Exception {
+        String fileToGet;
         if (args.length > 0) {
-            LOGGER.info("Going to request {} from Palisade", new File(args[0]).getAbsolutePath());
-            new RestDockerExample().run(new File(args[0]).getAbsolutePath());
+            fileToGet = new File(args[0]).getAbsolutePath();
         } else {
-            LOGGER.info("Requesting default {}", FILE);
-            new RestDockerExample().run(FILE);
+            fileToGet = FILE;
         }
+        LOGGER.info("Going to request {} from Palisade", fileToGet);
+        new RestDockerExample().run(fileToGet);
     }
 
     public void run(final String fileToRead) throws Exception {
