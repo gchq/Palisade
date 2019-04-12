@@ -25,6 +25,7 @@ import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
+import uk.gov.gchq.palisade.io.CloseActionInputStream;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.rule.Rules;
 
@@ -104,13 +105,14 @@ public abstract class SerialisedDataReader implements DataReader {
                     request.getContext(),
                     rules
             ).onClose(() -> {
-                LOGGER.info("Filtered stream as been closed");
+                //ensure the original stream is closed as well
                 try {
                     rawStream.close();
                 } catch (IOException ignored) {
                 }
             });
-            data = new ClosingInputStream(serialiser.serialise(deserialisedData), deserialisedData::close);
+            //make sure we close the streams
+            data = new CloseActionInputStream(serialiser.serialise(deserialisedData), deserialisedData::close);
         }
 
         return new DataReaderResponse().data(data);

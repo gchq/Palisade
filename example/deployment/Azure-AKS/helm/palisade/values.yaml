@@ -105,6 +105,11 @@ userservice:
 configureexample:
   inputfilepath: /data
 
+image:
+  repository: nginx
+  tag: stable
+  pullPolicy: IfNotPresent
+
 nameOverride: ""
 fullnameOverride: ""
 

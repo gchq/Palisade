@@ -1,5 +1,5 @@
 ---
-# Source: palisade/template-data-service.yaml
+# Source: palisade/templates/data-service.yaml
 kind: Service
 apiVersion: v1
 metadata:

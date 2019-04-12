@@ -90,9 +90,13 @@ public class ServicesConfigurator {
         DataService dataClient = clientServices.createDataService();
         CacheService cacheClient = clientServices.createCacheService();
 
-        // add the config for the clients to the config service
-        Collection<Service> services = Stream.of(clientServices.createExternalPalisadeService()).collect(Collectors.toList());
-        writeClientConfiguration(configClient, services);
+//        // add the config for the internal clients to the config service
+//        Collection<Service> internalServices = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
+//        writeInternalClientConfiguration(configClient, internalServices);
+
+        // add the config for the external clients to the config service
+        Collection<Service> externalServices = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, dataClient, cacheClient, clientServices.createExternalPalisadeService()).collect(Collectors.toList());
+        writeExternalClientConfiguration(configClient, externalServices);
 
         // write the config for the user service to the config service
         writeServerConfiguration(configClient, createUserServiceForServer(), UserService.class);
@@ -116,13 +120,13 @@ public class ServicesConfigurator {
     }
 
     /**
-     * This will write each of the client service configs into the config service ready
-     * for any of the services to get the details of how to contact those different services as required.
+     * This will write each of the external client service configs into the config service ready
+     * for any Palisade client to get the details of how to contact those different services as required.
      *
      * @param configService the configuration service
      * @param services      collection of services to write to the configuration service
      */
-    private void writeClientConfiguration(final ConfigurationService configService, final Collection<Service> services) {
+    private void writeExternalClientConfiguration(final ConfigurationService configService, final Collection<Service> services) {
         ServiceState initial = new ServiceState();
 
         //each service to write their configuration into the initial configuration
@@ -133,6 +137,25 @@ public class ServicesConfigurator {
                 .config(initial)
                 .service(Optional.empty())).join();
     }
+//
+//    /**
+//     * This will write each of the internal client service configs into the config service ready
+//     * for any of the internal services to get the details of how to contact those different services as required.
+//     *
+//     * @param configService the configuration service
+//     * @param services      collection of services to write to the configuration service
+//     */
+//    private void writeInternalClientConfiguration(final ConfigurationService configService, final Collection<Service> services) {
+//        ServiceState initial = new ServiceState();
+//
+//        //each service to write their configuration into the initial configuration
+//        services.forEach(service -> service.recordCurrentConfigTo(initial));
+//
+//        //insert this into the cache manually so it can be created later
+//        configService.add((AddConfigRequest) new AddConfigRequest()
+//                .config(initial)
+//                .service(Optional.empty())).join();
+//    }
 
     /**
      * This will write the provided services configuration into the config service

@@ -53,5 +53,5 @@ spec:
           timeoutSeconds: 10
         resources:
           {{- toYaml .Values.userservice.resources | nindent 12 }}
-      restartuser: Always
+      restartPolicy: Always
 status: {}
