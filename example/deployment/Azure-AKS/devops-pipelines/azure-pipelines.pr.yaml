@@ -37,7 +37,7 @@ stages:
         artifactName: local-docker
 
 - stage: Docker_Build_and_Push
-    jobs:
+  - jobs:
     - job:
       displayName: config-service
       dependsOn: PublishBuildArtifacts@1
