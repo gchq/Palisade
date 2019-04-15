@@ -32,9 +32,9 @@ spec:
         app:  user-service
     spec:
       containers:
+      - name: user-service
         image: "{{ .Values.userservice.image.repository }}:{{ .Values.userservice.image.tag }}"
         imagePullPolicy: "{{ .Values.userservice.image.pullPolicy }}"
-        name: user-service
         ports:
           - containerPort: 8080
         livenessProbe:
