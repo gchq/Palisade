@@ -36,28 +36,28 @@ stages:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)/example/deployment/local-docker'
         artifactName: local-docker
 
-  - job: Docker_build_config-service
+  - job: Docker_build_config_service
     displayName: config-service
     dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: config-service
-  - job: Docker_build_configure-service
+  - job: Docker_build_configure_service
     displayName: configure-service
     dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: configure-services
-  - job: Docker_build_configure-example
+  - job: Docker_build_configure_example
     displayName: configure-example
     dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: configure-example
-  - job: Docker_build_data-service
+  - job: Docker_build_data_service
     displayName: data-service
     dependsOn: Maven_Build
     steps:
@@ -71,28 +71,28 @@ stages:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: etcd
-  - job: Docker_build_palisade-service
+  - job: Docker_build_palisade_service
     displayName: palisade-service
     dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: palisade-service
-  - job: Docker_build_policy-service
+  - job: Docker_build_policy_service
     displayName: policy-service
     dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: policy-service
-  - job: Docker_build_resource-service
+  - job: Docker_build_resource_service
     displayName: resource-service
     dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: resource-service
-  - job: Docker_build_user-service
+  - job: Docker_build_user_service
     displayName: user-service
     dependsOn: Maven_Build
     steps:
@@ -103,14 +103,14 @@ stages:
   - job: Helm_deploy
     dependsOn: 
       - Docker_build_etcd
-      - Docker_build_config-service
-      - Docker_build_configure-services
-      - Docker_build_user-service
-      - Docker_build_policy-service
-      - Docker_build_resource-service
-      - Docker_build_data-service
-      - Docker_build_palisade-service
-      - Docker_build_configure-example
+      - Docker_build_confi_service
+      - Docker_build_configure_services
+      - Docker_build_user_service
+      - Docker_build_policy_service
+      - Docker_build_resource_service
+      - Docker_build_data_service
+      - Docker_build_palisade_service
+      - Docker_build_configure_example
     steps:
       - task: HelmDeploy@0
         displayName: 'helm upgrade'
