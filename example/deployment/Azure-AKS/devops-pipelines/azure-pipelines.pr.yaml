@@ -13,7 +13,7 @@ trigger:
 stages:
 - stage: Maven_Build  
   jobs:
-  - job:
+  - job: Maven_Build
     steps:
     - task: Maven@3
       inputs:
@@ -38,63 +38,63 @@ stages:
 
   - job:
     displayName: config-service
-    dependsOn: PublishBuildArtifacts@1
+    dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: config-service
   - job:
     displayName: configure-service
-    dependsOn: PublishBuildArtifacts@1
+    dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: configure-services
   - job:
     displayName: configure-example
-    dependsOn: PublishBuildArtifacts@1
+    dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: configure-example
   - job:
     displayName: data-service
-    dependsOn: PublishBuildArtifacts@1
+    dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: data-service
   - job:
     displayName: etcd
-    dependsOn: PublishBuildArtifacts@1
+    dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: etcd
   - job:
     displayName: palisade-service
-    dependsOn: PublishBuildArtifacts@1
+    dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: palisade-service
   - job:
     displayName: policy-service
-    dependsOn: PublishBuildArtifacts@1
+    dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: policy-service
   - job:
     displayName: resource-service
-    dependsOn: PublishBuildArtifacts@1
+    dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: resource-service
-  - job:
+  - job: user-service
     displayName: user-service
-    dependsOn: PublishBuildArtifacts@1
+    dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
