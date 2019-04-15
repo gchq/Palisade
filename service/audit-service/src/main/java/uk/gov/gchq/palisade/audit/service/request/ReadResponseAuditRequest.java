@@ -21,38 +21,26 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.service.request.Request;
 
 import static java.util.Objects.requireNonNull;
 
 /**
  * This is one of the objects that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
- * to be able to store an audit record. This class extends {@link Request} This class
- * is used for the indication to the Audit logs that an exception has been received.
+ * to be able to store an audit record. This class extends {@link AuditRequest} This class
+ * is used for the indication to the Audit logs that readResponse is being generated
  */
-public class ReadRequestExceptionAuditRequest extends AuditRequest {
-    private Throwable exception;
+public class ReadResponseAuditRequest extends AuditRequest {
     private RequestId requestId;
     private LeafResource resource;
 
-    public ReadRequestExceptionAuditRequest() {
-    }
-
-    /**
-     * @param ex {@link Throwable} is the type of the exception while processing
-     * @return the {@link ReadRequestExceptionAuditRequest}
-     */
-    public ReadRequestExceptionAuditRequest exception(final Throwable ex) {
-        requireNonNull(exception, "The exception type cannot be null");
-        this.exception = exception;
-        return this;
+    public ReadResponseAuditRequest() {
     }
 
     /**
      * @param request {@link RequestId} is the requestId for the ReadRequest
      * @return the {@link ReadRequestExceptionAuditRequest}
      */
-    public ReadRequestExceptionAuditRequest requestId(final RequestId request) {
+    public ReadResponseAuditRequest requestId(final RequestId request) {
         requireNonNull(request, "The requestId type cannot be null");
         this.requestId = requestId;
         return this;
@@ -62,7 +50,7 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
      * @param res {@link LeafResource} is the leafResource for the ReadRequest
      * @return the {@link ReadRequestExceptionAuditRequest}
      */
-    public ReadRequestExceptionAuditRequest resource(final LeafResource res) {
+    public ReadResponseAuditRequest resource(final LeafResource res) {
         requireNonNull(res, "The leafResource type cannot be null");
         this.resource = res;
         return this;
@@ -80,11 +68,6 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         return resource;
     }
 
-    public Throwable getException() {
-        requireNonNull(exception, "The exception type cannot be null.");
-        return exception;
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -93,10 +76,9 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final ReadRequestExceptionAuditRequest that = (ReadRequestExceptionAuditRequest) o;
+        final ReadResponseAuditRequest that = (ReadResponseAuditRequest) o;
         return new EqualsBuilder()
         .appendSuper(super.equals(o))
-        .append(exception, that.exception)
         .append(requestId, that.requestId)
         .append(resource, that.resource)
         .isEquals();
@@ -106,7 +88,6 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
     public int hashCode() {
         return new HashCodeBuilder(20, 39)
         .appendSuper(super.hashCode())
-        .append(exception)
         .append(requestId)
         .append(resource)
         .toHashCode();
@@ -116,7 +97,6 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
     public String toString() {
         return new ToStringBuilder(this)
         .appendSuper(super.toString())
-        .append("exception", exception)
         .append("requestId", requestId)
         .append("resource", resource)
         .toString();

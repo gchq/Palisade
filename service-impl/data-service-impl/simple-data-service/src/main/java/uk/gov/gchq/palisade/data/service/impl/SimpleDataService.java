@@ -20,8 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
-import uk.gov.gchq.palisade.audit.service.request.ExceptionAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ReadRequestExceptionAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ReadResponseAuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.heart.Heartbeat;
 import uk.gov.gchq.palisade.data.service.DataService;
@@ -70,15 +71,14 @@ public class SimpleDataService implements DataService {
     private final Heartbeat heartbeat;
     private AuditService auditService;
 
-    public SimpleDataService auditService(final AuditService auditService) {
-        requireNonNull(auditService, "The audit service cannot be set to null.");
-        this.auditService = auditService;
-        return this;
-    }
-
-
     public SimpleDataService() {
         heartbeat = new Heartbeat().serviceClass(SimpleDataService.class);
+    }
+
+    public SimpleDataService auditService(final AuditService auditService) {
+        requireNonNull(auditService, "The audit service cannot be set to null");
+        this.auditService = auditService;
+        return this;
     }
 
     public SimpleDataService palisadeService(final PalisadeService palisadeService) {
@@ -106,24 +106,32 @@ public class SimpleDataService implements DataService {
     private void auditReadRequestReceived(final ReadRequest request) {
         final ReadRequestReceivedAuditRequest requestReceivedAuditRequest = new ReadRequestReceivedAuditRequest();
         requestReceivedAuditRequest
-                .requestId(request.getRequestId())
-                .resource(request.getResource())
-                .id(request.getId())
-                .originalRequestId(request.getOriginalRequestId());
+        .requestId(request.getRequestId())
+        .resource(request.getResource())
+        .id(request.getId())
+        .originalRequestId(request.getOriginalRequestId());
         auditService.audit(requestReceivedAuditRequest);
     }
 
     private void auditRequestReceivedException(final ReadRequest request, final Throwable ex) {
-        final ExceptionAuditRequest auditRequestWithException = new ExceptionAuditRequest();
-        auditRequestWithException
-                .exception(ex)
-                .context(request.getContext(), ExceptionAuditRequest.class)
-                .userId(request.getUserId(), ExceptionAuditRequest.class)
-                .resourceId(request.getResourceId(), ExceptionAuditRequest.class)
-                .id(request.getId())
-                .originalRequestId(originalRequestId);
+        final ReadRequestExceptionAuditRequest readRequestExceptionAuditRequest = new ReadRequestExceptionAuditRequest();
+        readRequestExceptionAuditRequest.exception(ex)
+        .resource(request.getResource())
+        .requestId(request.getRequestId())
+        .id(request.getId())
+        .originalRequestId(request.getOriginalRequestId());
         LOGGER.debug("Error handling: " + ex.getMessage());
-        auditService.audit(auditRequestWithException);
+        auditService.audit(readRequestExceptionAuditRequest);
+    }
+
+    private void auditReadResponse(final ReadRequest request) {
+        final ReadResponseAuditRequest readResponseAuditRequest = new ReadResponseAuditRequest();
+        readResponseAuditRequest
+        .resource(request.getResource())
+        .requestId(request.getRequestId())
+        .id(request.getId())
+        .originalRequestId(request.getOriginalRequestId());
+        auditService.audit(readResponseAuditRequest);
     }
 
     @Override
@@ -132,51 +140,58 @@ public class SimpleDataService implements DataService {
         //check that we have an active heartbeat before serving request
 
         auditReadRequestReceived(request);
-
         if (!heartbeat.isBeating()) {
             throw new IllegalStateException("data service is not sending heartbeats! Can't send data. Has the cache service been configured?");
         }
-
         LOGGER.debug("Creating async read: {}", request);
-        return CompletableFuture
-                .supplyAsync(() -> {
-                    LOGGER.debug("Starting to read: {}", request);
-                    final GetDataRequestConfig getConfig = new GetDataRequestConfig()
-                            .requestId(request.getRequestId())
-                            .resource(request.getResource());
-                    getConfig.setOriginalRequestId(request.getOriginalRequestId());
-                    LOGGER.debug("Calling palisade service with: {}", getConfig);
-                    final DataRequestConfig config = getPalisadeService().getDataRequestConfig(getConfig).join();
-                    LOGGER.debug("Palisade service returned: {}", config);
+        return CompletableFuture.supplyAsync(() -> {
+            LOGGER.debug("Starting to read: {}", request);
+            final GetDataRequestConfig getConfig = new GetDataRequestConfig()
+            .requestId(request.getRequestId())
+            .resource(request.getResource());
+            getConfig.setOriginalRequestId(request.getOriginalRequestId());
+            LOGGER.debug("Calling palisade service with: {}", getConfig);
+            final DataRequestConfig config = getPalisadeService().getDataRequestConfig(getConfig).join();
+            LOGGER.debug("Palisade service returned: {}", config);
 
-                    final DataReaderRequest readerRequest = new DataReaderRequest()
-                            .resource(request.getResource())
-                            .user(config.getUser())
-                            .context(config.getContext())
-                            .rules(config.getRules().get(request.getResource()));
-                    readerRequest.setOriginalRequestId(request.getOriginalRequestId());
+            final DataReaderRequest readerRequest = new DataReaderRequest()
+            .resource(request.getResource())
+            .user(config.getUser())
+            .context(config.getContext())
+            .rules(config.getRules().get(request.getResource()));
+            readerRequest.setOriginalRequestId(request.getOriginalRequestId());
 
-                    LOGGER.debug("Calling reader with: {}", readerRequest);
-                    final DataReaderResponse readerResult = getReader().read(readerRequest);
-                    LOGGER.debug("Reader returned: {}", readerResult);
+            LOGGER.debug("Calling reader with: {}", readerRequest);
+            final DataReaderResponse readerResult = getReader().read(readerRequest);
+            LOGGER.debug("Reader returned: {}", readerResult);
 
-                    final ReadResponse response = new ReadResponse();
-                    if (null != readerResult.getData()) {
-                        response.data(readerResult.getData());
-                    }
-                    LOGGER.debug("Returning from read: {}", response);
-                    return response;
-                })
-                .exceptionally(ex -> {
-                    LOGGER.debug("Error handling: " + ex.getMessage());
-                    auditRequestReceivedException(request, ex);
-                    throw new RuntimeException(ex); //rethrow the exception
-                });
+            final ReadResponse response = new ReadResponse();
+            if (null != readerResult.getData()) {
+                response.data(readerResult.getData());
+            }
+            LOGGER.debug("Returning from read: {}", response);
+            auditReadResponse(request);
+            return response;
+        })
+        .exceptionally(ex -> {
+            LOGGER.debug("Error handling: " + ex.getMessage());
+            auditRequestReceivedException(request, ex);
+            throw new RuntimeException(ex); //rethrow the exception
+        });
     }
 
+    public PalisadeService getPalisadeService() {
+        requireNonNull(palisadeService, "The palisade service has not been set.");
+        return palisadeService;
+    }
+
+    public void setPalisadeService(final PalisadeService palisadeService) {
+        palisadeService(palisadeService);
+    }
 
     @Override
-    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceState config) throws
+    NoConfigException {
         requireNonNull(config, "config");
         String serialisedPalisade = config.getOrDefault(PALISADE_IMPL_KEY, null);
         if (nonNull(serialisedPalisade)) {
@@ -202,7 +217,6 @@ public class SimpleDataService implements DataService {
         } else {
             throw new NoConfigException("no audit specified in configuration");
         }
-
     }
 
     @Override
@@ -217,7 +231,6 @@ public class SimpleDataService implements DataService {
         config.put(CACHE_IMPL_KEY, serialisedCache);
         String serialisedAudit = new String(JSONSerialiser.serialise(auditService), StandardCharsets.UTF_8);
         config.put(AUDIT_IMPL_KEY, serialisedAudit);
-
     }
 
     public DataReader getReader() {
@@ -236,15 +249,6 @@ public class SimpleDataService implements DataService {
 
     public void setCacheService(final CacheService cacheService) {
         cacheService(cacheService);
-    }
-
-    public PalisadeService getPalisadeService() {
-        requireNonNull(palisadeService, "The palisade service has not been set.");
-        return palisadeService;
-    }
-
-    public void setPalisadeService(final PalisadeService palisadeService) {
-        palisadeService(palisadeService);
     }
 
     public AuditService getAuditService() {
