@@ -43,8 +43,8 @@ stages:
       - template: azure-pipelines.docker-template.yaml
         parameters:
           imageName: config-service
-  - job: Docker_build_configure_service
-    displayName: configure-service
+  - job: Docker_build_configure_services
+    displayName: configure-services
     dependsOn: Maven_Build
     steps:
       - template: azure-pipelines.docker-template.yaml
