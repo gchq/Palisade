@@ -103,7 +103,7 @@ stages:
   - job: Helm_deploy
     dependsOn: 
       - Docker_build_etcd
-      - Docker_build_confi_service
+      - Docker_build_config_service
       - Docker_build_configure_services
       - Docker_build_user_service
       - Docker_build_policy_service
