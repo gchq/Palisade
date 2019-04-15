@@ -22,7 +22,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.JobContext;
+//import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -32,32 +32,33 @@ import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.Context;
-import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
-import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
-import uk.gov.gchq.palisade.client.ConfiguredClientServices;
-import uk.gov.gchq.palisade.client.ServicesFactory;
-import uk.gov.gchq.palisade.config.service.ConfigurationService;
-import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
-import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
-import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
+//import uk.gov.gchq.palisade.Context;
+//import uk.gov.gchq.palisade.UserId;
+//import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
+//import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
+//import uk.gov.gchq.palisade.client.ConfiguredClientServices;
+//import uk.gov.gchq.palisade.client.ServicesFactory;
+//import uk.gov.gchq.palisade.config.service.ConfigurationService;
+//import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
+//import uk.gov.gchq.palisade.example.client.ExampleConfigurator;
+//import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+//import uk.gov.gchq.palisade.example.config.ExampleConfigurator;
+//import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
+//import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
-import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
-import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
+//import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
+//import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
+//import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
+//import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
+//import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
+//import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+//import java.util.Optional;
 
 /**
  * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
@@ -140,23 +141,23 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
 
         //configure the Palisade input format on an example client
 
-        final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpoints, Optional.empty(),
-                Optional.of(new ProxyRestPolicyService("http://" + hostname + ":8081/policy/")),
-                Optional.of(new ProxyRestUserService("http://" + hostname + ":8083/user/")),
-                Optional.of(new ProxyRestResourceService("http://" + hostname + ":8082/resource/")),
-                Optional.of(new ProxyRestPalisadeService("http://" + hostname + ":8080/palisade/")),
-                Optional.of(new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(etcdEndpoints, false))),
-                Optional.of(new ProxyRestConnectionDetail().url(dataServiceUrl).serviceClass(ProxyRestDataService.class)));
-        final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
+        //final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpoints, Optional.empty(),
+        //        Optional.of(new ProxyRestPolicyService("http://" + hostname + ":8081/policy/")),
+        //        Optional.of(new ProxyRestUserService("http://" + hostname + ":8083/user/")),
+        //        Optional.of(new ProxyRestResourceService("http://" + hostname + ":8082/resource/")),
+        //        Optional.of(new ProxyRestPalisadeService("http://" + hostname + ":8080/palisade/")),
+        //        Optional.of(new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(etcdEndpoints, false))),
+        //        Optional.of(new ProxyRestConnectionDetail().url(dataServiceUrl).serviceClass(ProxyRestDataService.class)));
+        //final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
+        //final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
-        configureJob(job, cs, 2);
+        //configureJob(job, cs, 2);
 
         //next add a resource request to the job
-        addDataRequest(job, client.getURIConvertedFile(), RESOURCE_TYPE, "Alice", "Payroll");
-        addDataRequest(job, client.getURIConvertedFile(), RESOURCE_TYPE, "Bob", "Payroll");
+        //addDataRequest(job, client.getURIConvertedFile(), RESOURCE_TYPE, "Alice", "Payroll");
+        //addDataRequest(job, client.getURIConvertedFile(), RESOURCE_TYPE, "Bob", "Payroll");
 
         //launch job
         boolean success = job.waitForCompletion(true);
@@ -164,36 +165,36 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         return (success) ? 0 : 1;
     }
 
-    /**
-     * Configures the given job to use this example client.
-     *
-     * @param job        the job to configure
-     * @param services   the Palisade services factory
-     * @param maxMapHint the hint for the maximum number of mappers
-     */
-    public static void configureJob(final Job job, final ServicesFactory services, final int maxMapHint) {
-        job.setInputFormatClass(PalisadeInputFormat.class);
+    //**
+    // * Configures the given job to use this example client.
+    // *
+    // * @param job        the job to configure
+    // * @param services   the Palisade services factory
+    // * @param maxMapHint the hint for the maximum number of mappers
+    // */
+    //public static void configureJob(final Job job, final ServicesFactory services, final int maxMapHint) {
+    //    job.setInputFormatClass(PalisadeInputFormat.class);
         //tell it which Palisade service to use
-        PalisadeInputFormat.setPalisadeService(job, services.getPalisadeService());
+    //    PalisadeInputFormat.setPalisadeService(job, services.getPalisadeService());
         //configure the serialiser to use
-        PalisadeInputFormat.setSerialiser(job, new ExampleObjSerialiser());
+    //    PalisadeInputFormat.setSerialiser(job, new ExampleObjSerialiser());
         //set the maximum mapper hint
-        PalisadeInputFormat.setMaxMapTasksHint(job, maxMapHint);
-    }
+    //    PalisadeInputFormat.setMaxMapTasksHint(job, maxMapHint);
+    //}
 
-    /**
-     * Utility method to add a read request to a job.
-     *
-     * @param context       the job to add the request to
-     * @param filename      example filename
-     * @param resourceType  the example resource type
-     * @param userId        the example user id
-     * @param justification the example justification
-     */
-    public static void addDataRequest(final JobContext context, final String filename, final String resourceType, final String userId, final String justification) {
-        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
-        PalisadeInputFormat.addDataRequest(context, dataRequest);
-    }
+    //
+    // * Utility method to add a read request to a job.
+    // *
+    // * @param context       the job to add the request to
+    // * @param filename      example filename
+    // * @param resourceType  the example resource type
+    // * @param userId        the example user id
+    // * @param justification the example justification
+    // */
+    //public static void addDataRequest(final JobContext context, final String filename, final String resourceType, final String userId, final String justification) {
+        //final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
+        //PalisadeInputFormat.addDataRequest(context, dataRequest);
+    //}
 
     public static void main(final String... args) throws Exception {
         final String outputDir;

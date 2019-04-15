@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# This script assumes it is running on the master node on an AWS EMR cluster from the hadoop users home directory
+# This script assumes it is running on the master node of an AWS EMR cluster from the hadoop users home directory
 #
-# This script will create an etcd cluster over all of your Yarn nodes and
+# This script will create an etcd cluster over all of the slave/core Yarn nodes,
 # persisting the data in 'etcd_<ip address>.etcd'
 
 if [ $# -gt 0 ]; then

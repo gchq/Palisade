@@ -80,6 +80,10 @@ resource "null_resource" "deploy_example" {
       source = "../../../example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
       destination = "/home/hadoop/jars/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
   }
+  provisioner "file" {
+      source = "../../../example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar"
+      destination = "/home/hadoop/jars/example-model-0.2.1-SNAPSHOT-shaded.jar"
+  }
 
   # Deploy the Palisade config service on the EMR master
   provisioner "remote-exec" {
@@ -87,17 +91,15 @@ resource "null_resource" "deploy_example" {
       "mkdir -p /home/hadoop/example_logs",
     ]
   }
-#  provisioner "remote-exec" {
-#    inline = [
-#      #"nohup /home/hadoop/deploy_example/deployConfigService.sh > /home/hadoop/example_logs/deployConfigService.log 2>&1 &",
-#      "nohup /home/hadoop/deploy_example/deployConfigService.sh &",
-#      "sleep 90",
-#    ]
-#  }
   provisioner "local-exec" {
-    #command = "ssh -o 'StrictHostKeyChecking no' -i ${var.aws_key_path} ec2-user@${self.public_ip} 'nohup some-command </dev/null >/dev/null 2>&1 &'"
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployConfigService.sh > /home/hadoop/example_logs/deployConfigService.log 2>&1 &'"
   }
+
+  # tell the config servive how the various Palisade services should be distributed over the cluster - this is stored in the Config service
+    provisioner "local-exec" {
+      command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/configureDistributedServices.sh ${aws_emr_cluster.palisade_cluster.master_public_dns}> /home/hadoop/example_logs/configureDistributedServices.log 2>&1 &'"
+    }
+
 
 
 }
