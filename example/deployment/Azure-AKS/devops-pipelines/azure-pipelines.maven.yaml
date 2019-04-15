@@ -2,7 +2,7 @@ trigger:
   batch: true
   branches:
     include:
-    - '*'
+    - 'gh-163-azure-aks'
   paths:
     include:
     - azure-pipelines.maven.yaml
