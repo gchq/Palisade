@@ -2,7 +2,7 @@ trigger:
   batch: true
   branches:
     include:
-    - '*'
+    - 'gh-163-azure-aks'
   paths:
     include:
     - example/deployment/local-docker/*
@@ -14,12 +14,6 @@ stages:
   variables: 
       - group: Palisade-azure
   jobs:
-    - job:
-      displayName: client
-      steps:
-      - template: azure-pipelines.docker-template.yaml  
-        parameters:
-          imageName: client
     - job:
       displayName: config-service
       steps:
@@ -68,12 +62,6 @@ stages:
       - template: azure-pipelines.docker-template.yaml  
         parameters:
           imageName: resource-service
-    - job:
-      displayName: rest-redirector
-      steps:
-      - template: azure-pipelines.docker-template.yaml  
-        parameters:
-          imageName: rest-redirector
     - job:
       displayName: user-service
       steps:
