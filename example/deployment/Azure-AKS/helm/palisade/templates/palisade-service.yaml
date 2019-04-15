@@ -7,7 +7,6 @@ metadata:
     app: palisade-service
   name:  palisade-service
 spec:
-  type: LoadBalancer
   selector:
     app: palisade-service
   ports:

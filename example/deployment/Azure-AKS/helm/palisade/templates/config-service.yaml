@@ -7,7 +7,6 @@ metadata:
     app: config-service
   name: config-service
 spec:
-  type: LoadBalancer
   selector:
     app: config-service
   ports:

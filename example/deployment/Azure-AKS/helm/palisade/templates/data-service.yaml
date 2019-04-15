@@ -7,7 +7,6 @@ metadata:
     app: data-service
   name: data-service
 spec:
-  type: LoadBalancer
   selector:
     app: data-service
   ports:
