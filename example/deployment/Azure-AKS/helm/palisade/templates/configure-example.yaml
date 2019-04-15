@@ -4,7 +4,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app:  configure-example
+    app: configure-example
   name: configure-example
 spec:
   template:

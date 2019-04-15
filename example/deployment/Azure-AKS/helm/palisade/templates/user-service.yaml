@@ -54,4 +54,4 @@ spec:
         resources:
           {{- toYaml .Values.userservice.resources | nindent 12 }}
       restartPolicy: Always
-status: {}
+

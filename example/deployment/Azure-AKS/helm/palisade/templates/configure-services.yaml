@@ -4,7 +4,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app:  configure-services
+    app: configure-services
   name: configure-services
 spec:
   template:
