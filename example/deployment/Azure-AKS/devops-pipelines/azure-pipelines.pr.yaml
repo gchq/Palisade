@@ -1,0 +1,121 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - 'gh-163-azure-aks'
+  paths:
+    include:
+    - azure-pipelines.maven.yaml
+    - example/deployment/local-docker/*
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker.yaml
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
+
+stages:
+- stage: Maven_Build  
+  jobs:
+  - job:
+    steps:
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.11'
+        jdkArchitectureOption: 'x64'
+        goals: 'clean install -P example'
+
+    - task: CopyFiles@2
+      inputs:
+        #sourceFolder: # Optional
+        contents: example/deployment/local-docker/**/docker/bin/**/*
+        targetFolder: $(Build.ArtifactStagingDirectory)
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: local-docker'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/example/deployment/local-docker'
+        artifactName: local-docker
+
+- stage: Docker_Build_and_Push
+    jobs:
+    - job:
+      displayName: config-service
+      dependsOn: PublishBuildArtifacts@1
+      steps:
+        - template: azure-pipelines.docker-template.yaml
+          parameters:
+            imageName: config-service
+    - job:
+      displayName: configure-service
+      dependsOn: PublishBuildArtifacts@1
+      steps:
+        - template: azure-pipelines.docker-template.yaml
+          parameters:
+            imageName: configure-services
+    - job:
+      displayName: configure-example
+      dependsOn: PublishBuildArtifacts@1
+      steps:
+        - template: azure-pipelines.docker-template.yaml
+          parameters:
+            imageName: configure-example
+    - job:
+      displayName: data-service
+      dependsOn: PublishBuildArtifacts@1
+      steps:
+        - template: azure-pipelines.docker-template.yaml
+          parameters:
+            imageName: data-service
+    - job:
+      displayName: etcd
+      dependsOn: PublishBuildArtifacts@1
+      steps:
+        - template: azure-pipelines.docker-template.yaml
+          parameters:
+            imageName: etcd
+    - job:
+      displayName: palisade-service
+      dependsOn: PublishBuildArtifacts@1
+      steps:
+        - template: azure-pipelines.docker-template.yaml
+          parameters:
+            imageName: palisade-service
+    - job:
+      displayName: policy-service
+      dependsOn: PublishBuildArtifacts@1
+      steps:
+        - template: azure-pipelines.docker-template.yaml
+          parameters:
+            imageName: policy-service
+    - job:
+      displayName: resource-service
+      dependsOn: PublishBuildArtifacts@1
+      steps:
+        - template: azure-pipelines.docker-template.yaml
+          parameters:
+            imageName: resource-service
+    - job:
+      displayName: user-service
+      dependsOn: PublishBuildArtifacts@1
+      steps:
+        - template: azure-pipelines.docker-template.yaml
+          parameters:
+            imageName: user-service
+
+- stage: Deploy_Palisade
+  jobs:
+    - job:
+      dependsOn: Docker_Build_and_Push
+      steps:
+        - task: HelmDeploy@0
+          displayName: 'helm upgrade'
+          inputs:
+            azureSubscription: 'palisade_rm'
+            azureResourceGroup: 'tmp-palisade-aks'
+            kubernetesCluster: 'palisade-aks'
+            command: upgrade
+            chartType: FilePath
+            chartPath: example/deployment/Azure-AKS/helm/palisade
+            releaseName: palisade
+            overrideValues: 'image.registry=$(registry_dns),image.tag=latest'
+            arguments: '--timeout 600 --force'
