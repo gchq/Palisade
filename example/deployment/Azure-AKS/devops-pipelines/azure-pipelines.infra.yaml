@@ -67,6 +67,7 @@ stages:
           - task: Kubernetes@1
             displayName: 'K8s RBAC Accounts'
             inputs:
+              connectionType: Azure Resource Manager
               azureSubscriptionEndpoint: 'palisade_rm'
               azureResourceGroup: 'tmp-palisade-aks'
               kubernetesCluster: 'palisade-aks'

@@ -5,7 +5,7 @@ variable "client_id" {
 
 variable "client_secret" {
   type        = "string"
-  description = "Password/secreet of service principal."
+  description = "Password/secret of service principal."
 }
 
 variable "agent_count" {
