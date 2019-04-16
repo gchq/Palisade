@@ -64,6 +64,17 @@ stages:
                 ingress_ip=$(az network public-ip show -n "palisade-ingress-ip" -g "tmp-palisade-ips" --query \"ipAddress\" | sed 's/\"//g')
                 echo "##vso[task.setvariable variable=ingressIpAddress]${ingress_ip}"
 
+          - task: Kubernetes@1
+            displayName: 'K8s RBAC Accounts'
+            inputs:
+              azureSubscriptionEndpoint: 'palisade_rm'
+              azureResourceGroup: 'tmp-palisade-aks'
+              kubernetesCluster: 'palisade-aks'
+              command: apply
+              useConfigurationFile: true
+              configuration: '$(System.DefaultWorkingDirectory)/$(azure-dir)/k8s/'
+              checkLatest: true
+
           - task: HelmDeploy@0
             displayName: 'helm upgrade nginx-ingress'
             inputs:
@@ -75,17 +86,6 @@ stages:
               chartName: 'stable/nginx-ingress'
               releaseName: 'nginx-ingress'
               overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=$(ingressIpAddress),controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=tmp-palisade-ips'
-
-          - task: Kubernetes@1
-            displayName: 'K8s RBAC Accounts'
-            inputs:
-              azureSubscriptionEndpoint: 'palisade_rm'
-              azureResourceGroup: 'tmp-palisade-aks'
-              kubernetesCluster: 'palisade-aks'
-              command: apply
-              useConfigurationFile: true
-              configuration: '$(System.DefaultWorkingDirectory)/$(azure-dir)/k8s/'
-              checkLatest: true
 
           - task: AzureCLI@1
             displayName: 'Create share secret within k8'
