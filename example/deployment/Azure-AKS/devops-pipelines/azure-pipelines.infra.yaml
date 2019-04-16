@@ -93,13 +93,13 @@ stages:
               arguments: ' --upgrade --service-account tiller'
 
           - task: HelmDeploy@0
-              displayName: 'helm upgrade nginx-ingress'
-              inputs:
-                azureSubscription: 'palisade_rm'
-                azureResourceGroup: 'tmp-palisade-aks'
-                kubernetesCluster: 'palisade-aks'
-                namespace: ingress
-                command: upgrade
-                chartName: 'stable/nginx-ingress'
-                releaseName: 'nginx-ingress'
-                overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=$(ingressIpAddress),controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=tmp-palisade-ips'
+            displayName: 'helm upgrade nginx-ingress'
+            inputs:
+              azureSubscription: 'palisade_rm'
+              azureResourceGroup: 'tmp-palisade-aks'
+              kubernetesCluster: 'palisade-aks'
+              namespace: ingress
+              command: upgrade
+              chartName: 'stable/nginx-ingress'
+              releaseName: 'nginx-ingress'
+              overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=$(ingressIpAddress),controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=tmp-palisade-ips'
