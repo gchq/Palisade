@@ -36,7 +36,8 @@ public final class LocalServices {
             "http://localhost:8083/user",
             "http://localhost:8084/data",
             "http://localhost:8085/config",
-            "http://localhost:8080/palisade"
+            "http://localhost:8080/palisade",
+            "http://localhost:8084/data"
     };
 
     private LocalServices() {
