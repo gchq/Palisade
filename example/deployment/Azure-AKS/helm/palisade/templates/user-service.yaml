@@ -22,7 +22,7 @@ metadata:
     app: user-service
   name: user-service
 spec:
-  replicas: 1
+  replicas: {{ .Values.userservice.replicas }}
   selector:
     matchLabels:
       app:  user-service
@@ -32,17 +32,11 @@ spec:
         app:  user-service
     spec:
       containers:
-      - image: palisadeacr.azurecr.io/user-service:latest
-        name: user-service
+      - name: user-service
+        image: "{{ .Values.userservice.image.repository }}:{{ .Values.userservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.userservice.image.pullPolicy }}"
         ports:
           - containerPort: 8080
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 0.5
-            memory: 2Gi
         livenessProbe:
           httpGet: 
             path: /user/v1/status
@@ -57,5 +51,7 @@ spec:
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
-      restartuser: Always
-status: {}
+        resources:
+          {{- toYaml .Values.userservice.resources | nindent 12 }}
+      restartPolicy: Always
+

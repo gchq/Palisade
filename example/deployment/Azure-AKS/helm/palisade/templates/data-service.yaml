@@ -1,5 +1,5 @@
 ---
-# Source: palisade/templates/config-service.yaml
+# Source: palisade/templates/data-service.yaml
 kind: Service
 apiVersion: v1
 metadata:
@@ -7,7 +7,6 @@ metadata:
     app: data-service
   name: data-service
 spec:
-  type: LoadBalancer
   selector:
     app: data-service
   ports:
@@ -23,7 +22,7 @@ metadata:
     app:  data-service
   name: data-service
 spec:
-  replicas: 1
+  replicas: {{ .Values.dataservice.replicas }}
   selector:
     matchLabels:
       app:  data-service
@@ -33,16 +32,9 @@ spec:
         app:  data-service
     spec:
       containers:
-      - image: palisadeacr.azurecr.io/data-service:latest
-        imagePullPolicy: Always
+      - image: "{{ .Values.dataservice.image.repository }}:{{ .Values.dataservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.dataservice.image.pullPolicy }}"
         name: data-service
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 0.5
-            memory: 10Gi
         livenessProbe:
           httpGet:
             path: /data/v1/status
@@ -57,6 +49,8 @@ spec:
             failureThreshold: 5
             periodSeconds: 60
             timeoutSeconds: 10
+          resources:
+            {{- toYaml .Values.dataservice.resources | nindent 12 }}
         volumeMounts:
           - name: data
             mountPath: /data

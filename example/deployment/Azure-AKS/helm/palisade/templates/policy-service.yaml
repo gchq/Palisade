@@ -22,7 +22,7 @@ metadata:
     app: policy-service
   name: policy-service
 spec:
-  replicas: 1
+  replicas: {{ .Values.policyservice.replicas }}
   selector:
     matchLabels:
       app:  policy-service
@@ -32,17 +32,11 @@ spec:
         app:  policy-service
     spec:
       containers:
-      - image: palisadeacr.azurecr.io/policy-service:latest
-        name: policy-service
+      - name: policy-service
+        image: "{{ .Values.policyservice.image.repository }}:{{ .Values.policyservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.policyservice.image.pullPolicy }}"
         ports:
           - containerPort: 8080
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 0.5
-            memory: 2Gi
         livenessProbe:
           httpGet: 
             path: /policy/v1/status
@@ -57,5 +51,7 @@ spec:
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
+        resources:
+          {{- toYaml .Values.policyservice.resources | nindent 12 }}
       restartPolicy: Always
 status: {}

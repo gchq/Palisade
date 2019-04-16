@@ -7,7 +7,6 @@ metadata:
     app: palisade-service
   name:  palisade-service
 spec:
-  type: LoadBalancer
   selector:
     app: palisade-service
   ports:
@@ -22,7 +21,7 @@ metadata:
      app: palisade-service
   name: palisade-service
 spec:
-  replicas: 1
+  replicas: {{ .Values.palisadeservice.replicas }}
   selector:
     matchLabels:
       app:  palisade-service
@@ -34,16 +33,10 @@ spec:
     spec:
       containers:
       - name: palisade-service
-        image: palisadeacr.azurecr.io/palisade-service:latest
+        image: "{{ .Values.palisadeservice.image.repository }}:{{ .Values.palisadeservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.palisadeservice.image.pullPolicy }}"
         ports:
           - containerPort: 8080
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 0.5
-            memory: 2Gi
         livenessProbe:
           httpGet:
             path: /palisade/v1/status
@@ -58,4 +51,6 @@ spec:
           failureThreshold: 5
           periodSeconds: 60
           timeoutSeconds: 10
+        resources:
+          {{- toYaml .Values.palisadeservice.resources | nindent 12 }}
       restartPolicy: Always
