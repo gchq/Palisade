@@ -95,11 +95,24 @@ resource "null_resource" "deploy_example" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployConfigService.sh > /home/hadoop/example_logs/deployConfigService.log 2>&1 &'"
   }
 
-  # tell the config servive how the various Palisade services should be distributed over the cluster - this is stored in the Config service
+  # tell the config servive how the various Palisade services should be distributed over the cluster - this configuration is stored in the Config service
     provisioner "local-exec" {
       command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/configureDistributedServices.sh ${aws_emr_cluster.palisade_cluster.master_public_dns}> /home/hadoop/example_logs/configureDistributedServices.log 2>&1 &'"
     }
 
+  # generate a data file on the cluster and put it into hdfs
+
+  # Deploy the Palisade Resource service on the EMR master node
+
+  # Deploy the Palisade User service on the EMR master node
+
+  # Deploy the example Palisade Policy service on the EMR master node
+
+  # Deploy the example Palisade service (co-ordinating service) on the EMR master node
+
+  # Deploy the example Palisade data service on the EMR master node
+
+  # Run the Palisade mapreduce example runner
 
 
 }
