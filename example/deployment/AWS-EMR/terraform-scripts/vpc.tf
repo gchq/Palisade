@@ -58,9 +58,9 @@
 #  route_table_id = "${aws_route_table.palisade_rt.id}"
 #}
 
-resource "aws_security_group" "palisade_allow_all" {
-  name        = "palisade_allow_all"
-  description = "Allow all inbound traffic for Palisade"
+resource "aws_security_group" "palisade_allow_inbound" {
+  name        = "palisade_allow_inbound"
+  description = "Allow inbound traffic for Palisade"
   #vpc_id      = "${aws_vpc.palisade_vpc.id}"
   vpc_id = "${var.vpc_id}"
 #  depends_on  = ["aws_subnet.palisade_subnet"]

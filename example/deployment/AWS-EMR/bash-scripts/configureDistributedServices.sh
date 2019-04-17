@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script assumes it is running on the master node on an AWS EMR cluster
-# This script will configure the Config service (which needs to be already running) so that it knows how the various Palisade services are distributed over the cluster
+# This script will configure the Palisade Config service (which needs to be already running) so that it knows how the various Palisade services are distributed over the cluster
 
 master_node=$1    # do we need to pass this? can we use localhost?
 
@@ -28,5 +28,4 @@ echo $data_connection_details
 # call DistributedServices class - passing it the addresses of all the Palisade services that will be running on the cluster
 
 java -cp /home/hadoop/jars/example-model-*-shaded.jar \
-    uk.gov.gchq.palisade.example.config.DistributedServices \
-    $etcd_connection_details http://localhost:8080/palisade http://localhost:8081/policy http://localhost:8082/resource http://localhost:8083/user $data_connection_details http://localhost:8085/config
+    uk.gov.gchq.palisade.example.config.DistributedServices $etcd_connection_details http://localhost:8080/palisade http://localhost:8081/policy http://localhost:8082/resource http://localhost:8083/user $data_connection_details http://localhost:8085/config

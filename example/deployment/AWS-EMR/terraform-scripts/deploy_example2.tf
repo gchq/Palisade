@@ -12,9 +12,9 @@ resource "null_resource" "deploy_example2" {
   }
 
   # tell the config service how the various Palisade services should be distributed over the cluster - this is stored in the Config service
-    provisioner "local-exec" {
-      command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/configureDistributedServices.sh ${aws_emr_cluster.palisade_cluster.master_public_dns}> /home/hadoop/example_logs/configureDistributedServices.log 2>&1 &'"
-    }
+#    provisioner "local-exec" {
+#      command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/configureDistributedServices.sh ${aws_emr_cluster.palisade_cluster.master_public_dns}> /home/hadoop/example_logs/configureDistributedServices.log 2>&1 &'"
+#    }
 
 
 

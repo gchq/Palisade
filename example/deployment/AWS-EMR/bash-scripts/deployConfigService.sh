@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script assumes it is running on the master node on an AWS EMR cluster
-# This script will deploy an instance of the config service on the master node - listening on port 8085
+# This script will deploy an instance of the Palisade Config service on the master node - listening on port 8085
 
 # identify all the yarn nodes in the cluster
 declare nodes=`yarn node -list 2> /dev/null | grep internal | cut -c 4- | tr '.' '\t' | cut -f1 | tr '-' '.'`
