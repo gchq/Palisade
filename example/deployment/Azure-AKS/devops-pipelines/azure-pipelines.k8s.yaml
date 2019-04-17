@@ -1,0 +1,19 @@
+stages:
+- stage: Deploy_Palisade
+  jobs:
+    - job:
+      variables: 
+      - group: Palisade-azure
+      steps:
+      - task: HelmDeploy@0
+        displayName: 'helm upgrade'
+        inputs:
+          azureSubscription: 'palisade_rm'
+          azureResourceGroup: 'tmp-palisade-aks'
+          kubernetesCluster: 'palisade-aks'
+          command: upgrade
+          chartType: FilePath
+          chartPath: example/deployment/Azure-AKS/helm/palisade
+          releaseName: palisade
+          overrideValues: 'image.registry=$(registry_dns),image.tag=latest'
+          arguments: '--timeout 600'

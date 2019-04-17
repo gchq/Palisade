@@ -1,0 +1,54 @@
+---
+# Source: palisade/templates/etcd.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app:  etcd
+  name: etcd
+spec:
+  selector:
+    app: etcd
+  ports:
+  - protocol: TCP
+    port: 2379
+    targetPort: 2379
+---    
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app:  etcd
+  name: etcd
+spec:
+  replicas: {{ .Values.etcd.replicas }}
+  selector:
+    matchLabels:
+      app:  etcd
+  template:
+    metadata:
+      labels:
+        app: etcd
+    spec:
+      containers: 
+      - name: etcd
+        image: "{{ .Values.etcd.image.repository }}:{{ .Values.etcd.image.tag }}"
+        imagePullPolicy: "{{ .Values.etcd.image.pullPolicy }}"
+        ports:
+          - containerPort: 2379
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 2379
+          periodSeconds: 5
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 2379
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          {{- toYaml .Values.etcd.resources | nindent 12 }}
+      restartPolicy: Always
+
