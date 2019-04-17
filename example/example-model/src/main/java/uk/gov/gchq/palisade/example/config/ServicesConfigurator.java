@@ -130,8 +130,8 @@ public class ServicesConfigurator {
 
         //insert this into the cache manually so it can be created later
         configService.add((AddConfigRequest) new AddConfigRequest()
-                .config(initial)
-                .service(Optional.empty())).join();
+        .config(initial)
+        .service(Optional.empty())).join();
     }
 
     /**
@@ -146,8 +146,8 @@ public class ServicesConfigurator {
         ServiceState config = new ServiceState();
         service.recordCurrentConfigTo(config);
         configService.add((AddConfigRequest) new AddConfigRequest()
-                .config(config)
-                .service(Optional.of(serviceClass))).join();
+        .config(config)
+        .service(Optional.of(serviceClass))).join();
     }
 
     /**
@@ -221,11 +221,11 @@ public class ServicesConfigurator {
      */
     protected PalisadeService createPalisadeServiceForServer() {
         return new SimplePalisadeService()
-                .cacheService(clientServices.createCacheService())
-                .policyService(clientServices.createPolicyService())
-                .resourceService(clientServices.createResourceService())
-                .userService(clientServices.createUserService())
-                .auditService(clientServices.createAuditService());
+        .cacheService(clientServices.createCacheService())
+        .policyService(clientServices.createPolicyService())
+        .resourceService(clientServices.createResourceService())
+        .userService(clientServices.createUserService())
+        .auditService(clientServices.createAuditService());
     }
 
     /**
@@ -238,7 +238,11 @@ public class ServicesConfigurator {
             Configuration conf = createHadoopConfiguration();
             HadoopDataReader reader = new HadoopDataReader().conf(conf);
             reader.addSerialiser(RESOURCE_TYPE, new AvroSerialiser<>(Employee.class));
-            return new SimpleDataService().reader(reader).palisadeService(clientServices.createPalisadeService()).cacheService(clientServices.createCacheService());
+            return new SimpleDataService()
+            .reader(reader)
+            .palisadeService(clientServices.createPalisadeService())
+            .cacheService(clientServices.createCacheService())
+            .auditService(clientServices.createAuditService());
         } catch (final IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
             return null;

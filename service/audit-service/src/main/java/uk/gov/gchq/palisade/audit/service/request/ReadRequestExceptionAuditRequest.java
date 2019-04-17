@@ -39,32 +39,32 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
     }
 
     /**
-     * @param ex {@link Throwable} is the type of the exception while processing
+     * @param exception {@link Throwable} is the type of the exception while processing
      * @return the {@link ReadRequestExceptionAuditRequest}
      */
-    public ReadRequestExceptionAuditRequest exception(final Throwable ex) {
+    public ReadRequestExceptionAuditRequest exception(final Throwable exception) {
         requireNonNull(exception, "The exception type cannot be null");
         this.exception = exception;
         return this;
     }
 
     /**
-     * @param request {@link RequestId} is the requestId for the ReadRequest
+     * @param requestId {@link RequestId} is the requestId for the ReadRequest
      * @return the {@link ReadRequestExceptionAuditRequest}
      */
-    public ReadRequestExceptionAuditRequest requestId(final RequestId request) {
-        requireNonNull(request, "The requestId type cannot be null");
+    public ReadRequestExceptionAuditRequest requestId(final RequestId requestId) {
+        requireNonNull(requestId, "The requestId type cannot be null");
         this.requestId = requestId;
         return this;
     }
 
     /**
-     * @param res {@link LeafResource} is the leafResource for the ReadRequest
+     * @param resource {@link LeafResource} is the leafResource for the ReadRequest
      * @return the {@link ReadRequestExceptionAuditRequest}
      */
-    public ReadRequestExceptionAuditRequest resource(final LeafResource res) {
-        requireNonNull(res, "The leafResource type cannot be null");
-        this.resource = res;
+    public ReadRequestExceptionAuditRequest resource(final LeafResource resource) {
+        requireNonNull(resource, "The leafResource type cannot be null");
+        this.resource = resource;
         return this;
     }
 

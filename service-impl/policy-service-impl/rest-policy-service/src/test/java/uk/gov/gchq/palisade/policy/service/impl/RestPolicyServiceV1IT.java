@@ -103,7 +103,7 @@ public class RestPolicyServiceV1IT {
 
         final Context context = new Context().purpose("purpose1");
         final GetPolicyRequest request = new GetPolicyRequest().user(user).context(context).resources(Arrays.asList(fileResource1, fileResource2));
-        request.setOriginalRequestId("test shouldGetPolcy");
+        request.setOriginalRequestId("test shouldGetPolicy");
 
         final Map<LeafResource, Policy> policies = new HashMap<>();
         policies.put(fileResource1, new Policy<>().owner(user));

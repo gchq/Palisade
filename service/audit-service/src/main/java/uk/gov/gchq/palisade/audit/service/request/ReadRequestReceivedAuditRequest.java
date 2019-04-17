@@ -37,12 +37,20 @@ public class ReadRequestReceivedAuditRequest extends AuditRequest {
     public ReadRequestReceivedAuditRequest() {
     }
 
+    /**
+     * @param requestId {@link RequestId} is the requestId for the ReadRequest
+     * @return the {@link ReadRequestReceivedAuditRequest}
+     */
     public ReadRequestReceivedAuditRequest requestId(final RequestId requestId) {
         requireNonNull(requestId, "The request id cannot be set to null.");
         this.requestId = requestId;
         return this;
     }
 
+    /**
+     * @param resource {@link LeafResource} is the leafResource for the ReadRequest
+     * @return the {@link ReadRequestReceivedAuditRequest}
+     */
     public ReadRequestReceivedAuditRequest resource(final LeafResource resource) {
         requireNonNull(resource, "The resource cannot be set to null.");
         this.resource = resource;
@@ -54,28 +62,9 @@ public class ReadRequestReceivedAuditRequest extends AuditRequest {
         return requestId;
     }
 
-    public void setRequestId(final RequestId requestId) {
-        requestId(requestId);
-    }
-
     public LeafResource getResource() {
         requireNonNull(resource, "The resource has not been set.");
         return resource;
-    }
-
-    public void setResource(final LeafResource resource) {
-        resource(resource);
-    }
-
-
-    /**
-     * @return the auditLog representation of this class
-     */
-    public String constructAuditLog() {
-        return "ReadRequestReceivedAuditRequest" + " 'requestId' " + getRequestId().getId()
-                + "' resourceId '" + getResource().getId()
-                + "' id '" + getId()
-                + "' originalRequestId '" + getOriginalRequestId();
     }
 
     @Override
@@ -88,28 +77,28 @@ public class ReadRequestReceivedAuditRequest extends AuditRequest {
         }
         final ReadRequestReceivedAuditRequest that = (ReadRequestReceivedAuditRequest) o;
         return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(requestId, that.requestId)
-                .append(resource, that.resource)
-                .isEquals();
+        .appendSuper(super.equals(o))
+        .append(requestId, that.requestId)
+        .append(resource, that.resource)
+        .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(20, 39)
-                .appendSuper(super.hashCode())
-                .append(requestId)
-                .append(resource)
-                .toHashCode();
+        .appendSuper(super.hashCode())
+        .append(requestId)
+        .append(resource)
+        .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .appendSuper(super.toString())
-                .append("requestId", requestId)
-                .append("resource", resource)
-                .toString();
+        .appendSuper(super.toString())
+        .append("requestId", requestId)
+        .append("resource", resource)
+        .toString();
     }
 
 }

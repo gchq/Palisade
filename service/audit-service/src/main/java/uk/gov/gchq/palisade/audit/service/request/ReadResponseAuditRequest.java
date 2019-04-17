@@ -37,11 +37,11 @@ public class ReadResponseAuditRequest extends AuditRequest {
     }
 
     /**
-     * @param request {@link RequestId} is the requestId for the ReadRequest
+     * @param requestId {@link RequestId} is the requestId for the ReadRequest
      * @return the {@link ReadRequestExceptionAuditRequest}
      */
-    public ReadResponseAuditRequest requestId(final RequestId request) {
-        requireNonNull(request, "The requestId type cannot be null");
+    public ReadResponseAuditRequest requestId(final RequestId requestId) {
+        requireNonNull(requestId, "The requestId type cannot be null");
         this.requestId = requestId;
         return this;
     }

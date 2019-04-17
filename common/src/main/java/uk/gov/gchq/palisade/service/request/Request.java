@@ -61,7 +61,7 @@ public abstract class Request {
     }
 
     public void setOriginalRequestId(final String originalRequestId) {
-        this.originalRequestId = originalRequestId;
+        originalRequestId(originalRequestId);
     }
 
     public String getOriginalRequestId() {
@@ -82,24 +82,24 @@ public abstract class Request {
         final Request request = (Request) o;
 
         return new EqualsBuilder()
-                .append(id, request.id)
-                .append(originalRequestId, request.originalRequestId)
-                .isEquals();
+        .append(id, request.id)
+        .append(originalRequestId, request.originalRequestId)
+        .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(5, 37)
-                .append(id)
-                .append(originalRequestId)
-                .toHashCode();
+        .append(id)
+        .append(originalRequestId)
+        .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("id", id)
-                .append("originalRequestId", originalRequestId)
-                .toString();
+        .append("id", id)
+        .append("originalRequestId", originalRequestId)
+        .toString();
     }
 }

@@ -35,6 +35,7 @@ import uk.gov.gchq.palisade.service.ServiceState;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
@@ -47,36 +48,30 @@ import static java.util.Objects.requireNonNull;
  * </pre>
  */
 public class LoggerAuditService implements AuditService {
-    private interface Handler {
-        void handle(Object o);
-    }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggerAuditService.class);
-    private static final Map<Class, Handler> DISPATCH = new HashMap<Class, Handler>();
+    private static final Map<Class, Consumer<Object>> DISPATCH = new HashMap<Class, Consumer<Object>>();
 
     //translate class object to handler
     static {
         //handler for ExceptionAuditRequest
         DISPATCH.put(ExceptionAuditRequest.class, (o) -> {
             requireNonNull(o, "exceptionAuditRequest");
-            AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
             ExceptionAuditRequest exceptionAuditRequest = (ExceptionAuditRequest) o;
-            final String msg = auditLogContext(auditRequestWithContext) + " 'exception'" + exceptionAuditRequest.getException().getMessage();
+            final String msg = " 'exception' " + auditLogContext(exceptionAuditRequest) + exceptionAuditRequest.getException().getMessage();
             LOGGER.error(msg);
         });
         //handler for ProcessingCompleteAuditRequest
         DISPATCH.put(ProcessingCompleteAuditRequest.class, (o) -> {
             requireNonNull(o, "processingCompleteAuditRequest");
             AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
-            final String msg = auditLogContext(auditRequestWithContext) + " 'processingComplete' ";
+            final String msg = " 'processingComplete' " + auditLogContext(auditRequestWithContext);
             LOGGER.info(msg);
         });
         //handler for ProcessingStartedAuditRequest
         DISPATCH.put(ProcessingStartedAuditRequest.class, (o) -> {
             requireNonNull(o, "processingStartedAuditRequest");
-            AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
             ProcessingStartedAuditRequest processingStartedAuditRequest = (ProcessingStartedAuditRequest) o;
-            final String msg = auditLogContext(auditRequestWithContext) + " 'processingStarted' "
+            final String msg = " 'processingStarted' " + auditLogContext(processingStartedAuditRequest)
             + processingStartedAuditRequest.getUser().toString()
             + "' accessed '" + processingStartedAuditRequest.getLeafResource().getId()
             + "' and it was processed using '" + processingStartedAuditRequest.getHowItWasProcessed();
@@ -86,7 +81,7 @@ public class LoggerAuditService implements AuditService {
         DISPATCH.put(RequestReceivedAuditRequest.class, (o) -> {
             requireNonNull(o, "RequestReceivedAuditRequest");
             AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
-            final String msg = auditLogContext(auditRequestWithContext) + " auditRequest ";
+            final String msg = " auditRequest " + auditLogContext(auditRequestWithContext);
             LOGGER.info(msg);
         });
         //handler for ReadRequestExceptionAuditRequest
@@ -136,13 +131,12 @@ public class LoggerAuditService implements AuditService {
         return msg;
     }
 
-
     @Override
     public CompletableFuture<Boolean> audit(final AuditRequest request) {
         requireNonNull(request, "The audit request can not be null.");
-        Handler handler = DISPATCH.get((request.getClass()));
+        Consumer<Object> handler = DISPATCH.get((request.getClass()));
         if (handler != null) {
-            handler.handle(request);
+            handler.accept(request);
         } else {
             //received an AuditRequest derived class that is not defined as a Handler above.
             //need to add handler for this class.
