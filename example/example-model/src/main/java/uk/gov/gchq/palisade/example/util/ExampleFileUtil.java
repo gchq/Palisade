@@ -29,6 +29,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
@@ -76,21 +78,28 @@ public final class ExampleFileUtil {
         try {
             uriPath = new URI(path);
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Can't parse the given file name", e);
-        }
-
-        // if this path has the the file:// scheme, then convert it via URI
-        Path file;
-        if (FileSystems.getDefault().provider().getScheme().equals(uriPath.getScheme())) {
-            file = Paths.get(uriPath);
-        } else {
-            file = Paths.get(path);
+            try {
+                uriPath = Paths.get(path).normalize().toUri();
+            } catch (Throwable f) {
+                throw new RuntimeException("Can't parse the given file name", f);
+            }
         }
 
         //is this a local file URL? If so attempt to normalise it
 
         if (isNull(uriPath.getScheme()) ||
                 FileSystems.getDefault().provider().getScheme().equals(uriPath.getScheme())) {
+
+            Pattern patt = Pattern.compile(FileSystems.getDefault().provider().getScheme() + ":[/]?([^/].*)$");
+            Matcher matt = patt.matcher(uriPath.toString());
+            Path file;
+
+            if (matt.matches()) {
+                String temp = matt.group(1);
+                return URI.create(FileSystems.getDefault().provider().getScheme() + "://" + matt.group(1));
+            } else {
+                file = Paths.get(uriPath).normalize();
+            }
             //normalise this against the file system
             try {
                 file = file.toRealPath(LinkOption.NOFOLLOW_LINKS);
@@ -102,4 +111,3 @@ public final class ExampleFileUtil {
         return uriPath;
     }
 }
-
