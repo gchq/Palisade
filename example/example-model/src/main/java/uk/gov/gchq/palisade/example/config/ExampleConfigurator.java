@@ -63,6 +63,7 @@ public final class ExampleConfigurator {
      * @param args command line arguments
      */
     public static void main(final String[] args) {
+        LOGGER.info("EMR debug: start of ExampleConfigurator");
         final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ServicesCreator cs = new ServicesCreator(configService);

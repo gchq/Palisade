@@ -134,17 +134,25 @@ resource "null_resource" "deploy_example" {
   }
   provisioner "remote-exec" {
       inline = [
+        "hdfs dfs -rm -r /example_data || echo Deleted",
         "mkdir -p /home/hadoop/example_data",
-        "java -cp /home/hadoop/jars/example-model-0.2.1-SNAPSHOT-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData /home/hadoop/example_data 10 1 > /home/hadoop/example_logs/deployDataServices.log 2>&1 ",
+        "java -cp /home/hadoop/jars/example-model-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData  /home/hadoop/example_data  10  1 > /home/hadoop/example_logs/deployDataServices.log 2>&1 ",
+        "hdfs dfs -mkdir /example_data",
+         "hdfs dfs -put /home/hadoop/example_data/* /example_data/"
       ]
     }
 
-#ssh -f -i ${key_path} -o StrictHostKeyChecking=no hadoop@${master_node} "sudo su - hdfs; hdfs dfs -mkdir /data; hdfs dfs -put /tmp/exampleObj_file1.txt /data/"
 
+  # Configure the Example - create some users and policies...
+  provisioner "remote-exec" {
+      inline = [
+        "java -cp /home/hadoop/jars/example-model-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.config.ExampleConfigurator /home/hadoop/example_data/Employee_file0.avro > /home/hadoop/example_logs/configureExample.log 2>&1 ",
+      ]
+    }
 
-  # Configure the Example - create some users and policies
+  # Run the Palisade mapreduce example runner....1st copy over the jar...
 
-  # Run the Palisade mapreduce example runner
+#  /home/gmiller/repos/Palisade/example/deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar
 
 
 }
