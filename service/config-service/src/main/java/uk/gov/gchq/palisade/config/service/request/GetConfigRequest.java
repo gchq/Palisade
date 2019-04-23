@@ -20,6 +20,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -41,11 +43,13 @@ public class GetConfigRequest extends Request {
      * The service for the configuration being requested.
      */
     private Optional<String> serviceClassName;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetConfigRequest.class);
 
     /**
      * Create an empty request.
      */
     public GetConfigRequest() {
+        LOGGER.info("EMR debug: GetConfigRequest - at start of GetConfigrequest");
         serviceClassName = Optional.empty();
     }
 
@@ -90,6 +94,7 @@ public class GetConfigRequest extends Request {
      * @return this object
      */
     public GetConfigRequest service(final Optional<Class<? extends Service>> serviceClassName) {
+        LOGGER.info("EMR debug: GetConfigRequest - at start of GetConfigrequest service");
         requireNonNull(serviceClassName, "serviceClassName");
         this.serviceClassName = serviceClassName.map(Class::getTypeName);
         return this;

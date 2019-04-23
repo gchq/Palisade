@@ -199,6 +199,7 @@ public class Configurator {
      * @implNote This is equivalent to calling {@code retrieveConfig(serviceClass, 0)}.
      */
     public ServiceState retrieveConfig(final Optional<Class<? extends Service>> serviceClass) throws NoConfigException {
+        LOGGER.info("EMR debug: Configurator - at start of retrieveConfig - definition 1");
         return retrieveConfig(serviceClass, 0);
     }
 
@@ -214,6 +215,7 @@ public class Configurator {
      * @throws NoConfigException if no configuration data can be retrieved, or the operation timed out
      */
     public ServiceState retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final Duration timeout) throws NoConfigException {
+        LOGGER.info("EMR debug: Configurator - at start of retrieveConfig - definition 2");
         requireNonNull(timeout, "timeout");
         return retrieveConfig(serviceClass, timeout.toMillis());
     }
@@ -229,6 +231,7 @@ public class Configurator {
      * @throws NoConfigException if the time out expires or no configuration could be found
      */
     private ServiceState retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final long timeout) throws NoConfigException {
+        LOGGER.info("EMR debug: Configurator - at start of retrieveConfig - definition 3");
         requireNonNull(serviceClass, "serviceClass");
         if (timeout < 0) {
             throw new IllegalArgumentException("negative timeout not allowed");

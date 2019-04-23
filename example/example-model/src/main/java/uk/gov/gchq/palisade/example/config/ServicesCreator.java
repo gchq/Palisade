@@ -15,6 +15,8 @@
  */
 package uk.gov.gchq.palisade.example.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
@@ -31,6 +33,7 @@ import static java.util.Objects.requireNonNull;
 
 public class ServicesCreator {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServicesCreator.class);
     private final ConfigurationService configService;
 
     private final ServiceState config;
@@ -43,9 +46,12 @@ public class ServicesCreator {
     private final PalisadeService palisadeService;
 
     public ServicesCreator(final ConfigurationService configService) {
+        LOGGER.info("EMR debug: ServicesCreator - at start of ServicesCreator");
         requireNonNull(configService, "configService");
         this.configService = configService;
+        LOGGER.info("EMR debug: ServicesCreator - after this.configService");
         this.config = new Configurator(configService).retrieveConfig(Optional.empty());
+        LOGGER.info("EMR debug: ServicesCreator - after this.config = new Configurator(configService).retrieveConfig(Optional.empty()");
         this.resourceService = createResourceService();
         this.auditService = createAuditService();
         this.policyService = createPolicyService();

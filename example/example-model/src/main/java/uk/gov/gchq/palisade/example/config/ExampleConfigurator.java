@@ -65,20 +65,29 @@ public final class ExampleConfigurator {
     public static void main(final String[] args) {
         LOGGER.info("EMR debug: start of ExampleConfigurator");
         final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        LOGGER.info("EMR debug: ExampleConfigurator - opened inputstream");
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
+        LOGGER.info("EMR debug: ExampleConfigurator - created ConfigurationService - configService");
         ServicesCreator cs = new ServicesCreator(configService);
+        LOGGER.info("EMR debug: ExampleConfigurator - created ServicesCreator cs");
         new ExampleConfigurator(cs, args[0]);
+        LOGGER.info("EMR debug: ExampleConfigurator - created new ExampleConfigurator");
     }
 
     public ExampleConfigurator(final ServicesCreator services, final String file) {
+        LOGGER.info("EMR debug: ExampleConfigurator - at start of constructor");
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(file);
         this.file = absoluteFileURI.toString();
+        LOGGER.info("EMR debug: ExampleConfigurator - constructor this.file");
         initialiseExample(services);
+        LOGGER.info("EMR debug: ExampleConfigurator - constructor - completed initialiseExample");
     }
 
     private void initialiseExample(final ServicesCreator services) {
         // The user authorisation owner or sys admin needs to add the user
+        LOGGER.info("EMR debug: ExampleConfigurator - start of initialiseExample");
         final UserService userService = services.getUserService();
+        LOGGER.info("EMR debug: ExampleConfigurator - initialiseExample - created UserService - userService");
 
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest().user(ExampleUsers.getAlice())

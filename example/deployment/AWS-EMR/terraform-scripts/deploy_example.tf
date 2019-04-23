@@ -71,14 +71,15 @@ resource "null_resource" "deploy_example" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployConfigService.sh > /home/hadoop/example_logs/deployConfigService.log 2>&1 &'"
   }
 
-  # Tell the config servive how the various Palisade services should be distributed over the cluster - this configuration is stored in the Config service.....1st copy over the jar....
+  # Tell the config service how the various Palisade services should be distributed over the cluster - this configuration is stored in the Config service.....1st copy over the jar....
   provisioner "file" {
       source = "../../../example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar"
       destination = "/home/hadoop/jars/example-model-0.2.1-SNAPSHOT-shaded.jar"
   }
   provisioner "local-exec" {
-      command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/configureDistributedServices.sh ${aws_emr_cluster.palisade_cluster.master_public_dns}> /home/hadoop/example_logs/configureDistributedServices.log 2>&1 &'"
+      command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/configureDistributedServices.sh  > /home/hadoop/example_logs/configureDistributedServices.log 2>&1 &'"
     }
+
 
   # Deploy the Palisade Resource service on the EMR master node...1st copy over the jar...
   provisioner "file" {
@@ -138,7 +139,7 @@ resource "null_resource" "deploy_example" {
         "mkdir -p /home/hadoop/example_data",
         "java -cp /home/hadoop/jars/example-model-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData  /home/hadoop/example_data  10  1 > /home/hadoop/example_logs/deployDataServices.log 2>&1 ",
         "hdfs dfs -mkdir /example_data",
-         "hdfs dfs -put /home/hadoop/example_data/* /example_data/"
+        "hdfs dfs -put /home/hadoop/example_data/* /example_data/"
       ]
     }
 
@@ -151,8 +152,22 @@ resource "null_resource" "deploy_example" {
     }
 
   # Run the Palisade mapreduce example runner....1st copy over the jar...
-
-#  /home/gmiller/repos/Palisade/example/deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar
-
-
+#  provisioner "file" {
+#      source = "../../../deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
+#      destination = "/home/hadoop/jars/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
+#  }
+#  provisioner "remote-exec" {
+#      inline = [
+#        "java -cp /home/hadoop/jars/example-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.config.RestExample /home/hadoop/example_data/Employee_file0.avro > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
+#      ]
+#    }
+  provisioner "file" {
+      source = "../../../deployment/local-jvm/example-runner/target/example-runner-0.2.1-SNAPSHOT-shaded.jar"
+      destination = "/home/hadoop/jars/example-runner-0.2.1-SNAPSHOT-shaded.jar"
+  }
+  provisioner "remote-exec" {
+      inline = [
+        "java -cp /home/hadoop/jars/example-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.config.RestExample /home/hadoop/example_data/Employee_file0.avro > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
+      ]
+    }
 }
