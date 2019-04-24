@@ -6,7 +6,7 @@ trigger:
   batch: true
   branches:
     include:
-      - '*'
+      - 'gh-163-azure-aks'
   paths:
     include:
       - example/deployment/Azure-AKS/terraform/*
@@ -83,16 +83,7 @@ stages:
               scriptPath: '$(System.DefaultWorkingDirectory)/$(azure-dir)/k8s/create_share_secret.sh'
               arguments: "tmp-palisade-aks $(data_storage_account_name) palisade-aks tmp-palisade-storage"
 
-          - task: HelmDeploy@0
-            displayName: 'helm init'
-            inputs:
-              azureSubscription: 'palisade_rm'
-              azureResourceGroup: 'tmp-palisade-aks'
-              kubernetesCluster: 'palisade-aks'
-              command: init
-              arguments: ' --upgrade --service-account tiller'
-
-          - task: HelmDeploy@0
+          - task: HelmDeploy@1
             displayName: 'helm upgrade nginx-ingress'
             inputs:
               azureSubscription: 'palisade_rm'
@@ -103,3 +94,12 @@ stages:
               chartName: 'stable/nginx-ingress'
               releaseName: 'nginx-ingress'
               overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=$(ingressIpAddress),controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=tmp-palisade-ips'
+
+          - task: HelmDeploy@0
+            displayName: 'helm init'
+            inputs:
+              azureSubscription: 'palisade_rm'
+              azureResourceGroup: 'tmp-palisade-aks'
+              kubernetesCluster: 'palisade-aks'
+              command: init
+              arguments: ' --upgrade --service-account tiller'
