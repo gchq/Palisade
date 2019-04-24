@@ -7,4 +7,8 @@ STORAGE_RESOURCE_GROUP=$4
 
 STORAGE_KEY=$(az storage account keys list --resource-group $STORAGE_RESOURCE_GROUP --account-name $AKS_PERS_STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)
 az aks get-credentials -n $AKS_CLUSTER_NAME -g $AKS_RESOURCE_GROUP
-kubectl create secret generic data-share-secret --from-literal=azurestorageaccountname=$AKS_PERS_STORAGE_ACCOUNT_NAME --from-literal=azurestorageaccountkey=$STORAGE_KEY
+if `kubectl get secret generic data-share-secret --from-literal=azurestorageaccountname=$AKS_PERS_STORAGE_ACCOUNT_NAME --from-literal=azurestorageaccountkey=$STORAGE_KEY` ; then
+    echo "Skipping task as the secret already exists"
+else
+    kubectl create secret generic data-share-secret --from-literal=azurestorageaccountname=$AKS_PERS_STORAGE_ACCOUNT_NAME --from-literal=azurestorageaccountkey=$STORAGE_KEY
+fi
