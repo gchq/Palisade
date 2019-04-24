@@ -91,6 +91,7 @@ stages:
               kubernetesCluster: 'palisade-aks'
               command: init
               arguments: ' --upgrade --service-account tiller'
+
           - task: HelmDeploy@0
             displayName: 'helm upgrade nginx-ingress'
             inputs:
