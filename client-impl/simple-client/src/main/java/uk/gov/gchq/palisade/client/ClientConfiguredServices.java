@@ -146,7 +146,7 @@ public class ClientConfiguredServices {
     protected static <T extends Service> Optional<T> attemptToCreate(final Class<T> serviceClass, final ServiceState state) {
         try {
             return Optional.of(Configurator.createFromConfig(serviceClass, state));
-        } catch (NoConfigException e) {
+        } catch (IllegalStateException | NoConfigException e) {
             return Optional.empty();
         }
     }
