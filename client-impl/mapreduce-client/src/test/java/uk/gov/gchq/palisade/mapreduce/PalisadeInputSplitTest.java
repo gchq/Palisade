@@ -46,7 +46,7 @@ public class PalisadeInputSplitTest {
         Assert.fail("exception expected");
     }
 
-    private StubResource stubResource = new StubResource("test type","test id","test format");
+    private StubResource stubResource = new StubResource("test type", "test id", "test format");
     private StubConnectionDetail stubConnectionDetail = new StubConnectionDetail("test con");
 
     @Test
@@ -54,7 +54,8 @@ public class PalisadeInputSplitTest {
         //Given
         DataRequestResponse drr = new DataRequestResponse()
                 .requestId(new RequestId().id("test string"))
-                .resource(stubResource, stubConnectionDetail);
+                .resource(stubResource, stubConnectionDetail)
+                .originalRequestId("test id");
         PalisadeInputSplit test = new PalisadeInputSplit(drr);
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();

@@ -43,7 +43,7 @@ public class InputFormatUtilsTest {
     @BeforeClass
     public static void setup() {
         reqResponse = new DataRequestResponse()
-                .requestId(new RequestId().id("testID"))
+                .requestId(new RequestId().id("testID")).originalRequestId("test")
                 .resource(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"))
                 .resource(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"))
                 .resource(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"))
@@ -65,8 +65,8 @@ public class InputFormatUtilsTest {
                 .collect(Collectors.toList());
         //Then - should equal original map
         assertEquals(original, entries
-                        .stream()
-                        .collect(InputFormatUtils.listToMapCollector())
+                .stream()
+                .collect(InputFormatUtils.listToMapCollector())
         );
     }
 
@@ -81,12 +81,12 @@ public class InputFormatUtilsTest {
                 .collect(Collectors.toList());
         //Then - should equal original map
         assertEquals(original, entries
-                        .stream()
-                        .collect(InputFormatUtils.listToMapCollector())
+                .stream()
+                .collect(InputFormatUtils.listToMapCollector())
         );
     }
 
-    @Test (expected = NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void shouldReturnErrorAsThereAreNoResourcesSet() {
         //Given
         DataRequestResponse req = new DataRequestResponse();

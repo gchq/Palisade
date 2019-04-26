@@ -18,7 +18,9 @@ package uk.gov.gchq.palisade.config.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.ServiceState;
 
 import static java.util.Objects.requireNonNull;
@@ -33,6 +35,7 @@ import static java.util.Objects.requireNonNull;
  * authentication/authorisation constraints placed upon requestees. This means that for example, a client may not be
  * able to set configuration details for a particular service.
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class AddConfigRequest extends GetConfigRequest {
 
     private ServiceState config;
@@ -72,6 +75,16 @@ public class AddConfigRequest extends GetConfigRequest {
      */
     public void setConfig(final ServiceState config) {
         config(config);
+    }
+
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+        throw new ForbiddenException("Should not call AddConfigRequest.setOriginalRequestId()");
+    }
+
+    @Override
+    public String getOriginalRequestId() {
+        throw new ForbiddenException("Should not call AddConfigRequest.getOriginalRequestId()");
     }
 
     @Override
