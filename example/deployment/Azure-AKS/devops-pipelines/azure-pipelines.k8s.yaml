@@ -5,6 +5,27 @@ stages:
       variables: 
       - group: Palisade-azure
       steps:
+      - task: AzureCLI@1
+        displayName: 'get-ingress-ip'
+        inputs:
+          azureSubscription: 'palisade_rm'
+          scriptLocation: inlineScript
+          inlineScript: |
+            ingress_ip=$(az network public-ip show -n "palisade-ingress-ip" -g "tmp-palisade-ips" --query \"ipAddress\" | sed 's/\"//g')
+            echo "##vso[task.setvariable variable=ingressIpAddress]${ingress_ip}"
+
+      - task: HelmDeploy@0
+        displayName: 'helm upgrade nginx-ingress'
+        inputs:
+          azureSubscription: 'palisade_rm'
+          azureResourceGroup: 'tmp-palisade-aks'
+          kubernetesCluster: 'palisade-aks'
+          namespace: ingress
+          command: upgrade
+          chartName: 'stable/nginx-ingress'
+          releaseName: 'nginx-ingress'
+          overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=$(ingressIpAddress),controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=tmp-palisade-ips'
+
       - task: HelmDeploy@0
         displayName: 'helm upgrade'
         inputs:
