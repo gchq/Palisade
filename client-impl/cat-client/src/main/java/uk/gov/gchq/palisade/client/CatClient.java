@@ -57,10 +57,10 @@ public class CatClient {
 
         PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
 
-        new CatClient(palisade).read(filename, userId, purpose);
+        new CatClient(palisade).read(userId, filename, purpose);
     }
 
-    private void read(final String filename, final String userId, final String purpose) {
+    protected void read(final String userId, final String filename, final String purpose) {
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
         final List<CompletableFuture<InputStream>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
