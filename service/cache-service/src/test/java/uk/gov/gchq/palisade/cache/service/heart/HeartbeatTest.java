@@ -209,11 +209,12 @@ public class HeartbeatTest {
         ScheduledExecutorService scheduler = heart.getExecutor();
         //null out reference
         heart = null;
+
         //Trigger manual gc
         System.gc();
-        long time = System.currentTimeMillis() + 10000;
 
         //Then - wait a limited amount of time for scheduler to stop
+        long time = System.currentTimeMillis() + 5000;
         while (System.currentTimeMillis() < time && !scheduler.isTerminated()) {
             Thread.sleep(50);
             System.gc();
