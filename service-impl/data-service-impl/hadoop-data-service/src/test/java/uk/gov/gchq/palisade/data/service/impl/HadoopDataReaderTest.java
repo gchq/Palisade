@@ -65,6 +65,7 @@ public class HadoopDataReaderTest {
                 .user(new User())
                 .context(new Context())
                 .rules(rules);
+        request.setOriginalRequestId("test");
 
         // When
         final DataReaderResponse response = reader.read(request);
@@ -94,6 +95,7 @@ public class HadoopDataReaderTest {
                 .user(new User())
                 .context(new Context())
                 .rules(rules);
+        request.setOriginalRequestId("test");
 
         // When
         final DataReaderResponse response = reader.read(request);

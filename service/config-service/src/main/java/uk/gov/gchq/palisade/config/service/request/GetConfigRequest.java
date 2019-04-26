@@ -19,7 +19,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -35,6 +37,7 @@ import static java.util.Objects.requireNonNull;
  * example, a client may not be able to request configuration details for a particular service.
  */
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class GetConfigRequest extends Request {
 
     /**
@@ -93,6 +96,16 @@ public class GetConfigRequest extends Request {
         requireNonNull(serviceClassName, "serviceClassName");
         this.serviceClassName = serviceClassName.map(Class::getTypeName);
         return this;
+    }
+
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+        throw new ForbiddenException("Should not call GetConfigRequest.setOriginalRequestId()");
+    }
+
+    @Override
+    public String getOriginalRequestId() {
+        throw new ForbiddenException("Should not call GetConfigRequest.getOriginalRequestId()");
     }
 
     @Override
