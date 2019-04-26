@@ -19,8 +19,8 @@ package uk.gov.gchq.palisade.example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.client.ClientConfiguredServices;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.client.ClientConfiguredServices;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.common.ExampleUsers;
