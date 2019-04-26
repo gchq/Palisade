@@ -118,7 +118,6 @@ public class LoggerAuditService implements AuditService {
             + readResponseAuditRequest.getResource().toString() + " ";
             LOGGER.info(msg);
         });
-
     }
 
     static String auditLogContext(final AuditRequestWithContext auditRequestWithContext) {
