@@ -15,18 +15,21 @@ stages:
             echo "##vso[task.setvariable variable=ingressIpAddress]${ingress_ip}"
 
       - task: HelmDeploy@0
-        displayName: 'helm install nginx-ingress'
+        displayName: 'helm upgrade nginx-ingress'
         inputs:
           azureSubscription: 'palisade_rm'
           azureResourceGroup: 'tmp-palisade-aks'
           kubernetesCluster: 'palisade-aks'
           namespace: ingress
-          command: install
+          command: upgrade
           chartName: 'stable/nginx-ingress'
-          overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=$(ingressIpAddress),controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=tmp-palisade-ips'
+          releaseName: 'nginx-ingress'
+          overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=51.143.144.190,controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-resource-group=tmp-palisade-ips'
+          force: true
+          waitForExecution: false
 
       - task: HelmDeploy@0
-        displayName: 'helm upgrade'
+        displayName: 'helm upgrade palisade deployment'
         inputs:
           azureSubscription: 'palisade_rm'
           azureResourceGroup: 'tmp-palisade-aks'
