@@ -24,7 +24,7 @@ stages:
           command: upgrade
           chartName: 'stable/nginx-ingress'
           releaseName: 'nginx-ingress'
-          overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=$(ingressIpAddress),controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-resource-group=tmp-palisade-ips'
+          overrideValues: 'controller.replicaCount=3'
           force: true
           timeoutInMinutes: 600
 
