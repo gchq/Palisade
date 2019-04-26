@@ -15,14 +15,17 @@ if [ $# -gt 0 ]; then
         for node in $nodes
          do
            ssh -f -i $key -o StrictHostKeyChecking=no hadoop@$node "mkdir -p /home/hadoop/deploy_example/resources; \
-                                                                    mkdir -p /home/hadoop/jars"
+                                                                    mkdir -p /home/hadoop/jars; \
+                                                                    mkdir -p /home/hadoop/example_data; \
+                                                                    mkdir -p /home/hadoop/example_logs"
            scp -i $key -r -q /home/hadoop/deploy_example/resources/configRest.json hadoop@$node:/home/hadoop/deploy_example/resources
            scp -i $key -r -q /home/hadoop/jars/example-rest-data-service-*-executable.jar hadoop@$node:/home/hadoop/jars
+           scp -i $key -r -q /home/hadoop/example_data/Employee* hadoop@$node:/home/hadoop/example_data
            ssh -f -i $key -o StrictHostKeyChecking=no hadoop@$node "java -jar /home/hadoop/jars/example-rest-data-service-*-executable.jar \
                                                                     -httpPort=8084 \
                                                                     -extractDirectory=.extract/Data \
                                                                     -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json \
-                                                                    -Dpalisade.properties.app.title=rest-data-service"
+                                                                    -Dpalisade.properties.app.title=rest-data-service > /home/hadoop/example_logs/deployDataService.log 2>&1 "
          done
     else
         echo "The first argument should be to a .pem file."
@@ -30,7 +33,3 @@ if [ $# -gt 0 ]; then
 else
     echo "Your command line contains no arguments, you need to supply the .pem file associated with your emr cluster."
 fi
-
-
-
-

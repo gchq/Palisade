@@ -17,7 +17,7 @@ do
      data_connection_details="http://$node:8084/data"
    else
      etcd_connection_details=${etcd_connection_details},"http://$node:2379"
-     data_connection_details=${data_connection_details},"http://$node:8084/data"
+     #data_connection_details=${data_connection_details},"http://$node:8084/data"
    fi
 done
 

@@ -117,17 +117,6 @@ resource "null_resource" "deploy_example" {
         command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployPalisadeService.sh > /home/hadoop/example_logs/deployPalisadeService.log 2>&1 &'"
       }
 
-  # Deploy the example Palisade Data service on the EMR master node.....1st copy over the jar...
-  provisioner "file" {
-      source = "../../../example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
-      destination = "/home/hadoop/jars/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
-  }
-  provisioner "remote-exec" {
-      inline = [
-        "/home/hadoop/deploy_example/deployDataServices.sh /home/hadoop/.ssh/${basename(var.pem_file)} > /home/hadoop/example_logs/deployDataServices.log 2>&1 ",
-      ]
-    }
-
   # Generate a data file on the cluster and put it into hdfs....1st copy over the jar...
   provisioner "file" {
       source = "../../../example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar"
@@ -143,6 +132,16 @@ resource "null_resource" "deploy_example" {
       ]
     }
 
+  # Deploy the example Palisade Data service on the EMR master node.....1st copy over the jar...
+  provisioner "file" {
+      source = "../../../example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
+      destination = "/home/hadoop/jars/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
+  }
+  provisioner "remote-exec" {
+      inline = [
+        "/home/hadoop/deploy_example/deployDataServices.sh /home/hadoop/.ssh/${basename(var.pem_file)} > /home/hadoop/example_logs/deployDataServices.log 2>&1 ",
+      ]
+    }
 
   # Configure the Example - create some users and policies...
   provisioner "remote-exec" {
@@ -167,7 +166,8 @@ resource "null_resource" "deploy_example" {
   }
   provisioner "remote-exec" {
       inline = [
-        "java -cp /home/hadoop/jars/example-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.config.RestExample /home/hadoop/example_data/Employee_file0.avro > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
+        "java -cp /home/hadoop/jars/example-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.RestExample /home/hadoop/example_data/Employee_file0.avro > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
       ]
     }
 }
+#scp -i ~/.ssh/developer6959ireland.pem ./example-runner-0.2.1-SNAPSHOT-shaded.jar hadoop@ip-172-31-40-214.eu-west-1.compute.internal:~/jars

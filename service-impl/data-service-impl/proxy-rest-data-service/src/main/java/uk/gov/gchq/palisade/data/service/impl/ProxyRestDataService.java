@@ -63,6 +63,7 @@ public class ProxyRestDataService extends ProxyRestService implements DataServic
     @Override
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         LOGGER.debug("Invoking REST read: " + request);
+        LOGGER.info("EMR debug: ProxyRestDataService - at start of read ");
         try {
             final CompletableFuture<Response> futureResponse = doPostAsync("read/chunked", request, Response.class);
             return futureResponse.thenApply(r -> new ReadResponse().data(r.readEntity(InputStream.class)));
