@@ -24,9 +24,9 @@ stages:
           command: upgrade
           chartName: 'stable/nginx-ingress'
           releaseName: 'nginx-ingress'
-          overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=51.143.144.190,controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-resource-group=tmp-palisade-ips'
+          overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=$(ingressIpAddress),controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-resource-group=tmp-palisade-ips'
           force: true
-          waitForExecution: false
+          timeoutInMinutes: 600
 
       - task: HelmDeploy@0
         displayName: 'helm upgrade palisade deployment'
