@@ -15,22 +15,19 @@
  */
 package uk.gov.gchq.palisade.client;
 
-import jdk.management.resource.ResourceId;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
-import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.client.CatClient;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.impl.MockDataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
-import uk.gov.gchq.palisade.io.BytesOutputStream;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
@@ -39,18 +36,12 @@ import uk.gov.gchq.palisade.service.impl.MockPalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class CatClientTest {
 
@@ -102,10 +93,10 @@ public class CatClientTest {
         readRequest2 = new ReadRequest().requestId(reqId).resource(resource2);
 
         readResponse1 = CompletableFuture.completedFuture(
-                new ReadResponse().data(new ByteArrayInputStream(Charset.forName("UTF-8").encode("Test data 1").array())));
+                new ReadResponse().data(IOUtils.toInputStream("Test data 1", Charset.forName("UTF-8"))));
 
         readResponse2 = CompletableFuture.completedFuture(
-                new ReadResponse().data(new ByteArrayInputStream(Charset.forName("UTF-8").encode("Test data 2").array())));
+                new ReadResponse().data(IOUtils.toInputStream("Test data 2", Charset.forName("UTF-8"))));
 
         Mockito.when(mockPalisadeService.registerDataRequest(Mockito.refEq(registerDataRequest, "id"))).thenReturn(reqResponse);
         Mockito.when(mockDataService.read(Mockito.refEq(readRequest1, "id"))).thenReturn(readResponse1);
@@ -123,7 +114,6 @@ public class CatClientTest {
 
         //Then
         assertEquals("Test data 1\nTest data 2\n", outContent.toString());
-
     }
 
     @After
