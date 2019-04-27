@@ -89,7 +89,7 @@ stages:
               azureSubscription: 'palisade_rm'
               scriptLocation: inlineScript
               inlineScript: |
-                ingress_ip=$(az network public-ip show -n "palisade-ingress-ip" -g "palisade-ips" --query \"ipAddress\" | sed 's/\"//g')
+                ingress_ip=$(az network public-ip show -n "palisade-ingress-ip" -g "palisade" --query \"ipAddress\" | sed 's/\"//g')
                 echo "##vso[task.setvariable variable=ingressIpAddress]${ingress_ip}"
 
           - task: AzureCLI@1
@@ -110,6 +110,6 @@ stages:
               command: upgrade
               chartName: 'stable/nginx-ingress'
               releaseName: 'nginx-ingress'
-              overrideValues: 'controller.replicaCount=3'
+              overrideValues: 'controller.replicaCount=3,controller.service.loadBalancerIP=$(ingressIpAddress),controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=palisade'
               force: true
               timeoutInMinutes: 600
