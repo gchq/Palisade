@@ -15,5 +15,5 @@ resource "azurerm_storage_share" "share" {
   name = "${var.share_name}"
   resource_group_name  = "${azurerm_resource_group.fileshare-rg.name}"
   storage_account_name = "${azurerm_storage_account.storage.name}"
-  quota = 250
+  quota = 500
 }
