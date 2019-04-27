@@ -11,14 +11,21 @@ stages:
           azureSubscription: 'palisade_rm'
           scriptLocation: inlineScript
           inlineScript: |
-            ingress_ip=$(az network public-ip show -n "palisade-ingress-ip" -g "tmp-palisade-ips" --query \"ipAddress\" | sed 's/\"//g')
+            ingress_ip=$(az network public-ip show -n "palisade-ingress-ip" -g "palisade-ips" --query \"ipAddress\" | sed 's/\"//g')
             echo "##vso[task.setvariable variable=ingressIpAddress]${ingress_ip}"
+
+      - task: AzureCLI@1
+        displayName: 'helm repo update'
+        inputs:
+          azureSubscription: 'palisade_rm'
+          scriptLocation: inlineScript
+          inlineScript: helm repo update
 
       - task: HelmDeploy@0
         displayName: 'helm upgrade nginx-ingress'
         inputs:
           azureSubscription: 'palisade_rm'
-          azureResourceGroup: 'tmp-palisade-aks'
+          azureResourceGroup: 'palisade'
           kubernetesCluster: 'palisade-aks'
           namespace: ingress
           command: upgrade

@@ -27,7 +27,7 @@ stages:
               backendType: azurerm
               backendServiceArm: 'palisade_rm'
               ensureBackend: true
-              backendAzureRmResourceGroupName: 'tmp-tfstate'
+              backendAzureRmResourceGroupName: 'tfstate'
               backendAzureRmResourceGroupLocation: uksouth
               backendAzureRmStorageAccountName: 'tfstatepalisade'
               backendAzureRmContainerName: tfstate
@@ -60,7 +60,7 @@ stages:
             inputs:
               connectionType: Azure Resource Manager
               azureSubscriptionEndpoint: 'palisade_rm'
-              azureResourceGroup: 'tmp-palisade-aks'
+              azureResourceGroup: 'palisade'
               kubernetesCluster: 'palisade-aks'
               command: apply
               useConfigurationFile: true
@@ -72,13 +72,13 @@ stages:
             inputs:
               azureSubscription: 'palisade_rm'
               scriptPath: '$(System.DefaultWorkingDirectory)/$(azure-dir)/k8s/create_share_secret.sh'
-              arguments: "tmp-palisade-aks $(data_storage_account_name) palisade-aks tmp-palisade-storage"
+              arguments: "palisade $(data_storage_account_name) palisade-aks palisade-storage"
 
           - task: HelmDeploy@0
             displayName: 'helm init'
             inputs:
               azureSubscription: 'palisade_rm'
-              azureResourceGroup: 'tmp-palisade-aks'
+              azureResourceGroup: 'palisade'
               kubernetesCluster: 'palisade-aks'
               command: init
               arguments: ' --upgrade --service-account tiller'
