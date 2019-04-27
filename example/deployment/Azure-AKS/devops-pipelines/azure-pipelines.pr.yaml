@@ -116,7 +116,7 @@ stages:
         displayName: 'helm upgrade'
         inputs:
           azureSubscription: 'palisade_rm'
-          azureResourceGroup: 'tmp-palisade-aks'
+          azureResourceGroup: 'palisade'
           kubernetesCluster: 'palisade-aks'
           command: upgrade
           chartType: FilePath
