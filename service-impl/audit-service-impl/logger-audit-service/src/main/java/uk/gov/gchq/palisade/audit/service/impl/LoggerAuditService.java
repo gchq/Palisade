@@ -21,10 +21,18 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.AuditRequestWithContext;
+import uk.gov.gchq.palisade.audit.service.request.ExceptionAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ProcessingCompleteAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ProcessingStartedAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.ServiceState;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
@@ -38,19 +46,66 @@ import static java.util.Objects.requireNonNull;
  */
 public class LoggerAuditService implements AuditService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggerAuditService.class);
+    private static final Map<Class, Consumer<Object>> DISPATCH = new HashMap<Class, Consumer<Object>>();
+
+    //translate class object to handler
+    static {
+        //handler for ExceptionAuditRequest
+        DISPATCH.put(ExceptionAuditRequest.class, (o) -> {
+            requireNonNull(o, "exceptionAuditRequest");
+            ExceptionAuditRequest exceptionAuditRequest = (ExceptionAuditRequest) o;
+            final String msg = " 'exception' " + auditLogContext(exceptionAuditRequest) + exceptionAuditRequest.getException().getMessage();
+            LOGGER.error(msg);
+        });
+        //handler for ProcessingCompleteAuditRequest
+        DISPATCH.put(ProcessingCompleteAuditRequest.class, (o) -> {
+            requireNonNull(o, "processingCompleteAuditRequest");
+            AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
+            final String msg = " 'processingComplete' " + auditLogContext(auditRequestWithContext);
+            LOGGER.info(msg);
+        });
+        //handler for ProcessingStartedAuditRequest
+        DISPATCH.put(ProcessingStartedAuditRequest.class, (o) -> {
+            requireNonNull(o, "processingStartedAuditRequest");
+            ProcessingStartedAuditRequest processingStartedAuditRequest = (ProcessingStartedAuditRequest) o;
+            final String msg = " 'processingStarted' " + auditLogContext(processingStartedAuditRequest)
+            + processingStartedAuditRequest.getUser().toString()
+            + "' accessed '" + processingStartedAuditRequest.getLeafResource().getId()
+            + "' and it was processed using '" + processingStartedAuditRequest.getHowItWasProcessed();
+            LOGGER.info(msg);
+        });
+        //handler for RequestReceivedAuditRequest
+        DISPATCH.put(RequestReceivedAuditRequest.class, (o) -> {
+            requireNonNull(o, "RequestReceivedAuditRequest");
+            AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
+            final String msg = " auditRequest " + auditLogContext(auditRequestWithContext);
+            LOGGER.info(msg);
+        });
+
+    }
+
+    static String auditLogContext(final AuditRequestWithContext auditRequestWithContext) {
+
+        final String msg = " 'userId' " + auditRequestWithContext.getUserId().getId()
+        + " 'purpose' " + auditRequestWithContext.getContext().getPurpose()
+        + "' resourceId '" + auditRequestWithContext.getResourceId()
+        + "' id '" + auditRequestWithContext.getId()
+        + "' originalRequestId '" + auditRequestWithContext.getOriginalRequestId();
+        return msg;
+    }
+
 
     @Override
     public CompletableFuture<Boolean> audit(final AuditRequest request) {
         requireNonNull(request, "The audit request can not be null.");
-        final String msg = "'" + request.getUser().getUserId().getId()
-                + "' accessed '" + request.getResource().getId()
-                + "' for '" + request.getContext().getPurpose()
-                + "' and it was processed using '" + request.getHowItWasProcessed() + "'";
-
-        if (null != request.getException()) {
-            LOGGER.error(msg + "', but an error occurred " + request.getException().getMessage(), request.getException());
+        Consumer<Object> handler = DISPATCH.get((request.getClass()));
+        if (handler != null) {
+            handler.accept(request);
         } else {
-            LOGGER.info(msg);
+            //received an AuditRequest derived class that is not defined as a Handler above.
+            //need to add handler for this class.
+            LOGGER.error("handler == null for " + request.getClass().getName());
+
         }
         return CompletableFuture.completedFuture(Boolean.TRUE);
     }

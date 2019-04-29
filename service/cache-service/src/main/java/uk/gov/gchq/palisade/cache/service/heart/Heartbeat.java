@@ -21,7 +21,8 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.service.Service;
 
-import java.lang.ref.WeakReference;
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -58,6 +59,11 @@ public class Heartbeat {
     private static final byte[] DUMMY_DATA = new byte[1];
 
     /**
+     * How long to wait between GC checks.
+     */
+    public static final Duration GC_CHECK_DELAY = Duration.ofMillis(500);
+
+    /**
      * The amount of time between heartbeats.
      */
     private Duration heartRate;
@@ -86,6 +92,11 @@ public class Heartbeat {
      * The heartbeat handle.
      */
     private ScheduledFuture<?> futureBeat = null;
+
+    /**
+     * The GC check handle.
+     */
+    private ScheduledFuture<?> futureGCCheck = null;
 
     /**
      * Create a new instance with the default instance name and heart rate.
@@ -304,15 +315,16 @@ public class Heartbeat {
      */
     private static class Beat implements Runnable {
         /**
-         * Weak reference to the heartbeat, used for GC detection.
+         * Phantom reference to the heartbeat, used for GC detection.
          */
-        private final WeakReference<Heartbeat> heart;
+        private final PhantomReference<Heartbeat> heart;
         private final CacheService localCache;
         private final AddCacheRequest<byte[]> cacheRequest;
         private final ScheduledExecutorService scheduler;
+        private final ReferenceQueue<Heartbeat> refQueue = new ReferenceQueue<>();
 
         Beat(final Heartbeat heartbeat) {
-            this.heart = new WeakReference<>(heartbeat);
+            this.heart = new PhantomReference<>(heartbeat, refQueue);
             this.localCache = heartbeat.getCacheService();
             this.scheduler = heartbeat.getExecutor();
             //create the request that we can reuse
@@ -330,11 +342,21 @@ public class Heartbeat {
 
         public void run() {
             //if heart is still alive, i.e. has not been garbage collected
-            if (nonNull(heart.get())) {
+            if (refQueue.poll() != heart) {
                 //send heartbeat
                 localCache.add(cacheRequest);
             } else {
                 //else terminate this scheduler
+                scheduler.shutdownNow();
+            }
+        }
+
+        /**
+         * Called to check the reference queue to see if we need to terminate the beats on this instance
+         * due to it no longer being reachable.
+         */
+        public void checkGC() {
+            if (refQueue.poll() == heart) {
                 scheduler.shutdownNow();
             }
         }
@@ -352,8 +374,13 @@ public class Heartbeat {
         validateState();
 
         //start the beat
-        this.futureBeat = heart.scheduleWithFixedDelay(new Beat(this), 0,
+        Beat beat = new Beat(this);
+        this.futureBeat = heart.scheduleWithFixedDelay(beat, 0,
                 getHeartBeat().toMillis(), TimeUnit.MILLISECONDS);
+
+        //set an extra task to check for this object being garbage collected regardless of heartbeat duration
+        this.futureGCCheck = heart.scheduleWithFixedDelay(beat::checkGC, 0,
+                GC_CHECK_DELAY.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -364,7 +391,9 @@ public class Heartbeat {
             return;
         }
         futureBeat.cancel(true);
+        futureGCCheck.cancel(true);
         futureBeat = null;
+        futureGCCheck = null;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Crown Copyright
+ * Copyright 2019 Crown Copyright
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.service.request.Request;
 
 /**
- * This is the abstract class that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
- * to be able to store an audit record. The default information is what resources
- * was being accessed.
+ * This is one of the objects that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
+ * to be able to store an audit record. This class extends {@link AuditRequest} This class
+ * is used for the indication to the Audit logs that a processing request has been received.
  */
-public class AuditRequest extends Request {
+public class RequestReceivedAuditRequest extends AuditRequestWithContext {
 
-    // no-arg constructor required
-    public AuditRequest() {
+    public RequestReceivedAuditRequest() {
     }
-
 
     @Override
     public boolean equals(final Object o) {
@@ -42,7 +38,7 @@ public class AuditRequest extends Request {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final AuditRequest that = (AuditRequest) o;
+        final RequestReceivedAuditRequest that = (RequestReceivedAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .isEquals();
@@ -50,7 +46,7 @@ public class AuditRequest extends Request {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(19, 37)
+        return new HashCodeBuilder(21, 39)
                 .appendSuper(super.hashCode())
                 .toHashCode();
     }

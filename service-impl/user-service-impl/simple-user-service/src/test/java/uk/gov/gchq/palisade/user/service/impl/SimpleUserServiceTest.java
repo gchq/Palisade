@@ -53,8 +53,12 @@ public class SimpleUserServiceTest {
         //add a user to the first service
         hms.addUser(new AddUserRequest().user(user2)).join();
         //both should be in the second service
-        User actual1 = test.getUser(new GetUserRequest().userId(new UserId().id("uid1"))).join();
-        User actual2 = test.getUser(new GetUserRequest().userId(new UserId().id("uid2"))).join();
+        GetUserRequest getUserRequest1 = new GetUserRequest().userId(new UserId().id("uid1"));
+        getUserRequest1.setOriginalRequestId("user1");
+        GetUserRequest getUserRequest2 = new GetUserRequest().userId(new UserId().id("uid2"));
+        getUserRequest2.setOriginalRequestId("user2");
+        User actual1 = test.getUser(getUserRequest1).join();
+        User actual2 = test.getUser(getUserRequest2).join();
 
         //Then
         assertThat(user, equalTo(actual1));
@@ -75,7 +79,9 @@ public class SimpleUserServiceTest {
         //When
         SimpleUserService test = new SimpleUserService();
         test.applyConfigFrom(con);
-        User actual1 = test.getUser(new GetUserRequest().userId(new UserId().id("uid1"))).join();
+        GetUserRequest getUserRequest = new GetUserRequest().userId(new UserId().id("uid1"));
+        getUserRequest.setOriginalRequestId("uid1");
+        User actual1 = test.getUser(getUserRequest).join();
 
         //Then
         assertThat(actual1, equalTo(user));
@@ -94,7 +100,9 @@ public class SimpleUserServiceTest {
         SimpleUserService test = new SimpleUserService();
         test.applyConfigFrom(con);
         try {
-            User actual1 = test.getUser(new GetUserRequest().userId(new UserId().id("uid1"))).join();
+            GetUserRequest getUserRequest = new GetUserRequest().userId(new UserId().id("uid1"));
+            getUserRequest.setOriginalRequestId("uid1");
+            User actual1 = test.getUser(getUserRequest).join();
         } catch (CompletionException e) {
             throw e.getCause();
         }

@@ -16,10 +16,12 @@
 
 package uk.gov.gchq.palisade.policy.service.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.service.request.Request;
@@ -31,6 +33,7 @@ import static java.util.Objects.requireNonNull;
  * That resource may be signifying a file, stream, directory or the system
  * (policy is applied to all requests to the Palisade system).
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class SetResourcePolicyRequest extends Request {
     private Resource resource;
     private Policy policy;
@@ -77,6 +80,18 @@ public class SetResourcePolicyRequest extends Request {
         policy(policy);
     }
 
+
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+        throw new ForbiddenException("Should not call SetResourcePolicyRequest.setOriginalRequestId()");
+    }
+
+    @Override
+    public String getOriginalRequestId() {
+        throw new ForbiddenException("Should not call SetResourcePolicyRequest.getOriginalRequestId()");
+    }
+
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -90,27 +105,27 @@ public class SetResourcePolicyRequest extends Request {
         final SetResourcePolicyRequest that = (SetResourcePolicyRequest) o;
 
         return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(resource, that.resource)
-                .append(policy, that.policy)
-                .isEquals();
+        .appendSuper(super.equals(o))
+        .append(resource, that.resource)
+        .append(policy, that.policy)
+        .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 29)
-                .appendSuper(super.hashCode())
-                .append(resource)
-                .append(policy)
-                .toHashCode();
+        .appendSuper(super.hashCode())
+        .append(resource)
+        .append(policy)
+        .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .appendSuper(super.toString())
-                .append("resource", resource)
-                .append("policy", policy)
-                .toString();
+        .appendSuper(super.toString())
+        .append("resource", resource)
+        .append("policy", policy)
+        .toString();
     }
 }

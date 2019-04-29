@@ -29,7 +29,7 @@ import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 public final class LocalServices {
 
     public static final String[] LOCAL_ARGS = {
-            "http://localhost:2379",                // ETCD
+            "http://localhost:31379",                // ETCD
             "http://localhost:8080/palisade",
             "http://localhost:8081/policy",
             "http://localhost:8082/resource",

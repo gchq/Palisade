@@ -64,7 +64,7 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
     /**
      * The request that is being processed in this task.
      */
-    private DataRequestResponse resourceDetails;
+    private DataRequestResponse dataRequestResponse;
 
     /**
      * Iterates through the resources to be processed.
@@ -123,7 +123,7 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
         if (reqDetails.getResources().isEmpty()) {
             throw new IOException("no resource details in input split");
         }
-        resourceDetails = reqDetails;
+        dataRequestResponse = reqDetails;
         resIt = reqDetails.getResources().entrySet().iterator();
         serialiser = PalisadeInputFormat.getSerialiser(taskAttemptContext);
         context = taskAttemptContext;
@@ -207,7 +207,10 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
         final ConnectionDetail conDetails = entry.getValue();
         final DataService service = conDetails.createService();
         //lodge request with the data service
-        final CompletableFuture<ReadResponse> futureResponse = service.read(new ReadRequest().requestId(resourceDetails.getRequestId()).resource(resource));
+        ReadRequest readRequest = new ReadRequest().requestId(dataRequestResponse.getRequestId()).resource(resource);
+        readRequest.setOriginalRequestId(dataRequestResponse.getOriginalRequestId());
+
+        final CompletableFuture<ReadResponse> futureResponse = service.read(readRequest);
         errResource = resource;
         //when this future completes, we should have an iterator of things once we deserialise
         itemIt = futureResponse.thenApply(response -> serialiser.deserialise(response.getData()).iterator())
@@ -239,8 +242,8 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
      */
     @Override
     public float getProgress() throws IOException {
-        return (resourceDetails != null && resourceDetails.getResources().size() > 0)
-                ? (float) processed / resourceDetails.getResources().size()
+        return (dataRequestResponse != null && dataRequestResponse.getResources().size() > 0)
+                ? (float) processed / dataRequestResponse.getResources().size()
                 : 0;
     }
 
@@ -250,7 +253,7 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
     @Override
     public void close() throws IOException {
         context = null;
-        resourceDetails = null;
+        dataRequestResponse = null;
         currentKey = null;
         currentValue = null;
         resIt = null;
