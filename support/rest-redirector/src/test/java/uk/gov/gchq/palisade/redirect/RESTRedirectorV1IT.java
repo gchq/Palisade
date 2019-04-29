@@ -104,7 +104,7 @@ public class RESTRedirectorV1IT {
     private static Heartbeat beat;
     private static TestSimpleRandomRedirector redirector;
     private static EmbeddedHttpServer server;
-    private static RESTRedirector<DummyService, RestDummyService> restInstance;
+    private static RESTRedirector<DummyService> restInstance;
 
     @BeforeClass
     public static void setup() throws IOException {
@@ -115,7 +115,7 @@ public class RESTRedirectorV1IT {
         //create a redirector
         redirector = (TestSimpleRandomRedirector) new TestSimpleRandomRedirector().cacheService(cache).redirectionClass(DummyService.class);
         //make the redirection server
-        restInstance = new RESTRedirector<>(DummyService.class, RestDummyService.class, redirector);
+        restInstance = new RESTRedirector<>(DummyService.class.getTypeName(), RestDummyService.class.getTypeName(), redirector, true);
         server = new EmbeddedHttpServer(BASE_URL, restInstance);
         server.startServer();
     }
@@ -216,7 +216,7 @@ public class RESTRedirectorV1IT {
         restInstance.recordCurrentConfigTo(state);
 
         //deliberately configure badly
-        RESTRedirector<?, ?> recoveredInstance = new RESTRedirector(Service.class, Service.class, new SimpleRandomRedirector());
+        RESTRedirector<?> recoveredInstance = new RESTRedirector(Service.class.getTypeName(), Service.class.getTypeName(), new SimpleRandomRedirector(), true);
         recoveredInstance.applyConfigFrom(state);
 
         //Then
