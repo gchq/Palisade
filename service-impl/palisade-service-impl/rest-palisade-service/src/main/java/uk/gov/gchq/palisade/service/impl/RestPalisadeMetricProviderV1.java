@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.service.PalisadeMetricProvider;
 import uk.gov.gchq.palisade.service.request.GetMetricRequest;
 
@@ -60,7 +60,7 @@ public class RestPalisadeMetricProviderV1 implements PalisadeMetricProvider {
 
     static synchronized PalisadeMetricProvider createService(final String serviceConfigPath) {
         if (palisadeMetricProvider == null) {
-            palisadeMetricProvider = RestUtil.createService(RestPalisadeMetricProviderV1.class, serviceConfigPath, PalisadeMetricProvider.class);
+            palisadeMetricProvider = ConfigUtils.createService(RestPalisadeMetricProviderV1.class, serviceConfigPath, PalisadeMetricProvider.class);
         }
         return palisadeMetricProvider;
     }

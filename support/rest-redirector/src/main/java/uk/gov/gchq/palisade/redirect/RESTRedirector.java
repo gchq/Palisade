@@ -19,10 +19,10 @@ package uk.gov.gchq.palisade.redirect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 import uk.gov.gchq.palisade.service.Service;
@@ -122,10 +122,10 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
     /**
      * Create a redirector from a configuration service which will be contacted via data stored in a {@link uk.gov.gchq.palisade.config.service.ConfigurationService}.
      *
-     * @see RestUtil#CONFIG_SERVICE_PATH
+     * @see ConfigUtils#CONFIG_SERVICE_PATH
      */
     public RESTRedirector() {
-        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        this(System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
     }
 
     /**
@@ -167,7 +167,7 @@ public class RESTRedirector<S extends Service, T extends S> extends AbstractAppl
      * @param serviceConfigPath the path to load the JSON from
      */
     private void selfConfigure(final String serviceConfigPath) {
-        ServiceState conf = RestUtil.retrieveConfig(RESTRedirector.class, serviceConfigPath, RESTRedirector.class);
+        ServiceState conf = ConfigUtils.retrieveConfig(RESTRedirector.class, serviceConfigPath, RESTRedirector.class);
         ServiceState overridden = Configurator.applyOverrides(conf, REDIRECTOR_KEY, REDIRECTION_CLASS_KEY, REST_IMPL_CLASS_KEY);
         //self configure
         applyConfigFrom(overridden);

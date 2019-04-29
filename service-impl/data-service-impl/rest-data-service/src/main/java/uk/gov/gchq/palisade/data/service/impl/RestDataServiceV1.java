@@ -25,10 +25,10 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
-import uk.gov.gchq.palisade.rest.RestUtil;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -67,7 +67,7 @@ public class RestDataServiceV1 implements DataService {
     static synchronized DataService createService(final String serviceConfigPath) {
         if (dataService == null) {
             //note that here we specifically allow the DataService implementing class to be overridden from a system property
-            dataService = RestUtil.createService(RestDataServiceV1.class, serviceConfigPath, DataService.class, DataService.class.getTypeName());
+            dataService = ConfigUtils.createService(RestDataServiceV1.class, serviceConfigPath, DataService.class, DataService.class.getTypeName());
         }
         return dataService;
     }
