@@ -250,6 +250,6 @@ public class ServicesConfigurator {
      * @return a user service as it would be configured as a standalone micro-service (server)
      */
     protected RESTRedirector createRESTRedirectorForServer() {
-        return new RESTRedirector(DataService.class.getTypeName(), "uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1", new SimpleRandomRedirector().redirectionClass(SimpleDataService.class).cacheService(clientServices.createCacheService()),false);
+        return new RESTRedirector(DataService.class.getTypeName(), "uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1", new SimpleRandomRedirector().redirectionClass(SimpleDataService.class).cacheService(clientServices.createCacheService()), false);
     }
 }
