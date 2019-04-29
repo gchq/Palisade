@@ -57,16 +57,6 @@ public class ReadRequestReceivedAuditRequest extends AuditRequest {
         return this;
     }
 
-    public RequestId getRequestId() {
-        requireNonNull(requestId, "The request id has not been set.");
-        return requestId;
-    }
-
-    public LeafResource getResource() {
-        requireNonNull(resource, "The resource has not been set.");
-        return resource;
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -77,28 +67,47 @@ public class ReadRequestReceivedAuditRequest extends AuditRequest {
         }
         final ReadRequestReceivedAuditRequest that = (ReadRequestReceivedAuditRequest) o;
         return new EqualsBuilder()
-        .appendSuper(super.equals(o))
-        .append(requestId, that.requestId)
-        .append(resource, that.resource)
-        .isEquals();
+                .appendSuper(super.equals(o))
+                .append(requestId, that.requestId)
+                .append(resource, that.resource)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(20, 39)
-        .appendSuper(super.hashCode())
-        .append(requestId)
-        .append(resource)
-        .toHashCode();
+                .appendSuper(super.hashCode())
+                .append(requestId)
+                .append(resource)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-        .appendSuper(super.toString())
-        .append("requestId", requestId)
-        .append("resource", resource)
-        .toString();
+                .appendSuper(super.toString())
+                .append("requestId", requestId)
+                .append("resource", resource)
+                .toString();
     }
+
+    public RequestId getRequestId() {
+        requireNonNull(requestId, "The request id has not been set.");
+        return requestId;
+    }
+
+    public LeafResource getResource() {
+        requireNonNull(resource, "The resource has not been set.");
+        return resource;
+    }
+
+    public void setRequestId(final RequestId requestId) {
+        requestId(requestId);
+    }
+
+    public void setResource(final LeafResource resource) {
+        resource(resource);
+    }
+
 
 }

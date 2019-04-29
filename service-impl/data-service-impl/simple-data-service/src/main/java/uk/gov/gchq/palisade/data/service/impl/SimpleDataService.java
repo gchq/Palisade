@@ -106,20 +106,20 @@ public class SimpleDataService implements DataService {
     private void auditReadRequestReceived(final ReadRequest request) {
         final ReadRequestReceivedAuditRequest requestReceivedAuditRequest = new ReadRequestReceivedAuditRequest();
         requestReceivedAuditRequest
-        .requestId(request.getRequestId())
-        .resource(request.getResource())
-        .id(request.getId())
-        .originalRequestId(request.getOriginalRequestId());
+                .requestId(request.getRequestId())
+                .resource(request.getResource())
+                .id(request.getId())
+                .originalRequestId(request.getOriginalRequestId());
         auditService.audit(requestReceivedAuditRequest);
     }
 
     private void auditRequestReceivedException(final ReadRequest request, final Throwable ex) {
         final ReadRequestExceptionAuditRequest readRequestExceptionAuditRequest = new ReadRequestExceptionAuditRequest();
         readRequestExceptionAuditRequest.exception(ex)
-        .resource(request.getResource())
-        .requestId(request.getRequestId())
-        .id(request.getId())
-        .originalRequestId(request.getOriginalRequestId());
+                .resource(request.getResource())
+                .requestId(request.getRequestId())
+                .id(request.getId())
+                .originalRequestId(request.getOriginalRequestId());
         LOGGER.debug("Error handling: " + ex.getMessage());
         auditService.audit(readRequestExceptionAuditRequest);
     }
@@ -127,10 +127,10 @@ public class SimpleDataService implements DataService {
     private void auditReadResponse(final ReadRequest request) {
         final ReadResponseAuditRequest readResponseAuditRequest = new ReadResponseAuditRequest();
         readResponseAuditRequest
-        .resource(request.getResource())
-        .requestId(request.getRequestId())
-        .id(request.getId())
-        .originalRequestId(request.getOriginalRequestId());
+                .resource(request.getResource())
+                .requestId(request.getRequestId())
+                .id(request.getId())
+                .originalRequestId(request.getOriginalRequestId());
         auditService.audit(readResponseAuditRequest);
     }
 
@@ -147,18 +147,18 @@ public class SimpleDataService implements DataService {
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Starting to read: {}", request);
             final GetDataRequestConfig getConfig = new GetDataRequestConfig()
-            .requestId(request.getRequestId())
-            .resource(request.getResource());
+                    .requestId(request.getRequestId())
+                    .resource(request.getResource());
             getConfig.setOriginalRequestId(request.getOriginalRequestId());
             LOGGER.debug("Calling palisade service with: {}", getConfig);
             final DataRequestConfig config = getPalisadeService().getDataRequestConfig(getConfig).join();
             LOGGER.debug("Palisade service returned: {}", config);
 
             final DataReaderRequest readerRequest = new DataReaderRequest()
-            .resource(request.getResource())
-            .user(config.getUser())
-            .context(config.getContext())
-            .rules(config.getRules().get(request.getResource()));
+                    .resource(request.getResource())
+                    .user(config.getUser())
+                    .context(config.getContext())
+                    .rules(config.getRules().get(request.getResource()));
             readerRequest.setOriginalRequestId(request.getOriginalRequestId());
 
             LOGGER.debug("Calling reader with: {}", readerRequest);
@@ -173,11 +173,11 @@ public class SimpleDataService implements DataService {
             auditReadResponse(request);
             return response;
         })
-        .exceptionally(ex -> {
-            LOGGER.debug("Error handling: " + ex.getMessage());
-            auditRequestReceivedException(request, ex);
-            throw new RuntimeException(ex); //rethrow the exception
-        });
+                .exceptionally(ex -> {
+                    LOGGER.debug("Error handling: " + ex.getMessage());
+                    auditRequestReceivedException(request, ex);
+                    throw new RuntimeException(ex); //rethrow the exception
+                });
     }
 
     public PalisadeService getPalisadeService() {
@@ -191,7 +191,7 @@ public class SimpleDataService implements DataService {
 
     @Override
     public void applyConfigFrom(final ServiceState config) throws
-    NoConfigException {
+            NoConfigException {
         requireNonNull(config, "config");
         String serialisedPalisade = config.getOrDefault(PALISADE_IMPL_KEY, null);
         if (nonNull(serialisedPalisade)) {

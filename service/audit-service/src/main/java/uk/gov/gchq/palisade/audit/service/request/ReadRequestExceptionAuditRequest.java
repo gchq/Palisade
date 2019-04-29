@@ -68,6 +68,43 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         return this;
     }
 
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final ReadRequestExceptionAuditRequest that = (ReadRequestExceptionAuditRequest) o;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(exception, that.exception)
+                .append(requestId, that.requestId)
+                .append(resource, that.resource)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(20, 39)
+                .appendSuper(super.hashCode())
+                .append(exception)
+                .append(requestId)
+                .append(resource)
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .appendSuper(super.toString())
+                .append("exception", exception)
+                .append("requestId", requestId)
+                .append("resource", resource)
+                .toString();
+    }
+
 
     public RequestId getRequestId() {
         requireNonNull(requestId, "The request id has not been set.");
@@ -85,40 +122,15 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         return exception;
     }
 
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final ReadRequestExceptionAuditRequest that = (ReadRequestExceptionAuditRequest) o;
-        return new EqualsBuilder()
-        .appendSuper(super.equals(o))
-        .append(exception, that.exception)
-        .append(requestId, that.requestId)
-        .append(resource, that.resource)
-        .isEquals();
+    public void setException(final Throwable exception) {
+        exception(exception);
     }
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(20, 39)
-        .appendSuper(super.hashCode())
-        .append(exception)
-        .append(requestId)
-        .append(resource)
-        .toHashCode();
+    public void setRequestId(final RequestId requestId) {
+        requestId(requestId);
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-        .appendSuper(super.toString())
-        .append("exception", exception)
-        .append("requestId", requestId)
-        .append("resource", resource)
-        .toString();
+    public void setResource(final LeafResource resource) {
+        resource(resource);
     }
 }
