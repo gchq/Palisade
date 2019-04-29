@@ -32,7 +32,6 @@ import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.InputStream;
-import java.time.Duration;
 import java.util.stream.Stream;
 
 
@@ -54,13 +53,13 @@ public class RestExample {
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
-        ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService, Duration.ofMinutes(1));
+        ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);
 
         PalisadeService palisade = configuredServices.getPalisadeService();
 
         final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 
-        final User alice  = ExampleUsers.getAlice();
+        final User alice = ExampleUsers.getAlice();
         final User bob = ExampleUsers.getBob();
         final User eve = ExampleUsers.getEve();
 

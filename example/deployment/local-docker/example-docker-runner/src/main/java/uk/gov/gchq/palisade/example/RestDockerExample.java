@@ -33,7 +33,6 @@ import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.File;
 import java.io.InputStream;
-import java.time.Duration;
 import java.util.stream.Stream;
 
 
@@ -57,7 +56,7 @@ public class RestDockerExample {
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
-        ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService, Duration.ofMinutes(1));
+        ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);
 
         PalisadeService palisade = configuredServices.getPalisadeService();
 

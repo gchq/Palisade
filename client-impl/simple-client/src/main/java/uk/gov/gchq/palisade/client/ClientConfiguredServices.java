@@ -40,6 +40,8 @@ import static java.util.Objects.requireNonNull;
 public class ClientConfiguredServices {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientConfiguredServices.class);
 
+    public static final Duration DEFAULT_TIMEOUT = Duration.ofMinutes(1);
+
     private final ConfigurationService configService;
 
     private final ServiceState config;
@@ -50,6 +52,10 @@ public class ClientConfiguredServices {
     private final Optional<UserService> userService;
     private final Optional<CacheService> cacheService;
     private final Optional<PalisadeService> palisadeService;
+
+    public ClientConfiguredServices(final ConfigurationService configService) {
+        this(configService, DEFAULT_TIMEOUT);
+    }
 
     public ClientConfiguredServices(final ConfigurationService configService, final Duration timeOut) {
         requireNonNull(configService, "configService");
