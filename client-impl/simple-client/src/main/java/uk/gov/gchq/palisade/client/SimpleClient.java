@@ -54,10 +54,12 @@ public class SimpleClient<T> {
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
+            final String uuid = dataRequestResponse.getOriginalRequestId();
 
             final ReadRequest readRequest = new ReadRequest()
                     .requestId(dataRequestResponse.getRequestId())
                     .resource(entry.getKey());
+            readRequest.setOriginalRequestId(uuid);
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(

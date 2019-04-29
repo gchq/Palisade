@@ -16,6 +16,8 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator;
 
+import org.apache.commons.io.IOUtils;
+
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
@@ -27,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Random;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 public final class CreateDataFile implements Callable<Boolean> {
@@ -42,8 +45,8 @@ public final class CreateDataFile implements Callable<Boolean> {
     }
 
     public Boolean call() {
-        try {
-            int bufferSize = 32;
+        outputFile.getParentFile().mkdirs();
+        try (OutputStream out = new FileOutputStream(outputFile)) {
             Stream<Employee> employeeStream;
             AvroSerialiser<Employee> employeeAvroSerialiser = new AvroSerialiser<>(Employee.class);
             // Need one Employee whose manager has a UID of Bob (for examples to work)
@@ -60,26 +63,25 @@ public final class CreateDataFile implements Callable<Boolean> {
             } else {
                 employeeStream = firstEmployeeStream;
             }
+
             BytesSuppliedInputStream in = (BytesSuppliedInputStream) employeeAvroSerialiser.serialise(employeeStream);
-            outputFile.getParentFile().mkdirs();
-            OutputStream out = new FileOutputStream(outputFile);
-            byte[] buffer = new byte[bufferSize];
-            int dataAvailable = in.read(buffer);
-            while (dataAvailable > 0) {
-                if (dataAvailable > bufferSize) {
-                    out.write(buffer);
-                } else {
-                    out.write(buffer, 0, dataAvailable);
-                }
-                dataAvailable = in.read(buffer);
-            }
-        } catch (final Exception ignore) {
+            IOUtils.copy(in, out);
+        } catch (final Exception error) {
+            error.printStackTrace();
         }
         return Boolean.TRUE;
     }
 
     private Stream<Employee> generateStreamOfEmployees() {
-        return Stream.generate(() -> Employee.generate(random)).limit(numberOfEmployees - 1);
+        final AtomicLong counter = new AtomicLong(0);
+        final long countWrite = numberOfEmployees / 10;
+        return Stream.generate(() -> {
+            long count = counter.incrementAndGet();
+            if ((numberOfEmployees > 1_000_000 && countWrite > 0 && count % countWrite == 0) || count % 1_000_000 == 0) {
+                System.err.printf("Thread %s has written %d records.%n", Thread.currentThread().getName(), count);
+            }
+            return Employee.generate(random);
+        }).limit(numberOfEmployees - 1);
     }
 
 }

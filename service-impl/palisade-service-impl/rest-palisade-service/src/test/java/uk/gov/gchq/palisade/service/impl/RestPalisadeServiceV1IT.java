@@ -31,11 +31,11 @@ import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.service.SimpleConnectionDetail;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -77,9 +77,10 @@ public class RestPalisadeServiceV1IT {
         final PalisadeService palisadeService = Mockito.mock(PalisadeService.class);
         MockPalisadeService.setMock(palisadeService);
 
+
         final RegisterDataRequest request = new RegisterDataRequest().resourceId("file1").userId(user.getUserId()).context(context);
 
-        final DataRequestResponse expectedResult = new DataRequestResponse().requestId(requestId).resource(fileResource1, new SimpleConnectionDetail().service(new MockPalisadeService()));
+        final DataRequestResponse expectedResult = new DataRequestResponse().requestId(requestId).originalRequestId("test requestId").resource(fileResource1, new SimpleConnectionDetail().service(new MockPalisadeService()));
         given(palisadeService.registerDataRequest(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
@@ -97,12 +98,14 @@ public class RestPalisadeServiceV1IT {
         MockPalisadeService.setMock(palisadeService);
 
         final GetDataRequestConfig getDataRequestConfig = new GetDataRequestConfig().requestId(requestId).resource(fileResource1);
+        getDataRequestConfig.setOriginalRequestId("shouldGetDataRequestConfig");
         final Map<LeafResource, Rules> rulesMap = new HashMap<>();
         rulesMap.put(fileResource1, new Rules().rule("testRule", new TestRule()));
         final DataRequestConfig expectedResult = new DataRequestConfig()
                 .user(user)
                 .context(context)
                 .rules(rulesMap);
+        expectedResult.setOriginalRequestId("test");
         given(palisadeService.getDataRequestConfig(getDataRequestConfig))
                 .willReturn(CompletableFuture.completedFuture(expectedResult));
 

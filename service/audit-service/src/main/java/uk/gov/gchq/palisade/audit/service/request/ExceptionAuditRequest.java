@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Crown Copyright
+ * Copyright 2019 Crown Copyright
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.service.request.Request;
+
+import static java.util.Objects.requireNonNull;
 
 /**
- * This is the abstract class that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
- * to be able to store an audit record. The default information is what resources
- * was being accessed.
+ * This is one of the objects that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
+ * to be able to store an audit record. This class extends {@link AuditRequest} This class
+ * is used for the indication to the Audit logs that an exception has been received.
  */
-public class AuditRequest extends Request {
+public class ExceptionAuditRequest extends AuditRequestWithContext {
+    private Throwable exception;
 
-    // no-arg constructor required
-    public AuditRequest() {
+    public ExceptionAuditRequest() {
+    }
+
+    /**
+     * @param ex {@link Throwable} is the type of the exception while processing
+     * @return the {@link ExceptionAuditRequest}
+     */
+    public ExceptionAuditRequest exception(final Throwable ex) {
+        requireNonNull(exception, "The exception type cannot be null");
+        this.exception = exception;
+        return this;
     }
 
 
@@ -42,16 +52,18 @@ public class AuditRequest extends Request {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final AuditRequest that = (AuditRequest) o;
+        final ExceptionAuditRequest that = (ExceptionAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
+                .append(exception, that.exception)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(19, 37)
+        return new HashCodeBuilder(27, 39)
                 .appendSuper(super.hashCode())
+                .append(exception)
                 .toHashCode();
     }
 
@@ -59,7 +71,12 @@ public class AuditRequest extends Request {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
+                .append("exception", exception)
                 .toString();
     }
 
+    public Throwable getException() {
+        requireNonNull(exception, "The exception type cannot be null");
+        return exception;
+    }
 }

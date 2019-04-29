@@ -17,8 +17,10 @@ package uk.gov.gchq.palisade.cache.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.Service;
 
 /**
@@ -27,6 +29,7 @@ import uk.gov.gchq.palisade.service.Service;
  *
  * @param <V> the type of object that is expected to be in the cache
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class GetCacheRequest<V> extends CacheRequest {
 
     public GetCacheRequest() {
@@ -46,6 +49,16 @@ public class GetCacheRequest<V> extends CacheRequest {
     public GetCacheRequest service(final Class<? extends Service> service) {
         super.service(service);
         return this;
+    }
+
+    @Override
+    public void setOriginalRequestId(final String originalRequestId) {
+        throw new ForbiddenException("Should not call GetCacheRequest.setOriginalRequestId()");
+    }
+
+    @Override
+    public String getOriginalRequestId() {
+        throw new ForbiddenException("Should not call GetCacheRequest.getOriginalRequestId()");
     }
 
     @Override
