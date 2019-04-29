@@ -74,6 +74,7 @@ public class ServicesConfigurator {
     private final ProxyServicesFactory clientServices;
 
     public ServicesConfigurator(final ProxyServicesFactory clientServices) {
+
         requireNonNull(clientServices, "clientServices");
         LOGGER.info("Starting to set the service configurations.");
         this.clientServices = clientServices;
