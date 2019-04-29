@@ -126,7 +126,7 @@ resource "null_resource" "deploy_example" {
       inline = [
         "hdfs dfs -rm -r /example_data || echo Deleted",
         "mkdir -p /home/hadoop/example_data",
-        "java -cp /home/hadoop/jars/example-model-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData  /home/hadoop/example_data  10  1 > /home/hadoop/example_logs/deployDataServices.log 2>&1 ",
+        "java -cp /home/hadoop/jars/example-model-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData  /home/hadoop/example_data  10  1 > /home/hadoop/example_logs/createDataFile.log 2>&1 ",
         "hdfs dfs -mkdir /example_data",
         "hdfs dfs -put /home/hadoop/example_data/* /example_data/"
       ]
