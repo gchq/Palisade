@@ -26,9 +26,9 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>local-jvm</module>
         <module>AWS-EMR</module>
         <module>local-docker</module>
+        <module>local-jvm</module>
         <module>mapreduce-example</module>
         <!--<module>Azure-HDInsight</module>-->
     </modules>

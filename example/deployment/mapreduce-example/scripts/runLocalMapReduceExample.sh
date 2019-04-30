@@ -2,7 +2,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-FILE=$2
+INPUTFILE=$2
 OUT_PATH=$1
 
 if [[ $# -lt 1 ]]
@@ -12,7 +12,7 @@ fi
 
 if [[ $# -lt 2 ]]
 then
-    FILE="$DIR/../../resources/exampleObj_file1.txt"
+    INPUTFILE="$DIR/../../resources/exampleObj_file1.txt"
 fi
 
 java -cp example/mapreduce-example/mapreduce-example-runner/target/mapreduce-example-runner-*-shaded.jar uk.gov.gchq.palisade.example.MapReduceExample "$FILE" "$OUT_PATH"

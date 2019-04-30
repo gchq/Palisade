@@ -22,7 +22,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.JobContext;
+//import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -32,33 +32,33 @@ import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.Context;
-import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
-import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
+//import uk.gov.gchq.palisade.Context;
+//import uk.gov.gchq.palisade.UserId;
+//import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
+//import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 //import uk.gov.gchq.palisade.client.ConfiguredClientServices;
 //import uk.gov.gchq.palisade.client.ServicesFactory;
-import uk.gov.gchq.palisade.config.service.ConfigurationService;
-import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
-import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-import uk.gov.gchq.palisade.example.config.ExampleConfigurator;
-import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
-import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
+//import uk.gov.gchq.palisade.config.service.ConfigurationService;
+//import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
+//import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+//import uk.gov.gchq.palisade.example.config.ExampleConfigurator;
+//import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
+//import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
-import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
-import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
-import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
+//import uk.gov.gchq.palisade.resource.service.impl.ProxyRestResourceService;
+//import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
+//import uk.gov.gchq.palisade.service.impl.ProxyRestPalisadeService;
+//import uk.gov.gchq.palisade.service.impl.ProxyRestPolicyService;
+//import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
+//import uk.gov.gchq.palisade.user.service.impl.ProxyRestUserService;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+//import java.util.Optional;
 
 /**
  * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
@@ -140,15 +140,15 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
 
         //configure the Palisade input format on an example client
 
-        final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpoints, Optional.empty(),
-                Optional.of(new ProxyRestPolicyService("http://" + hostname + ":8081/policy/")),
-                Optional.of(new ProxyRestUserService("http://" + hostname + ":8083/user/")),
-                Optional.of(new ProxyRestResourceService("http://" + hostname + ":8082/resource/")),
-                Optional.of(new ProxyRestPalisadeService("http://" + hostname + ":8080/palisade/")),
-                Optional.of(new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(etcdEndpoints, false))),
-                Optional.of(new ProxyRestConnectionDetail().url(dataServiceUrl).serviceClass(ProxyRestDataService.class)));
-        final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
-        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
+//        final ConfigurationService ics = ExampleConfigurator.setupMultiJVMConfigurationService(etcdEndpoints, Optional.empty(),
+//                Optional.of(new ProxyRestPolicyService("http://" + hostname + ":8081/policy/")),
+//                Optional.of(new ProxyRestUserService("http://" + hostname + ":8083/user/")),
+//                Optional.of(new ProxyRestResourceService("http://" + hostname + ":8082/resource/")),
+//                Optional.of(new ProxyRestPalisadeService("http://" + hostname + ":8080/palisade/")),
+//                Optional.of(new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(etcdEndpoints, false))),
+//                Optional.of(new ProxyRestConnectionDetail().url(dataServiceUrl).serviceClass(ProxyRestDataService.class)));
+//        final ConfiguredClientServices cs = new ConfiguredClientServices(ics);
+//        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
         // Edit the configuration of the Palisade requests below here
         // ==========================================================

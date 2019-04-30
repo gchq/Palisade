@@ -1,7 +1,7 @@
 {
   "@id": 1,
   "class": "uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService",
-  "baseUrl": "http://ip-172-31-32-109.eu-west-1.compute.internal:8085/config",
+  "baseUrl": "http://localhost:8085/config",
   "retryMax": 1,
   "retryPauseTime" : 5.000000000
 }
