@@ -19,6 +19,11 @@ org.apache.hadoop:hadoop-aws:2.9.2):
 - Apache License, Version 2.0
 
 
+Apache Tika, Version 1.20
+
+- Apache License, Version 2.0
+
+
 Commons IO (commons-io:commons-io:2.6)
 
 - Apache License, Version 2.0
