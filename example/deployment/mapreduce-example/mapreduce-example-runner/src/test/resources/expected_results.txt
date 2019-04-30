@@ -1,0 +1,5 @@
+item1c	1
+item1d	1
+item2c	1
+item2d	1
+redacted	2
