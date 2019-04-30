@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: data-service  
+  name: data-service
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: data-service
+      labels:
+        app: data-service
+    spec:
+      containers:
+        - name: data-service
+          image: example_data-service:latest
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /data/v1/status
+              port: 8080
+            failureThreshold: 5
+            periodSeconds: 60
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /data/v1/status
+              port: 8080
+            failureThreshold: 5
+            periodSeconds: 60
+            timeoutSeconds: 10
+      restartPolicy: Always
+
