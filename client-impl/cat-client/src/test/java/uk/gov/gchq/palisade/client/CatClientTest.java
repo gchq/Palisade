@@ -39,6 +39,7 @@ import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertEquals;
@@ -93,10 +94,10 @@ public class CatClientTest {
         readRequest2 = new ReadRequest().requestId(reqId).resource(resource2);
 
         readResponse1 = CompletableFuture.completedFuture(
-                new ReadResponse().data(IOUtils.toInputStream("Test data 1", Charset.forName("UTF-8"))));
+                new ReadResponse().data(IOUtils.toInputStream("Test data 1", StandardCharsets.UTF_8)));
 
         readResponse2 = CompletableFuture.completedFuture(
-                new ReadResponse().data(IOUtils.toInputStream("Test data 2", Charset.forName("UTF-8"))));
+                new ReadResponse().data(IOUtils.toInputStream("Test data 2", StandardCharsets.UTF_8)));
 
         Mockito.when(mockPalisadeService.registerDataRequest(Mockito.refEq(registerDataRequest, "id"))).thenReturn(reqResponse);
         Mockito.when(mockDataService.read(Mockito.refEq(readRequest1, "id"))).thenReturn(readResponse1);

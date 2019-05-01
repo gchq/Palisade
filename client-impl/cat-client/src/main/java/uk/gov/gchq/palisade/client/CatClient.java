@@ -49,19 +49,29 @@ public class CatClient {
     }
 
     public static void main(final String[] args) throws InterruptedException {
-        String userId = args[0];
-        String filename = args[1];
-        String purpose = args[2];
 
-        ServiceState clientConfig = RestUtil.createConfiguratorFromSystemVariable();
+        if (args.length == 3) {
 
-        PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
+            String userId = args[0];
+            String resource = args[1];
+            String purpose = args[2];
 
-        new CatClient(palisade).read(userId, filename, purpose);
+            ServiceState clientConfig = RestUtil.createConfiguratorFromSystemVariable();
+
+            PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
+
+            new CatClient(palisade).read(userId, resource, purpose);
+
+        } else {
+            System.out.printf("Usage: %s userId resource purpose", CatClient.class.getTypeName());
+            System.out.println("userId: the unique id of the user making this query");
+            System.out.println("resource: the name of the resource being requested");
+            System.out.println("purpose: purpose for accessing the resource");
+        }
     }
 
-    protected void read(final String userId, final String filename, final String purpose) {
-        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
+    protected void read(final String userId, final String resource, final String purpose) {
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(resource).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
         final List<CompletableFuture<InputStream>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
