@@ -44,7 +44,7 @@ import static java.util.Objects.isNull;
 public class RestDockerExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestDockerExample.class);
     //For the Docker build, this will have been created in the container before this executes
-    protected static final String FILE = new File("/data/exampleEmployee_file0.avro").getAbsolutePath();
+    protected static final String FILE = new File("/data/employee_file0.avro").getAbsolutePath();
 
     public static void main(final String[] args) throws Exception {
         String fileToGet;
