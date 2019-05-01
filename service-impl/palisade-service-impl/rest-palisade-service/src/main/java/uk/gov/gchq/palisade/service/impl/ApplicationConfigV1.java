@@ -44,7 +44,7 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
         PalisadeMetricProvider metrics = null;
         try {
             //first we check to see if one has been created in the configuration for us to create
-            metrics = RestPalisadeMetricProviderV1.createService(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+            metrics = RestPalisadeMetricProviderV1.createService(System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         } catch (Exception e) {
             LOGGER.info("No metric provider configured in configuration service");
         }
