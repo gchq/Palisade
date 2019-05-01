@@ -135,5 +135,7 @@ public class ProxyServicesFactory {
         return new ProxyRestPalisadeService(args[1]);
     }
 
-    public PalisadeService createClientPalisadeService() { return new ProxyRestPalisadeService(args[7]);}
+    public PalisadeService createClientPalisadeService() {
+        return new ProxyRestPalisadeService(args[7]);
+    }
 }
