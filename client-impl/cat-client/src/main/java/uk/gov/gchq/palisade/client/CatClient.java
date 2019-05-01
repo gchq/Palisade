@@ -18,12 +18,12 @@ package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.ServiceState;
@@ -56,7 +56,7 @@ public class CatClient {
             String resource = args[1];
             String purpose = args[2];
 
-            ServiceState clientConfig = RestUtil.createConfiguratorFromSystemVariable();
+            ServiceState clientConfig = ConfigUtils.createConfiguratorFromSystemVariable();
 
             PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
 
