@@ -167,9 +167,7 @@ public class ServicesConfigurator {
         try {
             Configuration conf = createHadoopConfiguration();
             HadoopResourceService resource = new HadoopResourceService().conf(conf).cacheService(clientServices.createCacheService());
-            final Map<String, ConnectionDetail> dataType = new HashMap<>();
-            dataType.put(RESOURCE_TYPE, clientServices.createDataServiceConnectionDetail());
-            resource.connectionDetail(null, dataType);
+            resource.addDataService(clientServices.createDataServiceConnectionDetail());
             return resource;
         } catch (IOException e) {
             throw new RuntimeException(e);
