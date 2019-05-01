@@ -110,7 +110,7 @@ public final class ConfigUtils {
 
     public static ServiceState createConfiguratorFromSystemVariable() throws InterruptedException {
 
-        final InputStream stream = StreamUtil.openStream(RestUtil.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(ConfigUtils.class, System.getProperty(CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
         ServiceState clientConfig = null;
