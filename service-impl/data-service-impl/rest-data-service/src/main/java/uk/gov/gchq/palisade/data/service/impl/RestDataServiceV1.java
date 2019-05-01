@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.data.service.impl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.io.IOUtils;
@@ -85,14 +86,14 @@ public class RestDataServiceV1 implements DataService {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    public ReadResponse readSync(final ReadRequest request) {
+    public ReadResponse readSync(@ApiParam(value = "The request") final ReadRequest request) {
         LOGGER.debug("Invoking read: {}", request);
         return read(request).join();
     }
 
     @POST
     @Path("/read/chunked")
-    @ApiOperation(value = "Reads some data and return it chunked",
+    @ApiOperation(value = "Reads some data and return it chunked.",
             response = InputStream.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -100,7 +101,7 @@ public class RestDataServiceV1 implements DataService {
     })
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @SuppressFBWarnings
-    public Response readChunked(final ReadRequest request) {
+    public Response readChunked(@ApiParam(value = "The request") final ReadRequest request) {
         return Response.ok(new DataStreamingOutput(read(request)), MediaType.APPLICATION_OCTET_STREAM).build();
     }
 
