@@ -58,4 +58,6 @@ spec:
       restartPolicy: Always
       volumes:
         - name: data
+          persistentVolumeClaim:
+            claimName: task-pv-claim
 

@@ -11,4 +11,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 "$K8SBASHSCRIPTS/k8sDeleteConfigureServices.sh"
 "$K8SBASHSCRIPTS/k8sDeleteConfigService.sh"
 "$K8SBASHSCRIPTS/k8sDeleteEtcd.sh"
+kubectl delete -f ./persistent-volume/k8sPersistentVolumeClaim.yaml
+kubectl delete -f ./persistent-volume/k8sPersistentVolume.yaml
+
 
