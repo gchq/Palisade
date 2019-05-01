@@ -15,6 +15,8 @@
  */
 package uk.gov.gchq.palisade;
 
+import java.time.Duration;
+
 /**
  * Class constants.
  */
@@ -27,4 +29,9 @@ public final class ConfigConsts {
      * The delay between sending requests to the configuration service. In milliseconds.
      */
     public static final long DELAY = 500;
+
+    /**
+     * Timeout for retrieving a configuration from the configuration service.
+     */
+    public static final Duration CONFIG_TIMEOUT = Duration.ofSeconds(10);
 }

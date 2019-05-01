@@ -28,7 +28,7 @@ public final class Launcher {
 
     public static void main(final String[] args) throws Exception {
         //Create a REST Redirector which will cause it to launch and attmept to connect to the configuration service.
-        RESTRedirector<?, ?> redirectService = new RESTRedirector<>();
+        RESTRedirector<?> redirectService = new RESTRedirector<>();
         //read the base path from the system property
         String basePath = System.getProperty(SystemProperty.BASE_PATH, SystemProperty.BASE_PATH_DEFAULT);
         //launch
