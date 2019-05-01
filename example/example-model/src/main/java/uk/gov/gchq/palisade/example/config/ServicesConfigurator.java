@@ -237,7 +237,11 @@ public class ServicesConfigurator {
             Configuration conf = createHadoopConfiguration();
             HadoopDataReader reader = new HadoopDataReader().conf(conf);
             reader.addSerialiser(RESOURCE_TYPE, new AvroSerialiser<>(Employee.class));
-            return new SimpleDataService().reader(reader).palisadeService(clientServices.createPalisadeService()).cacheService(clientServices.createCacheService());
+            return new SimpleDataService()
+                    .reader(reader)
+                    .palisadeService(clientServices.createPalisadeService())
+                    .cacheService(clientServices.createCacheService())
+                    .auditService(clientServices.createAuditService());
         } catch (final IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
             return null;
