@@ -32,9 +32,9 @@ public class ExampleSimpleClient extends SimpleClient<Employee> {
         super(palisadeService, new AvroSerialiser<>(Employee.class));
     }
 
-    public Stream<Employee> read(final String filename, final String userId, final String justification) {
+    public Stream<Employee> read(final String filename, final String userId, final String purpose) {
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(filename);
         String absoluteFile = absoluteFileURI.toString();
-        return super.read(absoluteFile, ServicesConfigurator.RESOURCE_TYPE, userId, justification);
+        return super.read(absoluteFile, ServicesConfigurator.RESOURCE_TYPE, userId, purpose);
     }
 }

@@ -27,6 +27,8 @@ import uk.gov.gchq.palisade.util.StreamUtil;
 import java.io.InputStream;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 /**
  * Utility class that includes functionality to create a {@link Service} from a given class name.
  */
@@ -103,5 +105,29 @@ public final class ConfigUtils {
                 }
             }
         }
+    }
+
+    public static ServiceState createConfiguratorFromSystemVariable() throws InterruptedException {
+
+        final InputStream stream = StreamUtil.openStream(ConfigUtils.class, System.getProperty(CONFIG_SERVICE_PATH));
+        ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
+
+        ServiceState clientConfig = null;
+        int times = 0;
+        while (isNull(clientConfig) && times < 30) {
+            try {
+                clientConfig = new Configurator(configService).retrieveConfig(Optional.empty());
+            } catch (NoConfigException e) {
+                LOGGER.warn("No client configuration present, waiting...");
+                Thread.sleep(ConfigConsts.DELAY);
+                times++;
+            }
+        }
+
+        if (isNull(clientConfig)) {
+            throw new RuntimeException("Couldn't retrieve client configuration. Is configuration service running?");
+        }
+
+        return clientConfig;
     }
 }
