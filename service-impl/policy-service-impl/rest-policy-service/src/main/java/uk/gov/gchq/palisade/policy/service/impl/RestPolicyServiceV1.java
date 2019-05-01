@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.CanAccessRequest;
@@ -32,7 +33,6 @@ import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
-import uk.gov.gchq.palisade.rest.RestUtil;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -64,7 +64,7 @@ public class RestPolicyServiceV1 implements PolicyService {
 
     static synchronized PolicyService createService(final String serviceConfigPath) {
         if (policyService == null) {
-            policyService = RestUtil.createService(RestPolicyServiceV1.class, serviceConfigPath, PolicyService.class);
+            policyService = ConfigUtils.createService(RestPolicyServiceV1.class, serviceConfigPath, PolicyService.class);
         }
         return policyService;
     }
