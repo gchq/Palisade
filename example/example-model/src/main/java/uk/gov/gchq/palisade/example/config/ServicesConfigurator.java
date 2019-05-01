@@ -26,7 +26,6 @@ import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
-import uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.impl.reader.HadoopDataReader;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
@@ -238,7 +237,11 @@ public class ServicesConfigurator {
             Configuration conf = createHadoopConfiguration();
             HadoopDataReader reader = new HadoopDataReader().conf(conf);
             reader.addSerialiser(RESOURCE_TYPE, new AvroSerialiser<>(Employee.class));
-            return new SimpleDataService().reader(reader).palisadeService(clientServices.createPalisadeService()).cacheService(clientServices.createCacheService());
+            return new SimpleDataService()
+                    .reader(reader)
+                    .palisadeService(clientServices.createPalisadeService())
+                    .cacheService(clientServices.createCacheService())
+                    .auditService(clientServices.createAuditService());
         } catch (final IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
             return null;
@@ -251,6 +254,6 @@ public class ServicesConfigurator {
      * @return a user service as it would be configured as a standalone micro-service (server)
      */
     protected RESTRedirector createRESTRedirectorForServer() {
-        return new RESTRedirector(DataService.class, RestDataServiceV1.class, new SimpleRandomRedirector().redirectionClass(SimpleDataService.class).cacheService(clientServices.createCacheService()));
+        return new RESTRedirector(DataService.class.getTypeName(), "uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1", new SimpleRandomRedirector().redirectionClass(SimpleDataService.class).cacheService(clientServices.createCacheService()), false);
     }
 }

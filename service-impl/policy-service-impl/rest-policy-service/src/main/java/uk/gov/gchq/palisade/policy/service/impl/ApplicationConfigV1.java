@@ -16,8 +16,8 @@
 
 package uk.gov.gchq.palisade.policy.service.impl;
 
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
-import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 
@@ -29,7 +29,7 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
     public ApplicationConfigV1() {
         super(RESOURCES);
         //make sure we can inject the service instance
-        PolicyService delegate = RestPolicyServiceV1.createService(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        PolicyService delegate = RestPolicyServiceV1.createService(System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         register(new ServiceBinder(delegate, PolicyService.class));
     }
 }
