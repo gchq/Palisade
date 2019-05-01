@@ -463,9 +463,9 @@ public class HadoopResourceService implements ResourceService {
 
         public ConnectionDetail get(final String type, final String format) {
             ConnectionDetail rtn = dataType.get(type);
-            if (Objects.isNull(rtn)) {
+            if (isNull(rtn)) {
                 rtn = dataFormat.get(format);
-                if (Objects.isNull(rtn)) {
+                if (isNull(rtn)) {
                     throw new IllegalStateException(String.format(ERROR_DETAIL_NOT_FOUND, type, format));
                 }
             }
