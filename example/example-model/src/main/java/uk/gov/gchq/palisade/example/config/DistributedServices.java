@@ -34,7 +34,7 @@ public final class DistributedServices {
         ProxyServicesFactory factory = new ProxyServicesFactory(args);
         new ServicesConfigurator(factory);
 
-        CacheService cs = factory.createCacheService();
+        CacheService cs = factory.createInternalCacheService();
         if (cs instanceof SimpleCacheService) {
             ((SimpleCacheService) cs).getBackingStore().close();
         }
