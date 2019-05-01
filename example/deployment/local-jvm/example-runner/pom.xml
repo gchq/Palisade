@@ -243,7 +243,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <mainClass>uk.gov.gchq.palisade.example.MultiJvmExample</mainClass>
+                            <mainClass>uk.gov.gchq.palisade.example.RestExample</mainClass>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -292,7 +292,7 @@
                         <fileset>
                             <directory>.</directory>
                             <includes>
-                                <include>exampleEmployee_file0.txt</include>
+                                <include>Employee_file0.txt</include>
                             </includes>
                         </fileset>
                     </filesets>

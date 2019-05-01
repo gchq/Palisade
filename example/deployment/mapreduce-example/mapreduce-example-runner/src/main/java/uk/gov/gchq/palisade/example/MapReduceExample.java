@@ -41,10 +41,13 @@ import uk.gov.gchq.palisade.UserId;
 //import uk.gov.gchq.palisade.example.config.ServicesCreator;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
+import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
+import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 //import uk.gov.gchq.palisade.example.config.ServicesConfigurator;
-import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
-//import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
+//import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
+import uk.gov.gchq.palisade.example.common.Purpose;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
@@ -75,20 +78,23 @@ public class MapReduceExample extends Configured implements Tool {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
 
     protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
-    private static final String RESOURCE_TYPE = "exampleObj";
+    private static final String RESOURCE_TYPE = "Employee";
 
     /**
      * This simple mapper example just extracts the property field of the example object and emits a count of one.
      */
-    private static class ExampleMap extends Mapper<LeafResource, ExampleObj, Text, IntWritable> {
+    private static class ExampleMap extends Mapper<LeafResource, Employee, Text, IntWritable> {
         private static final IntWritable ONE = new IntWritable(1);
 
         private Text outputKey = new Text();
 
-        protected void map(final LeafResource key, final ExampleObj value, final Context context) throws IOException, InterruptedException {
-            String property = value.getProperty();
-            outputKey.set(property);
-            context.write(outputKey, ONE);
+        protected void map(final LeafResource key, final Employee value, final Context context) throws IOException, InterruptedException {
+            //String property = value.getName();
+            String property = value.getTaxCode();
+            if(property != null && !property.isEmpty()) {
+                outputKey.set(property);
+                context.write(outputKey, ONE);
+            }
         }
     }
 
@@ -144,6 +150,9 @@ public class MapReduceExample extends Configured implements Tool {
 //        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
 
         // copied from RestExample
+        LOGGER.info("EMR debug: MapReduceExample - at start of section copied from RestExample ");
+        String confString = System.getProperty(RestUtil.CONFIG_SERVICE_PATH);
+        LOGGER.info("EMR debug: MapReduceExample - confString " + confString);
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ServiceState clientConfig = null;
@@ -169,8 +178,12 @@ public class MapReduceExample extends Configured implements Tool {
         configureJob(job, palisade, 2);
 
         //next add a resource request to the job
-        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Alice", "Payroll");
-        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Bob", "Payroll");
+        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Alice", Purpose.SALARY.name());
+        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Alice", Purpose.DUTY_OF_CARE.name());
+        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Alice", Purpose.STAFF_REPORT.name());
+        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Bob", Purpose.DUTY_OF_CARE.name());
+        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Bob", "");
+        addDataRequest(job, sourceFile, RESOURCE_TYPE, "Eve", "");
 
         //launch job
         boolean success = job.waitForCompletion(true);
@@ -190,7 +203,7 @@ public class MapReduceExample extends Configured implements Tool {
         //tell it which Palisade service to use
         PalisadeInputFormat.setPalisadeService(job, services);
         //configure the serialiser to use
-        PalisadeInputFormat.setSerialiser(job, new ExampleObjSerialiser());
+        PalisadeInputFormat.setSerialiser(job, new AvroSerialiser<Employee>(Employee.class));
         //set the maximum mapper hint
         PalisadeInputFormat.setMaxMapTasksHint(job, maxMapHint);
     }
@@ -213,8 +226,8 @@ public class MapReduceExample extends Configured implements Tool {
     public static void main(final String... args) throws Exception {
         final String outputDir;
         if (args.length < 1) {
-            System.out.printf("Usage: %s file [output_directory]\n", MapReduceExample.class.getTypeName());
-            System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
+            System.out.printf("Usage: %s input_file [output_directory]\n", MapReduceExample.class.getTypeName());
+            System.out.println("\nfile\tfile containing serialised Employee instances to read");
             System.out.println("output_directory\tdirectory to write mapreduce outputs to");
             System.exit(1);
         }

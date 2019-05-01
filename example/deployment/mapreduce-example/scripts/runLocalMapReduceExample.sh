@@ -1,21 +1,22 @@
 #!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+#/home/gmiller/repos/Palisade/example/deployment/mapreduce-example/scripts
 
 INPUTFILE=$2
 OUT_PATH=$1
 
 if [[ $# -lt 1 ]]
 then
-    OUT_PATH='/tmp/palisade-mapreduce-example/output'
+    OUT_PATH='/var/tmp/palisade-mapreduce-example/output'
 fi
 
 if [[ $# -lt 2 ]]
 then
-    INPUTFILE="$DIR/../../resources/exampleObj_file1.txt"
+    INPUTFILE="$DIR/../../../resources/Employee_file0.avro"
 fi
 
-java -cp example/mapreduce-example/mapreduce-example-runner/target/mapreduce-example-runner-*-shaded.jar uk.gov.gchq.palisade.example.MapReduceExample "$FILE" "$OUT_PATH"
+java -cp example/deployment/mapreduce-example/mapreduce-example-runner/target/mapreduce-example-runner-*-shaded.jar -Dpalisade.rest.config.path=configRest.json uk.gov.gchq.palisade.example.MapReduceExample "$INPUTFILE" "$OUT_PATH"
 
 if [[ $? -eq 0 ]]
 then

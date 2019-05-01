@@ -284,7 +284,7 @@ public abstract class ProxyRestService implements Service {
                 LOGGER.debug("Request to {}: \n{}\n failed due to {}\n", url, e.getMessage(), e);
                 throw e;
             }
-            LOGGER.debug("Request to {} was successful", url);
+            LOGGER.info("Request to {} was successful", url);
             return responseObj;
         }, getRetryMax(), getRetryPauseTime());
     }
