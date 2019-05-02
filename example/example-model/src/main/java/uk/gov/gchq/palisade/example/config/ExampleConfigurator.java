@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.example.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.client.ClientConfiguredServices;
 import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.common.ExampleUsers;
@@ -64,17 +65,17 @@ public final class ExampleConfigurator {
     public static void main(final String[] args) {
         final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-        ServicesCreator cs = new ServicesCreator(configService);
+        ClientConfiguredServices cs = new ClientConfiguredServices(configService);
         new ExampleConfigurator(cs, args[0]);
     }
 
-    public ExampleConfigurator(final ServicesCreator services, final String file) {
+    public ExampleConfigurator(final ClientConfiguredServices services, final String file) {
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(file);
         this.file = absoluteFileURI.toString();
         initialiseExample(services);
     }
 
-    private void initialiseExample(final ServicesCreator services) {
+    private void initialiseExample(final ClientConfiguredServices services) {
         // The user authorisation owner or sys admin needs to add the user
         final UserService userService = services.getUserService();
 

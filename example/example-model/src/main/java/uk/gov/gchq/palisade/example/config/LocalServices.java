@@ -35,7 +35,9 @@ public final class LocalServices {
     "http://localhost:8082/resource",
     "http://localhost:8083/user",
     "http://localhost:8084/data",
-    "http://localhost:8085/config"
+    "http://localhost:8085/config",
+    "http://localhost:8080/palisade",
+    "http://localhost:8084/data"
     };
 
     private LocalServices() {
@@ -52,7 +54,7 @@ public final class LocalServices {
         ProxyServicesFactory factory = new ProxyServicesFactory(LOCAL_ARGS);
         new ServicesConfigurator(factory);
 
-        CacheService cs = factory.createCacheService();
+        CacheService cs = factory.createInternalCacheService();
         if (cs instanceof SimpleCacheService) {
             ((SimpleCacheService) cs).getBackingStore().close();
         }

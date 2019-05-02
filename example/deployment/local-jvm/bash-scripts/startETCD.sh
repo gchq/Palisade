@@ -5,7 +5,6 @@ ETCD_VER=v3.3.12
 docker rm etcd-gcr-${ETCD_VER}
 rm -rf /tmp/etcd-data.tmp
 mkdir -p /tmp/etcd-data.tmp
-docker rmi gcr.io/etcd-development/etcd:${ETCD_VER} || true
 docker run \
   -p 31379:2379 \
   -p 31380:2380 \
