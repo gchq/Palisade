@@ -124,8 +124,8 @@ public class ExampleFileUtilTest {
     @Test
     public void shouldConvertFileSchemeWithSingleSlash() {
         //Given
-        String input = "file:" + temp.toString().replace("\\", "/");
-        String expected = "file://" + temp.toString().replace("\\", "/");
+        String input = (System.getProperty("os.name").toLowerCase().contains("win") ? "file:/" : "file:") + temp.toString().replace("\\", "/");
+        String expected = (System.getProperty("os.name").toLowerCase().contains("win") ? "file://" : "file:/") + temp.toString().replace("\\", "/");
 
         //When
         String actual = ExampleFileUtil.convertToFileURI(input).toString();

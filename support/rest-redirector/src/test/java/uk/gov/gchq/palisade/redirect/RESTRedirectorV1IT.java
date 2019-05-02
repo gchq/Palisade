@@ -37,7 +37,9 @@ import javax.ws.rs.PathParam;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import static java.util.Objects.nonNull;
 import static org.hamcrest.CoreMatchers.*;
@@ -98,7 +100,16 @@ public class RESTRedirectorV1IT {
 
     }
 
-    private static final String BASE_URL = "http://localhost:8080";
+    private static final String BASE_URL;
+
+    static {
+        String host = "";
+        try {
+            host = String.format("http://%s:8080", InetAddress.getLocalHost().getCanonicalHostName());
+        } catch (UnknownHostException e) { }
+
+        BASE_URL = host;
+    }
 
     private static CacheService cache;
     private static Heartbeat beat;
@@ -201,7 +212,7 @@ public class RESTRedirectorV1IT {
             url.connect();
 
             //Then
-            assertThat(redirector.host, is(equalTo("localhost")));
+            assertThat(redirector.host, either(is(equalTo(InetAddress.getLocalHost().getCanonicalHostName()))).or(is(equalTo("localhost"))));
         } finally {
             url.disconnect();
         }
