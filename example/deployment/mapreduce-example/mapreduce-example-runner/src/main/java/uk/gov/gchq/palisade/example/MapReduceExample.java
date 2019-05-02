@@ -243,7 +243,8 @@ public class MapReduceExample extends Configured implements Tool {
         FileUtils.deleteDirectory(new File(outputDir));
         Configuration conf = new Configuration();
         //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
-        conf.set("mapred.job.tracker", "local");
+        //conf.set("mapred.job.tracker", "local");
+        conf.set("mapredude.framework.name", "local");
         //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
         conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, new File(".").toURI().toURL().toString());
         ToolRunner.run(conf, new MapReduceExample(), new String[]{sourceFile, outputDir});

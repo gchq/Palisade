@@ -13,7 +13,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>example-aws-emr-configurator</module>
         <module>example-aws-emr-runner</module>
     </modules>
 </project>
