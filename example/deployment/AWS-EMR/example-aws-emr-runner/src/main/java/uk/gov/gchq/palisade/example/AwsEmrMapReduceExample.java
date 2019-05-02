@@ -74,8 +74,8 @@ import static java.util.Objects.isNull;
  * <p>
  * The word count example is adapted from: https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
  */
-public class MapReduceExample extends Configured implements Tool {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MapReduceExample.class);
+public class AwsEmrMapReduceExample extends Configured implements Tool {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AwsEmrMapReduceExample.class);
 
     protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
     private static final String RESOURCE_TYPE = "Employee";
@@ -128,7 +128,7 @@ public class MapReduceExample extends Configured implements Tool {
 
         //create the basic job object and configure it for this example
         Job job = Job.getInstance(getConf(), "Palisade MapReduce Example");
-        job.setJarByClass(MapReduceExample.class);
+        job.setJarByClass(AwsEmrMapReduceExample.class);
 
         //configure mapper
         job.setMapperClass(ExampleMap.class);
@@ -226,7 +226,7 @@ public class MapReduceExample extends Configured implements Tool {
     public static void main(final String... args) throws Exception {
         final String outputDir;
         if (args.length < 1) {
-            System.out.printf("Usage: %s input_file [output_directory]\n", MapReduceExample.class.getTypeName());
+            System.out.printf("Usage: %s input_file [output_directory]\n", AwsEmrMapReduceExample.class.getTypeName());
             System.out.println("\nfile\tfile containing serialised Employee instances to read");
             System.out.println("output_directory\tdirectory to write mapreduce outputs to");
             System.exit(1);
@@ -247,7 +247,7 @@ public class MapReduceExample extends Configured implements Tool {
         conf.set("mapredude.framework.name", "local");
         //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
         conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, new File(".").toURI().toURL().toString());
-        ToolRunner.run(conf, new MapReduceExample(), new String[]{sourceFile, outputDir});
+        ToolRunner.run(conf, new AwsEmrMapReduceExample(), new String[]{sourceFile, outputDir});
     }
 
     private static String createOutputDir() {
