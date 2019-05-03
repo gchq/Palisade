@@ -95,10 +95,13 @@ public final class ExampleFileUtil {
             Path file;
 
             if (matt.matches()) {
-                String temp = matt.group(1);
                 return URI.create(FileSystems.getDefault().provider().getScheme() + "://" + matt.group(1));
             } else {
-                file = Paths.get(uriPath).normalize();
+                if (isNull(uriPath.getScheme())) {
+                    file = FileSystems.getDefault().getPath(uriPath.getPath());
+                } else {
+                    file = Paths.get(uriPath).normalize();
+                }
             }
             //normalise this against the file system
             try {
