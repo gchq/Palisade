@@ -94,7 +94,7 @@ public class ServicesConfigurator {
 //        writeInternalClientConfiguration(configClient, internalServices);
 
         // add the config for the external clients to the config service
-        Collection<Service> externalServices = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, dataClient, cacheClient, clientServices.createExternalPalisadeService()).collect(Collectors.toList());
+        Collection<Service> externalServices = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, dataClient, cacheClient, clientServices.createClientPalisadeService()).collect(Collectors.toList());
         writeExternalClientConfiguration(configClient, externalServices);
 
         // write the config for the user service to the config service
