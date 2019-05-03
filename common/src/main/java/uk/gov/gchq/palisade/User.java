@@ -166,13 +166,13 @@ public class User implements Cloneable {
         return this;
     }
 
-    public User trainingCompleted(String... trainingCompleted) {
+    public User trainingCompleted(final String... trainingCompleted) {
         requireNonNull(trainingCompleted, "cannot add null training completed");
         Collections.addAll(this.trainingCompleted, trainingCompleted);
         return this;
     }
 
-    public User trainingCompleted(Set<String> trainingCompleted) {
+    public User trainingCompleted(final Set<String> trainingCompleted) {
         requireNonNull(trainingCompleted, "cannot add null training completed");
         this.trainingCompleted = trainingCompleted;
         return this;
@@ -183,11 +183,11 @@ public class User implements Cloneable {
         return trainingCompleted;
     }
 
-    public void setTrainingCompleted(Set<String> trainingCompleted) {
+    public void setTrainingCompleted(final Set<String> trainingCompleted) {
         trainingCompleted(trainingCompleted);
     }
 
-    public void addTrainingCompleted(Set<String> trainingCompleted) {
+    public void addTrainingCompleted(final Set<String> trainingCompleted) {
         requireNonNull(trainingCompleted, "cannot add null training completed");
         this.trainingCompleted.addAll(trainingCompleted);
     }
