@@ -151,23 +151,14 @@ resource "null_resource" "deploy_example" {
     }
 
   # Run the Palisade mapreduce example runner....1st copy over the jar...
-#  provisioner "file" {
-#      source = "../../../deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
-#      destination = "/home/hadoop/jars/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
-#  }
-#  provisioner "remote-exec" {
-#      inline = [
-#        "java -cp /home/hadoop/jars/example-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.config.RestExample /home/hadoop/example_data/Employee_file0.avro > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
-#      ]
-#    }
   provisioner "file" {
-      source = "../../../deployment/local-jvm/example-runner/target/example-runner-0.2.1-SNAPSHOT-shaded.jar"
-      destination = "/home/hadoop/jars/example-runner-0.2.1-SNAPSHOT-shaded.jar"
+      source = "../../../deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
+      destination = "/home/hadoop/jars/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
   }
   provisioner "remote-exec" {
       inline = [
-        "java -cp /home/hadoop/jars/example-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.RestExample /home/hadoop/example_data/Employee_file0.avro > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
+        "java -cp /home/hadoop/jars/example-aws-emr-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.AwsEmrMapReduceExample /example_data/Employee_file0.avro /user/hadoop/output > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
       ]
     }
 }
-#scp -i ~/.ssh/developer6959ireland.pem ./example-runner-0.2.1-SNAPSHOT-shaded.jar hadoop@ip-172-31-40-214.eu-west-1.compute.internal:~/jars
+

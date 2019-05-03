@@ -240,6 +240,9 @@ public class HadoopResourceService implements ResourceService {
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         final String resourceId = request.getResourceId();
         final String path = getInternalConf().get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+        //LOGGER.info("EMR debug: HadoopResourceService - FS_DEFAULT_NAME_KEY is: " + FS_DEFAULT_NAME_KEY);
+        LOGGER.info("EMR debug: HadoopResourceService - resourceId is: " + resourceId);
+        LOGGER.info("EMR debug: HadoopResourceService - path is: " + path);
         if (!resourceId.startsWith(path)) {
             throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, path));
         }

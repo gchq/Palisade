@@ -225,12 +225,15 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
 
     public static void main(final String... args) throws Exception {
         final String outputDir;
+        LOGGER.info("EMR debug: AwsEmrMapReduceExample - at start of main() ");
         if (args.length < 1) {
             System.out.printf("Usage: %s input_file [output_directory]\n", AwsEmrMapReduceExample.class.getTypeName());
             System.out.println("\nfile\tfile containing serialised Employee instances to read");
             System.out.println("output_directory\tdirectory to write mapreduce outputs to");
             System.exit(1);
         }
+
+
 
         String sourceFile = args[0];
 
@@ -239,14 +242,20 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         } else {
             outputDir = args[1];
         }
+        LOGGER.info("EMR debug: AwsEmrMapReduceExample - outputdir is: " + outputDir);
         //remove this as it needs to be not present when the job runs
         FileUtils.deleteDirectory(new File(outputDir));
         Configuration conf = new Configuration();
         //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
         //conf.set("mapred.job.tracker", "local");
-        conf.set("mapredude.framework.name", "local");
+        //conf.set("mapredude.framework.name", "local");
+        conf.set("mapredude.framework.name", "yarn");
         //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
-        conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, new File(".").toURI().toURL().toString());
+        //conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, new File(".").toURI().toURL().toString());
+        //set defaultFS to hdfs on cluster
+        conf.set("fs.defaultFS", "hdfs://ip-172-31-39-194.eu-west-1.compute.internal");
+        //set address of resource manager
+        conf.set("yarn.resourcemanager.address","ip-172-31-39-194.eu-west-1.compute.internal:8032");
         ToolRunner.run(conf, new AwsEmrMapReduceExample(), new String[]{sourceFile, outputDir});
     }
 
