@@ -48,6 +48,7 @@ public class User implements Cloneable {
     public static final String USER_ID = "userId";
     public static final String ROLES = "roles";
     public static final String AUTHS = "auths";
+    public static final String TRAINING_COMPLETED = "trainingCompleted";
 
     private static final Map<String, FieldGetter<User>> FIELD_GETTERS = createFieldGetters();
     private static final Map<String, FieldSetter<User>> FIELD_SETTERS = createFieldSetters();
@@ -55,6 +56,7 @@ public class User implements Cloneable {
     private UserId userId;
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
+    private Set<String> trainingCompleted = new HashSet<>();
 
     public Object getField(final String reference) {
         return Util.getField(this, FIELD_GETTERS, reference);
@@ -164,6 +166,33 @@ public class User implements Cloneable {
         return this;
     }
 
+    public User trainingCompleted(String... trainingCompleted) {
+        requireNonNull(trainingCompleted, "cannot add null training completed");
+        Collections.addAll(this.trainingCompleted, trainingCompleted);
+        return this;
+    }
+
+    public User trainingCompleted(Set<String> trainingCompleted) {
+        requireNonNull(trainingCompleted, "cannot add null training completed");
+        this.trainingCompleted = trainingCompleted;
+        return this;
+    }
+
+    public Set<String> getTrainingCompleted() {
+        // trainingCompleted cannot be null
+        return trainingCompleted;
+    }
+
+    public void setTrainingCompleted(Set<String> trainingCompleted) {
+        trainingCompleted(trainingCompleted);
+    }
+
+    public void addTrainingCompleted(Set<String> trainingCompleted) {
+        requireNonNull(trainingCompleted, "cannot add null training completed");
+        this.trainingCompleted.addAll(trainingCompleted);
+    }
+
+
     public User clone() {
         User clone;
         try {
@@ -193,6 +222,7 @@ public class User implements Cloneable {
                 .append(userId, user.userId)
                 .append(roles, user.roles)
                 .append(auths, user.auths)
+                .append(trainingCompleted, user.trainingCompleted)
                 .isEquals();
     }
 
@@ -202,6 +232,7 @@ public class User implements Cloneable {
                 .append(userId)
                 .append(roles)
                 .append(auths)
+                .append(trainingCompleted)
                 .toHashCode();
     }
 
@@ -211,6 +242,7 @@ public class User implements Cloneable {
                 .append("userId", userId)
                 .append("roles", roles)
                 .append("auths", auths)
+                .append("trainingCompleted", trainingCompleted)
                 .toString();
     }
 
@@ -219,6 +251,7 @@ public class User implements Cloneable {
         map.put(USER_ID, (user, subfield) -> user.getUserId().getField(subfield));
         map.put(ROLES, (user, subfield) -> user.getRoles());
         map.put(AUTHS, (user, subfield) -> user.getAuths());
+        map.put(TRAINING_COMPLETED, (user, subfield) -> user.getTrainingCompleted());
         return Collections.unmodifiableMap(map);
     }
 
@@ -228,6 +261,7 @@ public class User implements Cloneable {
         map.put(USER_ID, (user, subfield, value) -> user.getUserId().setField(subfield, value));
         map.put(ROLES, (user, subfield, value) -> user.roles((Set<String>) value));
         map.put(AUTHS, (user, subfield, value) -> user.auths((Set<String>) value));
+        map.put(TRAINING_COMPLETED, (user, subfield, value) -> user.trainingCompleted((Set<String>) value));
         return Collections.unmodifiableMap(map);
     }
 }
