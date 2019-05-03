@@ -13,4 +13,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 "$K8SBASHSCRIPTS/k8sDeleteEtcd.sh"
 "$K8SBASHSCRIPTS/k8sDeletePersistentVolume.sh"
 "$K8SBASHSCRIPTS/k8sDeleteNginxIngressController.sh"
-
+kubectl delete -f "$K8SBASHSCRIPTS/ingress/k8sIngress.yaml"
