@@ -2,7 +2,7 @@
 set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$DIR/../../bash-scripts/setScriptPath.sh"
-"$K8SBASHSCRIPTS/k8sDeleteExample.sh"
+"$K8SBASHSCRIPTS/k8sDeleteExample.sh" || true
 "$K8SBASHSCRIPTS/k8sDeleteDataService.sh"
 "$K8SBASHSCRIPTS/k8sDeletePalisadeService.sh"
 "$K8SBASHSCRIPTS/k8sDeleteUserService.sh"
@@ -11,7 +11,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 "$K8SBASHSCRIPTS/k8sDeleteConfigureServices.sh"
 "$K8SBASHSCRIPTS/k8sDeleteConfigService.sh"
 "$K8SBASHSCRIPTS/k8sDeleteEtcd.sh"
-kubectl delete -f ./persistent-volume/k8sPersistentVolumeClaim.yaml
-kubectl delete -f ./persistent-volume/k8sPersistentVolume.yaml
-
+"$K8SBASHSCRIPTS/k8sDeletePersistentVolume.sh"
+"$K8SBASHSCRIPTS/k8sDeleteNginxIngressController.sh"
 

@@ -32,7 +32,7 @@ To run the example locally in docker containers follow these steps (from the roo
 
     Then you can start the kubernetes cluster:
     ```
-    ./Users/nigel/development/Palisade/example/deployment/local-k8s/bash-scripts/buildServices.sh
+    ./example/deployment/local-k8s/bash-scripts/buildServices.sh
     ```
     You can check the pods are available:
     

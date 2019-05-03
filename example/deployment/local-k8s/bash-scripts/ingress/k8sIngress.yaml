@@ -2,24 +2,25 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: name-virtual-host-ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: config-service
-      http:
+    - http:
         paths:
-          - backend:
+          - path: /config-service
+            backend:
               serviceName: config-service
               servicePort: 8080
-    - host: palisade-service
-      http:
-        paths:
-          - backend:
+          - path: /config-service
+            backend:
+              serviceName: guava-service
+              servicePort: 8080
+          - path: /palisade-service
+            backend:
               serviceName: palisade-service
               servicePort: 8080
-    - host: data-service
-      http:
-        paths:
-          - backend:
+          - path: /data-service
+            backend:
               serviceName: data-service
               servicePort: 8080
-
