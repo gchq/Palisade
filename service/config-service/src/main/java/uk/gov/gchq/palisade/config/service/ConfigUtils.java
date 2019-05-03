@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.gov.gchq.palisade.rest;
+package uk.gov.gchq.palisade.config.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.ConfigConsts;
-import uk.gov.gchq.palisade.config.service.ConfigurationService;
-import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.Service;
@@ -30,14 +27,16 @@ import uk.gov.gchq.palisade.util.StreamUtil;
 import java.io.InputStream;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 /**
  * Utility class that includes functionality to create a {@link Service} from a given class name.
  */
-public final class RestUtil {
+public final class ConfigUtils {
     public static final String CONFIG_SERVICE_PATH = "palisade.rest.config.path";
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigUtils.class);
 
-    private RestUtil() {
+    private ConfigUtils() {
     }
 
     /**
@@ -59,7 +58,7 @@ public final class RestUtil {
     public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass, final String... overridable) throws NoConfigException {
         ConfigurationService service = createConfigServiceFromPath(resolverClass, configDetailsPath);
         //get the config for this service, try repeatedly until we get a valid configuration
-        return new Configurator(service).retrieveConfigAndCreate(serviceClass, ServiceConstants.CONFIG_TIMEOUT, overridable);
+        return new Configurator(service).retrieveConfigAndCreate(serviceClass, ConfigConsts.CONFIG_TIMEOUT, overridable);
     }
 
     /**
@@ -106,5 +105,29 @@ public final class RestUtil {
                 }
             }
         }
+    }
+
+    public static ServiceState createConfiguratorFromSystemVariable() throws InterruptedException {
+
+        final InputStream stream = StreamUtil.openStream(ConfigUtils.class, System.getProperty(CONFIG_SERVICE_PATH));
+        ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
+
+        ServiceState clientConfig = null;
+        int times = 0;
+        while (isNull(clientConfig) && times < 30) {
+            try {
+                clientConfig = new Configurator(configService).retrieveConfig(Optional.empty());
+            } catch (NoConfigException e) {
+                LOGGER.warn("No client configuration present, waiting...");
+                Thread.sleep(ConfigConsts.DELAY);
+                times++;
+            }
+        }
+
+        if (isNull(clientConfig)) {
+            throw new RuntimeException("Couldn't retrieve client configuration. Is configuration service running?");
+        }
+
+        return clientConfig;
     }
 }

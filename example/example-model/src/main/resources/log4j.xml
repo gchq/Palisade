@@ -23,6 +23,9 @@
             <param name="ConversionPattern" value="%c{3} %p %x - %m%n"/>
         </layout>
     </appender>
+    <logger name="org.reflections.Reflections">
+        <level value="ERROR"/>
+    </logger>
     <root>
         <priority value="info"></priority>
         <appender-ref ref="console"></appender-ref>
