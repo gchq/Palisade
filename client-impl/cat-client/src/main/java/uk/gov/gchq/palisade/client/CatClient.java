@@ -33,8 +33,6 @@ import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -63,17 +61,16 @@ public class CatClient {
             new CatClient(palisade).read(userId, resource, purpose);
 
         } else {
-            System.out.printf("Usage: %s userId resource purpose", CatClient.class.getTypeName());
-            System.out.println("userId: the unique id of the user making this query");
-            System.out.println("resource: the name of the resource being requested");
-            System.out.println("purpose: purpose for accessing the resource");
+            System.out.printf("Usage: %s userId resource purpose\n\n", CatClient.class.getSimpleName());
+            System.out.println("userId\t\t the unique id of the user making this query");
+            System.out.println("resource\t the name of the resource being requested");
+            System.out.println("purpose\t\t purpose for accessing the resource");
         }
     }
 
     protected void read(final String userId, final String resource, final String purpose) {
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(resource).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
-        final List<CompletableFuture<InputStream>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
@@ -81,6 +78,7 @@ public class CatClient {
             final ReadRequest readRequest = new ReadRequest()
                     .requestId(dataRequestResponse.getRequestId())
                     .resource(entry.getKey());
+            readRequest.setOriginalRequestId(dataRequestResponse.getOriginalRequestId());
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
             final CompletableFuture<InputStream> futureResult = futureResponse.thenApply(ReadResponse::getData);

@@ -85,11 +85,12 @@ public class CatClientTest {
                 new DataRequestResponse()
                 .requestId(reqId)
                 .resource(resource1, mockConnectionDetail)
-                .resource(resource2, mockConnectionDetail));
+                .resource(resource2, mockConnectionDetail)
+                .originalRequestId("Test ID"));
 
 
-        readRequest1 = new ReadRequest().requestId(reqId).resource(resource1);
-        readRequest2 = new ReadRequest().requestId(reqId).resource(resource2);
+        readRequest1 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource1).originalRequestId(reqId.getId());
+        readRequest2 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource2).originalRequestId(reqId.getId());
 
         readResponse1 = CompletableFuture.completedFuture(
                 new ReadResponse().data(IOUtils.toInputStream("Test data 1", StandardCharsets.UTF_8)));
@@ -98,8 +99,8 @@ public class CatClientTest {
                 new ReadResponse().data(IOUtils.toInputStream("Test data 2", StandardCharsets.UTF_8)));
 
         Mockito.when(mockPalisadeService.registerDataRequest(Mockito.refEq(registerDataRequest, "id"))).thenReturn(reqResponse);
-        Mockito.when(mockDataService.read(Mockito.refEq(readRequest1, "id"))).thenReturn(readResponse1);
-        Mockito.when(mockDataService.read(Mockito.refEq(readRequest2,"id"))).thenReturn(readResponse2);
+        Mockito.when(mockDataService.read(Mockito.refEq(readRequest1, "id", "originalRequestId"))).thenReturn(readResponse1);
+        Mockito.when(mockDataService.read(Mockito.refEq(readRequest2,"id", "originalRequestId"))).thenReturn(readResponse2);
 
         //When
         CatClient catClient = new CatClient(mockPalisadeService);
