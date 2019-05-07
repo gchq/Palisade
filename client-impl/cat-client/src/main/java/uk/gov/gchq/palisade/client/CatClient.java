@@ -19,16 +19,17 @@ package uk.gov.gchq.palisade.client;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.config.service.ConfigUtils;
-import uk.gov.gchq.palisade.config.service.Configurator;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
+import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -54,9 +55,12 @@ public class CatClient {
             String resource = args[1];
             String purpose = args[2];
 
-            ServiceState clientConfig = ConfigUtils.createConfiguratorFromSystemVariable();
+            final InputStream stream = StreamUtil.openStream(CatClient.class, System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+            ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
-            PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
+            ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);
+
+            PalisadeService palisade = configuredServices.getPalisadeService();
 
             new CatClient(palisade).read(userId, resource, purpose);
 

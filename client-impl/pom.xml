@@ -29,5 +29,6 @@
         <module>simple-client</module>
         <module>mapreduce-client</module>
         <module>cat-client</module>
+        <module>client-common</module>
     </modules>
 </project>
