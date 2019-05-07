@@ -91,8 +91,10 @@ public class ServicesConfigurator {
         CacheService cacheClient = clientServices.createInternalCacheService();
 
         // add the config for the clients to the config service
-//        Collection<Service> services = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
-        Collection<Service> services = Stream.of(palisadeClient).collect(Collectors.toList());
+
+        //although normally the client should only need the PalisadeService, we have to write all of the services here, since the
+        //ExampleConfigurator retrieves other services when it wants to configure them. In production code this would not be necessary
+        Collection<Service> services = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
         writeClientConfiguration(configClient, services);
 
         // write the serialisers to the cache
@@ -126,7 +128,7 @@ public class ServicesConfigurator {
      */
     private void writeSerialiserConfiguration(final CacheService cache) {
         CompletableFuture<Boolean> addCall = CachedSerialisedDataReader.addSerialiserToCache(cache, DataFlavour.of(RESOURCE_TYPE, RESOURCE_FORMAT), new AvroSerialiser<>(Employee.class));
-        LOGGER.info("Added thing to cache {}", addCall.join());
+        addCall.join();
     }
 
     /**

@@ -17,6 +17,8 @@
 package uk.gov.gchq.palisade.data.service.reader;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +61,8 @@ public abstract class SerialisedDataReader implements DataReader {
      * and the second element is the serialised format.
      */
     @JsonProperty("serialisers")
+    @JsonSerialize(keyUsing = DataFlavour.FlavourSerializer.class)
+    @JsonDeserialize(keyUsing = DataFlavour.FlavourDeserializer.class)
     private Map<DataFlavour, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
 
     /**

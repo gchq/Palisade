@@ -18,9 +18,19 @@ package uk.gov.gchq.palisade.data.service.reader;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.KeyDeserializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+
+import java.io.IOException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,11 +40,45 @@ import static java.util.Objects.requireNonNull;
  * of these two features.
  */
 public class DataFlavour {
+    /**
+     * The delimiter between data type and serialised format.
+     */
+    public static final String DELIMITER = "##";
 
     /**
      * The internal store of the flavour. The left entry is the data type and the right entry is the serialised format.
      */
     private final ImmutablePair<String, String> flavour;
+
+    /**
+     * Class to ensure {@link DataFlavour}s can be serialised into JSON.
+     */
+    public final static class FlavourSerializer extends StdSerializer<DataFlavour> {
+
+        public FlavourSerializer() {
+            super(DataFlavour.class);
+        }
+
+        @Override
+        public void serialize(final DataFlavour dataFlavour, final JsonGenerator jsonGenerator, final SerializerProvider serializerProvider) throws IOException {
+            jsonGenerator.writeFieldName(dataFlavour.getDataType() + DELIMITER + dataFlavour.getSerialisedFormat());
+        }
+    }
+
+    /**
+     * Class to ensure {@link DataFlavour}s can be deserialised from JSON.
+     */
+    public final static class FlavourDeserializer extends KeyDeserializer {
+
+        @Override
+        public Object deserializeKey(final String text, final DeserializationContext deserializationContext) throws IOException {
+            String[] parts = text.split(DELIMITER);
+            if (parts.length != 2) {
+                throw new IllegalStateException("error deserialising " + text + " as a DataFlavour, should be in format \"<data_type>" + DELIMITER + "<seralised_format>\"");
+            }
+            return DataFlavour.of(parts[0], parts[1]);
+        }
+    }
 
     /**
      * Create a flavour.
