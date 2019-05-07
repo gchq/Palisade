@@ -229,8 +229,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     throw new RuntimeException(ex); //rethrow the exception
                 });
         final RequestId requestId = new RequestId().id(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
-        final DataRequestConfig config = new DataRequestConfig();
-        config.setContext(request.getContext());
+        final DataRequestConfig config = new DataRequestConfig().context(request.getContext());
         config.setOriginalRequestId(originalRequestId);
         return CompletableFuture.allOf(futureUser, futureResources)
                 .thenApply(t -> getPolicy(request, futureUser, futureResources, originalRequestId))
@@ -241,7 +240,6 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 })
                 .thenApply(multiPolicy -> {
                     final DataRequestResponse response = new DataRequestResponse().requestId(requestId).originalRequestId(originalRequestId).resources(futureResources.join());
-                    response.setOriginalRequestId(originalRequestId);
                     LOGGER.debug("Responding with: {}", response);
                     return response;
                 })

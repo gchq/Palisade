@@ -86,7 +86,7 @@ public class DataRequestResponse {
     }
 
     public Map<LeafResource, ConnectionDetail> getResources() {
-        requireNonNull(resources, "The Resources have not been set.");
+        requireNonNull(resources, "The Resources has not been set.");
         return resources;
     }
 
@@ -95,7 +95,7 @@ public class DataRequestResponse {
     }
 
     public String getOriginalRequestId() {
-        requireNonNull(originalRequestId, "The originalRequestId type cannot be null");
+        requireNonNull(originalRequestId, "The originalRequestId has not been set.");
         return originalRequestId;
     }
 
