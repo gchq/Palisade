@@ -50,6 +50,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -123,7 +124,8 @@ public class ServicesConfigurator {
      * @param cache the cache to write to
      */
     private void writeSerialiserConfiguration(final CacheService cache) {
-        CachedSerialisedDataReader.addSerialiser(cache, RESOURCE_TYPE, RESOURCE_FORMAT, new AvroSerialiser<>(Employee.class));
+        CompletableFuture<Boolean> addCall = CachedSerialisedDataReader.addSerialiser(cache, RESOURCE_TYPE, RESOURCE_FORMAT, new AvroSerialiser<>(Employee.class));
+        LOGGER.info("Added thing to cache {}", addCall.join());
     }
 
     /**

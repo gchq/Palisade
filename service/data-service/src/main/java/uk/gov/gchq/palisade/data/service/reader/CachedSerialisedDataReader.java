@@ -16,7 +16,6 @@
 
 package uk.gov.gchq.palisade.data.service.reader;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import org.slf4j.Logger;

@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.resource.service.impl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -86,7 +87,7 @@ public class HadoopResourceService implements ResourceService {
 
     public static final String HADOOP_CONF_STRING = "hadoop.init.conf";
     public static final String CACHE_IMPL_KEY = "hadoop.cache.svc";
-    public static final String CONNECTION_DETAIL_KEY = "hadoop.conn.detail";
+    public static final String DATASERVICE_LIST = "hadoop.data.svc.list";
 
     /**
      * A regular expression that matches URIs that have the file:/ scheme with a single slash but not any more slashes.
@@ -169,6 +170,19 @@ public class HadoopResourceService implements ResourceService {
         } else {
             throw new NoConfigException("no cache service specified in configuration");
         }
+        //extract data services
+        String serialisedDataServices = config.getOrDefault(DATASERVICE_LIST, null);
+        if (nonNull(serialisedDataServices)) {
+            this.dataServices = JSONSerialiser.deserialise(serialisedDataServices.getBytes(StandardCharsets.UTF_8), new ConnectionDetailType());
+        } else {
+            throw new NoConfigException("no data services specified in configuration");
+        }
+    }
+
+    /**
+     * Make Jackson interprett the deserialised list correctly.
+     */
+    private static class ConnectionDetailType extends TypeReference<List<ConnectionDetail>> {
     }
 
     @Override
@@ -180,6 +194,8 @@ public class HadoopResourceService implements ResourceService {
         config.put(HADOOP_CONF_STRING, serialisedConf);
         String serialisedCache = new String(JSONSerialiser.serialise(cacheService), StandardCharsets.UTF_8);
         config.put(CACHE_IMPL_KEY, serialisedCache);
+        String serialisedDataServices = new String(JSONSerialiser.serialise(dataServices), StandardCharsets.UTF_8);
+        config.put(DATASERVICE_LIST, serialisedDataServices);
     }
 
     protected Configuration getInternalConf() {
@@ -228,6 +244,9 @@ public class HadoopResourceService implements ResourceService {
                                     return fileFileResource;
                                 },
                                 resourceDetails -> {
+                                    if (this.dataServices.size() < 1) {
+                                        throw new IllegalStateException("No Hadoop data services known about in Hadoop resource service");
+                                    }
                                     int service = ThreadLocalRandom.current().nextInt(this.dataServices.size());
                                     return this.dataServices.get(service);
                                 }

@@ -211,8 +211,10 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     return user;
                 })
                 .exceptionally(ex -> {
-                    LOGGER.debug("Failed to get user: {}" + ex.getMessage());
-                    auditRequestReceivedException(request, originalRequestId, ex);
+                    LOGGER.error("Failed to get user: {}" , ex.getMessage());
+                    if (nonNull(ex)) {
+                        auditRequestReceivedException(request, originalRequestId, ex);
+                    }
                     throw new RuntimeException(ex); //rethrow the exception
                 });
         final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId());
@@ -224,8 +226,10 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     return resources;
                 })
                 .exceptionally(ex -> {
-                    LOGGER.debug("Failed to get resources: {}" + ex.getMessage());
-                    auditRequestReceivedException(request, originalRequestId, ex);
+                    LOGGER.error("Failed to get resources: {}" , ex.getMessage());
+                    if (nonNull(ex)) {
+                        auditRequestReceivedException(request, originalRequestId, ex);
+                    }
                     throw new RuntimeException(ex); //rethrow the exception
                 });
         final RequestId requestId = new RequestId().id(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
@@ -246,8 +250,10 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     return response;
                 })
                 .exceptionally(ex -> {
-                    LOGGER.debug("Error handling: " + ex.getMessage());
-                    auditRequestReceivedException(request, originalRequestId, ex);
+                    LOGGER.error("Error handling: {}", ex.getMessage());
+                    if (nonNull(ex)) {
+                        auditRequestReceivedException(request, originalRequestId, ex);
+                    }
                     throw new RuntimeException(ex); //rethrow the exception
                 });
     }
@@ -301,8 +307,6 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         LOGGER.debug("Error handling: " + ex.getMessage());
         auditService.audit(auditRequestWithException);
     }
-
-
     private void cache(final RegisterDataRequest request, final User user,
                        final RequestId requestId, final MultiPolicy multiPolicy,
                        final int resCount,
