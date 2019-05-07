@@ -19,22 +19,21 @@ package uk.gov.gchq.palisade.client;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.config.service.ConfigUtils;
-import uk.gov.gchq.palisade.config.service.Configurator;
+import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
+import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -56,24 +55,26 @@ public class CatClient {
             String resource = args[1];
             String purpose = args[2];
 
-            ServiceState clientConfig = ConfigUtils.createConfiguratorFromSystemVariable();
+            final InputStream stream = StreamUtil.openStream(CatClient.class, System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+            ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
-            PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
+            ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);
+
+            PalisadeService palisade = configuredServices.getPalisadeService();
 
             new CatClient(palisade).read(userId, resource, purpose);
 
         } else {
-            System.out.printf("Usage: %s userId resource purpose", CatClient.class.getTypeName());
-            System.out.println("userId: the unique id of the user making this query");
-            System.out.println("resource: the name of the resource being requested");
-            System.out.println("purpose: purpose for accessing the resource");
+            System.out.printf("Usage: %s userId resource purpose\n\n", CatClient.class.getSimpleName());
+            System.out.println("userId\t\t the unique id of the user making this query");
+            System.out.println("resource\t the name of the resource being requested");
+            System.out.println("purpose\t\t purpose for accessing the resource");
         }
     }
 
     protected void read(final String userId, final String resource, final String purpose) {
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(resource).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
-        final List<CompletableFuture<InputStream>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
@@ -81,6 +82,7 @@ public class CatClient {
             final ReadRequest readRequest = new ReadRequest()
                     .requestId(dataRequestResponse.getRequestId())
                     .resource(entry.getKey());
+            readRequest.setOriginalRequestId(dataRequestResponse.getOriginalRequestId());
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
             final CompletableFuture<InputStream> futureResult = futureResponse.thenApply(ReadResponse::getData);
