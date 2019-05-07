@@ -29,6 +29,7 @@ import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.impl.reader.HadoopDataReader;
 import uk.gov.gchq.palisade.data.service.reader.CachedSerialisedDataReader;
+import uk.gov.gchq.palisade.data.service.reader.DataFlavour;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
@@ -90,8 +91,8 @@ public class ServicesConfigurator {
         CacheService cacheClient = clientServices.createInternalCacheService();
 
         // add the config for the clients to the config service
-        Collection<Service> services = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
-//        Collection<Service> services = Stream.of(palisadeClient).collect(Collectors.toList());
+//        Collection<Service> services = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
+        Collection<Service> services = Stream.of(palisadeClient).collect(Collectors.toList());
         writeClientConfiguration(configClient, services);
 
         // write the serialisers to the cache
@@ -124,7 +125,7 @@ public class ServicesConfigurator {
      * @param cache the cache to write to
      */
     private void writeSerialiserConfiguration(final CacheService cache) {
-        CompletableFuture<Boolean> addCall = CachedSerialisedDataReader.addSerialiser(cache, RESOURCE_TYPE, RESOURCE_FORMAT, new AvroSerialiser<>(Employee.class));
+        CompletableFuture<Boolean> addCall = CachedSerialisedDataReader.addSerialiserToCache(cache, DataFlavour.of(RESOURCE_TYPE, RESOURCE_FORMAT), new AvroSerialiser<>(Employee.class));
         LOGGER.info("Added thing to cache {}", addCall.join());
     }
 

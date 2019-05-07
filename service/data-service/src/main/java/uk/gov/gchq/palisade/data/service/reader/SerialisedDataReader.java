@@ -17,7 +17,6 @@
 package uk.gov.gchq.palisade.data.service.reader;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,13 +59,13 @@ public abstract class SerialisedDataReader implements DataReader {
      * and the second element is the serialised format.
      */
     @JsonProperty("serialisers")
-    private Map<ImmutablePair<String, String>, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
+    private Map<DataFlavour, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
 
     /**
      * @param serialisers a mapping of data type to serialiser
      * @return the {@link SerialisedDataReader}
      */
-    public SerialisedDataReader serialisers(final Map<ImmutablePair<String, String>, Serialiser<?>> serialisers) {
+    public SerialisedDataReader serialisers(final Map<DataFlavour, Serialiser<?>> serialisers) {
         requireNonNull(serialisers, "The serialisers cannot be set to null.");
         this.serialisers = serialisers;
         return this;
@@ -131,9 +130,9 @@ public abstract class SerialisedDataReader implements DataReader {
      */
     protected abstract InputStream readRaw(final LeafResource resource);
 
-    public <RULES_DATA_TYPE> Serialiser<RULES_DATA_TYPE> getSerialiser(final ImmutablePair<String, String> type) {
-        requireNonNull(type, "The type cannot be null.");
-        Serialiser<?> serialiser = serialisers.get(type);
+    public <RULES_DATA_TYPE> Serialiser<RULES_DATA_TYPE> getSerialiser(final DataFlavour flavour) {
+        requireNonNull(flavour, "The flavour cannot be null.");
+        Serialiser<?> serialiser = serialisers.get(flavour);
         if (null == serialiser) {
             serialiser = defaultSerialiser;
         }
@@ -142,17 +141,21 @@ public abstract class SerialisedDataReader implements DataReader {
 
     public <I> Serialiser<I> getSerialiser(final LeafResource resource) {
         requireNonNull(resource, "The resource cannot be null.");
-        return getSerialiser(ImmutablePair.of(resource.getType(), resource.getSerialisedFormat()));
+        return getSerialiser(DataFlavour.of(resource.getType(), resource.getSerialisedFormat()));
     }
 
-    public void addSerialiser(final String type, final String serialisedFormat, final Serialiser<?> serialiser) {
-        requireNonNull(type, "The type cannot be null.");
-        requireNonNull(serialisedFormat, "The format cannot be null.");
+    public void addSerialiser(final DataFlavour flavour, final Serialiser<?> serialiser) {
+        requireNonNull(flavour, "The flavour cannot be null.");
         requireNonNull(serialiser, "The serialiser cannot be null.");
-        serialisers.put(ImmutablePair.of(type, serialisedFormat), serialiser);
+        serialisers.put(flavour, serialiser);
     }
 
-    public void setSerialisers(final Map<ImmutablePair<String, String>, Serialiser<?>> serialisers) {
+    public void addAllSerialisers(final Map<DataFlavour, Serialiser<?>> mergingSerialisers) {
+        requireNonNull(mergingSerialisers, "mergingSerialisers");
+        serialisers.putAll(mergingSerialisers);
+    }
+
+    public void setSerialisers(final Map<DataFlavour, Serialiser<?>> serialisers) {
         serialisers(serialisers);
     }
 

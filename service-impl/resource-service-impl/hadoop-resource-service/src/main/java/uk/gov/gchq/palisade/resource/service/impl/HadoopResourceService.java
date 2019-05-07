@@ -82,8 +82,8 @@ public class HadoopResourceService implements ResourceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HadoopResourceService.class);
     public static final String ERROR_ADD_RESOURCE = "AddResource is not supported by HadoopResourceService resources should be added/created via regular file system behaviour.";
     public static final String ERROR_OUT_SCOPE = "resource ID is out of scope of the this resource Service. Found: %s expected: %s";
-    public static final String ERROR_DETAIL_NOT_FOUND = "Connection detail could not be found for type: %s format: %s";
     public static final String ERROR_RESOLVING_PARENTS = "Error occurred while resolving resourceParents";
+    public static final String ERROR_NO_DATA_SERVICES = "No Hadoop data services known about in Hadoop resource service";
 
     public static final String HADOOP_CONF_STRING = "hadoop.init.conf";
     public static final String CACHE_IMPL_KEY = "hadoop.cache.svc";
@@ -99,6 +99,11 @@ public class HadoopResourceService implements ResourceService {
 
     private FileSystem fileSystem;
 
+    /**
+     * This should be a list of endpoints of Hadoop data services. In a deployed system this shouldn't be a large list
+     * of data services (which will be started up by an external orchestration service), but a list of end points which
+     * should then provide further load balancing.
+     */
     private List<ConnectionDetail> dataServices = new ArrayList<>();
 
     public HadoopResourceService() {
@@ -245,7 +250,7 @@ public class HadoopResourceService implements ResourceService {
                                 },
                                 resourceDetails -> {
                                     if (this.dataServices.size() < 1) {
-                                        throw new IllegalStateException("No Hadoop data services known about in Hadoop resource service");
+                                        throw new IllegalStateException(ERROR_NO_DATA_SERVICES);
                                     }
                                     int service = ThreadLocalRandom.current().nextInt(this.dataServices.size());
                                     return this.dataServices.get(service);

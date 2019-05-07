@@ -167,7 +167,6 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(11, 37)
-                .appendSuper(super.hashCode())
                 .append(cache)
                 .append(redirectClass)
                 .append(getScope())
