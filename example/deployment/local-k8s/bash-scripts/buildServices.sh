@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR=$(dirname "$0")
 . "$DIR/../../bash-scripts/setScriptPath.sh"
 echo "K8SBASHSCRIPTS is set to"
 echo $K8SBASHSCRIPTS
