@@ -1,2 +1,7 @@
 #!/usr/bin/env bash
-kubectl delete -f configure-example/k8sConfigureExample.yaml
+DIR1=$1
+if [[ -n "$DIR1" ]]; then
+   kubectl delete -f $DIR1/configure-example/k8sConfigureExample.yaml
+else
+   echo "argument error"
+fi

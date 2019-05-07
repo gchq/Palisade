@@ -1,2 +1,7 @@
 #!/usr/bin/env bash
-kubectl apply -f resource-service/k8sResourceService.yaml
+DIR1=$1
+if [[ -n "$DIR1" ]]; then
+   kubectl apply -f $DIR1/resource-service/k8sResourceService.yaml
+else
+   echo "argument error"
+fi

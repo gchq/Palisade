@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
-kubectl apply -f ./ingress/mandatory.yaml
-kubectl apply -f ./ingress/cloudGeneric.yaml
+DIR1=$1
+if [[ -n "$DIR1" ]]; then
+   kubectl apply -f $DIR1/ingress/mandatory.yaml
+   kubectl apply -f $DIR1/ingress/cloudGeneric.yaml
+else
+   echo "argument error"
+fi

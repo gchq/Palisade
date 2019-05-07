@@ -1,2 +1,7 @@
 #!/usr/bin/env bash
-kubectl delete -f policy-service/k8sPolicyService.yaml
+DIR1=$1
+if [[ -n "$DIR1" ]]; then
+   kubectl delete -f $DIR1/policy-service/k8sPolicyService.yaml
+else
+   echo "argument error"
+fi

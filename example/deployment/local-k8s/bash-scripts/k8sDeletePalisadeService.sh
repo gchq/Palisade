@@ -1,2 +1,7 @@
 #!/usr/bin/env bash
-kubectl delete -f palisade-service/k8sPalisadeService.yaml
+DIR1=$1
+if [[ -n "$DIR1" ]]; then
+   kubectl delete -f $DIR1/palisade-service/k8sPalisadeService.yaml
+else
+   echo "argument error"
+fi

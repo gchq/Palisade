@@ -2,17 +2,19 @@
 set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$DIR/../../bash-scripts/setScriptPath.sh"
-"$K8SBASHSCRIPTS/k8sDeployEtcd.sh"
+echo "K8SBASHSCRIPTS is set to"
+echo $K8SBASHSCRIPTS
+"$K8SBASHSCRIPTS/k8sDeployEtcd.sh" "$K8SBASHSCRIPTS"
 # Create a pod shared volume
-"$K8SBASHSCRIPTS/k8sDeployNginxIngressController.sh"
-"$K8SBASHSCRIPTS/k8sDeployPersistentVolume.sh"
-"$K8SBASHSCRIPTS/k8sDeployConfigService.sh"
-"$K8SBASHSCRIPTS/k8sDeployConfigureServices.sh"
-"$K8SBASHSCRIPTS/k8sDeployPolicyService.sh"
-"$K8SBASHSCRIPTS/k8sDeployResourceService.sh"
-"$K8SBASHSCRIPTS/k8sDeployUserService.sh"
-"$K8SBASHSCRIPTS/k8sDeployPalisadeService.sh"
-"$K8SBASHSCRIPTS/k8sDeployDataService.sh"
+"$K8SBASHSCRIPTS/k8sDeployNginxIngressController.sh" "$K8SBASHSCRIPTS"
+"$K8SBASHSCRIPTS/k8sDeployPersistentVolume.sh" "$K8SBASHSCRIPTS"
+"$K8SBASHSCRIPTS/k8sDeployConfigService.sh" "$K8SBASHSCRIPTS"
+"$K8SBASHSCRIPTS/k8sDeployConfigureServices.sh" "$K8SBASHSCRIPTS"
+"$K8SBASHSCRIPTS/k8sDeployPolicyService.sh" "$K8SBASHSCRIPTS"
+"$K8SBASHSCRIPTS/k8sDeployResourceService.sh" "$K8SBASHSCRIPTS"
+"$K8SBASHSCRIPTS/k8sDeployUserService.sh" "$K8SBASHSCRIPTS"
+"$K8SBASHSCRIPTS/k8sDeployPalisadeService.sh" "$K8SBASHSCRIPTS"
+"$K8SBASHSCRIPTS/k8sDeployDataService.sh" "$K8SBASHSCRIPTS"
 kubectl apply -f "$K8SBASHSCRIPTS/ingress/k8sIngress.yaml"
 # wait for the data-service pod to be running
 sleep 5

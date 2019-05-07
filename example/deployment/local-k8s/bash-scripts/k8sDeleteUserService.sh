@@ -1,2 +1,7 @@
 #!/usr/bin/env bash
-kubectl delete -f user-service/k8sUserService.yaml
+DIR1=$1
+if [[ -n "$DIR1" ]]; then
+   kubectl delete -f $DIR1/user-service/k8sUserService.yaml
+else
+   echo "argument error"
+fi

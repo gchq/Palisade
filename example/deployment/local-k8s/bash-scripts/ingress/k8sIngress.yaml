@@ -8,15 +8,15 @@ spec:
   rules:
     - http:
         paths:
-          - path: /config-service
+          - path: /config-service/*
             backend:
               serviceName: config-service
               servicePort: 8080
-          - path: /config-service
+          - path: /config-service/*
             backend:
               serviceName: guava-service
               servicePort: 8080
-          - path: /palisade-service
+          - path: /palisade-service/*
             backend:
               serviceName: palisade-service
               servicePort: 8080
