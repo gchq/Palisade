@@ -62,7 +62,7 @@ user-service-844f86675c-gc2g8       1/1       Running     0          8m
     This script will not run if the `dockerComposeUp.sh` script has not been run or the buildServices.sh script
     
     ```bash
-      ./example/deployment/local-k8s/bash-scripts/bash-scripts/example.sh
+      ./example/deployment/local-k8s/bash-scripts/example.sh
     ```
 
 4. Stop the REST services:
