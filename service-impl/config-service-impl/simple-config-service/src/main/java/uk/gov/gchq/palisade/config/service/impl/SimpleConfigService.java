@@ -165,7 +165,7 @@ public class SimpleConfigService implements ConfigurationService {
         CompletableFuture<Optional<ServiceState>> cachedObject = cache.get(new GetCacheRequest<ServiceState>()
                 .service(ConfigurationService.class)
                 .key(ANONYMOUS_CONFIG_KEY));
-        return cachedObject.join().orElseThrow(() -> new NoConfigException("no initial configuration could be found"));
+        return cachedObject.join().orElseThrow(() -> new NoConfigException("no anonymous (client) configuration could be found"));
     }
 
     /**

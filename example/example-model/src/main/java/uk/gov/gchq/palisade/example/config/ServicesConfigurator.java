@@ -78,16 +78,16 @@ public class ServicesConfigurator {
         this.clientServices = clientServices;
 
         // create the client config service
-        ConfigurationService configClient = clientServices.createConfigService();
+        ConfigurationService configClient = clientServices.createInternalConfigService();
 
         // create the other client service
-        AuditService auditService = clientServices.createAuditService();
-        UserService userClient = clientServices.createUserService();
-        ResourceService resourceClient = clientServices.createResourceService();
-        PolicyService policyClient = clientServices.createPolicyService();
-        PalisadeService palisadeClient = clientServices.createPalisadeService();
-        DataService dataClient = clientServices.createDataService();
-        CacheService cacheClient = clientServices.createCacheService();
+        AuditService auditService = clientServices.createInternalAuditService();
+        UserService userClient = clientServices.createInternalUserService();
+        ResourceService resourceClient = clientServices.createInternalResourceService();
+        PolicyService policyClient = clientServices.createInternalPolicyService();
+        PalisadeService palisadeClient = clientServices.createClientPalisadeService();
+        DataService dataClient = clientServices.createInternalDataService();
+        CacheService cacheClient = clientServices.createInternalCacheService();
 
         // add the config for the clients to the config service
         Collection<Service> services = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
@@ -95,7 +95,7 @@ public class ServicesConfigurator {
         writeClientConfiguration(configClient, services);
 
         // write the serialisers to the cache
-        writeSerialiserConfiguration(clientServices.createCacheService());
+        writeSerialiserConfiguration(clientServices.createInternalCacheService());
 
         // write the config for the user service to the config service
         writeServerConfiguration(configClient, createUserServiceForServer(), UserService.class);
@@ -169,7 +169,7 @@ public class ServicesConfigurator {
      * @return a user service as it would be configured as a standalone micro-service (server)
      */
     protected UserService createUserServiceForServer() {
-        return new SimpleUserService().cacheService(clientServices.createCacheService());
+        return new SimpleUserService().cacheService(clientServices.createInternalCacheService());
     }
 
     /**
@@ -180,8 +180,8 @@ public class ServicesConfigurator {
     protected ResourceService createResourceServiceForServer() {
         try {
             Configuration conf = createHadoopConfiguration();
-            HadoopResourceService resource = new HadoopResourceService().conf(conf).cacheService(clientServices.createCacheService());
-            resource.addDataService(clientServices.createDataServiceConnectionDetail());
+            HadoopResourceService resource = new HadoopResourceService().conf(conf).cacheService(clientServices.createInternalCacheService());
+            resource.addDataService(clientServices.createClientDataServiceConnection());
             return resource;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -222,7 +222,7 @@ public class ServicesConfigurator {
      * @return a policy service as it would be configured as a standalone micro-service (server)
      */
     protected PolicyService createPolicyServiceForServer() {
-        return new HierarchicalPolicyService().cacheService(clientServices.createCacheService());
+        return new HierarchicalPolicyService().cacheService(clientServices.createInternalCacheService());
     }
 
     /**
@@ -232,11 +232,11 @@ public class ServicesConfigurator {
      */
     protected PalisadeService createPalisadeServiceForServer() {
         return new SimplePalisadeService()
-                .cacheService(clientServices.createCacheService())
-                .policyService(clientServices.createPolicyService())
-                .resourceService(clientServices.createResourceService())
-                .userService(clientServices.createUserService())
-                .auditService(clientServices.createAuditService());
+                .cacheService(clientServices.createInternalCacheService())
+                .policyService(clientServices.createInternalPolicyService())
+                .resourceService(clientServices.createInternalResourceService())
+                .userService(clientServices.createInternalUserService())
+                .auditService(clientServices.createInternalAuditService());
     }
 
     /**
@@ -247,12 +247,12 @@ public class ServicesConfigurator {
     protected DataService createDataServiceForServer() {
         try {
             Configuration conf = createHadoopConfiguration();
-            HadoopDataReader reader = (HadoopDataReader) new HadoopDataReader().conf(conf).cacheService(clientServices.createCacheService());
+            HadoopDataReader reader = (HadoopDataReader) new HadoopDataReader().conf(conf).cacheService(clientServices.createInternalCacheService());
             return new SimpleDataService()
                     .reader(reader)
-                    .palisadeService(clientServices.createPalisadeService())
-                    .cacheService(clientServices.createCacheService())
-                    .auditService(clientServices.createAuditService());
+                    .palisadeService(clientServices.createInternalPalisadeService())
+                    .cacheService(clientServices.createInternalCacheService())
+                    .auditService(clientServices.createInternalAuditService());
         } catch (final IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
             return null;
@@ -265,6 +265,6 @@ public class ServicesConfigurator {
      * @return a user service as it would be configured as a standalone micro-service (server)
      */
     protected RESTRedirector createRESTRedirectorForServer() {
-        return new RESTRedirector(DataService.class.getTypeName(), "uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1", new SimpleRandomRedirector().redirectionClass(SimpleDataService.class).cacheService(clientServices.createCacheService()), false);
+        return new RESTRedirector(DataService.class.getTypeName(), "uk.gov.gchq.palisade.data.service.impl.RestDataServiceV1", new SimpleRandomRedirector().redirectionClass(SimpleDataService.class).cacheService(clientServices.createInternalCacheService()), false);
     }
 }
