@@ -10,4 +10,5 @@ sed $'s/,emergencyContacts=/\\\nemergencyContacts=/g'| \
 sed $'s/,address=/\\\naddress=/g'| \
 sed $'s/,bankDetails=/\\\nbankDetails=/g'| \
 sed $'s/,taxCode=/\\\ntaxCode=/g'| \
-sed $'s/,nationality=/\\\nnationality=/g'
+sed $'s/,nationality=/\\\nnationality=/g'| \
+sed $'s/,manager=/\\\nmanager=/'
