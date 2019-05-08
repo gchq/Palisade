@@ -240,7 +240,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 })
                 .thenApply(multiPolicy -> {
                     final DataRequestResponse response = new DataRequestResponse().requestId(requestId).originalRequestId(originalRequestId).resources(futureResources.join());
-                    LOGGER.debug("Responding with: {}", response);
+                    LOGGER.info("Responding with: {}", response);
                     return response;
                 })
                 .exceptionally(ex -> {
