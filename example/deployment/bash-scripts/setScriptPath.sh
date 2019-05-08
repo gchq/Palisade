@@ -1,6 +1,7 @@
 #!/bin/bash
 # sets up the different paths for calling deployment scripts
-export EXAMPLE="./example"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+export EXAMPLE="$DIR/../.."
 export DOCKERBASHSCRIPTS="$EXAMPLE/deployment/local-docker/bash-scripts"
 export K8SBASHSCRIPTS="$EXAMPLE/deployment/local-k8s/bash-scripts"
 export LOCALJVMBASHSCRIPTS="$EXAMPLE/deployment/local-jvm/bash-scripts"
