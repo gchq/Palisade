@@ -61,6 +61,7 @@ import uk.gov.gchq.palisade.util.StreamUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.util.Optional;
 //import java.util.stream.Stream;
@@ -245,6 +246,8 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         LOGGER.info("EMR debug: AwsEmrMapReduceExample - outputdir is: " + outputDir);
         //remove this as it needs to be not present when the job runs
         FileUtils.deleteDirectory(new File(outputDir));
+        InetAddress ip = InetAddress.getLocalHost();
+        String hostname = ip.getHostName();
         Configuration conf = new Configuration();
         //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
         //conf.set("mapred.job.tracker", "local");
@@ -253,9 +256,11 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
         //conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, new File(".").toURI().toURL().toString());
         //set defaultFS to hdfs on cluster
-        conf.set("fs.defaultFS", "hdfs://ip-172-31-39-194.eu-west-1.compute.internal");
+        //conf.set("fs.defaultFS", ("hdfs://" + hostname));
+        conf.set("fs.defaultFS", ("hdfs://localhost"));           // *****revert this***
         //set address of resource manager
-        conf.set("yarn.resourcemanager.address","ip-172-31-39-194.eu-west-1.compute.internal:8032");
+        //conf.set("yarn.resourcemanager.address",(hostname + ":8032"));
+        conf.set("yarn.resourcemanager.address",("localhost:8032"));          //***revert***
         ToolRunner.run(conf, new AwsEmrMapReduceExample(), new String[]{sourceFile, outputDir});
     }
 

@@ -57,6 +57,13 @@ resource "null_resource" "deploy_example" {
     ]
   }
 
+  # Ensure the services are not running
+    provisioner "remote-exec" {
+      inline = [
+        "kill `ps -aef | grep example-rest-.*-service | grep -v grep | awk '{print $2}'`",
+      ]
+    }
+
   # Deploy the Palisade config service on the EMR master......1st copy over its jar....
   provisioner "file" {
       source = "../../../example-services/example-rest-config-service/target/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
@@ -150,15 +157,17 @@ resource "null_resource" "deploy_example" {
       ]
     }
 
-  # Run the Palisade mapreduce example runner....1st copy over the jar...
+  # Run the Palisade mapreduce example runner....1st copy over the jar
   provisioner "file" {
       source = "../../../deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
       destination = "/home/hadoop/jars/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
   }
   provisioner "remote-exec" {
       inline = [
-        "java -cp /home/hadoop/jars/example-aws-emr-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.AwsEmrMapReduceExample /example_data/Employee_file0.avro /user/hadoop/output > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
+        "hdfs dfs -rm -r /user/hadoop/output || echo Deleted",
+        "java -cp /home/hadoop/jars/example-aws-emr-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json  uk.gov.gchq.palisade.example.AwsEmrMapReduceExample hdfs:///example_data/Employee_file0.avro hdfs:///user/hadoop/output > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
       ]
     }
 }
+
 

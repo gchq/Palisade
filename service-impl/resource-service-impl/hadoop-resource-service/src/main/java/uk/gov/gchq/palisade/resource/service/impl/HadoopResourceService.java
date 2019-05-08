@@ -243,19 +243,23 @@ public class HadoopResourceService implements ResourceService {
         //LOGGER.info("EMR debug: HadoopResourceService - FS_DEFAULT_NAME_KEY is: " + FS_DEFAULT_NAME_KEY);
         LOGGER.info("EMR debug: HadoopResourceService - resourceId is: " + resourceId);
         LOGGER.info("EMR debug: HadoopResourceService - path is: " + path);
-        if (!resourceId.startsWith(path)) {
-            throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, path));
-        }
+//        if (!resourceId.startsWith(path)) {
+//            throw new UnsupportedOperationException(java.lang.String.format(ERROR_OUT_SCOPE, resourceId, path));
+//        }
         return getMapCompletableFuture(resourceId, ignore -> true);
     }
 
     private CompletableFuture<Map<LeafResource, ConnectionDetail>> getMapCompletableFuture(
             final String pathString, final Predicate<HadoopResourceDetails> predicate) {
+        LOGGER.info("EMR debug: HadoopResourceService - at start of getMapCompletableFuture");
         readConnectionDetails();
+        LOGGER.info("EMR debug: HadoopResourceService - after readConnectionDetails");
         return CompletableFuture.supplyAsync(() -> {
             try {
                 //pull latest connection details
+                LOGGER.info("EMR debug: HadoopResourceService - at start of try");
                 final RemoteIterator<LocatedFileStatus> remoteIterator = this.getFileSystem().listFiles(new Path(pathString), true);
+                LOGGER.info("EMR debug: HadoopResourceService - after remoteIterator");
                 return getPaths(remoteIterator)
                         .stream()
                         .map(HadoopResourceDetails::getResourceDetailsFromConnectionDetails)
@@ -317,6 +321,7 @@ public class HadoopResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
         final String pathString = getInternalConf().get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+        LOGGER.info("EMR debug: HadoopResourceService - getResourceByType - pathString is: " + pathString);
         final Predicate<HadoopResourceDetails> predicate = detail -> request.getType().equals(detail.getType());
         return getMapCompletableFuture(pathString, predicate);
     }
@@ -324,6 +329,7 @@ public class HadoopResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
         final String pathString = getInternalConf().get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+        LOGGER.info("EMR debug: HadoopResourceService - getResourceBySerialisedFormat - pathString is: " + pathString);
         final Predicate<HadoopResourceDetails> predicate = detail -> request.getSerialisedFormat().equals(detail.getFormat());
         return getMapCompletableFuture(pathString, predicate);
     }
