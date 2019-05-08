@@ -70,6 +70,7 @@ public class LoggerAuditService implements AuditService {
         //handler for ProcessingStartedAuditRequest
         DISPATCH.put(ProcessingStartedAuditRequest.class, (o) -> {
             requireNonNull(o, "processingStartedAuditRequest");
+            System.err.println(o.toString());
             ProcessingStartedAuditRequest processingStartedAuditRequest = (ProcessingStartedAuditRequest) o;
             final String msg = " 'processingStarted' " + auditLogContext(processingStartedAuditRequest)
             + processingStartedAuditRequest.getUser().toString()

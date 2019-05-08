@@ -97,8 +97,8 @@ public class DataRequestResponse {
     }
 
     public String getOriginalRequestId() {
-        requireNonNull(originalRequestId, "The originalRequestId has not been set.");
-        return originalRequestId;
+        requireNonNull(this.originalRequestId, "The originalRequestId has not been set.");
+        return this.originalRequestId;
     }
 
     @Override

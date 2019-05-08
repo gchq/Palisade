@@ -239,8 +239,9 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     cache(request, futureUser.join(), requestId, multiPolicy, futureResources.join().size(), originalRequestId);
                 })
                 .thenApply(multiPolicy -> {
+                    LOGGER.error("DEBUG: originalRequestId: " + originalRequestId);
                     final DataRequestResponse response = new DataRequestResponse().requestId(requestId).originalRequestId(originalRequestId).resources(futureResources.join());
-                    LOGGER.error("Responding with: {}", response);
+                    LOGGER.debug("Responding with: {}", response);
                     return response;
                 })
                 .exceptionally(ex -> {
