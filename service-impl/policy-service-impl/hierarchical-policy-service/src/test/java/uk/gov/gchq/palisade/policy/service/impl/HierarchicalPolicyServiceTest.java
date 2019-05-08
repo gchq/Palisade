@@ -56,7 +56,7 @@ public class HierarchicalPolicyServiceTest {
     public void setup() {
         policyService = new HierarchicalPolicyService().cacheService(cacheService);
 
-        policyService.setResourcePolicy(new SetResourcePolicyRequest()
+        CompletableFuture<Boolean> request1 = policyService.setResourcePolicy(new SetResourcePolicyRequest()
                 .resource(fileResource1)
                 .policy(new Policy<>()
                         .owner(testUser)
@@ -64,7 +64,7 @@ public class HierarchicalPolicyServiceTest {
                         .recordLevelRule("Check user has 'Sensitive' auth", new HasSensitiveAuthRule<>()))
         );
 
-        policyService.setResourcePolicy(new SetResourcePolicyRequest()
+        CompletableFuture<Boolean> request2 = policyService.setResourcePolicy(new SetResourcePolicyRequest()
                 .resource(fileResource2)
                 .policy(new Policy<>()
                         .owner(testUser)
@@ -72,19 +72,21 @@ public class HierarchicalPolicyServiceTest {
                         .recordLevelRule("Check user has 'Sensitive' auth", new HasSensitiveAuthRule<>()))
         );
 
-        policyService.setResourcePolicy(new SetResourcePolicyRequest()
+        CompletableFuture<Boolean> request3 = policyService.setResourcePolicy(new SetResourcePolicyRequest()
                 .resource(directoryResource)
                 .policy(new Policy<>()
                         .owner(testUser)
                         .recordLevelRule("Does nothing", new PassThroughRule<>()))
         );
 
-        policyService.setResourcePolicy(new SetResourcePolicyRequest()
+        CompletableFuture<Boolean> request4 = policyService.setResourcePolicy(new SetResourcePolicyRequest()
                 .resource(systemResource)
                 .policy(new Policy<>()
                         .owner(testUser)
                         .resourceLevelRule("Resource serialised format is txt", new IsTextResourceRule()))
         );
+
+        CompletableFuture.allOf(request1, request2, request3, request4).join();
     }
 
     private static SystemResource createTestSystemResource() {
