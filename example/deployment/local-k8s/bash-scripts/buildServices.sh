@@ -1,23 +1,22 @@
 #!/bin/bash
-set -e
-export DIR=$(dirname "$0")
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$DIR/../../bash-scripts/setScriptPath.sh"
 "${K8SBASHSCRIPTS}/k8sDeployEtcd.sh" "$K8SBASHSCRIPTS"
 # create an ingress controller (mandatory) see here: https://kubernetes.github.io/ingress-nginx/deploy/#docker-for-mac
 "${K8SBASHSCRIPTS}/k8sDeployNginxIngressController.sh" "$K8SBASHSCRIPTS"
-sleep 2
-kubectl get pods -n ingress-nginx
 # Create a pod shared volume
 "${K8SBASHSCRIPTS}/k8sDeployPersistentVolume.sh" "$K8SBASHSCRIPTS"
 "${K8SBASHSCRIPTS}/k8sDeployConfigService.sh" "$K8SBASHSCRIPTS"
+# Create services
 "${K8SBASHSCRIPTS}/k8sDeployConfigureServices.sh" "$K8SBASHSCRIPTS"
 "${K8SBASHSCRIPTS}/k8sDeployPolicyService.sh" "$K8SBASHSCRIPTS"
 "${K8SBASHSCRIPTS}/k8sDeployResourceService.sh" "$K8SBASHSCRIPTS"
 "${K8SBASHSCRIPTS}/k8sDeployUserService.sh" "$K8SBASHSCRIPTS"
 "${K8SBASHSCRIPTS}/k8sDeployPalisadeService.sh" "$K8SBASHSCRIPTS"
 "${K8SBASHSCRIPTS}/k8sDeployDataService.sh" "$K8SBASHSCRIPTS"
+# setup and configure for ingress on localhost
 kubectl apply -f "${K8SBASHSCRIPTS}/ingress/k8sIngress.yaml"
-# wait for the data-service pod to be running
+# wait for the data-service pod to be created
 sleep 5
 export DATA_POD=$(kubectl get pod -l app=data-service -o jsonpath="{.items[0].metadata.name}")
 export RESOURCE_POD=$(kubectl get pod -l app=resource-service -o jsonpath="{.items[0].metadata.name}")

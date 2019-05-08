@@ -1,5 +1,5 @@
 #!/bin/bash
-export DIR=$(dirname "$0")
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . $DIR/../../bash-scripts/setScriptPath.sh
 "${K8SBASHSCRIPTS}/k8sDeleteExample.sh" "$K8SBASHSCRIPTS" || true
 "${K8SBASHSCRIPTS}/k8sDeleteDataService.sh" "$K8SBASHSCRIPTS"
