@@ -34,10 +34,6 @@
         </layout>
     </appender>
     <root>
-        <priority value="info"></priority>
-        <appender-ref ref="console"></appender-ref>
-    </root>
-    <root>
         <priority value="debug"></priority>
         <appender-ref ref="file"></appender-ref>
     </root>
