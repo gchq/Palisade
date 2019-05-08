@@ -119,11 +119,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>1.20</version>
-        </dependency>
-        <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>cache-service</artifactId>
             <version>${project.parent.version}</version>
