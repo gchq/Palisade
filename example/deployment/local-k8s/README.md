@@ -55,6 +55,12 @@ policy-service-7798b79bd7-9qhpd     1/1       Running     0          8m
 resource-service-766cdbc97d-79sjx   1/1       Running     0          8m
 user-service-844f86675c-gc2g8       1/1       Running     0          8m
 
+You can verify that ingress is working correctly by running the following commands:
+
+curl -kL http://localhost/config/v1/status
+curl -kL http://localhost/palisade/v1/status
+curl -kL http://localhost/data/v1/status
+
 
     ```
 3. Run the example:

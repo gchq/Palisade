@@ -1,3 +1,4 @@
+# taken from https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
 apiVersion: v1
 kind: Namespace
 metadata:

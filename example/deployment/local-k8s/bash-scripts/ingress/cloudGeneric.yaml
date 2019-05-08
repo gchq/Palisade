@@ -1,4 +1,5 @@
 kind: Service
+#taken from https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/provider/cloud-generic.yaml
 apiVersion: v1
 metadata:
   name: ingress-nginx

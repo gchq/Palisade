@@ -3,8 +3,11 @@ set -e
 export DIR=$(dirname "$0")
 . "$DIR/../../bash-scripts/setScriptPath.sh"
 "${K8SBASHSCRIPTS}/k8sDeployEtcd.sh" "$K8SBASHSCRIPTS"
-# Create a pod shared volume
+# create an ingress controller (mandatory) see here: https://kubernetes.github.io/ingress-nginx/deploy/#docker-for-mac
 "${K8SBASHSCRIPTS}/k8sDeployNginxIngressController.sh" "$K8SBASHSCRIPTS"
+sleep 2
+kubectl get pods -n ingress-nginx
+# Create a pod shared volume
 "${K8SBASHSCRIPTS}/k8sDeployPersistentVolume.sh" "$K8SBASHSCRIPTS"
 "${K8SBASHSCRIPTS}/k8sDeployConfigService.sh" "$K8SBASHSCRIPTS"
 "${K8SBASHSCRIPTS}/k8sDeployConfigureServices.sh" "$K8SBASHSCRIPTS"
