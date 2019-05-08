@@ -27,8 +27,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-import uk.gov.gchq.palisade.data.serialise.Serialiser;
-import uk.gov.gchq.palisade.data.service.reader.SerialisedDataReader;
+import uk.gov.gchq.palisade.data.service.reader.CachedSerialisedDataReader;
 import uk.gov.gchq.palisade.resource.LeafResource;
 
 import java.io.IOException;
@@ -42,10 +41,10 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * An HadoopDataReader is an implementation of {@link SerialisedDataReader} for Hadoop that opens a file and returns
+ * An HadoopDataReader is an implementation of {@link CachedSerialisedDataReader} for Hadoop that opens a file and returns
  * a single {@link InputStream} containing all the records.
  */
-public class HadoopDataReader extends SerialisedDataReader {
+public class HadoopDataReader extends CachedSerialisedDataReader {
     @JsonIgnore
     private FileSystem fs;
 
@@ -53,9 +52,8 @@ public class HadoopDataReader extends SerialisedDataReader {
     }
 
     @JsonCreator
-    public HadoopDataReader(@JsonProperty("conf") final Map<String, String> conf, @JsonProperty("serialisers") final Map<String, Serialiser<?>> serialisers) throws IOException {
+    public HadoopDataReader(@JsonProperty("conf") final Map<String, String> conf) throws IOException {
         conf(conf);
-        serialisers(serialisers);
     }
 
     public HadoopDataReader conf(final Map<String, String> conf) throws IOException {
