@@ -83,7 +83,9 @@ public class AbstractLdapUserServiceTest {
         service.setMock(mock);
 
         // When
-        final User user = service.getUser(new GetUserRequest().userId(userId)).join();
+        GetUserRequest getUserRequest = new GetUserRequest().userId(userId);
+        getUserRequest.setOriginalRequestId("TEST shouldFetchUserDetailsFromLdap");
+        final User user = service.getUser(getUserRequest).join();
 
         // Then
         verify(context, times(1)).getAttributes("user\\#01", attrNames);
@@ -120,8 +122,12 @@ public class AbstractLdapUserServiceTest {
         service.setMock(mock);
 
         // When
-        final User user1 = service.getUser(new GetUserRequest().userId(userId)).join();
-        final User user2 = service.getUser(new GetUserRequest().userId(userId)).join();
+        GetUserRequest getUserRequest1 = new GetUserRequest().userId(userId);
+        getUserRequest1.setOriginalRequestId("test user1");
+        GetUserRequest getUserRequest2 = new GetUserRequest().userId(userId);
+        getUserRequest2.setOriginalRequestId("test user2");
+        final User user1 = service.getUser(getUserRequest1).join();
+        final User user2 = service.getUser(getUserRequest2).join();
 
         // Then
         assertEquals(userId, user1.getUserId());
@@ -189,8 +195,8 @@ public class AbstractLdapUserServiceTest {
         };
 
         given(context.search(searchBase,
-                        new BasicAttributes(attrIdForUserId, userId.getId()),
-                        requestAttrs)
+                new BasicAttributes(attrIdForUserId, userId.getId()),
+                requestAttrs)
         ).willReturn(responseAttrs);
 
         // When

@@ -56,35 +56,37 @@ public class HierarchicalPolicyServiceTest {
     public void setup() {
         policyService = new HierarchicalPolicyService().cacheService(cacheService);
 
-        policyService.setResourcePolicy(new SetResourcePolicyRequest()
-                        .resource(fileResource1)
-                        .policy(new Policy<>()
-                                .owner(testUser)
-                                .resourceLevelRule("Input is not null", new PassThroughRule<>())
-                                .recordLevelRule("Check user has 'Sensitive' auth", new HasSensitiveAuthRule<>()))
+        CompletableFuture<Boolean> request1 = policyService.setResourcePolicy(new SetResourcePolicyRequest()
+                .resource(fileResource1)
+                .policy(new Policy<>()
+                        .owner(testUser)
+                        .resourceLevelRule("Input is not null", new PassThroughRule<>())
+                        .recordLevelRule("Check user has 'Sensitive' auth", new HasSensitiveAuthRule<>()))
         );
 
-        policyService.setResourcePolicy(new SetResourcePolicyRequest()
-                        .resource(fileResource2)
-                        .policy(new Policy<>()
-                                .owner(testUser)
-                                .resourceLevelRule("Input is not null", new PassThroughRule<>())
-                                .recordLevelRule("Check user has 'Sensitive' auth", new HasSensitiveAuthRule<>()))
+        CompletableFuture<Boolean> request2 = policyService.setResourcePolicy(new SetResourcePolicyRequest()
+                .resource(fileResource2)
+                .policy(new Policy<>()
+                        .owner(testUser)
+                        .resourceLevelRule("Input is not null", new PassThroughRule<>())
+                        .recordLevelRule("Check user has 'Sensitive' auth", new HasSensitiveAuthRule<>()))
         );
 
-        policyService.setResourcePolicy(new SetResourcePolicyRequest()
-                        .resource(directoryResource)
-                        .policy(new Policy<>()
-                                .owner(testUser)
-                                .recordLevelRule("Does nothing", new PassThroughRule<>()))
+        CompletableFuture<Boolean> request3 = policyService.setResourcePolicy(new SetResourcePolicyRequest()
+                .resource(directoryResource)
+                .policy(new Policy<>()
+                        .owner(testUser)
+                        .recordLevelRule("Does nothing", new PassThroughRule<>()))
         );
 
-        policyService.setResourcePolicy(new SetResourcePolicyRequest()
-                        .resource(systemResource)
-                        .policy(new Policy<>()
-                                .owner(testUser)
-                                .resourceLevelRule("Resource serialised format is txt", new IsTextResourceRule()))
+        CompletableFuture<Boolean> request4 = policyService.setResourcePolicy(new SetResourcePolicyRequest()
+                .resource(systemResource)
+                .policy(new Policy<>()
+                        .owner(testUser)
+                        .resourceLevelRule("Resource serialised format is txt", new IsTextResourceRule()))
         );
+
+        CompletableFuture.allOf(request1, request2, request3, request4).join();
     }
 
     private static SystemResource createTestSystemResource() {
@@ -134,6 +136,7 @@ public class HierarchicalPolicyServiceTest {
                         .user(user)
                         .context(context));
 
+
         CanAccessResponse response = future.get();
         Collection<LeafResource> resources = response.getCanAccessResources();
         // check
@@ -147,7 +150,9 @@ public class HierarchicalPolicyServiceTest {
         User user = new User().userId("testUser").auths("Sensitive");
         Context context = new Context().purpose("testing");
         // try
-        CompletableFuture<MultiPolicy> future = policyService.getPolicy(new GetPolicyRequest().user(user).context(context).resources(Collections.singletonList(fileResource1)));
+        GetPolicyRequest getPolicyRequest = new GetPolicyRequest().user(user).context(context).resources(Collections.singletonList(fileResource1));
+        getPolicyRequest.setOriginalRequestId("test getPolicy");
+        CompletableFuture<MultiPolicy> future = policyService.getPolicy(getPolicyRequest);
         MultiPolicy response = future.get();
         Map<LeafResource, Rules> ruleMap = response.getRuleMap();
         // check

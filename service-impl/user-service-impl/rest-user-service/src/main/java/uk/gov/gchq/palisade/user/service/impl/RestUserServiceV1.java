@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
@@ -60,7 +60,7 @@ public class RestUserServiceV1 implements UserService {
 
     static synchronized UserService createService(final String serviceConfigPath) {
         if (userService == null) {
-            userService = RestUtil.createService(RestUserServiceV1.class, serviceConfigPath, UserService.class);
+            userService = ConfigUtils.createService(RestUserServiceV1.class, serviceConfigPath, UserService.class);
         }
         return userService;
     }

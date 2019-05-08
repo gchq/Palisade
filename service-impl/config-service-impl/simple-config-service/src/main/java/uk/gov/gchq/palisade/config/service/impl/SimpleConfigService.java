@@ -17,7 +17,6 @@ package uk.gov.gchq.palisade.config.service.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,7 +165,7 @@ public class SimpleConfigService implements ConfigurationService {
         CompletableFuture<Optional<ServiceState>> cachedObject = cache.get(new GetCacheRequest<ServiceState>()
                 .service(ConfigurationService.class)
                 .key(ANONYMOUS_CONFIG_KEY));
-        return cachedObject.join().orElseThrow(() -> new NoConfigException("no initial configuration could be found"));
+        return cachedObject.join().orElseThrow(() -> new NoConfigException("no anonymous (client) configuration could be found"));
     }
 
     /**

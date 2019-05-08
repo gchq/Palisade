@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service.request;
 
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -30,6 +31,7 @@ import static java.util.Objects.requireNonNull;
  * This class is used to send a request to the
  * {@link uk.gov.gchq.palisade.data.service.DataService} to read a resource.
  */
+
 public class ReadRequest extends Request {
     private RequestId requestId;
     private LeafResource resource;

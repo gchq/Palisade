@@ -84,7 +84,9 @@ public class RestUserServiceV1IT {
 
         final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
+
         final GetUserRequest getUserRequest = new GetUserRequest().userId(user.getUserId());
+        getUserRequest.setOriginalRequestId("RestUserServiceV1IT.shouldGetUser");
 
         given(userService.getUser(getUserRequest)).willReturn(CompletableFuture.completedFuture(user));
 

@@ -19,21 +19,17 @@ package uk.gov.gchq.palisade.resource.service.impl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -233,7 +229,9 @@ public class HadoopResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>>
     getResourcesByResource(final GetResourcesByResourceRequest request) {
-        return getResourcesById(new GetResourcesByIdRequest().resourceId(request.getResource().getId()));
+        GetResourcesByIdRequest getResourcesByIdRequest = new GetResourcesByIdRequest().resourceId(request.getResource().getId());
+        getResourcesByIdRequest.setOriginalRequestId(request.getOriginalRequestId());
+        return getResourcesById(getResourcesByIdRequest);
     }
 
     @Override
