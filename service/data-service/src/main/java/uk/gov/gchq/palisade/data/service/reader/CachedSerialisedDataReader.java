@@ -16,6 +16,10 @@
 
 package uk.gov.gchq.palisade.data.service.reader;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +42,25 @@ public abstract class CachedSerialisedDataReader extends SerialisedDataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedSerialisedDataReader.class);
 
     public static final String SERIALISER_KEY = "serialiser.map";
+
+    /**
+     * Wrapping class to ensure JSON serialisation preserves types.
+     */
+    public final static class MapWrap {
+
+        @JsonSerialize(keyUsing = DataFlavour.FlavourSerializer.class)
+        @JsonDeserialize(keyUsing = DataFlavour.FlavourDeserializer.class)
+        private final Map<DataFlavour, Serialiser<?>> instance;
+
+        @JsonCreator
+        public MapWrap(@JsonProperty("instance") final Map<DataFlavour, Serialiser<?>> instance) {
+            this.instance = instance;
+        }
+
+        public Map<DataFlavour, Serialiser<?>> getInstance() {
+            return instance;
+        }
+    }
 
     /**
      * Cache service for storing serialisers.
@@ -75,13 +98,13 @@ public abstract class CachedSerialisedDataReader extends SerialisedDataReader {
 
     private static Map<DataFlavour, Serialiser<?>> retrieveFromCache(final CacheService cache) {
         requireNonNull(cache, "cache");
-        GetCacheRequest<Map<DataFlavour, Serialiser<?>>> request = new GetCacheRequest<>()
+        GetCacheRequest<MapWrap> request = new GetCacheRequest<>()
                 .service(DataService.class)
                 .key(SERIALISER_KEY);
         //go retrieve this from the cache
-        Optional<Map<DataFlavour, Serialiser<?>>> map = cache.get(request).join();
+        Optional<MapWrap> map = cache.get(request).join();
 
-        Map<DataFlavour, Serialiser<?>> newMap = map.orElseGet(HashMap::new);
+        Map<DataFlavour, Serialiser<?>> newMap = map.orElse(new MapWrap(new HashMap())).getInstance();
 
         LOGGER.debug("Retrieved these serialisers from cache {}", newMap);
         //if there is nothing there then create a new map and return it
@@ -100,10 +123,12 @@ public abstract class CachedSerialisedDataReader extends SerialisedDataReader {
         typeMap.put(flavour, serialiser);
 
         //now record this back into the cache
-        AddCacheRequest<Map<DataFlavour, Serialiser<?>>> cacheRequest = new AddCacheRequest<>()
+        AddCacheRequest<MapWrap> cacheRequest = new AddCacheRequest<>()
                 .service(DataService.class)
                 .key(SERIALISER_KEY)
-                .value(typeMap);
+                .value(new MapWrap(typeMap));
+
+        LOGGER.debug("Adding {} for flavour {} to the cache", serialiser, flavour);
         return cache.add(cacheRequest);
     }
 }

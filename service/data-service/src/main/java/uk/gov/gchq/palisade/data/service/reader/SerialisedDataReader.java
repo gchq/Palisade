@@ -137,6 +137,7 @@ public abstract class SerialisedDataReader implements DataReader {
     public <RULES_DATA_TYPE> Serialiser<RULES_DATA_TYPE> getSerialiser(final DataFlavour flavour) {
         requireNonNull(flavour, "The flavour cannot be null.");
         Serialiser<?> serialiser = serialisers.get(flavour);
+
         if (null == serialiser) {
             serialiser = defaultSerialiser;
         }
