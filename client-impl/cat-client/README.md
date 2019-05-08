@@ -15,5 +15,5 @@ alias cat="java -Dpalisade.rest.config.path=$(pwd)/example/example-model/src/mai
 
 Then a user could run the command:
 ```bash
-cat file://$(pwd)/example/resources/exampleEmployee_file0.avro SALARY
+cat file://$(pwd)/example/resources/employee_file0.avro SALARY
 ```

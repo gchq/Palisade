@@ -28,6 +28,8 @@ import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.impl.SimpleDataService;
 import uk.gov.gchq.palisade.data.service.impl.reader.HadoopDataReader;
+import uk.gov.gchq.palisade.data.service.reader.CachedSerialisedDataReader;
+import uk.gov.gchq.palisade.data.service.reader.DataFlavour;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.impl.HierarchicalPolicyService;
@@ -35,7 +37,6 @@ import uk.gov.gchq.palisade.redirect.RESTRedirector;
 import uk.gov.gchq.palisade.redirect.impl.SimpleRandomRedirector;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.impl.HadoopResourceService;
-import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.ServiceState;
@@ -49,9 +50,8 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -68,7 +68,8 @@ import static java.util.Objects.requireNonNull;
 public class ServicesConfigurator {
     protected static final Logger LOGGER = LoggerFactory.getLogger(ServicesConfigurator.class);
     protected static final String HADOOP_CONF_PATH = "HADOOP_CONF_PATH";
-    public static final String RESOURCE_TYPE = "exampleEmployee";
+    public static final String RESOURCE_TYPE = "employee";
+    public static final String RESOURCE_FORMAT = "avro";
 
     private final ProxyServicesFactory clientServices;
 
@@ -90,8 +91,14 @@ public class ServicesConfigurator {
         CacheService cacheClient = clientServices.createInternalCacheService();
 
         // add the config for the clients to the config service
+
+        //although normally the client should only need the PalisadeService, we have to write all of the services here, since the
+        //ExampleConfigurator retrieves other services when it wants to configure them. In production code this would not be necessary
         Collection<Service> services = Stream.of(auditService, configClient, userClient, resourceClient, policyClient, palisadeClient, dataClient, cacheClient).collect(Collectors.toList());
         writeClientConfiguration(configClient, services);
+
+        // write the serialisers to the cache
+        writeSerialiserConfiguration(clientServices.createInternalCacheService());
 
         // write the config for the user service to the config service
         writeServerConfiguration(configClient, createUserServiceForServer(), UserService.class);
@@ -112,6 +119,16 @@ public class ServicesConfigurator {
         writeServerConfiguration(configClient, createRESTRedirectorForServer(), RESTRedirector.class);
 
         LOGGER.info("Finished setting the service configurations.");
+    }
+
+    /**
+     * Set up the serialiser for the Employee type in avro format for the data services.
+     *
+     * @param cache the cache to write to
+     */
+    private void writeSerialiserConfiguration(final CacheService cache) {
+        CompletableFuture<Boolean> addCall = CachedSerialisedDataReader.addSerialiserToCache(cache, DataFlavour.of(RESOURCE_TYPE, RESOURCE_FORMAT), new AvroSerialiser<>(Employee.class));
+        addCall.join();
     }
 
     /**
@@ -167,9 +184,7 @@ public class ServicesConfigurator {
         try {
             Configuration conf = createHadoopConfiguration();
             HadoopResourceService resource = new HadoopResourceService().conf(conf).cacheService(clientServices.createInternalCacheService());
-            final Map<String, ConnectionDetail> dataType = new HashMap<>();
-            dataType.put(RESOURCE_TYPE, clientServices.createClientDataServiceConnection());
-            resource.connectionDetail(null, dataType);
+            resource.addDataService(clientServices.createClientDataServiceConnection());
             return resource;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -235,8 +250,7 @@ public class ServicesConfigurator {
     protected DataService createDataServiceForServer() {
         try {
             Configuration conf = createHadoopConfiguration();
-            HadoopDataReader reader = new HadoopDataReader().conf(conf);
-            reader.addSerialiser(RESOURCE_TYPE, new AvroSerialiser<>(Employee.class));
+            HadoopDataReader reader = (HadoopDataReader) new HadoopDataReader().conf(conf).cacheService(clientServices.createInternalCacheService());
             return new SimpleDataService()
                     .reader(reader)
                     .palisadeService(clientServices.createInternalPalisadeService())
