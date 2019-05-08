@@ -50,6 +50,9 @@ import static java.util.Objects.requireNonNull;
  * need to implement a {@link uk.gov.gchq.palisade.data.service.DataService} for
  * each data storage technology and data format combination, rather than also
  * having to add the data structure into the mix.
+ * <p>
+ * A serialiser is chosen based on a {@link DataFlavour} which is a combination of
+ * data type and serialised format.
  */
 public abstract class SerialisedDataReader implements DataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialisedDataReader.class);
@@ -156,6 +159,12 @@ public abstract class SerialisedDataReader implements DataReader {
         serialisers.put(flavour, serialiser);
     }
 
+    /**
+     * Adds all the serialiser mappings to the current map of serialisers.Any existing mappings for a given {@link DataFlavour}
+     * are replaced.
+     *
+     * @param mergingSerialisers the new serialisers to merge
+     */
     public void addAllSerialisers(final Map<DataFlavour, Serialiser<?>> mergingSerialisers) {
         requireNonNull(mergingSerialisers, "mergingSerialisers");
         serialisers.putAll(mergingSerialisers);

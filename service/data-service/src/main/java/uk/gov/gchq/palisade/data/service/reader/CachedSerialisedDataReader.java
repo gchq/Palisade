@@ -39,10 +39,19 @@ import java.util.concurrent.CompletableFuture;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Adds behaviour to the {@link SerialisedDataReader} to keep details of the serialisers in the cache. This means
+ * that the serialisers are global across the Palisade deployment. When a call to {@link CachedSerialisedDataReader#read(DataReaderRequest)}
+ * is made, then the map of current serialisers is loaded from the cache and merged into the existing map. Therefore,
+ * if a serialiser is added, then the {@link DataReader} will find it dynamically and does not need to be restarted.
+ */
 public abstract class CachedSerialisedDataReader extends SerialisedDataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedSerialisedDataReader.class);
 
-    public static final String SERIALISER_KEY = "serialiser.map";
+    /**
+     * The serialiser key in the configuration.
+     */
+    public static final String SERIALISER_KEY = "cached.serialiser.map";
 
     /**
      * Wrapping class to ensure JSON serialisation preserves types.
@@ -68,21 +77,41 @@ public abstract class CachedSerialisedDataReader extends SerialisedDataReader {
      */
     private CacheService cacheService;
 
+    /**
+     * Load the map of serialisers from the cache service. The map retrieved will be merged into the current list by calling
+     * {@link SerialisedDataReader#addAllSerialisers(Map)}.
+     */
     public void retrieveSerialisersFromCache() {
         Map<DataFlavour, Serialiser<?>> newTypeMap = retrieveFromCache(getCacheService());
         addAllSerialisers(newTypeMap);
     }
 
+    /**
+     * Set the cache service to use.
+     *
+     * @param cacheService new cache service
+     * @return this object
+     */
     public CachedSerialisedDataReader cacheService(final CacheService cacheService) {
         requireNonNull(cacheService, "Cache service cannot be set to null.");
         this.cacheService = cacheService;
         return this;
     }
 
+    /**
+     * Set the cache service to use.
+     *
+     * @param cacheService new cache service
+     */
     public void setCacheService(final CacheService cacheService) {
         cacheService(cacheService);
     }
 
+    /**
+     * Get the current cache service.
+     *
+     * @return the current cache
+     */
     public CacheService getCacheService() {
         requireNonNull(cacheService, "The cache service has not been set.");
         return cacheService;
@@ -97,7 +126,13 @@ public abstract class CachedSerialisedDataReader extends SerialisedDataReader {
         return super.read(request);
     }
 
-
+    /**
+     * Fetch a map of serialisers from the given cache service. This doesn't do anything other than create a new map
+     * retrieved from the cache.
+     *
+     * @param cache the cache service to use
+     * @return new mappings
+     */
     private static Map<DataFlavour, Serialiser<?>> retrieveFromCache(final CacheService cache) {
         requireNonNull(cache, "cache");
         GetCacheRequest<MapWrap> request = new GetCacheRequest<>()
@@ -106,14 +141,24 @@ public abstract class CachedSerialisedDataReader extends SerialisedDataReader {
         //go retrieve this from the cache
         Optional<MapWrap> map = cache.get(request).join();
 
+        //unwrap the mapping or create a blank one
         Map<DataFlavour, Serialiser<?>> newMap = map.orElse(new MapWrap(new HashMap())).getInstance();
 
         LOGGER.debug("Retrieved these serialisers from cache {}", newMap);
-        //if there is nothing there then create a new map and return it
         return newMap;
     }
 
-
+    /**
+     * Adds a new serialiser to the cache of serialisers. This method will associate the given {@link DataFlavour} with
+     * the given {@link Serialiser} in the cache. The next time a {@link CachedSerialisedDataReader} subclass attempts to
+     * read some data, it will see this new mapping. This method is not atomic, but retrieves the entire map, adds the
+     * new mapping and then replaces it in the cache.
+     *
+     * @param cache      the cache service to use
+     * @param flavour    the data flavour to apply
+     * @param serialiser the serialiser
+     * @return a boolean that will complete when the map is updated in the cache
+     */
     public static CompletableFuture<Boolean> addSerialiserToCache(final CacheService cache, final DataFlavour flavour, final Serialiser<?> serialiser) {
         requireNonNull(cache, "cache");
         requireNonNull(flavour, "flavour");
