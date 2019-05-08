@@ -56,6 +56,7 @@ public abstract class SerialisedDataReader implements DataReader {
 
     @JsonProperty("default")
     private Serialiser<?> defaultSerialiser = new SimpleStringSerialiser();
+
     /**
      * Map of the types and formats to the serialising object. The first element of the key is the data type
      * and the second element is the serialised format.

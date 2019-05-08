@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,6 +97,7 @@ public abstract class CachedSerialisedDataReader extends SerialisedDataReader {
         return super.read(request);
     }
 
+
     private static Map<DataFlavour, Serialiser<?>> retrieveFromCache(final CacheService cache) {
         requireNonNull(cache, "cache");
         GetCacheRequest<MapWrap> request = new GetCacheRequest<>()
@@ -110,6 +112,7 @@ public abstract class CachedSerialisedDataReader extends SerialisedDataReader {
         //if there is nothing there then create a new map and return it
         return newMap;
     }
+
 
     public static CompletableFuture<Boolean> addSerialiserToCache(final CacheService cache, final DataFlavour flavour, final Serialiser<?> serialiser) {
         requireNonNull(cache, "cache");
