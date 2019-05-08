@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-key="Employee"
+key="Employee@"
 
 validate_example_output() {
    echo "Validating example output"
