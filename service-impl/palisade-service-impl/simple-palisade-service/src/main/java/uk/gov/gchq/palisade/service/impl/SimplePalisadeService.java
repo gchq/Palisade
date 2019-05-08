@@ -211,7 +211,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     return user;
                 })
                 .exceptionally(ex -> {
-                    LOGGER.error("Failed to get user: {}" , ex.getMessage());
+                    LOGGER.error("Failed to get user: {}", ex.getMessage());
                     if (nonNull(ex)) {
                         auditRequestReceivedException(request, originalRequestId, ex);
                     }
@@ -226,7 +226,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     return resources;
                 })
                 .exceptionally(ex -> {
-                    LOGGER.error("Failed to get resources: {}" , ex.getMessage());
+                    LOGGER.error("Failed to get resources: {}", ex.getMessage());
                     if (nonNull(ex)) {
                         auditRequestReceivedException(request, originalRequestId, ex);
                     }
@@ -307,6 +307,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         LOGGER.debug("Error handling: " + ex.getMessage());
         auditService.audit(auditRequestWithException);
     }
+
     private void cache(final RegisterDataRequest request, final User user,
                        final RequestId requestId, final MultiPolicy multiPolicy,
                        final int resCount,
