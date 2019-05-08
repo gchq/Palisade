@@ -18,6 +18,8 @@ package uk.gov.gchq.palisade.example.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.client.ClientConfiguredServices;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.common.ExampleUsers;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
@@ -34,7 +36,6 @@ import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
-import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.util.StreamUtil;
@@ -63,19 +64,14 @@ public final class ExampleConfigurator {
      * @param args command line arguments
      */
     public static void main(final String[] args) {
-        LOGGER.info("EMR debug: start of ExampleConfigurator");
-        final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
-        LOGGER.info("EMR debug: ExampleConfigurator - opened inputstream");
+        final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-        LOGGER.info("EMR debug: ExampleConfigurator - created ConfigurationService - configService");
-        ServicesCreator cs = new ServicesCreator(configService);
-        LOGGER.info("EMR debug: ExampleConfigurator - created ServicesCreator cs");
+        ClientConfiguredServices cs = new ClientConfiguredServices(configService);
         new ExampleConfigurator(cs, args[0]);
         LOGGER.info("EMR debug: ExampleConfigurator - created new ExampleConfigurator");
     }
 
-    public ExampleConfigurator(final ServicesCreator services, final String file) {
-        LOGGER.info("EMR debug: ExampleConfigurator - at start of constructor");
+    public ExampleConfigurator(final ClientConfiguredServices services, final String file) {
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(file);
         this.file = absoluteFileURI.toString();
         LOGGER.info("EMR debug: ExampleConfigurator - constructor this.file");
@@ -83,7 +79,7 @@ public final class ExampleConfigurator {
         LOGGER.info("EMR debug: ExampleConfigurator - constructor - completed initialiseExample");
     }
 
-    private void initialiseExample(final ServicesCreator services) {
+    private void initialiseExample(final ClientConfiguredServices services) {
         // The user authorisation owner or sys admin needs to add the user
         LOGGER.info("EMR debug: ExampleConfigurator - start of initialiseExample");
         final UserService userService = services.getUserService();

@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.example;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.CommonConfigurationKeys;
+//import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -34,15 +34,17 @@ import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.ConfigConsts;
-import uk.gov.gchq.palisade.Context;
-import uk.gov.gchq.palisade.UserId;
 //import uk.gov.gchq.palisade.example.common.Purpose;
 //import uk.gov.gchq.palisade.example.config.ServicesCreator;
+import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.config.service.ConfigConsts;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
+import uk.gov.gchq.palisade.Context;
+//import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
-import uk.gov.gchq.palisade.data.serialise.Serialiser;
+//import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 //import uk.gov.gchq.palisade.example.config.ServicesConfigurator;
 //import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
@@ -52,7 +54,6 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
@@ -92,7 +93,7 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         protected void map(final LeafResource key, final Employee value, final Context context) throws IOException, InterruptedException {
             //String property = value.getName();
             String property = value.getTaxCode();
-            if(property != null && !property.isEmpty()) {
+            if (property != null && !property.isEmpty()) {
                 outputKey.set(property);
                 context.write(outputKey, ONE);
             }
@@ -152,9 +153,10 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
 
         // copied from RestExample
         LOGGER.info("EMR debug: MapReduceExample - at start of section copied from RestExample ");
-        String confString = System.getProperty(RestUtil.CONFIG_SERVICE_PATH);
+        String confString = System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH);
         LOGGER.info("EMR debug: MapReduceExample - confString " + confString);
-        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+        //System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ServiceState clientConfig = null;
         int times = 0;
@@ -260,7 +262,10 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         conf.set("fs.defaultFS", ("hdfs://localhost"));           // *****revert this***
         //set address of resource manager
         //conf.set("yarn.resourcemanager.address",(hostname + ":8032"));
-        conf.set("yarn.resourcemanager.address",("localhost:8032"));          //***revert***
+        conf.set("yarn.resourcemanager.address",
+
+
+                ("localhost:8032"));          //***revert***
         ToolRunner.run(conf, new AwsEmrMapReduceExample(), new String[]{sourceFile, outputDir});
     }
 

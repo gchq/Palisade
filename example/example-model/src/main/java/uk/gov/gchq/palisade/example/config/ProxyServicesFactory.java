@@ -74,26 +74,26 @@ public class ProxyServicesFactory {
             return true;
         } else {
             LOGGER.error("error not enough arguments have been provided. The following arguments are required:\n" +
-                    "1. a csv of the etcd endpoints\n" +
-                    "2. the internal client url for the palisade service\n" +
-                    "3. the internal client url for the policy service\n" +
-                    "4. the internal client url for the resource service\n" +
-                    "5. the internal client url for the user service\n" +
-                    "6. the internal client url for the data service\n" +
-                    "7. the internal client url for the config service\n" +
-                    "8. the external client url for the palisade service\n" +
-                    "9. the external client url for the data service");
+                    "1. a commma separated list of the etcd endpoints\n" +
+                    "2. the internal url for the palisade service\n" +
+                    "3. the internal url for the policy service\n" +
+                    "4. the internal url for the resource service\n" +
+                    "5. the internal url for the user service\n" +
+                    "6. the internal url for the data service\n" +
+                    "7. the internal url for the config service\n" +
+                    "8. the externally accessible url for the palisade service (for clients)\n" +
+                    "9. the externally accessible url for the data service (for clients)");
             return false;
         }
     }
 
-    public ConnectionDetail createDataServiceConnectionDetail() {
+    public ConnectionDetail createClientDataServiceConnection() {
         return new ProxyRestConnectionDetail().url(args[8]).serviceClass(ProxyRestDataService.class);
     }
 
     private CacheService cacheService;
 
-    public CacheService createCacheService() {
+    public CacheService createInternalCacheService() {
         if (isNull(cacheService)) {
             if (args.length > 1) {
                 List<URI> etcdEndpoints = Arrays.stream(args[0].split(",")).map(URI::create).collect(Collectors.toList());
@@ -107,36 +107,35 @@ public class ProxyServicesFactory {
         return cacheService;
     }
 
-    public AuditService createAuditService() {
+    public AuditService createInternalAuditService() {
         return new LoggerAuditService();
     }
 
-    public PalisadeService createPalisadeService() {
-        return new ProxyRestPalisadeService(args[1]);
-    }
-
-    public PolicyService createPolicyService() {
-        return new ProxyRestPolicyService(args[2]);
-    }
-
-    public ResourceService createResourceService() {
-        return new ProxyRestResourceService(args[3]);
-    }
-
-    public UserService createUserService() {
-        return new ProxyRestUserService(args[4]);
-    }
-
-    public DataService createDataService() {
-        return new ProxyRestDataService(args[5]);
-    }
-
-    public ConfigurationService createConfigService() {
+    public ConfigurationService createInternalConfigService() {
         return new ProxyRestConfigService(args[6]);
     }
 
-    public PalisadeService createExternalPalisadeService() {
-        return new ProxyRestPalisadeService(args[7]);
+    public UserService createInternalUserService() {
+        return new ProxyRestUserService(args[4]);
     }
 
+    public PolicyService createInternalPolicyService() {
+        return new ProxyRestPolicyService(args[2]);
+    }
+
+    public ResourceService createInternalResourceService() {
+        return new ProxyRestResourceService(args[3]);
+    }
+
+    public DataService createInternalDataService() {
+        return new ProxyRestDataService(args[5]);
+    }
+
+    public PalisadeService createInternalPalisadeService() {
+        return new ProxyRestPalisadeService(args[1]);
+    }
+
+    public PalisadeService createClientPalisadeService() {
+        return new ProxyRestPalisadeService(args[7]);
+    }
 }

@@ -19,7 +19,6 @@ package uk.gov.gchq.palisade.redirect.impl;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +167,6 @@ public abstract class HeartbeatRedirector<T> implements Redirector<T> {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(11, 37)
-                .appendSuper(super.hashCode())
                 .append(cache)
                 .append(redirectClass)
                 .append(getScope())

@@ -68,10 +68,12 @@ public class SimpleClient<T> {
             final DataService dataService = connectionDetail.createService();
             LOGGER.info("EMR debug: SimpleClient - after dataService ");
             LOGGER.info(dataService.toString());
+            final String uuid = dataRequestResponse.getOriginalRequestId();
 
             final ReadRequest readRequest = new ReadRequest()
                     .requestId(dataRequestResponse.getRequestId())
                     .resource(entry.getKey());
+            readRequest.setOriginalRequestId(uuid);
 
             LOGGER.info("EMR debug: SimpleClient - after readRequest ");
             LOGGER.info(readRequest.toString());

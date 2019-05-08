@@ -34,15 +34,16 @@ import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.ConfigConsts;
-import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.config.service.ConfigConsts;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 //import uk.gov.gchq.palisade.example.common.Purpose;
 //import uk.gov.gchq.palisade.example.config.ServicesCreator;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
-import uk.gov.gchq.palisade.data.serialise.Serialiser;
+//import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 //import uk.gov.gchq.palisade.example.config.ServicesConfigurator;
 //import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
@@ -52,10 +53,10 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.rest.RestUtil;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
+//import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.File;
@@ -91,7 +92,7 @@ public class MapReduceExample extends Configured implements Tool {
         protected void map(final LeafResource key, final Employee value, final Context context) throws IOException, InterruptedException {
             //String property = value.getName();
             String property = value.getTaxCode();
-            if(property != null && !property.isEmpty()) {
+            if (property != null && !property.isEmpty()) {
                 outputKey.set(property);
                 context.write(outputKey, ONE);
             }
@@ -151,9 +152,9 @@ public class MapReduceExample extends Configured implements Tool {
 
         // copied from RestExample
         LOGGER.info("EMR debug: MapReduceExample - at start of section copied from RestExample ");
-        String confString = System.getProperty(RestUtil.CONFIG_SERVICE_PATH);
+        String confString = System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH);
         LOGGER.info("EMR debug: MapReduceExample - confString " + confString);
-        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ServiceState clientConfig = null;
         int times = 0;

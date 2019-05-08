@@ -18,7 +18,6 @@ package uk.gov.gchq.palisade.config.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
@@ -255,7 +254,7 @@ public class Configurator {
                 }
 
             } catch (CompletionException | InterruptedException | ExecutionException | CancellationException e) {
-                LOGGER.warn("Error while retrieving configuration for {}", serviceClass, e);
+                LOGGER.warn("Error while retrieving configuration for {} due to {}", serviceClass.map(Class::getTypeName).orElse("anonymous client"), e.getMessage());
                 //this should be rethrown immediately
                 if (e.getCause() instanceof NoConfigException) {
                     throw (NoConfigException) e.getCause();

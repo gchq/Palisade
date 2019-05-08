@@ -39,10 +39,9 @@ public class ExampleSimpleClient extends SimpleClient<Employee> {
         LOGGER.info("EMR debug: ExampleSimpleClient - after super palisadeService ");
     }
 
-    public Stream<Employee> read(final String filename, final String userId, final String justification) {
-        LOGGER.info("EMR debug: ExampleSimpleClient - at start of read");
+    public Stream<Employee> read(final String filename, final String userId, final String purpose) {
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(filename);
         String absoluteFile = absoluteFileURI.toString();
-        return super.read(absoluteFile, ServicesConfigurator.RESOURCE_TYPE, userId, justification);
+        return super.read(absoluteFile, ServicesConfigurator.RESOURCE_TYPE, userId, purpose);
     }
 }

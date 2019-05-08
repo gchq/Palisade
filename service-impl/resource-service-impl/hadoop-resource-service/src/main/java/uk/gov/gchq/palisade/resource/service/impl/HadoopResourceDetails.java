@@ -22,22 +22,22 @@ import java.util.regex.Pattern;
 /**
  * A storage class for the resources within {@link HadoopResourceService}.
  * <p>
- * This class has logic for manipulating the path of the resource into [connectionDetail, type, format]
+ * This class has logic for manipulating the path of the resource into [fileName, type, format]
  */
 public class HadoopResourceDetails {
     public static final String TYPE_DEL = "_";
     public static final String FORMAT_DEL = ".";
     public static final String FILE_NAME_FORMAT = "%s" + TYPE_DEL + "%s" + FORMAT_DEL + "%s";
-    private String connectionDetail, type, format;
+    private String fileName, type, format;
 
-    public HadoopResourceDetails(final String connectionDetail, final String type, final String format) {
-        this.connectionDetail = connectionDetail;
+    public HadoopResourceDetails(final String fileName, final String type, final String format) {
+        this.fileName = fileName;
         this.type = type;
         this.format = format;
     }
 
-    public String getConnectionDetail() {
-        return connectionDetail;
+    public String getFileName() {
+        return fileName;
     }
 
     public String getType() {
@@ -48,9 +48,9 @@ public class HadoopResourceDetails {
         return format;
     }
 
-    protected static HadoopResourceDetails getResourceDetailsFromConnectionDetails(final String connectionDetail) {
+    protected static HadoopResourceDetails getResourceDetailsFromFileName(final String fileName) {
         //The mirror of the FILE_NAME_FORMAT
-        final String[] split = connectionDetail.split(Pattern.quote("/"));
+        final String[] split = fileName.split(Pattern.quote("/"));
         final String fileString = split[split.length - 1];
         final String[] typeSplit = fileString.split(TYPE_DEL);
         if (typeSplit.length == 2) {
@@ -60,7 +60,7 @@ public class HadoopResourceDetails {
                 final String name = idSplit[0];
                 final String format = idSplit[1];
 
-                return new HadoopResourceDetails(connectionDetail, type, format);
+                return new HadoopResourceDetails(fileName, type, format);
             }
         }
         throw new IllegalArgumentException("Incorrect format expected:" + FILE_NAME_FORMAT + " found: " + fileString);
@@ -70,7 +70,7 @@ public class HadoopResourceDetails {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("type", type)
-                .append("id", connectionDetail)
+                .append("id", fileName)
                 .append("format", format)
                 .build();
     }

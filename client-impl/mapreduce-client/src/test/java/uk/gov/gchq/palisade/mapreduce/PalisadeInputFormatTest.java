@@ -84,7 +84,7 @@ public class PalisadeInputFormatTest {
         assertEquals(json, c.get(PalisadeInputFormat.REGISTER_REQUESTS_KEY));
     }
 
-    @Test (expected = RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void shouldErrorWhenAddingEmptyRequest() {
         //Given
         Configuration c = new Configuration();
@@ -153,12 +153,14 @@ public class PalisadeInputFormatTest {
                 .resource(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"))
                 .resource(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"))
                 .resource(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"))
-                .resource(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
+                .resource(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"))
+                .originalRequestId("request1.setup");
 
         request2 = new RegisterDataRequest().resourceId("res2").userId(new UserId().id("user2")).context(new Context().purpose("purpose2"));
         req2Response = new DataRequestResponse().requestId(new RequestId().id("request2"))
                 .resource(new StubResource("type_a", "id6", "format6"), new StubConnectionDetail("con6"))
-                .resource(new StubResource("type_b", "id7", "format7"), new StubConnectionDetail("con7"));
+                .resource(new StubResource("type_b", "id7", "format7"), new StubConnectionDetail("con7"))
+                .originalRequestId("request2.setup");
     }
 
     /**
@@ -230,7 +232,7 @@ public class PalisadeInputFormatTest {
         //When
         List<PalisadeInputSplit> splits = convert(callGetSplits(1, resources, mockService));
         //Then
-        checkForExpectedResources(splits,0,0);
+        checkForExpectedResources(splits, 0, 0);
     }
 
     @Test

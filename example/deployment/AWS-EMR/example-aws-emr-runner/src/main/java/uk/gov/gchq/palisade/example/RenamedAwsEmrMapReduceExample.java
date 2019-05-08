@@ -67,8 +67,8 @@ import java.util.List;
  * <p>
  * The word count example is adapted from: https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
  */
-public class renamedAwsEmrMapReduceExample extends Configured implements Tool {
-    private static final Logger LOGGER = LoggerFactory.getLogger(renamedAwsEmrMapReduceExample.class);
+public class RenamedAwsEmrMapReduceExample extends Configured implements Tool {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RenamedAwsEmrMapReduceExample.class);
 
     protected static final String DEFAULT_OUTPUT_DIR = createOutputDir();
     private static final String RESOURCE_TYPE = "Employee";
@@ -121,7 +121,7 @@ public class renamedAwsEmrMapReduceExample extends Configured implements Tool {
 
         //create the basic job object and configure it for this example
         Job job = Job.getInstance(getConf(), "Palisade MapReduce Example");
-        job.setJarByClass(renamedAwsEmrMapReduceExample.class);
+        job.setJarByClass(RenamedAwsEmrMapReduceExample.class);
 
         //configure mapper
         job.setMapperClass(ExampleMap.class);
@@ -198,7 +198,7 @@ public class renamedAwsEmrMapReduceExample extends Configured implements Tool {
     public static void main(final String... args) throws Exception {
         final String outputDir;
         if (args.length < 1) {
-            System.out.printf("Usage: %s file [output_directory]\n", renamedAwsEmrMapReduceExample.class.getTypeName());
+            System.out.printf("Usage: %s file [output_directory]\n", RenamedAwsEmrMapReduceExample.class.getTypeName());
             System.out.println("\nfile\tfile containing serialised ExampleObj instances to read");
             System.out.println("output_directory\tdirectory to write mapreduce outputs to");
             System.exit(1);
@@ -210,7 +210,7 @@ public class renamedAwsEmrMapReduceExample extends Configured implements Tool {
         //remove this as it needs to be not present when the job runs
         FileUtils.deleteDirectory(new File(args[1]));
         Configuration conf = new Configuration();
-        ToolRunner.run(conf, new renamedAwsEmrMapReduceExample(), args);
+        ToolRunner.run(conf, new RenamedAwsEmrMapReduceExample(), args);
     }
 
     private static String createOutputDir() {

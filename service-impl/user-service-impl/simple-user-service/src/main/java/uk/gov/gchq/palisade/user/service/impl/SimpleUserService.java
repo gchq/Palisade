@@ -118,10 +118,11 @@ public class SimpleUserService implements UserService {
         Objects.requireNonNull(request.getUser().getUserId());
         Objects.requireNonNull(request.getUser().getUserId().getId());
         //save to the cache service
-        getCacheService().add(new AddCacheRequest<User>()
+        AddCacheRequest<User> addCacheRequest = new AddCacheRequest<User>()
                 .service(this.getClass())
                 .key(request.getUser().getUserId().getId())
-                .value(request.getUser())).join();
+                .value(request.getUser());
+        getCacheService().add(addCacheRequest).join();
         return CompletableFuture.completedFuture(true);
     }
 }
