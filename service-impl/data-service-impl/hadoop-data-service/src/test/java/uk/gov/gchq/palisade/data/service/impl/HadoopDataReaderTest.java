@@ -23,8 +23,12 @@ import org.junit.rules.TemporaryFolder;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.cache.service.CacheService;
+import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.impl.reader.HadoopDataReader;
+import uk.gov.gchq.palisade.data.service.reader.DataFlavour;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -39,6 +43,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,6 +53,8 @@ public class HadoopDataReaderTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder(TestUtil.TMP_DIRECTORY);
 
+    private static final CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+
     @Test
     public void shouldReadTextFileWithNoRules() throws IOException {
         // Given
@@ -55,9 +62,10 @@ public class HadoopDataReaderTest {
         FileUtils.write(tmpFile, "some data\nsome more data", StandardCharsets.UTF_8);
 
         final Configuration conf = new Configuration();
-        final HadoopDataReader reader = new HadoopDataReader().conf(conf);
+        final HadoopDataReader reader = getReader(conf);
+        reader.addSerialiser(DataFlavour.of("string", "string"), new SimpleStringSerialiser());
 
-        final FileResource resource = (FileResource) new FileResource().type("string").id(tmpFile.getAbsolutePath());
+        final FileResource resource = (FileResource) new FileResource().type("string").id(tmpFile.getAbsolutePath()).serialisedFormat("string");
         final Rules<String> rules = new Rules<>();
 
         final DataReaderRequest request = new DataReaderRequest()
@@ -83,10 +91,10 @@ public class HadoopDataReaderTest {
         FileUtils.write(tmpFile, "some data\nsome more data", StandardCharsets.UTF_8);
 
         final Configuration conf = new Configuration();
-        final HadoopDataReader reader = new HadoopDataReader().conf(conf);
-        reader.addSerialiser("string", new SimpleStringSerialiser());
+        final HadoopDataReader reader = getReader(conf);
+        reader.addSerialiser(DataFlavour.of("string", "string"), new SimpleStringSerialiser());
 
-        final FileResource resource = new FileResource().id(tmpFile.getAbsolutePath()).type("string");
+        final FileResource resource = new FileResource().id(tmpFile.getAbsolutePath()).type("string").serialisedFormat("string");
         // Redact any records containing the word 'more'
         final Rules<String> rules = new Rules<String>().predicateRule("1", (r, u, j) -> !r.contains("more"));
 
@@ -104,5 +112,9 @@ public class HadoopDataReaderTest {
         final InputStream stream = response.getData();
         final Stream<String> lines = new BufferedReader(new InputStreamReader(stream)).lines();
         assertEquals(Collections.singletonList("some data"), lines.collect(Collectors.toList()));
+    }
+
+    private static HadoopDataReader getReader(Configuration conf) throws IOException {
+        return (HadoopDataReader) new HadoopDataReader().conf(conf).cacheService(cache);
     }
 }
