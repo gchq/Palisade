@@ -56,7 +56,7 @@ public abstract class CachedSerialisedDataReader extends SerialisedDataReader {
     /**
      * Wrapping class to ensure JSON serialisation preserves types.
      */
-    public final static class MapWrap {
+    public static final class MapWrap {
 
         @JsonSerialize(keyUsing = DataFlavour.FlavourSerializer.class)
         @JsonDeserialize(keyUsing = DataFlavour.FlavourDeserializer.class)

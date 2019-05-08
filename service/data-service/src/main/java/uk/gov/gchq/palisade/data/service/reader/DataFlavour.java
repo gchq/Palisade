@@ -19,12 +19,9 @@ package uk.gov.gchq.palisade.data.service.reader;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -53,7 +50,7 @@ public class DataFlavour {
     /**
      * Class to ensure {@link DataFlavour}s can be serialised into JSON.
      */
-    public final static class FlavourSerializer extends StdSerializer<DataFlavour> {
+    public static final class FlavourSerializer extends StdSerializer<DataFlavour> {
 
         public FlavourSerializer() {
             super(DataFlavour.class);
@@ -68,7 +65,7 @@ public class DataFlavour {
     /**
      * Class to ensure {@link DataFlavour}s can be deserialised from JSON.
      */
-    public final static class FlavourDeserializer extends KeyDeserializer {
+    public static final class FlavourDeserializer extends KeyDeserializer {
 
         @Override
         public Object deserializeKey(final String text, final DeserializationContext deserializationContext) throws IOException {
