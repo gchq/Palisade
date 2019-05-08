@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # sets up the different paths for calling deployment scripts
 export EXAMPLE="./example"
 export DOCKERBASHSCRIPTS="$EXAMPLE/deployment/local-docker/bash-scripts"

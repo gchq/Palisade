@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 export DIR=$(dirname "$0")
 . "$DIR/../../bash-scripts/setScriptPath.sh"
 kubectl apply -f ${K8SBASHSCRIPTS}/configure-example/k8sConfigureExample.yaml

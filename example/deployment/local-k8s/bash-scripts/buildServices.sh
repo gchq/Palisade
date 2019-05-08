@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 export DIR=$(dirname "$0")
 . "$DIR/../../bash-scripts/setScriptPath.sh"

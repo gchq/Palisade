@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 export DIR=$(dirname "$0")
 . $DIR/../../bash-scripts/setScriptPath.sh
 "${K8SBASHSCRIPTS}/k8sDeleteExample.sh" "$K8SBASHSCRIPTS" || true
