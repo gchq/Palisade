@@ -52,7 +52,7 @@ public final class LocalServices {
         ProxyServicesFactory factory = new ProxyServicesFactory(LOCAL_ARGS);
         new ServicesConfigurator(factory);
 
-        CacheService cs = factory.createCacheService();
+        CacheService cs = factory.createInternalCacheService();
         if (cs instanceof SimpleCacheService) {
             ((SimpleCacheService) cs).getBackingStore().close();
         }
