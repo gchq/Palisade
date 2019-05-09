@@ -46,6 +46,7 @@ public class RestExample {
         }
 
         String sourceFile = args[0];
+        LOGGER.info("Going to request {} from Palisade", sourceFile);
         new RestExample().run(sourceFile);
     }
 
