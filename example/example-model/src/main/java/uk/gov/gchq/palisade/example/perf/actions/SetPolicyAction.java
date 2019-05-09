@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.perf;
+package uk.gov.gchq.palisade.example.perf.actions;
+
+import uk.gov.gchq.palisade.example.perf.PerfAction;
 
 /**
  * Uses an existing deployment of Palisade to set policies on the given files. The policy from the example
@@ -33,12 +35,15 @@ public class SetPolicyAction extends PerfAction {
 
     @Override
     public String help() {
-        return "Action "+name()+" sets policies on the files previously generated," +
+        return "Action " + name() + " sets policies on the files previously generated," +
                 "\nso that they can be read through Palisade.";
     }
 
     @Override
-    public Integer apply(String[] strings) {
-        return null;
+    public Integer apply(final String[] strings) {
+        //validate path
+        //check files exist
+        //set policy on the four files..two must be empty
+        return Integer.valueOf(0);
     }
 }

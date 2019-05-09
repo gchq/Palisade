@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.perf;
+package uk.gov.gchq.palisade.example.perf.actions;
 
 /**
  * Subclass of usage to print an error.

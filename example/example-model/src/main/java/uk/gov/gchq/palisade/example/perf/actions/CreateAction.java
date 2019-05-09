@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.perf;
+package uk.gov.gchq.palisade.example.perf.actions;
 
 import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.example.hrdatagenerator.CreateDataFile;
+import uk.gov.gchq.palisade.example.perf.Perf;
+import uk.gov.gchq.palisade.example.perf.PerfAction;
+import uk.gov.gchq.palisade.example.perf.actions.ActionUtils;
 
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,9 +36,6 @@ import java.util.concurrent.Future;
  * Creates the files needed by other parts of the performance testing application.
  */
 public class CreateAction extends PerfAction {
-
-    public static final String SMALL_FILE_NAME = "employee_small.avro";
-    public static final String LARGE_FILE_NAME = "employee_large.avro";
 
     @Override
     public String name() {
@@ -73,11 +72,11 @@ public class CreateAction extends PerfAction {
         ExecutorService tasks = Executors.newFixedThreadPool(2, Util.createDaemonThreadFactory());
 
         //make a result writers
-        CreateDataFile smallWriter = new CreateDataFile(small, 0, getSmallFile(output).toFile());
-        CreateDataFile largeWriter = new CreateDataFile(large, 1, getLargeFile(output).toFile());
+        CreateDataFile smallWriter = new CreateDataFile(small, 0, ActionUtils.getSmallFile(output).toFile());
+        CreateDataFile largeWriter = new CreateDataFile(large, 1, ActionUtils.getLargeFile(output).toFile());
 
         //submit tasks
-        Perf.LOGGER.info("Going to create {} records in file {} and {} records in file {} in sub-directory", small, SMALL_FILE_NAME, large, LARGE_FILE_NAME);
+        Perf.LOGGER.info("Going to create {} records in file {} and {} records in file {} in sub-directory", small, ActionUtils.SMALL_FILE_NAME, large, ActionUtils.LARGE_FILE_NAME);
         Future<Boolean> smallFuture = tasks.submit(smallWriter);
         Future<Boolean> largeFuture = tasks.submit(largeWriter);
         Perf.LOGGER.info("Creation tasks submitted...");
@@ -91,9 +90,9 @@ public class CreateAction extends PerfAction {
 
             //copy the files to no policy variants
             Perf.LOGGER.info("Copying small file");
-            Files.copy(getSmallFile(output), getNoPolicyName(getSmallFile(output)), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(ActionUtils.getSmallFile(output), ActionUtils.getNoPolicyName(ActionUtils.getSmallFile(output)), StandardCopyOption.REPLACE_EXISTING);
             Perf.LOGGER.info("Copying large file");
-            Files.copy(getLargeFile(output), getNoPolicyName(getLargeFile(output)), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(ActionUtils.getLargeFile(output), ActionUtils.getNoPolicyName(ActionUtils.getLargeFile(output)), StandardCopyOption.REPLACE_EXISTING);
 
             //indicate success in exit code
             return Integer.valueOf((smallComplete && largeComplete) ? 0 : 1);
@@ -104,36 +103,6 @@ public class CreateAction extends PerfAction {
             //ensure executor shutdown
             tasks.shutdownNow();
         }
-    }
-
-    /**
-     * Make {@link Path} for small file.
-     *
-     * @param outputDirectory relative output directory
-     * @return complete path
-     */
-    private static Path getSmallFile(final Path outputDirectory) {
-        return outputDirectory.resolve(SMALL_FILE_NAME);
-    }
-
-    /**
-     * Make {@link Path} for large file.
-     *
-     * @param outputDirectory relative output directory
-     * @return complete path
-     */
-    private static Path getLargeFile(final Path outputDirectory) {
-        return outputDirectory.resolve("large").resolve(LARGE_FILE_NAME);
-    }
-
-    /**
-     * Create a file name with "-nopolicy" attached.
-     *
-     * @param file original path
-     * @return adapted path
-     */
-    private static Path getNoPolicyName(final Path file) {
-        return file.resolveSibling(file.getFileName().getFileName().toString().replace(".", "-nopolicy."));
     }
 
     /**
@@ -179,8 +148,8 @@ public class CreateAction extends PerfAction {
         }
 
         //check files don't already exist
-        Path smallFile = getSmallFile(relativeOutPath);
-        Path largeFile = getLargeFile(relativeOutPath);
+        Path smallFile = ActionUtils.getSmallFile(relativeOutPath);
+        Path largeFile = ActionUtils.getLargeFile(relativeOutPath);
         if (Files.exists(smallFile)) {
             throw new IllegalArgumentException("file already exists " + smallFile);
         }

@@ -18,6 +18,11 @@ package uk.gov.gchq.palisade.example.perf;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.gchq.palisade.example.perf.actions.CreateAction;
+import uk.gov.gchq.palisade.example.perf.actions.HelpAction;
+import uk.gov.gchq.palisade.example.perf.actions.SetPolicyAction;
+import uk.gov.gchq.palisade.example.perf.actions.UnknownAction;
+import uk.gov.gchq.palisade.example.perf.actions.UsageAction;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -43,6 +48,7 @@ public final class Perf {
         addAction(new CreateAction());
         addAction(new UsageAction());
         addAction(new HelpAction());
+        addAction(new SetPolicyAction());
     }
 
     /**

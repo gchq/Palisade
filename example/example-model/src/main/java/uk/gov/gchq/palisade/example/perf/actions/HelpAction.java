@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.perf;
+package uk.gov.gchq.palisade.example.perf.actions;
+
+import uk.gov.gchq.palisade.example.perf.Perf;
+import uk.gov.gchq.palisade.example.perf.PerfAction;
 
 import java.util.Objects;
 
