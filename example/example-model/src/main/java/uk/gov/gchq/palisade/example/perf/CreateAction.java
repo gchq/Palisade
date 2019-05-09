@@ -19,9 +19,12 @@ package uk.gov.gchq.palisade.example.perf;
 import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.example.hrdatagenerator.CreateDataFile;
 
+import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,7 +56,9 @@ public class CreateAction extends PerfAction {
                 "\tSMALL LARGE PATH" +
                 "\nwhere SMALL and LARGE are record number counts for the small and" +
                 "\nlarge employee Avro data files and PATH is the relative path from" +
-                "\nthe current directory to create the files in.";
+                "\nthe current directory to create the files in. It will also create" +
+                "\ncopies of the generated files so that the performance tool can read" +
+                "\nfrom them without security policies being attached to them.";
     }
 
     @Override
@@ -84,9 +89,15 @@ public class CreateAction extends PerfAction {
             boolean largeComplete = largeFuture.get().booleanValue();
             Perf.LOGGER.info("Large file written successfully {}", largeComplete);
 
+            //copy the files to no policy variants
+            Perf.LOGGER.info("Copying small file");
+            Files.copy(getSmallFile(output), getNoPolicyName(getSmallFile(output)), StandardCopyOption.REPLACE_EXISTING);
+            Perf.LOGGER.info("Copying large file");
+            Files.copy(getLargeFile(output), getNoPolicyName(getLargeFile(output)), StandardCopyOption.REPLACE_EXISTING);
+
             //indicate success in exit code
             return Integer.valueOf((smallComplete && largeComplete) ? 0 : 1);
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException | IOException e) {
             e.printStackTrace();
             return Integer.valueOf(1);
         } finally {
@@ -113,6 +124,16 @@ public class CreateAction extends PerfAction {
      */
     private static Path getLargeFile(final Path outputDirectory) {
         return outputDirectory.resolve("large").resolve(LARGE_FILE_NAME);
+    }
+
+    /**
+     * Create a file name with "-nopolicy" attached.
+     *
+     * @param file original path
+     * @return adapted path
+     */
+    private static Path getNoPolicyName(final Path file) {
+        return file.resolveSibling(file.getFileName().getFileName().toString().replace(".", "-nopolicy."));
     }
 
     /**

@@ -35,7 +35,7 @@ public final class Perf {
     /**
      * Map of action names to the classes that implement them.
      */
-    public static final Map<String, PerfAction> ACTIONS;
+    protected static final Map<String, PerfAction> ACTIONS;
 
     static {
         //populate the map, use a tree map so everything gets sorted when printed
@@ -71,13 +71,14 @@ public final class Perf {
                 actionArgs = Arrays.copyOfRange(args, 1, args.length);
             }
         }
-        //find the action class we need to run
+        //find the action class we need to run or default it to unknown
         PerfAction actionInstance = ACTIONS.getOrDefault(action, new UnknownAction());
 
         //call the action and exit with that return code
         try {
             Integer exitCode = actionInstance.apply(actionArgs);
             System.exit((nonNull(exitCode)) ? exitCode.intValue() : 0);
+
         } catch (IllegalArgumentException e) {
             LOGGER.error("Executing \"{}\" gave following error: {}", action, e.getMessage());
             System.exit(1);
