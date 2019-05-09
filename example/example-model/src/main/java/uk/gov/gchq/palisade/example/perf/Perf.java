@@ -36,12 +36,12 @@ import static java.util.Objects.requireNonNull;
  * Main class for the performance testing tool.
  */
 public final class Perf {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(Perf.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(Perf.class);
 
     /**
      * Map of action names to the classes that implement them.
      */
-    protected static final Map<String, PerfAction> ACTIONS;
+    public static final Map<String, PerfAction> ACTIONS;
 
     static {
         //populate the map, use a tree map so everything gets sorted when printed

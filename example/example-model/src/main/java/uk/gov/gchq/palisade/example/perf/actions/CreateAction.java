@@ -20,7 +20,6 @@ import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.example.hrdatagenerator.CreateDataFile;
 import uk.gov.gchq.palisade.example.perf.Perf;
 import uk.gov.gchq.palisade.example.perf.PerfAction;
-import uk.gov.gchq.palisade.example.perf.actions.ActionUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
