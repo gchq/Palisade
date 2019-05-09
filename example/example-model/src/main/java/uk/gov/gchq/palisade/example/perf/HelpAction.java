@@ -24,9 +24,15 @@ import static java.util.Objects.isNull;
  * Runs the detailed help for an action
  */
 public class HelpAction extends PerfAction {
+
+    @Override
+    public String name() {
+        return "help";
+    }
+
     @Override
     public String description() {
-        return "provides detailed help information on another action e.g. \"help setup\"";
+        return "provides detailed help information on another action e.g. \"help create\"";
     }
 
     @Override
@@ -40,7 +46,7 @@ public class HelpAction extends PerfAction {
     @Override
     public Integer apply(final String[] actionArgs) {
         if (actionArgs.length < 1) {
-            throw new IllegalArgumentException("please specify the action to print help for, e.g. \"setup\"");
+            throw new IllegalArgumentException("please specify the action to print help for, e.g. \"create\"");
         }
         //look up command
         PerfAction action = Perf.ACTIONS.get(actionArgs[0]);

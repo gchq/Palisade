@@ -22,25 +22,22 @@ import java.util.Objects;
  * Print the usage information for this application.
  */
 public class UsageAction extends PerfAction {
-    /**
-     * {@inheritDoc}
-     */
+
+    @Override
+    public String name() {
+        return "usage";
+    }
+
     @Override
     public String description() {
         return "prints usage information";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String help() {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Integer apply(final String[] strings) {
         //build usage string

@@ -24,17 +24,36 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
+/**
+ * Main class for the performance testing tool.
+ */
 public final class Perf {
     protected static final Logger LOGGER = LoggerFactory.getLogger(Perf.class);
 
+    /**
+     * Map of action names to the classes that implement them.
+     */
     public static final Map<String, PerfAction> ACTIONS;
 
     static {
+        //populate the map, use a tree map so everything gets sorted when printed
         ACTIONS = new TreeMap<>();
-        ACTIONS.put("setup", new CreateAction());
-        ACTIONS.put("usage", new UsageAction());
-        ACTIONS.put("help", new HelpAction());
+        addAction(new CreateAction());
+        addAction(new UsageAction());
+        addAction(new HelpAction());
+    }
+
+    /**
+     * Add the given action to the map of actions for the performance tool
+     *
+     * @param action action instance
+     */
+    protected static void addAction(final PerfAction action) {
+        requireNonNull(action, "action");
+        requireNonNull(action.name(), "action name is null for " + action.getClass());
+        ACTIONS.put(action.name(), action);
     }
 
     private Perf() {
