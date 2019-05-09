@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.resource.service.impl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -34,8 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.cache.service.CacheService;
-import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
-import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.resource.ChildResource;
@@ -57,11 +56,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,12 +82,12 @@ public class HadoopResourceService implements ResourceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HadoopResourceService.class);
     public static final String ERROR_ADD_RESOURCE = "AddResource is not supported by HadoopResourceService resources should be added/created via regular file system behaviour.";
     public static final String ERROR_OUT_SCOPE = "resource ID is out of scope of the this resource Service. Found: %s expected: %s";
-    public static final String ERROR_DETAIL_NOT_FOUND = "Connection detail could not be found for type: %s format: %s";
     public static final String ERROR_RESOLVING_PARENTS = "Error occurred while resolving resourceParents";
+    public static final String ERROR_NO_DATA_SERVICES = "No Hadoop data services known about in Hadoop resource service";
 
     public static final String HADOOP_CONF_STRING = "hadoop.init.conf";
     public static final String CACHE_IMPL_KEY = "hadoop.cache.svc";
-    public static final String CONNECTION_DETAIL_KEY = "hadoop.conn.detail";
+    public static final String DATASERVICE_LIST = "hadoop.data.svc.list";
 
     /**
      * A regular expression that matches URIs that have the file:/ scheme with a single slash but not any more slashes.
@@ -100,9 +99,12 @@ public class HadoopResourceService implements ResourceService {
 
     private FileSystem fileSystem;
 
-    @JsonIgnore
-    private ConnectionDetailStorage connectionDetailStorage = new ConnectionDetailStorage();
-
+    /**
+     * This should be a list of endpoints of Hadoop data services. In a deployed system this shouldn't be a large list
+     * of data services (which will be started up by an external orchestration service), but a list of end points which
+     * should then provide further load balancing.
+     */
+    private List<ConnectionDetail> dataServices = new ArrayList<>();
 
     public HadoopResourceService() {
     }
@@ -134,6 +136,12 @@ public class HadoopResourceService implements ResourceService {
         return cacheService;
     }
 
+    public HadoopResourceService addDataService(final ConnectionDetail detail) {
+        requireNonNull(detail, "detail");
+        dataServices.add(detail);
+        return this;
+    }
+
     private static Configuration createConfig(final Map<String, String> conf) {
         final Configuration config = new Configuration();
         if (nonNull(conf)) {
@@ -142,30 +150,6 @@ public class HadoopResourceService implements ResourceService {
             }
         }
         return config;
-    }
-
-    /**
-     * Write the internal details to the given cache.
-     */
-    private void writeConnectionDetails() {
-        final CacheService cache = getCacheService();
-        AddCacheRequest<ConnectionDetailStorage> dataFormatRequest = new AddCacheRequest<>()
-                .service(HadoopResourceService.class)
-                .key(CONNECTION_DETAIL_KEY)
-                .value(this.connectionDetailStorage);
-        cache.add(dataFormatRequest).join();
-    }
-
-    /**
-     * Read the internal details from the given cache.
-     */
-    private void readConnectionDetails() {
-        final CacheService cache = getCacheService();
-        GetCacheRequest<ConnectionDetailStorage> dataFormatRequest = new GetCacheRequest<>()
-                .service(HadoopResourceService.class)
-                .key(CONNECTION_DETAIL_KEY);
-        Optional<ConnectionDetailStorage> formats = cache.get(dataFormatRequest).join();
-        formats.ifPresent(cds -> connectionDetail(cds.getDataFormat(), cds.getDataType(), true));
     }
 
     @Override
@@ -191,6 +175,19 @@ public class HadoopResourceService implements ResourceService {
         } else {
             throw new NoConfigException("no cache service specified in configuration");
         }
+        //extract data services
+        String serialisedDataServices = config.getOrDefault(DATASERVICE_LIST, null);
+        if (nonNull(serialisedDataServices)) {
+            this.dataServices = JSONSerialiser.deserialise(serialisedDataServices.getBytes(StandardCharsets.UTF_8), new ConnectionDetailType());
+        } else {
+            throw new NoConfigException("no data services specified in configuration");
+        }
+    }
+
+    /**
+     * Make Jackson interprett the deserialised list correctly.
+     */
+    private static class ConnectionDetailType extends TypeReference<List<ConnectionDetail>> {
     }
 
     @Override
@@ -202,6 +199,8 @@ public class HadoopResourceService implements ResourceService {
         config.put(HADOOP_CONF_STRING, serialisedConf);
         String serialisedCache = new String(JSONSerialiser.serialise(cacheService), StandardCharsets.UTF_8);
         config.put(CACHE_IMPL_KEY, serialisedCache);
+        String serialisedDataServices = new String(JSONSerialiser.serialise(dataServices), StandardCharsets.UTF_8);
+        config.put(DATASERVICE_LIST, serialisedDataServices);
     }
 
     protected Configuration getInternalConf() {
@@ -212,18 +211,6 @@ public class HadoopResourceService implements ResourceService {
     protected FileSystem getFileSystem() {
         requireNonNull(fileSystem, "configuration must be set");
         return fileSystem;
-    }
-
-    public HadoopResourceService connectionDetail(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
-        return connectionDetail(dataFormat, dataType, false);
-    }
-
-    private HadoopResourceService connectionDetail(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType, final boolean skipWrite) {
-        this.connectionDetailStorage = new ConnectionDetailStorage(dataFormat, dataType);
-        if (!skipWrite) {
-            writeConnectionDetails();
-        }
-        return this;
     }
 
     @Override
@@ -246,25 +233,30 @@ public class HadoopResourceService implements ResourceService {
 
     private CompletableFuture<Map<LeafResource, ConnectionDetail>> getMapCompletableFuture(
             final String pathString, final Predicate<HadoopResourceDetails> predicate) {
-        readConnectionDetails();
         return CompletableFuture.supplyAsync(() -> {
             try {
                 //pull latest connection details
                 final RemoteIterator<LocatedFileStatus> remoteIterator = this.getFileSystem().listFiles(new Path(pathString), true);
                 return getPaths(remoteIterator)
                         .stream()
-                        .map(HadoopResourceDetails::getResourceDetailsFromConnectionDetails)
+                        .map(HadoopResourceDetails::getResourceDetailsFromFileName)
                         .filter(predicate)
                         .collect(Collectors.toMap(
                                 resourceDetails -> {
-                                    final String connectionDetail = resourceDetails.getConnectionDetail();
-                                    final FileResource fileFileResource = new FileResource().id(connectionDetail).type(resourceDetails.getType()).serialisedFormat(resourceDetails.getFormat());
+                                    final String fileName = resourceDetails.getFileName();
+                                    final FileResource fileFileResource = new FileResource().id(fileName).type(resourceDetails.getType()).serialisedFormat(resourceDetails.getFormat());
                                     resolveParents(fileFileResource, getInternalConf());
                                     return fileFileResource;
                                 },
-                                resourceDetails -> this.connectionDetailStorage.get(resourceDetails.getType(), resourceDetails.getFormat())
-
-                        ));
+                                resourceDetails -> {
+                                    if (this.dataServices.size() < 1) {
+                                        throw new IllegalStateException(ERROR_NO_DATA_SERVICES);
+                                    }
+                                    int service = ThreadLocalRandom.current().nextInt(this.dataServices.size());
+                                    return this.dataServices.get(service);
+                                }
+                                )
+                        );
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
@@ -336,16 +328,6 @@ public class HadoopResourceService implements ResourceService {
             paths.add(pathWithoutFSName);
         }
         return paths;
-    }
-
-    @JsonIgnore
-    public Map<String, ConnectionDetail> getDataType() {
-        return this.connectionDetailStorage.getDataType();
-    }
-
-    @JsonIgnore
-    public Map<String, ConnectionDetail> getDataFormat() {
-        return this.connectionDetailStorage.getDataFormat();
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
@@ -439,80 +421,5 @@ public class HadoopResourceService implements ResourceService {
                 .append(fileSystem)
                 .append(cacheService)
                 .toHashCode();
-    }
-
-    public static class ConnectionDetailStorage {
-        @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
-        private final Map<String, ConnectionDetail> dataFormat = new HashMap<>();
-        @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
-        private final Map<String, ConnectionDetail> dataType = new HashMap<>();
-
-        public ConnectionDetailStorage() {
-        }
-
-        public ConnectionDetailStorage(final Map<String, ConnectionDetail> dataFormat, final Map<String, ConnectionDetail> dataType) {
-            if (nonNull(dataFormat)) {
-                this.dataFormat.putAll(dataFormat);
-                this.dataFormat.values().removeIf(Objects::isNull);
-            }
-            if (nonNull(dataType)) {
-                this.dataType.putAll(dataType);
-                this.dataType.values().removeIf(Objects::isNull);
-            }
-        }
-
-        public ConnectionDetail get(final String type, final String format) {
-            ConnectionDetail rtn = dataType.get(type);
-            if (Objects.isNull(rtn)) {
-                rtn = dataFormat.get(format);
-                if (Objects.isNull(rtn)) {
-                    throw new IllegalStateException(String.format(ERROR_DETAIL_NOT_FOUND, type, format));
-                }
-            }
-            return rtn;
-        }
-
-        public Map<String, ConnectionDetail> getDataFormat() {
-            return new HashMap<>(dataFormat);
-        }
-
-        public Map<String, ConnectionDetail> getDataType() {
-            return new HashMap<>(dataType);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            final ConnectionDetailStorage that = (ConnectionDetailStorage) o;
-
-            return new EqualsBuilder()
-                    .append(this.dataFormat, that.dataFormat)
-                    .append(this.dataType, that.dataType)
-                    .isEquals();
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder(17, 37)
-                    .append(dataFormat)
-                    .append(dataType)
-                    .toHashCode();
-        }
-
-        @Override
-        public String toString() {
-            return new ToStringBuilder(this)
-                    .appendSuper(super.toString())
-                    .append("dataFormat", dataFormat)
-                    .append("dataType", dataType)
-                    .toString();
-        }
     }
 }

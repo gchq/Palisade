@@ -149,7 +149,6 @@ public class ServiceState {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 43)
-                .appendSuper(super.hashCode())
                 .append(configMap)
                 .toHashCode();
     }

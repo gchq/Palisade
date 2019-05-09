@@ -225,11 +225,11 @@ public class SimpleDataService implements DataService {
         config.put(DataService.class.getTypeName(), getClass().getTypeName());
         String serialised = new String(JSONSerialiser.serialise(getPalisadeService()), StandardCharsets.UTF_8);
         config.put(PALISADE_IMPL_KEY, serialised);
-        String serialisedReader = new String(JSONSerialiser.serialise(reader), StandardCharsets.UTF_8);
+        String serialisedReader = new String(JSONSerialiser.serialise(getReader()), StandardCharsets.UTF_8);
         config.put(READER_IMPL_KEY, serialisedReader);
-        String serialisedCache = new String(JSONSerialiser.serialise(cache), StandardCharsets.UTF_8);
+        String serialisedCache = new String(JSONSerialiser.serialise(getCacheService()), StandardCharsets.UTF_8);
         config.put(CACHE_IMPL_KEY, serialisedCache);
-        String serialisedAudit = new String(JSONSerialiser.serialise(auditService), StandardCharsets.UTF_8);
+        String serialisedAudit = new String(JSONSerialiser.serialise(getAuditService()), StandardCharsets.UTF_8);
         config.put(AUDIT_IMPL_KEY, serialisedAudit);
     }
 

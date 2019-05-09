@@ -118,7 +118,6 @@ public class ServiceBinder extends AbstractBinder {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(41, 47)
-                .appendSuper(super.hashCode())
                 .append(bindMap)
                 .toHashCode();
     }
