@@ -49,9 +49,10 @@ To run the example locally in docker containers (under kubernetes) follow these 
 ![Alt text](./runningServices.png?raw=true "Running services")
     You can verify that ingress is working correctly by running the following commands:
 
-    ```bash    
+    ```bash
     curl -kL http://localhost/config/v1/status && curl -kL http://localhost/palisade/v1/status &&
     curl -kL http://localhost/data/v1/status
+![Alt text](./checkUp.png?raw=true "Is service up")
     ```
     
 3. Run the test example with:
