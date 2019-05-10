@@ -48,19 +48,8 @@ To run the example locally in docker containers (under kubernetes) follow these 
     ```
 
     After a while you should see the liveness and readiness probes indicating all is well - see the example below:
-    ```bash    
-    ▶ kubectl get pods
-    NAME                                READY     STATUS      RESTARTS   AGE
-    config-service-5489cbc95f-b2js5     1/1       Running     0          2m
-    configure-example-7n8pr             0/1       Completed   0          2m
-    configure-service-6tkzs             0/1       Completed   0          2m
-    data-service-865784cd6-xz85z        1/1       Running     0          2m
-    etcd-6d6f4d5d66-85lbb               1/1       Running     0          2m
-    palisade-service-6d8fc58bb9-rm2vm   1/1       Running     0          2m
-    policy-service-6c7779db95-w9k5k     1/1       Running     0          2m
-    resource-service-764644dffd-dbnsj   1/1       Running     0          2m
-    user-service-76747d569-s24hd        1/1       Running     0          2m
-    ```
+
+![Alt text](./runningServices.png?raw=true "Running services")
     You can verify that ingress is working correctly by running the following commands:
 
     ```bash    
