@@ -6,7 +6,16 @@ The example runs several different queries by the different users, with differen
 For an overview of the example see [here](../../README.md)
 
 ### Prerequisites for running in kubernetes 
-As well as docker, this example also requires Kubernetes
+As well as docker, this example also requires Kubernetes. Kubernetes is now bundled as part of docker. The following
+screenshows shows the Docker Kubernetes preferences:
+
+![Alt text](./k8sPreferences.png?raw=true "Kubernetes preferences")
+
+
+##### N.B. If you have "Show system containers (advanced) ticked, you will be unable to run the etcd service on port 3279"
+
+
+<font color="green"> Some green text </font>
 
 To run the example locally in docker containers (under kubernetes) follow these steps (from the root of the project):
 
@@ -63,7 +72,6 @@ To run the example locally in docker containers (under kubernetes) follow these 
     ```bash
     ./example/deployment/local-k8s/bash-scripts/runExample.sh
     ```
-    Verify Alice and Eve
     
 4. Stop the REST services:
     ```bash
