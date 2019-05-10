@@ -96,7 +96,7 @@ public abstract class AbstractLeafResource extends AbstractResource implements L
         serialisedFormat(serialisedFormat);
     }
 
-    public void setAttributes(Map<String, Object> attributes) {
+    public void setAttributes(final Map<String, Object> attributes) {
         attributes(attributes);
     }
 

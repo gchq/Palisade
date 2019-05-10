@@ -44,12 +44,12 @@ public class StreamResource extends AbstractLeafResource {
     }
 
     @Override
-    public StreamResource attributes(Map<String, Object> attributes) {
+    public StreamResource attributes(final Map<String, Object> attributes) {
         return (StreamResource) super.attributes(attributes);
     }
 
     @Override
-    public StreamResource attribute(String attributeKey, Object attributeValue) {
+    public StreamResource attribute(final String attributeKey, final Object attributeValue) {
         return (StreamResource) super.attribute(attributeKey, attributeValue);
     }
 

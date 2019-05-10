@@ -42,12 +42,12 @@ public class FileResource extends AbstractLeafResource {
     }
 
     @Override
-    public FileResource attributes(Map<String, Object> attributes) {
+    public FileResource attributes(final Map<String, Object> attributes) {
         return (FileResource) super.attributes(attributes);
     }
 
     @Override
-    public FileResource attribute(String attributeKey, Object attributeValue) {
+    public FileResource attribute(final String attributeKey, final Object attributeValue) {
         return (FileResource) super.attribute(attributeKey, attributeValue);
     }
 
