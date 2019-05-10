@@ -35,7 +35,7 @@ public class RunAction  extends PerfAction {
     }
 
     @Override
-    public Integer apply(String[] strings) {
+    public Integer apply(final String[] args) {
         return null;
     }
 }
