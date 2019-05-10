@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.example.perf.actions.CreateAction;
 import uk.gov.gchq.palisade.example.perf.actions.HelpAction;
+import uk.gov.gchq.palisade.example.perf.actions.RunAction;
 import uk.gov.gchq.palisade.example.perf.actions.SetPolicyAction;
 import uk.gov.gchq.palisade.example.perf.actions.UnknownAction;
 import uk.gov.gchq.palisade.example.perf.actions.UsageAction;
@@ -50,6 +51,7 @@ public final class Perf {
         addAction(new UsageAction());
         addAction(new HelpAction());
         addAction(new SetPolicyAction());
+        addAction(new RunAction());
     }
 
     /**
@@ -87,7 +89,11 @@ public final class Perf {
             System.exit((nonNull(exitCode)) ? exitCode.intValue() : 0);
 
         } catch (IllegalArgumentException e) {
+            //don't print stack trace for simple error
             LOGGER.error("Executing \"{}\" gave following error: {}", action, e.getMessage());
+            System.exit(1);
+        } catch (RuntimeException e) {
+            LOGGER.error("Executing \"{}\" failed:", action, e);
             System.exit(1);
         }
     }

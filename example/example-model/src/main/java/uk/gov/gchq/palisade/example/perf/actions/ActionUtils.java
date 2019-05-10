@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example.perf.actions;
 
+import java.net.URI;
 import java.nio.file.Path;
 
 public final class ActionUtils {
@@ -38,7 +39,7 @@ public final class ActionUtils {
     }
 
     /**
-     * Make {@link Path} for large file.
+     * Make {@link URI} for large file.
      *
      * @param outputDirectory relative output directory
      * @return complete path
