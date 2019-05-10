@@ -19,6 +19,8 @@ package uk.gov.gchq.palisade.resource.impl;
 import uk.gov.gchq.palisade.resource.AbstractLeafResource;
 import uk.gov.gchq.palisade.resource.ParentResource;
 
+import java.util.Map;
+
 public class StreamResource extends AbstractLeafResource {
     long start;
     long end;
@@ -39,6 +41,16 @@ public class StreamResource extends AbstractLeafResource {
     @Override
     public StreamResource serialisedFormat(final String serialisedFormat) {
         return (StreamResource) super.serialisedFormat(serialisedFormat);
+    }
+
+    @Override
+    public StreamResource attributes(Map<String, Object> attributes) {
+        return (StreamResource) super.attributes(attributes);
+    }
+
+    @Override
+    public StreamResource attribute(String attributeKey, Object attributeValue) {
+        return (StreamResource) super.attribute(attributeKey, attributeValue);
     }
 
     @Override

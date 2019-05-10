@@ -21,39 +21,69 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class AbstractLeafResource extends AbstractResource implements LeafResource, ChildResource {
 
     private String type;
     private String serialisedFormat;
     private ParentResource parent;
+    private Map<String,Object> attributes = new HashMap<>();
 
     public AbstractLeafResource() {
     }
 
     public AbstractLeafResource type(final String type) {
-        Objects.requireNonNull(type, "The type of a resource cannot be set to null.");
+        requireNonNull(type, "The type of a resource cannot be set to null.");
         this.type = type;
         return this;
     }
 
     public AbstractLeafResource serialisedFormat(final String serialisedFormat) {
-        Objects.requireNonNull(serialisedFormat, "The serialised format of a resource cannot be set to null.");
+        requireNonNull(serialisedFormat, "The serialised format of a resource cannot be set to null.");
         this.serialisedFormat = serialisedFormat;
+        return this;
+    }
+
+    public AbstractLeafResource attributes(final Map<String, Object> attributes) {
+        requireNonNull(attributes, "The attributes of a resource cannot be set to null.");
+        this.attributes = attributes;
+        return this;
+    }
+
+    public AbstractLeafResource attribute(final String attributeKey, final Object attributeValue) {
+        requireNonNull(attributeKey, "The attributeKey cannot be set to null.");
+        requireNonNull(attributeKey, "The attributeValue cannot be set to null.");
+        this.attributes.put(attributeKey, attributeValue);
         return this;
     }
 
     @Override
     public String getType() {
-        Objects.requireNonNull(type, "The type has not been set for this resource.");
+        requireNonNull(type, "The type has not been set for this resource.");
         return type;
     }
 
     @Override
     public String getSerialisedFormat() {
-        Objects.requireNonNull(serialisedFormat, "The serialised format has not been set for this resource.");
+        requireNonNull(serialisedFormat, "The serialised format has not been set for this resource.");
         return serialisedFormat;
+    }
+
+    public Map<String, Object> getAttributes() {
+        // no null check required
+        return attributes;
+    }
+
+    public Object getAttribute(final String attributeKey) {
+        return this.attributes.getOrDefault(attributeKey, null);
+    }
+
+    public Boolean isAttributeSet(final String attributeKey) {
+        return this.attributes.containsKey(attributeKey);
     }
 
     @Override
@@ -66,15 +96,23 @@ public abstract class AbstractLeafResource extends AbstractResource implements L
         serialisedFormat(serialisedFormat);
     }
 
+    public void setAttributes(Map<String, Object> attributes) {
+        attributes(attributes);
+    }
+
+    public void setAttribute(final String attributeKey, final Object attributeValue) {
+        attribute(attributeKey, attributeValue);
+    }
+
     public AbstractLeafResource parent(final ParentResource parent) {
-        Objects.requireNonNull(parent, "The parent cannot be set to null.");
+        requireNonNull(parent, "The parent cannot be set to null.");
         this.parent = parent;
         return this;
     }
 
     @Override
     public ParentResource getParent() {
-        Objects.requireNonNull(parent, "The parent has not been set for this resource.");
+        requireNonNull(parent, "The parent has not been set for this resource.");
         return parent;
     }
 
@@ -100,6 +138,7 @@ public abstract class AbstractLeafResource extends AbstractResource implements L
                 .append(type, that.type)
                 .append(serialisedFormat, that.serialisedFormat)
                 .append(parent, that.parent)
+                .append(attributes, that.attributes)
                 .isEquals();
     }
 
@@ -110,6 +149,7 @@ public abstract class AbstractLeafResource extends AbstractResource implements L
                 .append(type)
                 .append(serialisedFormat)
                 .append(parent)
+                .append(attributes)
                 .toHashCode();
     }
 
@@ -120,6 +160,7 @@ public abstract class AbstractLeafResource extends AbstractResource implements L
                 .append("type", type)
                 .append("serialisedFormat", serialisedFormat)
                 .append("parent", parent)
+                .append("attributes", attributes)
                 .toString();
     }
 }
