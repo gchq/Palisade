@@ -40,25 +40,25 @@ To run the example locally in docker containers (under kubernetes) follow these 
 
     After a while you should see the liveness and readiness probes indicating all is well - see the example below:
     ```bash    
-    Palisade/example/deployment  gh-335-local-k8s ✗                                                                 46m ◒
     ▶ kubectl get pods
     NAME                                READY     STATUS      RESTARTS   AGE
-    config-service-b8fb57cbc-z6pgg      1/1       Running     0          8m
-    configure-services-z8p7w            0/1       Completed   0          8m
-    data-service-59fd76797d-8j8hp       1/1       Running     0          7m
-    etcd-84dbfdbc86-7chb6               1/1       Running     4          8m
-    palisade-service-68b4954ddf-kxmqh   1/1       Running     0          8m
-    policy-service-7798b79bd7-9qhpd     1/1       Running     0          8m
-    resource-service-766cdbc97d-79sjx   1/1       Running     0          8m
-    user-service-844f86675c-gc2g8       1/1       Running     0          8m
+    config-service-5489cbc95f-b2js5     1/1       Running     0          2m
+    configure-example-7n8pr             0/1       Completed   0          2m
+    configure-service-6tkzs             0/1       Completed   0          2m
+    data-service-865784cd6-xz85z        1/1       Running     0          2m
+    etcd-6d6f4d5d66-85lbb               1/1       Running     0          2m
+    palisade-service-6d8fc58bb9-rm2vm   1/1       Running     0          2m
+    policy-service-6c7779db95-w9k5k     1/1       Running     0          2m
+    resource-service-764644dffd-dbnsj   1/1       Running     0          2m
+    user-service-76747d569-s24hd        1/1       Running     0          2m
     ```
     You can verify that ingress is working correctly by running the following commands:
-    ```bash
-    curl -kL http://localhost/config/v1/status
-    curl -kL http://localhost/palisade/v1/status
+
+    ```bash    
+    curl -kL http://localhost/config/v1/status && curl -kL http://localhost/palisade/v1/status &&
     curl -kL http://localhost/data/v1/status
     ```
-
+    
 3. Run the test example with:
     ```bash
     ./example/deployment/local-k8s/bash-scripts/runExample.sh
