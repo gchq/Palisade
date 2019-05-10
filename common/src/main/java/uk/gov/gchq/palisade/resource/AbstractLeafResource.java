@@ -50,6 +50,7 @@ public abstract class AbstractLeafResource extends AbstractResource implements L
 
     public AbstractLeafResource attributes(final Map<String, Object> attributes) {
         requireNonNull(attributes, "The attributes of a resource cannot be set to null.");
+        this.attributes.clear();
         this.attributes.putAll(attributes);
         return this;
     }
