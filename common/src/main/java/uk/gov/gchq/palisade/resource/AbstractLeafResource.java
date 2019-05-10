@@ -31,7 +31,7 @@ public abstract class AbstractLeafResource extends AbstractResource implements L
     private String type;
     private String serialisedFormat;
     private ParentResource parent;
-    private Map<String,Object> attributes = new HashMap<>();
+    private Map<String, Object> attributes = new HashMap<>();
 
     public AbstractLeafResource() {
     }
