@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -80,12 +81,12 @@ public final class ExampleFileUtil {
         } catch (URISyntaxException e) {
             try {
                 uriPath = Paths.get(path).normalize().toUri();
-            } catch (Throwable f) {
-                throw new RuntimeException("Can't parse the given file name", f);
+            } catch (IllegalArgumentException | FileSystemNotFoundException f) {
+                throw new RuntimeException("Can't parse the given file name: ", f);
             }
         }
 
-        //is this a local file URL? If so attempt to normalise it
+        // If the URI scheme is not provided or is not correct for this filesystem attempt to correct it if possible
 
         if (isNull(uriPath.getScheme()) ||
                 FileSystems.getDefault().provider().getScheme().equals(uriPath.getScheme())) {

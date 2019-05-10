@@ -149,7 +149,6 @@ public class ExampleFileUtilTest {
     @Test
     public void shouldNotChangeNonExistentFile() {
         //Given
-        //String expected = "file:///nowhere/no_file";
         String expected = Paths.get(URI.create("file:///nowhere/no_file")).toUri().toString();
 
         //When
