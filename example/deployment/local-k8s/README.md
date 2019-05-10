@@ -3,7 +3,7 @@
 This example demonstrates different users querying an avro file over a REST api running locally in kubernetes containers.
 
 The example runs several different queries by the different users, with different purposes. When you run the example you will see the data has been redacted in line with the rules.  
-For an overview of the example see [here](../../README.md)
+For an overview of the example see [here](../README.md)
 
 ### Prerequisites for running in kubernetes 
 As well as docker, this example also requires Kubernetes. Kubernetes is now bundled as part of docker. The following
