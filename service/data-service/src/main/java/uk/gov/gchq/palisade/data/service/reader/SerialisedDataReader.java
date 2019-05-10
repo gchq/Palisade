@@ -17,6 +17,8 @@
 package uk.gov.gchq.palisade.data.service.reader;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,20 +50,30 @@ import static java.util.Objects.requireNonNull;
  * need to implement a {@link uk.gov.gchq.palisade.data.service.DataService} for
  * each data storage technology and data format combination, rather than also
  * having to add the data structure into the mix.
+ * <p>
+ * A serialiser is chosen based on a {@link DataFlavour} which is a combination of
+ * data type and serialised format.
  */
 public abstract class SerialisedDataReader implements DataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialisedDataReader.class);
 
     @JsonProperty("default")
     private Serialiser<?> defaultSerialiser = new SimpleStringSerialiser();
+
+    /**
+     * Map of the types and formats to the serialising object. The first element of the key is the data type
+     * and the second element is the serialised format.
+     */
     @JsonProperty("serialisers")
-    private Map<String, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
+    @JsonSerialize(keyUsing = DataFlavour.FlavourSerializer.class)
+    @JsonDeserialize(keyUsing = DataFlavour.FlavourDeserializer.class)
+    private Map<DataFlavour, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
 
     /**
      * @param serialisers a mapping of data type to serialiser
      * @return the {@link SerialisedDataReader}
      */
-    public SerialisedDataReader serialisers(final Map<String, Serialiser<?>> serialisers) {
+    public SerialisedDataReader serialisers(final Map<DataFlavour, Serialiser<?>> serialisers) {
         requireNonNull(serialisers, "The serialisers cannot be set to null.");
         this.serialisers = serialisers;
         return this;
@@ -126,9 +138,10 @@ public abstract class SerialisedDataReader implements DataReader {
      */
     protected abstract InputStream readRaw(final LeafResource resource);
 
-    public <RULES_DATA_TYPE> Serialiser<RULES_DATA_TYPE> getSerialiser(final String type) {
-        requireNonNull(type, "The type cannot be null.");
-        Serialiser<?> serialiser = serialisers.get(type);
+    public <RULES_DATA_TYPE> Serialiser<RULES_DATA_TYPE> getSerialiser(final DataFlavour flavour) {
+        requireNonNull(flavour, "The flavour cannot be null.");
+        Serialiser<?> serialiser = serialisers.get(flavour);
+
         if (null == serialiser) {
             serialiser = defaultSerialiser;
         }
@@ -137,16 +150,27 @@ public abstract class SerialisedDataReader implements DataReader {
 
     public <I> Serialiser<I> getSerialiser(final LeafResource resource) {
         requireNonNull(resource, "The resource cannot be null.");
-        return getSerialiser(resource.getType());
+        return getSerialiser(DataFlavour.of(resource.getType(), resource.getSerialisedFormat()));
     }
 
-    public void addSerialiser(final String type, final Serialiser<?> serialiser) {
-        requireNonNull(type, "The type cannot be null.");
+    public void addSerialiser(final DataFlavour flavour, final Serialiser<?> serialiser) {
+        requireNonNull(flavour, "The flavour cannot be null.");
         requireNonNull(serialiser, "The serialiser cannot be null.");
-        serialisers.put(type, serialiser);
+        serialisers.put(flavour, serialiser);
     }
 
-    public void setSerialisers(final Map<String, Serialiser<?>> serialisers) {
+    /**
+     * Adds all the serialiser mappings to the current map of serialisers.Any existing mappings for a given {@link DataFlavour}
+     * are replaced.
+     *
+     * @param mergingSerialisers the new serialisers to merge
+     */
+    public void addAllSerialisers(final Map<DataFlavour, Serialiser<?>> mergingSerialisers) {
+        requireNonNull(mergingSerialisers, "mergingSerialisers");
+        serialisers.putAll(mergingSerialisers);
+    }
+
+    public void setSerialisers(final Map<DataFlavour, Serialiser<?>> serialisers) {
         serialisers(serialisers);
     }
 

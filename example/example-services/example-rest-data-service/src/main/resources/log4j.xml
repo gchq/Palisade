@@ -18,13 +18,25 @@
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
                      debug="false">
-    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+    <appender name="CONSOLE_LOG" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out" />
+        <param name="Threshold" value="INFO" />
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%c{3} %p %x - %m%n"/>
+            <param name="ConversionPattern" value="%c{3} %p %x - %m%n" />
         </layout>
     </appender>
+    <appender name="FILE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${catalina.home}/logs/debug.log" />
+        <param name="Threshold" value="DEBUG" />
+        <param name="maxBackupIndex" value="5" />
+        <param name="maxFileSize" value="1500MB" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %c{3} %p %x - %m%n" />
+        </layout>
+    </appender>
+
     <root>
-        <priority value="info"></priority>
-        <appender-ref ref="console"></appender-ref>
+        <appender-ref ref="CONSOLE_LOG" />
+        <appender-ref ref="FILE_LOG" />
     </root>
 </log4j:configuration>
