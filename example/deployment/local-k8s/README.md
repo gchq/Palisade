@@ -14,9 +14,6 @@ screenshows shows the Docker Kubernetes preferences:
 
 ##### N.B. If you have "Show system containers (advanced) ticked, you will be unable to run the etcd service on port 3279"
 
-
-<font color="green"> Some green text </font>
-
 To run the example locally in docker containers (under kubernetes) follow these steps (from the root of the project):
 
 1. Compile the code:
