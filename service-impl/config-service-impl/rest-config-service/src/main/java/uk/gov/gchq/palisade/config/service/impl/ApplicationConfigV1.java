@@ -28,7 +28,7 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
     public ApplicationConfigV1() {
         super(RESOURCES);
         //make sure we can inject the service instance
-        ConfigurationService delegate = RestConfigServiceV1.createService(System.getProperty(RestConfigServiceV1.BOOTSTRAP_CONFIG));
+        ConfigurationService delegate = RestConfigServiceV1.createService(System.getenv(RestConfigServiceV1.BOOTSTRAP_CONFIG));
         register(new ServiceBinder(delegate, ConfigurationService.class));
     }
 
