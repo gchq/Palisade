@@ -262,8 +262,7 @@ public class HadoopFileResourceServiceTest {
     public void shouldJSONSerialiser() throws Exception {
         //use local copy for this test
         final HadoopResourceService service = new HadoopResourceService(conf, simpleCache);
-
-        //service.connectionDetail(dataFormat, dataType);
+        
         final byte[] serialise = JSONSerialiser.serialise(service, true);
         final String expected = "{\n" +
                 "  \"@id\" : 1,\n" +

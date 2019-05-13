@@ -70,7 +70,7 @@ public class HadoopResourceDetails {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("type", type)
-                .append("id", fileName)
+                .append("fileName", fileName)
                 .append("format", format)
                 .build();
     }

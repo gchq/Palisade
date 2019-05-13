@@ -307,6 +307,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         LOGGER.debug("Error handling: " + ex.getMessage());
         auditService.audit(auditRequestWithException);
     }
+
     private void cache(final RegisterDataRequest request, final User user,
                        final RequestId requestId, final MultiPolicy multiPolicy,
                        final int resCount,
