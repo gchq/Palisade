@@ -58,3 +58,4 @@ The example runs several different queries by the different users, with differen
 For deployment specific instructions on how to run the example see:  
 [Local JVM](deployment/local-jvm/README.md)  
 [Local Docker](deployment/local-docker/README.md)  
+[Local Kubernetes](deployment/local-k8s/README.md)  
