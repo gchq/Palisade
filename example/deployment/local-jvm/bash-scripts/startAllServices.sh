@@ -3,7 +3,6 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$DIR/../../bash-scripts/setScriptPath.sh"
 
-
 "${LOCALJVMBASHSCRIPTS}/stopAllServices.sh" > /dev/null 2>&1
 
 # deploy etcd
