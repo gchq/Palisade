@@ -26,6 +26,7 @@ import uk.gov.gchq.palisade.example.perf.trial.SleepTrial;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -72,13 +73,24 @@ public class RunAction extends PerfAction {
 
     @Override
     public String help() {
-        return "Run a series of performance tests and report the results." +
+        StringBuilder help = new StringBuilder("Run a series of performance tests and report the results." +
                 "\nThis command should be invoked as:\n\t" +
                 name() +
                 "\tDRY_RUN LIVE_TEST [TESTS SKIP]" +
                 "\nwhere DRY_RUN and LIVE_TEST are the number of dry runs of tests to perform before hand and the number" +
                 "\nof live trials respectively. The TESTS SKIP is a comma separated list of tests to skip." +
-                "\nThe list of valid tests is: " + testsToRun.keySet().stream().collect(Collectors.joining(", ")) + ".";
+                "\nThe list of valid tests is:\n");
+
+        testsToRun.entrySet().stream()
+                .forEach(e -> {
+                    help.append("\t")
+                            .append(e.getValue())
+                            .append("\t\t")
+                            .append(Objects.toString(e.getValue().description(), "no description"))
+                            .append("\n");
+                });
+
+        return help.toString();
     }
 
     @Override
@@ -111,6 +123,9 @@ public class RunAction extends PerfAction {
 
         //do the live trials
         performTrialBatch(liveTrials, collector, TrialType.LIVE, skipTests);
+        
+        //write the performance test outputs
+        collector.outputTo(System.out);
 
         return Integer.valueOf(0);
     }

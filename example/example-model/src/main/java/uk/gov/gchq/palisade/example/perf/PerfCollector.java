@@ -16,7 +16,12 @@
 
 package uk.gov.gchq.palisade.example.perf;
 
+import java.io.PrintStream;
+
 public class PerfCollector {
     public void logTime(String name, long time) {
+    }
+
+    public void outputTo(PrintStream out) {
     }
 }
