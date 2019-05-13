@@ -1,0 +1,17 @@
+---
+# source: palisade/templates/configure-services.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: configure-services
+  name: configure-services
+spec:
+  template:
+    spec:
+      containers:
+        - image: example_configure-services:latest
+          name: configure-services
+          imagePullPolicy: Never
+          command: ["/tmp/waitForHost.sh", "http://config-service:8080/config/v1/status", "java", "-cp", "/tmp/example-model-*-shaded.jar", "uk.gov.gchq.palisade.example.config.DistributedServices", "http://etcd:2379", "http://palisade-service:8080/palisade", "http://policy-service:8080/policy", "http://resource-service:8080/resource", "http://user-service:8080/user", "http://data-service:8080/data", "http://config-service:8080/config", "http://localhost/palisade", "http://localhost/data"]
+      restartPolicy: Never
