@@ -123,8 +123,9 @@ public class RunAction extends PerfAction {
 
         //do the live trials
         performTrialBatch(liveTrials, collector, TrialType.LIVE, skipTests);
-        
+
         //write the performance test outputs
+        System.out.println();
         collector.outputTo(System.out);
 
         return Integer.valueOf(0);

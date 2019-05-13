@@ -16,12 +16,54 @@
 
 package uk.gov.gchq.palisade.example.perf;
 
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
+/**
+ * An output collector receives timing data from performance tests and stores them. It can later be called on to write
+ * summary statistics to various outputs.
+ */
 public class PerfCollector {
-    public void logTime(String name, long time) {
+
+    /**
+     * Details of all the times.
+     */
+    private Map<String, List<Long>> times = new HashMap<>();
+
+    /**
+     * Records a single trial of a given test.
+     *
+     * @param testName the name of the test
+     * @param ns       the timing of the test in nanoseconds
+     * @throws IllegalArgumentException if {@code testName} is {@code null} or empty or {@code ns} is negative
+     */
+    public void logTime(final String testName, final long ns) {
+        requireNonNull(testName, "testName");
+        if (testName.trim().isEmpty()) {
+            throw new IllegalArgumentException("testName cannot be empty");
+        }
+        if (ns < 0) {
+            throw new IllegalArgumentException("ns is negative");
+        }
+
+        //create a list if needed and add this time
+        times.computeIfAbsent(testName, k -> new ArrayList<>())
+                .add(Long.valueOf(ns));
     }
 
-    public void outputTo(PrintStream out) {
+    /**
+     * Writes a table of summary statistics to the given {@link java.io.OutputStream}
+     *
+     * @param out
+     */
+    public void outputTo(final OutputStream out) {
+        requireNonNull(out, "out");
+        new PrintStream(out).println(times);
     }
 }
