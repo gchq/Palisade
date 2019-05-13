@@ -40,7 +40,8 @@ public final class Perf {
     public static final Logger LOGGER = LoggerFactory.getLogger(Perf.class);
 
     /**
-     * Map of action names to the classes that implement them.
+     * Map of action names to the classes that implement them. This map contains the name of the action given on the command
+     * line. We can then just look up what to do and call its apply() method.
      */
     public static final Map<String, PerfAction> ACTIONS;
 
@@ -75,7 +76,7 @@ public final class Perf {
         //if any argument was supplied that becomes the action
         if (args.length > 0) {
             action = args[0];
-            //if we have any further arguments that becomes the action arguments
+            //if we have any further arguments they becomes the action arguments
             if (args.length > 1) {
                 actionArgs = Arrays.copyOfRange(args, 1, args.length);
             }

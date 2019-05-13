@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.example.perf.actions;
 
 import uk.gov.gchq.palisade.example.perf.PerfAction;
 
-public class RunAction  extends PerfAction {
+public class RunAction extends PerfAction {
     @Override
     public String name() {
         return "run";
