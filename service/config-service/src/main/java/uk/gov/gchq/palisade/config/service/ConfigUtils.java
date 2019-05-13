@@ -31,7 +31,7 @@ import java.util.Optional;
  * Utility class that includes functionality to create a {@link Service} from a given class name.
  */
 public final class ConfigUtils {
-    public static final String CONFIG_SERVICE_PATH = "palisade_rest_config_path";
+    public static final String CONFIG_SERVICE_PATH = "PALISADE_REST_CONFIG_PATH";
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigUtils.class);
 
     private ConfigUtils() {

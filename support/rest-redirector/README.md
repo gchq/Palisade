@@ -3,7 +3,7 @@ A REST implementation of the redirection capability. This service can act as a r
 It uses HTTP temporary redirects to send the client to an alternative location. 
 
 The REST redirector will attempt to connect to a configuration service upon construction. The details for the configuration service
-should be contained in a file named by the environment variable "palisade_rest_config_path". The REST director will then configure itself according
+should be contained in a file named by the environment variable "PALISADE_REST_CONFIG_PATH". The REST director will then configure itself according
 to the details provided to it by the configuration service. Some of the configuration items can be overridden by setting extra system properties.
 
 | System property | Description |  Example |
