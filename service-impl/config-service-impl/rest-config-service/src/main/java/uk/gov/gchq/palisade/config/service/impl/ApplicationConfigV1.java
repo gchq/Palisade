@@ -20,6 +20,8 @@ import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 
+import static java.util.Objects.isNull;
+
 public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
     private static final Class<?>[] RESOURCES = new Class<?>[]{
             RestConfigServiceV1.class
@@ -27,9 +29,17 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
 
     public ApplicationConfigV1() {
         super(RESOURCES);
+        //check environment variable, if that doesn't work then check system property
+        String bootStrapLocation = System.getenv(RestConfigServiceV1.BOOTSTRAP_CONFIG);
+
+        if (isNull(bootStrapLocation)) {
+            bootStrapLocation = System.getProperty(RestConfigServiceV1.BOOTSTRAP_CONFIG);
+        }
+
         //make sure we can inject the service instance
-        ConfigurationService delegate = RestConfigServiceV1.createService(System.getenv(RestConfigServiceV1.BOOTSTRAP_CONFIG));
+        ConfigurationService delegate = RestConfigServiceV1.createService(bootStrapLocation);
         register(new ServiceBinder(delegate, ConfigurationService.class));
     }
+
 
 }
