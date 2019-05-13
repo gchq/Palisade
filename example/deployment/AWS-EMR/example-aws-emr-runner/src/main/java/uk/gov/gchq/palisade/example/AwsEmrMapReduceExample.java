@@ -36,12 +36,12 @@ import org.slf4j.LoggerFactory;
 
 //import uk.gov.gchq.palisade.example.common.Purpose;
 //import uk.gov.gchq.palisade.example.config.ServicesCreator;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.config.service.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
-import uk.gov.gchq.palisade.Context;
 //import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 //import uk.gov.gchq.palisade.data.serialise.Serialiser;
@@ -253,19 +253,16 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         Configuration conf = new Configuration();
         //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
         //conf.set("mapred.job.tracker", "local");
-        //conf.set("mapredude.framework.name", "local");
-        conf.set("mapredude.framework.name", "yarn");
+        //conf.set("mapreduce.framework.name", "local");
+        conf.set("mapreduce.framework.name", "yarn");
         //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
         //conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, new File(".").toURI().toURL().toString());
         //set defaultFS to hdfs on cluster
         //conf.set("fs.defaultFS", ("hdfs://" + hostname));
         conf.set("fs.defaultFS", ("hdfs://localhost"));           // *****revert this***
         //set address of resource manager
-        //conf.set("yarn.resourcemanager.address",(hostname + ":8032"));
-        conf.set("yarn.resourcemanager.address",
-
-
-                ("localhost:8032"));          //***revert***
+        //conf.set("yarn.resourcemanager.address", (hostname + ":8032"));
+        conf.set("yarn.resourcemanager.address", ("localhost:8032"));          //***revert***
         ToolRunner.run(conf, new AwsEmrMapReduceExample(), new String[]{sourceFile, outputDir});
     }
 

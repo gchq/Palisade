@@ -13,7 +13,7 @@ fi
 
 if [[ $# -lt 2 ]]
 then
-    INPUTFILE="$DIR/../../../resources/Employee_file0.avro"
+    INPUTFILE="$DIR/../../../resources/employee_file0.avro"
 fi
 
 java -cp example/deployment/mapreduce-example/mapreduce-example-runner/target/mapreduce-example-runner-*-shaded.jar -Dpalisade.rest.config.path=configRest.json uk.gov.gchq.palisade.example.MapReduceExample "$INPUTFILE" "$OUT_PATH"

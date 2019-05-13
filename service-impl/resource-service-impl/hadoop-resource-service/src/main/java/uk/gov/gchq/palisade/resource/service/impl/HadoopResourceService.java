@@ -224,8 +224,8 @@ public class HadoopResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         final String resourceId = request.getResourceId();
-        final String path = getInternalConf().get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
-        //LOGGER.info("EMR debug: HadoopResourceService - FS_DEFAULT_NAME_KEY is: " + FS_DEFAULT_NAME_KEY);
+        //final String path = getInternalConf().get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY);
+        final String path = "hdfs:///";
         LOGGER.info("EMR debug: HadoopResourceService - resourceId is: " + resourceId);
         LOGGER.info("EMR debug: HadoopResourceService - path is: " + path);
 //        if (!resourceId.startsWith(path)) {
@@ -242,6 +242,7 @@ public class HadoopResourceService implements ResourceService {
             try {
                 //pull latest connection details
                 LOGGER.info("EMR debug: HadoopResourceService - at start of try");
+                LOGGER.info("EMR debug: HadoopResourceService - pathString - " + pathString);
                 final RemoteIterator<LocatedFileStatus> remoteIterator = this.getFileSystem().listFiles(new Path(pathString), true);
                 LOGGER.info("EMR debug: HadoopResourceService - after remoteIterator");
                 return getPaths(remoteIterator)

@@ -22,12 +22,18 @@ resource "null_resource" "deploy_example" {
     ]
   }
 
-  # Copy EMR bash-scripts directory to EMR master......and make scripts executable
+  # Make required directories on the master
   provisioner "remote-exec" {
     inline = [
       "mkdir -p /home/hadoop/deploy_example",
+      "mkdir -p /home/hadoop/deploy_example/resources",
+      "mkdir -p /home/hadoop/jars",
+      "mkdir -p /home/hadoop/example_logs",
+      "mkdir -p /home/hadoop/example_data",
     ]
   }
+
+  # Copy EMR bash-scripts directory to EMR master......and make scripts executable
   provisioner "file" {
       source = "../bash-scripts/"
       destination = "/home/hadoop/deploy_example"
@@ -50,17 +56,11 @@ resource "null_resource" "deploy_example" {
 #    command = "../../local-jvm/bash-scripts/buildServices.sh"
 #  }
 
-  # Copy the executable jar files created by buildServices to the EMR master......
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /home/hadoop/jars",
-    ]
-  }
-
   # Ensure the services are not running
     provisioner "remote-exec" {
       inline = [
-        "kill `ps -aef | grep example-rest-.*-service | grep -v grep | awk '{print $2}'`",
+        "kill `ps -aef | grep example-rest-.*-service | grep -v grep | awk '{print $2}'` || echo Killed",
+        "hdfs dfs -rm -r /example_data || echo Deleted",
       ]
     }
 
@@ -68,11 +68,6 @@ resource "null_resource" "deploy_example" {
   provisioner "file" {
       source = "../../../example-services/example-rest-config-service/target/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
       destination = "/home/hadoop/jars/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /home/hadoop/example_logs",
-    ]
   }
   provisioner "local-exec" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployConfigService.sh > /home/hadoop/example_logs/deployConfigService.log 2>&1 &'"
@@ -132,7 +127,6 @@ resource "null_resource" "deploy_example" {
   provisioner "remote-exec" {
       inline = [
         "hdfs dfs -rm -r /example_data || echo Deleted",
-        "mkdir -p /home/hadoop/example_data",
         "java -cp /home/hadoop/jars/example-model-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData  /home/hadoop/example_data  10  1 > /home/hadoop/example_logs/createDataFile.log 2>&1 ",
         "hdfs dfs -mkdir /example_data",
         "hdfs dfs -put /home/hadoop/example_data/* /example_data/"
@@ -153,7 +147,7 @@ resource "null_resource" "deploy_example" {
   # Configure the Example - create some users and policies...
   provisioner "remote-exec" {
       inline = [
-        "java -cp /home/hadoop/jars/example-model-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.config.ExampleConfigurator /home/hadoop/example_data/Employee_file0.avro > /home/hadoop/example_logs/configureExample.log 2>&1 ",
+        "java -cp /home/hadoop/jars/example-model-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json uk.gov.gchq.palisade.example.config.ExampleConfigurator /home/hadoop/example_data/employee_file0.avro > /home/hadoop/example_logs/configureExample.log 2>&1 ",
       ]
     }
 
@@ -165,7 +159,7 @@ resource "null_resource" "deploy_example" {
   provisioner "remote-exec" {
       inline = [
         "hdfs dfs -rm -r /user/hadoop/output || echo Deleted",
-        "java -cp /home/hadoop/jars/example-aws-emr-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json  uk.gov.gchq.palisade.example.AwsEmrMapReduceExample hdfs:///example_data/Employee_file0.avro hdfs:///user/hadoop/output > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
+        "java -cp /home/hadoop/jars/example-aws-emr-runner-*-shaded.jar -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json  uk.gov.gchq.palisade.example.AwsEmrMapReduceExample hdfs:///example_data/employee_file0.avro hdfs:///user/hadoop/output > /home/hadoop/example_logs/exampleOutput.log 2>&1 ",
       ]
     }
 }

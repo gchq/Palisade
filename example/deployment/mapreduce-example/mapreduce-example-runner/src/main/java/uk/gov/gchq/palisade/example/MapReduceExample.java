@@ -34,6 +34,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.config.service.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigUtils;
@@ -41,7 +42,6 @@ import uk.gov.gchq.palisade.config.service.ConfigUtils;
 //import uk.gov.gchq.palisade.example.config.ServicesCreator;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.Configurator;
-import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 //import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
