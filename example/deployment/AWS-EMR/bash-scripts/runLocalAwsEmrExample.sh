@@ -3,8 +3,8 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 #/home/gmiller/repos/Palisade/example/deployment/mapreduce-example/scripts
 
-INPUTFILE=$2
-OUT_PATH=$1
+INPUTFILE=$1
+OUT_PATH=$2
 
 if [[ $# -lt 1 ]]
 then

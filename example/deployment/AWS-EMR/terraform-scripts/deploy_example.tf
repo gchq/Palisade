@@ -60,7 +60,6 @@ resource "null_resource" "deploy_example" {
     provisioner "remote-exec" {
       inline = [
         "kill `ps -aef | grep example-rest-.*-service | grep -v grep | awk '{print $2}'` || echo Killed",
-        "hdfs dfs -rm -r /example_data || echo Deleted",
       ]
     }
 

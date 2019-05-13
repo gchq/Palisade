@@ -216,6 +216,9 @@ public class ServicesConfigurator {
                 }
             }
         }
+
+        // tell the resource service that it is pointing at hdfs
+        ret.set("fs.defaultFS", ("hdfs://localhost"));
         return ret;
     }
 
