@@ -60,7 +60,7 @@ public class PerfCollector {
     /**
      * Writes a table of summary statistics to the given {@link java.io.OutputStream}
      *
-     * @param out
+     * @param out where to write output
      */
     public void outputTo(final OutputStream out) {
         requireNonNull(out, "out");

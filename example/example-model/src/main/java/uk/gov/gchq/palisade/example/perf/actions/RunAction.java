@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -54,7 +53,7 @@ public class RunAction extends PerfAction {
     /**
      * Adds the given trial to the list of tests we can run.
      *
-     * @param sleepTrial
+     * @param sleepTrial trial to add to list
      */
     private void addTrial(final PerfTrial sleepTrial) {
         requireNonNull(sleepTrial.name(), "trial has returned a null name: " + sleepTrial.getClass());
@@ -79,12 +78,12 @@ public class RunAction extends PerfAction {
                 "\tDRY_RUN LIVE_TEST [TESTS SKIP]" +
                 "\nwhere DRY_RUN and LIVE_TEST are the number of dry runs of tests to perform before hand and the number" +
                 "\nof live trials respectively. The TESTS SKIP is a comma separated list of tests to skip." +
-                "\nThe list of valid tests is:\n");
+                "\n\nThe list of valid tests is:\n");
 
         testsToRun.entrySet().stream()
                 .forEach(e -> {
                     help.append("\t")
-                            .append(e.getValue())
+                            .append(e.getValue().name())
                             .append("\t\t")
                             .append(Objects.toString(e.getValue().description(), "no description"))
                             .append("\n");
@@ -118,10 +117,12 @@ public class RunAction extends PerfAction {
 
         //do we need to do any dry runs?
         if (dryRuns > 0) {
+            Perf.LOGGER.info("Starting dry runs");
             performTrialBatch(dryRuns, collector, TrialType.DRY_RUN, skipTests);
         }
 
         //do the live trials
+        Perf.LOGGER.info("Starting live tests");
         performTrialBatch(liveTrials, collector, TrialType.LIVE, skipTests);
 
         //write the performance test outputs
@@ -154,6 +155,7 @@ public class RunAction extends PerfAction {
         for (Map.Entry<String, PerfTrial> e : testsToRun.entrySet()) {
             //do we need to skip this one?
             if (Arrays.binarySearch(testsToSkip, e.getKey()) > -1) {
+                Perf.LOGGER.info("Skpping test {}", e.getKey());
                 continue;
             }
 
@@ -184,11 +186,11 @@ public class RunAction extends PerfAction {
             delay(TEST_DELAY.toMillis());
 
             runTrial(trial, collector, type);
-            System.out.print(".." + i);
+            System.out.print(".." + (i + 1));
             System.out.flush();
         }
 
-        System.out.printf("\n");
+        System.out.printf("..done%n");
     }
 
     /**
