@@ -108,7 +108,7 @@ public class CreateAction extends PerfAction {
      * Validate the arguments for length and type
      *
      * @param args the action arguments
-     * @throws IllegalArgumentException if any error is found
+     * @throws IllegalArgumentException if any error is found in the arguments
      */
     private void validate(final String[] args) {
         if (args.length != 3) {

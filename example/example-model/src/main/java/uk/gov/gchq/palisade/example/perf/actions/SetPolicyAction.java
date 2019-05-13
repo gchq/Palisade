@@ -128,6 +128,7 @@ public class SetPolicyAction extends PerfAction {
      * Validate the arguments.
      *
      * @param args action arguments
+     * @throws IllegalArgumentException if any error is found in the arguments
      */
     private void validate(final String[] args) {
         if (args.length != 1) {
