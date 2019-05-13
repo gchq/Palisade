@@ -5,4 +5,7 @@ ADD docker/bin/example-model-*-shaded.jar /tmp/
 ADD waitForHost.sh /tmp/
 ADD docker/bin/configRest.json /tmp/
 
-CMD ["/tmp/waitForHost.sh", "http://policy-service:8080/policy/v1/status", "java", "-cp", "/tmp/example-model-*-shaded.jar", "-Dpalisade.rest.config.path=/tmp/configRest.json", "uk.gov.gchq.palisade.example.config.ExampleConfigurator", "/data/employee_file0.avro"]
+ARG PALISADE_REST_CONFIG_PATH="/tmp/configRest.json"
+ENV PALISADE_REST_CONFIG_PATH=$PALISADE_REST_CONFIG_PATH
+
+CMD ["/tmp/waitForHost.sh", "http://policy-service:8080/policy/v1/status", "java", "-cp", "/tmp/example-model-*-shaded.jar", "uk.gov.gchq.palisade.example.config.ExampleConfigurator", "/data/employee_file0.avro"]
