@@ -12,6 +12,7 @@ import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.data.service.impl.MockDataService;
@@ -175,7 +176,7 @@ public class HadoopFileResourceServiceTest {
 
         //when
         GetResourcesByTypeRequest getResourcesByTypeRequest = new GetResourcesByTypeRequest().type(TYPE_VALUE);
-        getResourcesByTypeRequest.setOriginalRequestId("test shouldGetResourcesByType");
+        getResourcesByTypeRequest.setOriginalRequestId(new RequestId().id("test shouldGetResourcesByType"));
         final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hadoopService.getResourcesByType(getResourcesByTypeRequest);
 
         //then
@@ -216,7 +217,7 @@ public class HadoopFileResourceServiceTest {
 
         //when
         GetResourcesBySerialisedFormatRequest getResourcesBySerialisedFormatRequest = new GetResourcesBySerialisedFormatRequest().serialisedFormat(FORMAT_VALUE);
-        getResourcesBySerialisedFormatRequest.setOriginalRequestId("test shouldGetResourcesByFormat");
+        getResourcesBySerialisedFormatRequest.setOriginalRequestId(new RequestId().id("test shouldGetResourcesByFormat"));
         final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hadoopService.getResourcesBySerialisedFormat(getResourcesBySerialisedFormatRequest);
 
         //then
@@ -241,7 +242,7 @@ public class HadoopFileResourceServiceTest {
         ), simpleConnection);
         //when
         GetResourcesByResourceRequest getResourcesByResourceRequest = new GetResourcesByResourceRequest().resource(new DirectoryResource().id("file:///" + id));
-        getResourcesByResourceRequest.setOriginalRequestId("test shouldGetResourcesByResource");
+        getResourcesByResourceRequest.setOriginalRequestId(new RequestId().id("test shouldGetResourcesByResource"));
         final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hadoopService.getResourcesByResource(getResourcesByResourceRequest);
 
         //then
@@ -262,7 +263,7 @@ public class HadoopFileResourceServiceTest {
     public void shouldJSONSerialiser() throws Exception {
         //use local copy for this test
         final HadoopResourceService service = new HadoopResourceService(conf, simpleCache);
-        
+
         final byte[] serialise = JSONSerialiser.serialise(service, true);
         final String expected = "{\n" +
                 "  \"@id\" : 1,\n" +

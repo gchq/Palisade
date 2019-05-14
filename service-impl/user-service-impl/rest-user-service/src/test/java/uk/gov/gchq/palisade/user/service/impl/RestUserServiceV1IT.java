@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
@@ -86,7 +87,7 @@ public class RestUserServiceV1IT {
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
 
         final GetUserRequest getUserRequest = new GetUserRequest().userId(user.getUserId());
-        getUserRequest.setOriginalRequestId("RestUserServiceV1IT.shouldGetUser");
+        getUserRequest.setOriginalRequestId(new RequestId().id("RestUserServiceV1IT.shouldGetUser"));
 
         given(userService.getUser(getUserRequest)).willReturn(CompletableFuture.completedFuture(user));
 
