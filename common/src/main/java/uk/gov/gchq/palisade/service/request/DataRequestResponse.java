@@ -38,8 +38,8 @@ import static java.util.Objects.requireNonNull;
  */
 public class DataRequestResponse {
     private RequestId requestId;
+    private RequestId originalRequestId; //this Id is unique per data access request from a user
     private Map<LeafResource, ConnectionDetail> resources;
-    private String originalRequestId; //this Id is unique per data access request from a user
 
     public DataRequestResponse() {
     }
@@ -75,7 +75,7 @@ public class DataRequestResponse {
         return this;
     }
 
-    public DataRequestResponse originalRequestId(final String originalRequestId) {
+    public DataRequestResponse originalRequestId(final RequestId originalRequestId) {
         requireNonNull(originalRequestId, "The originalRequestId cannot be null.");
         this.originalRequestId = originalRequestId;
         return this;
@@ -90,11 +90,11 @@ public class DataRequestResponse {
         return resources;
     }
 
-    public void setOriginalRequestId(final String originalRequestId) {
+    public void setOriginalRequestId(final RequestId originalRequestId) {
         originalRequestId(originalRequestId);
     }
 
-    public String getOriginalRequestId() {
+    public RequestId getOriginalRequestId() {
         requireNonNull(originalRequestId, "The originalRequestId type cannot be null");
         return originalRequestId;
     }

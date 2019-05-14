@@ -17,6 +17,7 @@ package uk.gov.gchq.palisade.cache.service.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.Service;
 
@@ -82,12 +83,12 @@ public class ListCacheRequest extends CacheRequest {
     }
 
     @Override
-    public void setOriginalRequestId(final String originalRequestId) {
+    public void setOriginalRequestId(final RequestId originalRequestId) {
         throw new ForbiddenException("Should not call ListCacheRequest.setOriginalRequestId()");
     }
 
     @Override
-    public String getOriginalRequestId() {
+    public RequestId getOriginalRequestId() {
         throw new ForbiddenException("Should not call ListCacheRequest.getOriginalRequestId()");
     }
 }
