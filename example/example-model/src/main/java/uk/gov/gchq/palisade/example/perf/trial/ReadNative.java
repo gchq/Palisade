@@ -19,27 +19,20 @@ package uk.gov.gchq.palisade.example.perf.trial;
 import uk.gov.gchq.palisade.example.perf.PerfFileSet;
 import uk.gov.gchq.palisade.example.perf.PerfTrial;
 
-import java.util.concurrent.ThreadLocalRandom;
-
-public class SleepTrial extends PerfTrial {
-
+public class ReadNative extends PerfTrial {
 
     @Override
     public String name() {
-        return "sleep";
+        return "native";
     }
 
     @Override
     public String description() {
-        return "does literally nothing";
+        return "performs a native read of a file";
     }
 
     @Override
     public void accept(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
 
-        try {
-            Thread.sleep(ThreadLocalRandom.current().nextInt(100, 1500));
-        } catch (InterruptedException ignored) {
-        }
     }
 }

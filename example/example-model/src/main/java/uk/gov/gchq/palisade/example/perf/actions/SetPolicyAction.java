@@ -22,6 +22,8 @@ import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.common.ExamplePolicies;
 import uk.gov.gchq.palisade.example.perf.Perf;
 import uk.gov.gchq.palisade.example.perf.PerfAction;
+import uk.gov.gchq.palisade.example.perf.PerfFileSet;
+import uk.gov.gchq.palisade.example.perf.PerfUtils;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
@@ -29,15 +31,15 @@ import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.gchq.palisade.example.perf.actions.ActionUtils.getLargeFile;
-import static uk.gov.gchq.palisade.example.perf.actions.ActionUtils.getNoPolicyName;
-import static uk.gov.gchq.palisade.example.perf.actions.ActionUtils.getSmallFile;
+import static uk.gov.gchq.palisade.example.perf.PerfUtils.getLargeFile;
+import static uk.gov.gchq.palisade.example.perf.PerfUtils.getNoPolicyName;
+import static uk.gov.gchq.palisade.example.perf.PerfUtils.getSmallFile;
+import static uk.gov.gchq.palisade.example.perf.PerfUtils.toURI;
 
 /**
  * Uses an existing deployment of Palisade to set policies on the given files. The policy from the example
@@ -69,7 +71,7 @@ public class SetPolicyAction extends PerfAction {
         URI uriOut = ExampleFileUtil.convertToFileURI(args[0]);
         Perf.LOGGER.info("Specified path {} has been normalised to {}", args[0], uriOut);
 
-        //for path manipulations, we temporaraily strip off the URI scheme so that we can operate on abstract path components
+        //for path manipulations, we temporarily strip off the URI scheme so that we can operate on abstract path components
         //as if they used the file scheme
         String scheme = uriOut.getScheme();
         String schemelessComponent = uriOut.toString().substring(scheme.length() + 1); //+1 to remove ':'
@@ -77,8 +79,11 @@ public class SetPolicyAction extends PerfAction {
         Path output = Paths.get(schemelessComponent);
 
         //make paths
-        Stream<URI> paths = Stream.of(getSmallFile(output), getLargeFile(output)).map(path -> toURI(scheme, path));
-        Stream<URI> noPolicyPaths = Stream.of(getNoPolicyName(getSmallFile(output)), getNoPolicyName(getLargeFile(output))).map(path -> toURI(scheme, path));
+        PerfFileSet fileSet = new PerfFileSet(toURI(scheme, getSmallFile(output)), toURI(scheme, getLargeFile(output)));
+        PerfFileSet noPolicySet = new PerfFileSet(toURI(scheme, getNoPolicyName(getSmallFile(output))), toURI(scheme, getNoPolicyName(getLargeFile(output))));
+
+        Stream<URI> paths = Stream.of(fileSet.getSmallFile(), fileSet.getLargeFile());
+        Stream<URI> noPolicyPaths = Stream.of(noPolicySet.getSmallFile(), noPolicySet.getLargeFile());
 
         //attempt to connect to Palisade
         final InputStream stream = StreamUtil.openStream(SetPolicyAction.class, System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
@@ -91,21 +96,6 @@ public class SetPolicyAction extends PerfAction {
         noPolicyPaths.forEach(path -> setPolicy(cs, ExamplePolicies.getEmptyPolicy(path.toString())));
 
         return Integer.valueOf(0);
-    }
-
-    /**
-     * Convert a scheme and path back to a URI.
-     *
-     * @param scheme the URI scheme
-     * @param path   path name
-     * @return URI corrected path
-     */
-    private static URI toURI(final String scheme, final Path path) {
-        try {
-            return new URI(scheme, path.toString(), null);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**

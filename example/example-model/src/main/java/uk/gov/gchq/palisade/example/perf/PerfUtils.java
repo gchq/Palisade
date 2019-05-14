@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example.perf.actions;
+package uk.gov.gchq.palisade.example.perf;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 
-public final class ActionUtils {
+import static java.util.Objects.requireNonNull;
+
+/**
+ * Utility methods for the performance tests.
+ */
+public final class PerfUtils {
 
     public static final String SMALL_FILE_NAME = "employee_small.avro";
     public static final String LARGE_FILE_NAME = "employee_large.avro";
     public static final String LARGE_DIRECTORY = "large";
 
-    private ActionUtils() {
+    private PerfUtils() {
     }
 
     /**
@@ -56,5 +62,22 @@ public final class ActionUtils {
      */
     public static Path getNoPolicyName(final Path file) {
         return file.resolveSibling(file.getFileName().getFileName().toString().replace(".", "-nopolicy."));
+    }
+
+    /**
+     * Convert a scheme and path back to a URI.
+     *
+     * @param scheme the URI scheme
+     * @param path   path name
+     * @return URI corrected path
+     */
+    public static URI toURI(final String scheme, final Path path) {
+        requireNonNull(scheme, "scheme");
+        requireNonNull(path, "path");
+        try {
+            return new URI(scheme, path.toString(), null);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

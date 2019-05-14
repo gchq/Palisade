@@ -19,10 +19,16 @@ package uk.gov.gchq.palisade.example.perf.actions;
 import uk.gov.gchq.palisade.example.perf.Perf;
 import uk.gov.gchq.palisade.example.perf.PerfAction;
 import uk.gov.gchq.palisade.example.perf.PerfCollector;
+import uk.gov.gchq.palisade.example.perf.PerfFileSet;
 import uk.gov.gchq.palisade.example.perf.PerfTrial;
 import uk.gov.gchq.palisade.example.perf.TrialType;
+import uk.gov.gchq.palisade.example.perf.trial.ReadNative;
 import uk.gov.gchq.palisade.example.perf.trial.SleepTrial;
+import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
@@ -30,6 +36,10 @@ import java.util.Objects;
 import java.util.TreeMap;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.gchq.palisade.example.perf.PerfUtils.getLargeFile;
+import static uk.gov.gchq.palisade.example.perf.PerfUtils.getNoPolicyName;
+import static uk.gov.gchq.palisade.example.perf.PerfUtils.getSmallFile;
+import static uk.gov.gchq.palisade.example.perf.PerfUtils.toURI;
 
 /**
  * Runs a series of performance tests under various circumstances and then reports the metrics to a collector.
@@ -48,7 +58,7 @@ public class RunAction extends PerfAction {
     public RunAction() {
         //create all the performance tests and add them in here
         addTrial(new SleepTrial());
-        addTrial(new SleepTrial());
+        addTrial(new ReadNative());
     }
 
     /**
@@ -76,7 +86,8 @@ public class RunAction extends PerfAction {
         StringBuilder help = new StringBuilder("Run a series of performance tests and report the results." +
                 "\nThis command should be invoked as:\n\t" +
                 name() +
-                "\tDRY_RUN LIVE_TEST [TESTS SKIP]" +
+                "\tPATH DRY_RUN LIVE_TEST [TESTS SKIP]" +
+                "\nwhere PATH is the path or URI to where the files have been created and" +
                 "\nwhere DRY_RUN and LIVE_TEST are the number of dry runs of tests to perform before hand and the number" +
                 "\nof live trials respectively. The TESTS SKIP is a comma separated list of tests to skip." +
                 "\n\nThe list of valid tests is:\n");
@@ -98,16 +109,31 @@ public class RunAction extends PerfAction {
         //first validate the arguments
         validate(args);
 
+        //get the path
+        //if the files exist on the local system, then convert the path to a absolute path
+        URI uriOut = ExampleFileUtil.convertToFileURI(args[0]);
+        Perf.LOGGER.info("Specified path {} has been normalised to {}", args[0], uriOut);
+
+        //for path manipulations, we temporaraily strip off the URI scheme so that we can operate on abstract path components
+        //as if they used the file scheme
+        String scheme = uriOut.getScheme();
+        String schemelessComponent = uriOut.toString().substring(scheme.length() + 1); //+1 to remove ':'
+
+        Path output = Paths.get(schemelessComponent);
+
+        PerfFileSet fileSet = new PerfFileSet(toURI(scheme, getSmallFile(output)), toURI(scheme, getLargeFile(output)));
+        PerfFileSet noPolicySet = new PerfFileSet(toURI(scheme, getNoPolicyName(getSmallFile(output))), toURI(scheme, getNoPolicyName(getLargeFile(output))));
+
         //how many dry runs do we need?
-        int dryRuns = Integer.parseInt(args[0]);
+        int dryRuns = Integer.parseInt(args[1]);
 
         //how many live trials do we need?
-        int liveTrials = Integer.parseInt(args[1]);
+        int liveTrials = Integer.parseInt(args[2]);
 
         //get list of tests to skip
         String[] skipTests = new String[0];
-        if (args.length > 2) {
-            skipTests = args[2].split(",");
+        if (args.length > 3) {
+            skipTests = args[3].split(",");
         }
 
         //must be sorted for binary search to succeed
@@ -119,12 +145,12 @@ public class RunAction extends PerfAction {
         //do we need to do any dry runs?
         if (dryRuns > 0) {
             Perf.LOGGER.info("Starting dry runs");
-            performTrialBatch(dryRuns, collector, TrialType.DRY_RUN, skipTests);
+            performTrialBatch(dryRuns, fileSet, noPolicySet, collector, TrialType.DRY_RUN, skipTests);
         }
 
         //do the live trials
         Perf.LOGGER.info("Starting live tests");
-        performTrialBatch(liveTrials, collector, TrialType.LIVE, skipTests);
+        performTrialBatch(liveTrials, fileSet, noPolicySet, collector, TrialType.LIVE, skipTests);
 
         //write the performance test outputs
         System.out.println();
@@ -137,13 +163,15 @@ public class RunAction extends PerfAction {
      * Perform a single batch of tests. This runs all tests the given number of times.
      *
      * @param trialCount  the number of trials of each test to run
+     * @param fileSet     the file set for tests
+     * @param noPolicySet the file set for tests with no policy
      * @param collector   the output collector
      * @param type        the test type being run
      * @param testsToSkip test names to skip
      * @throws IllegalArgumentException if any of {@code testsToSkip} are invalid
      * @throws IllegalArgumentException {@code trialCount} is < 1
      */
-    public void performTrialBatch(final int trialCount, final PerfCollector collector, final TrialType type, final String... testsToSkip) {
+    public void performTrialBatch(final int trialCount, final PerfFileSet fileSet, final PerfFileSet noPolicySet, final PerfCollector collector, final TrialType type, final String... testsToSkip) {
         requireNonNull(collector, "collector");
         requireNonNull(testsToSkip, "testsToSkip");
         if (trialCount < 1) {
@@ -161,20 +189,22 @@ public class RunAction extends PerfAction {
             }
 
             //perform a run of the named test
-            performSingleTrial(trialCount, e.getValue(), collector, type);
+            performSingleTrial(trialCount, e.getValue(), fileSet, noPolicySet, collector, type);
         }
     }
 
     /**
      * Perform a single trial a given number of times.
      *
-     * @param trialCount the count
-     * @param trial      the trial to run
-     * @param collector  the output collector
-     * @param type       the type of test being run
+     * @param trialCount  the count
+     * @param trial       the trial to run
+     * @param fileSet     the file set for tests
+     * @param noPolicySet the file set for tests with no policy
+     * @param collector   the output collector
+     * @param type        the type of test being run
      * @throws IllegalArgumentException {@code trialCount} is < 1
      */
-    public void performSingleTrial(final int trialCount, final PerfTrial trial, final PerfCollector collector, final TrialType type) {
+    public void performSingleTrial(final int trialCount, final PerfTrial trial, final PerfFileSet fileSet, final PerfFileSet noPolicySet, final PerfCollector collector, final TrialType type) {
         requireNonNull(trial, "trial");
         requireNonNull(collector, "collector");
         if (trialCount < 1) {
@@ -186,7 +216,7 @@ public class RunAction extends PerfAction {
         for (int i = 0; i < trialCount; i++) {
             delay(TEST_DELAY.toMillis());
 
-            runTrial(trial, collector, type);
+            runTrial(trial, fileSet, noPolicySet, collector, type);
             System.out.print(".." + (i + 1));
             System.out.flush();
         }
@@ -197,18 +227,20 @@ public class RunAction extends PerfAction {
     /**
      * Perform a single run of a single trial.
      *
-     * @param trial     the trial to run
-     * @param collector the output collector
-     * @param type      test type being run
+     * @param trial       the trial to run
+     * @param fileSet     the file set for tests
+     * @param noPolicySet the file set for tests with no policy
+     * @param collector   the output collector
+     * @param type        test type being run
      */
-    public static void runTrial(final PerfTrial trial, final PerfCollector collector, final TrialType type) {
+    public static void runTrial(final PerfTrial trial, final PerfFileSet fileSet, final PerfFileSet noPolicySet, final PerfCollector collector, final TrialType type) {
         requireNonNull(trial, "trial");
         requireNonNull(collector, "collector");
 
         //perform trial
         try {
             long time = System.nanoTime();
-            trial.run();
+            trial.accept(fileSet, noPolicySet);
             time = System.nanoTime() - time;
 
             //if this is a live trial then log it
@@ -227,13 +259,14 @@ public class RunAction extends PerfAction {
      * @throws IllegalArgumentException if any error is found in the arguments
      */
     private void validate(final String[] args) {
-        if (args.length < 2) {
-            throw new IllegalArgumentException("expected at least 2 arguments, see \"help " + name() + "\"");
+        if (args.length < 3) {
+            throw new IllegalArgumentException("expected at least 3 arguments, see \"help " + name() + "\"");
         }
 
-        //first two should be integers
+        //first one should be a path
+        //next two should be integers
         try {
-            int dry = Integer.parseInt(args[0]);
+            int dry = Integer.parseInt(args[1]);
             if (dry < 0) {
                 throw new IllegalArgumentException("dry run count cannot be less than 0");
             }
@@ -242,7 +275,7 @@ public class RunAction extends PerfAction {
         }
 
         try {
-            int actual = Integer.parseInt(args[1]);
+            int actual = Integer.parseInt(args[2]);
             if (actual < 1) {
                 throw new IllegalArgumentException("live count cannot be less than 1");
             }
@@ -251,8 +284,8 @@ public class RunAction extends PerfAction {
         }
 
         //each argument in third should be a valid test name
-        if (args.length > 2) {
-            String[] testsToSkip = args[2].split(",");
+        if (args.length > 3) {
+            String[] testsToSkip = args[3].split(",");
 
             validateTestNames(testsToSkip);
         }

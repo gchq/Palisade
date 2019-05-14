@@ -20,6 +20,7 @@ import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.example.hrdatagenerator.CreateDataFile;
 import uk.gov.gchq.palisade.example.perf.Perf;
 import uk.gov.gchq.palisade.example.perf.PerfAction;
+import uk.gov.gchq.palisade.example.perf.PerfUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -71,11 +72,11 @@ public class CreateAction extends PerfAction {
         ExecutorService tasks = Executors.newFixedThreadPool(2, Util.createDaemonThreadFactory());
 
         //make a result writers
-        CreateDataFile smallWriter = new CreateDataFile(small, 0, ActionUtils.getSmallFile(output).toFile());
-        CreateDataFile largeWriter = new CreateDataFile(large, 1, ActionUtils.getLargeFile(output).toFile());
+        CreateDataFile smallWriter = new CreateDataFile(small, 0, PerfUtils.getSmallFile(output).toFile());
+        CreateDataFile largeWriter = new CreateDataFile(large, 1, PerfUtils.getLargeFile(output).toFile());
 
         //submit tasks
-        Perf.LOGGER.info("Going to create {} records in file {} and {} records in file {} in sub-directory", small, ActionUtils.SMALL_FILE_NAME, large, ActionUtils.LARGE_FILE_NAME);
+        Perf.LOGGER.info("Going to create {} records in file {} and {} records in file {} in sub-directory", small, PerfUtils.SMALL_FILE_NAME, large, PerfUtils.LARGE_FILE_NAME);
         Future<Boolean> smallFuture = tasks.submit(smallWriter);
         Future<Boolean> largeFuture = tasks.submit(largeWriter);
         Perf.LOGGER.info("Creation tasks submitted...");
@@ -89,9 +90,9 @@ public class CreateAction extends PerfAction {
 
             //copy the files to no policy variants
             Perf.LOGGER.info("Copying small file");
-            Files.copy(ActionUtils.getSmallFile(output), ActionUtils.getNoPolicyName(ActionUtils.getSmallFile(output)), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(PerfUtils.getSmallFile(output), PerfUtils.getNoPolicyName(PerfUtils.getSmallFile(output)), StandardCopyOption.REPLACE_EXISTING);
             Perf.LOGGER.info("Copying large file");
-            Files.copy(ActionUtils.getLargeFile(output), ActionUtils.getNoPolicyName(ActionUtils.getLargeFile(output)), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(PerfUtils.getLargeFile(output), PerfUtils.getNoPolicyName(PerfUtils.getLargeFile(output)), StandardCopyOption.REPLACE_EXISTING);
 
             //indicate success in exit code
             return Integer.valueOf((smallComplete && largeComplete) ? 0 : 1);
@@ -147,8 +148,8 @@ public class CreateAction extends PerfAction {
         }
 
         //check files don't already exist
-        Path smallFile = ActionUtils.getSmallFile(relativeOutPath);
-        Path largeFile = ActionUtils.getLargeFile(relativeOutPath);
+        Path smallFile = PerfUtils.getSmallFile(relativeOutPath);
+        Path largeFile = PerfUtils.getLargeFile(relativeOutPath);
         if (Files.exists(smallFile)) {
             throw new IllegalArgumentException("file already exists " + smallFile);
         }

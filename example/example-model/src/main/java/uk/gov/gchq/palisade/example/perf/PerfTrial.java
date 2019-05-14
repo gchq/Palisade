@@ -16,10 +16,12 @@
 
 package uk.gov.gchq.palisade.example.perf;
 
+import java.util.function.BiConsumer;
+
 /**
  * Abstract superclass for all performance trials.
  */
-public abstract class PerfTrial implements Runnable {
+public abstract class PerfTrial implements BiConsumer<PerfFileSet, PerfFileSet> {
     /**
      * Returns the name for this performance test.
      *
@@ -33,5 +35,4 @@ public abstract class PerfTrial implements Runnable {
      * @return the usage line
      */
     public abstract String description();
-
 }
