@@ -114,7 +114,7 @@ public class RunAction extends PerfAction {
         URI uriOut = ExampleFileUtil.convertToFileURI(args[0]);
         Perf.LOGGER.info("Specified path {} has been normalised to {}", args[0], uriOut);
 
-        //for path manipulations, we temporaraily strip off the URI scheme so that we can operate on abstract path components
+        //for path manipulations, we temporarily strip off the URI scheme so that we can operate on abstract path components
         //as if they used the file scheme
         String scheme = uriOut.getScheme();
         String schemelessComponent = uriOut.toString().substring(scheme.length() + 1); //+1 to remove ':'
@@ -184,7 +184,7 @@ public class RunAction extends PerfAction {
         for (Map.Entry<String, PerfTrial> e : testsToRun.entrySet()) {
             //do we need to skip this one?
             if (Arrays.binarySearch(testsToSkip, e.getKey()) > -1) {
-                Perf.LOGGER.info("Skpping test {}", e.getKey());
+                Perf.LOGGER.info("Skipping test {}", e.getKey());
                 continue;
             }
 
