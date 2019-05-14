@@ -20,6 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.UserId;
@@ -83,14 +84,14 @@ public class CatClientTest {
 
         reqResponse = CompletableFuture.completedFuture(
                 new DataRequestResponse()
-                .requestId(reqId)
-                .resource(resource1, mockConnectionDetail)
-                .resource(resource2, mockConnectionDetail)
-                .originalRequestId("Test ID"));
+                        .requestId(reqId)
+                        .resource(resource1, mockConnectionDetail)
+                        .resource(resource2, mockConnectionDetail)
+                        .originalRequestId(new RequestId().id("Test ID")));
 
 
-        readRequest1 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource1).originalRequestId(reqId.getId());
-        readRequest2 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource2).originalRequestId(reqId.getId());
+        readRequest1 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource1).originalRequestId(reqId);
+        readRequest2 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource2).originalRequestId(reqId);
 
         readResponse1 = CompletableFuture.completedFuture(
                 new ReadResponse().data(IOUtils.toInputStream("Test data 1", StandardCharsets.UTF_8)));
@@ -100,7 +101,7 @@ public class CatClientTest {
 
         Mockito.when(mockPalisadeService.registerDataRequest(Mockito.refEq(registerDataRequest, "id"))).thenReturn(reqResponse);
         Mockito.when(mockDataService.read(Mockito.refEq(readRequest1, "id", "originalRequestId"))).thenReturn(readResponse1);
-        Mockito.when(mockDataService.read(Mockito.refEq(readRequest2,"id", "originalRequestId"))).thenReturn(readResponse2);
+        Mockito.when(mockDataService.read(Mockito.refEq(readRequest2, "id", "originalRequestId"))).thenReturn(readResponse2);
 
         //When
         CatClient catClient = new CatClient(mockPalisadeService);

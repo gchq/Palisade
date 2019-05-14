@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
@@ -54,7 +55,7 @@ public class SimpleClient<T> {
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
-            final String uuid = dataRequestResponse.getOriginalRequestId();
+            final RequestId uuid = dataRequestResponse.getOriginalRequestId();
 
             final ReadRequest readRequest = new ReadRequest()
                     .requestId(dataRequestResponse.getRequestId())

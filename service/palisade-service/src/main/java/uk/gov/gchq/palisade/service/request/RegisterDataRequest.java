@@ -21,6 +21,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
@@ -100,12 +101,12 @@ public class RegisterDataRequest extends Request {
 
 
     @Override
-    public void setOriginalRequestId(final String originalRequestId) {
+    public void setOriginalRequestId(final RequestId originalRequestId) {
         throw new ForbiddenException("Should not call RegisterDataRequest.setOriginalRequestId()");
     }
 
     @Override
-    public String getOriginalRequestId() {
+    public RequestId getOriginalRequestId() {
         throw new ForbiddenException("Should not call RegisterDataRequest.getOriginalRequestId()");
     }
 

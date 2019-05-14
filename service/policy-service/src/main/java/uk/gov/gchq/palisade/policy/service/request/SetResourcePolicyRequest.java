@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.policy.service.Policy;
@@ -82,12 +83,12 @@ public class SetResourcePolicyRequest extends Request {
 
 
     @Override
-    public void setOriginalRequestId(final String originalRequestId) {
+    public void setOriginalRequestId(final RequestId originalRequestId) {
         throw new ForbiddenException("Should not call SetResourcePolicyRequest.setOriginalRequestId()");
     }
 
     @Override
-    public String getOriginalRequestId() {
+    public RequestId getOriginalRequestId() {
         throw new ForbiddenException("Should not call SetResourcePolicyRequest.getOriginalRequestId()");
     }
 
@@ -105,27 +106,27 @@ public class SetResourcePolicyRequest extends Request {
         final SetResourcePolicyRequest that = (SetResourcePolicyRequest) o;
 
         return new EqualsBuilder()
-        .appendSuper(super.equals(o))
-        .append(resource, that.resource)
-        .append(policy, that.policy)
-        .isEquals();
+                .appendSuper(super.equals(o))
+                .append(resource, that.resource)
+                .append(policy, that.policy)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 29)
-        .appendSuper(super.hashCode())
-        .append(resource)
-        .append(policy)
-        .toHashCode();
+                .appendSuper(super.hashCode())
+                .append(resource)
+                .append(policy)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-        .appendSuper(super.toString())
-        .append("resource", resource)
-        .append("policy", policy)
-        .toString();
+                .appendSuper(super.toString())
+                .append("resource", resource)
+                .append("policy", policy)
+                .toString();
     }
 }
