@@ -16,35 +16,32 @@
 
 package uk.gov.gchq.palisade.example.perf.trial;
 
-import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
-import uk.gov.gchq.palisade.data.serialise.Serialiser;
+import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.client.ClientConfiguredServices;
+import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
+import uk.gov.gchq.palisade.example.common.ExampleUsers;
+import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.perf.PerfFileSet;
-import uk.gov.gchq.palisade.example.perf.PerfTrial;
+import uk.gov.gchq.palisade.service.PalisadeService;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * This test performs a native file read of large file in the 1st file set. This is done without going via Palisade, but
- * does try to deserialise the data.
+ * Test that reads the large data file from Palisade with no policy.
  */
-public class ReadNative extends PerfTrial {
+public class ReadLargeNoPolicyTrial extends PalisadeTrial {
 
     @Override
     public String name() {
-        return "native";
+        return "large_no_policy";
     }
 
     @Override
     public String description() {
-        return "performs a native read of a file";
+        return "reads the large data file with no policy set";
     }
 
     @Override
@@ -52,21 +49,18 @@ public class ReadNative extends PerfTrial {
         requireNonNull(fileSet, "fileSet");
         requireNonNull(noPolicySet, "noPolicySet");
 
-        //create the serialiser
-        Serialiser<Employee> serialiser = new AvroSerialiser<>(Employee.class);
+        //find Palisade entry point
+        ClientConfiguredServices configuredServices = getPalisadeClientServices();
 
-        //get file URI
-        Path fileToRead = Paths.get(fileSet.getLargeFile());
-        //read from file
-        try (InputStream bis = Files.newInputStream(fileToRead)) {
-            //create stream
-            Stream<Employee> dataStream = serialiser.deserialise(bis);
+        //register a request for a file
+        PalisadeService palisade = configuredServices.getPalisadeService();
 
-            //now read everything in the file
-            dataStream.count();
+        ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        User alice = ExampleUsers.getAlice();
+
+        try (Stream<Employee> results = client.read(noPolicySet.getLargeFile().toString(), alice.getUserId().getId(), Purpose.SALARY.name())) {
+            results.count();
         }
     }
 }

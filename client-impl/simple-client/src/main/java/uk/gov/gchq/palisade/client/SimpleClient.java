@@ -35,40 +35,53 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 public class SimpleClient<T> {
     private final Serialiser<T> serialiser;
 
     private final PalisadeService palisadeService;
 
     public SimpleClient(final PalisadeService palisadeService, final Serialiser<T> serialiser) {
-        Objects.requireNonNull(palisadeService, "palisade service must be provided");
+        requireNonNull(palisadeService, "palisade service must be provided");
         this.palisadeService = palisadeService;
-        Objects.requireNonNull(serialiser, "serialiser cannot be null");
+        requireNonNull(serialiser, "serialiser cannot be null");
         this.serialiser = serialiser;
     }
 
-    public Stream<T> read(final String filename, final String resourceType, final String userId, final String purpose) {
-        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
+    public DataRequestResponse makeRequest(final String fileName, final String resourceType, final String userId, final String purpose) {
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(fileName).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
-        final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
-        for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
+        return dataRequestResponse;
+    }
+
+    public Stream<T> getObjectStreams(final DataRequestResponse response) {
+        requireNonNull(response, "response");
+
+        final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(response.getResources().size());
+        for (final Entry<LeafResource, ConnectionDetail> entry : response.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
-            final String uuid = dataRequestResponse.getOriginalRequestId();
+            final String uuid = response.getOriginalRequestId();
 
             final ReadRequest readRequest = new ReadRequest()
-                    .requestId(dataRequestResponse.getRequestId())
+                    .requestId(response.getRequestId())
                     .resource(entry.getKey());
             readRequest.setOriginalRequestId(uuid);
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
-                    response -> getSerialiser().deserialise(response.getData())
+                    dataResponse -> getSerialiser().deserialise(dataResponse.getData())
             );
             futureResults.add(futureResult);
         }
 
         return futureResults.stream().flatMap(CompletableFuture::join);
+    }
+
+    public Stream<T> read(final String filename, final String resourceType, final String userId, final String purpose) {
+        final DataRequestResponse dataRequestResponse = makeRequest(filename, resourceType, userId, purpose);
+        return getObjectStreams(dataRequestResponse);
     }
 
     public Serialiser<T> getSerialiser() {

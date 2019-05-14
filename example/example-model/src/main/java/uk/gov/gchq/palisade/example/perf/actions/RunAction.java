@@ -22,8 +22,7 @@ import uk.gov.gchq.palisade.example.perf.PerfCollector;
 import uk.gov.gchq.palisade.example.perf.PerfFileSet;
 import uk.gov.gchq.palisade.example.perf.PerfTrial;
 import uk.gov.gchq.palisade.example.perf.TrialType;
-import uk.gov.gchq.palisade.example.perf.trial.ReadNative;
-import uk.gov.gchq.palisade.example.perf.trial.SleepTrial;
+import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNativeTrial;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 
 import java.net.URI;
@@ -55,10 +54,17 @@ public class RunAction extends PerfAction {
      */
     private Map<String, PerfTrial> testsToRun = new TreeMap<>();
 
+    /**
+     * The test to normalise against.
+     */
+    private PerfTrial normalised;
+
     public RunAction() {
         //create all the performance tests and add them in here
-        addTrial(new SleepTrial());
-        addTrial(new ReadNative());
+        //the one to normalise against
+        normalised = new ReadLargeNativeTrial();
+        addTrial(normalised);
+
     }
 
     /**
@@ -154,7 +160,7 @@ public class RunAction extends PerfAction {
 
         //write the performance test outputs
         System.out.println();
-        collector.outputTo(System.out);
+        collector.outputTo(System.out, normalised.name());
 
         return Integer.valueOf(0);
     }

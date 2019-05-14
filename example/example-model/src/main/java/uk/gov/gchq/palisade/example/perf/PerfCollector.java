@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -86,11 +87,15 @@ public class PerfCollector {
 
     /**
      * Writes a table of summary statistics to the given {@link java.io.OutputStream}. The output stream
-     * will not be closed when this method finishes.
+     * will not be closed when this method finishes. There will be a normalisation column, this will show the performance
+     * of each test relative to the mean of a specific one. This can be named in the {@code nameToNormalise} parameter.
+     * For example, if one test had a 2 second mean and the normalised test had a 1 second mean, then the normalised performance
+     * will be 2.
      *
-     * @param out where to write output
+     * @param out             where to write output
+     * @param nameToNormalise the name of the test to normalise to, may be {@code null}
      */
-    public void outputTo(final OutputStream out) {
+    public void outputTo(final OutputStream out, final String nameToNormalise) {
         requireNonNull(out, "out");
         PrintStream print = new PrintStream(out);
 
@@ -109,9 +114,22 @@ public class PerfCollector {
 
         print.printf(header.toString(), COL_HDRS);
 
+        PerfStats normal = null;
+        //do we have anything to normalise to?
+        if (nonNull(nameToNormalise) && times.containsKey(nameToNormalise)) {
+            normal = computePerfStats(times.get(nameToNormalise));
+        }
+
         //now for each test, compute statistics and output
         for (Map.Entry<String, List<Long>> entry : times.entrySet()) {
             PerfStats pfs = computePerfStats(entry.getValue());
+
+            //check normalisation
+            if (nonNull(normal)) {
+                //compute mean performance difference
+                pfs.norm = pfs.mean / normal.mean;
+            }
+
             //send to output
             print.printf(rows.toString(), entry.getKey(), pfs.numTrials, pfs.min, pfs.max, pfs.mean,
                     pfs.stdDev, pfs.pc25, pfs.pc50, pfs.pc75, pfs.pc99, pfs.norm);
@@ -172,8 +190,8 @@ public class PerfCollector {
         stats.pc75 = computePercentile(resultList, 75);
         stats.pc99 = computePercentile(resultList, 99);
 
-        computePercentile(resultList, 0);
-        computePercentile(resultList, 100);
+        //set default
+        stats.norm = 0;
         return stats;
     }
 

@@ -21,18 +21,30 @@ import java.util.function.BiConsumer;
 /**
  * Abstract superclass for all performance trials.
  */
-public abstract class PerfTrial implements BiConsumer<PerfFileSet, PerfFileSet> {
+public interface PerfTrial extends BiConsumer<PerfFileSet, PerfFileSet> {
     /**
      * Returns the name for this performance test.
      *
      * @return test name
      */
-    public abstract String name();
+    String name();
 
     /**
      * Provides a one line description of this performance test.
      *
      * @return the usage line
      */
-    public abstract String description();
+    String description();
+
+    /**
+     * Perform any setup functioanlity.
+     */
+    default void setup() {
+    }
+
+    /**
+     * Perform any tear down and clean functionality.
+     */
+    default void tearDown() {
+    }
 }
