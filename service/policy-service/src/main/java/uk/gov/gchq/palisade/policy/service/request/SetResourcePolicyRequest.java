@@ -106,27 +106,27 @@ public class SetResourcePolicyRequest extends Request {
         final SetResourcePolicyRequest that = (SetResourcePolicyRequest) o;
 
         return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(resource, that.resource)
-                .append(policy, that.policy)
-                .isEquals();
+        .appendSuper(super.equals(o))
+        .append(resource, that.resource)
+        .append(policy, that.policy)
+        .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 29)
-                .appendSuper(super.hashCode())
-                .append(resource)
-                .append(policy)
-                .toHashCode();
+        .appendSuper(super.hashCode())
+        .append(resource)
+        .append(policy)
+        .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .appendSuper(super.toString())
-                .append("resource", resource)
-                .append("policy", policy)
-                .toString();
+        .appendSuper(super.toString())
+        .append("resource", resource)
+        .append("policy", policy)
+        .toString();
     }
 }

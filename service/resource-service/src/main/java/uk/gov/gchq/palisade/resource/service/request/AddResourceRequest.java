@@ -102,27 +102,27 @@ public class AddResourceRequest extends Request {
         final AddResourceRequest that = (AddResourceRequest) o;
 
         return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(resource, that.resource)
-                .append(connectionDetail, that.connectionDetail)
-                .isEquals();
+        .appendSuper(super.equals(o))
+        .append(resource, that.resource)
+        .append(connectionDetail, that.connectionDetail)
+        .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .appendSuper(super.hashCode())
-                .append(resource)
-                .append(connectionDetail)
-                .toHashCode();
+        .appendSuper(super.hashCode())
+        .append(resource)
+        .append(connectionDetail)
+        .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .appendSuper(super.toString())
-                .append("resource", resource)
-                .append("connectionDetail", connectionDetail)
-                .toString();
+        .appendSuper(super.toString())
+        .append("resource", resource)
+        .append("connectionDetail", connectionDetail)
+        .toString();
     }
 }

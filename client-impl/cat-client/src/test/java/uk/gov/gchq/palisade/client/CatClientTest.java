@@ -84,10 +84,10 @@ public class CatClientTest {
 
         reqResponse = CompletableFuture.completedFuture(
                 new DataRequestResponse()
-                        .requestId(reqId)
-                        .resource(resource1, mockConnectionDetail)
-                        .resource(resource2, mockConnectionDetail)
-                        .originalRequestId(new RequestId().id("Test ID")));
+                    .requestId(reqId)
+                    .resource(resource1, mockConnectionDetail)
+                    .resource(resource2, mockConnectionDetail)
+                    .originalRequestId(new RequestId().id("Test ID")));
 
 
         readRequest1 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource1).originalRequestId(reqId);
