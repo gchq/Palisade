@@ -19,9 +19,10 @@ package uk.gov.gchq.palisade.example.perf;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,11 +31,37 @@ import static java.util.Objects.requireNonNull;
  * summary statistics to various outputs.
  */
 public class PerfCollector {
+    /**
+     * Column headers.
+     */
+    public static final String[] COL_HDRS = {"Test", "# trials", "Min", "Max", "Mean", "Std.dev.", "25%", "50%", "75%", "99%", "Norm"};
+    /**
+     * Number of nanoseconds in a second.
+     */
+    public static final double NANOS_IN_SECOND = 1e9d;
+
+    /**
+     * Utility class.
+     */
+    public static class PerfStats {
+        public double numTrials, min, max, mean, stdDev, pc25, pc50, pc75, pc99, norm;
+
+    }
 
     /**
      * Details of all the times.
      */
-    private Map<String, List<Long>> times = new HashMap<>();
+    private Map<String, List<Long>> times = new TreeMap<>();
+
+    /**
+     * Convert nanoseconds to seconds.
+     *
+     * @param ns nanoseconds
+     * @return seconds
+     */
+    public static double secondsToNano(final long ns) {
+        return ns / NANOS_IN_SECOND;
+    }
 
     /**
      * Records a single trial of a given test.
@@ -58,12 +85,123 @@ public class PerfCollector {
     }
 
     /**
-     * Writes a table of summary statistics to the given {@link java.io.OutputStream}
+     * Writes a table of summary statistics to the given {@link java.io.OutputStream}. The output stream
+     * will not be closed when this method finishes.
      *
      * @param out where to write output
      */
     public void outputTo(final OutputStream out) {
         requireNonNull(out, "out");
-        new PrintStream(out).println(times);
+        PrintStream print = new PrintStream(out);
+
+        print.println("All times in seconds.\n");
+        //build format strings
+        StringBuilder header = new StringBuilder("%-20s");
+        StringBuilder rows = new StringBuilder("%-20s");
+        Arrays.stream(COL_HDRS)
+                .skip(1) //skip "test" column
+                .forEach(ignore -> {
+                    header.append("%12s");
+                    rows.append("%12.3f");
+                });
+        header.append("%n");
+        rows.append("%n");
+
+        print.printf(header.toString(), COL_HDRS);
+
+        //now for each test, compute statistics and output
+        for (Map.Entry<String, List<Long>> entry : times.entrySet()) {
+            PerfStats pfs = computePerfStats(entry.getValue());
+            //send to output
+            print.printf(rows.toString(), entry.getKey(), pfs.numTrials, pfs.min, pfs.max, pfs.mean,
+                    pfs.stdDev, pfs.pc25, pfs.pc50, pfs.pc75, pfs.pc99, pfs.norm);
+        }
+
+        print.flush();
+    }
+
+    /**
+     * Compute the performance statistics for the given list of results. A {@link PerfStats} object is returned containing
+     * the results. All times in the given list must be in nanoseconds. The results are converted into seconds. Percentiles
+     * are calculated using the linear interpolation closest-rank method.
+     *
+     * @param results the list of results
+     * @return performance statistics data
+     */
+    public static PerfStats computePerfStats(final List<Long> results) {
+        requireNonNull(results, "results");
+        //deal with zero length results
+        if (results.isEmpty()) {
+            return new PerfStats();
+        }
+
+        //convert to seconds
+        double[] resultList = new double[results.size()];
+        for (int i = 0; i < results.size(); i++) {
+            resultList[i] = secondsToNano(results.get(i));
+        }
+
+        PerfStats stats = new PerfStats();
+        stats.numTrials = resultList.length;
+
+        //sort the list so we can get the percentiles
+        Arrays.sort(resultList);
+
+        //min and max are now trivially the first and last elements
+        stats.min = resultList[0];
+        stats.max = resultList[resultList.length - 1];
+
+        //compute mean
+        double total = 0;
+        for (double seconds : resultList) {
+            total = total + seconds;
+        }
+        stats.mean = total / stats.numTrials;
+
+        //compute standard deviation
+        double totalDiff = 0;
+        for (double seconds : resultList) {
+            double difFromMean = seconds - stats.mean;
+            totalDiff = totalDiff + (difFromMean * difFromMean);
+        }
+        stats.stdDev = Math.sqrt(totalDiff / stats.numTrials);
+
+        //compute percentiles
+        stats.pc25 = computePercentile(resultList, 25);
+        stats.pc50 = computePercentile(resultList, 50);
+        stats.pc75 = computePercentile(resultList, 75);
+        stats.pc99 = computePercentile(resultList, 99);
+
+        computePercentile(resultList, 0);
+        computePercentile(resultList, 100);
+        return stats;
+    }
+
+    /**
+     * Computes a given percentile from a sorted list of data. This uses the linear interpolated closest-rank method
+     * to calculate percentiles. If the list is not already sorted into ascending order, then the results are undefined,.
+     *
+     * @param data       the sorted data
+     * @param percentile the desired percentile, must be in range [0,100]
+     * @return the percentile result
+     * @throws IllegalArgumentException if {@code percentile} is out of range, or data is empty
+     */
+    public static double computePercentile(final double[] data, final double percentile) {
+        requireNonNull(data, "data");
+        if (data.length < 1) {
+            throw new IllegalArgumentException("data array is empty");
+        }
+        if (percentile < 0 || percentile > 100) {
+            throw new IllegalArgumentException("percentile must be between 0 and 100 inclusive");
+        }
+
+        //assume data is sorted
+        double rank = ((percentile / 100d) * (data.length - 1));
+        int truncatedRank = (int) rank;
+        double remain = rank - truncatedRank;
+        double lower = data[truncatedRank];
+        double upper = data[Math.min(truncatedRank + 1, data.length - 1)];
+        double result = lower + (remain * (upper - lower));
+        return result;
     }
 }

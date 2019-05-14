@@ -36,7 +36,7 @@ public class SleepTrial extends PerfTrial {
     @Override
     public void run() {
         try {
-            Thread.sleep(ThreadLocalRandom.current().nextInt(1000, 3000));
+            Thread.sleep(ThreadLocalRandom.current().nextInt(100, 1500));
         } catch (InterruptedException ignored) {
         }
     }

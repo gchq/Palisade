@@ -48,6 +48,7 @@ public class RunAction extends PerfAction {
     public RunAction() {
         //create all the performance tests and add them in here
         addTrial(new SleepTrial());
+        addTrial(new SleepTrial());
     }
 
     /**
