@@ -88,8 +88,7 @@ public class CatClientTest {
                         .resource(resource1, mockConnectionDetail)
                         .resource(resource2, mockConnectionDetail)
                         .originalRequestId(new RequestId().id("Test ID")));
-
-
+        
         readRequest1 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource1).originalRequestId(reqId);
         readRequest2 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource2).originalRequestId(reqId);
 
