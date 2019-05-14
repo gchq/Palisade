@@ -258,11 +258,11 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
         //conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, new File(".").toURI().toURL().toString());
         //set defaultFS to hdfs on cluster
-        //conf.set("fs.defaultFS", ("hdfs://" + hostname));
-        conf.set("fs.defaultFS", ("hdfs://localhost"));           // *****revert this***
+        conf.set("fs.defaultFS", ("hdfs://" + hostname));
+        //conf.set("fs.defaultFS", ("hdfs://localhost"));           // *****revert this***
         //set address of resource manager
-        //conf.set("yarn.resourcemanager.address", (hostname + ":8032"));
-        conf.set("yarn.resourcemanager.address", ("localhost:8032"));          //***revert***
+        conf.set("yarn.resourcemanager.address", (hostname + ":8032"));
+        //conf.set("yarn.resourcemanager.address", ("localhost:8032"));          //***revert***
         ToolRunner.run(conf, new AwsEmrMapReduceExample(), new String[]{sourceFile, outputDir});
     }
 

@@ -46,6 +46,7 @@ import uk.gov.gchq.palisade.user.service.impl.SimpleUserService;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -218,8 +219,16 @@ public class ServicesConfigurator {
         }
 
         // tell the resource service that it is pointing at hdfs
-        ret.set("fs.defaultFS", ("hdfs://localhost"));
-        return ret;
+        try {
+            InetAddress ip = InetAddress.getLocalHost();
+            String hostname = ip.getHostName();
+            ret.set("fs.defaultFS", ("hdfs://" + hostname));
+            return ret;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 
     /**
