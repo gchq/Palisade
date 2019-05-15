@@ -27,6 +27,7 @@ import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNoPolicyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeWithPolicyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadSmallFileReadOnlyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadSmallFileTrial;
+import uk.gov.gchq.palisade.example.perf.trial.ReadSmallNoPolicyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.SetupRequestTrial;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 
@@ -70,11 +71,12 @@ public class RunAction extends PerfAction {
         normalised = new ReadLargeNativeTrial();
         addTrial(normalised);
         addTrial(new ReadLargeNoPolicyTrial());
+        addTrial(new ReadSmallNoPolicyTrial());
         addTrial(new ReadLargeWithPolicyTrial());
         addTrial(new SetupRequestTrial(1));
         addTrial(new SetupRequestTrial(10));
-        addTrial(new ReadSmallFileTrial(5));
-        addTrial(new ReadSmallFileReadOnlyTrial(5));
+        addTrial(new ReadSmallFileTrial(2));
+        addTrial(new ReadSmallFileReadOnlyTrial(2));
     }
 
     /**

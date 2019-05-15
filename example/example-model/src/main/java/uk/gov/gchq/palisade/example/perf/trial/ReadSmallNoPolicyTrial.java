@@ -16,36 +16,28 @@
 
 package uk.gov.gchq.palisade.example.perf.trial;
 
-import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
-import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.perf.PerfFileSet;
-import uk.gov.gchq.palisade.example.perf.PerfTrial;
+import uk.gov.gchq.palisade.service.PalisadeService;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.gchq.palisade.example.perf.PerfUtils.sink;
 
 /**
- * This test performs a native file read of large file in the 1st file set. This is done without going via Palisade, but
- * does try to deserialise the data.
+ * Test that reads the small data file from Palisade with no policy and times entire Palisade interaction.
  */
-public class ReadLargeNativeTrial implements PerfTrial {
+public class ReadSmallNoPolicyTrial extends PalisadeTrial {
 
     @Override
     public String name() {
-        return "read_native_large";
+        return "small_no_policy";
     }
 
     @Override
     public String description() {
-        return "performs a native read and deserialise of the large file";
+        return "reads the small data file with no policy set";
     }
 
     @Override
@@ -53,20 +45,12 @@ public class ReadLargeNativeTrial implements PerfTrial {
         requireNonNull(fileSet, "fileSet");
         requireNonNull(noPolicySet, "noPolicySet");
 
-        //create the serialiser
-        Serialiser<Employee> serialiser = new AvroSerialiser<>(Employee.class);
+        //find Palisade entry point
+        PalisadeService palisade = getPalisadeClientServices();
 
-        //get file URI
-        Path fileToRead = Paths.get(fileSet.getLargeFile());
-        //read from file
-        try (InputStream bis = Files.newInputStream(fileToRead);
-             Stream<Employee> dataStream = serialiser.deserialise(bis)) {
-
-            //now read everything in the file
-            sink(dataStream);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        //setup a request and read data
+        try (Stream<Employee> data = getDataStream(palisade, noPolicySet.getSmallFile().toString())) {
+            sink(data);
         }
     }
 }
