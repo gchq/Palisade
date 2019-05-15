@@ -110,11 +110,7 @@ public class RunAction extends PerfAction {
 
         testsToRun.entrySet().stream()
                 .forEach(e -> {
-                    help.append("\t")
-                            .append(e.getValue().name())
-                            .append("\t\t")
-                            .append(Objects.toString(e.getValue().description(), "no description"))
-                            .append("\n");
+                    help.append(String.format("\t%20s\t%s%n", e.getValue().name(), Objects.toString(e.getValue().description(), "no description")));
                 });
 
         return help.toString();

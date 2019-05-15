@@ -52,7 +52,7 @@ public class SetupRequestTrial extends PalisadeTrial {
 
     @Override
     public String description() {
-        return String.format("Makes %d requests without reading data", requests);
+        return String.format("makes %d requests without reading data", requests);
     }
 
     @Override
