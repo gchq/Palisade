@@ -27,5 +27,6 @@
 
     <modules>
         <module>rest-redirector-service</module>
+        <module>simple-redirector-service</module>
     </modules>
 </project>
