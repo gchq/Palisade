@@ -60,7 +60,7 @@ public class PalisadeInputSplit extends InputSplit implements Writable {
      * @param originalRequestId this Id is unique per data access request from a user
      * @throws NullPointerException if anything is null
      */
-    public PalisadeInputSplit(final RequestId requestId, final Map<LeafResource, ConnectionDetail> resources, final String originalRequestId) {
+    public PalisadeInputSplit(final RequestId requestId, final Map<LeafResource, ConnectionDetail> resources, final RequestId originalRequestId) {
         Objects.requireNonNull(requestId, "requestId");
         Objects.requireNonNull(resources, "resources");
         Objects.requireNonNull(originalRequestId, "originalRequestId");

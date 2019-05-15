@@ -56,7 +56,7 @@ public class RestDataServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        request.setOriginalRequestId("id1");
+        request.setOriginalRequestId(new RequestId().id("id1"));
         RestDataServiceV1.setDefaultDelegate(new MockDataService());
         proxy = (ProxyRestDataService) new ProxyRestDataService("http://localhost:8084/data").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());

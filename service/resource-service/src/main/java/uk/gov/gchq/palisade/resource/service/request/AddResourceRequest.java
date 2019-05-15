@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -70,12 +71,12 @@ public class AddResourceRequest extends Request {
     }
 
     @Override
-    public void setOriginalRequestId(final String originalRequestId) {
+    public void setOriginalRequestId(final RequestId originalRequestId) {
         throw new ForbiddenException("Should not call AddResourceRequest.setOriginalRequestId()");
     }
 
     @Override
-    public String getOriginalRequestId() {
+    public RequestId getOriginalRequestId() {
         throw new ForbiddenException("Should not call AddResourceRequest.getOriginalRequestId()");
     }
 

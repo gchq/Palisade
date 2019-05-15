@@ -199,7 +199,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
 
     @Override
     public CompletableFuture<DataRequestResponse> registerDataRequest(final RegisterDataRequest request) {
-        final String originalRequestId = UUID.randomUUID().toString();
+        final RequestId originalRequestId = new RequestId().id(UUID.randomUUID().toString());
         LOGGER.debug("Registering data request: {}", request, originalRequestId);
         auditRequestReceived(request, originalRequestId);
         final GetUserRequest userRequest = new GetUserRequest().userId(request.getUserId());
@@ -259,7 +259,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 });
     }
 
-    private MultiPolicy getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources, final String originalRequestId) {
+    private MultiPolicy getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources, final RequestId originalRequestId) {
         final GetPolicyRequest policyRequest = new GetPolicyRequest().user(futureUser.join()).context(request.getContext()).resources(new HashSet<>(futureResources.join().keySet()));
         policyRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting policy from policyService: {}", policyRequest);
@@ -270,7 +270,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 }).join();
     }
 
-    private void auditProcessingStarted(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy, final String originalRequestId) {
+    private void auditProcessingStarted(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy, final RequestId originalRequestId) {
         for (final Entry<LeafResource, Policy> entry : multiPolicy.getPolicies().entrySet()) {
             final ProcessingStartedAuditRequest auditRequestProcessingStarted =
                     new ProcessingStartedAuditRequest();
@@ -286,7 +286,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         }
     }
 
-    private void auditRequestReceived(final RegisterDataRequest request, final String originalRequestId) {
+    private void auditRequestReceived(final RegisterDataRequest request, final RequestId originalRequestId) {
         final RequestReceivedAuditRequest requestReceivedAuditRequest = new RequestReceivedAuditRequest();
         requestReceivedAuditRequest.context(request.getContext(), RequestReceivedAuditRequest.class)
                 .userId(request.getUserId(), RequestReceivedAuditRequest.class)
@@ -296,7 +296,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         auditService.audit(requestReceivedAuditRequest).join();
     }
 
-    private void auditRequestReceivedException(final RegisterDataRequest request, final String originalRequestId, final Throwable ex) {
+    private void auditRequestReceivedException(final RegisterDataRequest request, final RequestId originalRequestId, final Throwable ex) {
         final ExceptionAuditRequest auditRequestWithException = new ExceptionAuditRequest();
         auditRequestWithException
                 .exception(ex)
@@ -312,7 +312,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
     private void cache(final RegisterDataRequest request, final User user,
                        final RequestId requestId, final MultiPolicy multiPolicy,
                        final int resCount,
-                       final String originalRequestId) {
+                       final RequestId originalRequestId) {
         DataRequestConfig dataRequestConfig = new DataRequestConfig()
                 .user(user)
                 .context(request.getContext())
