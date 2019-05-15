@@ -18,39 +18,51 @@ package uk.gov.gchq.palisade.example.perf.trial;
 
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.perf.PerfFileSet;
-import uk.gov.gchq.palisade.service.PalisadeService;
 
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.gchq.palisade.example.perf.PerfUtils.sink;
 
 /**
- * Test that reads the large data file from Palisade with no policy and times entire Palisade interaction.
+ * Sets up a data request through Palisade, but doesn't read any data back.
  */
-public class ReadLargeNoPolicyTrial extends PalisadeTrial {
+public class SetupRequestTrial extends PalisadeTrial {
+    /**
+     * Number of requests to make.
+     */
+    private final int requests;
+
+    /**
+     * Create a request trial.
+     *
+     * @param requests number of sequential requests to Palisade to make
+     * @throws IllegalArgumentException if {@code requests} less than 1
+     */
+    public SetupRequestTrial(final int requests) {
+        if (requests < 1) {
+            throw new IllegalArgumentException("requests less than 1");
+        }
+        this.requests = requests;
+    }
 
     @Override
     public String name() {
-        return "large_no_policy";
+        return String.format("make_%d_request", requests);
     }
 
     @Override
     public String description() {
-        return "reads the large data file with no policy set";
+        return String.format("Makes %d requests without reading data", requests);
     }
 
     @Override
     public void accept(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
         requireNonNull(fileSet, "fileSet");
         requireNonNull(noPolicySet, "noPolicySet");
-
-        //find Palisade entry point
-        PalisadeService palisade = getPalisadeClientServices();
-
-        //setup a request and read data
-        try (Stream<Employee> data = getDataStream(palisade, noPolicySet.getLargeFile().toString())) {
-            sink(data);
+        for (int i = 0; i < requests; i++) {
+            try (Stream<Employee> data = getDataStream(getPalisadeClientServices(), fileSet.getSmallFile().toString())) {
+                //do nothing
+            }
         }
     }
 }

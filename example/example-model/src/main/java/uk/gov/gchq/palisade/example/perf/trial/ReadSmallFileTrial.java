@@ -16,36 +16,45 @@
 
 package uk.gov.gchq.palisade.example.perf.trial;
 
-import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
-import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.perf.PerfFileSet;
-import uk.gov.gchq.palisade.example.perf.PerfTrial;
+import uk.gov.gchq.palisade.service.PalisadeService;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.gchq.palisade.example.perf.PerfUtils.sink;
 
 /**
- * This test performs a native file read of large file in the 1st file set. This is done without going via Palisade, but
- * does try to deserialise the data.
+ * Reads the small file a repeated number of times. This measures the entire interaction with Palisade.
  */
-public class ReadLargeNativeTrial implements PerfTrial {
+public class ReadSmallFileTrial extends PalisadeTrial {
+    /**
+     * Number of requests to make.
+     */
+    private final int requests;
+
+    /**
+     * Create a small file read trial.
+     *
+     * @param requests number of sequential requests to Palisade to make
+     * @throws IllegalArgumentException if {@code requests} less than 1
+     */
+    public ReadSmallFileTrial(final int requests) {
+        if (requests < 1) {
+            throw new IllegalArgumentException("requests less than 1");
+        }
+        this.requests = requests;
+    }
 
     @Override
     public String name() {
-        return "read_native_large";
+        return String.format("read_small_%d", requests);
     }
 
     @Override
     public String description() {
-        return "performs a native read and deserialise of a file";
+        return String.format("reads the small file %d times", requests);
     }
 
     @Override
@@ -53,20 +62,15 @@ public class ReadLargeNativeTrial implements PerfTrial {
         requireNonNull(fileSet, "fileSet");
         requireNonNull(noPolicySet, "noPolicySet");
 
-        //create the serialiser
-        Serialiser<Employee> serialiser = new AvroSerialiser<>(Employee.class);
+        //make multiple requests
+        for (int i = 0; i < requests; i++) {
+            //find Palisade entry point
+            PalisadeService palisade = getPalisadeClientServices();
 
-        //get file URI
-        Path fileToRead = Paths.get(fileSet.getLargeFile());
-        //read from file
-        try (InputStream bis = Files.newInputStream(fileToRead);
-             Stream<Employee> dataStream = serialiser.deserialise(bis)) {
-
-            //now read everything in the file
-            sink(dataStream);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            //setup a request and read data
+            try (Stream<Employee> data = getDataStream(palisade, fileSet.getSmallFile().toString())) {
+                sink(data);
+            }
         }
     }
 }

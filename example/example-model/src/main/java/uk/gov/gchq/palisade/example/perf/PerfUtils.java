@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.example.perf;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -80,5 +81,16 @@ public final class PerfUtils {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Sinks all the data in a stream.
+     *
+     * @param data the stream to sink data from
+     * @param <T>  type of stream
+     */
+    public static <T> void sink(final Stream<T> data) {
+        requireNonNull(data, "data");
+        System.err.println(data.count());
     }
 }

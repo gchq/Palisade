@@ -24,6 +24,8 @@ import uk.gov.gchq.palisade.example.perf.PerfTrial;
 import uk.gov.gchq.palisade.example.perf.TrialType;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNativeTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNoPolicyTrial;
+import uk.gov.gchq.palisade.example.perf.trial.ReadLargeWithPolicyTrial;
+import uk.gov.gchq.palisade.example.perf.trial.SetupRequestTrial;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 
 import java.net.URI;
@@ -66,6 +68,9 @@ public class RunAction extends PerfAction {
         normalised = new ReadLargeNativeTrial();
         addTrial(normalised);
         addTrial(new ReadLargeNoPolicyTrial());
+        addTrial(new ReadLargeWithPolicyTrial());
+        addTrial(new SetupRequestTrial(1));
+        addTrial(new SetupRequestTrial(10));
     }
 
     /**
@@ -246,10 +251,11 @@ public class RunAction extends PerfAction {
 
         //perform trial
         try {
+            trial.setup(fileSet, noPolicySet);
             long time = System.nanoTime();
             trial.accept(fileSet, noPolicySet);
             time = System.nanoTime() - time;
-
+            trial.tearDown(fileSet, noPolicySet);
             //if this is a live trial then log it
             if (type == TrialType.LIVE) {
                 collector.logTime(trial.name(), time);

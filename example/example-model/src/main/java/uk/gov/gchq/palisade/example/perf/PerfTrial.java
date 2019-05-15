@@ -37,14 +37,20 @@ public interface PerfTrial extends BiConsumer<PerfFileSet, PerfFileSet> {
     String description();
 
     /**
-     * Perform any setup functioanlity.
+     * Perform any setup functionality that is needed before each trial.
+     *
+     * @param fileSet     the file set of small and large data files
+     * @param noPolicySet the file set of files with no policy set
      */
-    default void setup() {
+    default void setup(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
     }
 
     /**
-     * Perform any tear down and clean functionality.
+     * Perform any tear down and clean functionality that is needed after each trial.
+     *
+     * @param fileSet     the file set of small and large data files
+     * @param noPolicySet the file set of files with no policy set
      */
-    default void tearDown() {
+    default void tearDown(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
     }
 }
