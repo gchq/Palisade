@@ -18,8 +18,9 @@ package uk.gov.gchq.palisade.example.rule;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.example.common.ExampleUser;
 import uk.gov.gchq.palisade.example.common.Purpose;
-import uk.gov.gchq.palisade.example.common.Role;
+import uk.gov.gchq.palisade.example.common.TrainingCourse;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.rule.Rule;
 
@@ -42,13 +43,18 @@ public class BankDetailsRule implements Rule<Employee> {
             return null;
         }
 
+        System.out.println("more work needed here !!!");
         requireNonNull(user);
         requireNonNull(context);
-        Set<String> roles = user.getRoles();
         String purpose = context.getPurpose();
-
-        if (roles.contains(Role.PAYROLL.name()) & purpose.equals(Purpose.SALARY.name())) {
-            return record;
+        if (user instanceof ExampleUser) {
+            System.out.println("The instance is for an ExampleUser");
+            Set<TrainingCourse> trainingCompleted = ((ExampleUser) user).getTrainingCompleted();
+            if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
+                return record;
+            }
+        } else {
+            System.out.println("The instance is NOT for an exampleUser");
         }
         return redactRecord(record);
     }
