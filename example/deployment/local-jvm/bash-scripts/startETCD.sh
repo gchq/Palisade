@@ -6,8 +6,8 @@ docker rm etcd-gcr-${ETCD_VER}
 rm -rf /tmp/etcd-data.tmp
 mkdir -p /tmp/etcd-data.tmp
 docker run \
-  -p 31379:2379 \
-  -p 31380:2380 \
+  -p 2379:2379 \
+  -p 2380:2380 \
   -d \
   --mount type=bind,source=/tmp/etcd-data.tmp,destination=/etcd-data \
   --name etcd-gcr-${ETCD_VER} \

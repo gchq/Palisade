@@ -4,5 +4,6 @@ We have 2 simple examples that demonstrate the automated auditing and policy rul
 
 * [Rest Example](../deployment/local-jvm/README.md)&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Running as Rest services in local JVMs
 * [Docker Example](../deployment/local-docker/README.md)&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Running as Rest services locally in Docker containers
+* [Kubernetes Example](../deployment/local-k8s/README.md)&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Running as Rest services locally in k8s pods
 * AWS EMR Example &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Coming soon
 * Azure HDInsight Example &nbsp; Coming soon

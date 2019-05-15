@@ -1,0 +1,7 @@
+{
+  "@id": 1,
+  "class": "uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService",
+  "baseUrl": "http://localhost/config",
+  "retryMax": 1,
+  "retryPauseTime" : 5.000000000
+}
