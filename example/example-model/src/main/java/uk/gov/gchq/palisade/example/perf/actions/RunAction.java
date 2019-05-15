@@ -183,7 +183,7 @@ public class RunAction extends PerfAction {
      * @param type        the test type being run
      * @param testsToSkip test names to skip
      * @throws IllegalArgumentException if any of {@code testsToSkip} are invalid
-     * @throws IllegalArgumentException {@code trialCount} is < 1
+     * @throws IllegalArgumentException {@code trialCount} is less than 1
      */
     public void performTrialBatch(final int trialCount, final PerfFileSet fileSet, final PerfFileSet noPolicySet, final PerfCollector collector, final TrialType type, final String... testsToSkip) {
         requireNonNull(collector, "collector");
