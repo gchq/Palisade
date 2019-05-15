@@ -73,7 +73,7 @@ public class SetPolicyAction extends PerfAction {
         //for path manipulations, we temporarily strip off the URI scheme so that we can operate on abstract path components
         //as if they used the file scheme
         String scheme = uriOut.getScheme();
-        String schemelessComponent = uriOut.toString().substring(scheme.length() + 1); //+1 to remove ':'
+        String schemelessComponent = uriOut.getRawSchemeSpecificPart();
 
         Path output = Paths.get(schemelessComponent);
 

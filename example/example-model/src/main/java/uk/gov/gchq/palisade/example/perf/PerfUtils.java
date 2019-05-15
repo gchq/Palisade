@@ -74,8 +74,9 @@ public final class PerfUtils {
     public static URI toURI(final String scheme, final Path path) {
         requireNonNull(scheme, "scheme");
         requireNonNull(path, "path");
+
         try {
-            return new URI(scheme, path.toString(), null);
+            return new URI(scheme, path.toUri().getRawSchemeSpecificPart(), null);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
