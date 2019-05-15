@@ -239,6 +239,10 @@ public class JSONSerialiser {
      * @return true if the clazz can be serialised/deserialised
      */
     public static boolean canHandle(final Class clazz) {
+        String getDetails = System.getProperty(JSON_SERIALISER_MODULES);
+
+        System.out.println("JSON_SERIALISER_MODULES is set to");
+        System.out.println(getDetails);
         return getInstance().mapper.canSerialize(clazz);
     }
 
