@@ -34,10 +34,10 @@ public class ExceptionAuditRequest extends AuditRequestWithContext {
     }
 
     /**
-     * @param ex {@link Throwable} is the type of the exception while processing
+     * @param exception {@link Throwable} is the type of the exception while processing
      * @return the {@link ExceptionAuditRequest}
      */
-    public ExceptionAuditRequest exception(final Throwable ex) {
+    public ExceptionAuditRequest exception(final Throwable exception) {
         requireNonNull(exception, "The exception type cannot be null");
         this.exception = exception;
         return this;
@@ -61,7 +61,7 @@ public class ExceptionAuditRequest extends AuditRequestWithContext {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(27, 39)
+        return new HashCodeBuilder(27, 41)
                 .appendSuper(super.hashCode())
                 .append(exception)
                 .toHashCode();

@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.example.perf.PerfFileSet;
 import uk.gov.gchq.palisade.example.perf.PerfTrial;
 import uk.gov.gchq.palisade.example.perf.TrialType;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNativeTrial;
+import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNoPolicyTrial;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 
 import java.net.URI;
@@ -64,7 +65,7 @@ public class RunAction extends PerfAction {
         //the one to normalise against
         normalised = new ReadLargeNativeTrial();
         addTrial(normalised);
-
+        addTrial(new ReadLargeNoPolicyTrial());
     }
 
     /**

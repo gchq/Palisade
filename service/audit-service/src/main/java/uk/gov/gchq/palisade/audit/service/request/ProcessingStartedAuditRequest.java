@@ -116,7 +116,7 @@ public class ProcessingStartedAuditRequest extends AuditRequestWithContext {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(23, 39)
+        return new HashCodeBuilder(23, 41)
                 .appendSuper(super.hashCode())
                 .append(user)
                 .append(leafResource)
