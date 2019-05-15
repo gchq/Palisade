@@ -223,6 +223,7 @@ public class ServicesConfigurator {
             InetAddress ip = InetAddress.getLocalHost();
             String hostname = ip.getHostName();
             ret.set("fs.defaultFS", ("hdfs://" + hostname));
+            //ret.set("fs.defaultFS", ("hdfs://localhost"));          // revert
             return ret;
         } catch (Exception e) {
             throw new RuntimeException(e);
