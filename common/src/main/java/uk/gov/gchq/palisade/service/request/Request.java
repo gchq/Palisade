@@ -56,7 +56,7 @@ public abstract class Request {
     }
 
     public String getId() {
-        //id will never be null
+        //id will never be null - set on construction
         return id;
     }
 
