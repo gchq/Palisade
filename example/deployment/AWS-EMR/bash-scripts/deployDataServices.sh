@@ -14,7 +14,8 @@ if [ $# -gt 0 ]; then
         sed -i "s/localhost/${HOSTNAME}/g" /home/hadoop/deploy_example/resources/configRest.json
         for node in $nodes
          do
-           ssh -f -i $key -o StrictHostKeyChecking=no hadoop@$node "mkdir -p /home/hadoop/deploy_example/resources; \
+           ssh -f -i $key -o StrictHostKeyChecking=no hadoop@$node "sudo kill `ps -aef | grep example-rest-.*-service | grep -v grep | awk '{print $2}'` || echo Killed \
+                                                                    mkdir -p /home/hadoop/deploy_example/resources; \
                                                                     mkdir -p /home/hadoop/jars; \
                                                                     mkdir -p /home/hadoop/example_data; \
                                                                     mkdir -p /home/hadoop/example_logs"
