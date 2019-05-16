@@ -131,10 +131,6 @@
                                 <palisade.rest.basePath>
                                     ${standalone-path}
                                 </palisade.rest.basePath>
-                                <palisade.rest.config.path>
-                                    <!-- This file exists in the docker-services module -->
-                                    configRest.json
-                                </palisade.rest.config.path>
                                 <palisade.error-mode.debug>
                                     true
                                 </palisade.error-mode.debug>
