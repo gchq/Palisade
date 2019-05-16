@@ -136,10 +136,6 @@
                                 <palisade.rest.basePath>
                                     ${standalone-path}
                                 </palisade.rest.basePath>
-                                <palisade.rest.config.path>
-                                    <!-- This file exists in the docker-services module -->
-                                    configRest.json
-                                </palisade.rest.config.path>
                                 <!-- Here you could override the Data service implementing class-->
                                 <!--
                                 <uk.gov.gchq.palisade.data.service.DataService>

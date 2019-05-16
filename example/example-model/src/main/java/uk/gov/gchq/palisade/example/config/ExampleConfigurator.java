@@ -48,7 +48,7 @@ public final class ExampleConfigurator {
      * @param args command line arguments
      */
     public static void main(final String[] args) {
-        final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ClientConfiguredServices cs = new ClientConfiguredServices(configService);
         new ExampleConfigurator(cs, args[0]);

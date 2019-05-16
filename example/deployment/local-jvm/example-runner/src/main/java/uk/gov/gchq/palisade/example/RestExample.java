@@ -51,7 +51,7 @@ public class RestExample {
     }
 
     public void run(final String sourceFile) throws Exception {
-        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
         ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);
