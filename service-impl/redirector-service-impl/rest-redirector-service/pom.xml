@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>uk.gov.gchq.palisade</groupId>
-            <artifactId>redirector</artifactId>
+            <artifactId>redirector-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -27,11 +27,6 @@
             <version>${project.parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>config-service</artifactId>
-            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -45,6 +40,17 @@
             <version>${project.parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>simple-redirector-service</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>config-service</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
@@ -75,6 +81,7 @@
             <version>${servlet-api.version}</version>
             <scope>compile</scope>
         </dependency>
+
     </dependencies>
 
 

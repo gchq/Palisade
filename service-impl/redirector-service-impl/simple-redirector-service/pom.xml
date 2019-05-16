@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
-        <artifactId>palisade-service-impl</artifactId>
+        <artifactId>redirector-service-impl</artifactId>
         <version>0.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>simple-redirector-service</artifactId>
@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>uk.gov.gchq.palisade</groupId>
-            <artifactId>redirector</artifactId>
+            <artifactId>redirector-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
