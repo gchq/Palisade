@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.impl;
+package uk.gov.gchq.palisade.redirect.service.redirect.impl;
 
-import uk.gov.gchq.palisade.redirect.RedirectionResult;
-import uk.gov.gchq.palisade.redirect.exception.NoInstanceException;
-import uk.gov.gchq.palisade.redirect.result.StringRedirectResult;
+import uk.gov.gchq.palisade.redirect.service.redirect.HeartbeatRedirector;
+import uk.gov.gchq.palisade.redirect.service.redirect.RedirectionResult;
+import uk.gov.gchq.palisade.redirect.service.redirect.exception.NoInstanceException;
+import uk.gov.gchq.palisade.redirect.service.redirect.result.StringRedirectResult;
 
 import java.lang.reflect.Method;
 import java.util.Collections;

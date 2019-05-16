@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.impl;
+package uk.gov.gchq.palisade.redirect.service.redirect;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,9 +23,8 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
-import uk.gov.gchq.palisade.redirect.RedirectionResult;
-import uk.gov.gchq.palisade.redirect.exception.NoInstanceException;
-import uk.gov.gchq.palisade.redirect.exception.RedirectionFailedException;
+import uk.gov.gchq.palisade.redirect.service.redirect.exception.NoInstanceException;
+import uk.gov.gchq.palisade.redirect.service.redirect.exception.RedirectionFailedException;
 
 import java.lang.reflect.Method;
 import java.util.Optional;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.exception;
+package uk.gov.gchq.palisade.redirect.service.redirect.exception;
 
 /**
  * An exception thrown by redirectors when no suitable instance of a {@link uk.gov.gchq.palisade.service.Service} could be found.

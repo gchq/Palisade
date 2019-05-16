@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect;
+package uk.gov.gchq.palisade.redirect.service.redirect;
 
 import org.apache.commons.lang3.ClassUtils;
 

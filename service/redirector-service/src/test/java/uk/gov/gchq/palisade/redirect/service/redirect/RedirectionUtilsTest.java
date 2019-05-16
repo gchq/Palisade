@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.impl;
+package uk.gov.gchq.palisade.redirect.service.redirect;
 
 import org.junit.Test;
-import uk.gov.gchq.palisade.redirect.RedirectionUtils;
 
 import static org.junit.Assert.assertEquals;
 

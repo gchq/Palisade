@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect;
+package uk.gov.gchq.palisade.redirect.service.redirect.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +23,8 @@ import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.redirect.service.redirect.RedirectionMarshall;
+import uk.gov.gchq.palisade.redirect.service.redirect.Redirector;
 import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 import uk.gov.gchq.palisade.service.Service;
