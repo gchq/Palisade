@@ -47,7 +47,7 @@ public class RequestOnlyTrial extends PalisadeTrial {
 
     @Override
     public String name() {
-        return String.format("request_small_%d_times", requests);
+        return "request_small_with_policy";
     }
 
     @Override
