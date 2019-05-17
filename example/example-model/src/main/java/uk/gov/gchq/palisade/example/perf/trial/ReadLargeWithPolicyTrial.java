@@ -31,7 +31,7 @@ import static uk.gov.gchq.palisade.example.perf.PerfUtils.sink;
 public class ReadLargeWithPolicyTrial extends PalisadeTrial {
     @Override
     public String name() {
-        return "large_with_policy";
+        return "read_large_policy";
     }
 
     @Override

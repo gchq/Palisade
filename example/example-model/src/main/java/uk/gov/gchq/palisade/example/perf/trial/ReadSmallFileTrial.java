@@ -49,7 +49,7 @@ public class ReadSmallFileTrial extends PalisadeTrial {
 
     @Override
     public String name() {
-        return String.format("read_small_%d", requests);
+        return String.format("read_small_%d_times", requests);
     }
 
     @Override

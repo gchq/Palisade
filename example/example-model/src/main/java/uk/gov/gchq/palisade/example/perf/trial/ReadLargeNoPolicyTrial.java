@@ -32,7 +32,7 @@ public class ReadLargeNoPolicyTrial extends PalisadeTrial {
 
     @Override
     public String name() {
-        return "large_no_policy";
+        return "read_large_no_policy";
     }
 
     @Override

@@ -40,7 +40,7 @@ public class ReadLargeNativeTrial implements PerfTrial {
 
     @Override
     public String name() {
-        return "read_native_large";
+        return "read_large_native";
     }
 
     @Override

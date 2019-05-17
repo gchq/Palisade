@@ -25,10 +25,10 @@ import uk.gov.gchq.palisade.example.perf.TrialType;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNativeTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNoPolicyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeWithPolicyTrial;
-import uk.gov.gchq.palisade.example.perf.trial.ReadSmallFileReadOnlyTrial;
+import uk.gov.gchq.palisade.example.perf.trial.DataOnlySmallTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadSmallFileTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadSmallNoPolicyTrial;
-import uk.gov.gchq.palisade.example.perf.trial.SetupRequestTrial;
+import uk.gov.gchq.palisade.example.perf.trial.RequestOnlyTrial;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 
 import java.net.URI;
@@ -73,10 +73,10 @@ public class RunAction extends PerfAction {
         addTrial(new ReadLargeNoPolicyTrial());
         addTrial(new ReadSmallNoPolicyTrial());
         addTrial(new ReadLargeWithPolicyTrial());
-        addTrial(new SetupRequestTrial(1));
-        addTrial(new SetupRequestTrial(10));
+        addTrial(new RequestOnlyTrial(1));
+        addTrial(new RequestOnlyTrial(10));
         addTrial(new ReadSmallFileTrial(2));
-        addTrial(new ReadSmallFileReadOnlyTrial(2));
+        addTrial(new DataOnlySmallTrial(2));
     }
 
     /**

@@ -18,27 +18,36 @@ package uk.gov.gchq.palisade.example.perf.trial;
 
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.perf.PerfFileSet;
+import uk.gov.gchq.palisade.example.perf.PerfUtils;
+import uk.gov.gchq.palisade.service.PalisadeService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Sets up a data request through Palisade, but doesn't read any data back.
+ * Reads a file repeatedly through Palisade, but only times how long it takes to read the data.
  */
-public class SetupRequestTrial extends PalisadeTrial {
+public class DataOnlySmallTrial extends PalisadeTrial {
     /**
      * Number of requests to make.
      */
     private final int requests;
 
     /**
-     * Create a request trial.
+     * Streams that will be opened before trial runs.
+     */
+    private List<Stream<Employee>> streams;
+
+    /**
+     * Create a small file read trial.
      *
      * @param requests number of sequential requests to Palisade to make
      * @throws IllegalArgumentException if {@code requests} less than 1
      */
-    public SetupRequestTrial(final int requests) {
+    public DataOnlySmallTrial(final int requests) {
         if (requests < 1) {
             throw new IllegalArgumentException("requests less than 1");
         }
@@ -47,22 +56,40 @@ public class SetupRequestTrial extends PalisadeTrial {
 
     @Override
     public String name() {
-        return String.format("make_%d_request", requests);
+        return String.format("data_only_small_%d_times", requests);
     }
 
     @Override
     public String description() {
-        return String.format("makes %d requests without reading data", requests);
+        return String.format("reads the small file %d times, but ONLY accounts for the data reading not setup", requests);
+    }
+
+    /**
+     * Overridden to create necessary requests in Palisade.
+     */
+    @Override
+    public void setup(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
+        //get palisade entry point
+        PalisadeService palisadeService = getPalisadeClientServices();
+
+        //set up the number of requests needed
+        streams = new ArrayList<>(requests);
+        for (int i = 0; i < requests; i++) {
+            streams.add(getDataStream(palisadeService, fileSet.getSmallFile().toString()));
+        }
+    }
+
+    @Override
+    public void tearDown(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
+        streams.clear();
     }
 
     @Override
     public void accept(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
         requireNonNull(fileSet, "fileSet");
         requireNonNull(noPolicySet, "noPolicySet");
-        for (int i = 0; i < requests; i++) {
-            try (Stream<Employee> data = getDataStream(getPalisadeClientServices(), fileSet.getSmallFile().toString())) {
-                //do nothing
-            }
-        }
+
+        //make multiple read attempts
+        streams.stream().forEach(PerfUtils::sink);
     }
 }
