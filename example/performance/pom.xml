@@ -45,20 +45,6 @@
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>${project.parent.groupId}</groupId>
-                    <artifactId>rest-redirector</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>${project.parent.groupId}</groupId>
-                    <artifactId>etcd-backing-store</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>${project.parent.groupId}</groupId>
-                    <artifactId>hadoop-data-service</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 </project>
