@@ -35,5 +35,6 @@
         <module>cache-service</module>
         <module>rest-service</module>
         <module>config-service</module>
+        <module>redirector-service</module>
     </modules>
 </project>
