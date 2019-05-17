@@ -32,8 +32,6 @@ import java.util.stream.Stream;
 
 public class ExampleSimpleClient extends SimpleClient<Employee> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExampleSimpleClient.class);
-
     public ExampleSimpleClient(final PalisadeService palisadeService) {
         super(palisadeService, new AvroSerialiser<>(Employee.class));
     }

@@ -27,11 +27,3 @@ export PATH=$PATH:/home/hadoop/apache-maven-3.6.1/bin:$JAVA_HOME
 cd /mnt1/repos/Palisade
 mvn clean install -P example > /home/hadoop/example_logs/install.log
 ./example/deployment/local-jvm/bash-scripts/buildServices.sh > /home/hadoop/example_logs/buildServices.log
-
-
-
-
-
-
-
-
