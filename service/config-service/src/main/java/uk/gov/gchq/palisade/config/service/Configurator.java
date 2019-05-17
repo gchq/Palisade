@@ -238,7 +238,7 @@ public class Configurator {
 
         GetConfigRequest request = new GetConfigRequest().service(serviceClass);
         ServiceState config = null;
-        LOGGER.info("Getting configuration for {} with timeout {}", serviceClass, timeout);
+        LOGGER.debug("Getting configuration for {} with timeout {}", serviceClass, timeout);
 
         while (config == null && (timeout == 0 || System.currentTimeMillis() < timeExpiry)) {
             try {

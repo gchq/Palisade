@@ -16,9 +16,6 @@
 
 package uk.gov.gchq.palisade.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
@@ -43,8 +40,6 @@ public class SimpleClient<T> {
 
     private final PalisadeService palisadeService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleClient.class);
-
     public SimpleClient(final PalisadeService palisadeService, final Serialiser<T> serialiser) {
         Objects.requireNonNull(palisadeService, "palisade service must be provided");
         this.palisadeService = palisadeService;
@@ -58,9 +53,7 @@ public class SimpleClient<T> {
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
-            LOGGER.debug(connectionDetail.toString());
             final DataService dataService = connectionDetail.createService();
-            LOGGER.debug(dataService.toString());
             final String uuid = dataRequestResponse.getOriginalRequestId();
 
             final ReadRequest readRequest = new ReadRequest()
@@ -68,15 +61,11 @@ public class SimpleClient<T> {
                     .resource(entry.getKey());
             readRequest.setOriginalRequestId(uuid);
 
-            LOGGER.debug(readRequest.toString());
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
-            LOGGER.debug(futureResponse.toString());
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
                     response -> getSerialiser().deserialise(response.getData())
             );
-            LOGGER.debug(futureResult.toString());
             futureResults.add(futureResult);
-            LOGGER.debug(futureResults.toString());
         }
 
         return futureResults.stream().flatMap(CompletableFuture::join);

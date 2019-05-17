@@ -8,5 +8,4 @@ java -jar "$EXAMPLESERVICES"/example-rest-config-service/target/example-rest-con
                 -extractDirectory=.extract/Config \
                 -Dpalisade.rest.bootstrap.path=.extract/Config/webapps/config/WEB-INF/classes/bootstrapConfig.json \
                 -Dpalisade.rest.basePath=config \
-                -Dpalisade.properties.app.title=rest-config-service \
-				-Droot.log.level=debug
+                -Dpalisade.properties.app.title=rest-config-service

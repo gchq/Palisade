@@ -8,5 +8,4 @@ java -jar "$EXAMPLESERVICES"/example-rest-resource-service/target/example-rest-r
                 -extractDirectory=.extract/Resource \
                 -Dpalisade.rest.config.path="$EXAMPLE/example-model/src/main/resources/configRest.json" \
                 -Dpalisade.rest.basePath=resource \
-                -Dpalisade.properties.app.title=rest-resource-service \
-				-Droot.log.level=debug
+                -Dpalisade.properties.app.title=rest-resource-service
