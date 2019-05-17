@@ -145,15 +145,8 @@ public class MapReduceExample extends Configured implements Tool {
         job.setOutputFormatClass(TextOutputFormat.class);
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
-        //configure the Palisade input format on an example client
-//        final ConfigurationService ics = new ServicesConfigurator(new String[0]);
-//        final ServicesCreator cs = new ServicesCreator(ics);
-//        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
-
         // copied from RestExample
-        LOGGER.info("EMR debug: MapReduceExample - at start of section copied from RestExample ");
         String confString = System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH);
-        LOGGER.info("EMR debug: MapReduceExample - confString " + confString);
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ServiceState clientConfig = null;

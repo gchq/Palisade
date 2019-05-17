@@ -137,28 +137,22 @@ public class SimpleDataService implements DataService {
     @Override
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
         requireNonNull(request, "The request cannot be null.");
-        LOGGER.info("EMR debug: SimpleDataService - at start of read - ready to check heartbeat ");
         //check that we have an active heartbeat before serving request
 
         auditReadRequestReceived(request);
         if (!heartbeat.isBeating()) {
             throw new IllegalStateException("data service is not sending heartbeats! Can't send data. Has the cache service been configured?");
         }
-        LOGGER.info("EMR debug: SimpleDataService - after check heartbeat ");
         LOGGER.debug("Creating async read: {}", request);
-        LOGGER.info("EMR debug: SimpleDataService - Creating async read: {}", request);
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Starting to read: {}", request);
-            LOGGER.info("EMR debug: SimpleDataService - Starting to read: {}", request);
             final GetDataRequestConfig getConfig = new GetDataRequestConfig()
                     .requestId(request.getRequestId())
                     .resource(request.getResource());
             getConfig.setOriginalRequestId(request.getOriginalRequestId());
             LOGGER.debug("Calling palisade service with: {}", getConfig);
-            LOGGER.info("EMR debug: Calling palisade service with: {}", getConfig);
             final DataRequestConfig config = getPalisadeService().getDataRequestConfig(getConfig).join();
             LOGGER.debug("Palisade service returned: {}", config);
-            LOGGER.info("EMR debug: Palisade service returned: {}", config);
 
             final DataReaderRequest readerRequest = new DataReaderRequest()
                     .resource(request.getResource())

@@ -53,21 +53,14 @@ public class SimpleClient<T> {
     }
 
     public Stream<T> read(final String filename, final String resourceType, final String userId, final String purpose) {
-        LOGGER.info("EMR debug: SimpleClient - at start of read ");
         final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
-        LOGGER.info("EMR debug: SimpleClient - after RegisterDataRequest ");
         final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
-        LOGGER.info("EMR debug: SimpleClient - got data request response ");
         final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
-        LOGGER.info("EMR debug: SimpleClient - after completable future<Stream> T>>> futureResults ");
         for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
-            LOGGER.info("EMR debug: SimpleClient - at top of for loop ");
             final ConnectionDetail connectionDetail = entry.getValue();
-            LOGGER.info("EMR debug: SimpleClient - after connectionDetail ");
-            LOGGER.info(connectionDetail.toString());
+            LOGGER.debug(connectionDetail.toString());
             final DataService dataService = connectionDetail.createService();
-            LOGGER.info("EMR debug: SimpleClient - after dataService ");
-            LOGGER.info(dataService.toString());
+            LOGGER.debug(dataService.toString());
             final String uuid = dataRequestResponse.getOriginalRequestId();
 
             final ReadRequest readRequest = new ReadRequest()
@@ -75,19 +68,15 @@ public class SimpleClient<T> {
                     .resource(entry.getKey());
             readRequest.setOriginalRequestId(uuid);
 
-            LOGGER.info("EMR debug: SimpleClient - after readRequest ");
-            LOGGER.info(readRequest.toString());
+            LOGGER.debug(readRequest.toString());
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
-            LOGGER.info("EMR debug: SimpleClient - after futureResponse ");
-            LOGGER.info(futureResponse.toString());
+            LOGGER.debug(futureResponse.toString());
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
                     response -> getSerialiser().deserialise(response.getData())
             );
-            LOGGER.info("EMR debug: SimpleClient - after futureResult ");
-            LOGGER.info(futureResult.toString());
+            LOGGER.debug(futureResult.toString());
             futureResults.add(futureResult);
-            LOGGER.info("EMR debug: SimpleClient - added to futureResults ");
-            LOGGER.info(futureResults.toString());
+            LOGGER.debug(futureResults.toString());
         }
 
         return futureResults.stream().flatMap(CompletableFuture::join);

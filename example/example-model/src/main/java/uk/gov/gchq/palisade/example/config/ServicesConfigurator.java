@@ -223,7 +223,7 @@ public class ServicesConfigurator {
             InetAddress ip = InetAddress.getLocalHost();
             String hostname = ip.getHostName();
             ret.set("fs.defaultFS", ("hdfs://" + hostname));
-            //ret.set("fs.defaultFS", ("hdfs://localhost"));          // revert
+            //ret.set("fs.defaultFS", ("hdfs://localhost"));          // uncomment this line to run locally rather than on a cluster
             return ret;
         } catch (Exception e) {
             throw new RuntimeException(e);

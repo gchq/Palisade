@@ -107,7 +107,6 @@ public class RestDataServiceV1 implements DataService {
 
     @Override
     public CompletableFuture<ReadResponse> read(final ReadRequest request) {
-        LOGGER.info("EMR debug: RestDataServiceV1 - at start of read ");
         return delegate.read(request);
     }
 

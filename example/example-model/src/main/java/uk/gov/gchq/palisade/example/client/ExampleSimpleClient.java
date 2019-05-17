@@ -36,7 +36,6 @@ public class ExampleSimpleClient extends SimpleClient<Employee> {
 
     public ExampleSimpleClient(final PalisadeService palisadeService) {
         super(palisadeService, new AvroSerialiser<>(Employee.class));
-        LOGGER.info("EMR debug: ExampleSimpleClient - after super palisadeService ");
     }
 
     public Stream<Employee> read(final String filename, final String userId, final String purpose) {

@@ -52,7 +52,6 @@ public class GetConfigRequest extends Request {
      * Create an empty request.
      */
     public GetConfigRequest() {
-        LOGGER.info("EMR debug: GetConfigRequest - at start of GetConfigrequest");
         serviceClassName = Optional.empty();
     }
 
@@ -97,7 +96,6 @@ public class GetConfigRequest extends Request {
      * @return this object
      */
     public GetConfigRequest service(final Optional<Class<? extends Service>> serviceClassName) {
-        LOGGER.info("EMR debug: GetConfigRequest - at start of GetConfigrequest service");
         requireNonNull(serviceClassName, "serviceClassName");
         this.serviceClassName = serviceClassName.map(Class::getTypeName);
         return this;

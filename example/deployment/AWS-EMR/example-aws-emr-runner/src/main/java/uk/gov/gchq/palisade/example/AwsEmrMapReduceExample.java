@@ -146,15 +146,8 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         job.setOutputFormatClass(TextOutputFormat.class);
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
-        //configure the Palisade input format on an example client
-//        final ConfigurationService ics = new ServicesConfigurator(new String[0]);
-//        final ServicesCreator cs = new ServicesCreator(ics);
-//        final ExampleSimpleClient client = new ExampleSimpleClient(cs, sourceFile);
-
         // copied from RestExample
-        LOGGER.info("EMR debug: MapReduceExample - at start of section copied from RestExample ");
         String confString = System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH);
-        LOGGER.info("EMR debug: MapReduceExample - confString " + confString);
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         //System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
@@ -228,7 +221,6 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
 
     public static void main(final String... args) throws Exception {
         final String outputDir;
-        LOGGER.info("EMR debug: AwsEmrMapReduceExample - at start of main() ");
         if (args.length < 1) {
             System.out.printf("Usage: %s input_file [output_directory]\n", AwsEmrMapReduceExample.class.getTypeName());
             System.out.println("\nfile\tfile containing serialised Employee instances to read");
@@ -245,7 +237,6 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         } else {
             outputDir = args[1];
         }
-        LOGGER.info("EMR debug: AwsEmrMapReduceExample - outputdir is: " + outputDir);
         //remove this as it needs to be not present when the job runs
         FileUtils.deleteDirectory(new File(outputDir));
         InetAddress ip = InetAddress.getLocalHost();
@@ -259,10 +250,10 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         //conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, new File(".").toURI().toURL().toString());
         //set defaultFS to hdfs on cluster
         conf.set("fs.defaultFS", ("hdfs://" + hostname));
-        //conf.set("fs.defaultFS", ("hdfs://localhost"));           // *****revert this***
+        //conf.set("fs.defaultFS", ("hdfs://localhost"));           // uncomment to run locally rather than on cluster
         //set address of resource manager
         conf.set("yarn.resourcemanager.address", (hostname + ":8032"));
-        //conf.set("yarn.resourcemanager.address", ("localhost:8032"));          //***revert***
+        //conf.set("yarn.resourcemanager.address", ("localhost:8032"));          // uncomment to run locally rather than on cluster
         ToolRunner.run(conf, new AwsEmrMapReduceExample(), new String[]{sourceFile, outputDir});
     }
 

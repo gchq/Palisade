@@ -68,22 +68,17 @@ public final class ExampleConfigurator {
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ClientConfiguredServices cs = new ClientConfiguredServices(configService);
         new ExampleConfigurator(cs, args[0]);
-        LOGGER.info("EMR debug: ExampleConfigurator - created new ExampleConfigurator");
     }
 
     public ExampleConfigurator(final ClientConfiguredServices services, final String file) {
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(file);
         this.file = absoluteFileURI.toString();
-        LOGGER.info("EMR debug: ExampleConfigurator - constructor this.file");
         initialiseExample(services);
-        LOGGER.info("EMR debug: ExampleConfigurator - constructor - completed initialiseExample");
     }
 
     private void initialiseExample(final ClientConfiguredServices services) {
         // The user authorisation owner or sys admin needs to add the user
-        LOGGER.info("EMR debug: ExampleConfigurator - start of initialiseExample");
         final UserService userService = services.getUserService();
-        LOGGER.info("EMR debug: ExampleConfigurator - initialiseExample - created UserService - userService");
 
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest().user(ExampleUsers.getAlice())
