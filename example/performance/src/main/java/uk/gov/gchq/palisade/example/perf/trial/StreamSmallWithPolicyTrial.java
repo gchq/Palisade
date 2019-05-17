@@ -56,7 +56,7 @@ public class StreamSmallWithPolicyTrial extends PalisadeTrial {
 
     @Override
     public String name() {
-        return String.format("stream_small_%d_times", requests);
+        return "stream_small_with_policy";
     }
 
     @Override
