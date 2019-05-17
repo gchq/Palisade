@@ -141,9 +141,6 @@
                                 <palisade.rest.basePath>
                                     ${standalone-path}
                                 </palisade.rest.basePath>
-                                <palisade.rest.bootstrap.path>
-                                    ${project.build.outputDirectory}/bootstrapConfig.json
-                                </palisade.rest.bootstrap.path>
                                 <palisade.error-mode.debug>
                                     true
                                 </palisade.error-mode.debug>

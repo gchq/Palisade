@@ -50,7 +50,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 @Api(value = "/")
 public class RestConfigServiceV1 implements ConfigurationService {
-    public static final String BOOTSTRAP_CONFIG = "palisade.rest.bootstrap.path";
+    public static final String BOOTSTRAP_CONFIG = "PALISADE_REST_BOOTSTRAP_PATH";
     private static final Logger LOGGER = LoggerFactory.getLogger(RestConfigServiceV1.class);
 
     private final ConfigurationService delegate;

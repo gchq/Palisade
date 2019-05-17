@@ -126,7 +126,7 @@ public class RESTRedirector<S extends Service> extends AbstractApplicationConfig
      * @see ConfigUtils#CONFIG_SERVICE_PATH
      */
     public RESTRedirector() {
-        this(System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+        this(System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
     }
 
     /**
