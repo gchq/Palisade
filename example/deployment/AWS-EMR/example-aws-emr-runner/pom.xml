@@ -54,6 +54,16 @@
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>proxy-rest-data-service</artifactId>
             <version>${project.parent.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
+                    <artifactId>jakarta.inject</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -84,6 +94,12 @@
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>etcd-backing-store</artifactId>
             <version>${project.parent.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId> <!-- exclude as it conflicts with version netty-all-4.0.23 in hadoop-common-->
+                    <artifactId>netty-codec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Added for jetcd-launcher -->
         <dependency>
@@ -100,6 +116,16 @@
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
+                    <artifactId>jakarta.inject</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -142,6 +168,16 @@
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
+                    <artifactId>jakarta.inject</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -183,6 +219,12 @@
             <artifactId>core-rest-service</artifactId>
             <version>${project.parent.version}</version>
             <classifier>classes</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -190,12 +232,24 @@
             <version>${project.parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-grizzly2-http</artifactId>
             <version>${jersey.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -208,6 +262,12 @@
             <artifactId>jersey-container-servlet</artifactId>
             <version>${jersey.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -235,6 +295,10 @@
                 <exclusion>
                     <groupId>org.ow2.asm</groupId> <!-- exclude asm version 5.0.4 as it conflicts with version 3.1-->
                     <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-beanutils</groupId> <!-- exclude commons-beanutils-core 1.8.0 conflicts with commons-beanutils 1.7.0-->
+                    <artifactId>commons-beanutils-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -277,6 +341,12 @@
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId> <!-- exclude as it conflicts with jsr305 annotations-->
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
