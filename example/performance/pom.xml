@@ -47,15 +47,15 @@
             <version>${project.parent.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>${project.parent.groupId}</groupId>
                     <artifactId>rest-redirector</artifactId>
-                    <groupId>uk.gov.gchq.palisade</groupId>
                 </exclusion>
                 <exclusion>
-                    <groupId>uk.gov.gchq.palisade</groupId>
+                    <groupId>${project.parent.groupId}</groupId>
                     <artifactId>etcd-backing-store</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>uk.gov.gchq.palisade</groupId>
+                    <groupId>${project.parent.groupId}</groupId>
                     <artifactId>hadoop-data-service</artifactId>
                 </exclusion>
             </exclusions>

@@ -30,7 +30,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Reads a file repeatedly through Palisade, but only times how long it takes to read the data.
  */
-public class DataOnlySmallTrial extends PalisadeTrial {
+public class StreamSmallWithPolicyTrial extends PalisadeTrial {
     /**
      * Number of requests to make.
      */
@@ -47,7 +47,7 @@ public class DataOnlySmallTrial extends PalisadeTrial {
      * @param requests number of sequential requests to Palisade to make
      * @throws IllegalArgumentException if {@code requests} less than 1
      */
-    public DataOnlySmallTrial(final int requests) {
+    public StreamSmallWithPolicyTrial(final int requests) {
         if (requests < 1) {
             throw new IllegalArgumentException("requests less than 1");
         }
@@ -56,7 +56,7 @@ public class DataOnlySmallTrial extends PalisadeTrial {
 
     @Override
     public String name() {
-        return String.format("data_only_small_%d_times", requests);
+        return String.format("stream_small_%d_times", requests);
     }
 
     @Override
