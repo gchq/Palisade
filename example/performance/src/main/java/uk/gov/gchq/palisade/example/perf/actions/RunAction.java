@@ -215,7 +215,7 @@ public class RunAction extends PerfAction {
      * @param noPolicySet the file set for tests with no policy
      * @param collector   the output collector
      * @param type        the type of test being run
-     * @throws IllegalArgumentException {@code trialCount} is < 1
+     * @throws IllegalArgumentException {@code trialCount} is less than 1
      */
     public void performSingleTrial(final int trialCount, final PerfTrial trial, final PerfFileSet fileSet, final PerfFileSet noPolicySet, final PerfCollector collector, final TrialType type) {
         requireNonNull(trial, "trial");
