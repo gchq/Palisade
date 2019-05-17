@@ -25,10 +25,10 @@ import uk.gov.gchq.palisade.example.perf.TrialType;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNativeTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNoPolicyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeWithPolicyTrial;
-import uk.gov.gchq.palisade.example.perf.trial.StreamSmallWithPolicyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadSmallFileTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadSmallNoPolicyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.RequestOnlyTrial;
+import uk.gov.gchq.palisade.example.perf.trial.StreamSmallWithPolicyTrial;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 
 import java.net.URI;
