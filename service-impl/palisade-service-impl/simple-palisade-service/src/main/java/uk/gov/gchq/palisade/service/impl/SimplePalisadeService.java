@@ -253,6 +253,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     LOGGER.error("Error handling: {}", ex.getMessage());
                     if (nonNull(ex)) {
                         auditRequestReceivedException(request, originalRequestId, ex);
+
                     }
                     throw new RuntimeException(ex); //rethrow the exception
                 });
@@ -281,7 +282,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     .id(request.getId())
                     .originalRequestId(originalRequestId);
             LOGGER.debug("Auditing: {}", auditRequestProcessingStarted);
-            auditService.audit(auditRequestProcessingStarted);
+            auditService.audit(auditRequestProcessingStarted).join();
         }
     }
 
@@ -292,7 +293,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 .resourceId(request.getResourceId(), RequestReceivedAuditRequest.class)
                 .id(request.getId())
                 .originalRequestId(originalRequestId);
-        auditService.audit(requestReceivedAuditRequest);
+        auditService.audit(requestReceivedAuditRequest).join();
     }
 
     private void auditRequestReceivedException(final RegisterDataRequest request, final RequestId originalRequestId, final Throwable ex) {
@@ -305,7 +306,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 .id(request.getId())
                 .originalRequestId(originalRequestId);
         LOGGER.debug("Error handling: " + ex.getMessage());
-        auditService.audit(auditRequestWithException);
+        auditService.audit(auditRequestWithException).join();
     }
 
     private void cache(final RegisterDataRequest request, final User user,
