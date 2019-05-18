@@ -43,10 +43,36 @@ public class CustomExampleUserSerializer extends StdSerializer<ExampleUser> {
 
     @Override
     public void serialize(final ExampleUser value, final JsonGenerator gen, final SerializerProvider provider) throws IOException {
-        System.out.println("In CustomExampleUserSerializer.serialise");
+        //serialize Example User
         gen.writeStartObject();
-        for (TrainingCourse trainingCourse : value.getTrainingCompleted()) {
-            gen.writeStringField("trainingCourse", trainingCourse.name());
+//        private UserId userId;
+        gen.writeStringField("id", value.getUserId().getId());
+//        private Set<String> roles = new HashSet<>();
+        gen.writeFieldName("roles");
+        {
+            gen.writeStartArray();
+            for (String role : value.getRoles()) {
+                gen.writeObject(role);
+            }
+            gen.writeEndArray();
+        }
+//        private Set<String> auths = new HashSet<>();
+        gen.writeFieldName("auths");
+        {
+            gen.writeStartArray();
+            for (String role : value.getAuths()) {
+                gen.writeObject(role);
+            }
+            gen.writeEndArray();
+        }
+
+        gen.writeFieldName("trainingCompleted");
+        {
+            gen.writeStartArray();
+            for (TrainingCourse trainingCourse : value.getTrainingCompleted()) {
+                gen.writeObject(trainingCourse.name());
+            }
+            gen.writeEndArray();
         }
         gen.writeEndObject();
     }

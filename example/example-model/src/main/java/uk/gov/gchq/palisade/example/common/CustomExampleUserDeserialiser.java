@@ -15,6 +15,7 @@
  */
 package uk.gov.gchq.palisade.example.common;
 
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
@@ -29,13 +30,67 @@ public class CustomExampleUserDeserialiser extends StdDeserializer<ExampleUser> 
     }
 
     @Override
-    public ExampleUser deserialize(final com.fasterxml.jackson.core.JsonParser p, final DeserializationContext ctxt) throws IOException, com.fasterxml.jackson.core.JsonProcessingException {
+    public ExampleUser deserialize(final com.fasterxml.jackson.core.JsonParser jp, final DeserializationContext ctxt) throws IOException, com.fasterxml.jackson.core.JsonProcessingException {
         System.out.println("In CustomExampleUserDeserialiser.deserialise");
-        return new ExampleUser();
+        ExampleUser exampleUser = new ExampleUser();
+
+        long id = 0;
+        String name = null;
+        String[] languages = null;
+        JsonToken currentToken = null;
+        while ((currentToken = jp.nextValue()) != null) {
+            switch (currentToken) {
+                case VALUE_STRING:
+                    switch (jp.getCurrentName()) {
+                        case "name":
+                            name = jp.getText();
+                            break;
+                        case "languages":
+
+
+                            return exampleUser;
+                    }
+            }
+        }
+
+    protected CustomExampleUserDeserialiser( final Class<?> vc){
+            super(vc);
+        }
+
     }
 
-    protected CustomExampleUserDeserialiser(final Class<?> vc) {
-        super(vc);
-    }
-
-}
+//    @Override
+//    public void serialize(final ExampleUser value, final JsonGenerator gen, final SerializerProvider provider) throws IOException {
+//        //serialize Example User
+//        gen.writeStartObject();
+////        private UserId userId;
+//        gen.writeStringField("id", value.getUserId().getId());
+////        private Set<String> roles = new HashSet<>();
+//        gen.writeFieldName("roles");
+//        {
+//            gen.writeStartArray();
+//            for (String role : value.getRoles()) {
+//                gen.writeObject(role);
+//            }
+//            gen.writeEndArray();
+//        }
+////        private Set<String> auths = new HashSet<>();
+//        gen.writeFieldName("auths");
+//        {
+//            gen.writeStartArray();
+//            for (String role : value.getAuths()) {
+//                gen.writeObject(role);
+//            }
+//            gen.writeEndArray();
+//        }
+//
+//        gen.writeFieldName("trainingCompleted");
+//        {
+//            gen.writeStartArray();
+//            for (TrainingCourse trainingCourse : value.getTrainingCompleted()) {
+//                gen.writeObject(trainingCourse.name());
+//            }
+//            gen.writeEndArray();
+//        }
+//        gen.writeEndObject();
+//    }

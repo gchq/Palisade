@@ -30,7 +30,6 @@ public class CustomExampleUserDeserializerTest {
         //given
 
         //when
-        objectMapper.readValue(json, clazz);
         //then
     }
 
