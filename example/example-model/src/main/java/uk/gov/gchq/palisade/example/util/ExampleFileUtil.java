@@ -86,7 +86,6 @@ public final class ExampleFileUtil {
         } else {
             file = Paths.get(path);
         }
-
         //is this a local file URL? If so attempt to normalise it
 
         if (isNull(uriPath.getScheme()) ||
@@ -102,4 +101,3 @@ public final class ExampleFileUtil {
         return uriPath;
     }
 }
-

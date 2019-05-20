@@ -147,14 +147,18 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>rest-redirector</artifactId>
+            <artifactId>rest-redirector-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>simple-redirector-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.gov.gchq.palisade</groupId>
             <artifactId>hr-data-generator</artifactId>
             <version>${project.parent.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

@@ -46,7 +46,7 @@ public class ProcessingCompleteAuditRequest extends AuditRequestWithContext {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(25, 39)
+        return new HashCodeBuilder(29, 37)
                 .appendSuper(super.hashCode())
                 .toHashCode();
     }

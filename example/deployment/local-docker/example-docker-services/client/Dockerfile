@@ -4,5 +4,8 @@ RUN apk add --no-cache curl
 COPY docker/bin/example-docker-runner-*-shaded.jar /example-docker-runner/
 ADD docker/bin/configRest.json /example-docker-runner/
 
+ENV PALISADE_REST_CONFIG_PATH="/example-docker-runner/configRest.json"
+
 ENTRYPOINT ["java"]
-CMD ["-cp", "/example-docker-runner/*", "-Dpalisade.rest.config.path=/example-docker-runner/configRest.json", "uk.gov.gchq.palisade.example.RestDockerExample", "/data/employee_file0.avro"]
+
+CMD ["-cp", "/example-docker-runner/*", "uk.gov.gchq.palisade.example.RestDockerExample"]

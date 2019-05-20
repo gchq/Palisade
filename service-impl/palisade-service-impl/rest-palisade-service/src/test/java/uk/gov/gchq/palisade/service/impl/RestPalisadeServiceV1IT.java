@@ -53,6 +53,7 @@ public class RestPalisadeServiceV1IT {
     private static final User user = new User().userId("user01").roles("role1", "role2").auths("auth1", "auth2");
     private static final Context context = new Context().purpose("purpose1");
     private static final RequestId requestId = new RequestId().id("id1");
+    private static final RequestId originalRequestId = new RequestId().id("id2");
     private static ProxyRestPalisadeService proxy;
     private static EmbeddedHttpServer server;
 
@@ -80,7 +81,7 @@ public class RestPalisadeServiceV1IT {
 
         final RegisterDataRequest request = new RegisterDataRequest().resourceId("file1").userId(user.getUserId()).context(context);
 
-        final DataRequestResponse expectedResult = new DataRequestResponse().requestId(requestId).originalRequestId("test requestId").resource(fileResource1, new SimpleConnectionDetail().service(new MockPalisadeService()));
+        final DataRequestResponse expectedResult = new DataRequestResponse().requestId(requestId).originalRequestId(originalRequestId).resource(fileResource1, new SimpleConnectionDetail().service(new MockPalisadeService()));
         given(palisadeService.registerDataRequest(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
@@ -98,14 +99,14 @@ public class RestPalisadeServiceV1IT {
         MockPalisadeService.setMock(palisadeService);
 
         final GetDataRequestConfig getDataRequestConfig = new GetDataRequestConfig().requestId(requestId).resource(fileResource1);
-        getDataRequestConfig.setOriginalRequestId("shouldGetDataRequestConfig");
+        getDataRequestConfig.setOriginalRequestId(new RequestId().id("shouldGetDataRequestConfig"));
         final Map<LeafResource, Rules> rulesMap = new HashMap<>();
         rulesMap.put(fileResource1, new Rules().rule("testRule", new TestRule()));
         final DataRequestConfig expectedResult = new DataRequestConfig()
                 .user(user)
                 .context(context)
                 .rules(rulesMap);
-        expectedResult.setOriginalRequestId("test");
+        expectedResult.setOriginalRequestId(new RequestId().id("test"));
         given(palisadeService.getDataRequestConfig(getDataRequestConfig))
                 .willReturn(CompletableFuture.completedFuture(expectedResult));
 

@@ -20,6 +20,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -86,7 +87,7 @@ public class CanAccessRequest extends Request {
             final CompletableFuture<? extends Collection<LeafResource>> futureResources,
             final CompletableFuture<User> futureUser,
             final String purpose,
-            final String originalRequestId) {
+            final RequestId originalRequestId) {
         return CompletableFuture.allOf(futureResources, futureUser)
                 .thenApply(t -> {
                     CanAccessRequest canAccessRequest = new CanAccessRequest().resources(futureResources.join()).user(futureUser.join()).context(new Context().purpose(purpose));
@@ -109,7 +110,7 @@ public class CanAccessRequest extends Request {
             final Collection<LeafResource> resources,
             final CompletableFuture<User> futureUser,
             final String purpose,
-            final String originalRequestId) {
+            final RequestId originalRequestId) {
         return futureUser.thenApply(auths -> {
             CanAccessRequest canAccessRequest = new CanAccessRequest().resources(resources).user(futureUser.join()).context(new Context().purpose(purpose));
             canAccessRequest.setOriginalRequestId(originalRequestId);

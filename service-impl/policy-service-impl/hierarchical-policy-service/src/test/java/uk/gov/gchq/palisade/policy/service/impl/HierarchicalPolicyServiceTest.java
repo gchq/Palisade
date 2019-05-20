@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
@@ -151,7 +152,7 @@ public class HierarchicalPolicyServiceTest {
         Context context = new Context().purpose("testing");
         // try
         GetPolicyRequest getPolicyRequest = new GetPolicyRequest().user(user).context(context).resources(Collections.singletonList(fileResource1));
-        getPolicyRequest.setOriginalRequestId("test getPolicy");
+        getPolicyRequest.setOriginalRequestId(new RequestId().id("test getPolicy"));
         CompletableFuture<MultiPolicy> future = policyService.getPolicy(getPolicyRequest);
         MultiPolicy response = future.get();
         Map<LeafResource, Rules> ruleMap = response.getRuleMap();

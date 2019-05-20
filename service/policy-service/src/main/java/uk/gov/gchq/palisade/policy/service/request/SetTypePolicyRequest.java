@@ -20,6 +20,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.policy.service.Policy;
@@ -78,12 +79,12 @@ public class SetTypePolicyRequest extends Request {
     }
 
     @Override
-    public void setOriginalRequestId(final String originalRequestId) {
+    public void setOriginalRequestId(final RequestId originalRequestId) {
         throw new ForbiddenException("Should not call SetTypePolicyRequest.setOriginalRequestId()");
     }
 
     @Override
-    public String getOriginalRequestId() {
+    public RequestId getOriginalRequestId() {
         throw new ForbiddenException("Should not call SetTypePolicyRequest.getOriginalRequestId()");
     }
 
