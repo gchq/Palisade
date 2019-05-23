@@ -44,9 +44,11 @@ import static java.util.Objects.requireNonNull;
  * </p>
  */
 public class User implements Cloneable {
+
     public static final String NAMESPACE = "User";
-    public static final String USER_ID = "userId";
+
     public static final String ROLES = "roles";
+
     public static final String AUTHS = "auths";
 
     private static final Map<String, FieldGetter<User>> FIELD_GETTERS = createFieldGetters();
