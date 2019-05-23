@@ -16,13 +16,7 @@
 
 package uk.gov.gchq.palisade.example.util;
 
-import org.apache.commons.io.FileUtils;
-
-import uk.gov.gchq.palisade.util.StreamUtil;
-
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
