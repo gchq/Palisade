@@ -90,40 +90,6 @@ public final class ExamplePolicies {
                 );
     }
 
-    //    public static SetResourcePolicyRequest getKorpyheExamplePolicy(final String file) {
-    // You can either implement the Rule interface for your Policy rules or
-    // you can chain together combinations of Koryphe functions/predicates.
-    // Both of the following policies have the same logic, but using
-    // koryphe means you don't need to define lots of different rules for
-    // different types of objects.
-//        return new SetResourcePolicyRequest()
-//                .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
-//                .policy(new Policy<ExampleObj>()
-//                        .owner(alice)
-//                        .recordLevelRule(
-//                                "1-visibility",
-//                                new TupleRule<ExampleObj>()
-//                                        .selection("Record.visibility", "User.auths")
-//                                        .predicate(new IsXInCollectionY()))
-//                        .recordLevelRule(
-//                                "2-ageOff",
-//                                new TupleRule<ExampleObj>()
-//                                        .selection("Record.timestamp")
-//                                        .predicate(new IsMoreThan(12L))
-//                        )
-//                        .recordLevelRule(
-//                                "3-redactProperty",
-//                                new TupleRule<ExampleObj>()
-//                                        .selection("User.roles", "Record.property")
-//                                        .function(new If<>()
-//                                                .predicate(0, new Not<>(new CollectionContains("admin")))
-//                                                .then(1, new SetValue("redacted")))
-//                                        .projection("User.roles", "Record.property")
-//                        )
-//                );
-
-//    }
-
     public static ParentResource getParent(final String fileURL) {
         URI normalised = ExampleFileUtil.convertToFileURI(fileURL);
         //this should only be applied to URLs that start with 'file://' not other types of URL

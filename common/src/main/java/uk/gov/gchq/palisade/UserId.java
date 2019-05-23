@@ -32,12 +32,6 @@ import java.util.Objects;
  */
 public class UserId implements Cloneable {
 
-    public static final String NAMESPACE = "UserId";
-    public static final String ID = "id";
-
-    private static final Map<String, FieldGetter<UserId>> FIELD_GETTERS = createFieldGetters();
-    private static final Map<String, FieldSetter<UserId>> FIELD_SETTERS = createFieldSetters();
-
     private String id;
 
     /**
@@ -65,30 +59,6 @@ public class UserId implements Cloneable {
     public String getId() {
         Objects.requireNonNull(id, "The UserId id field has not been initialised.");
         return id;
-    }
-
-    /**
-     * Adds a key value pair to a map which can then be used within the policy rules to make policy decisions.
-     *
-     * @param reference the key that references the value in the map
-     * @param value     the object that you want to store in the map
-     * @return the UserId object
-     */
-    public UserId field(final String reference, final Object value) {
-        Objects.requireNonNull(reference, "The reference parameter cannot be null.");
-        Objects.requireNonNull(value, "The value parameter cannot be null.");
-        Util.setField(this, FIELD_SETTERS, reference, value);
-        return this;
-    }
-
-    public void setField(final String reference, final Object value) {
-        field(reference, value);
-    }
-
-    public Object getField(final String reference) {
-        Object field = Util.getField(this, FIELD_GETTERS, reference);
-        Objects.requireNonNull(field, "The field for " + reference + " is not set.");
-        return field;
     }
 
     public UserId clone() {
@@ -131,17 +101,5 @@ public class UserId implements Cloneable {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .toString();
-    }
-
-    private static Map<String, FieldGetter<UserId>> createFieldGetters() {
-        Map<String, FieldGetter<UserId>> map = new HashMap<>();
-        map.put(ID, (userId, subfield) -> userId.getId());
-        return Collections.unmodifiableMap(map);
-    }
-
-    private static Map<String, FieldSetter<UserId>> createFieldSetters() {
-        Map<String, FieldSetter<UserId>> map = new HashMap<>();
-        map.put(ID, (userId, subfield, value) -> userId.setId(((String) value)));
-        return Collections.unmodifiableMap(map);
     }
 }

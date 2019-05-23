@@ -26,11 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExampleObjTuple implements Tuple<String> {
-    public static final String TIMESTAMP = "timestamp";
-    public static final String VISIBILITY = "visibility";
-    public static final String PROPERTY = "property";
-    private static final Map<String, FieldGetter<ExampleObj>> FIELD_GETTERS = createFieldGetters();
-    private static final Map<String, FieldSetter<ExampleObj>> FIELD_SETTERS = createFieldSetters();
 
     private ExampleObj obj;
 
@@ -42,13 +37,13 @@ public class ExampleObjTuple implements Tuple<String> {
     }
 
     @Override
-    public Object get(final String field) {
-        return Util.getField(obj, FIELD_GETTERS, field);
+    public void put(String s, Object o) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public void put(final String field, final Object value) {
-        Util.setField(obj, FIELD_SETTERS, field, value);
+    public Object get(String s) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -57,22 +52,6 @@ public class ExampleObjTuple implements Tuple<String> {
     }
 
     public ExampleObj getObj() {
-        return obj;
-    }
-
-    private static Map<String, FieldGetter<ExampleObj>> createFieldGetters() {
-        Map<String, FieldGetter<ExampleObj>> map = new HashMap<>();
-        map.put(TIMESTAMP, (obj, subfield) -> obj.getTimestamp());
-        map.put(VISIBILITY, (obj, subfield) -> obj.getVisibility());
-        map.put(PROPERTY, (obj, subfield) -> obj.getProperty());
-        return Collections.unmodifiableMap(map);
-    }
-
-    private static Map<String, FieldSetter<ExampleObj>> createFieldSetters() {
-        Map<String, FieldSetter<ExampleObj>> map = new HashMap<>();
-        map.put(TIMESTAMP, (obj, subfield, value) -> obj.setTimestamp((long) value));
-        map.put(VISIBILITY, (obj, subfield, value) -> obj.setVisibility((String) value));
-        map.put(PROPERTY, (obj, subfield, value) -> obj.setProperty((String) value));
-        return Collections.unmodifiableMap(map);
+        throw new UnsupportedOperationException();
     }
 }
