@@ -22,6 +22,5 @@ if [ "$FILE_PRESENT" -eq 0 ];then
     exit 1;
 fi
 
-
 # Run the generator
 java -cp $JAR_FILE uk.gov.gchq.palisade.example.hrdatagenerator.CreateData $@
