@@ -24,7 +24,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class Util {
-    private Util() {}
+    private Util() {
+    }
 
     /**
      * Converts varargs strings into an array.

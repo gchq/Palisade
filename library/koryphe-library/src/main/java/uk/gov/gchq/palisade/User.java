@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import uk.gov.gchq.palisade.util.FieldGetter;
 import uk.gov.gchq.palisade.util.FieldSetter;
 
