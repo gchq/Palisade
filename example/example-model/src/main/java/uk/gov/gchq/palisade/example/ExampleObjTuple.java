@@ -27,11 +27,11 @@ public class ExampleObjTuple  {
         this.obj = obj;
     }
 
-    public void put(String s, Object o) {
+    public void put(final String s, final Object o) {
         throw new UnsupportedOperationException();
     }
 
-    public Object get(String s) {
+    public Object get(final String s) {
         throw new UnsupportedOperationException();
     }
 
