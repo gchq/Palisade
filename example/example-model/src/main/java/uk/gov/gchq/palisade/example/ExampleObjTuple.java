@@ -16,16 +16,7 @@
 
 package uk.gov.gchq.palisade.example;
 
-import uk.gov.gchq.koryphe.tuple.Tuple;
-import uk.gov.gchq.palisade.Util;
-import uk.gov.gchq.palisade.util.FieldGetter;
-import uk.gov.gchq.palisade.util.FieldSetter;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-public class ExampleObjTuple implements Tuple<String> {
+public class ExampleObjTuple  {
 
     private ExampleObj obj;
 
@@ -36,17 +27,14 @@ public class ExampleObjTuple implements Tuple<String> {
         this.obj = obj;
     }
 
-    @Override
     public void put(String s, Object o) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
     public Object get(String s) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
     public Iterable<Object> values() {
         throw new UnsupportedOperationException();
     }

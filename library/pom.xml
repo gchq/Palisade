@@ -26,6 +26,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <!--<module>koryphe-library</module>-->
+        <module>koryphe-library</module>
     </modules>
 </project>
