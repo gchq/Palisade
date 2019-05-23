@@ -57,19 +57,19 @@ public final class ExamplePolicies {
                 .policy(new Policy<Employee>()
                         .owner(ExampleUsers.getAlice())
                         .recordLevelRule(
-                                "1-Bank_Details",
+                                "1-Bank details only visible for salary",
                                 new BankDetailsRule()
                         )
                         .recordLevelRule(
-                                "2-DUTY_OF_CARE",
+                                "2-Emergency numbers for duty y of care purpose",
                                 new DutyOfCareRule()
                         )
                         .recordLevelRule(
-                                "3-Nationality",
+                                "3-Nationality for staff report",
                                 new NationalityRule()
                         )
                         .recordLevelRule(
-                                "4-Address Masking",
+                                "4-Address masking for duty of care",
                                 new ZipCodeMaskingRule()
                         )
 
