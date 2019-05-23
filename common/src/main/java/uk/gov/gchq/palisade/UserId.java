@@ -19,16 +19,10 @@ package uk.gov.gchq.palisade;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.util.FieldGetter;
-import uk.gov.gchq.palisade.util.FieldSetter;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
- * A {@link UserId} uniquely identifies a {@link User}.
+ * A {@link UserId} uniquely identifies a {@link uk.gov.gchq.palisade.User}.
  */
 public class UserId implements Cloneable {
 

@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.rule.Rule;
 import uk.gov.gchq.palisade.rule.Rules;
-import uk.gov.gchq.palisade.util.FieldGetter;
-import uk.gov.gchq.palisade.util.FieldSetter;
 
 import java.net.URL;
 import java.time.Duration;
@@ -34,8 +32,6 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
