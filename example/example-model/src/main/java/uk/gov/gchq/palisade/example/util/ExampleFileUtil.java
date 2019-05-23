@@ -38,28 +38,6 @@ public final class ExampleFileUtil {
     }
 
     /**
-     * Copies the example file containing serialised {@link uk.gov.gchq.palisade.example.ExampleObj} records to the given
-     * path. This uses {@link StreamUtil#openStream(Class, String)} to read the file either as a resource relative to the
-     * given class or from the file system.
-     *
-     * @param file        the file to load
-     * @param destination where to copy it to
-     * @param resource    the {@link Class} to try and resolve against
-     */
-    public static void createDataPath(final String file, final String destination, final Class resource) {
-        requireNonNull(file, "file");
-        requireNonNull(destination, "destination");
-        requireNonNull(resource, "resource");
-        final File targetFile = new File(destination);
-        try (final InputStream data = StreamUtil.openStream(resource, file)) {
-            requireNonNull(data, "couldn't load file: " + file);
-            FileUtils.copyInputStreamToFile(data, targetFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * Convert the given path to an absolute URI. If the given path represents something on the local file system, then
      * the path will be converted to a full absolute path and converted to a {@code file:} URI, if not then it will be returned verbatim.
      *
