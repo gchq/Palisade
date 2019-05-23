@@ -65,155 +65,155 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>proxy-rest-user-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>proxy-rest-resource-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>proxy-rest-policy-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>proxy-rest-user-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>proxy-rest-resource-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>proxy-rest-policy-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>proxy-rest-config-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.etcd</groupId>
-            <artifactId>jetcd-launcher</artifactId>
-            <version>${jetcd.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>etcd-backing-store</artifactId>
-            <version>${project.parent.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.netty</groupId> <!-- exclude as it conflicts with version netty-all-4.0.23 in hadoop-common-->
-                    <artifactId>netty-codec</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- Added for jetcd-launcher -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>io.etcd</groupId>-->
+            <!--<artifactId>jetcd-launcher</artifactId>-->
+            <!--<version>${jetcd.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>etcd-backing-store</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>io.netty</groupId> &lt;!&ndash; exclude as it conflicts with version netty-all-4.0.23 in hadoop-common&ndash;&gt;-->
+                    <!--<artifactId>netty-codec</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; Added for jetcd-launcher &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>junit</groupId>-->
+            <!--<artifactId>junit</artifactId>-->
+            <!--<version>${junit.version}</version>-->
+        <!--</dependency>-->
 
         <!-- Test dependencies -->
 
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-rest-data-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
-                    <artifactId>jakarta.inject</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
-                    <artifactId>javax.inject</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-rest-palisade-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-rest-policy-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-rest-config-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-rest-user-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-rest-resource-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>rest-data-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
-                    <artifactId>jakarta.inject</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
-                    <artifactId>javax.inject</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>rest-palisade-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>rest-policy-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>rest-user-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>rest-resource-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>rest-config-service</artifactId>
-            <version>${project.parent.version}</version>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>example-rest-data-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.glassfish.hk2.external</groupId> &lt;!&ndash; exclude as it conflicts with hadoop-yarn-common javax.inject-1&ndash;&gt;-->
+                    <!--<artifactId>jakarta.inject</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.glassfish.hk2.external</groupId> &lt;!&ndash; exclude as it conflicts with hadoop-yarn-common javax.inject-1&ndash;&gt;-->
+                    <!--<artifactId>javax.inject</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>example-rest-palisade-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>example-rest-policy-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>example-rest-config-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>example-rest-user-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>example-rest-resource-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>rest-data-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.glassfish.hk2.external</groupId> &lt;!&ndash; exclude as it conflicts with hadoop-yarn-common javax.inject-1&ndash;&gt;-->
+                    <!--<artifactId>jakarta.inject</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.glassfish.hk2.external</groupId> &lt;!&ndash; exclude as it conflicts with hadoop-yarn-common javax.inject-1&ndash;&gt;-->
+                    <!--<artifactId>javax.inject</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>rest-palisade-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>rest-policy-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>rest-user-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>rest-resource-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>rest-config-service</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<classifier>classes</classifier>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>core-rest-service</artifactId>
@@ -251,31 +251,31 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet-api.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>${jersey.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.glassfish.hk2.external</groupId> <!-- exclude as it conflicts with hadoop-yarn-common javax.inject-1-->
-                    <artifactId>javax.inject</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.parent.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>javax.servlet</groupId>-->
+            <!--<artifactId>javax.servlet-api</artifactId>-->
+            <!--<version>${servlet-api.version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.glassfish.jersey.containers</groupId>-->
+            <!--<artifactId>jersey-container-servlet</artifactId>-->
+            <!--<version>${jersey.version}</version>-->
+            <!--<scope>test</scope>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.glassfish.hk2.external</groupId> &lt;!&ndash; exclude as it conflicts with hadoop-yarn-common javax.inject-1&ndash;&gt;-->
+                    <!--<artifactId>javax.inject</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>common</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<type>test-jar</type>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
@@ -348,13 +348,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-model</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>${project.parent.groupId}</groupId>-->
+            <!--<artifactId>example-model</artifactId>-->
+            <!--<version>${project.parent.version}</version>-->
+            <!--<scope>test</scope>-->
+            <!--<type>test-jar</type>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>mapreduce-client</artifactId>

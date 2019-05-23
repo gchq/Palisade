@@ -16,9 +16,10 @@ resource "null_resource" "deploy_example" {
       source      = "${var.pem_file}"
       destination = "/home/hadoop/.ssh/${basename(var.pem_file)}"
   }
+
   provisioner "remote-exec" {
     inline = [
-      "chmod 600 /home/hadoop/.ssh/${basename(var.pem_file)}",
+      "chmod 400 /home/hadoop/.ssh/${basename(var.pem_file)}",
     ]
   }
 
@@ -68,6 +69,7 @@ resource "null_resource" "deploy_example" {
       source = "../../../example-services/example-rest-config-service/target/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
       destination = "/home/hadoop/jars/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
   }
+
   provisioner "local-exec" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployConfigService.sh > /home/hadoop/example_logs/deployConfigService.log 2>&1 &'"
   }
