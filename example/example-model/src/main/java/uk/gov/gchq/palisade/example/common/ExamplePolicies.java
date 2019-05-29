@@ -69,7 +69,7 @@ public final class ExamplePolicies {
                                 new NationalityRule()
                         )
                         .recordLevelRule(
-                                "4-Address masking for duty of care",
+                                "4-Address masked for estates staff and otherwise only available for duty of care",
                                 new ZipCodeMaskingRule()
                         )
 
