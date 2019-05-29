@@ -57,7 +57,7 @@ public final class ExamplePolicies {
                 .policy(new Policy<Employee>()
                         .owner(ExampleUsers.getAlice())
                         .recordLevelRule(
-                                "1-Bank details only visible for salary",
+                                "1-Bank details only visible for the purpose of salary",
                                 new BankDetailsRule()
                         )
                         .recordLevelRule(
