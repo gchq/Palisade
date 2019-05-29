@@ -65,7 +65,7 @@ public final class ExamplePolicies {
                                 new DutyOfCareRule()
                         )
                         .recordLevelRule(
-                                "3-Nationality for staff report",
+                                "3-Nationality is only available for staff report",
                                 new NationalityRule()
                         )
                         .recordLevelRule(
