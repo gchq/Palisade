@@ -33,6 +33,7 @@ import uk.gov.gchq.palisade.io.BytesOutputStream;
 import uk.gov.gchq.palisade.io.BytesSuppliedInputStream;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.function.Supplier;
@@ -101,13 +102,31 @@ public class AvroSerialiser<O> implements Serialiser<O> {
             this.schema = schema;
         }
 
+        public void splitOutOutputStreamReset() {
+            outputStream.reset();
+        }
+
+        public void splitOutWriterCreate() throws IOException {
+            dataFileWriter.create(schema, outputStream);
+        }
+
+        public void splitOutAppend(final O next) throws IOException {
+//            LOGGER.debug("Appending: {}", next);
+            dataFileWriter.append(next);
+        }
+
+        public void splitOutFlush() throws IOException {
+//            LOGGER.debug("Flushing data file writer");
+            dataFileWriter.flush();
+        }
+
         @Override
         public Bytes get() {
-            outputStream.reset();
+            splitOutOutputStreamReset();
             if (!isCreated) {
                 LOGGER.debug("Creating data file writer");
                 try {
-                    dataFileWriter.create(schema, outputStream);
+                    splitOutWriterCreate();
                 } catch (final Exception e) {
                     return onError(dataFileWriter, "Unable to create data file writer", e);
                 }
@@ -115,17 +134,15 @@ public class AvroSerialiser<O> implements Serialiser<O> {
             }
             while (items.hasNext() && outputStream.getCount() == 0) {
                 final O next = items.next();
-                LOGGER.debug("Appending: {}", next);
                 try {
-                    dataFileWriter.append(next);
+                    splitOutAppend(next);
                 } catch (final Exception e) {
                     return onError(dataFileWriter, "Unable to serialise item", e);
                 }
             }
             if (!items.hasNext()) {
-                LOGGER.debug("Flushing data file writer");
                 try {
-                    dataFileWriter.flush();
+                    splitOutFlush();
                 } catch (final Exception e) {
                     return onError(dataFileWriter, "Unable to serialise flush after reading input stream", e);
                 }

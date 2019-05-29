@@ -43,12 +43,24 @@ public class BytesSuppliedInputStream extends InputStream {
     private final Supplier<Bytes> supplier;
     private byte[] bytes = null;
     private int bytesCount;
-    private int i = 0;
+    private int index = 0;
     private boolean end;
 
     public BytesSuppliedInputStream(final Supplier<Bytes> supplier) {
         requireNonNull(supplier, "supplier is required");
         this.supplier = supplier;
+    }
+
+    public Bytes splitOutGet() {
+        return supplier.get();
+    }
+
+    public byte[] splitOutGetBytes(final Bytes newBytes) {
+        return newBytes.getBytes();
+    }
+
+    public int splitOutBytesGetCount(final Bytes newBytes) {
+        return newBytes.getCount();
     }
 
     @Override
@@ -57,16 +69,16 @@ public class BytesSuppliedInputStream extends InputStream {
             return -1;
         }
 
-        if (null == bytes || i >= bytesCount) {
+        if (null == bytes || index >= bytesCount) {
             LOGGER.debug("Requesting more bytes");
-            final Bytes newBytes = supplier.get();
-            i = 0;
+            final Bytes newBytes = splitOutGet();
+            index = 0;
             if (null == newBytes) {
                 bytes = null;
                 bytesCount = 0;
             } else {
-                bytes = newBytes.getBytes();
-                bytesCount = newBytes.getCount();
+                bytes = splitOutGetBytes(newBytes);
+                bytesCount = splitOutBytesGetCount(newBytes);
                 if (null != bytes) {
                     if (bytesCount > bytes.length) {
                         bytesCount = bytes.length;
@@ -83,11 +95,56 @@ public class BytesSuppliedInputStream extends InputStream {
             return -1;
         }
 
-        byte b = bytes[i];
+        byte b = bytes[index];
         if (null != bytes && LOGGER.isDebugEnabled()) {
             LOGGER.debug("Reading byte {}", new String(new byte[]{b}));
         }
-        i++;
+        index++;
         return b & 0xff;
+    }
+
+    private void resetOnNullNewBytes() {
+        bytes = null;
+        bytesCount = 0;
+        index = 0;
+    }
+
+    @Override
+    public int read(final byte[] b, final int off, final int len) throws IOException {
+        if (len == 0) {
+            return 0;
+        }
+        if (end) {
+            return -1;
+        }
+        if (null == bytes || index >= bytesCount) {
+            final Bytes newBytes = supplier.get();
+            index = 0;
+            if (null == newBytes) {
+                resetOnNullNewBytes();
+            } else if (((bytes = newBytes.getBytes()) != null) && ((bytesCount = newBytes.getCount()) > bytes.length)) {
+                bytesCount = bytes.length;
+            }
+        }
+        if (null == bytes || bytesCount == 0) {
+            LOGGER.debug("Reached the end of the buffer");
+            end = true;
+            return -1;
+        }
+
+        int copyAmount = len;
+        int positionMinus1 = Arrays.binarySearch(bytes, 0, bytes.length, (byte) -1); //find end point in the stream
+        if ((positionMinus1 >= 0) && (positionMinus1 < copyAmount)) {
+            copyAmount = positionMinus1;
+        }
+        if ((bytesCount - index) < copyAmount) {
+            copyAmount = bytesCount - index;
+        }
+        if (copyAmount <= 0) {
+            return -1;
+        }
+        System.arraycopy(bytes, index, b, off, copyAmount);
+        index += copyAmount;
+        return copyAmount;
     }
 }
