@@ -111,12 +111,10 @@ public class AvroSerialiser<O> implements Serialiser<O> {
         }
 
         public void splitOutAppend(final O next) throws IOException {
-//            LOGGER.debug("Appending: {}", next);
             dataFileWriter.append(next);
         }
 
         public void splitOutFlush() throws IOException {
-//            LOGGER.debug("Flushing data file writer");
             dataFileWriter.flush();
         }
 
