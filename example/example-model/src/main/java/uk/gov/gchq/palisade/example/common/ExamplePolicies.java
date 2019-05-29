@@ -61,7 +61,7 @@ public final class ExamplePolicies {
                                 new BankDetailsRule()
                         )
                         .recordLevelRule(
-                                "2-Emergency numbers for duty y of care purpose",
+                                "2-Emergency numbers only available for duty of care purpose",
                                 new DutyOfCareRule()
                         )
                         .recordLevelRule(
