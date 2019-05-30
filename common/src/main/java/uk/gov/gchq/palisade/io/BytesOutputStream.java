@@ -37,7 +37,7 @@ public class BytesOutputStream extends ByteArrayOutputStream implements Bytes {
      * Resets the byte buffer to a new byte array.
      */
     public void reset() {
-        buf = new byte[32];
+        buf = new byte[2048]; //improve performance by having a larger serialised buffer
         count = 0;
     }
 }
