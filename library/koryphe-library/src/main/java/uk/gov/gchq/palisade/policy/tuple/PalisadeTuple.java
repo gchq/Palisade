@@ -37,9 +37,10 @@ import static java.util.Objects.requireNonNull;
  */
 public class PalisadeTuple implements Tuple<String> {
     public static final String RECORD_NAMESPACE = "Record";
+    public static final String CONTEXT_NAMESPACE = "Context";
     public static final String NAMESPACE_MSG =
-            "User" + ", " + "Context" + " or " + RECORD_NAMESPACE + ". "
-                    + "For example: " + "User" + "." + "auths";
+            User.NAMESPACE + ", " + CONTEXT_NAMESPACE + " or " + RECORD_NAMESPACE + ". "
+                    + "For example: " + User.NAMESPACE + "." + User.AUTHS;
 
     private static final Map<String, FieldGetter<PalisadeTuple>> FIELD_GETTERS = createFieldGetters();
     private static final Map<String, FieldSetter<PalisadeTuple>> FIELD_SETTERS = createFieldSetters();
