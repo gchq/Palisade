@@ -115,7 +115,6 @@ public class AvroSerialiser<O> implements Serialiser<O> {
             }
             while (items.hasNext() && outputStream.getCount() == 0) {
                 final O next = items.next();
-                LOGGER.debug("Appending: {}", next);
                 try {
                     dataFileWriter.append(next);
                 } catch (final Exception e) {
@@ -123,7 +122,6 @@ public class AvroSerialiser<O> implements Serialiser<O> {
                 }
             }
             if (!items.hasNext()) {
-                LOGGER.debug("Flushing data file writer");
                 try {
                     dataFileWriter.flush();
                 } catch (final Exception e) {
