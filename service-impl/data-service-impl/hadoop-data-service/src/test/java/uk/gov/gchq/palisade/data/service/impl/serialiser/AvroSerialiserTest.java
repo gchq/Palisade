@@ -26,10 +26,10 @@ import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.util.JsonAssert;
-import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -105,7 +105,8 @@ public class AvroSerialiserTest {
         final AvroSerialiser<Integer> serialiser = new AvroSerialiser<>(Integer.class);
 
         // When
-        final InputStream serialised = serialiser.serialise(Stream.of(INPUT));
+        Stream<Integer> stream = Stream.of(INPUT);
+        final InputStream serialised = serialiser.serialise(stream);
         final Stream<Integer> deserialised = serialiser.deserialise(serialised);
 
         // Then
