@@ -57,10 +57,17 @@ public class BytesSuppliedInputStream extends InputStream {
     }
 
     private int refillBuffer(final byte[] b, final int off, final int len) {
+        requireNonNull(b,"buffer cannot be null");
+        if (off < 0 || len < 0) {
+            throw new IndexOutOfBoundsException("offset or length are negative");
+        }
+        if (len > (b.length - off)) {
+            throw new IndexOutOfBoundsException("length overruns array length");
+        }
         if (len == 0) {
             return 0;
         }
-        if (end || b == null || off < 0 || len < 0 || off > b.length) {
+        if (end) {
             return -1;
         }
         if (null == bytes || index >= bytesCount) {
