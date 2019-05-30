@@ -57,7 +57,7 @@ public class BytesSuppliedInputStream extends InputStream {
     }
 
     private int refillBuffer(final byte[] b, final int off, final int len) {
-        requireNonNull(b,"buffer cannot be null");
+        requireNonNull(b, "buffer cannot be null");
         if (off < 0 || len < 0) {
             throw new IndexOutOfBoundsException("offset or length are negative");
         }
