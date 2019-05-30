@@ -60,7 +60,7 @@ public class BytesSuppliedInputStream extends InputStream {
         if (len == 0) {
             return 0;
         }
-        if (end) {
+        if (end || b == null || off < 0 || len < 0 || off > b.length) {
             return -1;
         }
         if (null == bytes || index >= bytesCount) {
