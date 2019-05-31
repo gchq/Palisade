@@ -1,23 +1,21 @@
 # HR Data Generator
 
-To generate some dummy HR data run this command from the base directory of the oinstall
+This module contains the code for the HR Data examples. This includes generator code that can produce AVRO files of
+synthetic HR data.
 
-java -cp example/example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData    args
+To use the generator, then from the Palisade root directory run:
 
-    ```bash
-      java -cp ./example/example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData    args
-    ```
+```mvn clean install -Pexample```
 
-pass 3 arguements (and an optional 4th arguement):
-    output directory path 
-    number of employees to generate 
-    number of output files 
-    optionally number of threads
-    
-    
-e.g. to genarate 1,000,000 employee records, spread over 15 files, running the program with 15 threads, and writing the output files to /data/employee:
+then to start the generator:
 
-    ```bash
-      java -cp ./example/example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData   /data/employee 1000000  15  15
-    ```
-    
+```./example/deployment/bash-scripts/createHRData.sh PATH EMPLOYEES FILES [THREADS]```
+
+where PATH is the relative path to generate the files, EMPLOYEES is the number of employee records to create, FILES
+is the number of files to spread them over and the THREADS (optional) specifies the number of threads to use.
+
+For example to generate 1,000,000 employee records, spread over 15 files, running the program with 15 threads, and writing the output files to /data/employee:
+
+```bash
+./example/deployment/bash-scripts/createHRData.sh /data/employee 1000000 15 15
+```

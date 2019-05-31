@@ -20,8 +20,13 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.util.FieldGetter;
+import uk.gov.gchq.palisade.util.FieldSetter;
+
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -40,9 +45,26 @@ import static java.util.Objects.requireNonNull;
  */
 public class User implements Cloneable {
 
+    public static final String NAMESPACE = "User";
+
+    public static final String ROLES = "roles";
+
+    public static final String AUTHS = "auths";
+
+    private static final Map<String, FieldGetter<User>> FIELD_GETTERS = createFieldGetters();
+    private static final Map<String, FieldSetter<User>> FIELD_SETTERS = createFieldSetters();
+
     private UserId userId;
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
+
+    public Object getField(final String reference) {
+        return Util.getField(this, FIELD_GETTERS, reference);
+    }
+
+    public void setField(final String reference, final Object value) {
+        Util.setField(this, FIELD_SETTERS, reference, value);
+    }
 
     /**
      * Sets the userId to a {@link UserId} with the given userId string.
@@ -192,5 +214,22 @@ public class User implements Cloneable {
                 .append("roles", roles)
                 .append("auths", auths)
                 .toString();
+    }
+
+    private static Map<String, FieldGetter<User>> createFieldGetters() {
+        Map<String, FieldGetter<User>> map = new HashMap<>();
+        //map.put(USER_ID, (user, subfield) -> user.getUserId().getField(subfield));
+        map.put(ROLES, (user, subfield) -> user.getRoles());
+        map.put(AUTHS, (user, subfield) -> user.getAuths());
+        return Collections.unmodifiableMap(map);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, FieldSetter<User>> createFieldSetters() {
+        Map<String, FieldSetter<User>> map = new HashMap<>();
+        //map.put(USER_ID, (user, subfield, value) -> user.getUserId().setField(subfield, value));
+        map.put(ROLES, (user, subfield, value) -> user.roles((Set<String>) value));
+        map.put(AUTHS, (user, subfield, value) -> user.auths((Set<String>) value));
+        return Collections.unmodifiableMap(map);
     }
 }

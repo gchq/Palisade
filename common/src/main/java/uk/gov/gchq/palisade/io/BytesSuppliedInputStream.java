@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
@@ -43,7 +42,7 @@ public class BytesSuppliedInputStream extends InputStream {
     private final Supplier<Bytes> supplier;
     private byte[] bytes = null;
     private int bytesCount;
-    private int i = 0;
+    private int index = 0;
     private boolean end;
 
     public BytesSuppliedInputStream(final Supplier<Bytes> supplier) {
@@ -51,30 +50,33 @@ public class BytesSuppliedInputStream extends InputStream {
         this.supplier = supplier;
     }
 
-    @Override
-    public int read() throws IOException {
+    private void resetBuffer() {
+        bytes = null;
+        bytesCount = 0;
+        index = 0;
+    }
+
+    private int refillBuffer(final byte[] b, final int off, final int len) {
+        requireNonNull(b, "buffer cannot be null");
+        if (off < 0 || len < 0) {
+            throw new IndexOutOfBoundsException("offset or length are negative");
+        }
+        if (len > (b.length - off)) {
+            throw new IndexOutOfBoundsException("length overruns array length");
+        }
+        if (len == 0) {
+            return 0;
+        }
         if (end) {
             return -1;
         }
-
-        if (null == bytes || i >= bytesCount) {
-            LOGGER.debug("Requesting more bytes");
+        if (null == bytes || index >= bytesCount) {
             final Bytes newBytes = supplier.get();
-            i = 0;
+            index = 0;
             if (null == newBytes) {
-                bytes = null;
-                bytesCount = 0;
-            } else {
-                bytes = newBytes.getBytes();
-                bytesCount = newBytes.getCount();
-                if (null != bytes) {
-                    if (bytesCount > bytes.length) {
-                        bytesCount = bytes.length;
-                    }
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Loaded {} bytes {}", bytesCount, new String(Arrays.copyOf(bytes, bytesCount)));
-                    }
-                }
+                resetBuffer();
+            } else if (((bytes = newBytes.getBytes()) != null) && ((bytesCount = newBytes.getCount()) > bytes.length)) {
+                bytesCount = bytes.length;
             }
         }
         if (null == bytes || bytesCount == 0) {
@@ -83,11 +85,31 @@ public class BytesSuppliedInputStream extends InputStream {
             return -1;
         }
 
-        byte b = bytes[i];
-        if (null != bytes && LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Reading byte {}", new String(new byte[]{b}));
+        int copyAmount = len;
+        if ((bytesCount - index) < copyAmount) {
+            copyAmount = bytesCount - index;
         }
-        i++;
-        return b & 0xff;
+        if (copyAmount <= 0) {
+            return -1;
+        }
+        System.arraycopy(bytes, index, b, off, copyAmount);
+        index += copyAmount;
+        return copyAmount;
+    }
+
+    @Override
+    public int read() throws IOException {
+
+        final byte[] individualElement = new byte[1];
+        int success = refillBuffer(individualElement, 0, 1);
+        if (success > 0) { //successful get of byte element
+            return individualElement[0] & 0xff;
+        }
+        return -1; //the end has been reached
+    }
+
+    @Override
+    public int read(final byte[] b, final int off, final int len) throws IOException {
+        return refillBuffer(b, off, len);
     }
 }
