@@ -5,9 +5,8 @@
 
 sudo sed -i "s/localhost/${HOSTNAME}/g" /home/hadoop/deploy_example/resources/configRest.json
 
-export PALISADE_REST_CONFIG_PATH=/home/hadoop/deploy_example/resources/configRest.json
-
-sudo java -jar /home/hadoop/jars/example-rest-resource-service-*-executable.jar \
+sudo PALISADE_REST_CONFIG_PATH=/home/hadoop/deploy_example/resources/configRest.json \
+    java -jar /home/hadoop/jars/example-rest-resource-service-*-executable.jar \
     -httpPort=8082 \
     -extractDirectory=.extract/Resource \
     -Dpalisade.properties.app.title=rest-resource-service

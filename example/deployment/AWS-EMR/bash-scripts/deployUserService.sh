@@ -5,7 +5,7 @@
 
 export PALISADE_REST_CONFIG_PATH=/home/hadoop/deploy_example/resources/configRest.json
 
-sudo java -jar /home/hadoop/jars/example-rest-user-service-*-executable.jar \
+sudo PALISADE_REST_CONFIG_PATH=/home/hadoop/deploy_example/resources/configRest.json java -jar /home/hadoop/jars/example-rest-user-service-*-executable.jar \
     -httpPort=8083 \
     -extractDirectory=.extract/User \
     -Dpalisade.properties.app.title=rest-user-service
