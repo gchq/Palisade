@@ -53,7 +53,7 @@ public class RestDockerExample {
     }
 
     public void run(final String fileToRead) throws Exception {
-        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getenv(ConfigConsts.CONFIG_SERVICE_PATH.get()));
+        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getenv(ConfigConsts.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
         ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);

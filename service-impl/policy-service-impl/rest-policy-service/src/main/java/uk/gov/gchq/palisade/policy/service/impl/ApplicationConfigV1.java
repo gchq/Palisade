@@ -29,7 +29,7 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
     public ApplicationConfigV1() {
         super(RESOURCES);
         //make sure we can inject the service instance
-        PolicyService delegate = RestPolicyServiceV1.createService(System.getenv(ConfigConsts.CONFIG_SERVICE_PATH.get()));
+        PolicyService delegate = RestPolicyServiceV1.createService(System.getenv(ConfigConsts.CONFIG_SERVICE_PATH));
         register(new ServiceBinder(delegate, PolicyService.class));
     }
 }

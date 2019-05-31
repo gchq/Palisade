@@ -48,7 +48,7 @@ public abstract class PalisadeTrial implements PerfTrial {
      */
     protected PalisadeService getPalisadeClientServices() {
         //attempt to connect to Palisade
-        final InputStream stream = StreamUtil.openStream(SetPolicyAction.class, System.getProperty(ConfigConsts.CONFIG_SERVICE_PATH.get()));
+        final InputStream stream = StreamUtil.openStream(SetPolicyAction.class, System.getProperty(ConfigConsts.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         //get the client services
         ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);
