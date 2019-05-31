@@ -75,7 +75,7 @@ public final class ExampleConfigurator {
                 new AddUserRequest().user(ExampleUsers.getEve())
         );
 
-        // Using Custom Rule implementations - without Koryphe
+        // Using Custom Rule implementations
         final SetResourcePolicyRequest customPolicies = ExamplePolicies.getExamplePolicy(file);
 
         final CompletableFuture<Boolean> policyStatus = services.getPolicyService().setResourcePolicy(
