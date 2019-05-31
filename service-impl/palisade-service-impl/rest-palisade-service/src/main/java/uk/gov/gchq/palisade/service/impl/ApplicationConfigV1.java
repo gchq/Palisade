@@ -19,7 +19,7 @@ package uk.gov.gchq.palisade.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.config.service.ConfigUtils;
+import uk.gov.gchq.palisade.config.service.ConfigConsts;
 import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 import uk.gov.gchq.palisade.service.PalisadeMetricProvider;
@@ -37,14 +37,14 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
     public ApplicationConfigV1() {
         super(RESOURCES);
         //make sure we can inject the service instance
-        PalisadeService delegate = RestPalisadeServiceV1.createService(System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
+        PalisadeService delegate = RestPalisadeServiceV1.createService(System.getenv(ConfigConsts.CONFIG_SERVICE_PATH.get()));
         ServiceBinder binder = new ServiceBinder(delegate, PalisadeService.class);
         register(binder);
         //optionally register a metric provider
         PalisadeMetricProvider metrics = null;
         try {
             //first we check to see if one has been created in the configuration for us to create
-            metrics = RestPalisadeMetricProviderV1.createService(System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
+            metrics = RestPalisadeMetricProviderV1.createService(System.getenv(ConfigConsts.CONFIG_SERVICE_PATH.get()));
         } catch (Exception e) {
             LOGGER.info("No metric provider configured in configuration service");
         }

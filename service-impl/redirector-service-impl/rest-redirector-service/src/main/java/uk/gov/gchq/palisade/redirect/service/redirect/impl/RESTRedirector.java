@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.redirect.service.redirect.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.config.service.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.Configurator;
 import uk.gov.gchq.palisade.exception.NoConfigException;
@@ -123,10 +124,10 @@ public class RESTRedirector<S extends Service> extends AbstractApplicationConfig
     /**
      * Create a redirector from a configuration service which will be contacted via data stored in a {@link uk.gov.gchq.palisade.config.service.ConfigurationService}.
      *
-     * @see ConfigUtils#CONFIG_SERVICE_PATH
+     * @see ConfigConsts#CONFIG_SERVICE_PATH
      */
     public RESTRedirector() {
-        this(System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
+        this(System.getenv(ConfigConsts.CONFIG_SERVICE_PATH.get()));
     }
 
     /**

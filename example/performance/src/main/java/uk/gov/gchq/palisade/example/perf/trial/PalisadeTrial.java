@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.example.perf.trial;
 
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.ClientConfiguredServices;
-import uk.gov.gchq.palisade.config.service.ConfigUtils;
+import uk.gov.gchq.palisade.config.service.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.common.ExampleUsers;
@@ -48,7 +48,7 @@ public abstract class PalisadeTrial implements PerfTrial {
      */
     protected PalisadeService getPalisadeClientServices() {
         //attempt to connect to Palisade
-        final InputStream stream = StreamUtil.openStream(SetPolicyAction.class, System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(SetPolicyAction.class, System.getProperty(ConfigConsts.CONFIG_SERVICE_PATH.get()));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         //get the client services
         ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.client.ClientConfiguredServices;
-import uk.gov.gchq.palisade.config.service.ConfigUtils;
+import uk.gov.gchq.palisade.config.service.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.common.ExampleUsers;
@@ -53,7 +53,7 @@ public class RestDockerExample {
     }
 
     public void run(final String fileToRead) throws Exception {
-        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getenv(ConfigConsts.CONFIG_SERVICE_PATH.get()));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
         ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);

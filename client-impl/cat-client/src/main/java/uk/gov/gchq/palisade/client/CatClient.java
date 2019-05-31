@@ -18,7 +18,7 @@ package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.config.service.ConfigUtils;
+import uk.gov.gchq.palisade.config.service.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
@@ -55,7 +55,7 @@ public class CatClient {
             String resource = args[1];
             String purpose = args[2];
 
-            final InputStream stream = StreamUtil.openStream(CatClient.class, System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
+            final InputStream stream = StreamUtil.openStream(CatClient.class, System.getenv(ConfigConsts.CONFIG_SERVICE_PATH.get()));
             ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
             ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);
