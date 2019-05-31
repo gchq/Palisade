@@ -18,9 +18,10 @@ done
 
 sed -i "s|<insert_etcd_connection_details>|${etcd_connection_details}|g" /home/hadoop/deploy_example/resources/bootstrapConfig.json
 
+export PALISADE_REST_BOOTSTRAP_PATH=/home/hadoop/deploy_example/resources/bootstrapConfig.json
+
 java -jar /home/hadoop/jars/example-rest-config-service-*-executable.jar \
     -httpPort=8085 \
     -extractDirectory=.extract/Config \
-    -Dpalisade.rest.bootstrap.path=/home/hadoop/deploy_example/resources/bootstrapConfig.json \
     -Dpalisade.rest.basePath=config \
     -Dpalisade.properties.app.title=rest-config-service

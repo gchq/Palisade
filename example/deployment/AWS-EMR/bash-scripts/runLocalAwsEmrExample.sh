@@ -15,7 +15,9 @@ then
     INPUTFILE="$DIR/../../../resources/employee_file0.avro"
 fi
 
-java -cp example/deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-*-shaded.jar -Dpalisade.rest.config.path=configRest.json uk.gov.gchq.palisade.example.AwsEmrMapReduceExample "$INPUTFILE" "$OUT_PATH"
+export PALISADE_REST_CONFIG_PATH=configRest.json
+
+java -cp example/deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-*-shaded.jar uk.gov.gchq.palisade.example.AwsEmrMapReduceExample "$INPUTFILE" "$OUT_PATH"
 
 if [[ $? -eq 0 ]]
 then

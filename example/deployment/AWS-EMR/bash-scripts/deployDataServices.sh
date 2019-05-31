@@ -22,10 +22,10 @@ if [ $# -gt 0 ]; then
            scp -i $key -r -q /home/hadoop/deploy_example/resources/configRest.json hadoop@$node:/home/hadoop/deploy_example/resources
            scp -i $key -r -q /home/hadoop/jars/example-rest-data-service-*-executable.jar hadoop@$node:/home/hadoop/jars/
            #scp -i $key -r -q /home/hadoop/example_data/employee* hadoop@$node:/home/hadoop/example_data
-           ssh -f -i $key -o StrictHostKeyChecking=no hadoop@$node "java -jar /home/hadoop/jars/example-rest-data-service-*-executable.jar \
+           ssh -f -i $key -o StrictHostKeyChecking=no hadoop@$node "PALISADE_REST_CONFIG_PATH=/home/hadoop/deploy_example/resources/configRest.json \
+                                                                    java -jar /home/hadoop/jars/example-rest-data-service-*-executable.jar \
                                                                     -httpPort=8084 \
                                                                     -extractDirectory=.extract/Data \
-                                                                    -Dpalisade.rest.config.path=/home/hadoop/deploy_example/resources/configRest.json \
                                                                     -Dpalisade.properties.app.title=rest-data-service > /home/hadoop/example_logs/deployDataService.log 2>&1 "
          done
     else
