@@ -147,8 +147,8 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
         // copied from RestExample
-        String confString = System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH);
-        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+        String confString = System.getenv(ConfigUtils.CONFIG_SERVICE_PATH);
+        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
         //System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ServiceState clientConfig = null;
