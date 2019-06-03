@@ -81,12 +81,6 @@ public final class ExampleConfigurator {
 
         System.out.println("About to add users");
 
-        final String JSON_SERIALISER_MODULES = "palisade.serialiser.json.modules";
-        final String moduleFactories = System.getProperty(JSON_SERIALISER_MODULES, "");
-
-        System.out.println("Configuration is set to");
-        System.out.println(moduleFactories);
-
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest().user(ExampleUsers.getAlice())
         );

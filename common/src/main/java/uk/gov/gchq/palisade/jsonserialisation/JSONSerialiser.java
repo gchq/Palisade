@@ -326,6 +326,8 @@ public class JSONSerialiser {
     public static <T> T deserialise(final byte[] bytes, final Class<T> clazz) {
         try {
             return getInstance().mapper.readValue(bytes, clazz);
+
+
         } catch (final IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

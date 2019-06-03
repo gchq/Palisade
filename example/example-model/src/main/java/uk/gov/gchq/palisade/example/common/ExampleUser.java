@@ -15,6 +15,7 @@
  */
 package uk.gov.gchq.palisade.example.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -27,26 +28,42 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-//@JsonIgnoreProperties(value = {"trainingCompleted"})
+@JsonIgnoreProperties(value = {"trainingCompleted"})
 public class ExampleUser extends User {
 
-    private Set<TrainingCourse> trainingCompleted = new HashSet<>();
+    private static final String TRAINING_KEY = "training completed";
+
+    public ExampleUser(final User user) {
+        super();
+        setUserId(user.getUserId());
+        setRoles(user.getRoles());
+        setAuths(user.getAuths());
+        setUserFields(user.getUserFields());
+    }
 
     public ExampleUser() {
+        super();
     }
 
     public ExampleUser trainingCompleted(final TrainingCourse... trainingCompleted) {
         requireNonNull(trainingCompleted, "cannot add null training completed");
-        Collections.addAll(this.trainingCompleted, trainingCompleted);
+        Set<TrainingCourse> trainingComplete = (Set<TrainingCourse>) getUserField(TRAINING_KEY);
+        if (trainingComplete == null) {
+            trainingComplete = new HashSet<>();
+        }
+        Collections.addAll(trainingComplete, trainingCompleted);
+        setUserField(TRAINING_KEY, trainingComplete);
         return this;
     }
 
     public Set<TrainingCourse> getTrainingCompleted() {
-        requireNonNull(trainingCompleted, "trainingCompleted cannot be null");
+        Set<TrainingCourse> trainingCompleted = (Set<TrainingCourse>) getUserField(TRAINING_KEY);
+        //Could be null as training is not necessarily set
         return trainingCompleted;
     }
 
-    public void setTrainingCompleted(final TrainingCourse... trainingCompleted) {
+    public void setTrainingCompleted(final TrainingCourse...
+                                             trainingCompleted) {
         trainingCompleted(trainingCompleted);
     }
 
@@ -64,7 +81,6 @@ public class ExampleUser extends User {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(trainingCompleted, exampleUser.trainingCompleted)
                 .isEquals();
     }
 
@@ -72,7 +88,6 @@ public class ExampleUser extends User {
     public int hashCode() {
         return new HashCodeBuilder(11, 19)
                 .appendSuper(super.hashCode())
-                .append(trainingCompleted)
                 .toHashCode();
     }
 
@@ -80,9 +95,6 @@ public class ExampleUser extends User {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("trainingCompleted", trainingCompleted)
                 .toString();
     }
-
-
 }

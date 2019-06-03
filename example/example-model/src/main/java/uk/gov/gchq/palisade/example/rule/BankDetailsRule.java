@@ -43,18 +43,20 @@ public class BankDetailsRule implements Rule<Employee> {
             return null;
         }
 
-        System.out.println("more work needed here !!!");
-        requireNonNull(user);
-        requireNonNull(context);
-        String purpose = context.getPurpose();
-        if (user instanceof ExampleUser) {
-            System.out.println("The instance is for an ExampleUser");
-            Set<TrainingCourse> trainingCompleted = ((ExampleUser) user).getTrainingCompleted();
+        try {
+            requireNonNull(user);
+            requireNonNull(context);
+            String purpose = context.getPurpose();
+
+            ExampleUser exampleUser = new ExampleUser(user);
+            requireNonNull(exampleUser);
+
+            Set<TrainingCourse> trainingCompleted = exampleUser.getTrainingCompleted();
             if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
                 return record;
             }
-        } else {
-            System.out.println("The instance is NOT for an exampleUser");
+        } catch (Exception e) {
+            System.out.println(e);
         }
         return redactRecord(record);
     }

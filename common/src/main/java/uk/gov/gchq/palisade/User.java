@@ -55,6 +55,7 @@ public class User implements Cloneable {
     private UserId userId;
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
+    private HashMap<String, Object> userFields = new HashMap<>();
 
     public Object getField(final String reference) {
         return Util.getField(this, FIELD_GETTERS, reference);
@@ -62,6 +63,23 @@ public class User implements Cloneable {
 
     public void setField(final String reference, final Object value) {
         Util.setField(this, FIELD_SETTERS, reference, value);
+    }
+
+    public Object getUserField(final String key) {
+        requireNonNull(key, "The key cannot be set to null.");
+        return userFields.get(key);
+    }
+
+    public void setUserField(final String key, final Object value) {
+        requireNonNull(key, "The key cannot be set to null.");
+        requireNonNull(key, "The value cannot be set to null.");
+        userFields.put(key, value);
+    }
+
+    public User userFields(final HashMap<String, Object> userFields) {
+        requireNonNull(userFields, "The userFields cannot be set to null.");
+        this.userFields = userFields;
+        return this;
     }
 
     /**
@@ -174,6 +192,7 @@ public class User implements Cloneable {
         clone.userId(getUserId().clone());
         clone.roles(Sets.newHashSet(getRoles()));
         clone.auths(Sets.newHashSet(getAuths()));
+        clone.userFields((HashMap<String, Object>) userFields.clone());
         return clone;
     }
 
@@ -193,6 +212,7 @@ public class User implements Cloneable {
                 .append(userId, user.userId)
                 .append(roles, user.roles)
                 .append(auths, user.auths)
+                .append(userFields, user.userFields)
                 .isEquals();
     }
 
@@ -202,6 +222,7 @@ public class User implements Cloneable {
                 .append(userId)
                 .append(roles)
                 .append(auths)
+                .append(userFields)
                 .toHashCode();
     }
 
@@ -211,6 +232,7 @@ public class User implements Cloneable {
                 .append("userId", userId)
                 .append("roles", roles)
                 .append("auths", auths)
+                .append("userFields", userFields)
                 .toString();
     }
 
@@ -229,5 +251,13 @@ public class User implements Cloneable {
         map.put(ROLES, (user, subfield, value) -> user.roles((Set<String>) value));
         map.put(AUTHS, (user, subfield, value) -> user.auths((Set<String>) value));
         return Collections.unmodifiableMap(map);
+    }
+
+    public HashMap<String, Object> getUserFields() {
+        return userFields;
+    }
+
+    public void setUserFields(final HashMap<String, Object> userFields) {
+        this.userFields = userFields;
     }
 }
