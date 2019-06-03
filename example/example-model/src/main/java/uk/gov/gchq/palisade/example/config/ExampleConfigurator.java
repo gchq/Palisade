@@ -79,8 +79,6 @@ public final class ExampleConfigurator {
         // The user authorisation owner or sys admin needs to add the user
         final UserService userService = services.getUserService();
 
-        System.out.println("About to add users");
-
         final CompletableFuture<Boolean> userAliceStatus = userService.addUser(
                 new AddUserRequest().user(ExampleUsers.getAlice())
         );
@@ -91,9 +89,6 @@ public final class ExampleConfigurator {
         final CompletableFuture<Boolean> userEveStatus = userService.addUser(
                 new AddUserRequest().user(ExampleUsers.getEve())
         );
-
-        System.out.println("Finished adding users");
-
 
         // You can either implement the Rule interface for your Policy rules or
         // you can chain together combinations of Koryphe functions/predicates.
