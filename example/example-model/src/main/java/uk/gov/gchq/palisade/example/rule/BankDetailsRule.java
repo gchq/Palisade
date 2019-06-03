@@ -20,6 +20,7 @@ import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.example.common.ExampleUser;
 import uk.gov.gchq.palisade.example.common.Purpose;
+import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.common.TrainingCourse;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.rule.Rule;
@@ -42,21 +43,29 @@ public class BankDetailsRule implements Rule<Employee> {
         if (null == record) {
             return null;
         }
+        requireNonNull(user);
+        requireNonNull(context);
+        Set<String> roles = user.getRoles();
+        String purpose = context.getPurpose();
 
         try {
-            requireNonNull(user);
-            requireNonNull(context);
-            String purpose = context.getPurpose();
 
+            if (roles.contains(Role.PAYROLL.name()) && purpose.equals(Purpose.SALARY.name())) {
+                return record;
+            }
             ExampleUser exampleUser = new ExampleUser(user);
             requireNonNull(exampleUser);
 
             Set<TrainingCourse> trainingCompleted = exampleUser.getTrainingCompleted();
-            if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
-                return record;
+            if (trainingCompleted != null) {
+                if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
+                    return record;
+                }
             }
         } catch (Exception e) {
+
             System.out.println(e);
+            System.out.println(e.getStackTrace());
         }
         return redactRecord(record);
     }
