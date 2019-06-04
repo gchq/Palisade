@@ -2,6 +2,10 @@ resource "null_resource" "deploy_example" {
 
 # NOTE: the current directory when running this will be example/deployment/AWS-EMR/terraform-scripts ***********
 
+  triggers = {
+    update = 2
+  }
+
   connection {
     type        = "ssh"
     host = "${aws_emr_cluster.palisade_cluster.master_public_dns}"

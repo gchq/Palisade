@@ -19,7 +19,6 @@ package uk.gov.gchq.palisade.example;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-//import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -34,28 +33,18 @@ import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import uk.gov.gchq.palisade.example.common.Purpose;
-//import uk.gov.gchq.palisade.example.config.ServicesCreator;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.config.service.ConfigConsts;
+import uk.gov.gchq.palisade.client.ClientConfiguredServices;
 import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
-import uk.gov.gchq.palisade.config.service.Configurator;
-//import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
-//import uk.gov.gchq.palisade.data.serialise.Serialiser;
-import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
-//import uk.gov.gchq.palisade.example.config.ServicesConfigurator;
-//import uk.gov.gchq.palisade.example.data.serialiser.ExampleObjSerialiser;
 import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
-import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
@@ -64,10 +53,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.nio.file.Files;
-import java.util.Optional;
-//import java.util.stream.Stream;
-
-import static java.util.Objects.isNull;
 
 /**
  * An example of a MapReduce job using example data from Palisade. This sets up a Palisade service which can serve
@@ -146,28 +131,12 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         job.setOutputFormatClass(TextOutputFormat.class);
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
-        // copied from RestExample
-        String confString = System.getenv(ConfigUtils.CONFIG_SERVICE_PATH);
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
-        //System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-        ServiceState clientConfig = null;
-        int times = 0;
-        while (isNull(clientConfig) && times < 30) {
-            try {
-                clientConfig = new Configurator(configService).retrieveConfig(Optional.empty());
-            } catch (NoConfigException e) {
-                LOGGER.warn("No client configuration present, waiting...");
-                Thread.sleep(ConfigConsts.DELAY);
-                times++;
-            }
-        }
-        if (isNull(clientConfig)) {
-            throw new RuntimeException("Couldn't retrieve client configuration. Is configuration service running?");
-        }
-        PalisadeService palisade = Configurator.createFromConfig(PalisadeService.class, clientConfig);
-        final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
-        // end of copied from RestExample
+
+        ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);
+
+        PalisadeService palisade = configuredServices.getPalisadeService();
 
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
@@ -181,7 +150,9 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         addDataRequest(job, sourceFile, RESOURCE_TYPE, "Bob", "");
         addDataRequest(job, sourceFile, RESOURCE_TYPE, "Eve", "");
 
+
         //launch job
+        LOGGER.info("Launch job!"); //TODO REMOVE THIS
         boolean success = job.waitForCompletion(true);
 
         return (success) ? 0 : 1;

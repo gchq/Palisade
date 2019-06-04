@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.lang.reflect.InvocationTargetException;
+import java.security.CodeSource;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
@@ -251,6 +252,7 @@ public class Configurator {
                 }
 
             } catch (CompletionException | InterruptedException | ExecutionException | CancellationException e) {
+                e.printStackTrace(); //TODO REMOVE THIS
                 LOGGER.warn("Error while retrieving configuration for {} due to {}", serviceClass.map(Class::getTypeName).orElse("anonymous client"), e.getMessage());
                 //this should be rethrown immediately
                 if (e.getCause() instanceof NoConfigException) {
@@ -274,4 +276,20 @@ public class Configurator {
             return config;
         }
     }
+
+    //TODO: Debug remove this!
+    private static void whoOwns(final String clazz) {
+        requireNonNull(clazz);
+        try {
+            CodeSource codeSource = Class.forName(clazz).getProtectionDomain().getCodeSource();
+            if (codeSource != null) {
+                LOGGER.info("{} loaded from {}", clazz, codeSource.getLocation());
+            } else {
+                LOGGER.info("{} loaded from dont know where!!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
