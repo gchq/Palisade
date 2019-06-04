@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example;
+package uk.gov.gchq.palisade.example.runner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
