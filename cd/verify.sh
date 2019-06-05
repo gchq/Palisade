@@ -11,6 +11,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Building Palisade code: mvn install -q -B -V"
     mvn install -q -B -V
     ./example/deployment/local-jvm/bash-scripts/buildServices.sh
+    export PALISADE_REST_CONFIG_PATH="$(pwd)/example/example-model/src/main/resources/configRest.json"
 
     echo "Starting the local-docker-example containers"
     ./example/deployment/local-docker/bash-scripts/dockerComposeUp.sh
@@ -31,13 +32,18 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Output is: $OUTPUT"
     validate_example_output "$OUTPUT"
     multi_jvm_result=$?
+
+    OUTPUT=`java -cp $(pwd)/client-impl/cat-client/target/cat-client-*-shaded.jar uk.gov.gchq.palisade.client.CatClient Alice file://$(pwd)/example/resources/employee_file0.avro SALARY | tee /dev/tty`
+    echo "Output is: $OUTPUT"
+    validate_example_output "$OUTPUT"
+    multi_jvm_cat_client_result=$?
     echo "Stopping the local-jvm-example"
     ./example/deployment/local-jvm/bash-scripts/stopAllServices.sh
 
     echo "Compiling javadoc"
     mvn javadoc:aggregate -q
 fi
-if [ ${container_result} -eq 0 ] && [ ${multi_jvm_result} -eq 0 ]; then
+if [ ${container_result} -eq 0 ] && [ ${multi_jvm_result} -eq 0 ] && [ ${multi_jvm_cat_client_result} -eq 0 ]; then
     echo "exit 0"
     exit 0
 else
