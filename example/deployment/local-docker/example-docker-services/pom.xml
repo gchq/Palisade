@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-docker-runner</artifactId>
+            <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -235,7 +235,8 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>../../../example-services/example-rest-redirector-service/target</directory>
+                                    <directory>../../../example-services/example-rest-redirector-service/target
+                                    </directory>
                                     <includes>
                                         <include>example-rest-redirector-service-*-shaded.jar</include>
                                     </includes>
