@@ -22,48 +22,69 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.EnumSet;
 
 import static java.util.Objects.requireNonNull;
 
 @JsonIgnoreProperties(value = {"trainingCompleted"})
 public class ExampleUser extends User {
 
-    private static final String TRAINING_KEY = "training completed";
+    public static final String TRAINING_KEY = "training completed";
 
     public ExampleUser(final User user) {
-        super();
         setUserId(user.getUserId());
-        setRoles(user.getRoles());
-        setAuths(user.getAuths());
         setUserFields(user.getUserFields());
     }
 
     public ExampleUser() {
-        super();
     }
 
     public ExampleUser trainingCompleted(final TrainingCourse... trainingCompleted) {
         requireNonNull(trainingCompleted, "cannot add null training completed");
-        Set<TrainingCourse> trainingComplete = (Set<TrainingCourse>) getUserField(TRAINING_KEY);
+        ArrayList<TrainingCourse> trainingComplete = (ArrayList<TrainingCourse>) getUserField(TRAINING_KEY);
         if (trainingComplete == null) {
-            trainingComplete = new HashSet<>();
+            trainingComplete = new ArrayList<>();
+        } else {
+            trainingComplete.clear();
         }
-        Collections.addAll(trainingComplete, trainingCompleted);
+        for (TrainingCourse training : trainingCompleted) {
+            trainingComplete.add(training);
+        }
+
+        System.out.println("Nigel inserted at:");
+        System.out.println(trainingComplete);
+
+        for (TrainingCourse training : trainingComplete) {
+            System.out.println(training);
+        }
+
+        System.out.println("Nigel finished inserted at:");
+
         setUserField(TRAINING_KEY, trainingComplete);
         return this;
     }
 
-    public Set<TrainingCourse> getTrainingCompleted() {
-        Set<TrainingCourse> trainingCompleted = (Set<TrainingCourse>) getUserField(TRAINING_KEY);
-        //Could be null as training is not necessarily set
-        return trainingCompleted;
+    public EnumSet<TrainingCourse> getTrainingCompleted() {
+
+        ArrayList<TrainingCourse> trainingCompleted = (ArrayList<TrainingCourse>) getUserField(TRAINING_KEY);
+        if (trainingCompleted == null) {
+            return EnumSet.noneOf(TrainingCourse.class);
+        }
+        EnumSet<TrainingCourse> trainingCourses = EnumSet.noneOf(TrainingCourse.class);
+        System.out.println("Nigel training courses");
+        System.out.println(trainingCompleted.getClass());
+        System.out.println(trainingCompleted);
+
+
+        for (TrainingCourse training : trainingCompleted) {
+            trainingCourses.add(training);
+        }
+
+        return trainingCourses;
     }
 
-    public void setTrainingCompleted(final TrainingCourse...
-                                             trainingCompleted) {
+    public void setTrainingCompleted(final TrainingCourse... trainingCompleted) {
         trainingCompleted(trainingCompleted);
     }
 

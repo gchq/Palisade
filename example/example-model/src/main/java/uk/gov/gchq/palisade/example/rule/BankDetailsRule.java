@@ -25,6 +25,7 @@ import uk.gov.gchq.palisade.example.common.TrainingCourse;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.rule.Rule;
 
+import java.util.EnumSet;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -54,18 +55,17 @@ public class BankDetailsRule implements Rule<Employee> {
                 return record;
             }
             ExampleUser exampleUser = new ExampleUser(user);
-            requireNonNull(exampleUser);
-
-            Set<TrainingCourse> trainingCompleted = exampleUser.getTrainingCompleted();
-            if (trainingCompleted != null) {
-                if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
-                    return record;
-                }
+            EnumSet<TrainingCourse> trainingCompleted = exampleUser.getTrainingCompleted();
+            if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
+                return record;
             }
         } catch (Exception e) {
 
+            System.out.println("Nigel caught exception");
             System.out.println(e);
             System.out.println(e.getStackTrace());
+            System.out.println("After print exception");
+            throw e;
         }
         return redactRecord(record);
     }

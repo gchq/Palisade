@@ -16,13 +16,15 @@
 
 package uk.gov.gchq.palisade;
 
-import com.google.common.collect.Sets;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.util.FieldGetter;
 import uk.gov.gchq.palisade.util.FieldSetter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +45,7 @@ import static java.util.Objects.requireNonNull;
  * The user auths are used specifically to decide what visibilities users can see.
  * </p>
  */
+@JsonIgnoreProperties(value = {"auths", "roles"})
 public class User implements Cloneable {
     public static final String NAMESPACE = "User";
     public static final String USER_ID = "userId";
@@ -53,9 +56,9 @@ public class User implements Cloneable {
     private static final Map<String, FieldSetter<User>> FIELD_SETTERS = createFieldSetters();
 
     private UserId userId;
-    private Set<String> roles = new HashSet<>();
-    private Set<String> auths = new HashSet<>();
-    private HashMap<String, Object> userFields = new HashMap<>();
+
+
+    private Map<String, Object> userFields = new HashMap<>();
 
     public Object getField(final String reference) {
         return Util.getField(this, FIELD_GETTERS, reference);
@@ -67,18 +70,31 @@ public class User implements Cloneable {
 
     public Object getUserField(final String key) {
         requireNonNull(key, "The key cannot be set to null.");
-        return userFields.get(key);
+        Object retVal = userFields.get(key);
+        System.out.println("The type of object being retrieved is for key " + key);
+        if (retVal != null) {
+            System.out.println(retVal.getClass());
+        }
+        return retVal;
+    }
+
+    public User userField(final String key, final Object value) {
+        requireNonNull(key, "The key cannot be set to null.");
+        requireNonNull(key, "The value cannot be set to null.");
+        System.out.println("The type of object being inserted is for key " + key);
+        System.out.println(value.getClass());
+        userFields.put(key, value);
+        return this;
     }
 
     public void setUserField(final String key, final Object value) {
-        requireNonNull(key, "The key cannot be set to null.");
-        requireNonNull(key, "The value cannot be set to null.");
-        userFields.put(key, value);
+        userField(key, value);
     }
 
-    public User userFields(final HashMap<String, Object> userFields) {
+    public User userFields(final Map<String, Object> userFields) {
         requireNonNull(userFields, "The userFields cannot be set to null.");
-        this.userFields = userFields;
+        this.userFields.clear();
+        this.userFields.putAll(userFields);
         return this;
     }
 
@@ -122,30 +138,54 @@ public class User implements Cloneable {
      */
     public User auths(final String... auths) {
         requireNonNull(auths, "Cannot add null auths.");
-        this.auths = new HashSet<>();
-        Collections.addAll(this.auths, auths);
+        ArrayList<String> authorisations = (ArrayList<String>) getUserField(AUTHS);
+        if (authorisations == null) {
+            authorisations = new ArrayList<>();
+        } else {
+            authorisations.clear();
+        }
+        Collections.addAll(authorisations, auths);
+        setUserField(AUTHS, new ArrayList<String>(new HashSet<>(authorisations)));
         return this;
     }
 
+    /**
+     * Adds the user auths.
+     *
+     * @param auths the user auths to add
+     * @return this User instance.
+     */
     public User auths(final Set<String> auths) {
         requireNonNull(auths, "Cannot add null auths.");
-        this.auths = auths;
+        ArrayList<String> authorisations = (ArrayList<String>) getUserField(AUTHS);
+        if (authorisations == null) {
+            authorisations = new ArrayList<>();
+        } else {
+            authorisations.clear();
+        }
+        authorisations.addAll(auths);
+        setUserField(AUTHS, new ArrayList<String>(new HashSet<>(authorisations)));
         return this;
+    }
+
+
+    /**
+     * Return the user auths.
+     *
+     * @return the authorisations
+     */
+    public Set<String> getAuths() {
+        // auths cannot be null
+        ArrayList<String> authorisations = (ArrayList<String>) getUserField(AUTHS);
+        if (authorisations == null) {
+            return Collections.emptySet();
+        }
+        return new HashSet<>(authorisations);
     }
 
     public void setAuths(final Set<String> auths) {
+        setUserField(AUTHS, new ArrayList<>());
         auths(auths);
-    }
-
-    public Set<String> getAuths() {
-        // auths cannot be null
-        return auths;
-    }
-
-    public User addAuths(final Set<String> auths) {
-        requireNonNull(auths, "Cannot add null auths.");
-        this.auths.addAll(auths);
-        return this;
     }
 
     /**
@@ -156,30 +196,54 @@ public class User implements Cloneable {
      */
     public User roles(final String... roles) {
         requireNonNull(roles, "Cannot add null roles.");
-        this.roles = new HashSet<>();
-        Collections.addAll(this.roles, roles);
+        ArrayList<String> roleArr = (ArrayList<String>) getUserField(ROLES);
+        if (roleArr == null) {
+            roleArr = new ArrayList<>();
+        } else {
+            roleArr.clear();
+        }
+        roleArr.addAll(Arrays.asList(roles));
+        setUserField(ROLES, new ArrayList<>(new HashSet<>(roleArr)));
         return this;
+    }
+
+    /**
+     * Adds the user roles.
+     *
+     * @param roles the user roles to add
+     * @return this User instance.
+     */
+    public User roles(final Set<String> roles) {
+        requireNonNull(roles, "Cannot add null roles.");
+        ArrayList<String> roleArr = (ArrayList<String>) getUserField(ROLES);
+        if (roleArr == null) {
+            roleArr = new ArrayList<>(roles);
+        } else {
+            roleArr.clear();
+        }
+        roleArr.addAll(roles);
+        setUserField(ROLES, new ArrayList<>(new HashSet<>(roleArr)));
+        return this;
+    }
+
+
+    /**
+     * Return the user auths.
+     *
+     * @return the authorisations
+     */
+    public Set<String> getRoles() {
+        // auths cannot be null
+        ArrayList<String> roles = (ArrayList<String>) getUserField(ROLES);
+        if (roles == null) {
+            return Collections.emptySet();
+        }
+        return new HashSet<>(roles);
     }
 
     public void setRoles(final Set<String> roles) {
+        setUserField(ROLES, new ArrayList<>());
         roles(roles);
-    }
-
-    public User roles(final Set<String> roles) {
-        requireNonNull(roles, "Cannot add null roles.");
-        this.roles = roles;
-        return this;
-    }
-
-    public Set<String> getRoles() {
-        // roles cannot be null
-        return roles;
-    }
-
-    public User addRoles(final Set<String> roles) {
-        requireNonNull(roles, "Cannot add null roles.");
-        this.roles.addAll(roles);
-        return this;
     }
 
     public User clone() {
@@ -190,9 +254,7 @@ public class User implements Cloneable {
             clone = new User();
         }
         clone.userId(getUserId().clone());
-        clone.roles(Sets.newHashSet(getRoles()));
-        clone.auths(Sets.newHashSet(getAuths()));
-        clone.userFields((HashMap<String, Object>) userFields.clone());
+        clone.userFields(new HashMap<>(userFields));
         return clone;
     }
 
@@ -210,8 +272,6 @@ public class User implements Cloneable {
 
         return new EqualsBuilder()
                 .append(userId, user.userId)
-                .append(roles, user.roles)
-                .append(auths, user.auths)
                 .append(userFields, user.userFields)
                 .isEquals();
     }
@@ -220,8 +280,6 @@ public class User implements Cloneable {
     public int hashCode() {
         return new HashCodeBuilder(11, 19)
                 .append(userId)
-                .append(roles)
-                .append(auths)
                 .append(userFields)
                 .toHashCode();
     }
@@ -230,8 +288,6 @@ public class User implements Cloneable {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("userId", userId)
-                .append("roles", roles)
-                .append("auths", auths)
                 .append("userFields", userFields)
                 .toString();
     }
@@ -253,11 +309,12 @@ public class User implements Cloneable {
         return Collections.unmodifiableMap(map);
     }
 
-    public HashMap<String, Object> getUserFields() {
+    public Map<String, Object> getUserFields() {
         return userFields;
     }
 
-    public void setUserFields(final HashMap<String, Object> userFields) {
+    public void setUserFields(final Map<String, Object> userFields) {
+        this.userFields.clear();
         this.userFields = userFields;
     }
 }
