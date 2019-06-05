@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example;
+package uk.gov.gchq.palisade.example.runner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,28 +31,26 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.stream.Stream;
 
 
-public class RestDockerExample {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestDockerExample.class);
-    //For the Docker build, this will have been created in the container before this executes
-    protected static final String FILE = new File("/data/employee_file0.avro").getAbsolutePath();
+public class RestExample {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestExample.class);
 
     public static void main(final String[] args) throws Exception {
-        String fileToGet;
-        if (args.length > 0) {
-            fileToGet = new File(args[0]).getAbsolutePath();
-        } else {
-            fileToGet = FILE;
+        if (args.length < 1) {
+            System.out.printf("Usage: %s file\n", RestExample.class.getTypeName());
+            System.out.println("\nfile\tfile containing serialised Employee instances to read");
+            System.exit(1);
         }
-        LOGGER.info("Going to request {} from Palisade", fileToGet);
-        new RestDockerExample().run(fileToGet);
+
+        String sourceFile = args[0];
+        LOGGER.info("Going to request {} from Palisade", sourceFile);
+        new RestExample().run(sourceFile);
     }
 
-    public void run(final String fileToRead) throws Exception {
+    public void run(final String sourceFile) throws Exception {
         final InputStream stream = StreamUtil.openStream(this.getClass(), System.getenv(ConfigConsts.CONFIG_SERVICE_PATH));
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
@@ -68,37 +66,37 @@ public class RestDockerExample {
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of SALARY...");
-        final Stream<Employee> aliceResults = client.read(fileToRead, "Alice", Purpose.SALARY.name());
+        final Stream<Employee> aliceResults = client.read(sourceFile, alice.getUserId().getId(), Purpose.SALARY.name());
         LOGGER.info("Alice got back: ");
         aliceResults.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of DUTY_OF_CARE...");
-        final Stream<Employee> aliceResults2 = client.read(fileToRead, "Alice", Purpose.DUTY_OF_CARE.name());
+        final Stream<Employee> aliceResults2 = client.read(sourceFile, alice.getUserId().getId(), Purpose.DUTY_OF_CARE.name());
         LOGGER.info("Alice got back: ");
         aliceResults2.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Alice [ " + alice.toString() + " } is reading the Employee file with a purpose of STAFF_REPORT...");
-        final Stream<Employee> aliceResults3 = client.read(fileToRead, "Alice", Purpose.STAFF_REPORT.name());
+        final Stream<Employee> aliceResults3 = client.read(sourceFile, alice.getUserId().getId(), Purpose.STAFF_REPORT.name());
         LOGGER.info("Alice got back: ");
         aliceResults3.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Bob [ " + bob.toString() + " } is reading the Employee file with a purpose of DUTY_OF_CARE...");
-        final Stream<Employee> bobResults1 = client.read(fileToRead, "Bob", Purpose.DUTY_OF_CARE.name());
+        final Stream<Employee> bobResults1 = client.read(sourceFile, bob.getUserId().getId(), Purpose.DUTY_OF_CARE.name());
         LOGGER.info("Bob got back: ");
         bobResults1.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Bob [ " + bob.toString() + " } is reading the Employee file with a purpose that is empty...");
-        final Stream<Employee> bobResults2 = client.read(fileToRead, "Bob", "");
+        final Stream<Employee> bobResults2 = client.read(sourceFile, bob.getUserId().getId(), "");
         LOGGER.info("Bob got back: ");
         bobResults2.map(Object::toString).forEach(LOGGER::info);
 
         LOGGER.info("");
         LOGGER.info("Eve [ " + eve.toString() + " } is reading the Employee file with a purpose that is empty...");
-        final Stream<Employee> eveResults1 = client.read(fileToRead, "Eve", "");
+        final Stream<Employee> eveResults1 = client.read(sourceFile, eve.getUserId().getId(), "");
         LOGGER.info("Eve got back: ");
         eveResults1.map(Object::toString).forEach(LOGGER::info);
     }
