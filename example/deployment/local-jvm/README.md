@@ -82,7 +82,7 @@ To run the example locally in JVMs follow these steps (from the root of the proj
       ./example/deployment/local-jvm/bash-scripts/runFormattedLocalJVMExample.sh
     ```     
     
-    This just runs the java class: `uk.gov.gchq.palisade.example.RestExample`. You can just run this class directly in your IDE.
+    This just runs the java class: `uk.gov.gchq.palisade.example.runner.RestExample`. You can just run this class directly in your IDE.
 
 5. Stop the REST services
     ```bash

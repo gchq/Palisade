@@ -27,6 +27,5 @@
 
     <modules>
         <module>example-docker-services</module>
-        <module>example-docker-runner</module>
     </modules>
 </project>
