@@ -16,7 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
-import uk.gov.gchq.palisade.config.service.ConfigConsts;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
@@ -29,7 +29,13 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
     public ApplicationConfigV1() {
         super(RESOURCES);
         //make sure we can inject the service instance
-        DataService delegate = RestDataServiceV1.createService(System.getenv(ConfigConsts.CONFIG_SERVICE_PATH));
+        String path;
+        try {
+            path = ConfigUtils.retrieveConfigurationPath();
+        } catch (IllegalStateException e) {
+            path = null;
+        }
+        DataService delegate = RestDataServiceV1.createService(path);
         register(new ServiceBinder(delegate, DataService.class));
     }
 }
