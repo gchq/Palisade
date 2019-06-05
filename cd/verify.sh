@@ -43,7 +43,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Compiling javadoc"
     mvn javadoc:aggregate -q
 fi
-if [ ${container_result} -eq 0 ] && [ ${multi_jvm_result} -eq 0 ] && [ ${multi_jvm_cat_client_result} -eq 0 ]; then
+if [[ ${container_result} -eq 0 ]] && [[ ${multi_jvm_result} -eq 0 ]] && [[ ${multi_jvm_cat_client_result} -eq 0 ]]; then
     echo "exit 0"
     exit 0
 else
