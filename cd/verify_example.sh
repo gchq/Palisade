@@ -18,7 +18,7 @@ validate_example_output() {
         key2flag=0
      fi
    done
-   if [[ $key1flag = 0 && $key2flag = 0 ]]; then
+   if [[ $key1flag = 0 ]] && [[ $key2flag = 0 ]]; then
         return 0
    fi
 
