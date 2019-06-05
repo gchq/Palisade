@@ -17,7 +17,7 @@
 package uk.gov.gchq.palisade.example.perf.actions;
 
 import uk.gov.gchq.palisade.client.ClientConfiguredServices;
-import uk.gov.gchq.palisade.config.service.ConfigConsts;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.common.ExamplePolicies;
 import uk.gov.gchq.palisade.example.perf.Perf;
@@ -85,7 +85,7 @@ public class SetPolicyAction extends PerfAction {
         Stream<URI> noPolicyPaths = Stream.of(noPolicySet.getSmallFile(), noPolicySet.getLargeFile());
 
         //attempt to connect to Palisade
-        final InputStream stream = StreamUtil.openStream(SetPolicyAction.class, System.getProperty(ConfigConsts.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(SetPolicyAction.class, ConfigUtils.retrieveConfigurationPath());
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ClientConfiguredServices cs = new ClientConfiguredServices(configService);
 

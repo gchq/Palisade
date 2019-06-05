@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.client.ClientConfiguredServices;
-import uk.gov.gchq.palisade.config.service.ConfigConsts;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.example.common.ExamplePolicies;
 import uk.gov.gchq.palisade.example.common.ExampleUsers;
@@ -48,7 +48,7 @@ public final class ExampleConfigurator {
      * @param args command line arguments
      */
     public static void main(final String[] args) {
-        final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getenv(ConfigConsts.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, ConfigUtils.retrieveConfigurationPath());
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ClientConfiguredServices cs = new ClientConfiguredServices(configService);
         new ExampleConfigurator(cs, args[0]);
