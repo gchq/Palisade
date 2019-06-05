@@ -16,7 +16,9 @@
 
 package uk.gov.gchq.palisade;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -46,6 +48,11 @@ import static java.util.Objects.requireNonNull;
  * </p>
  */
 @JsonIgnoreProperties(value = {"auths", "roles"})
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "class"
+)
 public class User implements Cloneable {
     public static final String NAMESPACE = "User";
     public static final String USER_ID = "userId";
@@ -57,13 +64,12 @@ public class User implements Cloneable {
 
     private UserId userId;
 
-
     private Map<String, Object> userFields = new HashMap<>();
+
 
     public Object getField(final String reference) {
         return Util.getField(this, FIELD_GETTERS, reference);
     }
-
     public void setField(final String reference, final Object value) {
         Util.setField(this, FIELD_SETTERS, reference, value);
     }
@@ -316,5 +322,10 @@ public class User implements Cloneable {
     public void setUserFields(final Map<String, Object> userFields) {
         this.userFields.clear();
         this.userFields = userFields;
+    }
+
+    @JsonGetter("class")
+    private String _getClass() {
+        return getClass().getName();
     }
 }

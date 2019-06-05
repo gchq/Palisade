@@ -21,6 +21,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -71,17 +72,11 @@ public class ExampleUser extends User {
         if (trainingCompleted == null) {
             return EnumSet.noneOf(TrainingCourse.class);
         }
-        EnumSet<TrainingCourse> trainingCourses = EnumSet.noneOf(TrainingCourse.class);
         System.out.println("Nigel training courses");
         System.out.println(trainingCompleted.getClass());
         System.out.println(trainingCompleted);
 
-
-        for (TrainingCourse training : trainingCompleted) {
-            trainingCourses.add(training);
-        }
-
-        return trainingCourses;
+        return EnumSet.copyOf(trainingCompleted);
     }
 
     public void setTrainingCompleted(final TrainingCourse... trainingCompleted) {
@@ -118,4 +113,19 @@ public class ExampleUser extends User {
                 .appendSuper(super.toString())
                 .toString();
     }
+
+    public static void main(String[] args) throws Exception {
+        User user = new ExampleUser().trainingCompleted(TrainingCourse.PAYROLL_TRAINING_COURSE).userId("bob").roles("payroll", "something").auths("authorised_person", "whatever");
+        byte[] bytesSerialised = JSONSerialiser.serialise(user, true);
+        String serialised = new String(bytesSerialised);
+        System.err.println(serialised);
+
+        User newUser = JSONSerialiser.deserialise(bytesSerialised, User.class);
+        //THE FOLLOWING LINE SHOULD REPORT THE ACTUAL CLASS e.g. ExampleUser not User!!
+        System.err.println(newUser.getClass());
+
+        ExampleUser copy=new ExampleUser(newUser);
+        System.err.println(copy.getTrainingCompleted());
+    }
+
 }
