@@ -49,22 +49,26 @@ public class BankDetailsRule implements Rule<Employee> {
         Set<String> roles = user.getRoles();
         String purpose = context.getPurpose();
 
+        System.out.println("class type");
+        System.out.println(user.getClass());
+
+
         try {
 
-            if (roles.contains(Role.PAYROLL.name()) && purpose.equals(Purpose.SALARY.name())) {
-                return record;
-            }
-            ExampleUser exampleUser = new ExampleUser(user);
-            EnumSet<TrainingCourse> trainingCompleted = exampleUser.getTrainingCompleted();
-            if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
-                return record;
+            if (user.getClass() == ExampleUser.class) {
+                ExampleUser exampleUser = (ExampleUser) user;
+                if (roles.contains(Role.PAYROLL.name()) && purpose.equals(Purpose.SALARY.name())) {
+                    return record;
+                }
+                EnumSet<TrainingCourse> trainingCompleted = exampleUser.getTrainingCompleted();
+                if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
+                    return record;
+                }
             }
         } catch (Exception e) {
 
-            System.out.println("Nigel caught exception");
             System.out.println(e);
             System.out.println(e.getStackTrace());
-            System.out.println("After print exception");
             throw e;
         }
         return redactRecord(record);

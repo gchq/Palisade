@@ -17,16 +17,14 @@
 package uk.gov.gchq.palisade;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.util.FieldGetter;
 import uk.gov.gchq.palisade.util.FieldSetter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +45,6 @@ import static java.util.Objects.requireNonNull;
  * The user auths are used specifically to decide what visibilities users can see.
  * </p>
  */
-@JsonIgnoreProperties(value = {"auths", "roles"})
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.CLASS,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
@@ -64,44 +61,15 @@ public class User implements Cloneable {
 
     private UserId userId;
 
-    private Map<String, Object> userFields = new HashMap<>();
-
+    private Set<String> roles = new HashSet<>();
+    private Set<String> auths = new HashSet<>();
 
     public Object getField(final String reference) {
         return Util.getField(this, FIELD_GETTERS, reference);
     }
+
     public void setField(final String reference, final Object value) {
         Util.setField(this, FIELD_SETTERS, reference, value);
-    }
-
-    public Object getUserField(final String key) {
-        requireNonNull(key, "The key cannot be set to null.");
-        Object retVal = userFields.get(key);
-        System.out.println("The type of object being retrieved is for key " + key);
-        if (retVal != null) {
-            System.out.println(retVal.getClass());
-        }
-        return retVal;
-    }
-
-    public User userField(final String key, final Object value) {
-        requireNonNull(key, "The key cannot be set to null.");
-        requireNonNull(key, "The value cannot be set to null.");
-        System.out.println("The type of object being inserted is for key " + key);
-        System.out.println(value.getClass());
-        userFields.put(key, value);
-        return this;
-    }
-
-    public void setUserField(final String key, final Object value) {
-        userField(key, value);
-    }
-
-    public User userFields(final Map<String, Object> userFields) {
-        requireNonNull(userFields, "The userFields cannot be set to null.");
-        this.userFields.clear();
-        this.userFields.putAll(userFields);
-        return this;
     }
 
     /**
@@ -144,14 +112,8 @@ public class User implements Cloneable {
      */
     public User auths(final String... auths) {
         requireNonNull(auths, "Cannot add null auths.");
-        ArrayList<String> authorisations = (ArrayList<String>) getUserField(AUTHS);
-        if (authorisations == null) {
-            authorisations = new ArrayList<>();
-        } else {
-            authorisations.clear();
-        }
-        Collections.addAll(authorisations, auths);
-        setUserField(AUTHS, new ArrayList<String>(new HashSet<>(authorisations)));
+        this.auths = new HashSet<>();
+        Collections.addAll(this.auths, auths);
         return this;
     }
 
@@ -163,17 +125,13 @@ public class User implements Cloneable {
      */
     public User auths(final Set<String> auths) {
         requireNonNull(auths, "Cannot add null auths.");
-        ArrayList<String> authorisations = (ArrayList<String>) getUserField(AUTHS);
-        if (authorisations == null) {
-            authorisations = new ArrayList<>();
-        } else {
-            authorisations.clear();
-        }
-        authorisations.addAll(auths);
-        setUserField(AUTHS, new ArrayList<String>(new HashSet<>(authorisations)));
+        this.auths = auths;
         return this;
     }
 
+    public void setAuths(final Set<String> auths) {
+        auths(auths);
+    }
 
     /**
      * Return the user auths.
@@ -181,17 +139,13 @@ public class User implements Cloneable {
      * @return the authorisations
      */
     public Set<String> getAuths() {
-        // auths cannot be null
-        ArrayList<String> authorisations = (ArrayList<String>) getUserField(AUTHS);
-        if (authorisations == null) {
-            return Collections.emptySet();
-        }
-        return new HashSet<>(authorisations);
+        return auths;
     }
 
-    public void setAuths(final Set<String> auths) {
-        setUserField(AUTHS, new ArrayList<>());
-        auths(auths);
+    public User addAuths(final Set<String> auths) {
+        requireNonNull(auths, "Cannot add null auths.");
+        this.auths.addAll(auths);
+        return this;
     }
 
     /**
@@ -202,15 +156,13 @@ public class User implements Cloneable {
      */
     public User roles(final String... roles) {
         requireNonNull(roles, "Cannot add null roles.");
-        ArrayList<String> roleArr = (ArrayList<String>) getUserField(ROLES);
-        if (roleArr == null) {
-            roleArr = new ArrayList<>();
-        } else {
-            roleArr.clear();
-        }
-        roleArr.addAll(Arrays.asList(roles));
-        setUserField(ROLES, new ArrayList<>(new HashSet<>(roleArr)));
+        this.roles = new HashSet<>();
+        Collections.addAll(this.roles, roles);
         return this;
+    }
+
+    public void setRoles(final Set<String> roles) {
+        roles(roles);
     }
 
     /**
@@ -221,14 +173,7 @@ public class User implements Cloneable {
      */
     public User roles(final Set<String> roles) {
         requireNonNull(roles, "Cannot add null roles.");
-        ArrayList<String> roleArr = (ArrayList<String>) getUserField(ROLES);
-        if (roleArr == null) {
-            roleArr = new ArrayList<>(roles);
-        } else {
-            roleArr.clear();
-        }
-        roleArr.addAll(roles);
-        setUserField(ROLES, new ArrayList<>(new HashSet<>(roleArr)));
+        this.roles = roles;
         return this;
     }
 
@@ -240,16 +185,13 @@ public class User implements Cloneable {
      */
     public Set<String> getRoles() {
         // auths cannot be null
-        ArrayList<String> roles = (ArrayList<String>) getUserField(ROLES);
-        if (roles == null) {
-            return Collections.emptySet();
-        }
-        return new HashSet<>(roles);
+        return roles;
     }
 
-    public void setRoles(final Set<String> roles) {
-        setUserField(ROLES, new ArrayList<>());
-        roles(roles);
+    public User addRoles(final Set<String> roles) {
+        requireNonNull(roles, "Cannot add null roles.");
+        this.roles.addAll(roles);
+        return this;
     }
 
     public User clone() {
@@ -260,7 +202,8 @@ public class User implements Cloneable {
             clone = new User();
         }
         clone.userId(getUserId().clone());
-        clone.userFields(new HashMap<>(userFields));
+        clone.roles(Sets.newHashSet(getRoles()));
+        clone.auths(Sets.newHashSet(getAuths()));
         return clone;
     }
 
@@ -278,7 +221,8 @@ public class User implements Cloneable {
 
         return new EqualsBuilder()
                 .append(userId, user.userId)
-                .append(userFields, user.userFields)
+                .append(roles, user.roles)
+                .append(auths, user.auths)
                 .isEquals();
     }
 
@@ -286,7 +230,8 @@ public class User implements Cloneable {
     public int hashCode() {
         return new HashCodeBuilder(11, 19)
                 .append(userId)
-                .append(userFields)
+                .append(roles)
+                .append(auths)
                 .toHashCode();
     }
 
@@ -294,7 +239,8 @@ public class User implements Cloneable {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("userId", userId)
-                .append("userFields", userFields)
+                .append("roles", roles)
+                .append("auths", auths)
                 .toString();
     }
 
@@ -315,17 +261,8 @@ public class User implements Cloneable {
         return Collections.unmodifiableMap(map);
     }
 
-    public Map<String, Object> getUserFields() {
-        return userFields;
-    }
-
-    public void setUserFields(final Map<String, Object> userFields) {
-        this.userFields.clear();
-        this.userFields = userFields;
-    }
-
     @JsonGetter("class")
-    private String _getClass() {
+    public String _getClass() {
         return getClass().getName();
     }
 }

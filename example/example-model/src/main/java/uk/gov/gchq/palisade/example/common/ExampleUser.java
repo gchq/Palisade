@@ -15,27 +15,24 @@
  */
 package uk.gov.gchq.palisade.example.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 
 import static java.util.Objects.requireNonNull;
 
-@JsonIgnoreProperties(value = {"trainingCompleted"})
 public class ExampleUser extends User {
 
-    public static final String TRAINING_KEY = "training completed";
+
+    EnumSet<TrainingCourse> trainingCourses = EnumSet.noneOf(TrainingCourse.class);
 
     public ExampleUser(final User user) {
         setUserId(user.getUserId());
-        setUserFields(user.getUserFields());
     }
 
     public ExampleUser() {
@@ -43,40 +40,13 @@ public class ExampleUser extends User {
 
     public ExampleUser trainingCompleted(final TrainingCourse... trainingCompleted) {
         requireNonNull(trainingCompleted, "cannot add null training completed");
-        ArrayList<TrainingCourse> trainingComplete = (ArrayList<TrainingCourse>) getUserField(TRAINING_KEY);
-        if (trainingComplete == null) {
-            trainingComplete = new ArrayList<>();
-        } else {
-            trainingComplete.clear();
-        }
-        for (TrainingCourse training : trainingCompleted) {
-            trainingComplete.add(training);
-        }
-
-        System.out.println("Nigel inserted at:");
-        System.out.println(trainingComplete);
-
-        for (TrainingCourse training : trainingComplete) {
-            System.out.println(training);
-        }
-
-        System.out.println("Nigel finished inserted at:");
-
-        setUserField(TRAINING_KEY, trainingComplete);
+        trainingCourses.clear();
+        trainingCourses.addAll(Arrays.asList(trainingCompleted));
         return this;
     }
 
     public EnumSet<TrainingCourse> getTrainingCompleted() {
-
-        ArrayList<TrainingCourse> trainingCompleted = (ArrayList<TrainingCourse>) getUserField(TRAINING_KEY);
-        if (trainingCompleted == null) {
-            return EnumSet.noneOf(TrainingCourse.class);
-        }
-        System.out.println("Nigel training courses");
-        System.out.println(trainingCompleted.getClass());
-        System.out.println(trainingCompleted);
-
-        return EnumSet.copyOf(trainingCompleted);
+        return trainingCourses;
     }
 
     public void setTrainingCompleted(final TrainingCourse... trainingCompleted) {
@@ -97,6 +67,7 @@ public class ExampleUser extends User {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
+                .append(trainingCourses, exampleUser.trainingCourses)
                 .isEquals();
     }
 
@@ -104,6 +75,7 @@ public class ExampleUser extends User {
     public int hashCode() {
         return new HashCodeBuilder(11, 19)
                 .appendSuper(super.hashCode())
+                .append(trainingCourses)
                 .toHashCode();
     }
 
@@ -111,21 +83,7 @@ public class ExampleUser extends User {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
+                .append("trainingCourses", trainingCourses)
                 .toString();
     }
-
-    public static void main(String[] args) throws Exception {
-        User user = new ExampleUser().trainingCompleted(TrainingCourse.PAYROLL_TRAINING_COURSE).userId("bob").roles("payroll", "something").auths("authorised_person", "whatever");
-        byte[] bytesSerialised = JSONSerialiser.serialise(user, true);
-        String serialised = new String(bytesSerialised);
-        System.err.println(serialised);
-
-        User newUser = JSONSerialiser.deserialise(bytesSerialised, User.class);
-        //THE FOLLOWING LINE SHOULD REPORT THE ACTUAL CLASS e.g. ExampleUser not User!!
-        System.err.println(newUser.getClass());
-
-        ExampleUser copy=new ExampleUser(newUser);
-        System.err.println(copy.getTrainingCompleted());
-    }
-
 }

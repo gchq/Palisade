@@ -20,15 +20,19 @@ import org.junit.Test;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.example.common.ExampleUser;
 import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.common.Role;
+import uk.gov.gchq.palisade.example.common.TrainingCourse;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.BankDetails;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
+import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class BankDetailsTest {
 
@@ -82,5 +86,22 @@ public class BankDetailsTest {
 
         // Then
         assertNull(actual.getBankDetails());
+    }
+
+    @Test
+    public void shouldDeserialiseExampleUser() {
+        //given
+        User user = new ExampleUser().trainingCompleted(TrainingCourse.PAYROLL_TRAINING_COURSE).userId("bob").roles("payroll", "something").auths("authorised_person", "whatever");
+
+        //when
+        byte[] bytesSerialised = JSONSerialiser.serialise(user, true);
+        String serialised = new String(bytesSerialised);
+        User newUser = JSONSerialiser.deserialise(bytesSerialised, User.class);
+
+        //then
+        assertEquals(newUser.getClass(), ExampleUser.class);
+        ExampleUser exampleUser = (ExampleUser) newUser;
+        assertEquals(exampleUser.getTrainingCompleted().size(), 1);
+        assertTrue("Contains Payroll_training", exampleUser.getTrainingCompleted().contains(TrainingCourse.PAYROLL_TRAINING_COURSE));
     }
 }
