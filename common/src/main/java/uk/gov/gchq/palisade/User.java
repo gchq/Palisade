@@ -169,7 +169,7 @@ public class User implements Cloneable {
      * @return the roles
      */
     public Set<String> getRoles() {
-        // auths cannot be null
+        // roles cannot be null
         return roles;
     }
 
