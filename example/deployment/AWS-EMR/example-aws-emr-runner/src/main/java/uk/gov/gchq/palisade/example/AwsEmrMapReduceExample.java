@@ -131,7 +131,7 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         job.setOutputFormatClass(TextOutputFormat.class);
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
-        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(this.getClass(), ConfigUtils.retrieveConfigurationPath());
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
         ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);
@@ -198,7 +198,6 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
             System.out.println("output_directory\tdirectory to write mapreduce outputs to");
             System.exit(1);
         }
-
 
 
         String sourceFile = args[0];
