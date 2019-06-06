@@ -105,7 +105,8 @@ public class User implements Cloneable {
      */
     public User auths(final Set<String> auths) {
         requireNonNull(auths, "Cannot add null auths.");
-        this.auths = auths;
+        this.auths.clear();
+        this.auths.addAll(auths);
         return this;
     }
 
@@ -158,10 +159,10 @@ public class User implements Cloneable {
      */
     public User roles(final Set<String> roles) {
         requireNonNull(roles, "Cannot add null roles.");
-        this.roles = roles;
+        this.roles.clear();
+        this.roles.addAll(roles);
         return this;
     }
-
 
     /**
      * Return the user roles.

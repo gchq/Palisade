@@ -28,7 +28,6 @@ import static java.util.Objects.requireNonNull;
 
 public class ExampleUser extends User {
 
-
     private EnumSet<TrainingCourse> trainingCourses = EnumSet.noneOf(TrainingCourse.class);
 
     public ExampleUser(final User user) {
