@@ -33,6 +33,12 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
+            <artifactId>rest-data-service</artifactId>
+            <version>${project.parent.version}</version>
+            <classifier>classes</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>rest-redirector-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

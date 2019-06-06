@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.service.redirect.exception;
+package uk.gov.gchq.palisade.redirect.service.exception;
 
 /**
- * An exception thrown by redirectors when no suitable instance of a {@link uk.gov.gchq.palisade.service.Service} could be found.
+ * An exception thrown by redirectors when no redirection can occur for some reason. The standard {@link Throwable} only
+ * and no-arg constructor have been deleted since a message MUST be supplied.
  */
-public class NoInstanceException extends RuntimeException {
-    public NoInstanceException(final String e) {
+public class RedirectionFailedException extends RuntimeException {
+    public RedirectionFailedException(final String e) {
         super(e);
     }
 
-    public NoInstanceException(final Throwable cause) {
-        super(cause);
-    }
-
-    public NoInstanceException(final String e, final Throwable cause) {
+    public RedirectionFailedException(final String e, final Throwable cause) {
         super(e, cause);
     }
 }
