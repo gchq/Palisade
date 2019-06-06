@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.service.redirect.result;
+package uk.gov.gchq.palisade.redirect.service.result;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import uk.gov.gchq.palisade.redirect.service.redirect.RedirectionResult;
+import uk.gov.gchq.palisade.redirect.service.RedirectionResult;
 
 import java.net.URL;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.service.redirect.impl;
+package uk.gov.gchq.palisade.redirect.service.impl;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -24,8 +24,8 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.heart.Heartbeat;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
-import uk.gov.gchq.palisade.redirect.service.redirect.RedirectionResult;
-import uk.gov.gchq.palisade.redirect.service.redirect.exception.NoInstanceException;
+import uk.gov.gchq.palisade.redirect.service.RedirectionResult;
+import uk.gov.gchq.palisade.redirect.service.exception.NoInstanceException;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.ServiceState;
