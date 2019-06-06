@@ -273,23 +273,8 @@ public class Configurator {
         if (config == null) {
             throw new NoConfigException("unable to retrieve configuration in specified time");
         } else {
+            LOGGER.info("Successfully retrieved service configuration for {}", serviceClass.map(Class::getTypeName).orElse("anonymous client"));
             return config;
         }
     }
-
-    //TODO: Debug remove this!
-    private static void whoOwns(final String clazz) {
-        requireNonNull(clazz);
-        try {
-            CodeSource codeSource = Class.forName(clazz).getProtectionDomain().getCodeSource();
-            if (codeSource != null) {
-                LOGGER.info("{} loaded from {}", clazz, codeSource.getLocation());
-            } else {
-                LOGGER.info("{} loaded from dont know where!!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 }
