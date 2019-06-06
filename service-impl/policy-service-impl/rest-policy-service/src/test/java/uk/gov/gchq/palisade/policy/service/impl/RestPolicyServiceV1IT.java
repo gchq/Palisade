@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
@@ -83,7 +84,7 @@ public class RestPolicyServiceV1IT {
 
         final Context context = new Context().purpose("purpose1");
         final CanAccessRequest request = new CanAccessRequest().resources(Collections.singletonList(fileResource1)).user(user).context(context);
-        request.setOriginalRequestId("shouldCallCanAccess");
+        request.setOriginalRequestId(new RequestId().id("shouldCallCanAccess"));
 
         given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(new CanAccessResponse().canAccessResources(Collections.singletonList(fileResource1))));
 
@@ -103,7 +104,7 @@ public class RestPolicyServiceV1IT {
 
         final Context context = new Context().purpose("purpose1");
         final GetPolicyRequest request = new GetPolicyRequest().user(user).context(context).resources(Arrays.asList(fileResource1, fileResource2));
-        request.setOriginalRequestId("test shouldGetPolicy");
+        request.setOriginalRequestId(new RequestId().id("test shouldGetPolicy"));
 
         final Map<LeafResource, Policy> policies = new HashMap<>();
         policies.put(fileResource1, new Policy<>().owner(user));

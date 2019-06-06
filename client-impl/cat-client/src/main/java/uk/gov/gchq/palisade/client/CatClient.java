@@ -55,7 +55,7 @@ public class CatClient {
             String resource = args[1];
             String purpose = args[2];
 
-            final InputStream stream = StreamUtil.openStream(CatClient.class, System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+            final InputStream stream = StreamUtil.openStream(CatClient.class, ConfigUtils.retrieveConfigurationPath());
             ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
             ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);

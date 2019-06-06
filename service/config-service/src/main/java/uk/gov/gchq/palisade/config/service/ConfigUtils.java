@@ -27,14 +27,58 @@ import uk.gov.gchq.palisade.util.StreamUtil;
 import java.io.InputStream;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 /**
  * Utility class that includes functionality to create a {@link Service} from a given class name.
  */
 public final class ConfigUtils {
-    public static final String CONFIG_SERVICE_PATH = "palisade.rest.config.path";
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigUtils.class);
 
     private ConfigUtils() {
+    }
+
+    /**
+     * Retrieves the path to the file that describes how to connect to the Palisade configuration service. This should be
+     * in an environment variable named {@link ConfigConsts#CONFIG_SERVICE_PATH}.
+     *
+     * @return the configuration service file path
+     * @throws IllegalStateException if the environment variable is not set
+     */
+    public static String retrieveConfigurationPath() {
+        String path = System.getenv(ConfigConsts.CONFIG_SERVICE_PATH);
+        if (isNull(path)) {
+            LOGGER.error("Couldn't find path for file describing how to connect to the Palisade configuration service. You need to set an environment " +
+                    "variable named {} to the path, e.g. {}=/home/user/myConfig.json", ConfigConsts.CONFIG_SERVICE_PATH, ConfigConsts.CONFIG_SERVICE_PATH);
+            throw new IllegalStateException(String.format("No configuration path due to environment variable %s not being set", ConfigConsts.CONFIG_SERVICE_PATH));
+        }
+        return path;
+    }
+
+    /**
+     * Retrieves the path to the file that describes how to connect to the Palisade cache service back-end. This should be in an environment variable
+     * OR Java system property named {@link ConfigConsts#BOOTSTRAP_CONFIG}. This method should only be used by the internal {@link ConfigurationService},
+     * not by clients. Clients are directed to the {@link ConfigUtils#retrieveConfigurationPath()} method.
+     *
+     * @return the cache service file path
+     * @throws IllegalStateException if neither the environment variable or system property are set
+     */
+    public static String retrieveBootstrapPath() {
+        //check environment variable, if that doesn't work then check system property
+        String bootStrapLocation = System.getenv(ConfigConsts.BOOTSTRAP_CONFIG);
+
+        if (isNull(bootStrapLocation)) {
+            bootStrapLocation = System.getProperty(ConfigConsts.BOOTSTRAP_CONFIG);
+        }
+
+        //if this still fails then throw an error
+        if (isNull(bootStrapLocation)) {
+            LOGGER.error("Couldn't find path for file describing how to connect to the Palisade cache service. You need to set an environment OR Java system property " +
+                    "variable named {} to the path, e.g. {}=/home/user/bootstrap.json", ConfigConsts.BOOTSTRAP_CONFIG, ConfigConsts.BOOTSTRAP_CONFIG);
+            throw new IllegalStateException(String.format("No configuration path due to environment variable or Java system property %s not being set", ConfigConsts.BOOTSTRAP_CONFIG));
+        }
+
+        return bootStrapLocation;
     }
 
     /**

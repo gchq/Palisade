@@ -2,7 +2,7 @@
 
 The Example module contains all the example specific modules:
 
-- hr-data-generator, which can create a fake sample dataset based around possible data that a company might hold about its employees.
+- [hr-data-generator](hr-data-generator/README.md), which can create a fake sample dataset based around possible data that a company might hold about its employees.
 - example-model, contains all the deployment agnostic example code such as the rules and example configuration.
 - example-services, contains all the example JVM REST based services
 - deployment, contains all the deployment specific code and scripts
@@ -58,3 +58,4 @@ The example runs several different queries by the different users, with differen
 For deployment specific instructions on how to run the example see:  
 [Local JVM](deployment/local-jvm/README.md)  
 [Local Docker](deployment/local-docker/README.md)  
+[Local Kubernetes](deployment/local-k8s/README.md)  

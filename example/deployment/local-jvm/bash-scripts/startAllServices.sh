@@ -3,7 +3,6 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$DIR/../../bash-scripts/setScriptPath.sh"
 
-
 "${LOCALJVMBASHSCRIPTS}/stopAllServices.sh" > /dev/null 2>&1
 
 # deploy etcd
@@ -13,7 +12,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 #start services
-"${GENERICSCRIPTS}/waitForHost.sh" localhost:31379/health "${LOCALJVMBASHSCRIPTS}/startConfigService.sh" &
+"${GENERICSCRIPTS}/waitForHost.sh" localhost:2379/health "${LOCALJVMBASHSCRIPTS}/startConfigService.sh" &
 "${GENERICSCRIPTS}/waitForHost.sh" http://localhost:8085/config/v1/status "${LOCALJVMBASHSCRIPTS}/configureServices.sh"
 "${LOCALJVMBASHSCRIPTS}/startPolicyService.sh" &
 "${LOCALJVMBASHSCRIPTS}/startResourceService.sh" &

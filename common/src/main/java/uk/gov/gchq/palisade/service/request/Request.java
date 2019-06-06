@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 
 import java.util.UUID;
@@ -31,8 +32,7 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class Request {
     private String id; //this is a unique ID for each individual request made between the micro-services
-    private String originalRequestId; //this Id is unique per data access request from a user
-
+    private RequestId originalRequestId; //this Id is unique per data access request from a user
 
     public Request() {
         id(UUID.randomUUID().toString());
@@ -45,8 +45,8 @@ public abstract class Request {
         return this;
     }
 
-    public Request originalRequestId(final String originalRequestId) {
-        requireNonNull(originalRequestId, "The id cannot be set to null.");
+    public Request originalRequestId(final RequestId originalRequestId) {
+        requireNonNull(originalRequestId, "The originalRequestId cannot be set to null.");
         this.originalRequestId = originalRequestId;
         return this;
     }
@@ -56,15 +56,15 @@ public abstract class Request {
     }
 
     public String getId() {
-        //id will never be null
+        //id will never be null - set on construction
         return id;
     }
 
-    public void setOriginalRequestId(final String originalRequestId) {
+    public void setOriginalRequestId(final RequestId originalRequestId) {
         originalRequestId(originalRequestId);
     }
 
-    public String getOriginalRequestId() {
+    public RequestId getOriginalRequestId() {
         requireNonNull(originalRequestId, "The originalRequestId type cannot be null");
         return originalRequestId;
     }

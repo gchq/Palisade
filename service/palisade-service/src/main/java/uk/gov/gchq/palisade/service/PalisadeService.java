@@ -87,10 +87,14 @@ public interface PalisadeService extends Service {
         Objects.requireNonNull(policy, "policy");
         Objects.requireNonNull(resources, "resources");
         final Map<LeafResource, Rules> ruleMap = policy.getRuleMap();
-        final Rules defaultEmpty = new Rules();
         resources.forEach(resource -> {
-            if (!ruleMap.getOrDefault(resource, defaultEmpty).containsRules()) {
-                throw new NoPolicyException("No policy rules available for " + resource);
+            if (!ruleMap.containsKey(resource)) {
+                throw new NoPolicyException("No policy record rules available for " + resource);
+            }
+            if (!ruleMap.get(resource).containsRules()) {
+                //policy available but is empty
+                //TODO: audit this because it is unusual behaviour
+
             }
         });
         return policy;

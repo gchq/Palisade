@@ -104,5 +104,4 @@ public class BankDetailsRulesTest {
         assertEquals(exampleUser.getTrainingCompleted().size(), 1);
         assertTrue("Contains Payroll_training", exampleUser.getTrainingCompleted().contains(TrainingCourse.PAYROLL_TRAINING_COURSE));
     }
-
 }

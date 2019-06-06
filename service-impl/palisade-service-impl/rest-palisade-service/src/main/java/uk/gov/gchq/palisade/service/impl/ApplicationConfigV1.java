@@ -37,14 +37,20 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
     public ApplicationConfigV1() {
         super(RESOURCES);
         //make sure we can inject the service instance
-        PalisadeService delegate = RestPalisadeServiceV1.createService(System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+        String path;
+        try {
+            path = ConfigUtils.retrieveConfigurationPath();
+        } catch (IllegalStateException e) {
+            path = null;
+        }
+        PalisadeService delegate = RestPalisadeServiceV1.createService(path);
         ServiceBinder binder = new ServiceBinder(delegate, PalisadeService.class);
         register(binder);
         //optionally register a metric provider
         PalisadeMetricProvider metrics = null;
         try {
             //first we check to see if one has been created in the configuration for us to create
-            metrics = RestPalisadeMetricProviderV1.createService(System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+            metrics = RestPalisadeMetricProviderV1.createService(path);
         } catch (Exception e) {
             LOGGER.info("No metric provider configured in configuration service");
         }

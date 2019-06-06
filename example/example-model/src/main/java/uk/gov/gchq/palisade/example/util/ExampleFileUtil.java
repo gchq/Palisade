@@ -16,13 +16,7 @@
 
 package uk.gov.gchq.palisade.example.util;
 
-import org.apache.commons.io.FileUtils;
-
-import uk.gov.gchq.palisade.util.StreamUtil;
-
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
@@ -35,28 +29,6 @@ import static java.util.Objects.requireNonNull;
 
 public final class ExampleFileUtil {
     private ExampleFileUtil() {
-    }
-
-    /**
-     * Copies the example file containing serialised {@link uk.gov.gchq.palisade.example.ExampleObj} records to the given
-     * path. This uses {@link StreamUtil#openStream(Class, String)} to read the file either as a resource relative to the
-     * given class or from the file system.
-     *
-     * @param file        the file to load
-     * @param destination where to copy it to
-     * @param resource    the {@link Class} to try and resolve against
-     */
-    public static void createDataPath(final String file, final String destination, final Class resource) {
-        requireNonNull(file, "file");
-        requireNonNull(destination, "destination");
-        requireNonNull(resource, "resource");
-        final File targetFile = new File(destination);
-        try (final InputStream data = StreamUtil.openStream(resource, file)) {
-            requireNonNull(data, "couldn't load file: " + file);
-            FileUtils.copyInputStreamToFile(data, targetFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -86,7 +58,6 @@ public final class ExampleFileUtil {
         } else {
             file = Paths.get(path);
         }
-
         //is this a local file URL? If so attempt to normalise it
 
         if (isNull(uriPath.getScheme()) ||
@@ -102,4 +73,3 @@ public final class ExampleFileUtil {
         return uriPath;
     }
 }
-

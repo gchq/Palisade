@@ -21,33 +21,18 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.client.ClientConfiguredServices;
 import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
+import uk.gov.gchq.palisade.example.common.ExamplePolicies;
 import uk.gov.gchq.palisade.example.common.ExampleUsers;
-import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
-import uk.gov.gchq.palisade.example.rule.BankDetailsRule;
-import uk.gov.gchq.palisade.example.rule.DutyOfCareRule;
-import uk.gov.gchq.palisade.example.rule.NationalityRule;
-import uk.gov.gchq.palisade.example.rule.ZipCodeMaskingRule;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
-import uk.gov.gchq.palisade.resource.ParentResource;
-import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
-import uk.gov.gchq.palisade.resource.impl.FileResource;
-import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.StreamSupport;
-
-import static java.util.Objects.isNull;
 
 /**
  * Convenience class for the examples to configure the users and data access policies for the example.
@@ -63,7 +48,7 @@ public final class ExampleConfigurator {
      * @param args command line arguments
      */
     public static void main(final String[] args) {
-        final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, System.getProperty(ConfigUtils.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(ExampleConfigurator.class, ConfigUtils.retrieveConfigurationPath());
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
         ClientConfiguredServices cs = new ClientConfiguredServices(configService);
         new ExampleConfigurator(cs, args[0]);
@@ -90,36 +75,8 @@ public final class ExampleConfigurator {
                 new AddUserRequest().user(ExampleUsers.getEve())
         );
 
-        // You can either implement the Rule interface for your Policy rules or
-        // you can chain together combinations of Koryphe functions/predicates.
-        // Both of the following policies have the same logic, but using
-        // koryphe means you don't need to define lots of different rules for
-        // different types of objects.
-
-        // Using Custom Rule implementations - without Koryphe
-        final SetResourcePolicyRequest customPolicies =
-                new SetResourcePolicyRequest()
-                        .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
-                        .policy(new Policy<Employee>()
-                                .owner(ExampleUsers.getAlice())
-                                .recordLevelRule(
-                                        "1-Bank_Details",
-                                        new BankDetailsRule()
-                                )
-                                .recordLevelRule(
-                                        "2-DUTY_OF_CARE",
-                                        new DutyOfCareRule()
-                                )
-                                .recordLevelRule(
-                                        "3-Nationality",
-                                        new NationalityRule()
-                                )
-                                .recordLevelRule(
-                                        "4-Address Masking",
-                                        new ZipCodeMaskingRule()
-                                )
-
-                        );
+        // Using Custom Rule implementations
+        final SetResourcePolicyRequest customPolicies = ExamplePolicies.getExamplePolicy(file);
 
         final CompletableFuture<Boolean> policyStatus = services.getPolicyService().setResourcePolicy(
                 customPolicies
@@ -127,75 +84,5 @@ public final class ExampleConfigurator {
         // Wait for the users and policies to be loaded
         CompletableFuture.allOf(userAliceStatus, userBobStatus, userEveStatus, policyStatus).join();
         LOGGER.info("The example users and data access policies have been initialised.");
-
-//        // Using Koryphe's functions/predicates
-//        final SetResourcePolicyRequest koryphePolicies = new SetResourcePolicyRequest()
-//                .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
-//                .policy(new Policy<ExampleObj>()
-//                        .owner(alice)
-//                        .recordLevelRule(
-//                                "1-visibility",
-//                                new TupleRule<ExampleObj>()
-//                                        .selection("Record.visibility", "User.auths")
-//                                        .predicate(new IsXInCollectionY()))
-//                        .recordLevelRule(
-//                                "2-ageOff",
-//                                new TupleRule<ExampleObj>()
-//                                        .selection("Record.timestamp")
-//                                        .predicate(new IsMoreThan(12L))
-//                        )
-//                        .recordLevelRule(
-//                                "3-redactProperty",
-//                                new TupleRule<ExampleObj>()
-//                                        .selection("User.roles", "Record.property")
-//                                        .function(new If<>()
-//                                                .predicate(0, new Not<>(new CollectionContains("admin")))
-//                                                .then(1, new SetValue("redacted")))
-//                                        .projection("User.roles", "Record.property")
-//                        )
-//                );
-//
-//        final CompletableFuture<Boolean> policyStatus = services.getPolicyService().setResourcePolicy(
-//                koryphePolicies
-//        );
-//        // Wait for the users and policies to be loaded
-//        CompletableFuture.allOf(userAliceStatus, userBobStatus, policyStatus).join();
-//        LOGGER.info("The example users and data access policies have been initialised.");
-    }
-
-    private static ParentResource getParent(final String fileURL) {
-        URI normalised = ExampleFileUtil.convertToFileURI(fileURL);
-        //this should only be applied to URLs that start with 'file://' not other types of URL
-        if (normalised.getScheme().equals(FileSystems.getDefault().provider().getScheme())) {
-            Path current = Paths.get(normalised);
-            Path parent = current.getParent();
-            //no parent can be found, must already be a directory tree root
-            if (isNull(parent)) {
-                throw new IllegalArgumentException(fileURL + " is already a directory tree root");
-            } else if (isDirectoryRoot(parent)) {
-                //else if this is a directory tree root
-                return new SystemResource().id(parent.toUri().toString());
-            } else {
-                //else recurse up a level
-                return new DirectoryResource().id(parent.toUri().toString()).parent(getParent(parent.toUri().toString()));
-            }
-        } else {
-            //if this is another scheme then there is no definable parent
-            return new SystemResource().id("");
-        }
-    }
-
-    /**
-     * Tests if the given {@link Path} represents a root of the default local file system.
-     *
-     * @param path the path to test
-     * @return true if {@code parent} is a root
-     */
-    private static boolean isDirectoryRoot(final Path path) {
-        return StreamSupport
-                .stream(FileSystems.getDefault()
-                        .getRootDirectories()
-                        .spliterator(), false)
-                .anyMatch(path::equals);
     }
 }

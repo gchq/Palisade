@@ -46,7 +46,6 @@ import static java.util.Objects.requireNonNull;
 public class Context {
 
     private static final String PURPOSE = "purpose";
-    public static final String NAMESPACE = "Context";
     private Map<String, Object> contents;
 
     public Context() {

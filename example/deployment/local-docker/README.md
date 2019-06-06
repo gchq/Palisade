@@ -50,7 +50,7 @@ To run the example locally in docker containers follow these steps (from the roo
     ```bash
       ./example/deployment/local-docker/bash-scripts/runFormattedLocalDockerExample.sh
     ```  
-    This runs the java class: `uk.gov.gchq.palisade.example.RestExample`.
+    This runs the java class: `uk.gov.gchq.palisade.example.runner.RestExample`.
     
 4. Stop the REST services:
 
