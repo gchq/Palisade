@@ -34,7 +34,9 @@
             <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %c{3} %p %x - %m%n" />
         </layout>
     </appender>
-
+    <logger name="org.reflections.Reflections">
+        <level value="ERROR"/>
+    </logger>
     <root>
         <appender-ref ref="CONSOLE_LOG" />
         <appender-ref ref="FILE_LOG" />

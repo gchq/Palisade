@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.service.redirect;
+package uk.gov.gchq.palisade.redirect.service;
 
-import uk.gov.gchq.palisade.redirect.service.redirect.impl.RESTRedirector;
+import uk.gov.gchq.palisade.redirect.service.impl.RESTRedirector;
 import uk.gov.gchq.palisade.rest.SystemProperty;
 
 /**

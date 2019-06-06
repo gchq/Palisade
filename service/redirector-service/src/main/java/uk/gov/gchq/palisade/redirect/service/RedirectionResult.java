@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.service.redirect.exception;
+package uk.gov.gchq.palisade.redirect.service;
 
 /**
- * An exception thrown by redirectors when no redirection can occur for some reason. The standard {@link Throwable} only
- * and no-arg constructor have been deleted since a message MUST be supplied.
+ * The result of a redirection request for an API call to a Palisade service. Instances of implementing classes are generated
+ * by a {@link RedirectionMarshall} and are not intended to be created by client code.
+ *
+ * @param <T> the type of redirection, typically a host/port pair or a URL for example
  */
-public class RedirectionFailedException extends RuntimeException {
-    public RedirectionFailedException(final String e) {
-        super(e);
-    }
-
-    public RedirectionFailedException(final String e, final Throwable cause) {
-        super(e, cause);
-    }
+public interface RedirectionResult<T> {
+    /**
+     * Get the result of the redirection request.
+     *
+     * @return the result object
+     */
+    T get();
 }
