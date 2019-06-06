@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.service.redirect;
+package uk.gov.gchq.palisade.redirect.service;
 
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import uk.gov.gchq.palisade.redirect.service.redirect.result.StringRedirectResult;
+import uk.gov.gchq.palisade.redirect.service.result.StringRedirectResult;
 import uk.gov.gchq.palisade.service.Service;
 
 import static org.junit.Assert.*;

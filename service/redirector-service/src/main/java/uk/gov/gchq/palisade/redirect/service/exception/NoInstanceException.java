@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.service.redirect;
+package uk.gov.gchq.palisade.redirect.service.exception;
 
 /**
- * The result of a redirection request for an API call to a Palisade service. Instances of implementing classes are generated
- * by a {@link RedirectionMarshall} and are not intended to be created by client code.
- *
- * @param <T> the type of redirection, typically a host/port pair or a URL for example
+ * An exception thrown by redirectors when no suitable instance of a {@link uk.gov.gchq.palisade.service.Service} could be found.
  */
-public interface RedirectionResult<T> {
-    /**
-     * Get the result of the redirection request.
-     *
-     * @return the result object
-     */
-    T get();
+public class NoInstanceException extends RuntimeException {
+    public NoInstanceException(final String e) {
+        super(e);
+    }
+
+    public NoInstanceException(final Throwable cause) {
+        super(cause);
+    }
+
+    public NoInstanceException(final String e, final Throwable cause) {
+        super(e, cause);
+    }
 }

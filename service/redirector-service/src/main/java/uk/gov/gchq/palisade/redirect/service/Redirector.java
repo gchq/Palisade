@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.redirect.service.redirect;
+package uk.gov.gchq.palisade.redirect.service;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import uk.gov.gchq.palisade.redirect.service.redirect.exception.NoInstanceException;
-import uk.gov.gchq.palisade.redirect.service.redirect.exception.RedirectionFailedException;
+import uk.gov.gchq.palisade.redirect.service.exception.NoInstanceException;
+import uk.gov.gchq.palisade.redirect.service.exception.RedirectionFailedException;
 
 import java.lang.reflect.Method;
 
