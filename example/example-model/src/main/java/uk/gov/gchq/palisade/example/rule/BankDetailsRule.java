@@ -49,27 +49,15 @@ public class BankDetailsRule implements Rule<Employee> {
         Set<String> roles = user.getRoles();
         String purpose = context.getPurpose();
 
-        System.out.println("class type");
-        System.out.println(user.getClass());
-
-
-        try {
-
-            if (user.getClass() == ExampleUser.class) {
-                ExampleUser exampleUser = (ExampleUser) user;
-                if (roles.contains(Role.PAYROLL.name()) && purpose.equals(Purpose.SALARY.name())) {
-                    return record;
-                }
-                EnumSet<TrainingCourse> trainingCompleted = exampleUser.getTrainingCompleted();
-                if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
-                    return record;
-                }
+        if (user instanceof ExampleUser) {
+            ExampleUser exampleUser = (ExampleUser) user;
+            if (roles.contains(Role.PAYROLL.name()) && purpose.equals(Purpose.SALARY.name())) {
+                return record;
             }
-        } catch (Exception e) {
-
-            System.out.println(e);
-            System.out.println(e.getStackTrace());
-            throw e;
+            EnumSet<TrainingCourse> trainingCompleted = exampleUser.getTrainingCompleted();
+            if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
+                return record;
+            }
         }
         return redactRecord(record);
     }

@@ -29,10 +29,12 @@ import static java.util.Objects.requireNonNull;
 public class ExampleUser extends User {
 
 
-    EnumSet<TrainingCourse> trainingCourses = EnumSet.noneOf(TrainingCourse.class);
+    private EnumSet<TrainingCourse> trainingCourses = EnumSet.noneOf(TrainingCourse.class);
 
     public ExampleUser(final User user) {
         setUserId(user.getUserId());
+        setAuths(user.getAuths());
+        setRoles(user.getRoles());
     }
 
     public ExampleUser() {

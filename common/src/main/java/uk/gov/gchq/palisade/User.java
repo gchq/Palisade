@@ -112,7 +112,7 @@ public class User implements Cloneable {
      */
     public User auths(final String... auths) {
         requireNonNull(auths, "Cannot add null auths.");
-        this.auths = new HashSet<>();
+        this.auths.clear();
         Collections.addAll(this.auths, auths);
         return this;
     }
@@ -156,11 +156,16 @@ public class User implements Cloneable {
      */
     public User roles(final String... roles) {
         requireNonNull(roles, "Cannot add null roles.");
-        this.roles = new HashSet<>();
+        this.roles.clear();
         Collections.addAll(this.roles, roles);
         return this;
     }
 
+    /**
+     * Adds the user roles.
+     *
+     * @param roles the user roles to add
+     */
     public void setRoles(final Set<String> roles) {
         roles(roles);
     }
@@ -179,9 +184,9 @@ public class User implements Cloneable {
 
 
     /**
-     * Return the user auths.
+     * Return the user roles.
      *
-     * @return the authorisations
+     * @return the roles
      */
     public Set<String> getRoles() {
         // auths cannot be null
