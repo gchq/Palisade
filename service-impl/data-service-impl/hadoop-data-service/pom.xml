@@ -72,6 +72,7 @@
             <version>${jackson.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- This only needs to be here for AWS access-->
         <!--<dependency>-->
             <!--<groupId>org.apache.hadoop</groupId>-->
             <!--<artifactId>hadoop-aws</artifactId>-->

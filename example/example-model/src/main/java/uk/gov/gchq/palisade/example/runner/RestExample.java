@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.example;
+package uk.gov.gchq.palisade.example.runner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class RestExample {
     }
 
     public void run(final String sourceFile) throws Exception {
-        final InputStream stream = StreamUtil.openStream(this.getClass(), System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
+        final InputStream stream = StreamUtil.openStream(this.getClass(), ConfigUtils.retrieveConfigurationPath());
         ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
 
         ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);

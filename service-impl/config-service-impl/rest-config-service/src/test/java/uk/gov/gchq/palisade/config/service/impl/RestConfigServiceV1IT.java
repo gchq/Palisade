@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.config.service.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.MockConfigurationService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
@@ -43,7 +44,6 @@ import java.util.concurrent.CompletionException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
 public class RestConfigServiceV1IT {
@@ -59,7 +59,7 @@ public class RestConfigServiceV1IT {
     @BeforeClass
     public static void beforeClass() throws IOException {
         //start the server
-        System.setProperty(RestConfigServiceV1.BOOTSTRAP_CONFIG, "mockBootstrapConfig.json");
+        System.setProperty(ConfigConsts.BOOTSTRAP_CONFIG, "mockBootstrapConfig.json");
         proxy = (ProxyRestConfigService) new ProxyRestConfigService("http://localhost:8085/config").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
