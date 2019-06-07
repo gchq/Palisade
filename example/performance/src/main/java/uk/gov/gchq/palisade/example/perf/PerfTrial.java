@@ -16,8 +16,6 @@
 
 package uk.gov.gchq.palisade.example.perf;
 
-import uk.gov.gchq.palisade.example.perf.trial.PalisadeTrial;
-
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
