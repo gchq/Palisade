@@ -16,28 +16,36 @@
 
 package uk.gov.gchq.palisade.example.perf.trial;
 
-import uk.gov.gchq.palisade.client.ClientUtil;
+import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
+import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.perf.PerfFileSet;
-import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.example.perf.PerfTrial;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.gchq.palisade.example.perf.PerfUtils.sink;
 
 /**
- * Test that reads the large data file from Palisade with an example policy and times entire Palisade interaction.
+ * This test performs a native file read of small file in the 1st file set. This is done without going via Palisade, but
+ * does try to deserialise the data.
  */
-public class ReadLargeWithPolicyTrial extends PalisadeTrial {
+public class ReadSmallNativeTrial extends PerfTrial {
+
     @Override
     public String name() {
-        return "read_large_with_policy";
+        return "read_small_native";
     }
 
     @Override
     public String description() {
-        return "reads the large data file with an example policy set";
+        return "performs a native read and deserialise of the small file";
     }
 
     @Override
@@ -45,12 +53,20 @@ public class ReadLargeWithPolicyTrial extends PalisadeTrial {
         requireNonNull(fileSet, "fileSet");
         requireNonNull(noPolicySet, "noPolicySet");
 
-        //find Palisade entry point
-        PalisadeService palisade = ClientUtil.getPalisadeClientEntryPoint();
+        //create the serialiser
+        Serialiser<Employee> serialiser = new AvroSerialiser<>(Employee.class);
 
-        //setup a request and read data
-        try (Stream<Employee> data = getDataStream(palisade, fileSet.getLargeFile().toString())) {
-            sink(data);
+        //get file URI
+        Path fileToRead = Paths.get(fileSet.getSmallFile());
+        //read from file
+        try (InputStream bis = Files.newInputStream(fileToRead);
+             Stream<Employee> dataStream = serialiser.deserialise(bis)) {
+
+            //now read everything in the file
+            sink(dataStream);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

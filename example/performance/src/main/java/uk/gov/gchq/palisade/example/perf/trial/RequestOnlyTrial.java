@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example.perf.trial;
 
+import uk.gov.gchq.palisade.client.ClientUtil;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.perf.PerfFileSet;
 
@@ -60,7 +61,7 @@ public class RequestOnlyTrial extends PalisadeTrial {
         requireNonNull(fileSet, "fileSet");
         requireNonNull(noPolicySet, "noPolicySet");
         for (int i = 0; i < requests; i++) {
-            try (Stream<Employee> data = getDataStream(getPalisadeClientServices(), fileSet.getSmallFile().toString())) {
+            try (Stream<Employee> data = getDataStream(ClientUtil.getPalisadeClientEntryPoint(), fileSet.getSmallFile().toString())) {
                 //do nothing
             }
         }

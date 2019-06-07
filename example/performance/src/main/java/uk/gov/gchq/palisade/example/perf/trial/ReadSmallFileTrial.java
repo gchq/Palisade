@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.example.perf.trial;
 
+import uk.gov.gchq.palisade.client.ClientUtil;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.perf.PerfFileSet;
 import uk.gov.gchq.palisade.service.PalisadeService;
@@ -65,7 +66,7 @@ public class ReadSmallFileTrial extends PalisadeTrial {
         //make multiple requests
         for (int i = 0; i < requests; i++) {
             //find Palisade entry point
-            PalisadeService palisade = getPalisadeClientServices();
+            PalisadeService palisade = ClientUtil.getPalisadeClientEntryPoint();
 
             //setup a request and read data
             try (Stream<Employee> data = getDataStream(palisade, fileSet.getSmallFile().toString())) {
