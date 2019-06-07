@@ -96,9 +96,12 @@ public class SimpleUserService implements UserService {
     public CompletableFuture<User> getUser(final GetUserRequest request) {
         Objects.requireNonNull(request);
         User user = null;
-        Optional<User> cachedUser = (Optional<User>) getCacheService().get(new GetCacheRequest<User>()
+
+        GetCacheRequest<User> temp = new GetCacheRequest<User>()
                 .service(this.getClass())
-                .key(request.getUserId().getId())).join();
+                .key(request.getUserId().getId());
+
+        Optional<User> cachedUser = (Optional<User>) getCacheService().get(temp).join();
 
         if (cachedUser.isPresent()) {
             user = cachedUser.get();
