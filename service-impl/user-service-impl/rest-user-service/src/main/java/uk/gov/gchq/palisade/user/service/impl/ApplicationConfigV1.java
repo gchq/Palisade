@@ -29,7 +29,13 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
     public ApplicationConfigV1() {
         super(RESOURCES);
         //make sure we can inject the service instance
-        UserService delegate = RestUserServiceV1.createService(System.getenv(ConfigUtils.CONFIG_SERVICE_PATH));
+        String path;
+        try {
+            path = ConfigUtils.retrieveConfigurationPath();
+        } catch (IllegalStateException e) {
+            path = null;
+        }
+        UserService delegate = RestUserServiceV1.createService(path);
         register(new ServiceBinder(delegate, UserService.class));
     }
 }

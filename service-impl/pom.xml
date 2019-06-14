@@ -34,6 +34,7 @@
         <module>cache-service-impl</module>
         <module>palisade-service-impl</module>
         <module>config-service-impl</module>
+        <module>redirector-service-impl</module>
     </modules>
 
 </project>

@@ -26,6 +26,18 @@ public final class ConfigConsts {
     }
 
     /**
+     * The environment variable name which should contain the path of the JSON file used to instantiate
+     * a {@link ConfigurationService} proxy.
+     */
+    public static final String CONFIG_SERVICE_PATH = "PALISADE_REST_CONFIG_PATH";
+
+    /**
+     * The environment variable name which should contain the path of the JSON file used to bootstrap the configuration
+     * service. This should contain details on how to connect to the cache service.
+     */
+    public static final String BOOTSTRAP_CONFIG = "PALISADE_REST_BOOTSTRAP_PATH";
+
+    /**
      * The delay between sending requests to the configuration service. In milliseconds.
      */
     public static final long DELAY = 500;

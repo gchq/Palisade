@@ -87,7 +87,7 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(20, 39)
+        return new HashCodeBuilder(19, 39)
                 .appendSuper(super.hashCode())
                 .append(exception)
                 .append(requestId)
