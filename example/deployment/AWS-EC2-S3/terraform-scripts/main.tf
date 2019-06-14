@@ -1,4 +1,4 @@
-resource "aws_instance" "palisade-instance" {
+resource "aws_instance" "palisade_instance" {
   ami             = "${data.aws_ami.amazon_linux.id}"
   instance_type   = "${var.instance_type}"
   key_name        = "${var.key_name}"
