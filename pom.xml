@@ -91,9 +91,7 @@
         <skip.surefire.tests>false</skip.surefire.tests>
         <skip.failsafe.tests>false</skip.failsafe.tests>
         <checkstyle.phase>test</checkstyle.phase>
-        <spotbugs.phase>test</spotbugs.phase>
         <checkstyle.plugin.version>3.0.0</checkstyle.plugin.version>
-        <spotbugs.plugin.version>3.1.10</spotbugs.plugin.version>
         <jcip.annotations.version>1.0-1</jcip.annotations.version>
         <testcontainers.version>1.10.5</testcontainers.version>
         <surefireArgLine/>
@@ -160,12 +158,6 @@
             <version>${jcip.annotations.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-annotations</artifactId>
-            <version>${spotbugs.plugin.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
@@ -187,7 +179,6 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -197,7 +188,6 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>test</checkstyle.phase>
-                <spotbugs.phase>test</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -206,7 +196,6 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>false</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -215,7 +204,6 @@
                 <skip.surefire.tests>false</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -225,7 +213,6 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
 
@@ -343,50 +330,6 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${spotbugs.plugin.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs</artifactId>
-                        <version>${spotbugs.plugin.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-
-                    <effort>default</effort>
-                    <threshold>Low</threshold>
-                    <xmlOutput>true</xmlOutput>
-                    <xmlOutputDirectory>
-                        ${project.build.directory}/spotbugs
-                    </xmlOutputDirectory>
-                    <excludeFilterFile>
-                        code-style/spotbugs-exclude.xml
-                    </excludeFilterFile>
-                    <onlyAnalyze>uk.gov.gchq.palisade.*</onlyAnalyze>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>analyze-compile</id>
-                        <phase>${spotbugs.phase}</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <effort>default</effort>
-                            <threshold>Low</threshold>
-                            <xmlOutput>true</xmlOutput>
-                            <xmlOutputDirectory>
-                                ${project.build.directory}/spotbugs
-                            </xmlOutputDirectory>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
