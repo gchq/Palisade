@@ -16,25 +16,65 @@
 
 package uk.gov.gchq.palisade.example.perf;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Abstract superclass for all performance trials.
  */
-public interface PerfTrial extends BiConsumer<PerfFileSet, PerfFileSet> {
+public abstract class PerfTrial implements BiConsumer<PerfFileSet, PerfFileSet> {
+    /**
+     * Normal trial name.
+     */
+    protected Optional<String> normal = Optional.empty();
+
     /**
      * Returns the name for this performance test.
      *
      * @return test name
      */
-    String name();
+    public abstract String name();
 
     /**
      * Provides a one line description of this performance test.
      *
      * @return the usage line
      */
-    String description();
+    public abstract String description();
+
+    /**
+     * Provide a trial instance to normalise performance times to.
+     *
+     * @return trial instance name to normalise to
+     */
+    public Optional<String> getNameForNormalisation() {
+        return normal;
+    }
+
+    /**
+     * Sets the name of the performance trial that this one should have times normalised against when reporting times.
+     *
+     * @param normalTrialName the trial name to normalise against
+     * @return this object
+     */
+    PerfTrial setNameForNormalisation(final Optional<String> normalTrialName) {
+        requireNonNull(normalTrialName, "normalTrialName");
+        this.normal = normalTrialName;
+        return this;
+    }
+
+    /**
+     * Sets the performance trial that this one should have times normalised against when reporting times.
+     *
+     * @param trial the trial to normalise against
+     * @return this object
+     */
+    public PerfTrial setNameForNormalisation(final PerfTrial trial) {
+        requireNonNull(trial, "trial");
+        return this.setNameForNormalisation(Optional.of(trial.name()));
+    }
 
     /**
      * Perform any setup functionality that is needed before each trial.
@@ -42,7 +82,7 @@ public interface PerfTrial extends BiConsumer<PerfFileSet, PerfFileSet> {
      * @param fileSet     the file set of small and large data files
      * @param noPolicySet the file set of files with no policy set
      */
-    default void setup(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
+    public void setup(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
     }
 
     /**
@@ -51,6 +91,6 @@ public interface PerfTrial extends BiConsumer<PerfFileSet, PerfFileSet> {
      * @param fileSet     the file set of small and large data files
      * @param noPolicySet the file set of files with no policy set
      */
-    default void tearDown(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
+    public void tearDown(final PerfFileSet fileSet, final PerfFileSet noPolicySet) {
     }
 }

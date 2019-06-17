@@ -24,7 +24,7 @@ import java.util.Objects;
 /**
  * Print the usage information for this application.
  */
-public class UsageAction extends PerfAction {
+public class UsageAction implements PerfAction {
 
     @Override
     public String name() {
