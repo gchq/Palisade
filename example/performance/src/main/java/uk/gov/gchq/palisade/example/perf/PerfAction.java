@@ -21,26 +21,26 @@ import java.util.function.Function;
  * Abstract class for performance tool actions. The {@link Function#apply(Object)} method should be overridden
  * to perform some action for the performance tool.
  */
-public abstract class PerfAction implements Function<String[], Integer> {
+public interface PerfAction extends Function<String[], Integer> {
 
     /**
      * Returns the name for this action
      *
      * @return action name
      */
-    public abstract String name();
+    String name();
 
     /**
      * Provides a one line description of this action to be used in program usage information.
      *
      * @return the usage line
      */
-    public abstract String description();
+    String description();
 
     /**
      * Print detailed help for this action.
      *
      * @return detailed help string
      */
-    public abstract String help();
+    String help();
 }

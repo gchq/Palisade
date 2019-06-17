@@ -44,7 +44,7 @@ import static uk.gov.gchq.palisade.example.perf.PerfUtils.toURI;
  * Uses an existing deployment of Palisade to set policies on the given files. The policy from the example
  * deployment is used.
  */
-public class SetPolicyAction extends PerfAction {
+public class SetPolicyAction implements PerfAction {
     @Override
     public String name() {
         return "policy";
