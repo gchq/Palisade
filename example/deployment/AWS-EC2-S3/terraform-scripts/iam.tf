@@ -20,8 +20,8 @@ EOF
 
 resource "aws_iam_instance_profile" "palisade_instance_profile" {
     name = "palisade_instance_profile"
-    roles = ["palisade_iam_role"]
-}
+    role = "palisade_iam_role"
+    }
 
 resource "aws_iam_role_policy" "palisade_iam_role_policy" {
   name = "palisade_iam_role_policy"

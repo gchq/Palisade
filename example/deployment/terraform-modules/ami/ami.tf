@@ -1,4 +1,4 @@
-data "aws_ami" "amazon_linux" {
+data "aws_ami" "amazon_linux-2" {
   most_recent = true
 
   owners = ["amazon"]
@@ -7,7 +7,7 @@ data "aws_ami" "amazon_linux" {
     name = "name"
 
     values = [
-      "amzn-ami-hvm-*-x86_64-gp2",
+      "amzn2-ami-hvm-*-x86_64-gp2",
     ]
   }
 
@@ -18,4 +18,9 @@ data "aws_ami" "amazon_linux" {
       "amazon",
     ]
   }
+}
+
+
+output "ami_id" {
+  value = "${data.aws_ami.amazon_linux-2.id}"
 }
