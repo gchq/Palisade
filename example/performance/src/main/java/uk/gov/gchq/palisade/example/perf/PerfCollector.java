@@ -115,7 +115,7 @@ public class PerfCollector {
         header.append("%n");
         rows.append("%n");
 
-        print.printf(header.toString(), COL_HDRS);
+        print.printf(header.toString(), (Object[]) COL_HDRS);
 
         Map<String, PerfStats> results = new HashMap<>();
 
