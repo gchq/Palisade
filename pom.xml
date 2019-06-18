@@ -54,6 +54,8 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <jar.plugin.version>3.1.1</jar.plugin.version>
         <compiler.plugin.version>3.8.0</compiler.plugin.version>
+        <!-- TODO: remove errorprone.javac.version property once JDK9+ migration complete -->
+        <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <slf4j.simple.version>1.7.25</slf4j.simple.version>
@@ -94,6 +96,7 @@
         <checkstyle.plugin.version>3.0.0</checkstyle.plugin.version>
         <jcip.annotations.version>1.0-1</jcip.annotations.version>
         <testcontainers.version>1.10.5</testcontainers.version>
+        <error.prone.version>2.3.3</error.prone.version>
         <surefireArgLine/>
         <failsafeArgLine/>
         <exclude.tests/>
@@ -220,6 +223,7 @@
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -227,9 +231,27 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <compilerArgument>-Xlint:deprecation</compilerArgument>
+                    <compilerArgs combine.children="append">
+                        <arg>-Xlint:deprecation</arg>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>-Xplugin:ErrorProne</arg>
+                        <!-- TODO: remove next arg once JDK9+ migration complete -->
+                        <arg>
+                            -J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${errorprone.javac.version}/javac-${errorprone.javac.version}.jar
+                        </arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${error.prone.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <fork>true</fork>
                 </configuration>
             </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
