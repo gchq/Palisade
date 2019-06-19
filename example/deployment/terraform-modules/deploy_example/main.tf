@@ -6,10 +6,11 @@ resource "null_resource" "deploy_example" {
     update = 2
   }
 
-  stuff2 = "${var.stuff}"
+  #stuff2 = "${var.stuff}"
 
   connection {
-    type        = "ssh"
+    #type        = "ssh"
+    type = "${var.stuff}"
     host = "${aws_instance.palisade_instance.public_dns}"
     user        = "ec2-user"
     private_key = "${file("${var.key_file}")}"
@@ -24,7 +25,6 @@ resource "null_resource" "deploy_example" {
       source      = "${var.key_file}"
       destination = "/home/ec2-user/.ssh/${basename(var.key_file)}"
   }
-
   provisioner "remote-exec" {
     inline = [
       "chmod 600 /home/ec2-user/.ssh/${basename(var.key_file)}",
@@ -62,6 +62,8 @@ resource "null_resource" "deploy_example" {
     inline = [
       "/home/ec2-user/deploy_example/startETCD.sh > /home/ec2-user/example_logs/startETCD.log 2>&1",
     ]
+    #depends_on  = ["null_resource.install_docker"]
+    #depends_on = ["aws_eip.opendj-source-ami-eip"]
   }
 
 #  # Run buildServices locally

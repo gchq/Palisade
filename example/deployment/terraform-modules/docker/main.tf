@@ -4,7 +4,8 @@ resource "null_resource" "install_docker" {
     type        = "ssh"
     host = "${var.host_name}"
     user        = "ec2-user"
-    private_key = "${var.key_file}"
+    #private_key = "${var.key_file}"
+    private_key = "${file("${var.key_file}")}"
     agent       = false
     timeout     = "30s"
   }

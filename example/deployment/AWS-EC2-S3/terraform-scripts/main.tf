@@ -6,14 +6,15 @@ module "ami" {
 module "docker" {
   source = "../../terraform-modules/docker"
   host_name = "${aws_instance.palisade_instance.public_dns}"
-  key_file = "${file("${var.pem_file}")}"
+  key_file = "${var.pem_file}"
 }
 
 module "deploy_example" {
   source = "../../terraform-modules/deploy_example"
-  stuff = "${module.docker.dummy_value}"
-  stuff2 = "${module.docker.dummy_value}"
-  key_file = "${file("${var.pem_file}")}"
+  #stuff = "${module.docker.dummy_value}"
+  #stuff2 = "${module.docker.dummy_value}"
+  #key_file = "${file("${var.pem_file}")}"
+  key_file = "${var.pem_file}"
 }
 
 resource "aws_instance" "palisade_instance" {
