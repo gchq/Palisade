@@ -26,7 +26,7 @@ import static java.util.Objects.isNull;
 /**
  * Runs the detailed help for an action
  */
-public class HelpAction extends PerfAction {
+public class HelpAction implements PerfAction {
 
     @Override
     public String name() {

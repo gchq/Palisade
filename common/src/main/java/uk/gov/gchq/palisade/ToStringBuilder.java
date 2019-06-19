@@ -16,7 +16,6 @@
 
 package uk.gov.gchq.palisade;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import uk.gov.gchq.palisade.util.DebugUtil;
@@ -29,8 +28,6 @@ import uk.gov.gchq.palisade.util.DebugUtil;
 public class ToStringBuilder extends org.apache.commons.lang3.builder.ToStringBuilder {
     public static final ToStringStyle SHORT_STYLE = new PalisadeShortStyle();
     public static final ToStringStyle FULL_STYLE = new PalisadeFullStyle();
-
-    @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
 
     public ToStringBuilder(final Object object) {
         super(object, getPalisadeToStringStyle());
