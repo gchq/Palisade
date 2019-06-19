@@ -8,7 +8,7 @@ container_result=0
 multi_jvm_result=0
 
 if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
-    echo "Building Palisade code: mvn install -q -B -V -Perror-prone"
+    echo "Building Palisade code: mvn install -q -B -V -P error-prone"
     mvn install -q -B -V
     ./example/deployment/local-jvm/bash-scripts/buildServices.sh
 
