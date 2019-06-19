@@ -6,8 +6,9 @@ set -e
 
 container_result=0
 multi_jvm_result=0
+multi_jvm_cat_client_result=0
 
-if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
+if [[ "$TRAVIS_PULL_REQUEST" != 'false' ]]; then
     echo "Building Palisade code: mvn install -q -B -V"
     mvn install -q -B -V
     ./example/deployment/local-jvm/bash-scripts/buildServices.sh
