@@ -20,8 +20,10 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import static java.util.Objects.nonNull;
@@ -46,7 +48,6 @@ public class PerfCollector {
      */
     public static class PerfStats {
         public double numTrials, min, max, mean, stdDev, pc25, pc50, pc75, pc99, norm;
-
     }
 
     /**
@@ -88,21 +89,23 @@ public class PerfCollector {
     /**
      * Writes a table of summary statistics to the given {@link java.io.OutputStream}. The output stream
      * will not be closed when this method finishes. There will be a normalisation column, this will show the performance
-     * of each test relative to the mean of a specific one. This can be named in the {@code nameToNormalise} parameter.
-     * For example, if one test had a 2 second mean and the normalised test had a 1 second mean, then the normalised performance
+     * of each test relative to the mean of a specific test. The map given details the names of which trials should have
+     * their times normalised against which others.
+     * For example, if one test had a 2 second mean its the normalised test had a 1 second mean, then the normalised performance
      * will be 2.
      *
-     * @param out             where to write output
-     * @param nameToNormalise the name of the test to normalise to, may be {@code null}
+     * @param normalMap the map of which test names to normalise against which others
+     * @param out       where to write output
      */
-    public void outputTo(final OutputStream out, final String nameToNormalise) {
+    public void outputTo(final OutputStream out, final Map<String, Optional<String>> normalMap) {
         requireNonNull(out, "out");
+        requireNonNull(normalMap, "normalMap");
         PrintStream print = new PrintStream(out);
 
         print.println("All times in seconds.\n");
         //build format strings
-        StringBuilder header = new StringBuilder("%-20s");
-        StringBuilder rows = new StringBuilder("%-20s");
+        StringBuilder header = new StringBuilder("%-30s");
+        StringBuilder rows = new StringBuilder("%-30s");
         Arrays.stream(COL_HDRS)
                 .skip(1) //skip "test" column
                 .forEach(ignore -> {
@@ -112,25 +115,38 @@ public class PerfCollector {
         header.append("%n");
         rows.append("%n");
 
-        print.printf(header.toString(), COL_HDRS);
+        print.printf(header.toString(), (Object[]) COL_HDRS);
 
-        PerfStats normal = null;
-        //do we have anything to normalise to?
-        if (nonNull(nameToNormalise) && times.containsKey(nameToNormalise)) {
-            normal = computePerfStats(times.get(nameToNormalise));
-        }
+        Map<String, PerfStats> results = new HashMap<>();
 
         //now for each test, compute statistics and output
         for (Map.Entry<String, List<Long>> entry : times.entrySet()) {
             PerfStats pfs = computePerfStats(entry.getValue());
+            results.put(entry.getKey(), pfs);
+        }
 
-            //check normalisation
-            if (nonNull(normal)) {
-                //compute mean performance difference
-                pfs.norm = pfs.mean / normal.mean;
+        //now do normalisation
+        for (Map.Entry<String, PerfStats> entry : results.entrySet()) {
+            //do we have an entry for this test?
+            if (normalMap.containsKey(entry.getKey())) {
+                //get the test name we should normalise against
+                Optional<String> normalTest = normalMap.get(entry.getKey());
+                normalTest.ifPresent(normalTestName -> {
+                            //get the perf stats for this test and the normalised one
+                            PerfStats trial = entry.getValue();
+                            PerfStats normalTrial = results.get(normalTestName);
+                            //if both non null then compute normalisation
+                            if (nonNull(trial) && nonNull(normalTrial)) {
+                                trial.norm = trial.mean / normalTrial.mean;
+                            }
+                        }
+                );
             }
+        }
 
-            //send to output
+        //send to output
+        for (Map.Entry<String, PerfStats> entry : results.entrySet()) {
+            PerfStats pfs = entry.getValue();
             print.printf(rows.toString(), entry.getKey(), pfs.numTrials, pfs.min, pfs.max, pfs.mean,
                     pfs.stdDev, pfs.pc25, pfs.pc50, pfs.pc75, pfs.pc99, pfs.norm);
         }

@@ -33,19 +33,19 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.gchq.palisade.example.perf.PerfUtils.sink;
 
 /**
- * This test performs a native file read of large file in the 1st file set. This is done without going via Palisade, but
+ * This test performs a native file read of small file in the 1st file set. This is done without going via Palisade, but
  * does try to deserialise the data.
  */
-public class ReadLargeNativeTrial extends PerfTrial {
+public class ReadSmallNativeTrial extends PerfTrial {
 
     @Override
     public String name() {
-        return "read_large_native";
+        return "read_small_native";
     }
 
     @Override
     public String description() {
-        return "performs a native read and deserialise of the large file";
+        return "performs a native read and deserialise of the small file";
     }
 
     @Override
@@ -57,7 +57,7 @@ public class ReadLargeNativeTrial extends PerfTrial {
         Serialiser<Employee> serialiser = new AvroSerialiser<>(Employee.class);
 
         //get file URI
-        Path fileToRead = Paths.get(fileSet.getLargeFile());
+        Path fileToRead = Paths.get(fileSet.getSmallFile());
         //read from file
         try (InputStream bis = Files.newInputStream(fileToRead);
              Stream<Employee> dataStream = serialiser.deserialise(bis)) {

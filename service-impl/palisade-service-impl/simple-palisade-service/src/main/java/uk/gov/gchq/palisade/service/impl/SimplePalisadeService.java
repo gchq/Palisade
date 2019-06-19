@@ -238,7 +238,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         config.setOriginalRequestId(originalRequestId);
         return CompletableFuture.allOf(futureUser, futureResources)
                 .thenApply(t -> getPolicy(request, futureUser, futureResources, originalRequestId))
-                .thenApply(multiPolicy -> ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
+                .thenApply(multiPolicy -> PalisadeService.ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
                 .thenAccept(multiPolicy -> {
                     auditProcessingStarted(request, futureUser.join(), multiPolicy, originalRequestId);
                     cache(request, futureUser.join(), requestId, multiPolicy, futureResources.join().size(), originalRequestId);

@@ -35,7 +35,7 @@ import java.util.concurrent.Future;
 /**
  * Creates the files needed by other parts of the performance testing application.
  */
-public class CreateAction extends PerfAction {
+public class CreateAction implements PerfAction {
 
     @Override
     public String name() {

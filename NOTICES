@@ -121,11 +121,6 @@ SLF4J (org.slf4j:slf4j-api:1.7.25, org.slf4j:slf4j-log4j12:1.7.25)
 - MIT License
 
 
-SpotBugs (com.github.spotbugs:spotbugs-maven-plugin:3.1.10):
-
-- GNU Lesser General Public License
-
-
 Checkstyle (org.apache.maven.plugins:maven-checkstyle-plugin:3.0.0):
 
 - GNU Lesser General Public License
