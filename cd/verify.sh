@@ -9,7 +9,7 @@ multi_jvm_result=0
 
 if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Building Palisade code: mvn install -q -B -V -P error-prone"
-    mvn install -q -B -V
+    mvn install -q -B -V -P error-prone
     ./example/deployment/local-jvm/bash-scripts/buildServices.sh
 
     echo "Starting the local-docker-example containers"
