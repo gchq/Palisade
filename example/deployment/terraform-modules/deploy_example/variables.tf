@@ -1,5 +1,2 @@
 variable "key_file" {}
-variable "stuff" {
-  default = "ssh"
-}
-#variable "stuff2" {}
+variable "host_name" {}

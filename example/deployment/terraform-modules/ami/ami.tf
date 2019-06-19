@@ -20,7 +20,6 @@ data "aws_ami" "amazon_linux-2" {
   }
 }
 
-
 output "ami_id" {
   value = "${data.aws_ami.amazon_linux-2.id}"
 }

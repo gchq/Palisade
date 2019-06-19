@@ -6,19 +6,24 @@ resource "null_resource" "deploy_example" {
     update = 2
   }
 
-  #stuff2 = "${var.stuff}"
-
   connection {
-    #type        = "ssh"
-    type = "${var.stuff}"
-    host = "${aws_instance.palisade_instance.public_dns}"
+    type        = "ssh"
+    host = "${var.host_name}"
     user        = "ec2-user"
     private_key = "${file("${var.key_file}")}"
     agent       = false
     timeout     = "30s"
   }
 
-
+  # install and start docker
+  provisioner "remote-exec" {
+    inline = [
+      "sudo yum update -y",
+      "sudo amazon-linux-extras install docker -y",
+      "sudo service docker start",
+      "sudo usermod -a -G docker ec2-user"
+    ]
+  }
 
   # Copy pem file to .ssh directory on EC2 instance.....and restrict its permissions
   provisioner "file" {
@@ -62,8 +67,6 @@ resource "null_resource" "deploy_example" {
     inline = [
       "/home/ec2-user/deploy_example/startETCD.sh > /home/ec2-user/example_logs/startETCD.log 2>&1",
     ]
-    #depends_on  = ["null_resource.install_docker"]
-    #depends_on = ["aws_eip.opendj-source-ami-eip"]
   }
 
 #  # Run buildServices locally
