@@ -8,9 +8,9 @@ container_result=0
 multi_jvm_result=0
 multi_jvm_cat_client_result=0
 
-if [[ "$TRAVIS_PULL_REQUEST" != 'false' ]]; then
-    echo "Building Palisade code: mvn install -q -B -V"
-    mvn install -q -B -V
+if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
+    echo "Building Palisade code: mvn install -q -B -V -P error-prone"
+    mvn install -q -B -V -P error-prone
     ./example/deployment/local-jvm/bash-scripts/buildServices.sh
     export PALISADE_REST_CONFIG_PATH="$(pwd)/example/example-model/src/main/resources/configRest.json"
 
