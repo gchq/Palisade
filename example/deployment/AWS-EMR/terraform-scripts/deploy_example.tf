@@ -3,7 +3,7 @@ resource "null_resource" "deploy_example" {
 # NOTE: the current directory when running this will be example/deployment/AWS-EMR/terraform-scripts ***********
 
   triggers = {
-    update = 2
+    update = 1
   }
 
   connection {
@@ -23,7 +23,7 @@ resource "null_resource" "deploy_example" {
 
   provisioner "remote-exec" {
     inline = [
-      "chmod 400 /home/hadoop/.ssh/${basename(var.pem_file)}",
+      "chmod 600 /home/hadoop/.ssh/${basename(var.pem_file)}",
     ]
   }
 

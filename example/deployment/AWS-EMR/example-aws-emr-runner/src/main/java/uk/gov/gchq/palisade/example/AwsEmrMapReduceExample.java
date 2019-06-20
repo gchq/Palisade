@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.client.ClientConfiguredServices;
 import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
@@ -43,6 +44,7 @@ import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.mapreduce.PalisadeInputFormat;
+import uk.gov.gchq.palisade.mapreduce.ReaderFailureMode;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
@@ -113,6 +115,8 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
 
         String sourceFile = args[0];
 
+
+
         //create the basic job object and configure it for this example
         Job job = Job.getInstance(getConf(), "Palisade MapReduce Example");
         job.setJarByClass(AwsEmrMapReduceExample.class);
@@ -141,6 +145,11 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         // Edit the configuration of the Palisade requests below here
         // ==========================================================
         configureJob(job, palisade, 2);
+
+        job.getConfiguration().set("mapreduce.job.user.classpath.first", "true");
+        Util.whereLoaded("com.fasterxml.jackson.databind.type.ReferenceType");
+        Util.whereLoaded("uk.gov.gchq.palisade.example.common.ExampleUser");
+        PalisadeInputFormat.setResourceErrorBehaviour(job, ReaderFailureMode.FAIL_ON_READ_FAILURE);
 
         //next add a resource request to the job
         addDataRequest(job, sourceFile, RESOURCE_TYPE, "Alice", Purpose.SALARY.name());

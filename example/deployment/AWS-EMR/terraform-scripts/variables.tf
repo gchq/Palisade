@@ -41,7 +41,7 @@ variable "cluster_name" {
 }
 
 variable "release_label" {
-  default = "emr-5.16.0"
+  default = "emr-5.24.0"
 }
 
 variable "apps_to_install" {

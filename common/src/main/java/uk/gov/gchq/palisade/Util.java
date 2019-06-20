@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.rule.Rule;
 import uk.gov.gchq.palisade.rule.Rules;
 
 import java.net.URL;
+import java.security.CodeSource;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
@@ -206,6 +207,25 @@ public final class Util {
         } catch (Exception e) {
             LOGGER.error("Call to failed to {} due to {}", address.toString(), e.getMessage());
             throw e;
+        }
+    }
+
+    public static String whereLoaded(String clazz) {
+        try {
+            Class c = Class.forName(clazz);
+            CodeSource codeSource = c.getProtectionDomain().getCodeSource();
+
+            if (codeSource != null) {
+
+                LOGGER.info("{} was loaded from {}", clazz, codeSource.getLocation());
+
+            } else {
+                LOGGER.info("I have no idea where {} came from!", clazz);
+            }
+            return (codeSource != null) ? codeSource.getLocation().toString() : "dunno";
+        } catch (Exception e) {
+            LOGGER.error("Couldn't resolve class {}", e.getMessage());
+            return e.getMessage();
         }
     }
 }

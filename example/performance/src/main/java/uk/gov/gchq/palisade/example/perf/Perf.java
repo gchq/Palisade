@@ -67,6 +67,7 @@ public final class Perf {
     }
 
     private Perf() {
+        new Exception();
     }
 
     public static void main(final String... args) throws Exception {

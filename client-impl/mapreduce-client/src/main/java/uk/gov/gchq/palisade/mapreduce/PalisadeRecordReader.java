@@ -21,6 +21,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
@@ -131,6 +132,7 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
         currentValue = null;
         errResource = null;
         processed = 0;
+        Util.whereLoaded("javax.ws.rs.core.Response$Status$Family");
     }
 
     /**
@@ -148,7 +150,8 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
             } catch (final CompletionException e) {
                 //something went wrong while fetching the next resource, what we do now depends on the user choice of how
                 //they want to handle errors, either way we need to log the error
-                LOGGER.warn("Failed to connect to resource " + errResource + " due to " + e.getCause());
+                LOGGER.warn("Failed to connect to resource {} due to {}", errResource, e.getCause());
+                LOGGER.warn("Failure exception is", e);
                 errResource = null;
                 //notify via counter
                 context.getCounter(PalisadeRecordReader.class.getSimpleName(), "Failed resources").increment(1);
