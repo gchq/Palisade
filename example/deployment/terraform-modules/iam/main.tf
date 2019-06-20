@@ -1,7 +1,7 @@
 # Create an IAM role for the EC2 Server
 resource "aws_iam_role" "palisade_iam_role" {
-    name = "palisade_iam_role"
-    assume_role_policy = <<EOF
+  name = "palisade_iam_role"
+  assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -19,9 +19,9 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "palisade_instance_profile" {
-    name = "palisade_instance_profile"
-    role = "palisade_iam_role"
-    }
+  name = "palisade_instance_profile"
+  role = "palisade_iam_role"
+}
 
 resource "aws_iam_role_policy" "palisade_iam_role_policy" {
   name = "palisade_iam_role_policy"
@@ -49,3 +49,7 @@ resource "aws_iam_role_policy" "palisade_iam_role_policy" {
 EOF
 }
 
+output "instance_profile_id" {
+  description = "The id of the aws_iam_instance_profile"
+  value = "${aws_iam_instance_profile.palisade_instance_profile.id}"
+}

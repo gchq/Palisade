@@ -2,7 +2,7 @@ data "aws_vpc" "default" {
   default = true
 }
 
-resource "security_group" "palisade_allow_inbound" {
+resource "aws_security_group" "palisade_allow_inbound" {
   name        = "palisade_allow_inbound"
   description = "Allow inbound traffic for Palisade"
   vpc_id      = "${data.aws_vpc.default.id}"
@@ -28,7 +28,7 @@ resource "security_group" "palisade_allow_inbound" {
   }
 }
 
-#output "sg_name" {
-#  description = "The name of the security group"
-#  value = aws_security_group.this.*.name
-#}
+output "sg_name" {
+  description = "The name of the security group"
+  value = "${aws_security_group.palisade_allow_inbound.name}"
+}
