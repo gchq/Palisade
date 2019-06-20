@@ -11,13 +11,11 @@
 
     <repositories>
         <repository>
-            <id>stroom</id>
-            <name>stroom repo</name>
-            <url>https://bintray.com/stroom</url>
+            <id>event-logging</id>
+            <name>stroom event-logging repo</name>
+            <url>https://dl.bintray.com/stroom/event-logging</url>
         </repository>
     </repositories>
-
-
     <artifactId>stroom-audit-service</artifactId>
 
     <dependencies>
@@ -39,3 +37,4 @@
         </dependency>
     </dependencies>
 </project>
+

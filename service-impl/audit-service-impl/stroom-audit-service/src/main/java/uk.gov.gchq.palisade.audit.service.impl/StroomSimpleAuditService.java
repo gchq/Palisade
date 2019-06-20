@@ -55,6 +55,7 @@ import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
+
 /**
  * A StroomAuditService is a simple implementation of an {@link AuditService} that simply constructs a message and logs
  * it using the Stroom EventLoggingService.
