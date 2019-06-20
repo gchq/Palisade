@@ -16,7 +16,6 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -100,7 +99,6 @@ public class RestDataServiceV1 implements DataService {
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    @SuppressFBWarnings
     public Response readChunked(@ApiParam(value = "The request") final ReadRequest request) {
         return Response.ok(new DataStreamingOutput(read(request)), MediaType.APPLICATION_OCTET_STREAM).build();
     }

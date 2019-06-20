@@ -7,4 +7,4 @@ export PALISADE_REST_CONFIG_PATH="$EXAMPLE/example-model/src/main/resources/conf
 
 java -cp "$EXAMPLESERVICES"/example-rest-redirector-service/target/example-rest-redirector-service-*-shaded.jar \
                 -Dpalisade.rest.basePath="http://localhost:8080/alter/this/path" \
-        uk.gov.gchq.palisade.redirect.Launcher
+        uk.gov.gchq.palisade.redirect.service.Launcher

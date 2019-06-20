@@ -36,7 +36,7 @@ import static uk.gov.gchq.palisade.example.perf.PerfUtils.sink;
  * This test performs a native file read of large file in the 1st file set. This is done without going via Palisade, but
  * does try to deserialise the data.
  */
-public class ReadLargeNativeTrial implements PerfTrial {
+public class ReadLargeNativeTrial extends PerfTrial {
 
     @Override
     public String name() {

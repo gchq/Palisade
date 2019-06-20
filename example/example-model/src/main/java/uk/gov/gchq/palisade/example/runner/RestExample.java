@@ -20,18 +20,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.client.ClientConfiguredServices;
-import uk.gov.gchq.palisade.config.service.ConfigUtils;
-import uk.gov.gchq.palisade.config.service.ConfigurationService;
+import uk.gov.gchq.palisade.client.ClientUtil;
 import uk.gov.gchq.palisade.example.client.ExampleSimpleClient;
 import uk.gov.gchq.palisade.example.common.ExampleUsers;
 import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
-import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.PalisadeService;
-import uk.gov.gchq.palisade.util.StreamUtil;
 
-import java.io.InputStream;
 import java.util.stream.Stream;
 
 
@@ -51,12 +46,7 @@ public class RestExample {
     }
 
     public void run(final String sourceFile) throws Exception {
-        final InputStream stream = StreamUtil.openStream(this.getClass(), ConfigUtils.retrieveConfigurationPath());
-        ConfigurationService configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-
-        ClientConfiguredServices configuredServices = new ClientConfiguredServices(configService);
-
-        PalisadeService palisade = configuredServices.getPalisadeService();
+        PalisadeService palisade = ClientUtil.getPalisadeClientEntryPoint();
 
         final ExampleSimpleClient client = new ExampleSimpleClient(palisade);
 

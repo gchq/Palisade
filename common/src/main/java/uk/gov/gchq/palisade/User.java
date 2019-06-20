@@ -16,6 +16,8 @@
 
 package uk.gov.gchq.palisade;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -38,9 +40,15 @@ import static java.util.Objects.requireNonNull;
  * The user auths are used specifically to decide what visibilities users can see.
  * </p>
  */
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "class"
+)
 public class User implements Cloneable {
 
     private UserId userId;
+
     private Set<String> roles = new HashSet<>();
     private Set<String> auths = new HashSet<>();
 
@@ -84,14 +92,21 @@ public class User implements Cloneable {
      */
     public User auths(final String... auths) {
         requireNonNull(auths, "Cannot add null auths.");
-        this.auths = new HashSet<>();
+        this.auths.clear();
         Collections.addAll(this.auths, auths);
         return this;
     }
 
+    /**
+     * Adds the user auths.
+     *
+     * @param auths the user auths to add
+     * @return this User instance.
+     */
     public User auths(final Set<String> auths) {
         requireNonNull(auths, "Cannot add null auths.");
-        this.auths = auths;
+        this.auths.clear();
+        this.auths.addAll(auths);
         return this;
     }
 
@@ -99,8 +114,12 @@ public class User implements Cloneable {
         auths(auths);
     }
 
+    /**
+     * Return the user auths.
+     *
+     * @return the authorisations
+     */
     public Set<String> getAuths() {
-        // auths cannot be null
         return auths;
     }
 
@@ -118,21 +137,38 @@ public class User implements Cloneable {
      */
     public User roles(final String... roles) {
         requireNonNull(roles, "Cannot add null roles.");
-        this.roles = new HashSet<>();
+        this.roles.clear();
         Collections.addAll(this.roles, roles);
         return this;
     }
 
+    /**
+     * Adds the user roles.
+     *
+     * @param roles the user roles to add
+     */
     public void setRoles(final Set<String> roles) {
         roles(roles);
     }
 
+    /**
+     * Adds the user roles.
+     *
+     * @param roles the user roles to add
+     * @return this User instance.
+     */
     public User roles(final Set<String> roles) {
         requireNonNull(roles, "Cannot add null roles.");
-        this.roles = roles;
+        this.roles.clear();
+        this.roles.addAll(roles);
         return this;
     }
 
+    /**
+     * Return the user roles.
+     *
+     * @return the roles
+     */
     public Set<String> getRoles() {
         // roles cannot be null
         return roles;
@@ -192,5 +228,10 @@ public class User implements Cloneable {
                 .append("roles", roles)
                 .append("auths", auths)
                 .toString();
+    }
+
+    @JsonGetter("class")
+    public String _getClass() {
+        return getClass().getName();
     }
 }
