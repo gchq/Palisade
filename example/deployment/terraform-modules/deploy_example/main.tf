@@ -15,15 +15,19 @@ resource "null_resource" "deploy_example" {
     timeout = "30s"
   }
 
-  # install and start docker
+  # install and start docker, install java
   provisioner "remote-exec" {
     inline = [
       "sudo yum update -y",
       "sudo amazon-linux-extras install docker -y",
       "sudo service docker start",
-      "sudo usermod -a -G docker ec2-user"
+      "sudo usermod -a -G docker ec2-user",
+      "sudo amazon-linux-extras install java-openjdk11 -y"
     ]
   }
+
+  #"sudo yum install java-1.8.0 -y"
+  #"sudo amazon-linux-extras install java-openjdk11 -y"
 
   # Copy pem file to .ssh directory on EC2 instance.....and restrict its permissions
   provisioner "file" {
@@ -46,10 +50,18 @@ resource "null_resource" "deploy_example" {
       "mkdir -p /home/ec2-user/example_logs",
       "mkdir -p /home/ec2-user/example_data",
       "mkdir -p /home/ec2-user/example/example-services/example-rest-config-service/target",
+      "mkdir -p /home/ec2-user/example/example-model/target",
+      "mkdir -p /home/ec2-user/example/example-model/src/main/resources",
+      "mkdir -p /home/ec2-user/example/example-services/example-rest-resource-service/target",
+      "mkdir -p /home/ec2-user/example/example-services/example-rest-user-service/target",
     ]
   }
 
   # Copy bash-scripts directories to ec2 instance......and make scripts executable
+  provisioner "file" {
+    source = "../../bash-scripts/"
+    destination = "/home/ec2-user/example/deployment/bash-scripts"
+  }
   provisioner "file" {
     source = "../bash-scripts/"
     destination = "/home/ec2-user/example/deployment/bash-scripts"
@@ -66,10 +78,8 @@ resource "null_resource" "deploy_example" {
   }
 
   # Deploy ETCD on the ec2 instance
-  provisioner "remote-exec" {
-    inline = [
-      "/home/ec2-user/example/deploymant/local-jvm/bash-scripts/startETCD.sh > /home/ec2-user/example_logs/startETCD.log 2>&1",
-    ]
+  provisioner "local-exec" {
+    command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ec2-user@${var.host_name} 'nohup /home/ec2-user/example/deployment/bash-scripts/deployETCD.sh > /home/ec2-user/example_logs/deployETCD.log 2>&1 &'"
   }
 
   #  # Run buildServices locally
@@ -91,36 +101,36 @@ resource "null_resource" "deploy_example" {
     destination = "/home/ec2-user/example/example-services/example-rest-config-service/target/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
   }
   provisioner "local-exec" {
-    command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ec2-user@${var.host_name} 'nohup /home/ec2-user/example/deploymant/local-jvm/bash-scripts/startConfigService.sh > /home/ec2-user/example_logs/startConfigService.log 2>&1 &'"
+    command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ec2-user@${var.host_name} 'nohup /home/ec2-user/example/deployment/bash-scripts/waitForHost.sh localhost:2379/health /home/ec2-user/example/deployment/local-jvm/bash-scripts/startConfigService.sh > /home/ec2-user/example_logs/startConfigService.log 2>&1 &'"
   }
 
-  #  # Tell the config service how the various Palisade services should be distributed - this configuration is stored in the Config service.....1st copy over the jar....
-  #  provisioner "file" {
-  #      source = "../../../example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar"
-  #      destination = "/home/hadoop/jars/example-model-0.2.1-SNAPSHOT-shaded.jar"
-  #  }
-  #  provisioner "local-exec" {
-  #      command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_instance.palisade_instance.master_public_dns} 'nohup /home/hadoop/deploy_example/configureDistributedServices.sh  > /home/hadoop/example_logs/configureDistributedServices.log 2>&1 &'"
-  #    }
+  # Tell the config service how the various Palisade services should be distributed - this configuration is stored in the Config service.....1st copy over the jar....
+  provisioner "file" {
+      source = "../../../example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar"
+      destination = "/home/ec2-user/example/example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar"
+  }
+  provisioner "local-exec" {
+      command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ec2-user@${var.host_name} 'nohup /home/ec2-user/example/deployment/bash-scripts/waitForHost.sh localhost:2379/health /home/ec2-user/example/deployment/local-jvm/bash-scripts/configureServices.sh  > /home/ec2-user/example_logs/configureServices.log 2>&1 &'"
+  }
 
 
-  #  # Deploy the Palisade Resource service on the ec2 instance...1st copy over the jar...
-  #  provisioner "file" {
-  #      source = "../../../example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
-  #      destination = "/home/hadoop/jars/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
-  #  }
-  #  provisioner "local-exec" {
-  #    command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_instance.palisade_instance.master_public_dns} 'nohup /home/hadoop/deploy_example/deployResourceService.sh > /home/hadoop/example_logs/deployResourceService.log 2>&1 &'"
-  #  }
+  # Deploy the Palisade Resource service on the ec2 instance...1st copy over the jar...
+  provisioner "file" {
+      source = "../../../example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
+      destination = "/home/ec2-user/example/example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
+  }
+  provisioner "local-exec" {
+    command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ec2-user@${var.host_name} 'nohup /home/ec2-user/example/deployment/local-jvm/bash-scripts/startResourceService.sh > /home/ec2-user/example_logs/startResourceService.log 2>&1 &'"
+  }
 
-  #  # Deploy the Palisade User service on the ec2 instance....1st copy over the jar....
-  #  provisioner "file" {
-  #      source = "../../../example-services/example-rest-user-service/target/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
-  #      destination = "/home/hadoop/jars/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
-  #  }
-  #  provisioner "local-exec" {
-  #      command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_instance.palisade_instance.master_public_dns} 'nohup /home/hadoop/deploy_example/deployUserService.sh > /home/hadoop/example_logs/deployUserService.log 2>&1 &'"
-  #    }
+  # Deploy the Palisade User service on the ec2 instance....1st copy over the jar....
+  provisioner "file" {
+      source = "../../../example-services/example-rest-user-service/target/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
+      destination = "/home/ec2-user/example/example-services/example-rest-user-service/target/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
+  }
+  provisioner "local-exec" {
+      command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ec2-user@${var.host_name} 'nohup /home/ec2-user/example/deployment/local-jvm/bash-scripts/startUserService.sh > /home/ec2-user/example_logs/startUserService.log 2>&1 &'"
+    }
 
   #  # Deploy the example Palisade Policy service on the ec2 instance.....1st copy over the jar...
   #  provisioner "file" {
