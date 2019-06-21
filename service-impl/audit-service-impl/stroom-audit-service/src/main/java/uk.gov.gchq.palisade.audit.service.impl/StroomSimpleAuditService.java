@@ -69,8 +69,8 @@ public class StroomSimpleAuditService implements AuditService {
 
 
     public static void logToStroom(final Class<? extends AuditRequest> cls, final String msg, final RequestId requestId, final UserId userId) {
-//Create the user involved in the authenticate action (possibly different from
-//the eventSource user)
+        //Create the user involved in the authenticate action (possibly different from
+        //the eventSource user)
         String userMsg = "";
         if (userId != null) {
             userMsg += userId.toString() + " ";
@@ -92,41 +92,39 @@ public class StroomSimpleAuditService implements AuditService {
         final Device device = DeviceUtil.createDevice(hostName, hostAddress);
 
 
-//Provide details of where the event came from
+        //Provide details of where the event came from
         final Event.EventSource eventSource = new Event.EventSource();
         eventSource.setSystem(EVENT_LOGGING_SYSTEM);
         eventSource.setGenerator("testCode");
         eventSource.setDevice(device);
         eventSource.setUser(user);
 
-//Create the authenticate object to describe the authentication specific details
+        //Create the authenticate object to describe the authentication specific details
         final Event.EventDetail.Process process = new Process();
         process.setAction(ProcessAction.EXECUTE);
-        //mmm not sure what action is the most appropriate here !!!
 
         final Event.EventDetail.Authenticate authenticate = new Event.EventDetail.Authenticate();
         authenticate.setAction(AuthenticateAction.LOGON);
         authenticate.setUser(user);
 
-//Create the detail of what happened
-//TypeId is typically a EVENT_LOGGING_SYSTEM specific code that is unique to a use case in that EVENT_LOGGING_SYSTEM
+        //Create the detail of what happened
+        //TypeId is typically a EVENT_LOGGING_SYSTEM specific code that is unique to a use case in that EVENT_LOGGING_SYSTEM
         final Event.EventDetail eventDetail = new Event.EventDetail();
         eventDetail.setTypeId(cls.getSimpleName());
         eventDetail.setDescription(msg);
         eventDetail.setAuthenticate(authenticate);
 
-//Define the time the event happened
+        //Define the time the event happened
         final Event.EventTime eventTime = EventLoggingUtil.createEventTime(new Date());
 
-//Combine the sub-objects together
+        //Combine the sub-objects together
         final Event event = EVENT_LOGGING_SERVICE.createEvent();
         event.setEventTime(eventTime);
         event.setEventSource(eventSource);
         event.setEventDetail(eventDetail);
 
-//Send the event
+        //Send the event
         EVENT_LOGGING_SERVICE.log(event);
-
     }
 
 
@@ -142,9 +140,7 @@ public class StroomSimpleAuditService implements AuditService {
         //handler for ProcessingCompleteAuditRequest
         DISPATCH.put(ProcessingCompleteAuditRequest.class, (o) -> {
             requireNonNull(o, "processingCompleteAuditRequest");
-            AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
-            final String msg = " 'processingComplete' " + auditLogContext(auditRequestWithContext);
-            logToStroom(AuditRequestWithContext.class, msg, auditRequestWithContext.getOriginalRequestId(), auditRequestWithContext.getUserId());
+            auditRequestWithContext((AuditRequestWithContext) o, "processingComplete");
         });
         //handler for ProcessingStartedAuditRequest
         DISPATCH.put(ProcessingStartedAuditRequest.class, (o) -> {
@@ -159,9 +155,8 @@ public class StroomSimpleAuditService implements AuditService {
         //handler for RequestReceivedAuditRequest
         DISPATCH.put(RequestReceivedAuditRequest.class, (o) -> {
             requireNonNull(o, "RequestReceivedAuditRequest");
-            AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
-            final String msg = " auditRequest " + auditLogContext(auditRequestWithContext);
-            logToStroom(AuditRequestWithContext.class, msg, auditRequestWithContext.getOriginalRequestId(), auditRequestWithContext.getUserId());
+            auditRequestWithContext((AuditRequestWithContext) o, "auditRequest");
+
         });
         //handler for ReadRequestExceptionAuditRequest
         DISPATCH.put(ReadRequestExceptionAuditRequest.class, (o) -> {
@@ -173,7 +168,7 @@ public class StroomSimpleAuditService implements AuditService {
                     + readRequestExceptionAuditRequest.getOriginalRequestId() + " "
                     + readRequestExceptionAuditRequest.getResource().toString() + " "
                     + readRequestExceptionAuditRequest.getException().toString();
-            logToStroom(ReadRequestExceptionAuditRequest.class, msg, readRequestExceptionAuditRequest.getRequestId(), null);
+            logToStroom(ReadRequestExceptionAuditRequest.class, msg, readRequestExceptionAuditRequest.getOriginalRequestId(), null);
         });
         //handler for ReadRequestReceivedAuditRequest
         DISPATCH.put(ReadRequestReceivedAuditRequest.class, (o) -> {
@@ -184,7 +179,7 @@ public class StroomSimpleAuditService implements AuditService {
                     + readRequestReceivedAuditRequest.getRequestId() + " "
                     + readRequestReceivedAuditRequest.getOriginalRequestId() + " "
                     + readRequestReceivedAuditRequest.getResource().toString() + " ";
-            logToStroom(ReadRequestReceivedAuditRequest.class, msg, readRequestReceivedAuditRequest.getRequestId(), null);
+            logToStroom(ReadRequestReceivedAuditRequest.class, msg, readRequestReceivedAuditRequest.getOriginalRequestId(), null);
         });
         //handler for ReadResponseAuditRequest
         DISPATCH.put(ReadResponseAuditRequest.class, (o) -> {
@@ -195,21 +190,25 @@ public class StroomSimpleAuditService implements AuditService {
                     + readResponseAuditRequest.getRequestId() + " "
                     + readResponseAuditRequest.getOriginalRequestId() + " "
                     + readResponseAuditRequest.getResource().toString() + " ";
-            logToStroom(ReadResponseAuditRequest.class, msg, readResponseAuditRequest.getRequestId(), null);
+            logToStroom(ReadResponseAuditRequest.class, msg, readResponseAuditRequest.getOriginalRequestId(), null);
+        });
+        DISPATCH.put(AuditRequest.class, (o) -> {
+            requireNonNull(o, "AuditRequest");
+            AuditRequest auditRequest = (AuditRequest) o;
+            final String msg = " 'readResponseAuditRequest' "
+                    + auditRequest.getId() + " "
+                    + auditRequest.getOriginalRequestId();
+            logToStroom(ReadResponseAuditRequest.class, msg, auditRequest.getOriginalRequestId(), null);
         });
     }
 
     public StroomSimpleAuditService() {
-        //Create the EVENT_LOGGING_SYSTEM that is logging the authenticat event
+        //Create the EVENT_LOGGING_SYSTEM that is logging the authenticate event
         EVENT_LOGGING_SYSTEM.setName("Palisade Audit Service");
         EVENT_LOGGING_SYSTEM.setEnvironment("Test");
-        String hostName = "";
-        String hostAddress = "";
-
-
     }
 
-    static String auditLogContext(final AuditRequestWithContext auditRequestWithContext) {
+    private static String auditLogContext(final AuditRequestWithContext auditRequestWithContext) {
 
         final String msg = " 'userId' " + auditRequestWithContext.getUserId().getId()
                 + " 'purpose' " + auditRequestWithContext.getContext().getPurpose()
@@ -217,6 +216,11 @@ public class StroomSimpleAuditService implements AuditService {
                 + "' id '" + auditRequestWithContext.getId()
                 + "' originalRequestId '" + auditRequestWithContext.getOriginalRequestId();
         return msg;
+    }
+
+    private static void auditRequestWithContext(final AuditRequestWithContext auditRequestWithContext, final String messageType) {
+        final String msg = " " + messageType + " " + auditLogContext(auditRequestWithContext);
+        logToStroom(AuditRequestWithContext.class, msg, auditRequestWithContext.getOriginalRequestId(), auditRequestWithContext.getUserId());
     }
 
     @Override
