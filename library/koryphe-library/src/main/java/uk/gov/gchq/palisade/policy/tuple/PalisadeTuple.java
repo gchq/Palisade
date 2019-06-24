@@ -37,8 +37,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class PalisadeTuple implements Tuple<String> {
     public static final String RECORD_NAMESPACE = "Record";
+    public static final String CONTEXT_NAMESPACE = "Context";
     public static final String NAMESPACE_MSG =
-            User.NAMESPACE + ", " + Context.NAMESPACE + " or " + RECORD_NAMESPACE + ". "
+            User.NAMESPACE + ", " + CONTEXT_NAMESPACE + " or " + RECORD_NAMESPACE + ". "
                     + "For example: " + User.NAMESPACE + "." + User.AUTHS;
 
     private static final Map<String, FieldGetter<PalisadeTuple>> FIELD_GETTERS = createFieldGetters();
@@ -120,7 +121,7 @@ public class PalisadeTuple implements Tuple<String> {
     private static Map<String, FieldGetter<PalisadeTuple>> createFieldGetters() {
         Map<String, FieldGetter<PalisadeTuple>> map = new HashMap<>();
         map.put(User.NAMESPACE, (tuple, field) -> tuple.getUser().getField(field));
-        map.put(Context.NAMESPACE, (tuple, field) -> tuple.getContext().get(field));
+        map.put("Context", (tuple, field) -> tuple.getContext().get(field));
         map.put(RECORD_NAMESPACE, (tuple, field) -> tuple.getRecord().get(field));
         map.put(null, (tuple, field) -> {
             throw new IllegalArgumentException("Reference must contain a namespace: " + NAMESPACE_MSG);
@@ -131,7 +132,7 @@ public class PalisadeTuple implements Tuple<String> {
     private static Map<String, FieldSetter<PalisadeTuple>> createFieldSetters() {
         Map<String, FieldSetter<PalisadeTuple>> map = new HashMap<>();
         map.put(User.NAMESPACE, (tuple, field, value) -> tuple.getUser().setField(field, value));
-        map.put(Context.NAMESPACE, (tuple, field, value) -> tuple.getContext().put(field, value));
+        map.put("Context", (tuple, field, value) -> tuple.getContext().put(field, value));
         map.put(RECORD_NAMESPACE, (tuple, field, value) -> tuple.getRecord().put(field, value));
         map.put(null, (tuple, field, value) -> {
             throw new IllegalArgumentException("Reference must contain a namespace: " + NAMESPACE_MSG);

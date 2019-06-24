@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>example-docker-runner</artifactId>
+            <artifactId>example-model</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -216,9 +216,9 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>../example-docker-runner/target</directory>
+                                    <directory>../../../example-model/target</directory>
                                     <includes>
-                                        <include>example-docker-runner-*-shaded.jar</include>
+                                        <include>example-model-*-shaded.jar</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -235,7 +235,8 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>../../../example-services/example-rest-redirector-service/target</directory>
+                                    <directory>../../../example-services/example-rest-redirector-service/target
+                                    </directory>
                                     <includes>
                                         <include>example-rest-redirector-service-*-shaded.jar</include>
                                     </includes>
@@ -388,7 +389,7 @@
                         <fileset>
                             <directory>./client/docker/bin</directory>
                             <includes>
-                                <include>example-docker-runner-*-shaded.jar</include>
+                                <include>example-model-*-shaded.jar</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
@@ -509,5 +510,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

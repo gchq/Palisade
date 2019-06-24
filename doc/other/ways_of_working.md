@@ -45,7 +45,7 @@ Please ensure your coding style is consistent with rest of the project and follo
 In particular please ensure you have adhered to the following:
 * Strive for small easy to read and understand classes and methods.
 * Separate out related classes into packages and avoid highly coupled classes and modules.
-* Checkstyle and spotbugs are run as part of 'mvn package' so you should ensure your code is compliant with these. The project will not build if there are issues which cause these plugins to fail.
+* Checkstyle is run as part of 'mvn package' so you should ensure your code is compliant with these. The project will not build if there are issues which cause these plugins to fail.
 * Classes and methods should comply with the single responsibility principal.
 * Avoid magic numbers and strings literals.
 * Avoid duplicating code, if necessary refactor the section of code and split it out into a reusable class.
@@ -60,7 +60,7 @@ In particular please ensure you have adhered to the following:
 * Make use of the core Java API - don't reinvent the wheel.
 * Make use of generic typing.
 * Make use of appropriate object oriented design patterns.
-* Use Loggers instead of System.out.print and throwable.printStackTrace.
+* Use Loggers instead of System.out.print and Throwable.printStackTrace.
 * Ensure that the toString(), equals() and hashCode() methods are implemented where appropriate.
 
 #### Javadoc

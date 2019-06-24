@@ -17,9 +17,11 @@
 package uk.gov.gchq.palisade;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -36,10 +38,14 @@ import static java.util.Objects.requireNonNull;
  * i.e. A users purpose for requesting the contents of a file.
  */
 @JsonPropertyOrder(value = {"class", "contents"}, alphabetic = true)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "class"
+)
 public class Context {
 
     private static final String PURPOSE = "purpose";
-    public static final String NAMESPACE = "Context";
     private Map<String, Object> contents;
 
     public Context() {
@@ -135,5 +141,10 @@ public class Context {
         requireNonNull(value, "The value cannot be null.");
         contents.putIfAbsent(key, value);
         return this;
+    }
+
+    @JsonGetter("class")
+    public String _getClass() {
+        return getClass().getName();
     }
 }

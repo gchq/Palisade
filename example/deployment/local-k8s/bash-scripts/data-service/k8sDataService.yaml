@@ -1,0 +1,70 @@
+---
+# Source: palisade/templates/data-service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: data-service
+  name: data-service
+spec:
+  selector:
+    app: data-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+# Source: palisade/templates/data-service.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: data-service
+  name: data-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  data-service
+  template:
+    metadata:
+      name: data-service
+      labels:
+        app: data-service
+    spec:
+      containers:
+        - image: example_data-service:latest
+          name: data-service
+          imagePullPolicy: Never
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 0.5
+              memory: 2Gi
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /data/v1/status
+              port: 8080
+            failureThreshold: 5
+            periodSeconds: 60
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /data/v1/status
+              port: 8080
+            failureThreshold: 5
+            periodSeconds: 60
+            timeoutSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      restartPolicy: Always
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: task-pv-claim
+

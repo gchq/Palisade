@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.user.service.impl;
 
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
@@ -54,9 +55,9 @@ public class SimpleUserServiceTest {
         hms.addUser(new AddUserRequest().user(user2)).join();
         //both should be in the second service
         GetUserRequest getUserRequest1 = new GetUserRequest().userId(new UserId().id("uid1"));
-        getUserRequest1.setOriginalRequestId("user1");
+        getUserRequest1.setOriginalRequestId(new RequestId().id("user1"));
         GetUserRequest getUserRequest2 = new GetUserRequest().userId(new UserId().id("uid2"));
-        getUserRequest2.setOriginalRequestId("user2");
+        getUserRequest2.setOriginalRequestId(new RequestId().id("user2"));
         User actual1 = test.getUser(getUserRequest1).join();
         User actual2 = test.getUser(getUserRequest2).join();
 
@@ -80,7 +81,7 @@ public class SimpleUserServiceTest {
         SimpleUserService test = new SimpleUserService();
         test.applyConfigFrom(con);
         GetUserRequest getUserRequest = new GetUserRequest().userId(new UserId().id("uid1"));
-        getUserRequest.setOriginalRequestId("uid1");
+        getUserRequest.setOriginalRequestId(new RequestId().id("uid1"));
         User actual1 = test.getUser(getUserRequest).join();
 
         //Then
@@ -101,7 +102,7 @@ public class SimpleUserServiceTest {
         test.applyConfigFrom(con);
         try {
             GetUserRequest getUserRequest = new GetUserRequest().userId(new UserId().id("uid1"));
-            getUserRequest.setOriginalRequestId("uid1");
+            getUserRequest.setOriginalRequestId(new RequestId().id("uid1"));
             User actual1 = test.getUser(getUserRequest).join();
         } catch (CompletionException e) {
             throw e.getCause();

@@ -18,12 +18,13 @@ package uk.gov.gchq.palisade.example.rule;
 
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.example.common.ExampleUser;
 import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.common.TrainingCourse;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.rule.Rule;
 
-import java.util.Set;
+import java.util.EnumSet;
 
 import static java.util.Objects.requireNonNull;
 
@@ -41,13 +42,16 @@ public class BankDetailsRule implements Rule<Employee> {
         if (null == record) {
             return null;
         }
-
         requireNonNull(user);
         requireNonNull(context);
         String purpose = context.getPurpose();
-        Set<String> trainingCompleted = user.getTrainingCompleted();
-        if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE.name()) & purpose.equals(Purpose.SALARY.name())) {
-            return record;
+
+        if (user instanceof ExampleUser) {
+            ExampleUser exampleUser = (ExampleUser) user;
+            EnumSet<TrainingCourse> trainingCompleted = exampleUser.getTrainingCompleted();
+            if (trainingCompleted.contains(TrainingCourse.PAYROLL_TRAINING_COURSE) & purpose.equals(Purpose.SALARY.name())) {
+                return record;
+            }
         }
         return redactRecord(record);
     }

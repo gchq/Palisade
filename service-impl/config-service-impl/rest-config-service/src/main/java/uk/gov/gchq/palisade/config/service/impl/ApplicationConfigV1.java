@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.config.service.impl;
 
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
@@ -27,9 +28,13 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
 
     public ApplicationConfigV1() {
         super(RESOURCES);
+
+        String bootStrapLocation = ConfigUtils.retrieveBootstrapPath();
+
         //make sure we can inject the service instance
-        ConfigurationService delegate = RestConfigServiceV1.createService(System.getProperty(RestConfigServiceV1.BOOTSTRAP_CONFIG));
+        ConfigurationService delegate = RestConfigServiceV1.createService(bootStrapLocation);
         register(new ServiceBinder(delegate, ConfigurationService.class));
     }
+
 
 }

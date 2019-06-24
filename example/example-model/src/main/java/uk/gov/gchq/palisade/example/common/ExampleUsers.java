@@ -24,8 +24,8 @@ public final class ExampleUsers {
     }
 
     public static User getAlice() {
-        final User alice = new User()
-                .trainingCompleted(TrainingCourse.PAYROLL_TRAINING_COURSE.name())
+        final User alice = new ExampleUser()
+                .trainingCompleted(TrainingCourse.PAYROLL_TRAINING_COURSE)
                 .userId("Alice")
                 .auths("public", "private")
                 .roles(Role.HR.name());
@@ -33,7 +33,7 @@ public final class ExampleUsers {
     }
 
     public static User getBob() {
-        final User bob = new User()
+        final User bob = new ExampleUser()
                 .userId("Bob")
                 .auths("public")
                 .roles(Role.ESTATES.name());
@@ -41,7 +41,7 @@ public final class ExampleUsers {
     }
 
     public static User getEve() {
-        final User eve = new User()
+        final User eve = new ExampleUser()
                 .userId("Eve")
                 .auths("public")
                 .roles(Role.IT.name());

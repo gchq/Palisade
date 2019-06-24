@@ -37,6 +37,7 @@
                 <module>hr-data-generator</module>
                 <module>example-services</module>
                 <module>deployment</module>
+                <module>performance</module>
             </modules>
         </profile>
         <profile>
@@ -46,6 +47,7 @@
                 <module>hr-data-generator</module>
                 <module>example-services</module>
                 <module>deployment</module>
+                <module>performance</module>
             </modules>
         </profile>
         <profile>
@@ -55,6 +57,7 @@
                 <module>hr-data-generator</module>
                 <module>example-services</module>
                 <module>deployment</module>
+                <module>performance</module>
             </modules>
         </profile>
 

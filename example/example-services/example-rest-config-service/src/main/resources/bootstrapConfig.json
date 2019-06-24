@@ -7,7 +7,7 @@
     "backingStore": {
       "class": "uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore",
       "connectionDetails": [
-        "http://localhost:31379"
+        "http://localhost:2379"
       ]
     },
     "codecs": {},

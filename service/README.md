@@ -14,5 +14,6 @@ Always check that there is not an existing service that could be tweaked before 
 * [Palisade Service](palisade-service/README.md)
 * [Policy Service](policy-service/README.md)
 * [Resource Service](resource-service/README.md)
+* [Redirector Service](resource-service/README.md)
 * [Rest Service](rest-service/README.md)
 * [User Service](user-service/README.md)

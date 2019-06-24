@@ -46,7 +46,7 @@ public class RequestReceivedAuditRequest extends AuditRequestWithContext {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(21, 39)
+        return new HashCodeBuilder(21, 37)
                 .appendSuper(super.hashCode())
                 .toHashCode();
     }

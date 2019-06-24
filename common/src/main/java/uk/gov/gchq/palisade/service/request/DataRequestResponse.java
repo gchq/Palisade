@@ -38,8 +38,8 @@ import static java.util.Objects.requireNonNull;
  */
 public class DataRequestResponse {
     private RequestId requestId;
+    private RequestId originalRequestId; //this Id is unique per data access request from a user
     private Map<LeafResource, ConnectionDetail> resources;
-    private String originalRequestId; //this Id is unique per data access request from a user
 
     public DataRequestResponse() {
     }
@@ -75,7 +75,7 @@ public class DataRequestResponse {
         return this;
     }
 
-    public DataRequestResponse originalRequestId(final String originalRequestId) {
+    public DataRequestResponse originalRequestId(final RequestId originalRequestId) {
         requireNonNull(originalRequestId, "The originalRequestId cannot be null.");
         System.err.println("setting original request id: " + originalRequestId);
         new Exception().printStackTrace(System.err);
@@ -92,13 +92,13 @@ public class DataRequestResponse {
         return resources;
     }
 
-    public void setOriginalRequestId(final String originalRequestId) {
+    public void setOriginalRequestId(final RequestId originalRequestId) {
         originalRequestId(originalRequestId);
     }
 
-    public String getOriginalRequestId() {
-        requireNonNull(this.originalRequestId, "The originalRequestId has not been set.");
-        return this.originalRequestId;
+    public RequestId getOriginalRequestId() {
+        requireNonNull(originalRequestId, "The originalRequestId type cannot be null");
+        return originalRequestId;
     }
 
     @Override
@@ -114,27 +114,27 @@ public class DataRequestResponse {
         final DataRequestResponse that = (DataRequestResponse) o;
 
         return new EqualsBuilder()
-        .append(requestId, that.requestId)
-        .append(resources, that.resources)
-        .append(originalRequestId, that.originalRequestId)
-        .isEquals();
+                .append(requestId, that.requestId)
+                .append(resources, that.resources)
+                .append(originalRequestId, that.originalRequestId)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 67)
-        .append(requestId)
-        .append(resources)
-        .append(originalRequestId)
-        .toHashCode();
+                .append(requestId)
+                .append(resources)
+                .append(originalRequestId)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-        .append("requestId", requestId)
-        .append("resources", resources)
-        .append("originalRequestId", originalRequestId)
-        .toString();
+                .append("requestId", requestId)
+                .append("resources", resources)
+                .append("originalRequestId", originalRequestId)
+                .toString();
     }
 }

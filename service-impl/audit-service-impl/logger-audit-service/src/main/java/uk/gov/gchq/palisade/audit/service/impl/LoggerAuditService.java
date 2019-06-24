@@ -73,9 +73,9 @@ public class LoggerAuditService implements AuditService {
             System.err.println(o.toString());
             ProcessingStartedAuditRequest processingStartedAuditRequest = (ProcessingStartedAuditRequest) o;
             final String msg = " 'processingStarted' " + auditLogContext(processingStartedAuditRequest)
-            + processingStartedAuditRequest.getUser().toString()
-            + "' accessed '" + processingStartedAuditRequest.getLeafResource().getId()
-            + "' and it was processed using '" + processingStartedAuditRequest.getHowItWasProcessed();
+                    + processingStartedAuditRequest.getUser().toString()
+                    + "' accessed '" + processingStartedAuditRequest.getLeafResource().getId()
+                    + "' and it was processed using '" + processingStartedAuditRequest.getHowItWasProcessed();
             LOGGER.info(msg);
         });
         //handler for RequestReceivedAuditRequest
@@ -90,11 +90,11 @@ public class LoggerAuditService implements AuditService {
             requireNonNull(o, "ReadRequestExceptionAuditRequest");
             ReadRequestExceptionAuditRequest readRequestExceptionAuditRequest = (ReadRequestExceptionAuditRequest) o;
             final String msg = " 'readRequestException' "
-            + readRequestExceptionAuditRequest.getId() + " "
-            + readRequestExceptionAuditRequest.getRequestId() + " "
-            + readRequestExceptionAuditRequest.getOriginalRequestId() + " "
-            + readRequestExceptionAuditRequest.getResource().toString() + " "
-            + readRequestExceptionAuditRequest.getException().toString();
+                    + readRequestExceptionAuditRequest.getId() + " "
+                    + readRequestExceptionAuditRequest.getRequestId() + " "
+                    + readRequestExceptionAuditRequest.getOriginalRequestId() + " "
+                    + readRequestExceptionAuditRequest.getResource().toString() + " "
+                    + readRequestExceptionAuditRequest.getException().toString();
             LOGGER.error(msg);
         });
         //handler for ReadRequestReceivedAuditRequest
@@ -102,10 +102,10 @@ public class LoggerAuditService implements AuditService {
             requireNonNull(o, "ReadRequestReceivedAuditRequest");
             ReadRequestReceivedAuditRequest readRequestReceivedAuditRequest = (ReadRequestReceivedAuditRequest) o;
             final String msg = " 'readRequestReceived' "
-            + readRequestReceivedAuditRequest.getId() + " "
-            + readRequestReceivedAuditRequest.getRequestId() + " "
-            + readRequestReceivedAuditRequest.getOriginalRequestId() + " "
-            + readRequestReceivedAuditRequest.getResource().toString() + " ";
+                    + readRequestReceivedAuditRequest.getId() + " "
+                    + readRequestReceivedAuditRequest.getRequestId() + " "
+                    + readRequestReceivedAuditRequest.getOriginalRequestId() + " "
+                    + readRequestReceivedAuditRequest.getResource().toString() + " ";
             LOGGER.info(msg);
         });
         //handler for ReadResponseAuditRequest
@@ -113,10 +113,10 @@ public class LoggerAuditService implements AuditService {
             requireNonNull(o, "ReadResponseAuditRequest");
             ReadResponseAuditRequest readResponseAuditRequest = (ReadResponseAuditRequest) o;
             final String msg = " 'readResponseAuditRequest' "
-            + readResponseAuditRequest.getId() + " "
-            + readResponseAuditRequest.getRequestId() + " "
-            + readResponseAuditRequest.getOriginalRequestId() + " "
-            + readResponseAuditRequest.getResource().toString() + " ";
+                    + readResponseAuditRequest.getId() + " "
+                    + readResponseAuditRequest.getRequestId() + " "
+                    + readResponseAuditRequest.getOriginalRequestId() + " "
+                    + readResponseAuditRequest.getResource().toString() + " ";
             LOGGER.info(msg);
         });
     }
@@ -124,10 +124,10 @@ public class LoggerAuditService implements AuditService {
     static String auditLogContext(final AuditRequestWithContext auditRequestWithContext) {
 
         final String msg = " 'userId' " + auditRequestWithContext.getUserId().getId()
-        + " 'purpose' " + auditRequestWithContext.getContext().getPurpose()
-        + "' resourceId '" + auditRequestWithContext.getResourceId()
-        + "' id '" + auditRequestWithContext.getId()
-        + "' originalRequestId '" + auditRequestWithContext.getOriginalRequestId();
+                + " 'purpose' " + auditRequestWithContext.getContext().getPurpose()
+                + "' resourceId '" + auditRequestWithContext.getResourceId()
+                + "' id '" + auditRequestWithContext.getId()
+                + "' originalRequestId '" + auditRequestWithContext.getOriginalRequestId();
         return msg;
     }
 

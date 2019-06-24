@@ -1,8 +1,9 @@
 FROM openjdk:8-jre-alpine
 
 RUN apk add --no-cache curl
-COPY docker/bin/example-docker-runner-*-shaded.jar /example-docker-runner/
-ADD docker/bin/configRest.json /example-docker-runner/
+COPY docker/bin/example-model-*-shaded.jar /example-model/
+ADD docker/bin/configRest.json /example-model/
 
-ENTRYPOINT ["java"]
-CMD ["-cp", "/example-docker-runner/*", "-Dpalisade.rest.config.path=/example-docker-runner/configRest.json", "uk.gov.gchq.palisade.example.RestDockerExample", "/data/Employee_file0.avro"]
+ENV PALISADE_REST_CONFIG_PATH="/example-model/configRest.json"
+
+CMD ["-cp", "/example-model/*", "uk.gov.gchq.palisade.example.runner.RestExample" , "/data/employee_file0.avro" ]
