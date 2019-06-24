@@ -33,9 +33,9 @@ resource "azurerm_kubernetes_cluster" "k8s-cluster-name" {
   }
 
   addon_profile {
-    oms_agent = {
-      enabled = "true"
-      log_analytics_workspace_id = "${var.log_analytics_workspace_id}"
-    }
+    //    oms_agent = {
+    //      enabled = "true"
+    //      log_analytics_workspace_id = "${var.log_analytics_workspace_id}"
+    //    }
   }
 }
