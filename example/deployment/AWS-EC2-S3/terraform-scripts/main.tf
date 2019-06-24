@@ -24,6 +24,9 @@ module "deploy_example" {
   source = "../../terraform-modules/deploy_example"
   key_file = "${var.pem_file}"
   host_name = "${aws_instance.palisade_instance.public_dns}"
+  ec2_userid = "${var.ec2_userid}"
+  data_file_name = "${var.data_file_name}"
+  bucket_name = "${var.bucket_name}"
 }
 
 provider "aws" {
