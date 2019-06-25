@@ -21,6 +21,11 @@ variable "ops_resource_group_name" {
   description = "OPs resource group name"
 }
 
+variable "oms_sku" {
+  type        = "string"
+  description = "OMS SKU"
+}
+
 variable "config_share_resource_group_name" {
   type = "string"
   description = "Config share resource group name"
