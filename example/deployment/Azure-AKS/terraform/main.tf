@@ -42,6 +42,5 @@ module "aks" {
     client_secret="${var.client_secret}"
     subscription_id="${var.subscription_id}"
 
-    log_analytics_workspace_id="${module.oms.oms_workspace_resource_id}"
     vnet_subnet_id="/subscriptions/${var.subscription_id}/resourceGroups/${var.vnet_resource_group_name}/providers/Microsoft.Network/virtualNetworks/${var.vnet_name}/subnets/aks-subnet"
 }
