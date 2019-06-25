@@ -43,6 +43,10 @@ variable "vnet_subnet_id" {
   type        = "string"
   description = "Fully qualified resource ID for the vnet subnet to bind the nodes to."
 }
+variable "log_analytics_workspace_id" {
+  type        = "string"
+  description = "Fully qualified resource ID for the Log Analytics/OMS workspace."
+}
 
 variable "vm_size" {
   default     = "Standard_DS3_v2"

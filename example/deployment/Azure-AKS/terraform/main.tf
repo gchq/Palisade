@@ -1,3 +1,11 @@
+module "oms" {
+    source = "./oms"
+
+    resource_group_name = "${var.ops_resource_group_name}"
+    oms_location = "${var.primary_region}"
+    oms_sku = "${var.oms_sku}"
+}
+
 module "acr" {
     source = "./acr"
 
@@ -42,5 +50,6 @@ module "aks" {
     client_secret="${var.client_secret}"
     subscription_id="${var.subscription_id}"
 
+    log_analytics_workspace_id="${module.oms.oms_workspace_resource_id}"
     vnet_subnet_id="/subscriptions/${var.subscription_id}/resourceGroups/${var.vnet_resource_group_name}/providers/Microsoft.Network/virtualNetworks/${var.vnet_name}/subnets/aks-subnet"
 }
