@@ -1,3 +1,9 @@
+provider "aws" {
+  access_key = "${var.aws_access_key}"
+  secret_key = "${var.aws_secret_key}"
+  region = "${var.aws_region}"
+}
+
 module "security_group" {
   source = "../../terraform-modules/security_group"     # base directory from which modules are referenced is example/deployment/AWS-EC2-S3/terraform-scripts
   ingress_ip_range = "${var.ingress_ip_range}"
@@ -11,6 +17,7 @@ module "ami" {
 
 module "iam" {
   source = "../../terraform-modules/iam"
+  bucket_nme = "${var.bucket_name}"
 }
 
 module "s3_bucket" {
@@ -27,12 +34,7 @@ module "deploy_example" {
   ec2_userid = "${var.ec2_userid}"
   data_file_name = "${var.data_file_name}"
   bucket_name = "${var.bucket_name}"
-}
-
-provider "aws" {
-  access_key = "${var.aws_access_key}"
-  secret_key = "${var.aws_secret_key}"
-  region = "${var.aws_region}"
+  s3_endpoint = "${var.s3_endpoint}"
 }
 
 resource "aws_instance" "palisade_instance" {

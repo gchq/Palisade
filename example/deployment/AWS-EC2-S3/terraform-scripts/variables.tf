@@ -16,6 +16,10 @@ variable "aws_secret_key" {}
 
 variable "bucket_name" {}
 
+variable "s3_endpoint" {
+  default = "s3-eu-west-1.amazonaws.com"
+}
+
 variable "key_name" {}
 
 variable "pem_file" {}

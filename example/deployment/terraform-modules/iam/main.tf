@@ -33,7 +33,7 @@ resource "aws_iam_role_policy" "palisade_iam_role_policy" {
     {
       "Effect": "Allow",
       "Action": ["s3:ListBucket"],
-      "Resource": ["arn:aws:s3:::developer6959palisadeec2test"]
+      "Resource": ["arn:aws:s3:::${var.bucket_name}"]
     },
     {
       "Effect": "Allow",
@@ -42,7 +42,7 @@ resource "aws_iam_role_policy" "palisade_iam_role_policy" {
         "s3:GetObject",
         "s3:DeleteObject"
       ],
-      "Resource": ["arn:aws:s3:::developer6959palisadeec2test/*"]
+      "Resource": ["arn:aws:s3:::${var.bucket_name}/*"]
     }
   ]
 }

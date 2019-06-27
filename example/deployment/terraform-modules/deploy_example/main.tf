@@ -26,10 +26,7 @@ resource "null_resource" "deploy_example" {
     ]
   }
 
-  #"sudo yum install java-1.8.0 -y"
-  #"sudo amazon-linux-extras install java-openjdk11 -y"
-
-  # Copy pem file to .ssh directory on EC2 instance.....and restrict its permissions
+  # Copy pem file to .ssh directory on EC2 instance.....and restrict its permissions      Is this still needed?
   provisioner "file" {
     source = "${var.key_file}"
     destination = "/home/${var.ec2_userid}/.ssh/${basename(var.key_file)}"
@@ -55,6 +52,7 @@ resource "null_resource" "deploy_example" {
       "mkdir -p /home/${var.ec2_userid}/example/example-services/example-rest-policy-service/target",
       "mkdir -p /home/${var.ec2_userid}/example/example-services/example-rest-palisade-service/target",
       "mkdir -p /home/${var.ec2_userid}/example/example-services/example-rest-data-service/target",
+      "mkdir -p /home/${var.ec2_userid}/example/resources",
     ]
   }
 
@@ -111,10 +109,14 @@ resource "null_resource" "deploy_example" {
     command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh localhost:2379/health /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startConfigService.sh > /home/${var.ec2_userid}/example_logs/startConfigService.log 2>&1 &'"
   }
 
-  # Tell the config service how the various Palisade services should be distributed - this configuration is stored in the Config service.....1st copy over the jar....
+  # Tell the config service how the various Palisade services should be distributed - this configuration is stored in the Config service.....1st copy over the jar....and the S3 specific config file...
   provisioner "file" {
       source = "../../../example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar"
       destination = "/home/${var.ec2_userid}/example/example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar"
+  }
+  provisioner "file" {
+    source = "../../../resources/hadoop_s3.xml"
+    destination = "/home/${var.ec2_userid}/example/resources/hadoop_s3.xml"
   }
   provisioner "local-exec" {
       command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh localhost:2379/health /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/configureServices.sh  > /home/${var.ec2_userid}/example_logs/configureServices.log 2>&1 &'"
@@ -178,26 +180,14 @@ resource "null_resource" "deploy_example" {
   # Configure the Example - create some users and policies...
   provisioner "remote-exec" {
       inline = [
-        "/home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://localhost:8081/policy/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://localhost:8082/resource/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://localhost:8083/user/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/configureExamples.sh > /home/${var.ec2_userid}/example_logs/configureExamples.log 2>&1 ",
+        "/home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://localhost:8081/policy/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://localhost:8082/resource/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://localhost:8083/user/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/configureExamples.sh s3a://${var.bucket_name}.${var.s3_endpoint}/employee_file0.avro > /home/${var.ec2_userid}/example_logs/configureExamples.log 2>&1 ",
       ]
     }
 
   # Run the Example...
   provisioner "remote-exec" {
     inline = [
-      "/home/${var.ec2_userid}/example/deployment/bash-scripts/runFormattedLocalJVMExample.sh"
+      "/home/${var.ec2_userid}/example/deployment/bash-scripts/runFormattedLocalJVMExample.sh s3a://${var.bucket_name}.${var.s3_endpoint}/employee_file0.avro"
     ]
   }
-
-  #  # Run the Palisade mapreduce example runner....1st copy over the jar
-  #  provisioner "file" {
-  #      source = "../../../deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
-  #      destination = "/home/${var.ec2_userid}/jars/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
-  #  }
-  #  provisioner "remote-exec" {
-  #      inline = [
-  #        "hdfs dfs -rm -r /user/${var.ec2_userid}/output || echo Deleted",
-  #        "/home/${var.ec2_userid}/deploy_example/executeExample.sh > /home/${var.ec2_userid}/example_logs/exampleOutput.log 2>&1 ",
-  #      ]
-  #    }
 }
