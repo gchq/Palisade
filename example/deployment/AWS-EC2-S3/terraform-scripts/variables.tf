@@ -24,16 +24,6 @@ variable "key_name" {}
 
 variable "pem_file" {}
 
-#variable "vpc_cidr_block" {
-#  default = "168.31.0.0/16"
-#}
-
-variable "subnet_id" { }
-
-variable "subnet_cidr_block" {
-  default = "168.31.0.0/20"
-}
-
 variable "ingress_ip_range" {
   type = "list"
 }

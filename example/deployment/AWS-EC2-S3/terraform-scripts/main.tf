@@ -1,3 +1,4 @@
+# Main terraform script to deploy Palisade on ec2, grant permissions via IAM to read from S3 bucket, and successfully demonstrate Palisade against  a file in an S3 bucket
 provider "aws" {
   access_key = "${var.aws_access_key}"
   secret_key = "${var.aws_secret_key}"
@@ -17,7 +18,7 @@ module "ami" {
 
 module "iam" {
   source = "../../terraform-modules/iam"
-  bucket_nme = "${var.bucket_name}"
+  bucket_name = "${var.bucket_name}"
 }
 
 module "s3_bucket" {
@@ -35,6 +36,19 @@ module "deploy_example" {
   data_file_name = "${var.data_file_name}"
   bucket_name = "${var.bucket_name}"
   s3_endpoint = "${var.s3_endpoint}"
+}
+
+# create hadoop_s3.xml from templatefile
+data "template_file" "hadoop_s3" {
+  template = "${file("../../../resources/hadoop_s3.tmpl")}"
+  vars = {
+    bucket_name = "${var.bucket_name}"
+  }
+}
+resource "local_file" "hadoop_s3" {
+  #content = templatefile("../../../resources/hadoop_s3.tmpl", { bucket_name = "${var.bucket_name}" })
+  content = "${data.template_file.hadoop_s3.rendered}"
+  filename = "../../../resources/hadoop_s3.xml"
 }
 
 resource "aws_instance" "palisade_instance" {
