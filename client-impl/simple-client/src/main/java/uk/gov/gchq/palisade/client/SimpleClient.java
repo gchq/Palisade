@@ -64,9 +64,10 @@ public class SimpleClient<T> {
             final DataService dataService = connectionDetail.createService();
             final RequestId uuid = response.getOriginalRequestId();
 
-            final ReadRequest readRequest = new ReadRequest()
-                    .requestId(response.getRequestId())
-                    .resource(entry.getKey());
+            final ReadRequest readRequest = (ReadRequest) new ReadRequest()
+                    .token(response.getToken())
+                    .resource(entry.getKey())
+                    .originalRequestId(response.getOriginalRequestId());
             readRequest.setOriginalRequestId(uuid);
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);

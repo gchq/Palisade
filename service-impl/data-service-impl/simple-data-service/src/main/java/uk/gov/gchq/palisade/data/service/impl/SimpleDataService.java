@@ -106,7 +106,7 @@ public class SimpleDataService implements DataService {
     private void auditReadRequestReceived(final ReadRequest request) {
         final ReadRequestReceivedAuditRequest requestReceivedAuditRequest = new ReadRequestReceivedAuditRequest();
         requestReceivedAuditRequest
-                .requestId(request.getRequestId())
+                .requestId(request.getToken())
                 .resource(request.getResource())
                 .id(request.getId())
                 .originalRequestId(request.getOriginalRequestId());
@@ -117,7 +117,7 @@ public class SimpleDataService implements DataService {
         final ReadRequestExceptionAuditRequest readRequestExceptionAuditRequest = new ReadRequestExceptionAuditRequest();
         readRequestExceptionAuditRequest.exception(ex)
                 .resource(request.getResource())
-                .requestId(request.getRequestId())
+                .requestId(request.getToken())
                 .id(request.getId())
                 .originalRequestId(request.getOriginalRequestId());
         LOGGER.debug("Error handling: " + ex.getMessage());
@@ -128,7 +128,7 @@ public class SimpleDataService implements DataService {
         final ReadResponseAuditRequest readResponseAuditRequest = new ReadResponseAuditRequest();
         readResponseAuditRequest
                 .resource(request.getResource())
-                .requestId(request.getRequestId())
+                .requestId(request.getToken())
                 .id(request.getId())
                 .originalRequestId(request.getOriginalRequestId());
         auditService.audit(readResponseAuditRequest);
@@ -147,7 +147,7 @@ public class SimpleDataService implements DataService {
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Starting to read: {}", request);
             final GetDataRequestConfig getConfig = new GetDataRequestConfig()
-                    .requestId(request.getRequestId())
+                    .requestId(request.getToken())
                     .resource(request.getResource());
             getConfig.setOriginalRequestId(request.getOriginalRequestId());
             LOGGER.debug("Calling palisade service with: {}", getConfig);

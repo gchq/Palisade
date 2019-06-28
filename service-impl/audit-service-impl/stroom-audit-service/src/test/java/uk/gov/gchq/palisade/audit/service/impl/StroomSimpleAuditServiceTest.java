@@ -15,7 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.audit.service.request.ExceptionAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class StroomSimpleAuditServiceTest {
 
         Logger.getRootLogger().addAppender(appender);
 
-        final ExceptionAuditRequest auditRequestWithException = new ExceptionAuditRequest();
+        final RegisterRequestExceptionAuditRequest auditRequestWithException = new RegisterRequestExceptionAuditRequest();
         Throwable mockException = Mockito.mock(Throwable.class);
         Mockito.doReturn("exception output").when(mockException).getMessage();
         Context mockContext = Mockito.mock(Context.class);
@@ -52,9 +52,9 @@ public class StroomSimpleAuditServiceTest {
         Mockito.doReturn("origRequestId").when(mockRequestId).toString();
         auditRequestWithException
                 .exception(mockException)
-                .context(mockContext, ExceptionAuditRequest.class)
-                .userId(mockUserId, ExceptionAuditRequest.class)
-                .resourceId(resourceId, ExceptionAuditRequest.class)
+                .context(mockContext, RegisterRequestExceptionAuditRequest.class)
+                .userId(mockUserId, RegisterRequestExceptionAuditRequest.class)
+                .resourceId(resourceId, RegisterRequestExceptionAuditRequest.class)
                 .id(id)
                 .originalRequestId(mockRequestId);
 

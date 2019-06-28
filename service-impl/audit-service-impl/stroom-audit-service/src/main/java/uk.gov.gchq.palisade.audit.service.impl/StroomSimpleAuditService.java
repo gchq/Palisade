@@ -35,9 +35,9 @@ import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequestWithContext;
-import uk.gov.gchq.palisade.audit.service.request.ExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ProcessingCompleteAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ProcessingStartedAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestExceptionAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadResponseAuditRequest;
@@ -55,7 +55,6 @@ import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
-
 /**
  * A StroomAuditService is a simple implementation of an {@link AuditService} that simply constructs a message and logs
  * it using the Stroom EventLoggingService.
@@ -67,6 +66,11 @@ public class StroomSimpleAuditService implements AuditService {
     private static final EventLoggingService EVENT_LOGGING_SERVICE = new DefaultEventLoggingService();
     private static final System EVENT_LOGGING_SYSTEM = new System();
 
+    public StroomSimpleAuditService() {
+        //Create the EVENT_LOGGING_SYSTEM that is logging the authenticate event
+        EVENT_LOGGING_SYSTEM.setName("Palisade Audit Service");
+        EVENT_LOGGING_SYSTEM.setEnvironment("Test");
+    }
 
     public static void logToStroom(final Class<? extends AuditRequest> cls, final String msg, final RequestId requestId, final UserId userId) {
         //Create the user involved in the authenticate action (possibly different from
@@ -95,7 +99,7 @@ public class StroomSimpleAuditService implements AuditService {
         //Provide details of where the event came from
         final Event.EventSource eventSource = new Event.EventSource();
         eventSource.setSystem(EVENT_LOGGING_SYSTEM);
-        eventSource.setGenerator("testCode");
+        eventSource.setGenerator("Palisade");
         eventSource.setDevice(device);
         eventSource.setUser(user);
 
@@ -130,27 +134,27 @@ public class StroomSimpleAuditService implements AuditService {
 
     //translate class object to handler
     static {
-        //handler for ExceptionAuditRequest
-        DISPATCH.put(ExceptionAuditRequest.class, (o) -> {
-            requireNonNull(o, "exceptionAuditRequest");
-            ExceptionAuditRequest exceptionAuditRequest = (ExceptionAuditRequest) o;
-            final String msg = " 'exception' " + auditLogContext(exceptionAuditRequest) + exceptionAuditRequest.getException().getMessage();
-            logToStroom(ExceptionAuditRequest.class, msg, exceptionAuditRequest.getOriginalRequestId(), exceptionAuditRequest.getUserId());
+        //handler for RegisterRequestExceptionAuditRequest
+        DISPATCH.put(RegisterRequestExceptionAuditRequest.class, (o) -> {
+            requireNonNull(o, "registerRequestExceptionAuditRequest");
+            RegisterRequestExceptionAuditRequest registerRequestExceptionAuditRequest = (RegisterRequestExceptionAuditRequest) o;
+            final String msg = " 'exception' " + auditLogContext(registerRequestExceptionAuditRequest) + registerRequestExceptionAuditRequest.getException().getMessage();
+            logToStroom(RegisterRequestExceptionAuditRequest.class, msg, registerRequestExceptionAuditRequest.getOriginalRequestId(), registerRequestExceptionAuditRequest.getUserId());
         });
-        //handler for ProcessingCompleteAuditRequest
-        DISPATCH.put(ProcessingCompleteAuditRequest.class, (o) -> {
+        //handler for ReadRequestCompleteAuditRequest
+        DISPATCH.put(ReadRequestCompleteAuditRequest.class, (o) -> {
             requireNonNull(o, "processingCompleteAuditRequest");
             auditRequestWithContext((AuditRequestWithContext) o, "processingComplete");
         });
-        //handler for ProcessingStartedAuditRequest
-        DISPATCH.put(ProcessingStartedAuditRequest.class, (o) -> {
-            requireNonNull(o, "processingStartedAuditRequest");
-            ProcessingStartedAuditRequest processingStartedAuditRequest = (ProcessingStartedAuditRequest) o;
-            final String msg = " 'processingStarted' " + auditLogContext(processingStartedAuditRequest)
-                    + processingStartedAuditRequest.getUser().toString()
-                    + "' accessed '" + processingStartedAuditRequest.getLeafResource().getId()
-                    + "' and it was processed using '" + processingStartedAuditRequest.getHowItWasProcessed();
-            logToStroom(ProcessingStartedAuditRequest.class, msg, processingStartedAuditRequest.getOriginalRequestId(), processingStartedAuditRequest.getUserId());
+        //handler for RegisterRequestCompleteAuditRequest
+        DISPATCH.put(RegisterRequestCompleteAuditRequest.class, (o) -> {
+            requireNonNull(o, "registerRequestCompleteAuditRequest");
+            RegisterRequestCompleteAuditRequest registerRequestCompleteAuditRequest = (RegisterRequestCompleteAuditRequest) o;
+            final String msg = " 'processingStarted' " + auditLogContext(registerRequestCompleteAuditRequest)
+                    + registerRequestCompleteAuditRequest.getUser().toString()
+                    + "' accessed '" + registerRequestCompleteAuditRequest.getLeafResource().getId()
+                    + "' and it was processed using '" + registerRequestCompleteAuditRequest.getHowItWasProcessed();
+            logToStroom(RegisterRequestCompleteAuditRequest.class, msg, registerRequestCompleteAuditRequest.getOriginalRequestId(), registerRequestCompleteAuditRequest.getUserId());
         });
         //handler for RequestReceivedAuditRequest
         DISPATCH.put(RequestReceivedAuditRequest.class, (o) -> {
@@ -200,12 +204,6 @@ public class StroomSimpleAuditService implements AuditService {
                     + auditRequest.getOriginalRequestId();
             logToStroom(ReadResponseAuditRequest.class, msg, auditRequest.getOriginalRequestId(), null);
         });
-    }
-
-    public StroomSimpleAuditService() {
-        //Create the EVENT_LOGGING_SYSTEM that is logging the authenticate event
-        EVENT_LOGGING_SYSTEM.setName("Palisade Audit Service");
-        EVENT_LOGGING_SYSTEM.setEnvironment("Test");
     }
 
     private static String auditLogContext(final AuditRequestWithContext auditRequestWithContext) {

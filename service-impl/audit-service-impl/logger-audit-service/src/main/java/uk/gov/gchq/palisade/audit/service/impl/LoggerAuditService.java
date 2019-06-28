@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequestWithContext;
-import uk.gov.gchq.palisade.audit.service.request.ExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ProcessingCompleteAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ProcessingStartedAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestExceptionAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadResponseAuditRequest;
@@ -53,28 +53,28 @@ public class LoggerAuditService implements AuditService {
 
     //translate class object to handler
     static {
-        //handler for ExceptionAuditRequest
-        DISPATCH.put(ExceptionAuditRequest.class, (o) -> {
-            requireNonNull(o, "exceptionAuditRequest");
-            ExceptionAuditRequest exceptionAuditRequest = (ExceptionAuditRequest) o;
-            final String msg = " 'exception' " + auditLogContext(exceptionAuditRequest) + exceptionAuditRequest.getException().getMessage();
+        //handler for RegisterRequestExceptionAuditRequest
+        DISPATCH.put(RegisterRequestExceptionAuditRequest.class, (o) -> {
+            requireNonNull(o, "registerRequestExceptionAuditRequest");
+            RegisterRequestExceptionAuditRequest registerRequestExceptionAuditRequest = (RegisterRequestExceptionAuditRequest) o;
+            final String msg = " 'exception' " + auditLogContext(registerRequestExceptionAuditRequest) + registerRequestExceptionAuditRequest.getException().getMessage();
             LOGGER.error(msg);
         });
-        //handler for ProcessingCompleteAuditRequest
-        DISPATCH.put(ProcessingCompleteAuditRequest.class, (o) -> {
+        //handler for ReadRequestCompleteAuditRequest
+        DISPATCH.put(ReadRequestCompleteAuditRequest.class, (o) -> {
             requireNonNull(o, "processingCompleteAuditRequest");
             AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
             final String msg = " 'processingComplete' " + auditLogContext(auditRequestWithContext);
             LOGGER.info(msg);
         });
-        //handler for ProcessingStartedAuditRequest
-        DISPATCH.put(ProcessingStartedAuditRequest.class, (o) -> {
-            requireNonNull(o, "processingStartedAuditRequest");
-            ProcessingStartedAuditRequest processingStartedAuditRequest = (ProcessingStartedAuditRequest) o;
-            final String msg = " 'processingStarted' " + auditLogContext(processingStartedAuditRequest)
-                    + processingStartedAuditRequest.getUser().toString()
-                    + "' accessed '" + processingStartedAuditRequest.getLeafResource().getId()
-                    + "' and it was processed using '" + processingStartedAuditRequest.getHowItWasProcessed();
+        //handler for RegisterRequestCompleteAuditRequest
+        DISPATCH.put(RegisterRequestCompleteAuditRequest.class, (o) -> {
+            requireNonNull(o, "registerRequestCompleteAuditRequest");
+            RegisterRequestCompleteAuditRequest registerRequestCompleteAuditRequest = (RegisterRequestCompleteAuditRequest) o;
+            final String msg = " 'processingStarted' " + auditLogContext(registerRequestCompleteAuditRequest)
+                    + registerRequestCompleteAuditRequest.getUser().toString()
+                    + "' accessed '" + registerRequestCompleteAuditRequest.getLeafResource().getId()
+                    + "' and it was processed using '" + registerRequestCompleteAuditRequest.getHowItWasProcessed();
             LOGGER.info(msg);
         });
         //handler for RequestReceivedAuditRequest

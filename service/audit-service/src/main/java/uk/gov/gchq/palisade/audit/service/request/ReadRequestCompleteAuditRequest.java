@@ -17,11 +17,8 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.rule.Rules;
 
 import java.net.UnknownHostException;
 
@@ -30,33 +27,52 @@ import static java.util.Objects.requireNonNull;
 /**
  * This is one of the objects that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
  * to be able to store an audit record. This class extends {@link AuditRequest} This class
- * is used for the indication to the Audit logs that readResponse is being generated
+ * is used for the indication to the Audit logs that processing has been completed.
  */
-public class ReadResponseAuditRequest extends AuditRequest {
+public class ReadRequestCompleteAuditRequest extends AuditRequest {
+
     private LeafResource resource;
-    private Rules rulesApplied;
+    private long numberOfRecordsReturned;
 
-    public ReadResponseAuditRequest() throws UnknownHostException {
+    public ReadRequestCompleteAuditRequest() throws UnknownHostException {
     }
 
     /**
-     * @param requestId {@link RequestId} is the requestId for the ReadRequest
-     * @return the {@link ReadRequestExceptionAuditRequest}
+     * @param resource the {@link LeafResource} which the data has just finished being read
+     * @return the {@link ReadRequestCompleteAuditRequest}
      */
-    public ReadResponseAuditRequest requestId(final RequestId requestId) {
-        requireNonNull(requestId, "The requestId type cannot be null");
-        this.requestId = requestId;
+    public ReadRequestCompleteAuditRequest resource(final LeafResource resource) {
+        requireNonNull(resource, "The resource cannot be null");
+        this.resource = resource;
         return this;
     }
 
     /**
-     * @param res {@link LeafResource} is the leafResource for the ReadRequest
-     * @return the {@link ReadRequestExceptionAuditRequest}
+     * @param numberOfRecordsReturned is the number of records that was returned to the user from this resource
+     * @return the {@link ReadRequestCompleteAuditRequest}
      */
-    public ReadResponseAuditRequest resource(final LeafResource res) {
-        requireNonNull(res, "The leafResource type cannot be null");
-        this.resource = res;
+    public ReadRequestCompleteAuditRequest numberOfRecordsReturned(final long numberOfRecordsReturned) {
+        requireNonNull(numberOfRecordsReturned, "The numberOfRecordsReturned cannot be null");
+        this.numberOfRecordsReturned = numberOfRecordsReturned;
         return this;
+    }
+
+    public LeafResource getResource() {
+        requireNonNull(resource, "The resource has not been set");
+        return resource;
+    }
+
+    public void setResource(LeafResource resource) {
+        resource(resource);
+    }
+
+    public long getNumberOfRecordsReturned() {
+        requireNonNull(numberOfRecordsReturned, "The numberOfRecordsReturned has not been set");
+        return numberOfRecordsReturned;
+    }
+
+    public void setNumberOfRecordsReturned(long numberOfRecordsReturned) {
+        numberOfRecordsReturned(numberOfRecordsReturned);
     }
 
     @Override
@@ -67,20 +83,16 @@ public class ReadResponseAuditRequest extends AuditRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final ReadResponseAuditRequest that = (ReadResponseAuditRequest) o;
+        final ReadRequestCompleteAuditRequest that = (ReadRequestCompleteAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(requestId, that.requestId)
-                .append(resource, that.resource)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(19, 41)
+        return new HashCodeBuilder(29, 37)
                 .appendSuper(super.hashCode())
-                .append(requestId)
-                .append(resource)
                 .toHashCode();
     }
 
@@ -88,26 +100,7 @@ public class ReadResponseAuditRequest extends AuditRequest {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("requestId", requestId)
-                .append("resource", resource)
                 .toString();
     }
 
-    public RequestId getRequestId() {
-        requireNonNull(requestId, "The request id has not been set.");
-        return requestId;
-    }
-
-    public LeafResource getResource() {
-        requireNonNull(resource, "The resource has not been set.");
-        return resource;
-    }
-
-    public void setRequestId(final RequestId requestId) {
-        requestId(requestId);
-    }
-
-    public void setResource(final LeafResource resource) {
-        resource(resource);
-    }
 }

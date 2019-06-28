@@ -19,30 +19,64 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.service.Service;
+
+import java.net.UnknownHostException;
 
 import static java.util.Objects.requireNonNull;
 
 /**
  * This is one of the objects that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
  * to be able to store an audit record. This class extends {@link AuditRequest} This class
- * is used for the indication to the Audit logs that an exception has been received.
+ * is used for the indication to the Audit logs that an exception has been received while processing the RegisterDataRequest
+ * and which service it was that triggered the exception.
  */
-public class ExceptionAuditRequest extends AuditRequestWithContext {
-    private Throwable exception;
+public class RegisterRequestExceptionAuditRequest extends AuditRequest {
 
-    public ExceptionAuditRequest() {
+    private Throwable exception;
+    private Service service;
+
+    // no-arg constructor required
+    public RegisterRequestExceptionAuditRequest() throws UnknownHostException {
     }
 
     /**
      * @param exception {@link Throwable} is the type of the exception while processing
-     * @return the {@link ExceptionAuditRequest}
+     * @return the {@link RegisterRequestExceptionAuditRequest}
      */
-    public ExceptionAuditRequest exception(final Throwable exception) {
+    public RegisterRequestExceptionAuditRequest exception(final Throwable exception) {
         requireNonNull(exception, "The exception type cannot be null");
         this.exception = exception;
         return this;
     }
 
+    /**
+     * @param service {@link Service} is the palisade service that the exception was triggered by.
+     * @return the {@link RegisterRequestExceptionAuditRequest}
+     */
+    public RegisterRequestExceptionAuditRequest service(final Service service) {
+        requireNonNull(service, "The service cannot be null");
+        this.service = service;
+        return this;
+    }
+
+    public Throwable getException() {
+        requireNonNull(exception, "The exception type has not been set");
+        return exception;
+    }
+
+    public void setException(Throwable exception) {
+        exception(exception);
+    }
+
+    public Service getService() {
+        requireNonNull(service, "The service has not been set");
+        return service;
+    }
+
+    public void setService(Service service) {
+        service(service);
+    }
 
     @Override
     public boolean equals(final Object o) {
@@ -52,10 +86,11 @@ public class ExceptionAuditRequest extends AuditRequestWithContext {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final ExceptionAuditRequest that = (ExceptionAuditRequest) o;
+        final RegisterRequestExceptionAuditRequest that = (RegisterRequestExceptionAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(exception, that.exception)
+                .append(service, that.service)
                 .isEquals();
     }
 
@@ -64,6 +99,7 @@ public class ExceptionAuditRequest extends AuditRequestWithContext {
         return new HashCodeBuilder(27, 41)
                 .appendSuper(super.hashCode())
                 .append(exception)
+                .append(service)
                 .toHashCode();
     }
 
@@ -72,11 +108,7 @@ public class ExceptionAuditRequest extends AuditRequestWithContext {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("exception", exception)
+                .append("service", service)
                 .toString();
-    }
-
-    public Throwable getException() {
-        requireNonNull(exception, "The exception type cannot be null");
-        return exception;
     }
 }

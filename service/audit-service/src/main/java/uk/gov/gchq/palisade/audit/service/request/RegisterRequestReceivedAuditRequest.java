@@ -17,8 +17,10 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.resource.LeafResource;
+import uk.gov.gchq.palisade.UserId;
 
 import java.net.UnknownHostException;
 
@@ -27,40 +29,82 @@ import static java.util.Objects.requireNonNull;
 /**
  * This is one of the objects that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
  * to be able to store an audit record. This class extends {@link AuditRequest} This class
- * is used for the indication to the Audit logs that a ReqadRequest has been received.
+ * is used for the indication to the Audit logs that a RegisterDataRequest request has been received.
  */
-public class ReadRequestReceivedAuditRequest extends AuditRequest {
-    private LeafResource resource;
+public class RegisterRequestReceivedAuditRequest extends AuditRequest {
+
+    private Context context;
+    private UserId userId;
+    private String resourceId;
     private String clientIp;
     private String clientHostname;
 
-    public ReadRequestReceivedAuditRequest() throws UnknownHostException {
+    // no-arg constructor required
+    public RegisterRequestReceivedAuditRequest() throws UnknownHostException {
     }
 
     /**
-     * @param resource {@link LeafResource} is the resource to be read
-     * @return the {@link ReadRequestReceivedAuditRequest}
+     * @param context the context that was passed by the client to the palisade service
+     * @return the {@link RegisterRequestReceivedAuditRequest}
      */
-    public ReadRequestReceivedAuditRequest resource(final LeafResource resource) {
-        requireNonNull(resource, "The resource cannot be set to null.");
-        this.resource = resource;
+    public RegisterRequestReceivedAuditRequest context(final Context context) {
+        requireNonNull(context, "The context cannot be set to null");
+        this.context = context;
         return this;
     }
 
-    public LeafResource getResource() {
-        requireNonNull(resource, "The resource has not been set.");
-        return resource;
+    public Context getContext() {
+        requireNonNull(this.context, "The context has not been set");
+        return context;
     }
 
-    public void setResource(final LeafResource resource) {
-        resource(resource);
+    public void setContext(final Context context) {
+        context(context);
+    }
+
+    /**
+     * @param userId the {@link UserId} of the user making the data request which was passed by the client to the palisade service
+     * @return the {@link RegisterRequestReceivedAuditRequest}
+     */
+    public RegisterRequestReceivedAuditRequest userId(final UserId userId) {
+        requireNonNull(userId, "The userId cannot be set to null");
+        this.userId = userId;
+        return this;
+    }
+
+    public UserId getUserId() {
+        requireNonNull(this.context, "The userId has not been set");
+        return userId;
+    }
+
+    public void setUserId(UserId userId) {
+        userId(userId);
+    }
+
+    /**
+     * @param resourceId the pointer to a resource that was passed by the client to the palisade service
+     * @return the {@link RegisterRequestReceivedAuditRequest}
+     */
+    public RegisterRequestReceivedAuditRequest resourceId(final String resourceId) {
+        requireNonNull(resourceId, "The resourceId cannot be set to null");
+        this.resourceId = resourceId;
+        return this;
+    }
+
+    public String getResourceId() {
+        requireNonNull(this.context, "The resourceId has not been set");
+        return resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        resourceId(resourceId);
     }
 
     /**
      * @param clientIp the IP address of the client machine that the user triggered the data access request from
-     * @return the {@link ReadRequestReceivedAuditRequest}
+     * @return the {@link RegisterRequestReceivedAuditRequest}
      */
-    public ReadRequestReceivedAuditRequest clientIp(final String clientIp) {
+    public RegisterRequestReceivedAuditRequest clientIp(final String clientIp) {
         requireNonNull(clientIp, "The clientIp cannot be set to null");
         this.clientIp = clientIp;
         return this;
@@ -77,9 +121,9 @@ public class ReadRequestReceivedAuditRequest extends AuditRequest {
 
     /**
      * @param clientHostname the hostname of the client machine that the user triggered the data access request from
-     * @return the {@link ReadRequestReceivedAuditRequest}
+     * @return the {@link RegisterRequestReceivedAuditRequest}
      */
-    public ReadRequestReceivedAuditRequest clientHostname(final String clientHostname) {
+    public RegisterRequestReceivedAuditRequest clientHostname(final String clientHostname) {
         requireNonNull(clientHostname, "The clientHostname cannot be set to null");
         this.clientHostname = clientHostname;
         return this;
@@ -102,10 +146,12 @@ public class ReadRequestReceivedAuditRequest extends AuditRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final ReadRequestReceivedAuditRequest that = (ReadRequestReceivedAuditRequest) o;
+        final RegisterRequestReceivedAuditRequest that = (RegisterRequestReceivedAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(resource, that.resource)
+                .append(context, that.context)
+                .append(userId, that.userId)
+                .append(resourceId, that.resourceId)
                 .append(clientIp, that.clientIp)
                 .append(clientHostname, that.clientHostname)
                 .isEquals();
@@ -113,9 +159,11 @@ public class ReadRequestReceivedAuditRequest extends AuditRequest {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(13, 37)
+        return new HashCodeBuilder(21, 37)
                 .appendSuper(super.hashCode())
-                .append(resource)
+                .append(context)
+                .append(userId)
+                .append(resourceId)
                 .append(clientIp)
                 .append(clientHostname)
                 .toHashCode();
@@ -125,7 +173,9 @@ public class ReadRequestReceivedAuditRequest extends AuditRequest {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("resource", resource)
+                .append("context", context)
+                .append("userid", userId)
+                .append("resourceId", resourceId)
                 .append("clientIp", clientIp)
                 .append("clientHostname", clientHostname)
                 .toString();

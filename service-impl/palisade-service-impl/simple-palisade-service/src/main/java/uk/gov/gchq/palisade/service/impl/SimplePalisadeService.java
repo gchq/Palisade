@@ -23,9 +23,9 @@ import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.audit.service.AuditService;
-import uk.gov.gchq.palisade.audit.service.request.ExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ProcessingStartedAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.RequestReceivedAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
@@ -199,9 +199,9 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
 
     @Override
     public CompletableFuture<DataRequestResponse> registerDataRequest(final RegisterDataRequest request) {
-        final RequestId originalRequestId = new RequestId().id(UUID.randomUUID().toString());
+        final RequestId originalRequestId = request.getId();
         LOGGER.debug("Registering data request: {}", request, originalRequestId);
-        auditRequestReceived(request, originalRequestId);
+        auditRequestReceived(request);
         final GetUserRequest userRequest = new GetUserRequest().userId(request.getUserId());
         userRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting user from userService: {}", userRequest);
@@ -213,7 +213,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 .exceptionally(ex -> {
                     LOGGER.error("Failed to get user: {}", ex.getMessage());
                     if (nonNull(ex)) {
-                        auditRequestReceivedException(request, originalRequestId, ex);
+                        auditRequestReceivedException(request, ex);
                     }
                     throw new RuntimeException(ex); //rethrow the exception
                 });
@@ -228,7 +228,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 .exceptionally(ex -> {
                     LOGGER.error("Failed to get resources: {}", ex.getMessage());
                     if (nonNull(ex)) {
-                        auditRequestReceivedException(request, originalRequestId, ex);
+                        auditRequestReceivedException(request, ex);
                     }
                     throw new RuntimeException(ex); //rethrow the exception
                 });
@@ -240,11 +240,11 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 .thenApply(t -> getPolicy(request, futureUser, futureResources, originalRequestId))
                 .thenApply(multiPolicy -> PalisadeService.ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
                 .thenAccept(multiPolicy -> {
-                    auditProcessingStarted(request, futureUser.join(), multiPolicy, originalRequestId);
+                    auditProcessingStarted(request, futureUser.join(), multiPolicy);
                     cache(request, futureUser.join(), requestId, multiPolicy, futureResources.join().size(), originalRequestId);
                 })
                 .thenApply(multiPolicy -> {
-                    final DataRequestResponse response = new DataRequestResponse().requestId(requestId).originalRequestId(originalRequestId).resources(futureResources.join());
+                    final DataRequestResponse response = new DataRequestResponse().token(requestId.getId()).resources(futureResources.join());
                     response.setOriginalRequestId(originalRequestId);
                     LOGGER.debug("Responding with: {}", response);
                     return response;
@@ -252,8 +252,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 .exceptionally(ex -> {
                     LOGGER.error("Error handling: {}", ex.getMessage());
                     if (nonNull(ex)) {
-                        auditRequestReceivedException(request, originalRequestId, ex);
-
+                        auditRequestReceivedException(request, ex);
                     }
                     throw new RuntimeException(ex); //rethrow the exception
                 });
@@ -270,41 +269,34 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 }).join();
     }
 
-    private void auditProcessingStarted(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy, final RequestId originalRequestId) {
-        for (final Entry<LeafResource, Policy> entry : multiPolicy.getPolicies().entrySet()) {
-            final ProcessingStartedAuditRequest auditRequestProcessingStarted =
-                    new ProcessingStartedAuditRequest();
-            auditRequestProcessingStarted.resource(entry.getKey()).user(user)
-                    .howItWasProcessed(entry.getValue().getMessage())
-                    .context(request.getContext(), ProcessingStartedAuditRequest.class)
-                    .userId(request.getUserId(), ProcessingStartedAuditRequest.class)
-                    .resourceId(request.getResourceId(), ProcessingStartedAuditRequest.class)
-                    .id(request.getId())
-                    .originalRequestId(originalRequestId);
-            LOGGER.debug("Auditing: {}", auditRequestProcessingStarted);
-            auditService.audit(auditRequestProcessingStarted).join();
-        }
+    private void auditProcessingStarted(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy) {
+        RegisterRequestCompleteAuditRequest registerRequestCompleteAuditRequest = new RegisterRequestCompleteAuditRequest()
+                .leafResources(multiPolicy.getPolicies().keySet())
+                .user(user)
+                .originalRequestId(request.getOriginalRequestId());
+        LOGGER.debug("Auditing: {}", registerRequestCompleteAuditRequest);
+        auditService.audit(registerRequestCompleteAuditRequest).join();
     }
 
-    private void auditRequestReceived(final RegisterDataRequest request, final RequestId originalRequestId) {
-        final RequestReceivedAuditRequest requestReceivedAuditRequest = new RequestReceivedAuditRequest();
-        requestReceivedAuditRequest.context(request.getContext(), RequestReceivedAuditRequest.class)
-                .userId(request.getUserId(), RequestReceivedAuditRequest.class)
-                .resourceId(request.getResourceId(), RequestReceivedAuditRequest.class)
+    private void auditRequestReceived(final RegisterDataRequest request) {
+        final RegisterRequestReceivedAuditRequest requestReceivedAuditRequest = new RegisterRequestReceivedAuditRequest();
+        requestReceivedAuditRequest.context(request.getContext(), RegisterRequestReceivedAuditRequest.class)
+                .userId(request.getUserId(), RegisterRequestReceivedAuditRequest.class)
+                .resourceId(request.getResourceId(), RegisterRequestReceivedAuditRequest.class)
                 .id(request.getId())
-                .originalRequestId(originalRequestId);
+                .originalRequestId(request.getId());
         auditService.audit(requestReceivedAuditRequest).join();
     }
 
-    private void auditRequestReceivedException(final RegisterDataRequest request, final RequestId originalRequestId, final Throwable ex) {
-        final ExceptionAuditRequest auditRequestWithException = new ExceptionAuditRequest();
+    private void auditRequestReceivedException(final RegisterDataRequest request, final Throwable ex) {
+        final RegisterRequestExceptionAuditRequest auditRequestWithException = new RegisterRequestExceptionAuditRequest();
         auditRequestWithException
                 .exception(ex)
-                .context(request.getContext(), ExceptionAuditRequest.class)
-                .userId(request.getUserId(), ExceptionAuditRequest.class)
-                .resourceId(request.getResourceId(), ExceptionAuditRequest.class)
+                .context(request.getContext(), RegisterRequestExceptionAuditRequest.class)
+                .userId(request.getUserId(), RegisterRequestExceptionAuditRequest.class)
+                .resourceId(request.getResourceId(), RegisterRequestExceptionAuditRequest.class)
                 .id(request.getId())
-                .originalRequestId(originalRequestId);
+                .originalRequestId(request.getId());
         LOGGER.debug("Error handling: " + ex.getMessage());
         auditService.audit(auditRequestWithException).join();
     }
