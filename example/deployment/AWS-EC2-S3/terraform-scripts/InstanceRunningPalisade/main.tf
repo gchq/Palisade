@@ -6,32 +6,33 @@ provider "aws" {
 }
 
 module "security_group" {
-  source = "../../terraform-modules/security_group"     # base directory from which modules are referenced is example/deployment/AWS-EC2-S3/terraform-scripts
+  source = "../../../terraform-modules/security_group"     # base directory from which modules are referenced is example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade
   ingress_ip_range = "${var.ingress_ip_range}"
   owner = "${var.owner}"
   project = "${var.project}"
 }
 
 module "ami" {
-  source = "../../terraform-modules/ami"
+  source = "../../../terraform-modules/ami"
 }
 
 module "iam" {
-  source = "../../terraform-modules/iam"
+  source = "../../../terraform-modules/iam"
   bucket_name = "${var.bucket_name}"
 }
 
 module "s3_bucket" {
-  source = "../../terraform-modules/s3_bucket"
+  source = "../../../terraform-modules/s3_bucket"
   bucket_name = "${var.bucket_name}"
   owner = "${var.owner}"
   project = "${var.project}"
 }
 
-module "deploy_example" {
-  source = "../../terraform-modules/deploy_example"
+module "deploy_palisade" {
+  source = "../../../terraform-modules/deploy_palisade"
   key_file = "${var.pem_file}"
   host_name = "${aws_instance.palisade_instance.public_dns}"
+  private_host_name = "${aws_instance.palisade_instance.private_dns}"
   ec2_userid = "${var.ec2_userid}"
   data_file_name = "${var.data_file_name}"
   bucket_name = "${var.bucket_name}"
@@ -40,15 +41,14 @@ module "deploy_example" {
 
 # create hadoop_s3.xml from templatefile
 data "template_file" "hadoop_s3" {
-  template = "${file("../../../resources/hadoop_s3.tmpl")}"
+  template = "${file("../../../../resources/hadoop_s3.tmpl")}"
   vars = {
     bucket_name = "${var.bucket_name}"
   }
 }
 resource "local_file" "hadoop_s3" {
-  #content = templatefile("../../../resources/hadoop_s3.tmpl", { bucket_name = "${var.bucket_name}" })
   content = "${data.template_file.hadoop_s3.rendered}"
-  filename = "../../../resources/hadoop_s3.xml"
+  filename = "../../../../resources/hadoop_s3.xml"
 }
 
 resource "aws_instance" "palisade_instance" {
