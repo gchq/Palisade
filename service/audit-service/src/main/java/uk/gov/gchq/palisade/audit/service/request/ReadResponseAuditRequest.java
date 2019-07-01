@@ -17,47 +17,63 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.rule.Rules;
-
-import java.net.UnknownHostException;
 
 import static java.util.Objects.requireNonNull;
 
 /**
  * This is one of the objects that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
  * to be able to store an audit record. This class extends {@link AuditRequest} This class
- * is used for the indication to the Audit logs that readResponse is being generated
+ * is used for the indication to the Audit logs that data has started to be sent to the client
  */
 public class ReadResponseAuditRequest extends AuditRequest {
     private LeafResource resource;
     private Rules rulesApplied;
 
-    public ReadResponseAuditRequest() throws UnknownHostException {
+    public ReadResponseAuditRequest() {
     }
 
     /**
-     * @param requestId {@link RequestId} is the requestId for the ReadRequest
+     * @param rulesApplied {@link Rules} is the rules that are being applied to this resource for this request
      * @return the {@link ReadRequestExceptionAuditRequest}
      */
-    public ReadResponseAuditRequest requestId(final RequestId requestId) {
-        requireNonNull(requestId, "The requestId type cannot be null");
-        this.requestId = requestId;
+    public ReadResponseAuditRequest rulesApplied(final Rules rulesApplied) {
+        requireNonNull(rulesApplied, "The rulesApplied cannot be null");
+        this.rulesApplied = rulesApplied;
         return this;
     }
 
+    public Rules getRulesApplied() {
+        requireNonNull(rulesApplied, "The field rulesApplied has not been set.");
+        return rulesApplied;
+    }
+
+    public void setRulesApplied(Rules rulesApplied) {
+        rulesApplied(rulesApplied);
+    }
+
     /**
-     * @param res {@link LeafResource} is the leafResource for the ReadRequest
+     * @param resource {@link LeafResource} is the leafResource that is being read
      * @return the {@link ReadRequestExceptionAuditRequest}
      */
-    public ReadResponseAuditRequest resource(final LeafResource res) {
-        requireNonNull(res, "The leafResource type cannot be null");
-        this.resource = res;
+    public ReadResponseAuditRequest resource(final LeafResource resource) {
+        requireNonNull(resource, "The leafResource cannot be null");
+        this.resource = resource;
         return this;
     }
+
+    public LeafResource getResource() {
+        requireNonNull(resource, "The resource has not been set.");
+        return resource;
+    }
+
+    public void setResource(final LeafResource resource) {
+        resource(resource);
+    }
+
+
 
     @Override
     public boolean equals(final Object o) {
@@ -70,7 +86,7 @@ public class ReadResponseAuditRequest extends AuditRequest {
         final ReadResponseAuditRequest that = (ReadResponseAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(requestId, that.requestId)
+                .append(rulesApplied, that.rulesApplied)
                 .append(resource, that.resource)
                 .isEquals();
     }
@@ -79,7 +95,7 @@ public class ReadResponseAuditRequest extends AuditRequest {
     public int hashCode() {
         return new HashCodeBuilder(19, 41)
                 .appendSuper(super.hashCode())
-                .append(requestId)
+                .append(rulesApplied)
                 .append(resource)
                 .toHashCode();
     }
@@ -88,26 +104,8 @@ public class ReadResponseAuditRequest extends AuditRequest {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("requestId", requestId)
+                .append("rulesApplied", rulesApplied)
                 .append("resource", resource)
                 .toString();
-    }
-
-    public RequestId getRequestId() {
-        requireNonNull(requestId, "The request id has not been set.");
-        return requestId;
-    }
-
-    public LeafResource getResource() {
-        requireNonNull(resource, "The resource has not been set.");
-        return resource;
-    }
-
-    public void setRequestId(final RequestId requestId) {
-        requestId(requestId);
-    }
-
-    public void setResource(final LeafResource resource) {
-        resource(resource);
     }
 }

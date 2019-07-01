@@ -17,12 +17,10 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.LeafResource;
 
-import java.net.UnknownHostException;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -39,7 +37,7 @@ public class RegisterRequestCompleteAuditRequest extends AuditRequest {
     private Set<LeafResource> leafResources;
 
     // no-arg constructor required
-    public RegisterRequestCompleteAuditRequest() throws UnknownHostException {
+    public RegisterRequestCompleteAuditRequest() {
     }
 
     /**

@@ -17,12 +17,9 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.UserId;
-
-import java.net.UnknownHostException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,7 +37,7 @@ public class RegisterRequestReceivedAuditRequest extends AuditRequest {
     private String clientHostname;
 
     // no-arg constructor required
-    public RegisterRequestReceivedAuditRequest() throws UnknownHostException {
+    public RegisterRequestReceivedAuditRequest() {
     }
 
     /**
@@ -77,7 +74,7 @@ public class RegisterRequestReceivedAuditRequest extends AuditRequest {
         return userId;
     }
 
-    public void setUserId(UserId userId) {
+    public void setUserId(final UserId userId) {
         userId(userId);
     }
 
@@ -96,7 +93,7 @@ public class RegisterRequestReceivedAuditRequest extends AuditRequest {
         return resourceId;
     }
 
-    public void setResourceId(String resourceId) {
+    public void setResourceId(final String resourceId) {
         resourceId(resourceId);
     }
 
@@ -115,7 +112,7 @@ public class RegisterRequestReceivedAuditRequest extends AuditRequest {
         return clientIp;
     }
 
-    public void setClientIp(String clientIp) {
+    public void setClientIp(final String clientIp) {
         clientIp(clientIp);
     }
 
@@ -134,7 +131,7 @@ public class RegisterRequestReceivedAuditRequest extends AuditRequest {
         return clientHostname;
     }
 
-    public void setClientHostname(String clientHostname) {
+    public void setClientHostname(final String clientHostname) {
         clientHostname(clientHostname);
     }
 

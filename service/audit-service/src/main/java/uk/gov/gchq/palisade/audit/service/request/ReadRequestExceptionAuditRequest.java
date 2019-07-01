@@ -22,8 +22,6 @@ import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
-import java.net.UnknownHostException;
-
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -38,7 +36,7 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
     private LeafResource resource;
     private Throwable exception;
 
-    public ReadRequestExceptionAuditRequest() throws UnknownHostException {
+    public ReadRequestExceptionAuditRequest() {
     }
 
     /**

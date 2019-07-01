@@ -18,6 +18,8 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -30,16 +32,22 @@ import java.util.Date;
  * to be able to store an audit record. The default information is when was the audit record created and by what server
  */
 public class AuditRequest extends Request {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuditRequest.class);
 
     private final Date timestamp;
     private final String serverIp;
     private final String serverHostname;
 
     // no-arg constructor required
-    public AuditRequest() throws UnknownHostException {
+    public AuditRequest() {
         timestamp = new Date();
         //TODO check this is the right thing to do
-        InetAddress inetAddress = InetAddress.getLocalHost();
+        InetAddress inetAddress = null;
+        try {
+            inetAddress = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
         serverHostname = inetAddress.getHostName();
         serverIp = inetAddress.getHostAddress();
     }

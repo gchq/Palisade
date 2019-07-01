@@ -17,11 +17,8 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.service.Service;
-
-import java.net.UnknownHostException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -34,10 +31,10 @@ import static java.util.Objects.requireNonNull;
 public class RegisterRequestExceptionAuditRequest extends AuditRequest {
 
     private Throwable exception;
-    private Service service;
+    private Class<? extends Service> serviceClass;
 
     // no-arg constructor required
-    public RegisterRequestExceptionAuditRequest() throws UnknownHostException {
+    public RegisterRequestExceptionAuditRequest() {
     }
 
     /**
@@ -51,12 +48,12 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
     }
 
     /**
-     * @param service {@link Service} is the palisade service that the exception was triggered by.
+     * @param serviceClass {@link Class<Service>} is the palisade service that the exception was triggered by.
      * @return the {@link RegisterRequestExceptionAuditRequest}
      */
-    public RegisterRequestExceptionAuditRequest service(final Service service) {
-        requireNonNull(service, "The service cannot be null");
-        this.service = service;
+    public RegisterRequestExceptionAuditRequest service(final Class<? extends Service> serviceClass) {
+        requireNonNull(serviceClass, "The serviceClass cannot be null");
+        this.serviceClass = serviceClass;
         return this;
     }
 
@@ -69,12 +66,12 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
         exception(exception);
     }
 
-    public Service getService() {
-        requireNonNull(service, "The service has not been set");
-        return service;
+    public Class<? extends Service> getServiceClass() {
+        requireNonNull(serviceClass, "The serviceClass has not been set");
+        return serviceClass;
     }
 
-    public void setService(Service service) {
+    public void setService(Class<? extends Service> service) {
         service(service);
     }
 
@@ -90,7 +87,7 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(exception, that.exception)
-                .append(service, that.service)
+                .append(serviceClass, that.serviceClass)
                 .isEquals();
     }
 
@@ -99,7 +96,7 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
         return new HashCodeBuilder(27, 41)
                 .appendSuper(super.hashCode())
                 .append(exception)
-                .append(service)
+                .append(serviceClass)
                 .toHashCode();
     }
 
@@ -108,7 +105,7 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("exception", exception)
-                .append("service", service)
+                .append("serviceClass", serviceClass)
                 .toString();
     }
 }

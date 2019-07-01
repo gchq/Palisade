@@ -20,8 +20,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.LeafResource;
 
-import java.net.UnknownHostException;
-
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -34,7 +32,7 @@ public class ReadRequestCompleteAuditRequest extends AuditRequest {
     private LeafResource resource;
     private long numberOfRecordsReturned;
 
-    public ReadRequestCompleteAuditRequest() throws UnknownHostException {
+    public ReadRequestCompleteAuditRequest() {
     }
 
     /**
