@@ -47,6 +47,7 @@ public class AuditRequest extends Request {
             inetAddress = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             LOGGER.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
         serverHostname = inetAddress.getHostName();
         serverIp = inetAddress.getHostAddress();
