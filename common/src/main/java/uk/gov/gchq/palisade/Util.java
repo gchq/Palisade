@@ -210,21 +210,27 @@ public final class Util {
         }
     }
 
-    public static String whereLoaded(String clazz) {
+    /**
+     * Debug utility for finding which JAR file (if any) a class was loaded from. This is useful in debugging classpath
+     * conflicts.
+     *
+     * @param clazz the fully qualified class name to search for
+     * @return where the class was loaded from, or {@code null}
+     */
+    public static String locateJarFile(final String clazz) {
+        requireNonNull(clazz, "clazz");
         try {
             Class c = Class.forName(clazz);
             CodeSource codeSource = c.getProtectionDomain().getCodeSource();
 
             if (codeSource != null) {
-
                 LOGGER.info("{} was loaded from {}", clazz, codeSource.getLocation());
 
             } else {
-                LOGGER.info("I have no idea where {} came from!", clazz);
+                LOGGER.info("Can't determine where {} was loaded from", clazz);
             }
-            return (codeSource != null) ? codeSource.getLocation().toString() : "dunno";
+            return (codeSource != null) ? codeSource.getLocation().toString() : null;
         } catch (Exception e) {
-            LOGGER.error("Couldn't resolve class {}", e.getMessage());
             return e.getMessage();
         }
     }

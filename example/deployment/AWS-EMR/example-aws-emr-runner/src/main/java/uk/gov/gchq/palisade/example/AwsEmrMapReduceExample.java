@@ -116,7 +116,6 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         String sourceFile = args[0];
 
 
-
         //create the basic job object and configure it for this example
         Job job = Job.getInstance(getConf(), "Palisade MapReduce Example");
         job.setJarByClass(AwsEmrMapReduceExample.class);
@@ -147,8 +146,9 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         configureJob(job, palisade, 2);
 
         job.getConfiguration().set("mapreduce.job.user.classpath.first", "true");
-        Util.whereLoaded("com.fasterxml.jackson.databind.type.ReferenceType");
-        Util.whereLoaded("uk.gov.gchq.palisade.example.common.ExampleUser");
+        Util.locateJarFile("org.apache.hadoop.yarn.webapp.WebApp");
+        Util.locateJarFile("com.google.common.base.CharMatcher");
+
         PalisadeInputFormat.setResourceErrorBehaviour(job, ReaderFailureMode.FAIL_ON_READ_FAILURE);
 
         //next add a resource request to the job
