@@ -72,9 +72,18 @@ resource "null_resource" "deploy_example" {
   }
 
   # Deploy ETCD on the ec2 instance
+  provisioner "remote-exec" {
+    inline = [
+      "ip=`hostname -I  | sed 's/ .*//'`",
+      "echo IP ****************************** $ip",
+      "sed -i \"s/PRIVATEIP/$ip/\" /home/${var.ec2_userid}/example/deployment/bash-scripts/deployETCD.sh"
+    ]
+  }
   provisioner "local-exec" {
     command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/bash-scripts/deployETCD.sh > /home/${var.ec2_userid}/example_logs/deployETCD.log 2>&1 &'"
   }
+  #ip=`hostname -I  | sed 's/ .*//'`
+  #cat deployETCD.sh | sed "s/PRIVATEIP/$ip/"
 
   #  # Run buildServices locally
   #  provisioner "local-exec" {
