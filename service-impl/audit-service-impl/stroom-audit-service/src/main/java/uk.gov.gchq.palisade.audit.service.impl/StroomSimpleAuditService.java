@@ -16,12 +16,12 @@
 
 package uk.gov.gchq.palisade.audit.service.impl;
 
+import event.logging.Activity;
 import event.logging.AuthenticateAction;
-import event.logging.Device;
+import event.logging.AuthenticateOutcome;
+import event.logging.Classification;
 import event.logging.Event;
-import event.logging.Event.EventDetail.Process;
-import event.logging.EventLoggingService;
-import event.logging.ProcessAction;
+import event.logging.ObjectOutcome;
 import event.logging.System;
 import event.logging.User;
 import event.logging.impl.DefaultEventLoggingService;
@@ -29,25 +29,18 @@ import event.logging.util.DeviceUtil;
 import event.logging.util.EventLoggingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.gov.gchq.palisade.RequestId;
-import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.AuditRequestWithContext;
-import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestExceptionAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadResponseAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.RequestReceivedAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.ServiceState;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -62,163 +55,232 @@ import static java.util.Objects.requireNonNull;
 public class StroomSimpleAuditService implements AuditService {
     private static final Logger LOGGER = LoggerFactory.getLogger(StroomSimpleAuditService.class);
     private static final Map<Class, Consumer<Object>> DISPATCH = new HashMap<Class, Consumer<Object>>();
-    //Create the logging service
-    private static final EventLoggingService EVENT_LOGGING_SERVICE = new DefaultEventLoggingService();
-    private static final System EVENT_LOGGING_SYSTEM = new System();
+
+    private static final DefaultEventLoggingService EVENT_LOGGING_SERVICE = new DefaultEventLoggingService();
+    private static final System SYSTEM = new System();
+    private static final String EVENT_GENERATOR = "Palisade";
 
     public StroomSimpleAuditService() {
-        //Create the EVENT_LOGGING_SYSTEM that is logging the authenticate event
-        EVENT_LOGGING_SYSTEM.setName("Palisade Audit Service");
-        EVENT_LOGGING_SYSTEM.setEnvironment("Test");
     }
 
-    public static void logToStroom(final Class<? extends AuditRequest> cls, final String msg, final RequestId requestId, final UserId userId) {
-        //Create the user involved in the authenticate action (possibly different from
-        //the eventSource user)
-        String userMsg = "";
-        if (userId != null) {
-            userMsg += userId.toString() + " ";
-        }
-        userMsg += requestId.toString();
+    /**
+     * @param systemName the name of the system from which the audit service is receiving audit logs from
+     * @return {@link StroomSimpleAuditService}
+     */
+    public StroomSimpleAuditService systemName(final String systemName) {
+        requireNonNull(systemName, "The system name cannot be null.");
+        SYSTEM.setName(systemName);
+        return this;
+    }
 
-        final User user = EventLoggingUtil.createUser(userMsg);
-        String hostName;
-        String hostAddress;
+    public void setSystemName(final String systemName) {
+        systemName(systemName);
+    }
 
-        //Describe the device the event occurred on
-        try {
-            InetAddress inetAddress = InetAddress.getLocalHost();
-            hostName = inetAddress.getHostName();
-            hostAddress = inetAddress.getHostAddress();
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-        final Device device = DeviceUtil.createDevice(hostName, hostAddress);
+    public String getSystemName() {
+        return SYSTEM.getName();
+    }
 
+    /**
+     * @param organisation the organisation that the system belongs too
+     * @return {@link StroomSimpleAuditService}
+     */
+    public StroomSimpleAuditService organisation(final String organisation) {
+        requireNonNull(organisation, "The organisation cannot be null.");
+        SYSTEM.setOrganisation(organisation);
+        return this;
+    }
 
-        //Provide details of where the event came from
-        final Event.EventSource eventSource = new Event.EventSource();
-        eventSource.setSystem(EVENT_LOGGING_SYSTEM);
-        eventSource.setGenerator("Palisade");
-        eventSource.setDevice(device);
-        eventSource.setUser(user);
+    public void setOrganisation(final String organisation) {
+        organisation(organisation);
+    }
 
-        //Create the authenticate object to describe the authentication specific details
-        final Event.EventDetail.Process process = new Process();
-        process.setAction(ProcessAction.EXECUTE);
+    public String getOrganisation() {
+        return SYSTEM.getOrganisation();
+    }
 
-        final Event.EventDetail.Authenticate authenticate = new Event.EventDetail.Authenticate();
-        authenticate.setAction(AuthenticateAction.LOGON);
-        authenticate.setUser(user);
+    /**
+     * @param env the system environment of this deployment, e.g prod, ref, test
+     * @return {@link StroomSimpleAuditService}
+     */
+    public StroomSimpleAuditService systemEnv(final String env) {
+        requireNonNull(env, "The env cannot be null.");
+        SYSTEM.setEnvironment(env);
+        return this;
+    }
 
-        //Create the detail of what happened
-        //TypeId is typically a EVENT_LOGGING_SYSTEM specific code that is unique to a use case in that EVENT_LOGGING_SYSTEM
-        final Event.EventDetail eventDetail = new Event.EventDetail();
-        eventDetail.setTypeId(cls.getSimpleName());
-        eventDetail.setDescription(msg);
-        eventDetail.setAuthenticate(authenticate);
+    public void setSystemEnv(final String systemEnv) {
+        systemEnv(systemEnv);
+    }
 
-        //Define the time the event happened
-        final Event.EventTime eventTime = EventLoggingUtil.createEventTime(new Date());
+    public String getSystemEnv() {
+        return SYSTEM.getEnvironment();
+    }
 
-        //Combine the sub-objects together
-        final Event event = EVENT_LOGGING_SERVICE.createEvent();
+    /**
+     * @param description the description of the system from which the audit service is receiving audit logs from
+     * @return {@link StroomSimpleAuditService}
+     */
+    public StroomSimpleAuditService systemDescription(final String description) {
+        requireNonNull(description, "The description cannot be null.");
+        SYSTEM.setDescription(description);
+        return this;
+    }
+
+    public void setSystemDescription(final String description) {
+        systemDescription(description);
+    }
+
+    public String getSystemDescription() {
+        return SYSTEM.getDescription();
+    }
+
+    /**
+     * @param systemVersion the system version of this deployment, v1, v1.0.2, v2, etc
+     * @return {@link StroomSimpleAuditService}
+     */
+    public StroomSimpleAuditService systemVersion(final String systemVersion) {
+        requireNonNull(systemVersion, "The systemVersion cannot be null.");
+        SYSTEM.setEnvironment(systemVersion);
+        return this;
+    }
+
+    public void setSystemVersion(final String systemVersion) {
+        systemVersion(systemVersion);
+    }
+
+    public String getSystemVersion() {
+        return SYSTEM.getVersion();
+    }
+
+    /**
+     * @param systemClassification the classification of the system from which the audit service is receiving audit logs from
+     * @return {@link StroomSimpleAuditService}
+     */
+    public StroomSimpleAuditService systemClassification(final String systemClassification) {
+        requireNonNull(systemClassification, "The systemClassification cannot be null.");
+        Classification classification = new Classification();
+        classification.setText(systemClassification);
+        SYSTEM.setClassification(classification);
+        return this;
+    }
+
+    public void setSystemlassification(final String systemClassification) {
+        systemClassification(systemClassification);
+    }
+
+    public String getSystemlassification() {
+        return SYSTEM.getClassification().getText();
+    }
+
+    private static Event generateNewGenericEvent(final AuditRequest request){
+        Event event = EVENT_LOGGING_SERVICE.createEvent();
+        // set the event time
+        Event.EventTime eventTime = EventLoggingUtil.createEventTime(request.getTimestamp());
         event.setEventTime(eventTime);
+        // set the event chain
+        Event.EventChain eventChain = new Event.EventChain();
+        Activity parent = new Activity();
+        parent.setId(request.getOriginalRequestId().getId());
+        Activity activity = new Activity();
+        activity.setParent(parent);
+        activity.setId(request.getId().getId());
+        eventChain.setActivity(activity);
+        // set the event source
+        Event.EventSource eventSource = new Event.EventSource();
+        eventSource.setSystem(SYSTEM);
+        eventSource.setGenerator(EVENT_GENERATOR);
+        eventSource.setServer(DeviceUtil.createDevice(request.getServerHostname(), request.getServerIp()));
         event.setEventSource(eventSource);
-        event.setEventDetail(eventDetail);
-
-        //Send the event
-        EVENT_LOGGING_SERVICE.log(event);
+        return event;
     }
-
 
     //translate class object to handler
     static {
-        //handler for RegisterRequestExceptionAuditRequest
-        DISPATCH.put(RegisterRequestExceptionAuditRequest.class, (o) -> {
-            requireNonNull(o, "registerRequestExceptionAuditRequest");
-            RegisterRequestExceptionAuditRequest registerRequestExceptionAuditRequest = (RegisterRequestExceptionAuditRequest) o;
-            final String msg = " 'exception' " + auditLogContext(registerRequestExceptionAuditRequest) + registerRequestExceptionAuditRequest.getException().getMessage();
-            logToStroom(RegisterRequestExceptionAuditRequest.class, msg, registerRequestExceptionAuditRequest.getOriginalRequestId(), registerRequestExceptionAuditRequest.getUserId());
-        });
-        //handler for ReadRequestCompleteAuditRequest
-        DISPATCH.put(ReadRequestCompleteAuditRequest.class, (o) -> {
-            requireNonNull(o, "processingCompleteAuditRequest");
-            auditRequestWithContext((AuditRequestWithContext) o, "processingComplete");
+        //handler for RegisterRequestReceivedAuditRequest
+        DISPATCH.put(RegisterRequestReceivedAuditRequest.class, (o) -> {
+            requireNonNull(o, "RegisterRequestReceivedAuditRequest cannot be null");
+            RegisterRequestReceivedAuditRequest registerRequestReceivedAuditRequest = (RegisterRequestReceivedAuditRequest) o;
+
+            Event event = generateNewGenericEvent(registerRequestReceivedAuditRequest);
+            // log who the user is claiming to be
+            Event.EventSource eventSource = event.getEventSource();
+            eventSource.setUser(EventLoggingUtil.createUser(registerRequestReceivedAuditRequest.getUserId().getId()));
+            // log where the client (palisade service) that the audit request came from
+            eventSource.setClient(DeviceUtil.createDevice(registerRequestReceivedAuditRequest.getClientHostname(), registerRequestReceivedAuditRequest.getClientIp()));
+            // TODO log the resource id being requested
+
+            // TODO log the context that was supplied with the request
+
+            // TODO create View request event detail???
+            EventLoggingUtil.createEventDetail("???", "???");
+            Event.EventDetail eventDetail = new Event.EventDetail();
+            eventDetail.setView(new ObjectOutcome());
+//            event.setEventDetail(eventDetail);
+            EVENT_LOGGING_SERVICE.log(event);
         });
         //handler for RegisterRequestCompleteAuditRequest
         DISPATCH.put(RegisterRequestCompleteAuditRequest.class, (o) -> {
-            requireNonNull(o, "registerRequestCompleteAuditRequest");
+            requireNonNull(o, "RegisterRequestCompleteAuditRequest cannot be null");
             RegisterRequestCompleteAuditRequest registerRequestCompleteAuditRequest = (RegisterRequestCompleteAuditRequest) o;
-            final String msg = " 'processingStarted' " + auditLogContext(registerRequestCompleteAuditRequest)
-                    + registerRequestCompleteAuditRequest.getUser().toString()
-                    + "' accessed '" + registerRequestCompleteAuditRequest.getLeafResource().getId()
-                    + "' and it was processed using '" + registerRequestCompleteAuditRequest.getHowItWasProcessed();
-            logToStroom(RegisterRequestCompleteAuditRequest.class, msg, registerRequestCompleteAuditRequest.getOriginalRequestId(), registerRequestCompleteAuditRequest.getUserId());
+
+            // create authentication audit log
+            Event authenticationEvent = generateNewGenericEvent(registerRequestCompleteAuditRequest);
+            Event.EventSource eventSource = authenticationEvent.getEventSource();
+            // log the user
+            User user = EventLoggingUtil.createUser(registerRequestCompleteAuditRequest.getUser().getUserId().getId());
+            eventSource.setUser(user);
+            // log authentication event
+            Event.EventDetail eventDetail = new Event.EventDetail();
+            Event.EventDetail.Authenticate authenticate = new Event.EventDetail.Authenticate();
+            authenticate.setUser(user);
+            authenticate.setAction(AuthenticateAction.CONNECT);
+            AuthenticateOutcome authenticateOutcome = new AuthenticateOutcome();
+            authenticateOutcome.setSuccess(true);
+            authenticate.setOutcome(authenticateOutcome);
+            eventDetail.setAuthenticate(authenticate);
+            authenticationEvent.setEventDetail(eventDetail);
+            // send the authenticate audit log
+            EVENT_LOGGING_SERVICE.log(authenticationEvent);
+
+            // TODO log the resources that the user is approved to access (authorisation)
+            Event event = generateNewGenericEvent(registerRequestCompleteAuditRequest);
+            // log the list of resources
+
+            // log the trusted user information
+
         });
-        //handler for RequestReceivedAuditRequest
-        DISPATCH.put(RequestReceivedAuditRequest.class, (o) -> {
-            requireNonNull(o, "RequestReceivedAuditRequest");
-            auditRequestWithContext((AuditRequestWithContext) o, "auditRequest");
+        //handler for RegisterRequestExceptionAuditRequest
+        DISPATCH.put(RegisterRequestExceptionAuditRequest.class, (o) -> {
+            requireNonNull(o, "RegisterRequestExceptionAuditRequest cannot be null");
+            RegisterRequestExceptionAuditRequest registerRequestExceptionAuditRequest = (RegisterRequestExceptionAuditRequest) o;
+
+
+        });
+        //handler for ReadRequestReceivedAuditRequest
+        DISPATCH.put(ReadRequestReceivedAuditRequest.class, (o) -> {
+            requireNonNull(o, "ReadRequestReceivedAuditRequest cannot be null");
+            ReadRequestReceivedAuditRequest readRequestReceivedAuditRequest = (ReadRequestReceivedAuditRequest) o;
+
+        });
+        //handler for ReadRequestCompleteAuditRequest
+        DISPATCH.put(ReadRequestCompleteAuditRequest.class, (o) -> {
+            requireNonNull(o, "ReadRequestCompleteAuditRequest cannot be null");
+            ReadRequestCompleteAuditRequest readRequestCompleteAuditRequest = (ReadRequestCompleteAuditRequest) o;
 
         });
         //handler for ReadRequestExceptionAuditRequest
         DISPATCH.put(ReadRequestExceptionAuditRequest.class, (o) -> {
-            requireNonNull(o, "ReadRequestExceptionAuditRequest");
+            requireNonNull(o, "ReadRequestExceptionAuditRequest cannot be null");
             ReadRequestExceptionAuditRequest readRequestExceptionAuditRequest = (ReadRequestExceptionAuditRequest) o;
-            final String msg = " 'readRequestException' "
-                    + readRequestExceptionAuditRequest.getId() + " "
-                    + readRequestExceptionAuditRequest.getRequestId() + " "
-                    + readRequestExceptionAuditRequest.getOriginalRequestId() + " "
-                    + readRequestExceptionAuditRequest.getResource().toString() + " "
-                    + readRequestExceptionAuditRequest.getException().toString();
-            logToStroom(ReadRequestExceptionAuditRequest.class, msg, readRequestExceptionAuditRequest.getOriginalRequestId(), null);
-        });
-        //handler for ReadRequestReceivedAuditRequest
-        DISPATCH.put(ReadRequestReceivedAuditRequest.class, (o) -> {
-            requireNonNull(o, "ReadRequestReceivedAuditRequest");
-            ReadRequestReceivedAuditRequest readRequestReceivedAuditRequest = (ReadRequestReceivedAuditRequest) o;
-            final String msg = " 'readRequestReceived' "
-                    + readRequestReceivedAuditRequest.getId() + " "
-                    + readRequestReceivedAuditRequest.getRequestId() + " "
-                    + readRequestReceivedAuditRequest.getOriginalRequestId() + " "
-                    + readRequestReceivedAuditRequest.getResource().toString() + " ";
-            logToStroom(ReadRequestReceivedAuditRequest.class, msg, readRequestReceivedAuditRequest.getOriginalRequestId(), null);
+
         });
         //handler for ReadResponseAuditRequest
         DISPATCH.put(ReadResponseAuditRequest.class, (o) -> {
-            requireNonNull(o, "ReadResponseAuditRequest");
+            requireNonNull(o, "ReadResponseAuditRequest cannot be null");
             ReadResponseAuditRequest readResponseAuditRequest = (ReadResponseAuditRequest) o;
-            final String msg = " 'readResponseAuditRequest' "
-                    + readResponseAuditRequest.getId() + " "
-                    + readResponseAuditRequest.getRequestId() + " "
-                    + readResponseAuditRequest.getOriginalRequestId() + " "
-                    + readResponseAuditRequest.getResource().toString() + " ";
-            logToStroom(ReadResponseAuditRequest.class, msg, readResponseAuditRequest.getOriginalRequestId(), null);
+
         });
-        DISPATCH.put(AuditRequest.class, (o) -> {
-            requireNonNull(o, "AuditRequest");
-            AuditRequest auditRequest = (AuditRequest) o;
-            final String msg = " 'readResponseAuditRequest' "
-                    + auditRequest.getId() + " "
-                    + auditRequest.getOriginalRequestId();
-            logToStroom(ReadResponseAuditRequest.class, msg, auditRequest.getOriginalRequestId(), null);
-        });
-    }
-
-    private static String auditLogContext(final AuditRequestWithContext auditRequestWithContext) {
-
-        final String msg = " 'userId' " + auditRequestWithContext.getUserId().getId()
-                + " 'purpose' " + auditRequestWithContext.getContext().getPurpose()
-                + "' resourceId '" + auditRequestWithContext.getResourceId()
-                + "' id '" + auditRequestWithContext.getId()
-                + "' originalRequestId '" + auditRequestWithContext.getOriginalRequestId();
-        return msg;
-    }
-
-    private static void auditRequestWithContext(final AuditRequestWithContext auditRequestWithContext, final String messageType) {
-        final String msg = " " + messageType + " " + auditLogContext(auditRequestWithContext);
-        logToStroom(AuditRequestWithContext.class, msg, auditRequestWithContext.getOriginalRequestId(), auditRequestWithContext.getUserId());
     }
 
     @Override
