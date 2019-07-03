@@ -82,8 +82,6 @@ resource "null_resource" "deploy_example" {
   provisioner "local-exec" {
     command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/bash-scripts/deployETCD.sh > /home/${var.ec2_userid}/example_logs/deployETCD.log 2>&1 &'"
   }
-  #ip=`hostname -I  | sed 's/ .*//'`
-  #cat deployETCD.sh | sed "s/PRIVATEIP/$ip/"
 
   #  # Run buildServices locally
   #  provisioner "local-exec" {
@@ -117,75 +115,74 @@ resource "null_resource" "deploy_example" {
     destination = "/home/${var.ec2_userid}/example/resources/hadoop_s3.xml"
   }
   provisioner "local-exec" {
-      command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh ${var.private_host_name}:2379/health /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/configureRemoteServices.sh  > /home/${var.ec2_userid}/example_logs/configureRemoteServices.log 2>&1 &'"
+      command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh ${var.private_host_name}:2379/health /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh ${var.private_host_name}:8085/config/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/configureRemoteServices.sh  > /home/${var.ec2_userid}/example_logs/configureRemoteServices.log 2>&1 &'"
   }
 
-
-  # Deploy the Palisade Resource service on the ec2 instance...1st copy over the jar...
-  provisioner "file" {
-      source = "../../../../example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
-      destination = "/home/${var.ec2_userid}/example/example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
-  }
-  provisioner "local-exec" {
-    command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startResourceService.sh > /home/${var.ec2_userid}/example_logs/startResourceService.log 2>&1 &'"
-  }
-
-  # Deploy the Palisade User service on the ec2 instance....1st copy over the jar....
-  provisioner "file" {
-      source = "../../../../example-services/example-rest-user-service/target/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
-      destination = "/home/${var.ec2_userid}/example/example-services/example-rest-user-service/target/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
-  }
-  provisioner "local-exec" {
-      command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startUserService.sh > /home/${var.ec2_userid}/example_logs/startUserService.log 2>&1 &'"
+    # Deploy the Palisade Resource service on the ec2 instance...1st copy over the jar...
+    provisioner "file" {
+        source = "../../../../example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
+        destination = "/home/${var.ec2_userid}/example/example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
+    }
+    provisioner "local-exec" {
+      command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startResourceService.sh > /home/${var.ec2_userid}/example_logs/startResourceService.log 2>&1 &'"
     }
 
-  # Deploy the example Palisade Policy service on the ec2 instance.....1st copy over the jar...
-  provisioner "file" {
-      source = "../../../../example-services/example-rest-policy-service/target/example-rest-policy-service-0.2.1-SNAPSHOT-executable.jar"
-      destination = "/home/${var.ec2_userid}/example/example-services/example-rest-policy-service/target/example-rest-policy-service-0.2.1-SNAPSHOT-executable.jar"
-  }
-  provisioner "local-exec" {
-        command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startPolicyService.sh > /home/${var.ec2_userid}/example_logs/startPolicyService.log 2>&1 &'"
+    # Deploy the Palisade User service on the ec2 instance....1st copy over the jar....
+    provisioner "file" {
+        source = "../../../../example-services/example-rest-user-service/target/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
+        destination = "/home/${var.ec2_userid}/example/example-services/example-rest-user-service/target/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
+    }
+    provisioner "local-exec" {
+        command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startUserService.sh > /home/${var.ec2_userid}/example_logs/startUserService.log 2>&1 &'"
       }
 
-  # Deploy the example Palisade service (co-ordinating service) on the ec2 instance.....1st copy over the jar...
-  provisioner "file" {
-      source = "../../../../example-services/example-rest-palisade-service/target/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
-      destination = "/home/${var.ec2_userid}/example/example-services/example-rest-palisade-service/target/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
-  }
-  provisioner "local-exec" {
-        command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startPalisadeService.sh > /home/${var.ec2_userid}/example_logs/startPalisadeService.log 2>&1 &'"
-  }
+    # Deploy the example Palisade Policy service on the ec2 instance.....1st copy over the jar...
+    provisioner "file" {
+        source = "../../../../example-services/example-rest-policy-service/target/example-rest-policy-service-0.2.1-SNAPSHOT-executable.jar"
+        destination = "/home/${var.ec2_userid}/example/example-services/example-rest-policy-service/target/example-rest-policy-service-0.2.1-SNAPSHOT-executable.jar"
+    }
+    provisioner "local-exec" {
+          command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startPolicyService.sh > /home/${var.ec2_userid}/example_logs/startPolicyService.log 2>&1 &'"
+        }
 
-  # Generate a data file on the instance....1st copy over the jar...
-  provisioner "remote-exec" {
-      inline = [
-        "aws s3api delete-object --bucket ${var.bucket_name} --key ${var.data_file_name} || echo Deleted",
-        "java -cp /home/${var.ec2_userid}/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData  /home/${var.ec2_userid}/example_data  10  1 > /home/${var.ec2_userid}/example_logs/createDataFile.log 2>&1 ",
-        "aws s3 cp /home/${var.ec2_userid}/example_data/${var.data_file_name} s3://${var.bucket_name}/${var.data_file_name} || echo File not copied to S3 bucket"
-      ]
+    # Deploy the example Palisade service (co-ordinating service) on the ec2 instance.....1st copy over the jar...
+    provisioner "file" {
+        source = "../../../../example-services/example-rest-palisade-service/target/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
+        destination = "/home/${var.ec2_userid}/example/example-services/example-rest-palisade-service/target/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
+    }
+    provisioner "local-exec" {
+          command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startPalisadeService.sh > /home/${var.ec2_userid}/example_logs/startPalisadeService.log 2>&1 &'"
     }
 
-  # Deploy the example Palisade Data service on the ec2 instance.....1st copy over the jar...
-  provisioner "file" {
-      source = "../../../../example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
-      destination = "/home/${var.ec2_userid}/example/example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
-  }
-  provisioner "local-exec" {
-    command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startDataService.sh > /home/${var.ec2_userid}/example_logs/startDataService.log 2>&1 &'"
-  }
+    # Generate a data file on the instance....1st copy over the jar...
+    provisioner "remote-exec" {
+        inline = [
+          "aws s3api delete-object --bucket ${var.bucket_name} --key ${var.data_file_name} || echo Deleted",
+          "java -cp /home/${var.ec2_userid}/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData  /home/${var.ec2_userid}/example_data  10  1 > /home/${var.ec2_userid}/example_logs/createDataFile.log 2>&1 ",
+          "aws s3 cp /home/${var.ec2_userid}/example_data/${var.data_file_name} s3://${var.bucket_name}/${var.data_file_name} || echo File not copied to S3 bucket"
+        ]
+      }
 
-  # Configure the Example - create some users and policies...
-  provisioner "remote-exec" {
-      inline = [
-        "/home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8081/policy/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8082/resource/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8083/user/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/configureExamples.sh s3a://${var.bucket_name}.${var.s3_endpoint}/employee_file0.avro > /home/${var.ec2_userid}/example_logs/configureExamples.log 2>&1 ",
-      ]
+    # Deploy the example Palisade Data service on the ec2 instance.....1st copy over the jar...
+    provisioner "file" {
+        source = "../../../../example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
+        destination = "/home/${var.ec2_userid}/example/example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
+    }
+    provisioner "local-exec" {
+      command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startDataService.sh > /home/${var.ec2_userid}/example_logs/startDataService.log 2>&1 &'"
     }
 
-#  # Run the Example...
-#  provisioner "remote-exec" {
-#    inline = [
-#      "/home/${var.ec2_userid}/example/deployment/bash-scripts/runFormattedLocalJVMExample.sh s3a://${var.bucket_name}.${var.s3_endpoint}/employee_file0.avro"
-#    ]
-#  }
+    # Configure the Example - create some users and policies...
+    provisioner "remote-exec" {
+        inline = [
+          "/home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8081/policy/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8082/resource/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8083/user/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/configureExamples.sh s3a://${var.bucket_name}.${var.s3_endpoint}/employee_file0.avro > /home/${var.ec2_userid}/example_logs/configureExamples.log 2>&1 ",
+        ]
+      }
+
+/*  # Run the Example...
+  provisioner "remote-exec" {
+    inline = [
+      "/home/${var.ec2_userid}/example/deployment/bash-scripts/runFormattedLocalJVMExample.sh s3a://${var.bucket_name}.${var.s3_endpoint}/employee_file0.avro"
+    ]
+  }*/
 }

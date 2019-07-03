@@ -4,5 +4,4 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$DIR/../../bash-scripts/setScriptPath.sh"
 
-export HADOOP_CONF_PATH=/home/ec2-user/example/resources/hadoop_s3.xml
 java -cp "$EXAMPLE"/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.config.LocalServices

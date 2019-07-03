@@ -1,34 +1,15 @@
-# Main terraform script to deploy Palisade on ec2, grant permissions via IAM to read from S3 bucket, and successfully demonstrate Palisade against  a file in an S3 bucket
+# Main terraform script to deploy the Palisade example on an ec2 instance, grant permissions via IAM to read from S3 bucket, and successfully demonstrate Palisade against  a file in an S3 bucket
 provider "aws" {
   access_key = "${var.aws_access_key}"
   secret_key = "${var.aws_secret_key}"
   region = "${var.aws_region}"
 }
 
-module "security_group" {
-  source = "../../terraform-modules/security_group"     # base directory from which modules are referenced is example/deployment/AWS-EC2-S3/terraform-scripts
-  ingress_ip_range = "${var.ingress_ip_range}"
-  owner = "${var.owner}"
-  project = "${var.project}"
-}
-
 module "ami" {
-  source = "../../terraform-modules/ami"
+  source = "../../../terraform-modules/ami"
 }
 
-#module "iam" {
-#  source = "../../terraform-modules/iam"
-#  bucket_name = "${var.bucket_name}"
-#}
-
-module "s3_bucket" {
-  source = "../../terraform-modules/s3_bucket"
-  bucket_name = "${var.bucket_name}"
-  owner = "${var.owner}"
-  project = "${var.project}"
-}
-
-module "deploy_example" {
+/*module "deploy_example" {
   source = "../../terraform-modules/deploy_example"
   key_file = "${var.pem_file}"
   host_name = "${aws_instance.palisade_instance.public_dns}"
@@ -36,27 +17,15 @@ module "deploy_example" {
   data_file_name = "${var.data_file_name}"
   bucket_name = "${var.bucket_name}"
   s3_endpoint = "${var.s3_endpoint}"
-}
+}*/
 
-# create hadoop_s3.xml from templatefile
-data "template_file" "hadoop_s3" {
-  template = "${file("../../../resources/hadoop_s3.tmpl")}"
-  vars = {
-    bucket_name = "${var.bucket_name}"
-  }
-}
-resource "local_file" "hadoop_s3" {
-  content = "${data.template_file.hadoop_s3.rendered}"
-  filename = "../../../resources/hadoop_s3.xml"
-}
-
-resource "aws_instance" "palisade_instance" {
+resource "aws_instance" "instance_running_palisade_example" {
   ami = "${module.ami.ami_id}"
   instance_type = "${var.instance_type}"
   key_name = "${var.key_name}"
 
   tags {
-    Name = "Palisade Example"
+    Name = "Running Palisade Example"
     Owner = "${var.owner}"
     Project = "${var.project}"
   }
@@ -64,7 +33,6 @@ resource "aws_instance" "palisade_instance" {
   security_groups = [
     "${module.security_group.sg_name}"]
 
-#  iam_instance_profile = "${module.iam.instance_profile_id}"
 }
 
 
