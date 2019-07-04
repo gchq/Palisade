@@ -4,7 +4,7 @@ oms_sku="Free"
 ops_resource_group_name="palisade"
 
 config_share_resource_group_name="palisade-storage"
-config_share_storage_account_name="palisadestorage"
+config_share_storage_account_name="temppalisadestorage"
 config_share_share_name="data"
 
 ip_resource_group_name="palisade"
