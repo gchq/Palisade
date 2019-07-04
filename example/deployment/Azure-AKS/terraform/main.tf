@@ -43,4 +43,5 @@ module "aks" {
     subscription_id="${var.subscription_id}"
 
     vnet_subnet_id="/subscriptions/${var.subscription_id}/resourceGroups/${var.vnet_resource_group_name}/providers/Microsoft.Network/virtualNetworks/${var.vnet_name}/subnets/aks-subnet"
+    log_analytics_workspace_id = ""
 }
