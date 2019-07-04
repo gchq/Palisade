@@ -20,6 +20,13 @@ resource "aws_security_group" "palisade_allow_inbound" {
     cidr_blocks = ["${var.ingress_ip_range}"]
   }
 
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    self = true
+  }
+
   egress {
     from_port   = 0
     to_port     = 0

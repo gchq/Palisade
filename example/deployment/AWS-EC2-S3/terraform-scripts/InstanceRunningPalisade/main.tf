@@ -28,17 +28,6 @@ module "s3_bucket" {
   project = "${var.project}"
 }
 
-module "deploy_palisade" {
-  source = "../../../terraform-modules/deploy_palisade"
-  key_file = "${var.pem_file}"
-  host_name = "${aws_instance.palisade_instance.public_dns}"
-  private_host_name = "${aws_instance.palisade_instance.private_dns}"
-  ec2_userid = "${var.ec2_userid}"
-  data_file_name = "${var.data_file_name}"
-  bucket_name = "${var.bucket_name}"
-  s3_endpoint = "${var.s3_endpoint}"
-}
-
 # create hadoop_s3.xml from templatefile
 data "template_file" "hadoop_s3" {
   template = "${file("../../../../resources/hadoop_s3.tmpl")}"
@@ -51,13 +40,14 @@ resource "local_file" "hadoop_s3" {
   filename = "../../../../resources/hadoop_s3.xml"
 }
 
+# create instance running Palisade
 resource "aws_instance" "palisade_instance" {
   ami = "${module.ami.ami_id}"
   instance_type = "${var.instance_type}"
   key_name = "${var.key_name}"
 
   tags {
-    Name = "Palisade Example"
+    Name = "Running Palisade Services"
     Owner = "${var.owner}"
     Project = "${var.project}"
   }
@@ -66,6 +56,44 @@ resource "aws_instance" "palisade_instance" {
     "${module.security_group.sg_name}"]
 
   iam_instance_profile = "${module.iam.instance_profile_id}"
+}
+
+module "deploy_palisade" {
+  source = "../../../terraform-modules/deploy_palisade"
+  key_file = "${var.pem_file}"
+  host_name = "${aws_instance.palisade_instance.public_dns}"
+  private_host_name = "${aws_instance.palisade_instance.private_dns}"
+  ec2_userid = "${var.ec2_userid}"
+  data_file_name = "${var.data_file_name}"
+  bucket_name = "${var.bucket_name}"
+  s3_endpoint = "${var.s3_endpoint}"
+}
+
+# create instance running Example
+resource "aws_instance" "instance_running_palisade_example" {
+  ami = "${module.ami.ami_id}"
+  instance_type = "${var.instance_type}"
+  key_name = "${var.key_name}"
+
+  tags {
+    Name = "Running Palisade Example"
+    Owner = "${var.owner}"
+    Project = "${var.project}"
+  }
+
+  security_groups = [
+    "${module.security_group.sg_name}"]
+}
+
+module "deploy_example" {
+  source = "../../../terraform-modules/deploy_example"
+  key_file = "${var.pem_file}"
+  host_name = "${aws_instance.instance_running_palisade_example.public_dns}"
+  private_host_name = "${aws_instance.instance_running_palisade_example.private_dns}"
+  ec2_userid = "${var.ec2_userid}"
+  bucket_name = "${var.bucket_name}"
+  s3_endpoint = "${var.s3_endpoint}"
+  palisade_host_private_host_name = "${aws_instance.palisade_instance.private_dns}"
 }
 
 

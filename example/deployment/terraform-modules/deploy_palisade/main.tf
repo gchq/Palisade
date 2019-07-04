@@ -1,4 +1,4 @@
-resource "null_resource" "deploy_example" {
+resource "null_resource" "deploy_palisade" {
 
   # NOTE: the current directory when running this will be example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade ***********
 
@@ -75,7 +75,6 @@ resource "null_resource" "deploy_example" {
   provisioner "remote-exec" {
     inline = [
       "ip=`hostname -I  | sed 's/ .*//'`",
-      "echo IP ****************************** $ip",
       "sed -i \"s/PRIVATEIP/$ip/\" /home/${var.ec2_userid}/example/deployment/bash-scripts/deployETCD.sh"
     ]
   }
@@ -177,12 +176,5 @@ resource "null_resource" "deploy_example" {
         inline = [
           "/home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8081/policy/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8082/resource/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8083/user/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/configureExamples.sh s3a://${var.bucket_name}.${var.s3_endpoint}/employee_file0.avro > /home/${var.ec2_userid}/example_logs/configureExamples.log 2>&1 ",
         ]
-      }
-
-/*  # Run the Example...
-  provisioner "remote-exec" {
-    inline = [
-      "/home/${var.ec2_userid}/example/deployment/bash-scripts/runFormattedLocalJVMExample.sh s3a://${var.bucket_name}.${var.s3_endpoint}/employee_file0.avro"
-    ]
-  }*/
+    }
 }
