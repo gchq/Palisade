@@ -31,9 +31,4 @@ resource "azurerm_kubernetes_cluster" "k8s-cluster-name" {
     client_id     = "${var.client_id}"
     client_secret = "${var.client_secret}"
   }
-
-  oms_agent {
-    enabled = false
-    log_analytics_workspace_id = "${var.log_analytics_workspace_id}"
-  }
 }
