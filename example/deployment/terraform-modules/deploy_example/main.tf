@@ -19,7 +19,7 @@ resource "null_resource" "deploy_example" {
     timeout = "30s"
   }
 
-  # install and start docker, install java
+  # install java
   provisioner "remote-exec" {
     inline = [
       "sudo yum update -y",

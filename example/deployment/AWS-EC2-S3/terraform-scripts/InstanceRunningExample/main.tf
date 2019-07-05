@@ -9,16 +9,7 @@ module "ami" {
   source = "../../../terraform-modules/ami"
 }
 
-/*module "deploy_example" {
-  source = "../../terraform-modules/deploy_example"
-  key_file = "${var.pem_file}"
-  host_name = "${aws_instance.palisade_instance.public_dns}"
-  ec2_userid = "${var.ec2_userid}"
-  data_file_name = "${var.data_file_name}"
-  bucket_name = "${var.bucket_name}"
-  s3_endpoint = "${var.s3_endpoint}"
-}*/
-
+# create instance running Example
 resource "aws_instance" "instance_running_palisade_example" {
   ami = "${module.ami.ami_id}"
   instance_type = "${var.instance_type}"
@@ -31,8 +22,16 @@ resource "aws_instance" "instance_running_palisade_example" {
   }
 
   security_groups = [
-    "${module.security_group.sg_name}"]
-
+    "${var.sg_name}"]
 }
 
-
+module "deploy_example" {
+  source = "../../../terraform-modules/deploy_example"
+  key_file = "${var.pem_file}"
+  host_name = "${aws_instance.instance_running_palisade_example.public_dns}"
+  private_host_name = "${aws_instance.instance_running_palisade_example.private_dns}"
+  ec2_userid = "${var.ec2_userid}"
+  bucket_name = "${var.bucket_name}"
+  s3_endpoint = "${var.s3_endpoint}"
+  palisade_host_private_host_name = "${var.palisade_host_private_host_name}"
+}

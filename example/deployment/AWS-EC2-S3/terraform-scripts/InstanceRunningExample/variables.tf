@@ -43,3 +43,7 @@ variable "data_file_name" {
 variable "ec2_userid" {
   default = "ec2-user"
 }
+
+variable "sg_name" {}
+
+variable "palisade_host_private_host_name" {}
