@@ -6,6 +6,10 @@ STORAGE_RESOURCE_GROUP=$4
 
 
 STORAGE_KEY=$(az storage account keys list --resource-group $STORAGE_RESOURCE_GROUP --account-name $AKS_PERS_STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)
+
+echo "storage key set to"
+echo $STORAGE_KEY
+
 az aks get-credentials -n $AKS_CLUSTER_NAME -g $AKS_RESOURCE_GROUP
 
 if kubectl get secret data-share-secret; then
