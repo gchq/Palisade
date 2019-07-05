@@ -29,6 +29,7 @@ node_modules
 .settings
 .classpath
 .terraform
+dependency-reduced-pom.xml
 terraform.tfvars
 terraform.tfstate
 terraform.tfstate.backup

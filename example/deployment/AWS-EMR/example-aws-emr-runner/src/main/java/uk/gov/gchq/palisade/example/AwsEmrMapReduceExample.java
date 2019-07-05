@@ -78,6 +78,7 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         private Text outputKey = new Text();
 
         protected void map(final LeafResource key, final Employee value, final Context context) throws IOException, InterruptedException {
+            LOGGER.info("Employee read: {} ", value);
             //String property = value.getName();
             String property = value.getTaxCode();
             if (property != null && !property.isEmpty()) {
@@ -115,6 +116,10 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
 
         String sourceFile = args[0];
 
+        Util.locateJarFile("org.apache.hadoop.yarn.webapp.WebApp");
+        Util.locateJarFile("com.google.common.base.CharMatcher");
+        Util.locateJarFile("repackaged.com.google.common.base.CharMatcher");
+
 
         //create the basic job object and configure it for this example
         Job job = Job.getInstance(getConf(), "Palisade MapReduce Example");
@@ -146,8 +151,6 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         configureJob(job, palisade, 2);
 
         job.getConfiguration().set("mapreduce.job.user.classpath.first", "true");
-        Util.locateJarFile("org.apache.hadoop.yarn.webapp.WebApp");
-        Util.locateJarFile("com.google.common.base.CharMatcher");
 
         PalisadeInputFormat.setResourceErrorBehaviour(job, ReaderFailureMode.FAIL_ON_READ_FAILURE);
 
