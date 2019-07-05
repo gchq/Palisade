@@ -5,6 +5,9 @@ AKS_CLUSTER_NAME=$3
 STORAGE_RESOURCE_GROUP=$4
 
 
+echo $STORAGE_RESOURCE_GROUP
+echo $AKS_PERS_STORAGE_ACCOUNT_NAME
+
 STORAGE_KEY=$(az storage account keys list --resource-group $STORAGE_RESOURCE_GROUP --account-name $AKS_PERS_STORAGE_ACCOUNT_NAME --query "[0].value" -o tsv)
 
 echo "storage key set to"
