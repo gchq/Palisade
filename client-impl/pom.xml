@@ -30,6 +30,5 @@
         <module>mapreduce-client</module>
         <module>cat-client</module>
         <module>client-common</module>
-        <module>shade-hadoop-client</module>
     </modules>
 </project>

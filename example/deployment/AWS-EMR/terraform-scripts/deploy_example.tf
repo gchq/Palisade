@@ -3,7 +3,7 @@ resource "null_resource" "deploy_example" {
 # NOTE: the current directory when running this will be example/deployment/AWS-EMR/terraform-scripts ***********
 
   triggers = {
-    update = 1
+    update = 2
   }
 
   connection {
