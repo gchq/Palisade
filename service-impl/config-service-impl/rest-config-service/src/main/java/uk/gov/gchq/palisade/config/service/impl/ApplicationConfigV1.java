@@ -28,7 +28,6 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
 
     public ApplicationConfigV1() {
         super(RESOURCES);
-
         String bootStrapLocation = ConfigUtils.retrieveBootstrapPath();
 
         //make sure we can inject the service instance
