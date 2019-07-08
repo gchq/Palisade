@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.rule.Rule;
 import uk.gov.gchq.palisade.rule.Rules;
 
 import java.net.URL;
+import java.security.CodeSource;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
