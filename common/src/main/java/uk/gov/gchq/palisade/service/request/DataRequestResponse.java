@@ -78,7 +78,6 @@ public class DataRequestResponse {
     public DataRequestResponse originalRequestId(final RequestId originalRequestId) {
         requireNonNull(originalRequestId, "The originalRequestId cannot be null.");
         System.err.println("setting original request id: " + originalRequestId);
-        new Exception().printStackTrace(System.err);
         this.originalRequestId = originalRequestId;
         return this;
     }
