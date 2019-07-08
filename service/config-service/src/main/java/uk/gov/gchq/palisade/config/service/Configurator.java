@@ -24,7 +24,6 @@ import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.lang.reflect.InvocationTargetException;
-import java.security.CodeSource;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;

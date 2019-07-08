@@ -16,9 +16,6 @@
 
 package uk.gov.gchq.palisade.example.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 
