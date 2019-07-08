@@ -69,12 +69,12 @@ public class RegisterRequestCompleteAuditRequest extends AuditRequest {
         user(user);
     }
 
-    public Set<LeafResource> getLeafResource() {
+    public Set<LeafResource> getLeafResources() {
         requireNonNull(leafResources, "The leafResources has not been set.");
         return leafResources;
     }
 
-    public void setLeafResource(final Set<LeafResource> leafResources) {
+    public void setLeafResources(final Set<LeafResource> leafResources) {
         leafResources(leafResources);
     }
 

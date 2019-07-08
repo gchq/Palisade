@@ -21,7 +21,7 @@ import java.util.List;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class StroomSimpleAuditServiceTest {
+public class StroomAuditServiceTest {
 
     @Mock
     AppenderSkeleton appender;
@@ -50,22 +50,27 @@ public class StroomSimpleAuditServiceTest {
         String id = "Id";
         RequestId mockRequestId = Mockito.mock(RequestId.class);
         Mockito.doReturn("origRequestId").when(mockRequestId).toString();
-        auditRequestWithException
-                .exception(mockException)
-                .context(mockContext, RegisterRequestExceptionAuditRequest.class)
-                .userId(mockUserId, RegisterRequestExceptionAuditRequest.class)
-                .resourceId(resourceId, RegisterRequestExceptionAuditRequest.class)
-                .id(id)
-                .originalRequestId(mockRequestId);
+//        auditRequestWithException
+//                .exception(mockException)
+//                .context(mockContext, RegisterRequestExceptionAuditRequest.class)
+//                .userId(mockUserId, RegisterRequestExceptionAuditRequest.class)
+//                .resourceId(resourceId, RegisterRequestExceptionAuditRequest.class)
+//                .id(id)
+//                .originalRequestId(mockRequestId);
 
         // When
-        StroomSimpleAuditService stroomSimpleAuditService = new StroomSimpleAuditService();
-        stroomSimpleAuditService.audit(auditRequestWithException);
+        StroomAuditService stroomAuditService = new StroomAuditService();
+        stroomAuditService.audit(auditRequestWithException);
 
         //Then
         final List<LoggingEvent> logs = logCaptor.getAllValues();
         for (LoggingEvent logEvent : logs) {
             java.lang.System.out.println(logEvent);
         }
+    }
+
+    @Test
+    public void test() {
+        System.out.println(StroomAuditService.class.getSimpleName());
     }
 }
