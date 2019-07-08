@@ -1,8 +1,8 @@
 # Hadoop Library
 
-A Hadoop client library dependency which is used within Palisade. Hadoop contains several dependencies of its own which
-override the later versions Palisade uses and are not always backwards-compatible. Therefore we use this dependency which
-excludes others that have been updated within Palisade.
+This is a Hadoop client library dependency which is used within Palisade. Hadoop contains several dependencies for its own use, which
+Palisade also uses. The later versions Palisade uses are not always backwards-compatible, therefore we use this Hadoop dependency which
+excludes others which have been found to cause problems within Palisade.
 
 ## Profiles
 There are two Maven build profiles that can be used with this module:
