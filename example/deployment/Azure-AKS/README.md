@@ -74,6 +74,15 @@ git clone https://github.com/gchq/Palisade.git
 cd Palisade && git checkout develop
 ```
 
+##Modify /etc/hosts on the client VM
+Obtain the ingress public IP:
+![public ip](./publicIp.png)
+
+
+```bash
+vim /etc/hosts
+51.143.144.171 config-service palisade-service data-service
+```
 
 ##Generate the test data 
 
