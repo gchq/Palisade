@@ -36,26 +36,37 @@ To run the AWS-EMR example follow these steps (from the root of the project):
 3. Create a Terraform variables file. Copy this template and save it as `example/deployment/AWS-EMR/terraform-scripts/terraform.tfvars`:
 
     ```bash
+    # Set the access and secret key OR the profile name, not both!
+ 
     "aws_access_key" = "<Your AWS subscription access key>"
     
-    "aws_secret_key" = "<Your AWS subscription secret key"
-    
+    "aws_secret_key" = "<Your AWS subscription secret key>"
+     
+    "aws_profile_name" = "<Your AWS profile name>"
+
+    # Override the default eu-west-1 if you want
+    # "aws_region" = ""
+ 
     "bucket_name" = "<Globally unique S3 bucket name>"
     
     "key_name" = "<Name of EC2 key pair instance for EMR cluster>"
     
     "pem_file" = "<Path to the private key (.pem file) for the above key pair>"
     
-    "vpc_id" = "????"
+    "vpc_id" = "<ID of a VPC in AWS subscription>"
     
     "ingress_ip_range" = [ "1.2.3.4/32" , "5.6.7.8/32" ]
     
-    "subnet_id" = "????" 
+    "subnet_id" = "<ID of subnet that is in above VPC>" 
     ```
     
     This needs to be populated with the values indicated above before the example will run.
     
     1. Your AWS access key and secret key are specific to your AWS subscription. You can find information on where these are located [here](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html).
+        
+        You should set the **either** the access and secret keys **or** the profile name, not both. The profile name should be in the AWS shared credential file
+        `~/.aws/credentials` (or `%UserProfile%\.aws\credentials` on Windows).
+                
     2. The `bucket_name` must be a globally unique S3 bucket name of your choosing. Bucket naming rules are [here](https://docs.aws.amazon.com/AmazonS3/latest/dev//BucketRestrictions.html#bucketnamingrules).
     3. You will need to create a key pair which allows you to SSH into the EMR cluster and for Terraform to provision the cluster:
         1. Create a key pair by logging in and from the AWS console, select Services -> EC2. Then select Key Pairs from the side menu.
@@ -64,10 +75,11 @@ To run the AWS-EMR example follow these steps (from the root of the project):
        Put the name of your key pair in the `key_name` field  as it appears in AWS (no `.pem` extension).
     
     4. `pem_file` should be the path to the private key create in previous step (ending in `.pem` extension).
-    5. `vpc_id` is the name of the Virtual Private Cloud the EMR cluster will connect to. From AWS console, select Services -> VPC, then choose Your VPCs from the side menu.
+    5. `vpc_id` is the ID of the Virtual Private Cloud the EMR cluster will connect to. From AWS console, select Services -> VPC, then choose Your VPCs from the side menu.
     You may create a new VPC for this example or use an existing one. Place the name in the `vpc_id` field.
     6. The `ingress_ip_range` is a list of public IPs that will be able to connect into the EMR cluster. This should be your public IP for your client machine.
-    7. The `subnet_id` should be the name of a valid subnet name from the Subnets page of the VPC service in AWS.
+    7. The `subnet_id` should be the ID of a valid subnet from the Subnets page of the VPC service in AWS. It should be part of the VPC named earlier.
+    8. **Optional**: Change the AWS region by uncommenting the `aws_region` key and setting a region name.
 4. Initialise Terraform by running the following line from the Palisade root directory:
 
     ```(cd example/deployment/AWS-EMR/terraform-scripts/ && terraform init)```

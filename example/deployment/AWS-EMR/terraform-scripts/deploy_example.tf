@@ -2,10 +2,6 @@ resource "null_resource" "deploy_example" {
 
 # NOTE: the current directory when running this will be example/deployment/AWS-EMR/terraform-scripts ***********
 
-  triggers = {
-    update = 2
-  }
-
   connection {
     type        = "ssh"
     host = "${aws_emr_cluster.palisade_cluster.master_public_dns}"
@@ -55,11 +51,6 @@ resource "null_resource" "deploy_example" {
       "/home/hadoop/deploy_example/deployETCD.sh /home/hadoop/.ssh/${basename(var.pem_file)}",
     ]
   }
-
-#  # Run buildServices locally
-#  provisioner "local-exec" {
-#    command = "../../local-jvm/bash-scripts/buildServices.sh"
-#  }
 
   # Ensure the services are not running
     provisioner "remote-exec" {
