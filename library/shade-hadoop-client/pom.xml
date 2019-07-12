@@ -11,11 +11,12 @@
 
     <artifactId>shade-hadoop-client</artifactId>
 
-    <!-- Hadoop includes many outdated dependencies that conflict with later versions in Palisade, several have to be
+    <!-- Hadoop includes many older dependencies that conflict with later versions in Palisade, several have to be
     excluded here. Hadoop also uses an older version of Google's Guava that later versions are not backwards
     compatible with, so we relocate the Guava library in this shaded build. -->
 
-    <!-- Activating the aws profile ensures the Amazon Web Services s3a connector is available in Palisade -->
+    <!-- Activating the aws profile ensures the Amazon Web Services s3a connector is available in Palisade. -->
+
     <profiles>
         <profile>
             <id>aws</id>
