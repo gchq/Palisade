@@ -11,4 +11,5 @@ fi
 #./example/deployment/local-jvm/bash-scripts/buildServices.sh                 # ensure that executables for the services are built before deploying
 
 cd ./example/deployment/AWS-EMR/terraform-scripts
+terraform init
 terraform apply     -var pem_file=$1

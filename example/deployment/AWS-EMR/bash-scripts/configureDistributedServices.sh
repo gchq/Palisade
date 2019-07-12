@@ -26,7 +26,10 @@ echo $etcd_connection_details
 echo "data_connection_details"
 echo $data_connection_details
 
+# Update the location of the NameNode in the HDFS configuration
+sed -i "s/##HOST##/${private_dns}/g" /home/hadoop/deploy_example/resources/hdfs_conf.xml
+
 # call DistributedServices class - passing it the addresses of all the Palisade services that will be running on the cluster
 
-java -cp /home/hadoop/jars/example-model-*-shaded.jar \
+HADOOP_CONF_PATH=/home/hadoop/deploy_example/resources/hdfs_conf.xml java -cp /home/hadoop/jars/example-model-*-shaded.jar \
     uk.gov.gchq.palisade.example.config.DistributedServices $etcd_connection_details http://$private_dns:8080/palisade http://$private_dns:8081/policy http://$private_dns:8082/resource http://$private_dns:8083/user $data_connection_details http://$private_dns:8085/config  http://$private_dns:8080/palisade  $data_connection_details

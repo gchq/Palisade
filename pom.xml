@@ -330,6 +330,7 @@
                         <include>**/*ITs.java</include>
                         <include>**/*IntegrationTests.java</include>
                     </includes>
+                    <environmentVariables></environmentVariables>
                     <systemPropertyVariables>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml

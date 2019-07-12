@@ -251,7 +251,6 @@ public class Configurator {
                 }
 
             } catch (CompletionException | InterruptedException | ExecutionException | CancellationException e) {
-                e.printStackTrace(); //TODO REMOVE THIS
                 LOGGER.warn("Error while retrieving configuration for {} due to {}", serviceClass.map(Class::getTypeName).orElse("anonymous client"), e.getMessage());
                 //this should be rethrown immediately
                 if (e.getCause() instanceof NoConfigException) {

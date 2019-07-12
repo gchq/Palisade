@@ -18,7 +18,6 @@ if [ $# -gt 0 ]; then
         rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
         sudo rm -rf /opt/etcd-${ETCD_VER}
         sudo mkdir -p /opt/etcd-${ETCD_VER}
-
         curl -L ${DOWNLOAD_URL}/${ETCD_VER}/etcd-${ETCD_VER}-linux-amd64.tar.gz -o /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
         sudo tar xzvf /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz -C /opt/etcd-${ETCD_VER} --strip-components=1
         rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
