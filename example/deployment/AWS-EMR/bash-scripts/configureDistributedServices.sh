@@ -23,6 +23,10 @@ done
 
 echo "etcd_connection_details"
 echo $etcd_connection_details
+
+# Switch the data_connection_details for where the REST Redirector is
+data_connection_details="http://$private_dns:8084/data"
+
 echo "data_connection_details"
 echo $data_connection_details
 

@@ -119,6 +119,15 @@ resource "null_resource" "deploy_example" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployPalisadeService.sh > /home/hadoop/example_logs/deployPalisadeService.log 2>&1 &'"
   }
 
+  # Deploy the rest redirector
+  provisioner "file" {
+    source = "../../../example-services/example-rest-redirector-service/target/example-rest-redirector-service-0.2.1-SNAPSHOT-shaded.jar"
+    destination = "/home/hadoop/jars/example-rest-redirector-service-0.2.1-SNAPSHOT-shaded.jar"
+  }
+  provisioner "local-exec" {
+    command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployRESTRedirectorService.sh > /home/hadoop/example_logs/deployRESTRedirectorService.log 2>&1 &'"
+  }
+
   # Generate a data file on the cluster and put it into hdfs....1st copy over the jar...
   provisioner "file" {
     source = "../../../example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar"

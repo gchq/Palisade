@@ -47,6 +47,6 @@ resource "aws_emr_cluster" "palisade_cluster" {
 }
 
 resource "aws_iam_instance_profile" "emr_profile" {
-  name = "emr_profile"
+  name = "emr_profile2"
   role = "${aws_iam_role.EMR_EC2_DefaultRole_Palisade.id}"
 }
