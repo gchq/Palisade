@@ -23,8 +23,10 @@ import org.junit.Test;
 
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -71,7 +73,7 @@ public class ExampleFileUtilTest {
     public void shouldConvertLocalRelativePath() {
         //Given
         String input = temp.getParent().toString() + "/./././././././" + temp.getFileName();
-        String expected = "file://" + temp.toString();
+        String expected = (System.getProperty("os.name").toLowerCase().contains("win") ? "file:///" : "file://") + temp.toString().replace("\\", "/");
 
         //When
         String actual = ExampleFileUtil.convertToFileURI(input).toString();
@@ -84,7 +86,7 @@ public class ExampleFileUtilTest {
     public void shouldConvertLocalAbsolutePath() {
         //Given
         String input = temp.toString();
-        String expected = "file://" + temp.toString();
+        String expected = (System.getProperty("os.name").toLowerCase().contains("win") ? "file:///" : "file://") + temp.toString().replace("\\", "/");
 
         //When
         String actual = ExampleFileUtil.convertToFileURI(input).toString();
@@ -96,8 +98,8 @@ public class ExampleFileUtilTest {
     @Test
     public void shouldConvertFileSchemeWithRelative() {
         //Given
-        String input = "file://" + temp.getParent().toString() + "/././././" + temp.getFileName().toString();
-        String expected = "file://" + temp.toString();
+        String input = (System.getProperty("os.name").toLowerCase().contains("win") ? "file:///" : "file://") + temp.getParent().toString().replace("\\", "/") + "/././././" + temp.getFileName().toString();
+        String expected = (System.getProperty("os.name").toLowerCase().contains("win") ? "file:///" : "file://") + temp.toString().replace("\\", "/");
 
         //When
         String actual = ExampleFileUtil.convertToFileURI(input).toString();
@@ -109,8 +111,8 @@ public class ExampleFileUtilTest {
     @Test
     public void shouldConvertFileSchemeWithAbsolute() {
         //Given
-        String input = "file://" + temp.toString();
-        String expected = "file://" + temp.toString();
+        String input = (System.getProperty("os.name").toLowerCase().contains("win") ? "file:///" : "file://") + temp.toString().replace("\\", "/");
+        String expected = (System.getProperty("os.name").toLowerCase().contains("win") ? "file:///" : "file://") + temp.toString().replace("\\", "/");
 
         //When
         String actual = ExampleFileUtil.convertToFileURI(input).toString();
@@ -122,8 +124,8 @@ public class ExampleFileUtilTest {
     @Test
     public void shouldConvertFileSchemeWithSingleSlash() {
         //Given
-        String input = "file:" + temp.toString();
-        String expected = "file://" + temp.toString();
+        String input = (System.getProperty("os.name").toLowerCase().contains("win") ? "file:/" : "file:") + temp.toString().replace("\\", "/");
+        String expected = (System.getProperty("os.name").toLowerCase().contains("win") ? "file://" : "file:/") + temp.toString().replace("\\", "/");
 
         //When
         String actual = ExampleFileUtil.convertToFileURI(input).toString();
@@ -147,7 +149,7 @@ public class ExampleFileUtilTest {
     @Test
     public void shouldNotChangeNonExistentFile() {
         //Given
-        String expected = "file:///nowhere/no_file";
+        String expected = Paths.get(URI.create("file:///nowhere/no_file")).toUri().toString();
 
         //When
         String actual = ExampleFileUtil.convertToFileURI(expected).toString();

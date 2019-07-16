@@ -167,6 +167,7 @@ public class RedirectionMarshallTest {
 
         //When
         boolean compareDifferent = service.equals(service2);
+        @SuppressWarnings("SelfEquals")
         boolean compareSelf = service.equals(service);
 
         //Then
