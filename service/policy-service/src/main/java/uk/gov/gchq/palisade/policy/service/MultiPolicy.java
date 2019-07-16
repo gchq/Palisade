@@ -33,7 +33,7 @@ import static java.util.Objects.requireNonNull;
  * This class contains the mapping of {@link LeafResource}'s to the applicable {@link Policy}
  */
 public class MultiPolicy {
-    private Map<LeafResource, Policy> policies;
+    private Map<LeafResource, Policy> policies = new HashMap<>();
 
     // no-args constructor required
     public MultiPolicy() {
@@ -45,12 +45,13 @@ public class MultiPolicy {
      */
     public MultiPolicy policies(final Map<LeafResource, Policy> policies) {
         requireNonNull(policies, "The policies cannot be set to null.");
-        this.policies = policies;
+        this.policies.clear();
+        this.policies.putAll(policies);
         return this;
     }
 
     public Map<LeafResource, Policy> getPolicies() {
-        requireNonNull(policies, "The policies have not been set.");
+        //never null
         return policies;
     }
 
@@ -76,10 +77,11 @@ public class MultiPolicy {
      * Sets the given {@link Policy} to the given {@link LeafResource} provided
      * there isn't already a {@link Policy} assigned to that {@link LeafResource}.
      *
-     * @param resource the resource that you want the {@link Policy} for.
-     * @param policy   The {@link Policy} for the given {@link LeafResource}.
+     * @param resource the resource that you want the {@link Policy} for
+     * @param policy   The {@link Policy} for the given {@link LeafResource}
+     * @return this object
      */
-    public void setPolicy(final LeafResource resource, final Policy policy) {
+    public MultiPolicy setPolicy(final LeafResource resource, final Policy policy) {
         requireNonNull(resource, "Cannot set a policy to a null resource.");
         requireNonNull(policy, "Cannot set a null policy to a resource.");
         Map<LeafResource, Policy> policies = getPolicies();
@@ -88,10 +90,11 @@ public class MultiPolicy {
         }
 
         policies.put(resource, policy);
+        return this;
     }
 
     /**
-     * This extracts the list of rules from the {@link Policy} attached to each {@link LeafResource}.
+     * This extracts the list of record level rules from the {@link Policy} attached to each {@link LeafResource}.
      *
      * @return a mapping of the {@link LeafResource}'s to the record level {@link Rules} from the policies.
      */

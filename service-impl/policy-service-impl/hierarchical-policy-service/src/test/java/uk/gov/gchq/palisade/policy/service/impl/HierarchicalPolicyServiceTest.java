@@ -250,4 +250,7 @@ public class HierarchicalPolicyServiceTest {
         assertEquals(1, canAccessAfterResult.get().getCanAccessResources().size());
         assertNotEquals("TestObj2", canAccessAfterResult.get().getCanAccessResources().iterator().next().getType());
     }
+
+    //should not create policy out of thin air
+    
 }

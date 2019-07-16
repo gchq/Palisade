@@ -49,19 +49,19 @@ public class Policy<RULE_DATA_TYPE> {
 
     // no-args constructor required
     public Policy() {
-        recordRules(new Rules<>());
-        resourceRules(new Rules<>());
+        recordRules = new Rules<>();
+        resourceRules = new Rules<>();
     }
 
     public Policy<RULE_DATA_TYPE> recordRules(final Rules<RULE_DATA_TYPE> recordRules) {
         requireNonNull(recordRules, "The record level rules cannot be set to null.");
-        this.recordRules = recordRules;
+        this.recordRules.rules(recordRules.getRules());
         return this;
     }
 
     public Policy<RULE_DATA_TYPE> resourceRules(final Rules<Resource> resourceRules) {
         requireNonNull(resourceRules, "The resource level rules cannot be set to null.");
-        this.resourceRules = resourceRules;
+        this.resourceRules.rules(resourceRules.getRules());
         return this;
     }
 

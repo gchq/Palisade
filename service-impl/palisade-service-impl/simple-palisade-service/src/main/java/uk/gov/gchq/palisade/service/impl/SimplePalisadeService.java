@@ -205,6 +205,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         final GetUserRequest userRequest = new GetUserRequest().userId(request.getUserId());
         userRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting user from userService: {}", userRequest);
+
         final CompletableFuture<User> futureUser = userService.getUser(userRequest)
                 .thenApply(user -> {
                     LOGGER.debug("Got user: {}", user);
@@ -217,8 +218,10 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     }
                     throw new RuntimeException(ex); //rethrow the exception
                 });
+
         final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId());
         resourceRequest.setOriginalRequestId(originalRequestId);
+
         LOGGER.debug("Getting resources from resourceService: {}", resourceRequest);
         final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources = resourceService.getResourcesById(resourceRequest)
                 .thenApply(resources -> {
@@ -232,10 +235,13 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     }
                     throw new RuntimeException(ex); //rethrow the exception
                 });
+
         final RequestId requestId = new RequestId().id(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
+
         final DataRequestConfig config = new DataRequestConfig();
         config.setContext(request.getContext());
         config.setOriginalRequestId(originalRequestId);
+
         return CompletableFuture.allOf(futureUser, futureResources)
                 .thenApply(t -> getPolicy(request, futureUser, futureResources, originalRequestId))
                 .thenApply(multiPolicy -> PalisadeService.ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
