@@ -34,7 +34,6 @@ data-service-64f596c6b9-cbr9t       1/1     Running     0          114m
 data-service-64f596c6b9-h8h68       1/1     Running     0          114m
 data-service-64f596c6b9-r86w5       1/1     Running     0          114m
 data-service-64f596c6b9-rsftk       1/1     Running     0          114m
-etcd-fcdf6b9f4-xlsgp                1/1     Running     1          27h
 palisade-service-c98d8b7c-kc9vr     1/1     Running     0          114m
 policy-service-6594d845db-dg2fm     1/1     Running     0          114m
 resource-service-79487d98d8-s5jpk   1/1     Running     0          114m
