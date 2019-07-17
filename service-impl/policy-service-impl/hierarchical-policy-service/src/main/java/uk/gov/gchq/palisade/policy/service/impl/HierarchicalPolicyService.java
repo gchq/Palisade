@@ -123,7 +123,8 @@ public class HierarchicalPolicyService implements PolicyService {
                 .map(resource -> {
                     CompletableFuture<Rules<LeafResource>> futureRules = getApplicableRules(resource, true, resource.getType());
                     Rules<LeafResource> rules = futureRules.join();
-                    return Util.applyRulesToRecord(resource, user, context, rules);
+                    System.err.println(rules);
+                    return Util.applyRulesToItem(resource, user, context, rules);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());

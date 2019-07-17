@@ -266,7 +266,10 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
     }
 
     private MultiPolicy getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources, final RequestId originalRequestId) {
-        final GetPolicyRequest policyRequest = new GetPolicyRequest().user(futureUser.join()).context(request.getContext()).resources(new HashSet<>(futureResources.join().keySet()));
+        final GetPolicyRequest policyRequest = new GetPolicyRequest()
+                .user(futureUser.join())
+                .context(request.getContext())
+                .resources(new HashSet<>(futureResources.join().keySet()));
         policyRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting policy from policyService: {}", policyRequest);
         return policyService.getPolicy(policyRequest)

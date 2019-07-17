@@ -21,6 +21,7 @@ import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
+import uk.gov.gchq.palisade.resource.StubResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
@@ -36,8 +37,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -145,6 +149,35 @@ public class HierarchicalPolicyServiceTest {
         assertEquals(fileResource1, resources.iterator().next());
     }
 
+    //should filter out resources where no policy is defined
+    @Test
+    public void shouldRemoveResourcesWithNoPolicy() {
+        //Given
+        User user = new User().userId("testUser").auths("Sensitive");
+        Context context = new Context().purpose("testing");
+
+        FileResource noPolicyResource = createTestFileResource(3);
+
+        //Set up a resource and parent with no policy attached
+        SystemResource noPolicyParent=new SystemResource().id("nowhere");
+        StubResource noPolicyStub = new StubResource();
+        noPolicyStub.type("test").id("something");
+        noPolicyStub.serialisedFormat("something");
+        noPolicyStub.parent(noPolicyParent);
+
+        //When
+        CompletableFuture<CanAccessResponse> future=policyService.canAccess(
+                new CanAccessRequest()
+                .user(user)
+                .context(context)
+                .resources(Collections.singletonList(noPolicyStub)));
+
+        CanAccessResponse response=future.join();
+
+        //Then
+        assertThat(response.getCanAccessResources(),is(equalTo(Collections.emptyList())));
+    }
+
     @Test
     public void getPolicy() throws InterruptedException, ExecutionException, TimeoutException {
         // given
@@ -250,7 +283,4 @@ public class HierarchicalPolicyServiceTest {
         assertEquals(1, canAccessAfterResult.get().getCanAccessResources().size());
         assertNotEquals("TestObj2", canAccessAfterResult.get().getCanAccessResources().iterator().next().getType());
     }
-
-    //should not create policy out of thin air
-    
 }
