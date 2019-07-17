@@ -30,6 +30,7 @@
         <module>hashmap-backing-store</module>
         <module>properties-backing-store</module>
         <module>etcd-backing-store</module>
+        <module>k8s-backing-store</module>
     </modules>
 
     <dependencies>

@@ -28,7 +28,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import static uk.gov.gchq.palisade.util.TestUtil.streamEqual;
 
 public abstract class AbstractBackingStoreTest {
@@ -63,7 +62,7 @@ public abstract class AbstractBackingStoreTest {
         //When
         Stream<String> ret = impl.list("test1");
         //Then
-        assertTrue(streamEqual(Stream.of("test1_key1", "test1_key2"), ret));
+        assertTrue(streamEqual(Stream.of(impl.convertKeyToCompatible("test1_key1"), impl.convertKeyToCompatible("test1_key2")), ret));
     }
 
     @Test
@@ -77,8 +76,8 @@ public abstract class AbstractBackingStoreTest {
         Stream<String> ret = impl.list("foo");
         Stream<String> ret2 = impl.list("bar");
         //Then
-        assertTrue(streamEqual(Stream.of("foo_key1"), ret));
-        assertTrue(streamEqual(Stream.of("bar_key2"), ret2));
+        assertTrue(streamEqual(Stream.of(impl.convertKeyToCompatible("foo_key1")), ret));
+        assertTrue(streamEqual(Stream.of(impl.convertKeyToCompatible("bar_key2")), ret2));
     }
 
     @Test
@@ -140,6 +139,7 @@ public abstract class AbstractBackingStoreTest {
         //Then
         //check not there
         result = impl.get("remove_test1");
+
         assertFalse(result.getValue().isPresent());
     }
 
@@ -363,8 +363,8 @@ public abstract class AbstractBackingStoreTest {
     @Test
     public void shouldStoreAndOverwrite() {
         //Given
-        byte[] expected = new byte[]{1, 2, 3, 4};
-        byte[] expected2 = new byte[]{5, 6, 7, 8};
+        byte[] expected = new byte[]{1, 2, 3, 4, 0};
+        byte[] expected2 = new byte[]{5, 6, 7, 8, 0};
         //When
         impl.add("new_test2", Integer.class, expected);
         SimpleCacheObject actual = impl.get("new_test2");

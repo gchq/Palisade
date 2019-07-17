@@ -24,7 +24,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     validate_example_output "$OUTPUT"
     container_result=$?
     echo "Stopping the local-docker-example containers"
-    echo "y" | ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh
+    echo "y" | ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh TRUE
 
     echo "Starting the local-jvm-example"
     ./example/deployment/local-jvm/bash-scripts/startAllServices.sh

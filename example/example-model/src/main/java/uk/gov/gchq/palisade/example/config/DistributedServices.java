@@ -16,6 +16,9 @@
 
 package uk.gov.gchq.palisade.example.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 
@@ -30,8 +33,17 @@ public final class DistributedServices {
     private DistributedServices() {
     }
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyServicesFactory.class);
+
     public static void main(final String[] args) {
+        if (args.length > 0) {
+            LOGGER.info("Configuring ProxyServiceFactory with the following args" + args);
+        } else {
+            LOGGER.info("Configuring ProxyServiceFactory with no args");
+        }
         ProxyServicesFactory factory = new ProxyServicesFactory(args);
+
+
         new ServicesConfigurator(factory);
 
         CacheService cs = factory.createInternalCacheService();

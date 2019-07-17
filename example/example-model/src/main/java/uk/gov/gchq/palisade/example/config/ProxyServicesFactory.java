@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.K8sBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.impl.ProxyRestConfigService;
@@ -74,7 +75,7 @@ public class ProxyServicesFactory {
             return true;
         } else {
             LOGGER.error("error not enough arguments have been provided. The following arguments are required:\n" +
-                    "1. a commma separated list of the etcd endpoints\n" +
+                    "1. a commma separated list of the etcd endpoints OR the word: FALSE indicating that Palisade is running on a kubernetes cluster and should use the embedded etcd instance\n" +
                     "2. the internal url for the palisade service\n" +
                     "3. the internal url for the policy service\n" +
                     "4. the internal url for the resource service\n" +
@@ -96,8 +97,13 @@ public class ProxyServicesFactory {
     public CacheService createInternalCacheService() {
         if (isNull(cacheService)) {
             if (args.length > 1) {
-                List<URI> etcdEndpoints = Arrays.stream(args[0].split(",")).map(URI::create).collect(Collectors.toList());
-                cacheService = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(etcdEndpoints));
+                if (args[0].equalsIgnoreCase("FALSE")) {
+                    // need to create a kubernetes backing store
+                    cacheService = new SimpleCacheService().backingStore(new K8sBackingStore());
+                } else {
+                    List<URI> etcdEndpoints = Arrays.stream(args[0].split(",")).map(URI::create).collect(Collectors.toList());
+                    cacheService = new SimpleCacheService().backingStore(new EtcdBackingStore().connectionDetails(etcdEndpoints));
+                }
             } else {
                 LOGGER.error("Failed to create the Configuration for the cache service due to missing the 1st argument, " +
                         "which should be a comma separated list of etcd client endpoints");

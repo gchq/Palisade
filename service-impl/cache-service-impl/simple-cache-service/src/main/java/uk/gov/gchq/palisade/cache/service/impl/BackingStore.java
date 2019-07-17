@@ -103,6 +103,19 @@ public interface BackingStore {
     boolean remove(final String key);
 
     /**
+     * Some backing store implementations have restrictions on the key that can be added. This method
+     * returns the key converted to the compatible format
+     *
+     * @param key the key to remove
+     * @return conversion of key type
+     * @throws IllegalArgumentException if the given key is <code>null</code> once whitespace is trimmed
+     */
+    default String convertKeyToCompatible(String key) throws IllegalArgumentException {
+        return key;
+    }
+
+
+    /**
      * Get a stream of all keys with a given prefix. This method acts as a way to query the backing store to find which
      * keys it has. The returned list will have all the keys that start with the given string in it.
      *
@@ -168,6 +181,7 @@ public interface BackingStore {
         BackingStore.durationCheck(timeToLive);
         return cacheKey;
     }
+
 
     @JsonGetter("class")
     default String _getClass() {

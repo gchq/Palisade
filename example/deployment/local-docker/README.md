@@ -21,12 +21,12 @@ To run the example locally in docker containers follow these steps (from the roo
     
     *NOTE* This will clean all stopped docker services, requiring them to be rebuilt when you next want to start them up. 
     ```bash
-     ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh
+     ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh TRUE
     ```
 
     Then you can start up the docker containers:
     ```bash
-     ./example/deployment/local-docker/bash-scripts/dockerComposeUp.sh
+     ./example/deployment/local-docker/bash-scripts/dockerComposeUp.sh TRUE
     ```
 
     You can check the containers are available:

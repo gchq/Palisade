@@ -21,17 +21,17 @@ To run the example locally in docker containers (under kubernetes) follow these 
     mvn clean install -P example
     ```
 
-2. Start the REST services:
+1. Start the REST services:
     If you have made changes to the code since you last built the docker containers then you will need to run:
     
     *NOTE* This will clean all stopped docker services, requiring them to be rebuilt when you next want to start them up. 
     ```bash
-     ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh
+     ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh FALSE
     ```
 
     Then you can start up the docker containers to create the docker images:
     ```bash
-     ./example/deployment/local-docker/bash-scripts/dockerComposeCreateOnly.sh
+     ./example/deployment/local-docker/bash-scripts/dockerComposeCreateOnly.sh FALSE
     ```
     
     Then you can start the kubernetes cluster:
@@ -46,22 +46,22 @@ To run the example locally in docker containers (under kubernetes) follow these 
 
     After a while you should see the liveness and readiness probes indicating all is well - see the example below:
 
-![Alt text](./runningServices.png?raw=true "Running services")
+    ![Alt text](./runningServices.png?raw=true "Running services")
     You can verify that ingress is working correctly by running the following commands:
 
     ```bash
     curl -kL http://localhost/config/v1/status && curl -kL http://localhost/palisade/v1/status &&
     curl -kL http://localhost/data/v1/status
-![Alt text](./checkUp.png?raw=true "Is service up")
+    ![Alt text](./checkUp.png?raw=true "Is service up")
     ```
     
-3. Run the test example with:
+1. Run the test example with:
     ```bash
     ./example/deployment/local-k8s/bash-scripts/runExample.sh
     ```
     
-4. Stop the REST services:
+1. Stop the REST services:
     ```bash
     ./example/deployment/local-k8s/bash-scripts/deleteServices.sh
-    ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh
+    ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh FALSE
     ```

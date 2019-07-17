@@ -12,7 +12,9 @@ services:
     networks:
       - palisade_network
   config-service:
-    build: config-service
+    build:
+      context: ./config-service
+      dockerfile: DockerfileWithEtcd
     container_name: config-service
     networks:
       - palisade_network
@@ -24,7 +26,9 @@ services:
     depends_on:
       - etcd
   configure-services:
-    build: configure-services
+    build:
+      context: ./configure-services
+      dockerfile: DockerfileWithEtcd
     container_name: configure-services
     networks:
       - palisade_network
