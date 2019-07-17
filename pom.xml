@@ -101,6 +101,7 @@
         <surefireArgLine/>
         <failsafeArgLine/>
         <exclude.tests/>
+        <portNumberArgLine>9081</portNumberArgLine>
 
         <!-- Other -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -299,6 +300,7 @@
                         <exclude>${exclude.tests}</exclude>
                     </excludes>
                     <systemPropertyVariables>
+                        <portNumber>${portNumberArgLine}</portNumber>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
@@ -331,6 +333,7 @@
                         <include>**/*IntegrationTests.java</include>
                     </includes>
                     <systemPropertyVariables>
+                        <portNumber>${portNumberArgLine}</portNumber>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>

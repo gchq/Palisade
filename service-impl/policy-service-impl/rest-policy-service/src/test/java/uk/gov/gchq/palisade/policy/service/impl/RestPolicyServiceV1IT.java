@@ -60,12 +60,12 @@ public class RestPolicyServiceV1IT {
     private static ProxyRestPolicyService proxy;
     private static EmbeddedHttpServer server;
 
-
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("portNumber");
         RestPolicyServiceV1.setDefaultDelegate(new MockPolicyService());
-        proxy = (ProxyRestPolicyService) new ProxyRestPolicyService("http://localhost:8081/policy").retryMax(1);
-        server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
+        proxy = (ProxyRestPolicyService) new ProxyRestPolicyService("http://localhost:"+portNumber+"/policy").retryMax(1);
+        server = new EmbeddedHttpServer("http://0.0.0.0:"+portNumber+"/policy", new ApplicationConfigV1());
         server.startServer();
     }
 
