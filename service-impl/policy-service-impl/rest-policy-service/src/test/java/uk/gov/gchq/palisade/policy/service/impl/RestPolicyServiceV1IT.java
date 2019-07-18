@@ -65,7 +65,7 @@ public class RestPolicyServiceV1IT {
         String portNumber = System.getProperty("portNumber");
         RestPolicyServiceV1.setDefaultDelegate(new MockPolicyService());
         proxy = (ProxyRestPolicyService) new ProxyRestPolicyService("http://localhost:"+portNumber+"/policy").retryMax(1);
-        server = new EmbeddedHttpServer("http://0.0.0.0:"+portNumber+"/policy", new ApplicationConfigV1());
+        server = new EmbeddedHttpServer("http://0.0.0.0:"+portNumber+"/policy/v1", new ApplicationConfigV1());
         server.startServer();
     }
 
