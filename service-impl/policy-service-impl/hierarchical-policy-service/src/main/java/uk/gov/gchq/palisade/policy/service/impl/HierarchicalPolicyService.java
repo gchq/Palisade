@@ -121,7 +121,7 @@ public class HierarchicalPolicyService implements PolicyService {
     private Collection<LeafResource> canAccess(final Context context, final User user, final Collection<LeafResource> resources) {
         return resources.stream()
                 .map(resource -> {
-                    CompletableFuture<Optional<Rules<LeafResource>>> futureRules = getApplicableRules2(resource, true, resource.getType());
+                    CompletableFuture<Optional<Rules<LeafResource>>> futureRules = getApplicableRules(resource, true, resource.getType());
                     Optional<Rules<LeafResource>> rules = futureRules.join();
                     if (rules.isPresent()) {
                         return Util.applyRulesToItem(resource, user, context, rules.get());
@@ -148,18 +148,12 @@ public class HierarchicalPolicyService implements PolicyService {
      * @return A completable future of {@link Rules} object of type T, which contains the list of rules
      * that need to be applied to the resource.
      */
-    protected <T> CompletableFuture<Optional<Rules<T>>> getApplicableRules2(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
-
-        //expected behaviour, if no rule set at all, then throw exception upon resource filtering
-        //once this fixed, it should then fail in the DataService since the palisade service doesn't filter the resource list on the returned resources
-
+    protected <T> CompletableFuture<Optional<Rules<T>>> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
         CompletableFuture<Optional<Rules<T>>> inheritedRules;
         if (resource instanceof ChildResource) {
-            System.err.println("recursing from " + resource);
-            inheritedRules = getApplicableRules2(((ChildResource) resource).getParent(), canAccessRequest, originalDataType);
+            inheritedRules = getApplicableRules(((ChildResource) resource).getParent(), canAccessRequest, originalDataType);
         } else {
             //we are at top of hierarchy
-            System.err.println("recurse stop at " + resource);
             CompletableFuture<Optional<Policy>> inheritedPolicy = (CompletableFuture<Optional<Policy>>) getCacheService().get(
                     new GetCacheRequest<Policy>()
                             .service(this.getClass())
@@ -176,12 +170,6 @@ public class HierarchicalPolicyService implements PolicyService {
         return inheritedRules.thenCombine(newPolicy, (oldRules, policy) -> {
             Optional<Rules<T>> newRules = extractRules(canAccessRequest, policy);
             return mergeRules(oldRules, newRules);
-//            if (policy.isPresent()) {
-//                Rules<T> newRules = extractRules(canAccessRequest, policy);
-//                return mergeRules(oldRules, newRules);
-//            } else {
-//                return oldRules;
-//            }
         });
     }
 
@@ -235,7 +223,7 @@ public class HierarchicalPolicyService implements PolicyService {
          */
         HashMap<LeafResource, Policy> map = new HashMap<>();
         canAccessResources.forEach(resource -> {
-            CompletableFuture<Optional<Rules<Object>>> rules = getApplicableRules2(resource, false, resource.getType());
+            CompletableFuture<Optional<Rules<Object>>> rules = getApplicableRules(resource, false, resource.getType());
             Optional<Rules<Object>> optionalRecordRules = rules.join();
             if (optionalRecordRules.isPresent()) {
                 map.put(resource, new Policy<>().recordRules(optionalRecordRules.get()));
