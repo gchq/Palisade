@@ -55,13 +55,13 @@ public class Policy<RULE_DATA_TYPE> {
 
     public Policy<RULE_DATA_TYPE> recordRules(final Rules<RULE_DATA_TYPE> recordRules) {
         requireNonNull(recordRules, "The record level rules cannot be set to null.");
-        this.recordRules.rules(recordRules.getRules());
+        this.recordRules = recordRules;
         return this;
     }
 
     public Policy<RULE_DATA_TYPE> resourceRules(final Rules<Resource> resourceRules) {
         requireNonNull(resourceRules, "The resource level rules cannot be set to null.");
-        this.resourceRules.rules(resourceRules.getRules());
+        this.resourceRules = resourceRules;
         return this;
     }
 
