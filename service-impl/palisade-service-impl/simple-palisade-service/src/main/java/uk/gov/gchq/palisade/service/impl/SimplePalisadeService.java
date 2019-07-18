@@ -275,7 +275,6 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 .context(request.getContext())
                 .userId(request.getUserId())
                 .resourceId(request.getResourceId());
-        // TODO need to set the clients IP and hostname with the IP and hostname of where the Palisade service is running
         requestReceivedAuditRequest.setOriginalRequestId(request.getOriginalRequestId());
         auditService.audit(requestReceivedAuditRequest).join();
     }

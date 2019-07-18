@@ -34,8 +34,6 @@ public class RegisterRequestReceivedAuditRequest extends AuditRequest {
     private Context context;
     private UserId userId;
     private String resourceId;
-    private String clientIp;
-    private String clientHostname;
 
     // no-arg constructor required
     public RegisterRequestReceivedAuditRequest() {
@@ -98,44 +96,6 @@ public class RegisterRequestReceivedAuditRequest extends AuditRequest {
         resourceId(resourceId);
     }
 
-    /**
-     * @param clientIp the IP address of the client machine that the user triggered the data access request from
-     * @return the {@link RegisterRequestReceivedAuditRequest}
-     */
-    public RegisterRequestReceivedAuditRequest clientIp(final String clientIp) {
-        requireNonNull(clientIp, "The clientIp cannot be set to null");
-        this.clientIp = clientIp;
-        return this;
-    }
-
-    public String getClientIp() {
-        requireNonNull(this.clientIp, "The clientIp has not been set");
-        return clientIp;
-    }
-
-    public void setClientIp(final String clientIp) {
-        clientIp(clientIp);
-    }
-
-    /**
-     * @param clientHostname the hostname of the client machine that the user triggered the data access request from
-     * @return the {@link RegisterRequestReceivedAuditRequest}
-     */
-    public RegisterRequestReceivedAuditRequest clientHostname(final String clientHostname) {
-        requireNonNull(clientHostname, "The clientHostname cannot be set to null");
-        this.clientHostname = clientHostname;
-        return this;
-    }
-
-    public String getClientHostname() {
-        requireNonNull(this.clientHostname, "The clientHostname has not been set");
-        return clientHostname;
-    }
-
-    public void setClientHostname(final String clientHostname) {
-        clientHostname(clientHostname);
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -150,8 +110,6 @@ public class RegisterRequestReceivedAuditRequest extends AuditRequest {
                 .append(context, that.context)
                 .append(userId, that.userId)
                 .append(resourceId, that.resourceId)
-                .append(clientIp, that.clientIp)
-                .append(clientHostname, that.clientHostname)
                 .isEquals();
     }
 
@@ -162,8 +120,6 @@ public class RegisterRequestReceivedAuditRequest extends AuditRequest {
                 .append(context)
                 .append(userId)
                 .append(resourceId)
-                .append(clientIp)
-                .append(clientHostname)
                 .toHashCode();
     }
 
@@ -174,8 +130,6 @@ public class RegisterRequestReceivedAuditRequest extends AuditRequest {
                 .append("context", context)
                 .append("userid", userId)
                 .append("resourceId", resourceId)
-                .append("clientIp", clientIp)
-                .append("clientHostname", clientHostname)
                 .toString();
     }
 }

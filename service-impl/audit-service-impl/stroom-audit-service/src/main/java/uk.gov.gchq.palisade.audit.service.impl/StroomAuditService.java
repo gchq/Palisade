@@ -217,7 +217,7 @@ public class StroomAuditService implements AuditService {
             Event.EventSource eventSource = event.getEventSource();
             eventSource.setUser(EventLoggingUtil.createUser(registerRequestReceivedAuditRequest.getUserId().getId()));
             // log where the client (palisade service) that the audit request came from
-            eventSource.setClient(DeviceUtil.createDevice(registerRequestReceivedAuditRequest.getClientHostname(), registerRequestReceivedAuditRequest.getClientIp()));
+            eventSource.setClient(DeviceUtil.createDevice(registerRequestReceivedAuditRequest.getServerHostname(), registerRequestReceivedAuditRequest.getServerIp()));
             // create View request event detail
             Event.EventDetail eventDetail = new Event.EventDetail();
             eventDetail.setDescription("Audits the fact that a user has requested approval to access a data resource with a given purpose. All the details have been provided by the user and not yet validated.");
