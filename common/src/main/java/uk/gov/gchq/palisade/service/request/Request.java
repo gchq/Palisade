@@ -35,24 +35,13 @@ public abstract class Request {
     private RequestId originalRequestId; //this Id is unique per data access request from a user
 
     public Request() {
-        id(UUID.randomUUID().toString());
-    }
-
-
-    public Request id(final String id) {
-        requireNonNull(id, "The id cannot be set to null.");
-        this.id = new RequestId().id(id);
-        return this;
+        this.id = new RequestId().id(UUID.randomUUID().toString());
     }
 
     public Request originalRequestId(final RequestId originalRequestId) {
         requireNonNull(originalRequestId, "The originalRequestId cannot be set to null.");
         this.originalRequestId = originalRequestId;
         return this;
-    }
-
-    public void setId(final String id) {
-        id(id);
     }
 
     public RequestId getId() {

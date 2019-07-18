@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.audit.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
@@ -97,7 +98,7 @@ public class LoggerAuditService implements AuditService {
         DISPATCH.put(ReadResponseAuditRequest.class, (o) -> {
             requireNonNull(o, "ReadResponseAuditRequest cannot be null");
             ReadResponseAuditRequest readResponseAuditRequest = (ReadResponseAuditRequest) o;
-            final String msg = "'ReadResponseAuditRequest': "+ readResponseAuditRequest;
+            final String msg = "'ReadResponseAuditRequest': " + readResponseAuditRequest;
             LOGGER.info(msg);
         });
     }

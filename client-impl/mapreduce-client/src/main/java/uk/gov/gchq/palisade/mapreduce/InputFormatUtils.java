@@ -59,7 +59,7 @@ final class InputFormatUtils {
                 .values()
                 .stream()
                         //make each map into an input split
-                .map(m -> new PalisadeInputSplit(response.getRequestId(), m, response.getOriginalRequestId()))
+                .map(m -> new PalisadeInputSplit(response.getToken(), m, response.getOriginalRequestId()))
                         //reduce to a list
                 .collect(Collectors.toList());
     }

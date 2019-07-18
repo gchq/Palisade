@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
@@ -319,16 +320,16 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
     public CompletableFuture<DataRequestConfig> getDataRequestConfig(
             final GetDataRequestConfig request) {
         requireNonNull(request);
-        requireNonNull(request.getRequestId());
+        requireNonNull(request.getToken());
         // TODO: need to validate that the user is actually requesting the correct info.
         // extract resources from request and check they are a subset of the original RegisterDataRequest resources
-        final GetCacheRequest<DataRequestConfig> cacheRequest = new GetCacheRequest<>().key(request.getRequestId().getId()).service(this.getClass());
+        final GetCacheRequest<DataRequestConfig> cacheRequest = new GetCacheRequest<>().key(request.getToken()).service(this.getClass());
         LOGGER.debug("Getting cached data: {}", cacheRequest);
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {
-                    DataRequestConfig value = cache.orElseThrow(() -> createCacheException(request.getRequestId().getId()));
+                    DataRequestConfig value = cache.orElseThrow(() -> createCacheException(request.getToken()));
                     if (null == value.getUser()) {
-                        throw createCacheException(request.getRequestId().getId());
+                        throw createCacheException(request.getToken());
                     }
                     LOGGER.debug("Got cache: {}", value);
                     return value;

@@ -122,7 +122,7 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>logger-audit-service</artifactId>
+            <artifactId>stroom-audit-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

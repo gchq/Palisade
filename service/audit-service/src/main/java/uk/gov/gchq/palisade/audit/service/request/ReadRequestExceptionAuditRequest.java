@@ -17,9 +17,9 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.service.Service;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import static java.util.Objects.requireNonNull;
@@ -32,7 +32,6 @@ import static java.util.Objects.requireNonNull;
 public class ReadRequestExceptionAuditRequest extends AuditRequest {
 
     private String token;
-    private Service service;
     private LeafResource resource;
     private Throwable exception;
 
@@ -46,16 +45,6 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
     public ReadRequestExceptionAuditRequest token(final String token) {
         requireNonNull(token, "The token cannot be null");
         this.token = token;
-        return this;
-    }
-
-    /**
-     * @param service {@link Service} is the service that triggered the exception
-     * @return the {@link ReadRequestExceptionAuditRequest}
-     */
-    public ReadRequestExceptionAuditRequest service(final Service service) {
-        requireNonNull(service, "The service cannot be null");
-        this.service = service;
         return this;
     }
 
@@ -84,17 +73,8 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         return token;
     }
 
-    public void setToken(String token) {
+    public void setToken(final String token) {
         token(token);
-    }
-
-    public Service getService() {
-        requireNonNull(service, "The service has not been set");
-        return service;
-    }
-
-    public void setService(Service service) {
-        service(service);
     }
 
     public LeafResource getResource() {
@@ -102,7 +82,7 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         return resource;
     }
 
-    public void setResource(LeafResource resource) {
+    public void setResource(final LeafResource resource) {
         resource(resource);
     }
 
@@ -111,7 +91,7 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         return exception;
     }
 
-    public void setException(Throwable exception) {
+    public void setException(final Throwable exception) {
         exception(exception);
     }
 
@@ -127,7 +107,6 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(token, that.token)
-                .append(service, that.service)
                 .append(resource, that.resource)
                 .append(exception, that.exception)
                 .isEquals();
@@ -138,7 +117,6 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         return new HashCodeBuilder(19, 39)
                 .appendSuper(super.hashCode())
                 .append(token)
-                .append(service)
                 .append(resource)
                 .append(exception)
                 .toHashCode();
@@ -149,7 +127,6 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("token", token)
-                .append("service", service)
                 .append("resource", resource)
                 .append("exception", exception)
                 .toString();

@@ -23,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.Util;
+import uk.gov.gchq.palisade.audit.service.AuditService;
+import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
@@ -56,6 +58,8 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class SerialisedDataReader implements DataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialisedDataReader.class);
+    protected long numberOfRecordsProcessed = 0;
+    protected long numberOfRecordsReturned = 0;
 
     @JsonProperty("default")
     private Serialiser<?> defaultSerialiser = new SimpleStringSerialiser();
@@ -68,6 +72,8 @@ public abstract class SerialisedDataReader implements DataReader {
     @JsonSerialize(keyUsing = DataFlavour.FlavourSerializer.class)
     @JsonDeserialize(keyUsing = DataFlavour.FlavourDeserializer.class)
     private Map<DataFlavour, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
+
+    private AuditService auditService;
 
     /**
      * @param serialisers a mapping of data type to serialiser
@@ -82,6 +88,12 @@ public abstract class SerialisedDataReader implements DataReader {
     public SerialisedDataReader defaultSerialiser(final Serialiser<?> serialiser) {
         requireNonNull(serialiser, "The default serialiser cannot be set to null.");
         this.defaultSerialiser = serialiser;
+        return this;
+    }
+
+    public SerialisedDataReader auditService(final AuditService auditService) {
+        requireNonNull(auditService, "The audit service cannot be set to null");
+        this.auditService = auditService;
         return this;
     }
 
@@ -110,12 +122,19 @@ public abstract class SerialisedDataReader implements DataReader {
             data = rawStream;
         } else {
             LOGGER.debug("Applying rules: {}", rules);
+            // TODO identify way to count the number of records processed and returned
             final Stream<Object> deserialisedData = Util.applyRulesToStream(
                     serialiser.deserialise(rawStream),
                     request.getUser(),
                     request.getContext(),
                     rules
             ).onClose(() -> {
+                // Audit log the number of results returned
+                ReadRequestCompleteAuditRequest auditRequest = new ReadRequestCompleteAuditRequest()
+                        .resource(request.getResource())
+                        .numberOfRecordsProcessed(numberOfRecordsProcessed)
+                        .numberOfRecordsReturned(numberOfRecordsReturned);
+                auditRequest.originalRequestId(request.getOriginalRequestId());
                 //ensure the original stream is closed as well
                 try {
                     rawStream.close();
@@ -176,5 +195,14 @@ public abstract class SerialisedDataReader implements DataReader {
 
     public void setDefaultSerialiser(final Serialiser<?> defaultSerialiser) {
         defaultSerialiser(defaultSerialiser);
+    }
+
+    public AuditService getAuditService() {
+        requireNonNull(auditService, "The audit service has not been set.");
+        return auditService;
+    }
+
+    public void setAuditService(final AuditService auditService) {
+        auditService(auditService);
     }
 }

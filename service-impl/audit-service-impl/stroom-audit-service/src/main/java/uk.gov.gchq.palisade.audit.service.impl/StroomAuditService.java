@@ -21,6 +21,8 @@ import event.logging.AuthenticateAction;
 import event.logging.AuthenticateOutcome;
 import event.logging.Authorisation;
 import event.logging.Classification;
+import event.logging.Criteria;
+import event.logging.Data;
 import event.logging.Event;
 import event.logging.ObjectOutcome;
 import event.logging.Outcome;
@@ -33,6 +35,7 @@ import event.logging.util.DeviceUtil;
 import event.logging.util.EventLoggingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
@@ -180,7 +183,7 @@ public class StroomAuditService implements AuditService {
         return SYSTEM.getClassification().getText();
     }
 
-    private static Event generateNewGenericEvent(final AuditRequest request){
+    private static Event generateNewGenericEvent(final AuditRequest request) {
         Event event = EVENT_LOGGING_SERVICE.createEvent();
         // set the event time
         Event.EventTime eventTime = EventLoggingUtil.createEventTime(request.getTimestamp());
@@ -334,8 +337,10 @@ public class StroomAuditService implements AuditService {
             search.setOutcome(createOutcome(true));
             // set the number of records returned
             search.setTotalResults(BigInteger.valueOf(readRequestCompleteAuditRequest.getNumberOfRecordsReturned()));
-            // TODO set the resource that those records were read from
-
+            // set the resource that those records were read from
+            Criteria.DataSources dataSources = new Criteria.DataSources();
+            dataSources.getDataSource().add(readRequestCompleteAuditRequest.getResource().getId());
+            search.setDataSources(dataSources);
             viewEventDetail.setSearch(search);
             viewEvent.setEventDetail(viewEventDetail);
             EVENT_LOGGING_SERVICE.log(viewEvent);
@@ -347,13 +352,15 @@ public class StroomAuditService implements AuditService {
             // view request
             Event viewEvent = generateNewGenericEvent(readRequestExceptionAuditRequest);
             Event.EventDetail viewEventDetail = new Event.EventDetail();
-            viewEventDetail.setDescription("Audits the fact that an exception occured while reading a specific data resource.");
+            viewEventDetail.setDescription("Audits the fact that an exception occurred while reading a specific data resource.");
             Search search = new Search();
             search.setOutcome(createOutcome(false));
-            // TODO set the exception details
-
-            // TODO set the resource that those records were read from
-
+            // set the exception details
+            search.getOutcome().setDescription(readRequestExceptionAuditRequest.getException().getMessage());
+            // set the resource that those records were read from
+            Criteria.DataSources dataSources = new Criteria.DataSources();
+            dataSources.getDataSource().add(readRequestExceptionAuditRequest.getResource().getId());
+            search.setDataSources(dataSources);
             viewEventDetail.setSearch(search);
             viewEvent.setEventDetail(viewEventDetail);
             EVENT_LOGGING_SERVICE.log(viewEvent);
@@ -366,11 +373,19 @@ public class StroomAuditService implements AuditService {
             Event viewEvent = generateNewGenericEvent(readResponseAuditRequest);
             Event.EventDetail viewEventDetail = new Event.EventDetail();
             viewEventDetail.setDescription("Audits the fact that the stream of data from a specific data resource has started to be returned to the client.");
-
-            // TODO set the resource that those records were read from
-
-            // TODO set the rules being applied
-
+            ObjectOutcome view = new ObjectOutcome();
+            // set the resource that those records were read from
+            event.logging.Object resource = new event.logging.Object();
+            resource.setId(readResponseAuditRequest.getResource().getId());
+            resource.setType(readResponseAuditRequest.getResource().getType());
+            view.getObjects().add(resource);
+            // set the rules being applied
+            for (String rule : (Set<String>) readResponseAuditRequest.getRulesApplied().getRules().keySet()) {
+                Data data = new Data();
+                data.setName(rule);
+                view.getData().add(data);
+            }
+            viewEventDetail.setView(view);
             viewEvent.setEventDetail(viewEventDetail);
             EVENT_LOGGING_SERVICE.log(viewEvent);
         });

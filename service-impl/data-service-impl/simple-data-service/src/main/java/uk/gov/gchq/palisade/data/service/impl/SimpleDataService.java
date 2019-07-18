@@ -33,6 +33,7 @@ import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
+import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
@@ -106,9 +107,7 @@ public class SimpleDataService implements DataService {
     private void auditReadRequestReceived(final ReadRequest request) {
         final ReadRequestReceivedAuditRequest requestReceivedAuditRequest = new ReadRequestReceivedAuditRequest();
         requestReceivedAuditRequest
-                .requestId(request.getToken())
                 .resource(request.getResource())
-                .id(request.getId())
                 .originalRequestId(request.getOriginalRequestId());
         auditService.audit(requestReceivedAuditRequest);
     }
@@ -116,20 +115,19 @@ public class SimpleDataService implements DataService {
     private void auditRequestReceivedException(final ReadRequest request, final Throwable ex) {
         final ReadRequestExceptionAuditRequest readRequestExceptionAuditRequest = new ReadRequestExceptionAuditRequest();
         readRequestExceptionAuditRequest.exception(ex)
+                .token(request.getToken())
                 .resource(request.getResource())
-                .requestId(request.getToken())
-                .id(request.getId())
+                .exception(ex)
                 .originalRequestId(request.getOriginalRequestId());
         LOGGER.debug("Error handling: " + ex.getMessage());
         auditService.audit(readRequestExceptionAuditRequest);
     }
 
-    private void auditReadResponse(final ReadRequest request) {
+    private void auditReadResponse(final ReadRequest request, final Rules rules) {
         final ReadResponseAuditRequest readResponseAuditRequest = new ReadResponseAuditRequest();
         readResponseAuditRequest
                 .resource(request.getResource())
-                .requestId(request.getToken())
-                .id(request.getId())
+                .rulesApplied(rules)
                 .originalRequestId(request.getOriginalRequestId());
         auditService.audit(readResponseAuditRequest);
     }
@@ -147,7 +145,7 @@ public class SimpleDataService implements DataService {
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Starting to read: {}", request);
             final GetDataRequestConfig getConfig = new GetDataRequestConfig()
-                    .requestId(request.getToken())
+                    .token(request.getToken())
                     .resource(request.getResource());
             getConfig.setOriginalRequestId(request.getOriginalRequestId());
             LOGGER.debug("Calling palisade service with: {}", getConfig);
@@ -170,7 +168,7 @@ public class SimpleDataService implements DataService {
                 response.data(readerResult.getData());
             }
             LOGGER.debug("Returning from read: {}", response);
-            auditReadResponse(request);
+            auditReadResponse(request, config.getRules().get(request.getResource()));
             return response;
         })
                 .exceptionally(ex -> {

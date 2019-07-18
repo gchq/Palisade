@@ -17,6 +17,7 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.LeafResource;
 
@@ -31,6 +32,7 @@ public class ReadRequestCompleteAuditRequest extends AuditRequest {
 
     private LeafResource resource;
     private long numberOfRecordsReturned;
+    private long numberOfRecordsProcessed;
 
     public ReadRequestCompleteAuditRequest() {
     }
@@ -55,12 +57,22 @@ public class ReadRequestCompleteAuditRequest extends AuditRequest {
         return this;
     }
 
+    /**
+     * @param numberOfRecordsProcessed is the number of records that was processed from this resource
+     * @return the {@link ReadRequestCompleteAuditRequest}
+     */
+    public ReadRequestCompleteAuditRequest numberOfRecordsProcessed(final long numberOfRecordsProcessed) {
+        requireNonNull(numberOfRecordsProcessed, "The numberOfRecordsProcessed cannot be null");
+        this.numberOfRecordsProcessed = numberOfRecordsProcessed;
+        return this;
+    }
+
     public LeafResource getResource() {
         requireNonNull(resource, "The resource has not been set");
         return resource;
     }
 
-    public void setResource(LeafResource resource) {
+    public void setResource(final LeafResource resource) {
         resource(resource);
     }
 
@@ -69,8 +81,17 @@ public class ReadRequestCompleteAuditRequest extends AuditRequest {
         return numberOfRecordsReturned;
     }
 
-    public void setNumberOfRecordsReturned(long numberOfRecordsReturned) {
+    public void setNumberOfRecordsReturned(final long numberOfRecordsReturned) {
         numberOfRecordsReturned(numberOfRecordsReturned);
+    }
+
+    public long getNumberOfRecordsProcessed() {
+        requireNonNull(numberOfRecordsProcessed, "The numberOfRecordsProcessed has not been set");
+        return numberOfRecordsProcessed;
+    }
+
+    public void setNumberOfRecordsProcessed(final long numberOfRecordsProcessed) {
+        numberOfRecordsProcessed(numberOfRecordsProcessed);
     }
 
     @Override

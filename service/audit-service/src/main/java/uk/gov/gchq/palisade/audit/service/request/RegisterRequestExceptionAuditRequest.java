@@ -17,6 +17,7 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.service.Service;
 
@@ -48,7 +49,7 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
     }
 
     /**
-     * @param serviceClass {@link Class<Service>} is the palisade service that the exception was triggered by.
+     * @param serviceClass {@link Class} is the palisade service that the exception was triggered by.
      * @return the {@link RegisterRequestExceptionAuditRequest}
      */
     public RegisterRequestExceptionAuditRequest service(final Class<? extends Service> serviceClass) {
@@ -62,7 +63,7 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
         return exception;
     }
 
-    public void setException(Throwable exception) {
+    public void setException(final Throwable exception) {
         exception(exception);
     }
 
@@ -71,7 +72,7 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
         return serviceClass;
     }
 
-    public void setService(Class<? extends Service> service) {
+    public void setService(final Class<? extends Service> service) {
         service(service);
     }
 

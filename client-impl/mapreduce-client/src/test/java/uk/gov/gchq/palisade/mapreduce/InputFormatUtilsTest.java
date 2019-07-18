@@ -43,12 +43,13 @@ public class InputFormatUtilsTest {
     @BeforeClass
     public static void setup() {
         reqResponse = new DataRequestResponse()
-                .requestId(new RequestId().id("testID")).originalRequestId(new RequestId().id("test"))
+                .token("testToken")
                 .resource(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"))
                 .resource(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"))
                 .resource(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"))
                 .resource(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"))
                 .resource(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
+        reqResponse.originalRequestId(new RequestId().id("test"));
     }
 
     @Test

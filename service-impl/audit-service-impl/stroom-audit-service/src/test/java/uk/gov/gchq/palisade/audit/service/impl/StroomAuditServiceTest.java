@@ -12,9 +12,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
-import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
 
 import java.util.List;
@@ -42,21 +41,12 @@ public class StroomAuditServiceTest {
         final RegisterRequestExceptionAuditRequest auditRequestWithException = new RegisterRequestExceptionAuditRequest();
         Throwable mockException = Mockito.mock(Throwable.class);
         Mockito.doReturn("exception output").when(mockException).getMessage();
-        Context mockContext = Mockito.mock(Context.class);
-        Mockito.doReturn("purpose").when(mockContext).getPurpose();
-        UserId mockUserId = Mockito.mock(UserId.class);
-        Mockito.doReturn("UserId string").when(mockUserId).getId();
-        String resourceId = "ResourceId";
-        String id = "Id";
         RequestId mockRequestId = Mockito.mock(RequestId.class);
-        Mockito.doReturn("origRequestId").when(mockRequestId).toString();
-//        auditRequestWithException
-//                .exception(mockException)
-//                .context(mockContext, RegisterRequestExceptionAuditRequest.class)
-//                .userId(mockUserId, RegisterRequestExceptionAuditRequest.class)
-//                .resourceId(resourceId, RegisterRequestExceptionAuditRequest.class)
-//                .id(id)
-//                .originalRequestId(mockRequestId);
+        Mockito.doReturn("originalRequestId").when(mockRequestId).toString();
+        auditRequestWithException
+                .exception(mockException)
+                .service(AuditService.class)
+                .originalRequestId(mockRequestId);
 
         // When
         StroomAuditService stroomAuditService = new StroomAuditService();
@@ -69,8 +59,4 @@ public class StroomAuditServiceTest {
         }
     }
 
-    @Test
-    public void test() {
-        System.out.println(StroomAuditService.class.getSimpleName());
-    }
 }

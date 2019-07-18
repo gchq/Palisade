@@ -52,7 +52,7 @@ public class RestDataServiceV1IT {
 
     private static final SystemResource sysResource = new SystemResource().id("File");
     private static final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
-    private static final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);
+    private static final ReadRequest request = new ReadRequest().token("token1").resource(resource);
 
     @BeforeClass
     public static void beforeClass() throws IOException {

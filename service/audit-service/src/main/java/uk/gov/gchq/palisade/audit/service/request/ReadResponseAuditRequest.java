@@ -17,6 +17,7 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.rule.Rules;
@@ -50,7 +51,7 @@ public class ReadResponseAuditRequest extends AuditRequest {
         return rulesApplied;
     }
 
-    public void setRulesApplied(Rules rulesApplied) {
+    public void setRulesApplied(final Rules rulesApplied) {
         rulesApplied(rulesApplied);
     }
 
