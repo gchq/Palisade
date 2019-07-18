@@ -135,6 +135,7 @@ public abstract class SerialisedDataReader implements DataReader {
                         .numberOfRecordsProcessed(numberOfRecordsProcessed)
                         .numberOfRecordsReturned(numberOfRecordsReturned);
                 auditRequest.originalRequestId(request.getOriginalRequestId());
+                getAuditService().audit(auditRequest);
                 //ensure the original stream is closed as well
                 try {
                     rawStream.close();
