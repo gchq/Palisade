@@ -83,19 +83,16 @@ To run the AWS-EMR example follow these steps (from the root of the project):
     6. The `ingress_ip_range` is a list of public IPs that will be able to connect into the EMR cluster. This should be your public IP for your client machine.
     7. The `subnet_id` should be the ID of a valid subnet from the Subnets page of the VPC service in AWS. It should be part of the VPC named earlier.
     8. **Optional**: Change the AWS region by uncommenting the `aws_region` key and setting a region name.
-4. Initialise Terraform by running the following line from the Palisade root directory:
-
-    ```(cd example/deployment/AWS-EMR/terraform-scripts/ && terraform init)```
-5. Run the script below to start creating instances on AWS and run the example. It requires the key pair PEM file from earlier. 
+4. Run the script below to start creating instances on AWS and run the example. It requires the key pair PEM file from earlier. 
 
     ```./example/deployment/AWS-EMR/bash-scripts/runAWS-EMRExample.sh <path to PEM private key file>```
-6. Answer `yes` when asked if Terraform may create AWS infrastructure.
+5. Answer `yes` when asked if Terraform may create AWS infrastructure.
 **You will start to incur charges to your AWS subscription at this point!**
-7. It will take several minutes to deploy the EMR cluster and run the Palisade example.
-8. Once complete, you can SSH into the master node by finding Services -> EMR from the AWS console, then selecting the name of the EMR
+6. It will take several minutes to deploy the EMR cluster and run the Palisade example.
+7. Once complete, you can SSH into the master node by finding Services -> EMR from the AWS console, then selecting the name of the EMR
     instance created by Palisade (something like "PalisadeExample") and then selecting the "SSH" link from the "Master Public DNS" section near the top.
-    Follow the instructions to log in.
-9. Running the command below inside the SSH terminal should list the outputs from the MapReduce job:
+    Follow the instructions to log in. Ensure you are logged in as the "hadoop" user.
+8. Running the command below inside the SSH terminal should list the outputs from the MapReduce job:
 
    ```hdfs dfs -ls output```
    
@@ -110,7 +107,13 @@ To run the AWS-EMR example follow these steps (from the root of the project):
     Run the following to display the output file:
     
     ```hdfs dfs -text output/part-r-00000```
-10. **IMPORTANT! Destroy your cluster! Ignoring this step will leave your EMR cluster running and costing you money!**
+    
+    which will produce output similar to this (you actual counts and values may differ):
+    ```bash
+    hdfs dfs -text output/part-r-00000
+    11500L     10
+    ```
+9. **IMPORTANT! Destroy your cluster! Ignoring this step will leave your EMR cluster running and costing you money!**
 
     Log out of your SSH terminal and run the following from your client machine:
     
