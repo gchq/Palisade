@@ -27,7 +27,6 @@ import io.fabric8.kubernetes.client.dsl.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -41,17 +40,47 @@ public class K8sBackingStore implements BackingStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(K8sBackingStore.class);
     Config config = new ConfigBuilder().build();
     KubernetesClient client = new DefaultKubernetesClient(config);
+    private static final String NAMESPACE = "default";
     String namespace;
-    public static final Charset UTF8 = StandardCharsets.UTF_8;
 
     public K8sBackingStore() {
+        log("K8sBackingStore");
         if (namespace == null) {
             namespace = client.getNamespace();
         }
         if (namespace == null) {
-            namespace = "default";
+            namespace = NAMESPACE;
+        }
+
+
+        try {
+//            Namespace existing = null;
+            log("K8sBackingStore before existing");
+//            NamespaceList namespaces = client.namespaces().list();
+//            log("K8sBackingStore before loop");
+//            for (Namespace namespace1 : namespaces.getItems()) {
+//                log("start of loop");
+//                log("namespace with name: " + namespace1.getMetadata().getName() + " has status: " + namespace1.getStatus());
+//                if (namespace1.getMetadata().getName().equalsIgnoreCase(namespace)) {
+//                    existing = namespace1;
+//                }
+//
+//            }
+//            Namespace existing = client.namespaces().withName(namespace).get();
+            log("K8sBackingStore after existing");
+//            if (existing == null) {
+//                log("K8sBackingStore create namespace");
+//                Namespace ns = new NamespaceBuilder().withNewMetadata().withName(namespace).addToLabels("name", namespace).endMetadata().build();
+//                client.namespaces().create(ns);
+//                log("New namespace " + namespace + " created");
+//
+//            }
+        } catch (Exception e) {
+            log("caught exception:" + e.getMessage());
+            throw e;
         }
     }
+
 
     /**
      * Clean up the resource
@@ -62,7 +91,8 @@ public class K8sBackingStore implements BackingStore {
     }
 
     @Override
-    public String convertKeyToCompatible(final String key) throws IllegalArgumentException {
+    public String convertKeyToCompatible(final String key) throws
+            IllegalArgumentException {
         //only allow lower case alphanumberic character or -
         if (key.trim().length() == 0) {
             throw new IllegalArgumentException();
@@ -90,7 +120,8 @@ public class K8sBackingStore implements BackingStore {
      * @throws IllegalArgumentException if <code>key</code> is empty (once whitespace is trimmed)
      */
     @Override
-    public boolean add(final String key, final Class<?> valueClass, final byte[] value, final Optional<Duration> timeToLive) {
+    public boolean add(final String key, final Class<?> valueClass,
+                       final byte[] value, final Optional<Duration> timeToLive) {
 
         if (key == null) {
             throw new IllegalArgumentException("key");
@@ -155,9 +186,16 @@ public class K8sBackingStore implements BackingStore {
                 if (configMap.getData().containsKey("expiryTimestamp")) {
                     if (Instant.now().isAfter(Instant.ofEpochMilli(Long.valueOf(configMap.getData().get("expiryTimestamp"))))) {
                         remove(key);
+                        log("Timedout on key " + key);
+
                         return new SimpleCacheObject(Object.class, Optional.empty());
                     }
                 }
+                String className = Class.forName(configMap.getData().get("valueClass")).toString();
+                byte[] data = configMap.getData().get("value").getBytes(StandardCharsets.UTF_8);
+
+                log("get for key " + key + " with className " + className + " data " + new String(data));
+
                 return new SimpleCacheObject(Class.forName(configMap.getData().get("valueClass")), Optional.of(configMap.getData().get("value").getBytes(StandardCharsets.UTF_8)));
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException("Get request failed due to the class of the value not being found.", e);
@@ -188,6 +226,7 @@ public class K8sBackingStore implements BackingStore {
             if (configMap == null || configMap.getData().isEmpty()) {
                 return false;
             }
+            log("remove " + key);
             return client.configMaps().inNamespace(namespace).withName(dns1123Compatible).delete();
         } catch (KubernetesClientException e) {
             throw new RuntimeException("Get request failed due to the class of the value not being found.", e);
