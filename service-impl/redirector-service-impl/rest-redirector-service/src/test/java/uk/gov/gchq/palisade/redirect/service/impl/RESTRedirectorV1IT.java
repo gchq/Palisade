@@ -39,7 +39,6 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
 
 import static java.util.Objects.nonNull;
 import static org.hamcrest.CoreMatchers.*;
@@ -100,16 +99,8 @@ public class RESTRedirectorV1IT {
 
     }
 
-    private static final String BASE_URL;
+    private static final String BASE_URL = "http://localhost:8080";
 
-    static {
-        String host = "http://localhost:8080";
-        // try {
-        //     host = String.format("http://%s:9080", InetAddress.getLocalHost().getCanonicalHostName());
-        // } catch (UnknownHostException e) { }
-
-        BASE_URL = host;
-    }
 
     private static CacheService cache;
     private static Heartbeat beat;
@@ -143,7 +134,7 @@ public class RESTRedirectorV1IT {
 
     @Test
     public void shouldRedirectCorrectlyVoid() throws Exception {
-        HttpURLConnection url = (HttpURLConnection) new URL("http://localhost:8080/serviceMethod/45").openConnection();
+        HttpURLConnection url = (HttpURLConnection) new URL( BASE_URL + "/serviceMethod/45").openConnection();
         try {
             //Given
             url.setInstanceFollowRedirects(false);
@@ -164,7 +155,7 @@ public class RESTRedirectorV1IT {
 
     @Test
     public void shouldRedirectCorrectlyInt() throws Exception {
-        HttpURLConnection url = (HttpURLConnection) new URL("http://localhost:8080/anotherMethod/test").openConnection();
+        HttpURLConnection url = (HttpURLConnection) new URL(BASE_URL + "/anotherMethod/test").openConnection();
         try {
             //Given
             url.setInstanceFollowRedirects(false);
@@ -185,7 +176,7 @@ public class RESTRedirectorV1IT {
 
     @Test
     public void shouldProduce404() throws Exception {
-        HttpURLConnection url = (HttpURLConnection) new URL("http://localhost:8080/does/not/exist").openConnection();
+        HttpURLConnection url = (HttpURLConnection) new URL(BASE_URL + "/does/not/exist").openConnection();
         try {
             //Given
             url.setInstanceFollowRedirects(false);
@@ -203,7 +194,7 @@ public class RESTRedirectorV1IT {
 
     @Test
     public void shouldSetHostNameCorrectly() throws Exception {
-        HttpURLConnection url = (HttpURLConnection) new URL("http://localhost:8080/does/not/exist").openConnection();
+        HttpURLConnection url = (HttpURLConnection) new URL(BASE_URL + "/does/not/exist").openConnection();
         try {
             //Given
             url.setInstanceFollowRedirects(false);
@@ -212,7 +203,7 @@ public class RESTRedirectorV1IT {
             url.connect();
 
             //Then
-            assertThat(redirector.host, either(is(equalTo(InetAddress.getLocalHost().getCanonicalHostName()))).or(is(equalTo("localhost"))));
+            assertThat(redirector.host, either(is(equalTo(InetAddress.getLocalHost().getCanonicalHostName()))).or(is(equalTo("localhost"))).or(is(equalTo("hostname"))).or(is(equalTo("127.0.0.1"))));
         } finally {
             url.disconnect();
         }
