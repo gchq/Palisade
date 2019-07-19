@@ -103,10 +103,10 @@ public class RESTRedirectorV1IT {
     private static final String BASE_URL;
 
     static {
-        String host = "";
-        try {
-            host = String.format("http://%s:8080", InetAddress.getLocalHost().getCanonicalHostName());
-        } catch (UnknownHostException e) { }
+        String host = "http://localhost:8080";
+        // try {
+        //     host = String.format("http://%s:9080", InetAddress.getLocalHost().getCanonicalHostName());
+        // } catch (UnknownHostException e) { }
 
         BASE_URL = host;
     }
@@ -127,7 +127,7 @@ public class RESTRedirectorV1IT {
         redirector = (TestSimpleRandomRedirector) new TestSimpleRandomRedirector().cacheService(cache).redirectionClass(DummyService.class);
         //make the redirection server
         restInstance = new RESTRedirector<>(DummyService.class.getTypeName(), RestDummyService.class.getTypeName(), redirector, true);
-        server = new EmbeddedHttpServer(BASE_URL, restInstance);
+        server = new EmbeddedHttpServer("http://localhost:8080", restInstance);
         server.startServer();
     }
 
@@ -143,7 +143,7 @@ public class RESTRedirectorV1IT {
 
     @Test
     public void shouldRedirectCorrectlyVoid() throws Exception {
-        HttpURLConnection url = (HttpURLConnection) new URL(BASE_URL + "/serviceMethod/45").openConnection();
+        HttpURLConnection url = (HttpURLConnection) new URL("http://localhost:8080/serviceMethod/45").openConnection();
         try {
             //Given
             url.setInstanceFollowRedirects(false);
@@ -164,7 +164,7 @@ public class RESTRedirectorV1IT {
 
     @Test
     public void shouldRedirectCorrectlyInt() throws Exception {
-        HttpURLConnection url = (HttpURLConnection) new URL(BASE_URL + "/anotherMethod/test").openConnection();
+        HttpURLConnection url = (HttpURLConnection) new URL("http://localhost:8080/anotherMethod/test").openConnection();
         try {
             //Given
             url.setInstanceFollowRedirects(false);
@@ -185,7 +185,7 @@ public class RESTRedirectorV1IT {
 
     @Test
     public void shouldProduce404() throws Exception {
-        HttpURLConnection url = (HttpURLConnection) new URL(BASE_URL + "/does/not/exist").openConnection();
+        HttpURLConnection url = (HttpURLConnection) new URL("http://localhost:8080/does/not/exist").openConnection();
         try {
             //Given
             url.setInstanceFollowRedirects(false);
@@ -203,7 +203,7 @@ public class RESTRedirectorV1IT {
 
     @Test
     public void shouldSetHostNameCorrectly() throws Exception {
-        HttpURLConnection url = (HttpURLConnection) new URL(BASE_URL + "/does/not/exist").openConnection();
+        HttpURLConnection url = (HttpURLConnection) new URL("http://localhost:8080/does/not/exist").openConnection();
         try {
             //Given
             url.setInstanceFollowRedirects(false);
