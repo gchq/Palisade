@@ -11,7 +11,7 @@ trigger:
 stages:
 - stage: Docker_Build_and_Push
   variables:
-  - group: ${{variables.devOpsServiceConnection}}
+  - group: ${{variables.groupName}}
   jobs:
   - job:
     displayName: config-service
