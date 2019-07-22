@@ -79,9 +79,8 @@ public class MultiPolicy {
      *
      * @param resource the resource that you want the {@link Policy} for
      * @param policy   The {@link Policy} for the given {@link LeafResource}
-     * @return this object
      */
-    public MultiPolicy setPolicy(final LeafResource resource, final Policy policy) {
+    public void setPolicy(final LeafResource resource, final Policy policy) {
         requireNonNull(resource, "Cannot set a policy to a null resource.");
         requireNonNull(policy, "Cannot set a null policy to a resource.");
         Map<LeafResource, Policy> policies = getPolicies();
@@ -90,7 +89,6 @@ public class MultiPolicy {
         }
 
         policies.put(resource, policy);
-        return this;
     }
 
     /**
