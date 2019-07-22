@@ -41,12 +41,15 @@ public class RestUserServiceV1IT {
 
     private static ProxyRestUserService proxy;
     private static EmbeddedHttpServer server;
+    
+
 
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("restUserServicePort");
         RestUserServiceV1.setDefaultDelegate(new MockUserService());
-        proxy = (ProxyRestUserService) new ProxyRestUserService("http://localhost:8083/user").retryMax(1);
-        server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
+        proxy = (ProxyRestUserService) new ProxyRestUserService("http://localhost:"+portNumber+"/user").retryMax(1);
+        server = new EmbeddedHttpServer("http://0.0.0.0:"+portNumber+"/user/v1", new ApplicationConfigV1());
         server.startServer();
     }
 

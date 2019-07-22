@@ -56,11 +56,13 @@ public class RestConfigServiceV1IT {
     private static ProxyRestConfigService proxy;
     private static EmbeddedHttpServer server;
 
+
     @BeforeClass
     public static void beforeClass() throws IOException {
         //start the server
+        String portNumber = System.getProperty("restConfigServicePort");
         System.setProperty(ConfigConsts.BOOTSTRAP_CONFIG, "mockBootstrapConfig.json");
-        proxy = (ProxyRestConfigService) new ProxyRestConfigService("http://localhost:8085/config").retryMax(1);
+        proxy = (ProxyRestConfigService) new ProxyRestConfigService("http://localhost:" + portNumber + "/config").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }

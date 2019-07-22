@@ -53,10 +53,12 @@ public class RestResourceServiceV1IT {
 
     private static final SystemResource sysResource = new SystemResource().id("file");
 
+
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("restResourceServicePort");
         RestResourceServiceV1.setDefaultDelegate(new MockResourceService());
-        proxy = (ProxyRestResourceService) new ProxyRestResourceService("http://localhost:8082/resource").retryMax(1);
+        proxy = (ProxyRestResourceService) new ProxyRestResourceService("http://localhost:"+portNumber+"/resource").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }

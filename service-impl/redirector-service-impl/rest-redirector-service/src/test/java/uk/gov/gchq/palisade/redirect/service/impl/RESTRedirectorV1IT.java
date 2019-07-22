@@ -98,8 +98,7 @@ public class RESTRedirectorV1IT {
         public String host;
 
     }
-
-    private static final String BASE_URL = "http://localhost:8080";
+    
 
 
     private static CacheService cache;
@@ -107,6 +106,7 @@ public class RESTRedirectorV1IT {
     private static TestSimpleRandomRedirector redirector;
     private static EmbeddedHttpServer server;
     private static RESTRedirector<DummyService> restInstance;
+    private static final String BASE_URL = "http://localhost:" + System.getProperty("restRedirectorPort");
 
     @BeforeClass
     public static void setup() throws IOException {
@@ -118,7 +118,7 @@ public class RESTRedirectorV1IT {
         redirector = (TestSimpleRandomRedirector) new TestSimpleRandomRedirector().cacheService(cache).redirectionClass(DummyService.class);
         //make the redirection server
         restInstance = new RESTRedirector<>(DummyService.class.getTypeName(), RestDummyService.class.getTypeName(), redirector, true);
-        server = new EmbeddedHttpServer("http://localhost:8080", restInstance);
+        server = new EmbeddedHttpServer(BASE_URL, restInstance);
         server.startServer();
     }
 

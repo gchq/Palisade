@@ -62,7 +62,7 @@ public class RestPolicyServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        String portNumber = System.getProperty("portNumber");
+        String portNumber = System.getProperty("restPolicyServicePort");
         RestPolicyServiceV1.setDefaultDelegate(new MockPolicyService());
         proxy = (ProxyRestPolicyService) new ProxyRestPolicyService("http://localhost:"+portNumber+"/policy").retryMax(1);
         server = new EmbeddedHttpServer("http://0.0.0.0:"+portNumber+"/policy/v1", new ApplicationConfigV1());
