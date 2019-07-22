@@ -134,7 +134,7 @@ public class RESTRedirectorV1IT {
 
     @Test
     public void shouldRedirectCorrectlyVoid() throws Exception {
-        HttpURLConnection url = (HttpURLConnection) new URL( BASE_URL + "/serviceMethod/45").openConnection();
+        HttpURLConnection url = (HttpURLConnection) new URL(BASE_URL + "/serviceMethod/45").openConnection();
         try {
             //Given
             url.setInstanceFollowRedirects(false);

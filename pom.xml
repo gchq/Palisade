@@ -336,14 +336,7 @@
                 </executions>
                 <configuration>
                     <skipITs>${skip.failsafe.tests}</skipITs>
-                        <restUserServicePort>${restUserServicePort}</restUserServicePort>
-                        <restPolicyServicePort>${restPolicyServicePort}</restPolicyServicePort>
-                        <restRedirectorPort>${restRedirectorPort}</restRedirectorPort>
-                        <restConfigServicePort>${restConfigServicePort}</restConfigServicePort>
-                        <restDataServicePort>${restDataServicePort}</restDataServicePort>
-                        <restPalisadeMetricProviderPort>${restPalisadeMetricProviderPort}</restPalisadeMetricProviderPort>
-                        <restPalisadeServicePort>${restPalisadeServicePort}</restPalisadeServicePort>
-                        <restResourceServicePort>${restResourceServicePort}</restResourceServicePort>
+                    <argLine>${failsafeArgLine}</argLine>
                     <excludes>
                         <exclude>${exclude.tests}</exclude>
                     </excludes>
