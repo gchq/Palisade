@@ -147,7 +147,7 @@ public class RESTRedirectorV1IT {
             //Then
             assertThat(locationHeader, is(notNullValue()));
             assertThat(responseCode, is(equalTo(307)));
-            assertThat(locationHeader, is(equalTo("http://test-instance:8080/serviceMethod/45")));
+            assertThat(locationHeader, is(equalTo("http://test-instance:"+System.getProperty("restRedirectorPort")+"/serviceMethod/45")));
         } finally {
             url.disconnect();
         }
@@ -168,7 +168,7 @@ public class RESTRedirectorV1IT {
             //Then
             assertThat(locationHeader, is(notNullValue()));
             assertThat(responseCode, is(equalTo(307)));
-            assertThat(locationHeader, is(equalTo("http://test-instance:8080/anotherMethod/test")));
+            assertThat(locationHeader, is(equalTo("http://test-instance:"+System.getProperty("restRedirectorPort")+"/anotherMethod/test")));
         } finally {
             url.disconnect();
         }
