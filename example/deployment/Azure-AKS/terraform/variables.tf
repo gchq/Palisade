@@ -22,7 +22,7 @@ variable "ops_resource_group_name" {
 }
 
 variable "oms_sku" {
-  type        = "string"
+  type = "string"
   description = "OMS SKU"
 }
 
@@ -74,4 +74,9 @@ variable "dns_prefix" {
 variable "acr_name" {
   type = "string"
   description = "Name of the ACR."
+}
+
+variable "quota_size" {
+  type = "string"
+  description = "directory quota size"
 }

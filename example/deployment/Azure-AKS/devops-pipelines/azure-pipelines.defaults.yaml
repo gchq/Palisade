@@ -1,0 +1,5 @@
+variables:
+- name: devOpsServiceConnection
+  value: palisade_rm
+- name: groupName
+  value: Palisade-azure

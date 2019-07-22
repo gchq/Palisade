@@ -1,3 +1,5 @@
+variables:
+- template: example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.defaults.yaml
 steps:
 - task: DownloadBuildArtifacts@0
   displayName: 'Download Build Artifacts'
@@ -12,7 +14,7 @@ steps:
 - task: Docker@0
   displayName: 'Build  ${{ parameters.imageName }} image'
   inputs:
-    azureSubscription: 'palisade_rm'
+    azureSubscription: ${{variables.devOpsServiceConnection}}
     azureContainerRegistry: 'palisadeacr.azurecr.io'
     dockerFile: '$(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}/Dockerfile'
     imageName: '${{ parameters.imageName }}:$(Build.BuildId)'
@@ -21,7 +23,7 @@ steps:
 - task: Docker@0
   displayName: 'Push ${{ parameters.imageName }} image'
   inputs:
-    azureSubscription: 'palisade_rm'
+    azureSubscription: ${{variables.devOpsServiceConnection}}
     azureContainerRegistry: 'palisadeacr.azurecr.io'
     action: 'Push an image'
     imageName: '${{ parameters.imageName }}:$(Build.BuildId)'

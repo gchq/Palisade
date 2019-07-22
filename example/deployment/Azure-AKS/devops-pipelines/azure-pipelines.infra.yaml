@@ -1,4 +1,5 @@
 variables:
+  - template: example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.defaults.yaml
   azure-dir: example/deployment/Azure-AKS
   devops-dir: $(azure-dir)/devops-pipelines
 
@@ -14,7 +15,7 @@ stages:
     jobs:
       - job:
         variables:
-          - group: Palisade-azure
+          - group: ${{variables.groupName}}
         steps:
           - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
             displayName: 'terraform init'
@@ -22,7 +23,7 @@ stages:
               command: init
               workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
               backendType: azurerm
-              backendServiceArm: 'palisade_rm'
+              backendServiceArm: ${{variables.devOpsServiceConnection}}
               ensureBackend: true
               backendAzureRmResourceGroupName: 'tfstate'
               backendAzureRmResourceGroupLocation: uksouth
@@ -35,7 +36,7 @@ stages:
             inputs:
               command: plan
               workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
-              environmentServiceName: 'palisade_rm'
+              environmentServiceName: ${{variables.devOpsServiceConnection}}
               commandOptions: '-var-file default.tfvars -var client_id=$(terraform_sp_app_id) -var client_secret=$(terraform_sp_pass) -var subscription_id=$(subscription_id)  -out plan'
 
           - task: charleszipp.azure-pipelines-tasks-terraform.azure-pipelines-tasks-terraform-cli.TerraformCLI@0
@@ -43,7 +44,7 @@ stages:
             inputs:
               command: apply
               workingDirectory: '$(System.DefaultWorkingDirectory)/$(azure-dir)/terraform'
-              environmentServiceName: 'palisade_rm'
+              environmentServiceName: ${{variables.devOpsServiceConnection}}
               commandOptions: plan
 
           - task: HelmInstaller@0
@@ -56,7 +57,7 @@ stages:
             displayName: 'K8s RBAC Accounts'
             inputs:
               connectionType: Azure Resource Manager
-              azureSubscriptionEndpoint: 'palisade_rm'
+              azureSubscriptionEndpoint: ${{variables.devOpsServiceConnection}}
               azureResourceGroup: 'palisade'
               kubernetesCluster: 'palisade-aks'
               command: apply
@@ -67,14 +68,14 @@ stages:
           - task: AzureCLI@1
             displayName: 'Create share secret within k8'
             inputs:
-              azureSubscription: 'palisade_rm'
+              azureSubscription: ${{variables.devOpsServiceConnection}}
               scriptPath: '$(System.DefaultWorkingDirectory)/$(azure-dir)/k8s/create_share_secret.sh'
               arguments: "palisade $(data_storage_account_name) palisade-aks palisade-storage"
 
           - task: HelmDeploy@0
             displayName: 'helm init'
             inputs:
-              azureSubscription: 'palisade_rm'
+              azureSubscription: ${{variables.devOpsServiceConnection}}
               azureResourceGroup: 'palisade'
               kubernetesCluster: 'palisade-aks'
               command: init
@@ -83,7 +84,7 @@ stages:
           - task: AzureCLI@1
             displayName: 'get-ingress-ip'
             inputs:
-              azureSubscription: 'palisade_rm'
+              azureSubscription: ${{variables.devOpsServiceConnection}}
               scriptLocation: inlineScript
               inlineScript: |
                 ingress_ip=$(az network public-ip show -n "palisade-ingress-ip" -g "palisade" --query \"ipAddress\" | sed 's/\"//g')
@@ -92,7 +93,7 @@ stages:
           - task: AzureCLI@1
             displayName: 'helm repo update'
             inputs:
-              azureSubscription: 'palisade_rm'
+              azureSubscription: ${{variables.devOpsServiceConnection}}
               scriptLocation: inlineScript
               inlineScript: |
                 helm repo update
@@ -100,7 +101,7 @@ stages:
           - task: HelmDeploy@0
             displayName: 'helm upgrade nginx-ingress'
             inputs:
-              azureSubscription: 'palisade_rm'
+              azureSubscription: ${{variables.devOpsServiceConnection}}
               azureResourceGroup: 'palisade'
               kubernetesCluster: 'palisade-aks'
               namespace: ingress
