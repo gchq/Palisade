@@ -1,7 +1,7 @@
 variables:
-- template: example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.defaults.yaml
-azure-dir: example/deployment/Azure-AKS
-devops-dir: $(azure-dir)/devops-pipelines
+  azure-dir: example/deployment/Azure-AKS
+  devops-dir: $(azure-dir)/devops-pipelines
+  - template: example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.defaults.yaml
 
 trigger:
   batch: true
