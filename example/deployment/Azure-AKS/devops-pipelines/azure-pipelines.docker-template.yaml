@@ -1,5 +1,5 @@
 variables:
-- template: example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.defaults.yaml
+- template: ./azure-pipelines.defaults.yaml
 steps:
 - task: DownloadBuildArtifacts@0
   displayName: 'Download Build Artifacts'

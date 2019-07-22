@@ -1,5 +1,5 @@
 variables:
-- template: example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.defaults.yaml
+- template: ./azure-pipelines.defaults.yaml
 stages:
 - stage: Deploy_Palisade
   jobs:
