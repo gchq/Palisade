@@ -74,7 +74,7 @@ occur and not interfere with the results. The second number is the number of liv
 
 Depending on the size of the files you created, this may take some time to run. Output will be similar to the following:
 ```bash
-example.perf.Perf INFO  - Specified path perf_test has been normalised to file:///Users/username/Palisade/perf_test/
+example.perf.Perf INFO  - Specified path perf_test has been normalised to file:///<user home directory>/Palisade/perf_test/
 example.perf.Perf INFO  - Starting dry runs
 Starting test read_large_native:10000
 
