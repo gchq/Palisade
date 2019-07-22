@@ -3,20 +3,33 @@
 Palisade includes a performance tool for testing some simple scenarios. It uses the example data and generates some fake HR data using
 the [HR data generator](../hr-data-generator/README.md).
 
+The tool can run various performance tests, some operate on
+a large data file and some operate on a smaller data file. You can set the sizes for each of these.
+
+The tests will read the files natively, i.e. without Palisade and then read the same files by using Palisade, both with and
+without a redaction policy set. The test names state briefly what is being tested, e.g. "read_small_native" is a read of
+the smaller data file without using Palisade, "read_large_with_policy" is a read of the larger file via Palisade with policy enforced.
+The general naming scheme is "test_size_variant".
+
+Once you have completed [building](#building) below, you can get detail on each test by running:
+```bash
+./example/deployment/bash-scripts/perf.sh help run
+```
+
 ## Usage
 
 ### Building
+<a name="building"></a>
 To use the performance tool, you must first build Palisade (from the Palisade root directory):
 ```bash
 mvn clean install -P example
 ./example/deployment/local-jvm/bash-scripts/buildServices.sh
 ```
-
-Open a separate terminal window and start the Palisade services running on your local machine:
+You can then run the following command to start the Palisade services running on your local machine.
 ```bash
 ./example/deployment/local-jvm/bash-scripts/startAllServices.sh
 ```
-Wait for those to initialize and then from the first terminal you can run:
+Wait for those to initialize, then switch to a new terminal:
 ```bash
 ./example/deployment/bash-scripts/perf.sh
 ```
@@ -99,8 +112,3 @@ read_large_no_policy                 5.000       1.360       1.759       1.513  
 The tool reports several statistics, but the most useful are the mean and standard deviation. The percentage columns are the various
 percentile levels. The "Norm" column is the normalised column, showing how long various tests took compared to reading the files
 natively (without Palisade); tests against large and small files are normalised to the corresponding native test.
-
-Lastly, you can get detail on each test by running:
-```bash
-./example/deployment/bash-scripts/perf.sh help run
-```
