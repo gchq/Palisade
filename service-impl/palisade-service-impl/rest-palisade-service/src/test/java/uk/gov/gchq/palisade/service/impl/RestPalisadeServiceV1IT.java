@@ -56,11 +56,11 @@ public class RestPalisadeServiceV1IT {
     private static final RequestId originalRequestId = new RequestId().id("id2");
     private static ProxyRestPalisadeService proxy;
     private static EmbeddedHttpServer server;
-
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("restPalisadeServicePort");
         RestPalisadeServiceV1.setDefaultDelegate(new MockPalisadeService());
-        proxy = (ProxyRestPalisadeService) new ProxyRestPalisadeService("http://localhost:8080/palisade").retryMax(1);
+        proxy = (ProxyRestPalisadeService) new ProxyRestPalisadeService("http://localhost:"+portNumber+"/palisade").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }

@@ -101,6 +101,14 @@
         <surefireArgLine/>
         <failsafeArgLine/>
         <exclude.tests/>
+        <restPolicyServicePort>9081</restPolicyServicePort>
+        <restRedirectorPort>8080</restRedirectorPort>
+        <restConfigServicePort>8085</restConfigServicePort>
+        <restDataServicePort>8084</restDataServicePort>
+        <restPalisadeMetricProviderPort>8080</restPalisadeMetricProviderPort>
+        <restPalisadeServicePort>8080</restPalisadeServicePort>
+        <restResourceServicePort>8082</restResourceServicePort>
+        <restUserServicePort>8083</restUserServicePort>
 
         <!-- Other -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -299,6 +307,14 @@
                         <exclude>${exclude.tests}</exclude>
                     </excludes>
                     <systemPropertyVariables>
+                        <restUserServicePort>${restUserServicePort}</restUserServicePort>
+                        <restPolicyServicePort>${restPolicyServicePort}</restPolicyServicePort>
+                        <restRedirectorPort>${restRedirectorPort}</restRedirectorPort>
+                        <restConfigServicePort>${restConfigServicePort}</restConfigServicePort>
+                        <restDataServicePort>${restDataServicePort}</restDataServicePort>
+                        <restPalisadeMetricProviderPort>${restPalisadeMetricProviderPort}</restPalisadeMetricProviderPort>
+                        <restPalisadeServicePort>${restPalisadeServicePort}</restPalisadeServicePort>
+                        <restResourceServicePort>${restResourceServicePort}</restResourceServicePort>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
@@ -331,6 +347,14 @@
                         <include>**/*IntegrationTests.java</include>
                     </includes>
                     <systemPropertyVariables>
+                        <restUserServicePort>${restUserServicePort}</restUserServicePort>
+                        <restPolicyServicePort>${restPolicyServicePort}</restPolicyServicePort>
+                        <restRedirectorPort>${restRedirectorPort}</restRedirectorPort>
+                        <restConfigServicePort>${restConfigServicePort}</restConfigServicePort>
+                        <restDataServicePort>${restDataServicePort}</restDataServicePort>
+                        <restPalisadeMetricProviderPort>${restPalisadeMetricProviderPort}</restPalisadeMetricProviderPort>
+                        <restPalisadeServicePort>${restPalisadeServicePort}</restPalisadeServicePort>
+                        <restResourceServicePort>${restResourceServicePort}</restResourceServicePort>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
