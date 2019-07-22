@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.stream.Stream;
 
@@ -28,12 +29,13 @@ import java.util.stream.Stream;
 public interface Serialiser<I> extends Serializable {
 
     /**
-     * Serialises a {@link Stream} of objects into an {@link InputStream}.
+     * Serialises a {@link Stream} of objects to an {@link OutputStream}.
      *
      * @param objects the stream of objects to be serialised
-     * @return the serialised form
+     * @param output the output stream to write the serialised bytes to
+     * @return this object
      */
-    InputStream serialise(final Stream<I> objects);
+    Serialiser<I> serialise(final Stream<I> objects, final OutputStream output);
 
     /**
      * Deserialise an {@link InputStream} into a {@link Stream} of objects.
