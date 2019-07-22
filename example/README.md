@@ -6,7 +6,7 @@ The Example module contains all the example specific modules:
 - example-model, contains all the deployment agnostic example code such as the rules and example configuration.
 - example-services, contains all the example JVM REST based services
 - deployment, contains all the deployment specific code and scripts
-- [performance](performance/README.md), which can provides a performance benchmarking tool
+- [performance](performance/README.md), which provides a performance benchmarking tool
 
 The example demonstrates different users querying an avro file over a REST api.
 
