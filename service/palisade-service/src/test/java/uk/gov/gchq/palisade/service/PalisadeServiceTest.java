@@ -25,7 +25,8 @@ public class PalisadeServiceTest {
         res1 = new StubResource();
         //create a new empty policy for this resource
         policy = new Policy();
-        multiPolicy = new MultiPolicy().setPolicy(res1, policy);
+        multiPolicy = new MultiPolicy();
+        multiPolicy.setPolicy(res1, policy);
         //create a new policy with no entry for the resource
         emptyPolicy = new MultiPolicy();
     }
