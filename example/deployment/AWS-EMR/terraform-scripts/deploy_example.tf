@@ -11,10 +11,6 @@ resource "null_resource" "deploy_example" {
     timeout = "30s"
   }
 
-  triggers {
-    update = 2
-  }
-
   # Copy pem file to .ssh directory on EMR master.....and restrict its permissions
   provisioner "file" {
     source = "${var.pem_file}"
