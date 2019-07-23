@@ -164,7 +164,6 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
 
 
         //launch job
-        LOGGER.info("Launch job!"); //TODO REMOVE THIS
         boolean success = job.waitForCompletion(true);
 
         return (success) ? 0 : 1;
@@ -224,18 +223,11 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
         InetAddress ip = InetAddress.getLocalHost();
         String hostname = ip.getHostName();
         Configuration conf = new Configuration();
-        //Set job tracker to local implementation - REMOVE THIS FOR RUNNING IN DISTRIBUTED MODE
-        //conf.set("mapred.job.tracker", "local");
-        //conf.set("mapreduce.framework.name", "local");
         conf.set("mapreduce.framework.name", "yarn");
-        //Set file system to local implementation and set the root to current directory - REMOVE IN DISTRIBUTED MODE
-        //conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, new File(".").toURI().toURL().toString());
         //set defaultFS to hdfs on cluster
         conf.set("fs.defaultFS", ("hdfs://" + hostname));
-        //conf.set("fs.defaultFS", ("hdfs://localhost"));           // uncomment to run locally rather than on cluster
         //set address of resource manager
         conf.set("yarn.resourcemanager.address", (hostname + ":8032"));
-        //conf.set("yarn.resourcemanager.address", ("localhost:8032"));          // uncomment to run locally rather than on cluster
         ToolRunner.run(conf, new AwsEmrMapReduceExample(), new String[]{sourceFile, outputDir});
     }
 
