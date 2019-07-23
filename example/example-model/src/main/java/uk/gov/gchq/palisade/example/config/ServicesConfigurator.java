@@ -46,7 +46,6 @@ import uk.gov.gchq.palisade.user.service.impl.SimpleUserService;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
