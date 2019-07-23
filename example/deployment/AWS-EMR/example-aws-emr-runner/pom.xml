@@ -25,20 +25,6 @@
     </parent>
     <artifactId>example-aws-emr-runner</artifactId>
 
-    <!--<repositories>-->
-    <!--<repository>-->
-    <!--<id>emr-5.22.0-artifacts</id>-->
-    <!--<name>EMR 5.22.0 Releases Repository</name>-->
-    <!--<releases>-->
-    <!--<enabled>true</enabled>-->
-    <!--</releases>-->
-    <!--<snapshots>-->
-    <!--<enabled>false</enabled>-->
-    <!--</snapshots>-->
-    <!--<url>https://s3.eu-west-1.amazonaws.com/eu-west-1-emr-artifacts/emr-5.22.0/repos/maven/</url>-->
-    <!--</repository>-->
-    <!--</repositories>-->
-
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
