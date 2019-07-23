@@ -132,7 +132,6 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
         currentValue = null;
         errResource = null;
         processed = 0;
-        Util.locateJarFile("javax.ws.rs.core.Response$Status$Family");
     }
 
     /**
