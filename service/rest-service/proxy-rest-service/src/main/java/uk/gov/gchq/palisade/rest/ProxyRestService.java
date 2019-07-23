@@ -299,7 +299,6 @@ public abstract class ProxyRestService implements Service {
 
     protected <O> O doPut(final URL url, final Object body, final Class<O> outputType) {
         try {
-            String stuff = new String(JSONSerialiser.serialise(body));
             return doPut(url, new String(JSONSerialiser.serialise(body), "UTF-8"), outputType);
         } catch (final UnsupportedEncodingException e) {
             throw new RuntimeException(e);
