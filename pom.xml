@@ -101,6 +101,7 @@
         <surefireArgLine/>
         <failsafeArgLine/>
         <exclude.tests/>
+
         <restRedirectorPort>9080</restRedirectorPort>
         <restPalisadeMetricProviderPort>9080</restPalisadeMetricProviderPort>
         <restPalisadeServicePort>9080</restPalisadeServicePort>
@@ -319,6 +320,9 @@
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
                     </systemPropertyVariables>
+                    <environmentVariables>
+                        <PALISADE_REST_CONFIG_PATH>example/example-model/src/main/resources/configRest.json</PALISADE_REST_CONFIG_PATH>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -359,6 +363,9 @@
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
                     </systemPropertyVariables>
+                    <environmentVariables>
+                        <PALISADE_REST_CONFIG_PATH>example/example-model/src/main/resources/configRest.json</PALISADE_REST_CONFIG_PATH>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
