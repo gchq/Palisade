@@ -39,6 +39,6 @@ node_modules
 .classpath/
 
 ##VSCODE default files that dont need to be tracked
-library/shade-hadoop-client/dependency-reduced-pom.xml
+dependency-reduced-pom.xml
 eclipse-formatter.xml
 .vscode/settings.json
