@@ -101,6 +101,7 @@
         <surefireArgLine/>
         <failsafeArgLine/>
         <exclude.tests/>
+        
 
         <!-- Other -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -299,6 +300,7 @@
                         <exclude>${exclude.tests}</exclude>
                     </excludes>
                     <systemPropertyVariables>
+                        <PALISADE_REST_CONFIG_PATH>example/example-model/src/main/resources/configRest.json</PALISADE_REST_CONFIG_PATH>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
@@ -331,6 +333,7 @@
                         <include>**/*IntegrationTests.java</include>
                     </includes>
                     <systemPropertyVariables>
+                        <PALISADE_REST_CONFIG_PATH>example/example-model/src/main/resources/configRest.json</PALISADE_REST_CONFIG_PATH>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>

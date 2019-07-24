@@ -48,6 +48,8 @@ public final class ConfigUtils {
     public static String retrieveConfigurationPath() {
         String path = System.getenv(ConfigConsts.CONFIG_SERVICE_PATH);
         if (isNull(path)) {
+            path = System.getProperty(ConfigConsts.CONFIG_SERVICE_PATH);
+        } else if (isNull(path)) {
             LOGGER.error("Couldn't find path for file describing how to connect to the Palisade configuration service. You need to set an environment " +
                     "variable named {} to the path, e.g. {}=/home/user/myConfig.json", ConfigConsts.CONFIG_SERVICE_PATH, ConfigConsts.CONFIG_SERVICE_PATH);
             throw new IllegalStateException(String.format("No configuration path due to environment variable %s not being set", ConfigConsts.CONFIG_SERVICE_PATH));
