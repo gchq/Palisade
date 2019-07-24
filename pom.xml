@@ -101,14 +101,14 @@
         <surefireArgLine/>
         <failsafeArgLine/>
         <exclude.tests/>
+        <restRedirectorPort>9080</restRedirectorPort>
+        <restPalisadeMetricProviderPort>9080</restPalisadeMetricProviderPort>
+        <restPalisadeServicePort>9080</restPalisadeServicePort>
         <restPolicyServicePort>9081</restPolicyServicePort>
-        <restRedirectorPort>8080</restRedirectorPort>
-        <restConfigServicePort>8085</restConfigServicePort>
-        <restDataServicePort>8084</restDataServicePort>
-        <restPalisadeMetricProviderPort>8080</restPalisadeMetricProviderPort>
-        <restPalisadeServicePort>8080</restPalisadeServicePort>
-        <restResourceServicePort>8082</restResourceServicePort>
-        <restUserServicePort>8083</restUserServicePort>
+        <restResourceServicePort>9082</restResourceServicePort>
+        <restUserServicePort>9083</restUserServicePort>
+        <restDataServicePort>9084</restDataServicePort>
+        <restConfigServicePort>9085</restConfigServicePort>
 
         <!-- Other -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

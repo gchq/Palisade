@@ -203,7 +203,7 @@ public class RESTRedirectorV1IT {
             url.connect();
 
             //Then
-            assertThat(redirector.host, either(is(equalTo(InetAddress.getLocalHost().getCanonicalHostName()))).or(is(equalTo("localhost"))).or(is(equalTo("hostname"))).or(is(equalTo("127.0.0.1"))));
+            assertThat(redirector.host, either(is(equalTo(InetAddress.getLocalHost().getCanonicalHostName()))).or(is(equalTo("localhost"))).or(is(equalTo(InetAddress.getLocalHost().getHostName()))).or(is(equalTo("127.0.0.1"))));
         } finally {
             url.disconnect();
         }
