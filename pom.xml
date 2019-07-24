@@ -101,6 +101,7 @@
         <surefireArgLine/>
         <failsafeArgLine/>
         <exclude.tests/>
+        
 
         <!-- Other -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -303,6 +304,9 @@
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
                     </systemPropertyVariables>
+                    <environmentVariables>
+                        <PALISADE_REST_CONFIG_PATH>example/example-model/src/main/resources/configRest.json</PALISADE_REST_CONFIG_PATH>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -335,6 +339,9 @@
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
                     </systemPropertyVariables>
+                    <environmentVariables>
+                        <PALISADE_REST_CONFIG_PATH>example/example-model/src/main/resources/configRest.json</PALISADE_REST_CONFIG_PATH>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
