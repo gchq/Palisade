@@ -27,6 +27,7 @@
 
     <modules>
         <module>local-docker</module>
+        <module>AWS-EMR</module>
         <!--<module>Azure-HDInsight</module>-->
     </modules>
 </project>
