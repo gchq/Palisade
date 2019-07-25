@@ -15,7 +15,7 @@ For an overview of the example see [here](../../README.md).
 
 1. In order to run this example you will also need to have [Terraform](https://www.terraform.io/) installed locally. **Currently
 this requires Terraform 0.11 and does not work with Terraform 0.12. This will be addressed in a future release.**
-2. You will need and AWS account subscription.
+2. You will need an AWS account subscription.
 
 ### Instructions
 
