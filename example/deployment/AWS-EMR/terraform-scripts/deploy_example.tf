@@ -159,7 +159,7 @@ resource "null_resource" "deploy_example" {
   # Run the Palisade mapreduce example runner....1st copy over the jar
   provisioner "file" {
     source = "../../../deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-*-shaded.jar"
-    destination = "/home/hadoop/jars/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
+    destination = "/home/hadoop/jars/"
   }
   provisioner "remote-exec" {
     inline = [
