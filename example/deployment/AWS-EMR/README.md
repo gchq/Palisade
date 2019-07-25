@@ -108,7 +108,7 @@ To run the AWS-EMR example follow these steps (from the root of the project):
     
     ```hdfs dfs -text output/part-r-00000```
     
-    which will produce output similar to this (you actual counts and values may differ):
+    which will produce output similar to this (your actual counts and values may differ):
     ```bash
     hdfs dfs -text output/part-r-00000
     11500L     10
