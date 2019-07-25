@@ -25,7 +25,7 @@ nohup /home/hadoop/deploy_example/deployResourceService.sh > /home/hadoop/exampl
 echo deployed Palisade resource service
 
 # Deploy the Palisade User service on the EMR master node....1st copy over the jar....
-cp example/example-services/example-rest-user-service/target/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar  /home/hadoop/jars/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar
+cp example/example-services/example-rest-user-service/target/example-rest-user-service-*-executable.jar  /home/hadoop/jars/
 nohup /home/hadoop/deploy_example/deployUserService.sh > /home/hadoop/example_logs/deployUserService.log 2>&1 &
 echo deployed Palisade user service
 
