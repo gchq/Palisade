@@ -39,7 +39,6 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
 
 import static java.util.Objects.nonNull;
 import static org.hamcrest.CoreMatchers.*;
@@ -99,23 +98,15 @@ public class RESTRedirectorV1IT {
         public String host;
 
     }
+    
 
-    private static final String BASE_URL;
-
-    static {
-        String host = "";
-        try {
-            host = String.format("http://%s:8080", InetAddress.getLocalHost().getCanonicalHostName());
-        } catch (UnknownHostException e) { }
-
-        BASE_URL = host;
-    }
 
     private static CacheService cache;
     private static Heartbeat beat;
     private static TestSimpleRandomRedirector redirector;
     private static EmbeddedHttpServer server;
     private static RESTRedirector<DummyService> restInstance;
+    private static final String BASE_URL = "http://localhost:" + System.getProperty("restRedirectorPort");
 
     @BeforeClass
     public static void setup() throws IOException {
@@ -156,7 +147,7 @@ public class RESTRedirectorV1IT {
             //Then
             assertThat(locationHeader, is(notNullValue()));
             assertThat(responseCode, is(equalTo(307)));
-            assertThat(locationHeader, is(equalTo("http://test-instance:8080/serviceMethod/45")));
+            assertThat(locationHeader, is(equalTo("http://test-instance:"+System.getProperty("restRedirectorPort")+"/serviceMethod/45")));
         } finally {
             url.disconnect();
         }
@@ -177,7 +168,7 @@ public class RESTRedirectorV1IT {
             //Then
             assertThat(locationHeader, is(notNullValue()));
             assertThat(responseCode, is(equalTo(307)));
-            assertThat(locationHeader, is(equalTo("http://test-instance:8080/anotherMethod/test")));
+            assertThat(locationHeader, is(equalTo("http://test-instance:"+System.getProperty("restRedirectorPort")+"/anotherMethod/test")));
         } finally {
             url.disconnect();
         }
@@ -212,7 +203,7 @@ public class RESTRedirectorV1IT {
             url.connect();
 
             //Then
-            assertThat(redirector.host, either(is(equalTo(InetAddress.getLocalHost().getCanonicalHostName()))).or(is(equalTo("localhost"))));
+            assertThat(redirector.host, either(is(equalTo(InetAddress.getLocalHost().getCanonicalHostName()))).or(is(equalTo("localhost"))).or(is(equalTo(InetAddress.getLocalHost().getHostName()))).or(is(equalTo("127.0.0.1"))));
         } finally {
             url.disconnect();
         }

@@ -14,22 +14,25 @@
 
 target/
 *.iml
-.settings
-.project
+.project/
 bin/
-.class
-.idea
-*/.classpath
+*.class
+*/atlassian-ide*
+.idea/
+.classpath/
 *.pem
 *.DS_Store
 _book
-node_modules
-.extract
-.project
-.settings
-.classpath
-.terraform
-dependency-reduced-pom.xml
+node_modules/
+.extract/
+.project/
+.settings/
+.terraform/
 terraform.tfvars
 terraform.tfstate
 terraform.tfstate.backup
+dependency-reduced-pom.xml
+
+##VSCODE default files that dont need to be tracked
+eclipse-formatter.xml
+.vscode/

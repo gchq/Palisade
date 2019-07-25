@@ -121,9 +121,14 @@ public class HierarchicalPolicyService implements PolicyService {
     private Collection<LeafResource> canAccess(final Context context, final User user, final Collection<LeafResource> resources) {
         return resources.stream()
                 .map(resource -> {
-                    CompletableFuture<Rules<LeafResource>> futureRules = getApplicableRules(resource, true, resource.getType());
-                    Rules<LeafResource> rules = futureRules.join();
-                    return Util.applyRulesToRecord(resource, user, context, rules);
+                    CompletableFuture<Optional<Rules<LeafResource>>> futureRules = getApplicableRules(resource, true, resource.getType());
+                    Optional<Rules<LeafResource>> rules = futureRules.join();
+                    if (rules.isPresent()) {
+                        return Util.applyRulesToItem(resource, user, context, rules.get());
+                    } else {
+                        LOGGER.debug("No policy for {}, removing resource from list...", resource);
+                        return null;
+                    }
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -143,12 +148,12 @@ public class HierarchicalPolicyService implements PolicyService {
      * @return A completable future of {@link Rules} object of type T, which contains the list of rules
      * that need to be applied to the resource.
      */
-    protected <T> CompletableFuture<Rules<T>> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
-
-        CompletableFuture<Rules<T>> inheritedRules;
+    protected <T> CompletableFuture<Optional<Rules<T>>> getApplicableRules(final Resource resource, final boolean canAccessRequest, final String originalDataType) {
+        CompletableFuture<Optional<Rules<T>>> inheritedRules;
         if (resource instanceof ChildResource) {
             inheritedRules = getApplicableRules(((ChildResource) resource).getParent(), canAccessRequest, originalDataType);
         } else {
+            //we are at top of hierarchy
             CompletableFuture<Optional<Policy>> inheritedPolicy = (CompletableFuture<Optional<Policy>>) getCacheService().get(
                     new GetCacheRequest<Policy>()
                             .service(this.getClass())
@@ -163,40 +168,47 @@ public class HierarchicalPolicyService implements PolicyService {
                         .key(RESOURCE_POLICIES_PREFIX + resource.getId()));
 
         return inheritedRules.thenCombine(newPolicy, (oldRules, policy) -> {
-            if (policy.isPresent()) {
-                Rules<T> newRules = extractRules(canAccessRequest, policy);
-                return mergeRules(oldRules, newRules);
-            } else {
-                return oldRules;
-            }
+            Optional<Rules<T>> newRules = extractRules(canAccessRequest, policy);
+            return mergeRules(oldRules, newRules);
         });
     }
 
-    private <T> Rules<T> extractRules(final boolean canAccessRequest, final Optional<Policy> policy) {
+    private <T> Optional<Rules<T>> extractRules(final boolean canAccessRequest, final Optional<Policy> policy) {
         if (canAccessRequest) {
-            if (policy.isPresent()) {
-                return policy.get().getResourceRules();
-            } else {
-                return new Rules<>();
-            }
+            return policy.map(p -> p.getResourceRules());
         } else {
-            if (policy.isPresent()) {
-                return policy.get().getRecordRules();
-            } else {
-                return new Rules<>();
-            }
+            return policy.map(p -> p.getRecordRules());
         }
     }
 
-    private <T> Rules<T> mergeRules(final Rules<T> inheritedRules, final Rules<T> newRules) {
-        String inheritedMessage = inheritedRules.getMessage();
-        String newMessage = newRules.getMessage();
-        if (!inheritedMessage.equals(Rules.NO_RULES_SET) && !newMessage.equals(Rules.NO_RULES_SET)) {
-            inheritedRules.message(inheritedMessage + ", " + newMessage);
-        } else if (!newMessage.equals(Rules.NO_RULES_SET)) {
-            inheritedRules.message(newMessage);
+    private <T> Optional<Rules<T>> mergeRules(final Optional<Rules<T>> inheritedRules, final Optional<Rules<T>> newRules) {
+        if (inheritedRules.isPresent()) {
+            if (newRules.isPresent()) {
+                //both present --> merge
+                String inheritedMessage = inheritedRules.get().getMessage();
+                String newMessage = newRules.get().getMessage();
+                if (!inheritedMessage.equals(Rules.NO_RULES_SET) && !newMessage.equals(Rules.NO_RULES_SET)) {
+                    inheritedRules.get().message(inheritedMessage + ", " + newMessage);
+                } else if (!newMessage.equals(Rules.NO_RULES_SET)) {
+                    inheritedRules.get().message(newMessage);
+                }
+                //don't test for inheritedRules != Rules.NO_RULES_SET as that is the default case, there is nothing to do
+                inheritedRules.get().addRules(newRules.get().getRules());
+                return inheritedRules;
+            } else {
+                //only inherited present
+                return inheritedRules;
+            }
+        } else {
+            if (newRules.isPresent()) {
+                //new rules but no inherited ones
+                return newRules;
+            } else {
+                //neither
+                return Optional.empty();
+            }
         }
-        return inheritedRules.addRules(newRules.getRules());
+
     }
 
     @Override
@@ -205,10 +217,19 @@ public class HierarchicalPolicyService implements PolicyService {
         User user = request.getUser();
         Collection<LeafResource> resources = request.getResources();
         Collection<LeafResource> canAccessResources = canAccess(context, user, resources);
+        /* Having filtered out any resources the user doesn't have access to in the line above, we now build the map
+         * of resource to record level rule policies. If there are resource level rules for a record then there SHOULD
+         * be record level rules. Either list may be empty, but they should at least be present!
+         */
         HashMap<LeafResource, Policy> map = new HashMap<>();
         canAccessResources.forEach(resource -> {
-            CompletableFuture<Rules<Object>> rules = getApplicableRules(resource, false, resource.getType());
-            map.put(resource, new Policy<>().recordRules(rules.join()));
+            CompletableFuture<Optional<Rules<Object>>> rules = getApplicableRules(resource, false, resource.getType());
+            Optional<Rules<Object>> optionalRecordRules = rules.join();
+            if (optionalRecordRules.isPresent()) {
+                map.put(resource, new Policy<>().recordRules(optionalRecordRules.get()));
+            } else {
+                LOGGER.warn("Couldn't find any record level rules for {}. This shouldn't be the case, since we found resource level rules for it!");
+            }
         });
         return CompletableFuture.completedFuture(new MultiPolicy().policies(map));
     }
