@@ -12,7 +12,9 @@ variable "aws_region" {
 
 variable "aws_access_key" {} 
 
-variable "aws_secret_key" {}
+variable "aws_secret_key" {
+    default = ""
+}
 
 variable "aws_profile_name" {
     default = ""
