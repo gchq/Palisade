@@ -127,7 +127,7 @@ resource "null_resource" "deploy_example" {
   # Generate a data file on the cluster and put it into hdfs....1st copy over the jar...
   provisioner "file" {
     source = "../../../example-model/target/example-model-*-shaded.jar"
-    destination = "/home/hadoop/jars/example-model-0.2.1-SNAPSHOT-shaded.jar"
+    destination = "/home/hadoop/jars/"
   }
   provisioner "remote-exec" {
     inline = [
