@@ -10,19 +10,22 @@ steps:
     artifactName: local-docker
     downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
 
-- task: Docker@0
-  displayName: 'Build  ${{ parameters.imageName }} image'
-  inputs:
-    azureSubscription: '${{variables.devOpsServiceConnection}}'
-    azureContainerRegistry: 'palisadeacr.azurecr.io'
-    dockerFile: '$(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}/Dockerfile'
-    imageName: '${{ parameters.imageName }}:$(Build.BuildId)'
-    includeLatestTag: true
+#- task: Docker@0
+#  displayName: 'Build  ${{ parameters.imageName }} image'
+#  inputs:
+#    azureSubscription: '${{variables.devOpsServiceConnection}}'
+#    azureContainerRegistry: 'palisadeacr.azurecr.io'
+#    dockerFile: '$(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}/Dockerfile'
+#    imageName: '${{ parameters.imageName }}:$(Build.BuildId)'
+#    includeLatestTag: true
 
-- script: docker login -u $(dockerId) -p $(pswd) palisadeacr.azurecr.io
+-script: docker build -t $(dockerId).azurecr.io/${{ parameters.imageName }}:$(Build.BuildId) $(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}/Dockerfile
+
+
+- script: docker login -u $(dockerId) -p $(pswd) $(dockerId).azurecr.io
   displayName: 'Login to docker environment'
 
-- script: docker push $(dockerId).azurecr.io/${{ parameters.imageName }}:$(Build.BuildId)
+- script: docker push $(dockerId).azureacr.io/${{ parameters.imageName }}:$(Build.BuildId)
 
 #- task: Docker@0
 #  displayName: 'Push ${{ parameters.imageName }} image'
