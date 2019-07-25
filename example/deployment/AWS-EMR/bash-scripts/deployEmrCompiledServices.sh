@@ -10,7 +10,7 @@ sudo rm -Rf .extract
 mkdir .extract
 
 # Deploy the Palisade config service on the EMR master
-cp example/example-services/example-rest-config-service/target/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar  /home/hadoop/jars/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar
+cp example/example-services/example-rest-config-service/target/example-rest-config-service-*-executable.jar  /home/hadoop/jars/
 nohup /home/hadoop/deploy_example/deployConfigService.sh > /home/hadoop/example_logs/deployConfigService.log 2>&1 &
 echo deployed Palisade config service
 
