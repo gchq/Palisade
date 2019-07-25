@@ -11,6 +11,8 @@ You will need to add in the following variables:
 * subscription_id - follow this [instruction](https://blogs.msdn.microsoft.com/mschray/2016/03/18/getting-your-azure-subscription-guid-new-portal/) in order to obtain the *subscription id* for your particular subscription (A subscription is a selection of resources)
 * terraform_sp_app_id - in order for terraform to be able to create resources, a service principal application and password must be created - follow these [instructions](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal) in order to create an Azure AD application
 * terraform_sp_pass - the password created above
+* dockerId - the container registry address - see below (e.g palisadeacr)
+* pswd - the container registry password (see below under Access Control IAM)
 
 Your library entry should appear as below:
 ![library image](./library.png)
