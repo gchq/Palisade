@@ -14,7 +14,6 @@ resource "aws_emr_cluster" "palisade_cluster" {
   ec2_attributes {
     instance_profile                  = "${aws_iam_instance_profile.emr_profile.id}"
     key_name                          = "${var.key_name}"
-    #subnet_id                         = "${aws_subnet.palisade_subnet.id}"
     subnet_id                         = "${var.subnet_id}"
     emr_managed_master_security_group = "${aws_security_group.palisade_allow_inbound.id}"
     emr_managed_slave_security_group  = "${aws_security_group.palisade_allow_inbound.id}"
