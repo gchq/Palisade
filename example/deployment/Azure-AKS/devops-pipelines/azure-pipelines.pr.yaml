@@ -12,6 +12,8 @@ trigger:
 
 stages:
 - stage: Maven_Build
+  variables:
+  - group: ${{variables.groupName}}
   jobs:
   - job: Maven_Build
     steps:
