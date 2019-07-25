@@ -18,7 +18,6 @@ package uk.gov.gchq.palisade.example.client;
 
 import uk.gov.gchq.palisade.client.SimpleClient;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
-
 import uk.gov.gchq.palisade.example.config.ServicesConfigurator;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
