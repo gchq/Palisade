@@ -61,8 +61,8 @@ resource "null_resource" "deploy_example" {
 
   # Deploy the Palisade config service on the EMR master......1st copy over its jar....
   provisioner "file" {
-    source = "../../../example-services/example-rest-config-service/target/example-rest-config-service-*-executable.jar"
-    destination = "/home/hadoop/jars/"
+    source = "../../../example-services/example-rest-config-service/target/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
+    destination = "/home/hadoop/jars/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
   }
 
   provisioner "local-exec" {
@@ -81,8 +81,8 @@ resource "null_resource" "deploy_example" {
 
   # Deploy the Palisade Resource service on the EMR master node...1st copy over the jar...
   provisioner "file" {
-    source = "../../../example-services/example-rest-resource-service/target/example-rest-resource-service-*-executable.jar"
-    destination = "/home/hadoop/jars/"
+    source = "../../../example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
+    destination = "/home/hadoop/jars/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar"
   }
   provisioner "local-exec" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployResourceService.sh > /home/hadoop/example_logs/deployResourceService.log 2>&1 &'"
@@ -90,8 +90,8 @@ resource "null_resource" "deploy_example" {
 
   # Deploy the Palisade User service on the EMR master node....1st copy over the jar....
   provisioner "file" {
-    source = "../../../example-services/example-rest-user-service/target/example-rest-user-service-*-executable.jar"
-    destination = "/home/hadoop/jars/"
+    source = "../../../example-services/example-rest-user-service/target/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
+    destination = "/home/hadoop/jars/example-rest-user-service-0.2.1-SNAPSHOT-executable.jar"
   }
   provisioner "local-exec" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployUserService.sh > /home/hadoop/example_logs/deployUserService.log 2>&1 &'"
@@ -99,8 +99,8 @@ resource "null_resource" "deploy_example" {
 
   # Deploy the example Palisade Policy service on the EMR master node.....1st copy over the jar...
   provisioner "file" {
-    source = "../../../example-services/example-rest-policy-service/target/example-rest-policy-service-*-executable.jar"
-    destination = "/home/hadoop/jars/"
+    source = "../../../example-services/example-rest-policy-service/target/example-rest-policy-service-0.2.1-SNAPSHOT-executable.jar"
+    destination = "/home/hadoop/jars/example-rest-policy-service-0.2.1-SNAPSHOT-executable.jar"
   }
   provisioner "local-exec" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployPolicyService.sh > /home/hadoop/example_logs/deployPolicyService.log 2>&1 &'"
@@ -108,8 +108,8 @@ resource "null_resource" "deploy_example" {
 
   # Deploy the example Palisade service (co-ordinating service) on the EMR master node.....1st copy over the jar...
   provisioner "file" {
-    source = "../../../example-services/example-rest-palisade-service/target/example-rest-palisade-service-*-executable.jar"
-    destination = "/home/hadoop/jars/"
+    source = "../../../example-services/example-rest-palisade-service/target/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
+    destination = "/home/hadoop/jars/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
   }
   provisioner "local-exec" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployPalisadeService.sh > /home/hadoop/example_logs/deployPalisadeService.log 2>&1 &'"
@@ -117,8 +117,8 @@ resource "null_resource" "deploy_example" {
 
   # Deploy the rest redirector
   provisioner "file" {
-    source = "../../../example-services/example-rest-redirector-service/target/example-rest-redirector-service-*-shaded.jar"
-    destination = "/home/hadoop/jars/"
+    source = "../../../example-services/example-rest-redirector-service/target/example-rest-redirector-service-0.2.1-SNAPSHOT-shaded.jar"
+    destination = "/home/hadoop/jars/example-rest-redirector-service-0.2.1-SNAPSHOT-shaded.jar"
   }
   provisioner "local-exec" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployRESTRedirectorService.sh > /home/hadoop/example_logs/deployRESTRedirectorService.log 2>&1 &'"
@@ -126,8 +126,8 @@ resource "null_resource" "deploy_example" {
 
   # Generate a data file on the cluster and put it into hdfs....1st copy over the jar...
   provisioner "file" {
-    source = "../../../example-model/target/example-model-*-shaded.jar"
-    destination = "/home/hadoop/jars/"
+    source = "../../../example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar"
+    destination = "/home/hadoop/jars/example-model-0.2.1-SNAPSHOT-shaded.jar"
   }
   provisioner "remote-exec" {
     inline = [
@@ -140,8 +140,8 @@ resource "null_resource" "deploy_example" {
 
   # Deploy the example Palisade Data service on the EMR master node.....1st copy over the jar...
   provisioner "file" {
-    source = "../../../example-services/example-rest-data-service/target/example-rest-data-service-*-executable.jar"
-    destination = "/home/hadoop/jars/"
+    source = "../../../example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
+    destination = "/home/hadoop/jars/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
   }
   provisioner "remote-exec" {
     inline = [
@@ -158,8 +158,8 @@ resource "null_resource" "deploy_example" {
 
   # Run the Palisade mapreduce example runner....1st copy over the jar
   provisioner "file" {
-    source = "../../../deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-*-shaded.jar"
-    destination = "/home/hadoop/jars/"
+    source = "../../../deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
+    destination = "/home/hadoop/jars/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar"
   }
   provisioner "remote-exec" {
     inline = [
