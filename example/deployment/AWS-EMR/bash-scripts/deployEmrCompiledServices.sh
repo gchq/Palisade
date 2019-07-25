@@ -49,6 +49,6 @@ echo deployed Palisade data service
 echo configured example
 
 # Run the Palisade mapreduce example runner....1st copy over the jar
-cp example/deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar  /home/hadoop/jars/example-aws-emr-runner-0.2.1-SNAPSHOT-shaded.jar
+cp example/deployment/AWS-EMR/example-aws-emr-runner/target/example-aws-emr-runner-*-shaded.jar  /home/hadoop/jars/
 hdfs dfs -rm -r /user/hadoop/output || echo Deleted
 /home/hadoop/deploy_example/executeExample.sh > /home/hadoop/example_logs/exampleOutput.log 2>&1
