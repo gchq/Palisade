@@ -141,7 +141,7 @@ resource "null_resource" "deploy_example" {
   # Deploy the example Palisade Data service on the EMR master node.....1st copy over the jar...
   provisioner "file" {
     source = "../../../example-services/example-rest-data-service/target/example-rest-data-service-*-executable.jar"
-    destination = "/home/hadoop/jars/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
+    destination = "/home/hadoop/jars/"
   }
   provisioner "remote-exec" {
     inline = [
