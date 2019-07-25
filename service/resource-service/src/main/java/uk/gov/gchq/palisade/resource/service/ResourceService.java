@@ -75,7 +75,7 @@ public interface ResourceService extends Service {
     CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request);
 
     /**
-     * Obtain a list of resources that match a specifc resource type. This method allows a client to obtain potentially
+     * Obtain a list of resources that match a specific resource type. This method allows a client to obtain potentially
      * large collections of resources by requesting all the resources of one particular type. For example, a client may
      * request all "employee contact card" records. Please note the warning in the class documentation above, that just
      * because a resource is available does not guarantee that the requesting client has the right to access it.

@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-kill `ps -aef | grep example-rest-.*-service | grep -v grep | awk '{print $2}'`
+pkill -u $(whoami) -f 'example-rest-.*-service'
 docker stop etcd-gcr-v3.3.12
