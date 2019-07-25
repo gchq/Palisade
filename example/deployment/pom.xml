@@ -26,7 +26,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>AWS-EMR</module>
         <module>local-docker</module>
         <!--<module>Azure-HDInsight</module>-->
     </modules>
