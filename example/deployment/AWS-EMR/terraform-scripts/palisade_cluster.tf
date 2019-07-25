@@ -37,7 +37,6 @@ resource "aws_emr_cluster" "palisade_cluster" {
     args = ["instance.isMaster=true", "echo running on master node"]
   }
 
-#    args = [ "--install-boto --install-bluetalon ${data.terraform_remote_state.gep.bluetalon_private_ip} ${data.terraform_remote_state.gep.bluetalon_private_ip} --debug --efs-dns ${aws_efs_mount_target.gep_emr_efs_mount_az1.dns_name} --efs-mount /test" ]
 }
 
 resource "aws_iam_instance_profile" "emr_profile" {
