@@ -67,7 +67,7 @@ To run the AWS-EMR example follow these steps (from the root of the project):
         
         You can setup a named profile according to instructions [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
         
-        You should set the **either** the access and secret keys **or** a profile name, not both. If you are using shared credentials, the profile name should be in the AWS shared credential file
+        You should set **either** the access and secret keys **or** a profile name, not both. If you are using shared credentials, the profile name should be in the AWS shared credential file
         `~/.aws/credentials` (or `%UserProfile%\.aws\credentials` on Windows). 
                 
     2. The `bucket_name` must be a globally unique S3 bucket name of your choosing. Bucket naming rules are [here](https://docs.aws.amazon.com/AmazonS3/latest/dev//BucketRestrictions.html#bucketnamingrules).
