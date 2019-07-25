@@ -62,7 +62,7 @@ resource "null_resource" "deploy_example" {
   # Deploy the Palisade config service on the EMR master......1st copy over its jar....
   provisioner "file" {
     source = "../../../example-services/example-rest-config-service/target/example-rest-config-service-*-executable.jar"
-    destination = "/home/hadoop/jars/example-rest-config-service-0.2.1-SNAPSHOT-executable.jar"
+    destination = "/home/hadoop/jars/"
   }
 
   provisioner "local-exec" {
