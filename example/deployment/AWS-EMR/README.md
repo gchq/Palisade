@@ -113,6 +113,8 @@ To run the AWS-EMR example follow these steps (from the root of the project):
     hdfs dfs -text output/part-r-00000
     11500L     10
     ```
+
+    This result comes from 6 queries of the data acting under different users and different purposes where only one query of the data returned the tax code.
 9. **IMPORTANT! Destroy your cluster! Ignoring this step will leave your EMR cluster running and costing you money!**
 
     Log out of your SSH terminal and run the following from your client machine:
