@@ -40,7 +40,7 @@ nohup /home/hadoop/deploy_example/deployPalisadeService.sh > /home/hadoop/exampl
 echo deployed Palisade Palisade service
 
 # Deploy the example Palisade Data service on the EMR master node.....1st copy over the jar...
-cp example/example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar  /home/hadoop/jars/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar
+cp example/example-services/example-rest-data-service/target/example-rest-data-service-*-executable.jar  /home/hadoop/jars/
 /home/hadoop/deploy_example/deployDataServices.sh /home/hadoop/.ssh/developer6959ireland.pem > /home/hadoop/example_logs/deployDataServices.log 2>&1
 echo deployed Palisade data service
 
