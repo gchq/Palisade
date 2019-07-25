@@ -109,7 +109,7 @@ resource "null_resource" "deploy_example" {
   # Deploy the example Palisade service (co-ordinating service) on the EMR master node.....1st copy over the jar...
   provisioner "file" {
     source = "../../../example-services/example-rest-palisade-service/target/example-rest-palisade-service-*-executable.jar"
-    destination = "/home/hadoop/jars/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
+    destination = "/home/hadoop/jars/"
   }
   provisioner "local-exec" {
     command = "ssh -f -i ${var.pem_file} -o 'StrictHostKeyChecking no' hadoop@${aws_emr_cluster.palisade_cluster.master_public_dns} 'nohup /home/hadoop/deploy_example/deployPalisadeService.sh > /home/hadoop/example_logs/deployPalisadeService.log 2>&1 &'"
