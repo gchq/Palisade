@@ -122,5 +122,5 @@ stages:
         chartType: FilePath
         chartPath: example/deployment/Azure-AKS/helm/palisade
         releaseName: palisade
-        overrideValues: 'image.registry=$(registry_dns),image.tag=latest'
+        overrideValues: 'image.registry=$(registry_dns),image.tag=$(Build.BuildId)'
         arguments: '--timeout 600 --force'
