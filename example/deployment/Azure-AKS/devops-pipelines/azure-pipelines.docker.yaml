@@ -12,7 +12,6 @@ trigger:
 #shows that it maybe necessary to run docker login. This script depends on the secret being stored as part of the pipeline as
 #a secret variable - this link shows how this can be achieved: https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
 steps:
-- script: docker login -u $(dockerId) -p $(pswd) palisadeacr.azurecr.io
 stages:
 - stage: Docker_Build_and_Push
   variables:
