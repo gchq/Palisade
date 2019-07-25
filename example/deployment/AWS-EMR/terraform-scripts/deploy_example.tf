@@ -108,7 +108,7 @@ resource "null_resource" "deploy_example" {
 
   # Deploy the example Palisade service (co-ordinating service) on the EMR master node.....1st copy over the jar...
   provisioner "file" {
-    source = "../../../example-services/example-rest-palisade-service/target/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
+    source = "../../../example-services/example-rest-palisade-service/target/example-rest-palisade-service-*-executable.jar"
     destination = "/home/hadoop/jars/example-rest-palisade-service-0.2.1-SNAPSHOT-executable.jar"
   }
   provisioner "local-exec" {
