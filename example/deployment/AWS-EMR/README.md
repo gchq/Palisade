@@ -2,7 +2,7 @@
 
 This example shows how Palisade can be run on an AWS - EMR cluster. It will create an AWS EMR cluster and install
 Palisade on to them. You can then launch some Palisade examples which will demonstrate the use of Palisade within
-a live Hadoop cluster. The example will start a MapReduce job containing several queries on the example HR data that
+a live Hadoop cluster. By default this guide will run a word count MapReduce example that tell you have many unique
 will be processed through a simple MapReduce job.
 
 For an overview of the example see [here](../../README.md).
