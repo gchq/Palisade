@@ -27,8 +27,10 @@ steps:
 - script: docker ps
   displayName: 'List docker containers'
 
-- script: docker login -u $(dockerId) -p $(pswd) palisadeacr.azurecr.io
+- script: docker login -u palisadeacr -p $(pswd) palisadeacr.azurecr.io
   displayName: 'Login to docker environment'
+
+
 
 - script: docker push 'palisadeacr.azureacr.io/${{ parameters.imageName }}:$(Build.BuildId)'
   displayName: 'Pushing ${{ parameters.imageName }} image'
