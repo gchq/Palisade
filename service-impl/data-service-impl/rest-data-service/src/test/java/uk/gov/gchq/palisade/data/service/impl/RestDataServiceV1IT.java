@@ -53,12 +53,13 @@ public class RestDataServiceV1IT {
     private static final SystemResource sysResource = new SystemResource().id("File");
     private static final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
     private static final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);
-
+    
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("restDataServicePort");
         request.setOriginalRequestId(new RequestId().id("id1"));
         RestDataServiceV1.setDefaultDelegate(new MockDataService());
-        proxy = (ProxyRestDataService) new ProxyRestDataService("http://localhost:8084/data").retryMax(1);
+        proxy = (ProxyRestDataService) new ProxyRestDataService("http://localhost:"+portNumber+"/data").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }

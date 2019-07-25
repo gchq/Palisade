@@ -43,9 +43,10 @@ public class RestPalisadeMetricProviderV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("restPalisadeMetricProviderPort");
         RestPalisadeMetricProviderV1.setDefaultDelegate(new MockPalisadeMetricProvider());
         RestPalisadeServiceV1.setDefaultDelegate(new MockPalisadeService());
-        proxy = (ProxyRestPalisadeMetricProvider) new ProxyRestPalisadeMetricProvider("http://localhost:8080/palisade").retryMax(1);
+        proxy = (ProxyRestPalisadeMetricProvider) new ProxyRestPalisadeMetricProvider("http://localhost:"+portNumber+"/palisade").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
