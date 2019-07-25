@@ -10,9 +10,9 @@ steps:
     artifactName: local-docker
     downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
 
-- script: docker build -t $(dockerId).azurecr.io/${{ parameters.imageName }}:$(Build.BuildId) $(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}
+- script: docker build -t $(dockerId).azurecr.io/${{ parameters.imageName }}:latest -t $(dockerId).azurecr.io/${{ parameters.imageName }}:$(Build.BuildId) $(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}
   displayName: 'Building ${{ parameters.imageName }} image'
 
 
-- script: docker login -u $(dockerId) -p $(pswd) $(dockerId).azurecr.io && docker images && docker push '$(dockerId).azurecr.io/${{ parameters.imageName }}:$(Build.BuildId)'
+- script: docker login -u $(dockerId) -p $(pswd) $(dockerId).azurecr.io && docker images && docker push '$(dockerId).azurecr.io/${{ parameters.imageName }}'
   displayName: 'Pushing ${{ parameters.imageName }} image'
