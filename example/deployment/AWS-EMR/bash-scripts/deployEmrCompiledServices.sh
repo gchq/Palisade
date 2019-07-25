@@ -20,7 +20,7 @@ nohup /home/hadoop/deploy_example/configureDistributedServices.sh  > /home/hadoo
 echo configured Palisade config service
 
 # Deploy the Palisade Resource service on the EMR master node...1st copy over the jar...
-cp example/example-services/example-rest-resource-service/target/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar  /home/hadoop/jars/example-rest-resource-service-0.2.1-SNAPSHOT-executable.jar
+cp example/example-services/example-rest-resource-service/target/example-rest-resource-service-*-executable.jar  /home/hadoop/jars/
 nohup /home/hadoop/deploy_example/deployResourceService.sh > /home/hadoop/example_logs/deployResourceService.log 2>&1 &
 echo deployed Palisade resource service
 
