@@ -1,7 +1,6 @@
 steps:
-- task: DockerLogin@0
+- script: docker login -u $(dockerId) -p $(pswd) palisadeacr.azurecr.io
   displayName: 'Login to docker environment'
-  script: docker login -u $(dockerId) -p $(pswd) palisadeacr.azurecr.io
 
 - task: DownloadBuildArtifacts@0
   displayName: 'Download Build Artifacts'
