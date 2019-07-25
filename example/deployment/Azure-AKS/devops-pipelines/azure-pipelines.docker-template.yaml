@@ -22,11 +22,13 @@ steps:
 - script: docker login -u $(dockerId) -p $(pswd) palisadeacr.azurecr.io
   displayName: 'Login to docker environment'
 
-- task: Docker@0
-  displayName: 'Push ${{ parameters.imageName }} image'
-  inputs:
-    azureSubscription: '${{variables.devOpsServiceConnection}}'
-    azureContainerRegistry: 'palisadeacr.azurecr.io'
-    action: 'Push an image'
-    imageName: '${{ parameters.imageName }}:$(Build.BuildId)'
-    includeLatestTag: true
+- script: docker push $(dockerId).azurecr.io/${{ parameters.imageName }}:$(Build.BuildId)
+
+#- task: Docker@0
+#  displayName: 'Push ${{ parameters.imageName }} image'
+#  inputs:
+#    azureSubscription: '${{variables.devOpsServiceConnection}}'
+#    azureContainerRegistry: 'palisadeacr.azurecr.io'
+#    action: 'Push an image'
+#    imageName: '${{ parameters.imageName }}:$(Build.BuildId)'
+#    includeLatestTag: true
