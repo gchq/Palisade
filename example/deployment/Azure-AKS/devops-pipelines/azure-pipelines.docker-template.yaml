@@ -19,7 +19,7 @@ steps:
 #    imageName: '${{ parameters.imageName }}:$(Build.BuildId)'
 #    includeLatestTag: true
 
-- script: docker build -t palisadeacr.azurecr.io/${{ parameters.imageName }} $(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}
+- script: docker build -t palisadeacr.azurecr.io/${{ parameters.imageName }}:$(Build.BuildId) $(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}
 
 - script: docker images
   displayName: 'List docker images'
@@ -27,12 +27,12 @@ steps:
 - script: docker ps
   displayName: 'List docker containers'
 
-- script: docker login -u palisadeacr -p $(pswd) palisadeacr.azurecr.io
+- script: docker login -u palisadeacr -p $(pswd)
   displayName: 'Login to docker environment'
 
 
 
-- script: docker images && docker push 'palisadeacr.azureacr.io/${{ parameters.imageName }}'
+- script: docker images && docker push 'palisadeacr.azurecr.io/${{ parameters.imageName }}:$(Build.BuildId)'
   displayName: 'Pushing ${{ parameters.imageName }} image'
 
 
