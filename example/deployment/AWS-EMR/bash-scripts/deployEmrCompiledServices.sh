@@ -15,7 +15,7 @@ nohup /home/hadoop/deploy_example/deployConfigService.sh > /home/hadoop/example_
 echo deployed Palisade config service
 
 # Tell the config service how the various Palisade services should be distributed over the cluster - this configuration is stored in the Config service.....1st copy over the jar....
-cp example/example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar  /home/hadoop/jars/example-model-0.2.1-SNAPSHOT-shaded.jar
+cp example/example-model/target/example-model-*-shaded.jar  /home/hadoop/jars/
 nohup /home/hadoop/deploy_example/configureDistributedServices.sh  > /home/hadoop/example_logs/configureDistributedServices.log 2>&1 &
 echo configured Palisade config service
 
