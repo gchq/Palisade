@@ -27,7 +27,7 @@ steps:
 - script: docker ps
   displayName: 'List docker containers'
 
-- script: docker login -u palisadeacr -p $(pswd)
+- script: docker login -u palisadeacr -p $(pswd) palisadeacr.azurecr.io
   displayName: 'Login to docker environment'
 
 
