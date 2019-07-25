@@ -117,7 +117,7 @@ resource "null_resource" "deploy_example" {
 
   # Deploy the rest redirector
   provisioner "file" {
-    source = "../../../example-services/example-rest-redirector-service/target/example-rest-redirector-service-0.2.1-SNAPSHOT-shaded.jar"
+    source = "../../../example-services/example-rest-redirector-service/target/example-rest-redirector-service-*-shaded.jar"
     destination = "/home/hadoop/jars/"
   }
   provisioner "local-exec" {
