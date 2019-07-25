@@ -8,7 +8,6 @@ then
     exit 1;
 fi
 
-
 cd ./example/deployment/AWS-EMR/terraform-scripts
 terraform init
 terraform apply     -var pem_file=$1
