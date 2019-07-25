@@ -78,7 +78,6 @@ public class AwsEmrMapReduceExample extends Configured implements Tool {
 
         protected void map(final LeafResource key, final Employee value, final Context context) throws IOException, InterruptedException {
             LOGGER.info("Employee read: {} ", value);
-            //String property = value.getName();
             String property = value.getTaxCode();
             if (property != null && !property.isEmpty()) {
                 outputKey.set(property);
