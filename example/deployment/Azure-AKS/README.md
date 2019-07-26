@@ -24,6 +24,8 @@ The order of executing the pipelines should be as follows:
 1. *docker* - Build and publish all the palisade docker images
 1. *k8* - Perform the Kubernetes cluster update
 
+N.B The *PR* pipeline combines *maven* *docker* and *k8* pipelines into one.
+
 ##Checking Palisade deployed correctly
 1. Open the Microsoft Azure Cloud Shell by following these [instructions](https://docs.microsoft.com/en-us/azure/cloud-shell/quickstart)
 1. The following [documentation](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough) is useful for explaining how to create an Azure Kubernetes Cluster. For this example that creation is done by the 'Infra' pipeline.
