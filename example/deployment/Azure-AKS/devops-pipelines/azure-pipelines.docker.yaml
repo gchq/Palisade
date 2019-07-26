@@ -1,61 +1,66 @@
+variables:
+- template: ./azure-pipelines.defaults.yaml
 trigger:
   batch: true
   paths:
     include:
-      - example/deployment/local-docker/*
-      - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker.yaml
-      - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
+    - example/deployment/local-docker/*
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker.yaml
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
 
+#following this example here: https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/docker?view=azure-devops
+#shows that it maybe necessary to run docker login. This script depends on the secret being stored as part of the pipeline as
+#a secret variable - this link shows how this can be achieved: https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
 stages:
-  - stage: Docker_Build_and_Push
-    variables:
-      - group: Palisade-azure
-    jobs:
-      - job:
-        displayName: config-service
-        steps:
-          - template: azure-pipelines.docker-template-no-etcd.yaml
-            parameters:
-              imageName: config-service
-      - job:
-        displayName: configure-service
-        steps:
-          - template: azure-pipelines.docker-template-no-etcd.yaml
-            parameters:
-              imageName: configure-services
-      - job:
-        displayName: configure-example
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: configure-example
-      - job:
-        displayName: data-service
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: data-service
-      - job:
-        displayName: palisade-service
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: palisade-service
-      - job:
-        displayName: policy-service
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: policy-service
-      - job:
-        displayName: resource-service
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: resource-service
-      - job:
-        displayName: user-service
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: user-service
+- stage: Docker_Build_and_Push
+  variables:
+  - group: ${{variables.groupName}}
+  jobs:
+  - job:
+    displayName: config-service
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: config-service
+  - job:
+    displayName: configure-service
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: configure-services
+  - job:
+    displayName: configure-example
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: configure-example
+  - job:
+    displayName: data-service
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: data-service
+  - job:
+    displayName: palisade-service
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: palisade-service
+  - job:
+    displayName: policy-service
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: policy-service
+  - job:
+    displayName: resource-service
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: resource-service
+  - job:
+    displayName: user-service
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: user-service

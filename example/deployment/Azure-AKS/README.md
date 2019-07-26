@@ -1,24 +1,39 @@
 # Azure AKS Example
 
-This example demonstrates how to deploy Palisade within the Azure Kubernetes service using the Azure DevOps pipelines to automate the deployment process and to run the example
-
+This example demonstrates how to deploy Palisade within the Azure Kubernetes service using the Azure DevOps pipelines to automate the deployment process and then to run the example.
 The pre-requisites of this example are:
 - Azure subscription
 - Azure service principle with contributor access permissions on your subscription
 - Azure DevOps account
 
-
 ##Configuring the Azure DevOps account: 
 [devOps](./ConfigureAzureDevOPS.md)
 
-##Connecting to the example
+N.B The pipeline id (*'pipeline:'*) defined in the following files:
+/Palisade/example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
+refers to a given devops setup.
+The documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/download-build-artifacts?view=azure-devops) describes the build artefacts.
+Currently this file contains the pipeline id == 8. This is the pipeline for *maven*
+The pipeline id can be found as shown in the diagram below:
+![public ip](./buildId.png)
+
+##Pipelines to execute to build and deploy the example
+The order of executing the pipelines should be as follows:
+1. *infra* - Create the main infrastructure
+1. *maven* - Build all components of Palisade
+1. *docker* - Build and publish all the palisade docker images
+1. *k8* - Perform the Kubernetes cluster update
+
+N.B The *PR* pipeline combines *maven* *docker* and *k8* pipelines into one.
+
+##Checking Palisade deployed correctly
 1. Open the Microsoft Azure Cloud Shell by following these [instructions](https://docs.microsoft.com/en-us/azure/cloud-shell/quickstart)
-1. The following [documentation](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough) is useful for explaining hoe create an Azure Kubernetes Cluster
+1. The following [documentation](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough) is useful for explaining how to create an Azure Kubernetes Cluster. For this example that creation is done by the 'Infra' pipeline.
 1. Run the following command in the command shell:
 ( This command downloads credentials and configures the Kubernetes CLI to use them.)
 ```bash
 user@Azure:~$ az aks get-credentials --resource-group palisade --name palisade-aks
-Merged "palisade-aks" as current context in /home/nigel/.kube/config
+Merged "palisade-aks" as current context in /home/<user>/.kube/config
 user@Azure:~$
 ```
 1. If all is well, you can now issue the following command and see the status output:
@@ -41,7 +56,7 @@ user-service-96d9dd769-kmrrt        1/1     Running     0          114m
 user@Azure:~
 ```
 
-Note how all services indicated they healthy and up.
+Note how all services indicated they are up and healthy.
 
 ##Client VM
 Create a virtual machine named *client-vm* with the following specification
@@ -62,15 +77,15 @@ and mount the disk to /data
 Running the following command should produce the following:
 
 ```bash
+client@client-vm:~$ df -a | grep 'data\|Filesystem'
 Filesystem                                   1K-blocks     Used Available Use% Mounted on
 //palisadestorage.file.core.windows.net/data 524288000 96349504 427938496  19% /data
-client@client-vm:~$ 
 ```
 
 Checkout the Palisade repository:
 ```bash
 git clone https://github.com/gchq/Palisade.git
-cd Palisade && git checkout develop
+cd Palisade && git checkout '<branch>'
 ```
 
 ##Modify /etc/hosts on the client VM
@@ -80,24 +95,25 @@ Obtain the ingress public IP:
 
 ```bash
 vim /etc/hosts
-51.143.144.171 config-service palisade-service data-service
+'<ingress public ip>' config-service palisade-service data-service
 ```
 
 ##Generate the test data 
 
-Use the following command:
+Use the following command to create a test data set:
 
 ```bash
-java -cp Palisade/example/hr-data-generator/target/hr-data-generator-0.2.1-SNAPSHOT-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData /data/50m50/ 50000000 50 15 > dataGen.output 2> dataGen.err &
+java -cp Palisade/example/hr-data-generator/target/hr-data-generator-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData /data/testData/ '<number of records>' '<number of files to split records over>' '<number of threads to use>' &
 ```
 
 ##Run the test example:
+This example only uses a single threaded java client to read the resources one at a time and, therefore is not taking advantage of distributed client technologies yet.
 
 ```bash
-java -cp Palisade/example/example-model/target/example-model-0.2.1-SNAPSHOT-shaded.jar -DPALISADE_REST_CONFIG_PATH=Palisade/example/deployment/Azure-AKS/configRest.json uk.gov.gchq.palisade.example.runner.RestExample /data/employee_file0.avro 
-example.runner.RestExample INFO  - Going to request /data/employee_file0.avro from Palisade
+java -cp Palisade/example/example-model/target/example-model-*-shaded.jar -DPALISADE_REST_CONFIG_PATH=Palisade/example/deployment/Azure-AKS/configRest.json uk.gov.gchq.palisade.example.runner.RestExample /data/testData 
+example.runner.RestExample INFO  - Going to request /data/testData from Palisade
 example.runner.RestExample INFO  - 
-example.runner.RestExample INFO  - Alice [ ExampleUser[userId=UserId[id=Alice],roles=[HR],auths=[private, public],trainingCourses=[PAYROLL_TRAINING_COURSE]] } is reading the Employee file with a purpose of SALARY...
+example.runner.RestExample INFO  - Alice  ExampleUser[userId=UserId[id=Alice],roles=[HR],auths=[private, public],trainingCourses=[PAYROLL_TRAINING_COURSE]]  is reading the Employee file with a purpose of SALARY...
 setting original request id: RequestId[id=6c111aee-2a13-443f-aa19-391aaf014269]
 example.runner.RestExample INFO  - Alice got back: 
 

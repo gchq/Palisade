@@ -1,0 +1,9 @@
+variables:
+- name: devOpsServiceConnection
+  value: palisade_rm
+- name: groupName
+  value: Palisade-azure
+- name: azure-dir
+  value: example/deployment/Azure-AKS
+- name: devops-dir
+  value: example/deployment/Azure-AKS/devops-pipelines

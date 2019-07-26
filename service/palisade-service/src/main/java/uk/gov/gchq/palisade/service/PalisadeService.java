@@ -94,7 +94,6 @@ public interface PalisadeService extends Service {
             if (!ruleMap.get(resource).containsRules()) {
                 //policy available but is empty
                 //TODO: audit this because it is unusual behaviour
-
             }
         });
         return policy;

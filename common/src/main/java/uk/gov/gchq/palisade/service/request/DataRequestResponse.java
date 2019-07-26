@@ -77,7 +77,6 @@ public class DataRequestResponse {
 
     public DataRequestResponse originalRequestId(final RequestId originalRequestId) {
         requireNonNull(originalRequestId, "The originalRequestId cannot be null.");
-        System.err.println("setting original request id: " + originalRequestId);
         this.originalRequestId = originalRequestId;
         return this;
     }
@@ -87,7 +86,7 @@ public class DataRequestResponse {
     }
 
     public Map<LeafResource, ConnectionDetail> getResources() {
-        requireNonNull(resources, "The Resources has not been set.");
+        requireNonNull(resources, "The Resources have not been set.");
         return resources;
     }
 

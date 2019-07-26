@@ -83,6 +83,7 @@
         <javax.activation.version>1.2.0</javax.activation.version>
 
         <!-- Testing properties -->
+        <hadoop-minicluster.version>3.2.0</hadoop-minicluster.version>
         <junit.version>4.12</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
         <mockito.version>1.10.19</mockito.version>
@@ -100,6 +101,15 @@
         <surefireArgLine/>
         <failsafeArgLine/>
         <exclude.tests/>
+
+        <restRedirectorPort>9080</restRedirectorPort>
+        <restPalisadeMetricProviderPort>9080</restPalisadeMetricProviderPort>
+        <restPalisadeServicePort>9080</restPalisadeServicePort>
+        <restPolicyServicePort>9081</restPolicyServicePort>
+        <restResourceServicePort>9082</restResourceServicePort>
+        <restUserServicePort>9083</restUserServicePort>
+        <restDataServicePort>9084</restDataServicePort>
+        <restConfigServicePort>9085</restConfigServicePort>
 
         <!-- Other -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -298,10 +308,21 @@
                         <exclude>${exclude.tests}</exclude>
                     </excludes>
                     <systemPropertyVariables>
+                        <restUserServicePort>${restUserServicePort}</restUserServicePort>
+                        <restPolicyServicePort>${restPolicyServicePort}</restPolicyServicePort>
+                        <restRedirectorPort>${restRedirectorPort}</restRedirectorPort>
+                        <restConfigServicePort>${restConfigServicePort}</restConfigServicePort>
+                        <restDataServicePort>${restDataServicePort}</restDataServicePort>
+                        <restPalisadeMetricProviderPort>${restPalisadeMetricProviderPort}</restPalisadeMetricProviderPort>
+                        <restPalisadeServicePort>${restPalisadeServicePort}</restPalisadeServicePort>
+                        <restResourceServicePort>${restResourceServicePort}</restResourceServicePort>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
                     </systemPropertyVariables>
+                    <environmentVariables>
+                        <PALISADE_REST_CONFIG_PATH>example/example-model/src/main/resources/configRest.json</PALISADE_REST_CONFIG_PATH>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -330,10 +351,21 @@
                         <include>**/*IntegrationTests.java</include>
                     </includes>
                     <systemPropertyVariables>
+                        <restUserServicePort>${restUserServicePort}</restUserServicePort>
+                        <restPolicyServicePort>${restPolicyServicePort}</restPolicyServicePort>
+                        <restRedirectorPort>${restRedirectorPort}</restRedirectorPort>
+                        <restConfigServicePort>${restConfigServicePort}</restConfigServicePort>
+                        <restDataServicePort>${restDataServicePort}</restDataServicePort>
+                        <restPalisadeMetricProviderPort>${restPalisadeMetricProviderPort}</restPalisadeMetricProviderPort>
+                        <restPalisadeServicePort>${restPalisadeServicePort}</restPalisadeServicePort>
+                        <restResourceServicePort>${restResourceServicePort}</restResourceServicePort>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
                     </systemPropertyVariables>
+                    <environmentVariables>
+                        <PALISADE_REST_CONFIG_PATH>example/example-model/src/main/resources/configRest.json</PALISADE_REST_CONFIG_PATH>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>

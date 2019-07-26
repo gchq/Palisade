@@ -149,7 +149,6 @@ public abstract class SerialisedDataReader implements DataReader {
         }
     }
 
-
     /**
      * This is the method that connects to the data and streams the raw data
      * into the {@link SerialisedDataReader}.

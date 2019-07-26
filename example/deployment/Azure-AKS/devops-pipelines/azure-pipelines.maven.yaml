@@ -5,7 +5,7 @@ trigger:
     - azure-pipelines.maven.yaml
 
 stages:
-- stage: Maven_Build  
+- stage: Maven_Build
   jobs:
   - job:
     steps:

@@ -1,116 +1,120 @@
+variables:
+- template: ./azure-pipelines.defaults.yaml
+
 trigger:
   batch: true
   paths:
     include:
-      - azure-pipelines.maven.yaml
-      - example/deployment/local-docker/*
-      - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker.yaml
-      - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
+    - azure-pipelines.maven.yaml
+    - example/deployment/local-docker/*
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker.yaml
+    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
 
 stages:
-  - stage: Maven_Build
-    jobs:
-      - job: Maven_Build
-        steps:
-          - task: Maven@3
-            inputs:
-              mavenPomFile: 'pom.xml'
-              mavenOptions: '-Xmx3072m'
-              javaHomeOption: 'JDKVersion'
-              jdkVersionOption: '1.11'
-              jdkArchitectureOption: 'x64'
-              goals: 'clean install'
+- stage: Maven_Build
+  variables:
+  - group: ${{variables.groupName}}
+  jobs:
+  - job: Maven_Build
+    steps:
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.11'
+        jdkArchitectureOption: 'x64'
+        goals: 'clean install'
 
-          - task: CopyFiles@2
-            inputs:
-              #sourceFolder: # Optional
-              contents: example/deployment/local-docker/**/docker/bin/**/*
-              targetFolder: $(Build.ArtifactStagingDirectory)
+        - task: CopyFiles@2
+          inputs:
+            #sourceFolder: # Optional
+            contents: example/deployment/local-docker/**/docker/bin/**/*
+            targetFolder: $(Build.ArtifactStagingDirectory)
 
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Artifact: local-docker'
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/example/deployment/local-docker'
-              artifactName: local-docker
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact: local-docker'
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/example/deployment/local-docker'
+            artifactName: local-docker
 
-      - job: Docker_build_config_service
-        displayName: config-service
-        dependsOn: Maven_Build
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: config-service
-      - job: Docker_build_configure_services
-        displayName: configure-services
-        dependsOn: Maven_Build
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: configure-services
-      - job: Docker_build_configure_example
-        displayName: configure-example
-        dependsOn: Maven_Build
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: configure-example
-      - job: Docker_build_data_service
-        displayName: data-service
-        dependsOn: Maven_Build
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: data-service
-      - job: Docker_build_palisade_service
-        displayName: palisade-service
-        dependsOn: Maven_Build
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: palisade-service
-      - job: Docker_build_policy_service
-        displayName: policy-service
-        dependsOn: Maven_Build
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: policy-service
-      - job: Docker_build_resource_service
-        displayName: resource-service
-        dependsOn: Maven_Build
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: resource-service
-      - job: Docker_build_user_service
-        displayName: user-service
-        dependsOn: Maven_Build
-        steps:
-          - template: azure-pipelines.docker-template.yaml
-            parameters:
-              imageName: user-service
+  - job: Docker_build_config_service
+    displayName: config-service
+    dependsOn: Maven_Build
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: config-service
+  - job: Docker_build_configure_services
+    displayName: configure-services
+    dependsOn: Maven_Build
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: configure-services
+  - job: Docker_build_configure_example
+    displayName: configure-example
+    dependsOn: Maven_Build
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: configure-example
+  - job: Docker_build_data_service
+    displayName: data-service
+    dependsOn: Maven_Build
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: data-service
+  - job: Docker_build_palisade_service
+    displayName: palisade-service
+    dependsOn: Maven_Build
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: palisade-service
+  - job: Docker_build_policy_service
+    displayName: policy-service
+    dependsOn: Maven_Build
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: policy-service
+  - job: Docker_build_resource_service
+    displayName: resource-service
+    dependsOn: Maven_Build
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: resource-service
+  - job: Docker_build_user_service
+    displayName: user-service
+    dependsOn: Maven_Build
+    steps:
+    - template: azure-pipelines.docker-template.yaml
+      parameters:
+        imageName: user-service
 
-      - job: Helm_deploy
-        dependsOn:
-          - Docker_build_etcd
-          - Docker_build_config_service
-          - Docker_build_configure_services
-          - Docker_build_user_service
-          - Docker_build_policy_service
-          - Docker_build_resource_service
-          - Docker_build_data_service
-          - Docker_build_palisade_service
-          - Docker_build_configure_example
-        steps:
-          - task: HelmDeploy@0
-            displayName: 'helm upgrade'
-            inputs:
-              azureSubscription: 'palisade_rm'
-              azureResourceGroup: 'palisade'
-              kubernetesCluster: 'palisade-aks'
-              command: upgrade
-              chartType: FilePath
-              chartPath: example/deployment/Azure-AKS/helm/palisade
-              releaseName: palisade
-              overrideValues: 'image.registry=$(registry_dns),image.tag=latest'
-              arguments: '--timeout 600 --force'
+  - job: Helm_deploy
+    dependsOn:
+    - Docker_build_config_service
+    - Docker_build_configure_services
+    - Docker_build_user_service
+    - Docker_build_policy_service
+    - Docker_build_resource_service
+    - Docker_build_data_service
+    - Docker_build_palisade_service
+    - Docker_build_configure_example
+    steps:
+    - task: HelmDeploy@0
+      displayName: 'helm upgrade'
+      inputs:
+        azureSubscription: ${{variables.devOpsServiceConnection}}
+        azureResourceGroup: 'palisade'
+        kubernetesCluster: 'palisade-aks'
+        command: upgrade
+        chartType: FilePath
+        chartPath: example/deployment/Azure-AKS/helm/palisade
+        releaseName: palisade
+        overrideValues: 'image.registry=$(registry_dns),image.tag=$(Build.BuildId)'
+        arguments: '--timeout 600 --force'
