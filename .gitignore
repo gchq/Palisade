@@ -14,13 +14,12 @@
 
 */target/
 target/
-*/*.iml
 *.iml
 */.settings
 */.project
 */bin
 bin/
-*/*.class
+*.class
 */atlassian-ide*
 */.idea
 .idea/*
@@ -36,4 +35,8 @@ node_modules
 .settings
 .settings/
 .classpath
-.classpath/
+dependency-reduced-pom.xml
+
+##VSCODE default files that dont need to be tracked
+eclipse-formatter.xml
+.vscode/*
