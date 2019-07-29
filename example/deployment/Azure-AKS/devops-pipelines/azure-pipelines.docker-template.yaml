@@ -3,8 +3,7 @@ steps:
 - task: DownloadBuildArtifacts@0
   displayName: 'Download Build Artifacts'
   inputs:
-    buildType: current
-    project: '$(System.TeamProjectId)'
+    buildVersionToDownload: latestFromBranch
     artifactName: local-docker
     downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
 
@@ -12,8 +11,8 @@ steps:
   displayName: 'Building ${{ parameters.imageName }} image'
 
 
-- script: docker login -u $(dockerId) -p $(pswd) $(dockerId).azurecr.io && docker images'
-  displayName: 'login and list docker images'
+- script: docker login -u $(dockerId) -p $(pswd) $(dockerId).azurecr.io
+  displayName: 'login to container register'
 
 - script: docker push '$(dockerId).azurecr.io/${{ parameters.imageName }}'
   displayName: 'Pushing ${{ parameters.imageName }} image'
