@@ -15,46 +15,46 @@
  */
 package uk.gov.gchq.palisade.data.serialise;
 
-import uk.gov.gchq.palisade.io.SuppliedInputStream;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 public abstract class LineSerialiser<T> implements Serialiser<T> {
-    public static final String LINE_ENDING = String.format("%n");
-    public static final Charset CHARSET = Charset.forName("UTF-8");
+    public static final Charset CHARSET = StandardCharsets.UTF_8;
 
     public abstract String serialiseLine(final T obj);
 
     public abstract T deserialiseLine(final String line);
 
     @Override
-    public InputStream serialise(final Stream<T> stream) {
-        if (isNull(stream)) {
-            return new EmptyInputStream();
-        }
-        return serialise(stream.iterator());
+    public Serialiser<T> serialise(final Stream<T> objects, final OutputStream output) {
+        return serialise(objects.iterator(), output);
     }
 
-    public InputStream serialise(final Iterator<T> itr) {
-        if (isNull(itr)) {
-            return new EmptyInputStream();
-        }
-        final Supplier<byte[]> supplier = () -> {
-            if (itr.hasNext()) {
-                final T next = itr.next();
-                return (serialiseLine(next) + LINE_ENDING).getBytes(CHARSET);
+    public Serialiser<T> serialise(final Iterator<T> itr, final OutputStream output) {
+        requireNonNull(output, "output");
+        if (nonNull(itr)) {
+            PrintWriter printOut = new PrintWriter(new OutputStreamWriter(output, CHARSET));
+            try {
+                itr.forEachRemaining(item -> {
+                    printOut.println(serialiseLine(item));
+                });
+            } finally {
+                printOut.flush();
             }
-            return null;
-        };
-        return new SuppliedInputStream(supplier);
+        }
+        return this;
     }
 
     @Override
@@ -62,18 +62,8 @@ public abstract class LineSerialiser<T> implements Serialiser<T> {
         if (isNull(stream)) {
             return Stream.empty();
         }
-        return new BufferedReader(new InputStreamReader(stream))
+        return new BufferedReader(new InputStreamReader(stream, CHARSET))
                 .lines()
                 .map(this::deserialiseLine);
-    }
-
-    private static class EmptyInputStream extends InputStream {
-        public int read() {
-            return -1;
-        }
-
-        public int available() {
-            return 0;
-        }
     }
 }

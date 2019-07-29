@@ -60,11 +60,12 @@ public class AvroSerialiserTest {
         final AvroSerialiser<Integer> serialiser = new AvroSerialiser<>(Integer.class);
 
         // When
-        final InputStream serialised = serialiser.serialise(Stream.of(INPUT));
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        serialiser.serialise(Stream.of(INPUT), outputStream);
 
         // Then
         final DatumReader<Integer> datumReader = new SpecificDatumReader<>(Integer.class);
-        final DataFileStream<Integer> in = new DataFileStream<>(serialised, datumReader);
+        final DataFileStream<Integer> in = new DataFileStream<>(new ByteArrayInputStream(outputStream.toByteArray()), datumReader);
         final List<Integer> deserialised = Lists.newArrayList((Iterator<Integer>) in);
         assertEquals(Arrays.asList(INPUT), deserialised);
     }
@@ -104,8 +105,9 @@ public class AvroSerialiserTest {
 
         // When
         Stream<Integer> stream = Stream.of(INPUT);
-        final InputStream serialised = serialiser.serialise(stream);
-        final Stream<Integer> deserialised = serialiser.deserialise(serialised);
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        serialiser.serialise(stream, outputStream);
+        final Stream<Integer> deserialised = serialiser.deserialise(new ByteArrayInputStream(outputStream.toByteArray()));
 
         // Then
         assertEquals(Arrays.asList(INPUT), deserialised.collect(Collectors.toList()));
@@ -127,8 +129,9 @@ public class AvroSerialiserTest {
         );
 
         // When
-        final InputStream serialised = serialiser.serialise(input.stream());
-        final Stream<TestObj> deserialised = serialiser.deserialise(serialised);
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        serialiser.serialise(input.stream(), outputStream);
+        final Stream<TestObj> deserialised = serialiser.deserialise(new ByteArrayInputStream(outputStream.toByteArray()));
 
         // Then
         assertEquals(input, deserialised.collect(Collectors.toList()));

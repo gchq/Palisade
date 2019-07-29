@@ -21,31 +21,65 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import static java.util.Objects.requireNonNull;
 
 /**
  * This class is used to return to the client the {@link InputStream} of data
  * along with any error/warning/info messages that the client should be aware of.
+ * <p>
+ * The actual data stream can be retrieved once only. Clients should call {@link ReadResponse#asInputStream()} to obtain
+ * an input stream for the data OR select for that data to be copied to a provided {@link OutputStream}. Any further attempts
+ * to call one of these methods on an instance will result in an exception being thrown.
+ * <p>
+ * Concrete sub-classes of this class should call {@link ReadResponse#setUsed()} as soon as the data stream from Palisade
+ * has been realised through either {@link ReadResponse#asInputStream()} or {@link ReadResponse#writeTo(OutputStream)}.
  */
-public class ReadResponse {
-    private InputStream data;
+public abstract class ReadResponse {
     private String message;
+    /**
+     * Specifies if the data stream has been retrieved from this response.
+     */
+    private volatile boolean isUsed;
 
-    public ReadResponse data(final InputStream data) {
-        requireNonNull(data, "The data stream cannot be set to null.");
-        this.data = data;
-        return this;
+    /**
+     * Retrieves the data returned from the request as an {@link InputStream}. This method can only be called once.
+     *
+     * @return a stream of data from Palisade
+     * @throws IOException if {@link ReadResponse#isUsed} returns {@code true}, or an underlying IO error occurs
+     */
+    public abstract InputStream asInputStream() throws IOException;
+
+    /**
+     * Instructs the data stream from Palisade be copied to the given {@link OutputStream}. This method can only be called
+     * once.
+     *
+     * @param output the stream to copy to the data to
+     * @return this object
+     * @throws IOException if {@link ReadResponse#isUsed} returns {@code true}, or an underlying IO error occurs
+     */
+    public abstract ReadResponse writeTo(final OutputStream output) throws IOException;
+
+    /**
+     * Tests whether the data stream from this instance has already been retrieved, either as an {@link InputStream} or
+     * copied to another stream.
+     *
+     * @return true if the stream has already been used
+     * @see ReadResponse#asInputStream()
+     * @see ReadResponse#writeTo(OutputStream)
+     */
+    public boolean isUsed() {
+        return isUsed;
     }
 
-    public InputStream getData() {
-        requireNonNull(data, "The data stream has not been set.");
-        return data;
-    }
-
-    public void setData(final InputStream data) {
-        data(data);
+    /**
+     * Sets the data stream as retrieved.
+     */
+    protected void setUsed() {
+        this.isUsed = true;
     }
 
     public ReadResponse message(final String message) {
@@ -76,7 +110,6 @@ public class ReadResponse {
         final ReadResponse that = (ReadResponse) o;
 
         return new EqualsBuilder()
-                .append(data, that.data)
                 .append(message, that.message)
                 .isEquals();
     }
@@ -84,7 +117,6 @@ public class ReadResponse {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 61)
-                .append(data)
                 .append(message)
                 .toHashCode();
     }
@@ -92,7 +124,6 @@ public class ReadResponse {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("data", data)
                 .append("message", message)
                 .toString();
     }
