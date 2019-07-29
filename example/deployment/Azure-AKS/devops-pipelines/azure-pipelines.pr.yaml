@@ -7,7 +7,7 @@ trigger:
     include:
     - azure-pipelines.maven.yaml
     - azure-pipelines.docker-jobs-template.yaml
-    - azure-pipelines.k8.yaml
+    - azure-pipelines.k8s.yaml
     - example/deployment/local-docker/*
     - azure-pipelines.docker-template.yaml
 
