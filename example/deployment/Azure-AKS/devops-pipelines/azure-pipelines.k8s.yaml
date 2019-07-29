@@ -1,9 +1,7 @@
-variables:
-- template: ./azure-pipelines.defaults.yaml
-
 jobs:
 - job:
   variables:
+  - template: ./azure-pipelines.defaults.yaml
   - group: ${{variables.groupName}}
   steps:
   - task: HelmDeploy@0
