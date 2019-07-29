@@ -22,7 +22,6 @@ import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Manager;
-import uk.gov.gchq.palisade.io.BytesSuppliedInputStream;
 
 import java.io.File;
 import java.io.FileOutputStream;

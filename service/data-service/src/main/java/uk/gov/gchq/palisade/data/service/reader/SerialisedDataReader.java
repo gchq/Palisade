@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.data.service.reader;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,12 +28,13 @@ import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
-import uk.gov.gchq.palisade.io.CloseActionInputStream;
+import uk.gov.gchq.palisade.data.service.reader.request.ResponseWriter;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.rule.Rules;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -45,6 +47,7 @@ import static java.util.Objects.requireNonNull;
  * serialisers to serialise the data into the for that the rules need to be able
  * to apply those rules and then de-serialise to how the client is expecting the
  * data to be returned.
+ * <p>
  * This class means that the only places where the structure of the data needs
  * to be known is in the serialisers, rules and client code. Therefore you only
  * need to implement a {@link uk.gov.gchq.palisade.data.service.DataService} for
@@ -101,32 +104,50 @@ public abstract class SerialisedDataReader implements DataReader {
         requireNonNull(request, "The request cannot be null.");
 
         final Serialiser<Object> serialiser = getSerialiser(request.getResource());
+        //set up the raw input stream from the data source
         final InputStream rawStream = readRaw(request.getResource());
 
-        final InputStream data;
         final Rules<Object> rules = request.getRules();
-        if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
-            LOGGER.debug("No rules to apply");
-            data = rawStream;
-        } else {
-            LOGGER.debug("Applying rules: {}", rules);
-            final Stream<Object> deserialisedData = Util.applyRulesToStream(
-                    serialiser.deserialise(rawStream),
-                    request.getUser(),
-                    request.getContext(),
-                    rules
-            ).onClose(() -> {
-                //ensure the original stream is closed as well
+
+        ResponseWriter serialisedWriter = new ResponseWriter() {
+            @Override
+            public ResponseWriter write(final OutputStream output) throws IOException {
+                requireNonNull(output, "output");
+                //if nothing to do, then just copy the bytes across
+                if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
+                    LOGGER.debug("No rules to apply");
+                    IOUtils.copy(rawStream, output);
+                } else {
+                    LOGGER.debug("Applying rules: {}", rules);
+                    //create stream of filtered objects
+                    final Stream<Object> deserialisedData = Util.applyRulesToStream(
+                            serialiser.deserialise(rawStream),
+                            request.getUser(),
+                            request.getContext(),
+                            rules
+                    ).onClose(this::close);
+                    //write this stream to the output
+                    serialiser.serialise(deserialisedData, output);
+                }
+                return this;
+            }
+
+            @Override
+            public DataReader getReader() {
+                return SerialisedDataReader.this;
+            }
+
+            @Override
+            public void close() {
                 try {
                     rawStream.close();
                 } catch (IOException ignored) {
                 }
-            });
-            //make sure we close the streams
-            data = new CloseActionInputStream(serialiser.serialise(deserialisedData), deserialisedData::close);
-        }
+            }
+        };
 
-        return new DataReaderResponse().data(data);
+        //set reponse object to use the writer above
+        return new DataReaderResponse().writer(serialisedWriter);
     }
 
     /**

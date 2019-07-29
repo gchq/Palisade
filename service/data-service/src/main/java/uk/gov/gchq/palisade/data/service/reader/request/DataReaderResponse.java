@@ -21,8 +21,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 
-import java.io.InputStream;
-
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -30,21 +28,22 @@ import static java.util.Objects.requireNonNull;
  * format expected by the client, along with any error/info messages for the client.
  */
 public class DataReaderResponse {
-    private InputStream data;
+    private ResponseWriter writer;
     private String message;
-
 
     // no args constructor required
     public DataReaderResponse() {
     }
 
     /**
-     * @param data an {@link InputStream} of data.
+     * Set the writer object for this response.
+     *
+     * @param writer the data writer object
      * @return the {@link DataReaderResponse}
      */
-    public DataReaderResponse data(final InputStream data) {
-        requireNonNull(data, "The data stream cannot be set to null.");
-        this.data = data;
+    public DataReaderResponse writer(final ResponseWriter writer) {
+        requireNonNull(writer, "The writer cannot be set to null.");
+        this.writer = writer;
         return this;
     }
 
@@ -58,17 +57,17 @@ public class DataReaderResponse {
         return this;
     }
 
-    public InputStream getData() {
-        requireNonNull(data, "The data stream has not been set.");
-        return data;
+    public ResponseWriter getWriter() {
+        requireNonNull(writer, "The writer has not been set.");
+        return writer;
     }
 
-    public void setData(final InputStream data) {
-        data(data);
+    public void setWriter(final ResponseWriter writer) {
+        writer(writer);
     }
 
     public String getMessage() {
-        requireNonNull(data, "The message has not been set.");
+        requireNonNull(message, "The message has not been set.");
         return message;
     }
 
@@ -89,7 +88,7 @@ public class DataReaderResponse {
         final DataReaderResponse that = (DataReaderResponse) o;
 
         return new EqualsBuilder()
-                .append(data, that.data)
+                .append(writer, that.writer)
                 .append(message, that.message)
                 .isEquals();
     }
@@ -97,7 +96,7 @@ public class DataReaderResponse {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(13, 37)
-                .append(data)
+                .append(writer)
                 .append(message)
                 .toHashCode();
     }
@@ -105,7 +104,7 @@ public class DataReaderResponse {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("data", data)
+                .append("data", writer)
                 .append("message", message)
                 .toString();
     }
