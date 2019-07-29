@@ -18,6 +18,10 @@ variable "aws_secret_key" {
     default = ""
 }
 
+variable "aws_session_token" {
+  default = ""
+}
+
 variable "aws_profile_name" {
     default = ""
 }
@@ -77,4 +81,14 @@ variable "master_instance_count" {
 
 variable "core_instance_count" {
   default = "3"
+}
+
+variable "palisade_version" {}
+
+variable "number_of_employees_in_test_data" {
+  default = "10"
+}
+
+variable "number_of_files_to_split_test_data_over" {
+  default = "1"
 }

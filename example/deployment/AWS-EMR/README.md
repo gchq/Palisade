@@ -37,11 +37,13 @@ To run the AWS-EMR example follow these steps (from the root of the project):
 3. Create a Terraform variables file. Copy this template and save it as `example/deployment/AWS-EMR/terraform-scripts/terraform.tfvars`:
 
     ```bash
-    # Set the access and secret key OR the profile name, not both!
+    # Set the access and secret key plus token OR the profile name, not both!
  
     "aws_access_key" = "<Your AWS subscription access key>"
     
     "aws_secret_key" = "<Your AWS subscription secret key>"
+ 
+    "aws_session_token" = "<Your AWS subscription session token>"
      
     "aws_profile_name" = "<Your AWS profile name>"
 
@@ -52,22 +54,22 @@ To run the AWS-EMR example follow these steps (from the root of the project):
     
     "key_name" = "<Name of EC2 key pair instance for EMR cluster>"
     
-    "pem_file" = "<Path to the private key (.pem file) for the above key pair>"
-    
     "vpc_id" = "<ID of a VPC in AWS subscription>"
     
     "ingress_ip_range" = [ "1.2.3.4/32" , "5.6.7.8/32" ]
     
     "subnet_id" = "<ID of subnet that is in above VPC>" 
+
+    "palisade_version" = "<version of palisade to deploy>"
     ```
     
     This needs to be populated with the values indicated above before the example will run.
     
-    1. Your AWS access key and secret key are specific to your AWS subscription. You can find information on where these are located [here](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html).
+    1. Your AWS session token, access key and secret key are specific to your AWS subscription. You can find information on where these are located [here](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html).
         
         You can setup a named profile according to instructions [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
         
-        You should set **either** the access and secret keys **or** a profile name, not both. If you are using shared credentials, the profile name should be in the AWS shared credential file
+        You should set **either** the access and secret keys plus session token **or** a profile name, not both. If you are using shared credentials, the profile name should be in the AWS shared credential file
         `~/.aws/credentials` (or `%UserProfile%\.aws\credentials` on Windows). 
                 
     2. The `bucket_name` must be a globally unique S3 bucket name of your choosing. Bucket naming rules are [here](https://docs.aws.amazon.com/AmazonS3/latest/dev//BucketRestrictions.html#bucketnamingrules).
@@ -76,13 +78,15 @@ To run the AWS-EMR example follow these steps (from the root of the project):
         2. Click "Create Key Pair" which will ask for a name and give you a private certificate to download.
         
        Put the name of your key pair in the `key_name` field  as it appears in AWS (no `.pem` extension).
-    
-    4. `pem_file` should be the path to the private key create in previous step (ending in `.pem` extension).
-    5. `vpc_id` is the ID of the Virtual Private Cloud the EMR cluster will connect to. From AWS console, select Services -> VPC, then choose Your VPCs from the side menu.
+    4. `vpc_id` is the ID of the Virtual Private Cloud the EMR cluster will connect to. From AWS console, select Services -> VPC, then choose Your VPCs from the side menu.
     You may create a new VPC for this example or use an existing one. Place the name in the `vpc_id` field.
-    6. The `ingress_ip_range` is a list of public IPs that will be able to connect into the EMR cluster. This should be your public IP for your client machine.
-    7. The `subnet_id` should be the ID of a valid subnet from the Subnets page of the VPC service in AWS. It should be part of the VPC named earlier.
+    5. The `ingress_ip_range` is a list of public IPs that will be able to connect into the EMR cluster. This should be your public IP for your client machine.
+    6. The `subnet_id` should be the ID of a valid subnet from the Subnets page of the VPC service in AWS. It should be part of the VPC named earlier.
+    7. The `palisade_version` should be the version of palisade to be deployed which should be the same as the version you have built locally.
     8. **Optional**: Change the AWS region by uncommenting the `aws_region` key and setting a region name.
+    9. **Optional**: Change the number of employee records generated from the default of `10` by adding the variable `number_of_employees_in_test_data`
+    10. **Optional**: Change the number of files the records are split over from the default of `1` by adding the variable `number_of_files_to_split_test_data_over`
+
 4. Run the script below to start creating instances on AWS and run the example. It requires the key pair PEM file from earlier. 
 
     ```./example/deployment/AWS-EMR/bash-scripts/runAWS-EMRExample.sh <path to PEM private key file>```

@@ -25,6 +25,7 @@ import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.resource.ParentResource;
+import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
@@ -52,8 +53,16 @@ public final class ExamplePolicies {
      * @return security policy request
      */
     public static SetResourcePolicyRequest getExamplePolicy(final String file) {
+
+        Resource resource;
+        if (file.endsWith(".avro")) {
+            resource = new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file));
+        } else {
+            resource = new DirectoryResource().id(file).parent(getParent(file));
+        }
+
         return new SetResourcePolicyRequest()
-                .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
+                .resource(resource)
                 .policy(new Policy<Employee>()
                         .owner(ExampleUsers.getAlice())
                         .recordLevelRule(
@@ -72,7 +81,6 @@ public final class ExamplePolicies {
                                 "4-Address masked for estates staff and otherwise only available for duty of care",
                                 new ZipCodeMaskingRule()
                         )
-
                 );
     }
 

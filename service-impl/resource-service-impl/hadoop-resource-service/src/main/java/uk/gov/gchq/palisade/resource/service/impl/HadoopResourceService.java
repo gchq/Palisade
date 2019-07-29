@@ -272,7 +272,7 @@ public class HadoopResourceService implements ResourceService {
             final int fileDepth = path.depth();
             final int fsDepth = new Path(configuration.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)).depth();
 
-            if (fileDepth > fsDepth + 1) {
+            if (fileDepth > fsDepth) {
                 DirectoryResource parent = new DirectoryResource().id(fixURIScheme(path.getParent().toString()));
                 resource.setParent(parent);
                 resolveParents(parent, configuration);
