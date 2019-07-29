@@ -32,4 +32,4 @@ stages:
     variables:
       - group: ${{variables.groupName}}
     jobs:
-      - template: azure-pipelines.k8.yaml
+      - template: azure-pipelines.k8s.yaml
