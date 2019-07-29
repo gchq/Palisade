@@ -34,10 +34,10 @@ The *login server* entry should appear as: palisadeacr.azurecr.io
 Pipelines contain a series of builds - the builds we will create are defined as the following:
 
 * *infra* - The main infrastructure build - essentially responsible for creating the kubernetes cluster and infrastructure used by the Palisade deployment
-* *PR* - Joining together of the following phases in this order: maven, docker, k8
-    * *maven* - Build all components of Palisade, publish the local docker example artifacts to the pipeline build environment ready for subsequent pipelines to use
-    * *docker* - Build and push all the palisade docker images to the azure container registry: The container registry pushed to is defined in [azure-pipelines.docker-template.yaml](devops-pipelines/azure-pipelines.docker-template.yaml) - currently set to: *azureContainerRegistry: 'palisadeacr.azurecr.io'*
-    * *k8* - kubernetes pipeline - performs the Azure kubernetes cluster update for the project.
+* *PR* - Joining together of the following build pipelines in this order: maven, docker, k8
+* *maven* - Build all components of Palisade, publish the local docker example artifacts to the pipeline build environment ready for subsequent pipelines to use
+* *docker* - Build and push all the palisade docker images to the azure container registry: The container registry pushed to is defined in [azure-pipelines.docker-template.yaml](devops-pipelines/azure-pipelines.docker-template.yaml) - currently set to: *azureContainerRegistry: 'palisadeacr.azurecr.io'*
+* *k8* - kubernetes pipeline - performs the Azure kubernetes cluster update for the project.
 
 1. Select *+ New* and select *New build pipeline*
 1. Under Connect -> Where is your code? Select GitHub
@@ -47,6 +47,9 @@ Pipelines contain a series of builds - the builds we will create are defined as 
 
 * infra - `https://github.com/gchq/Palisade/blob/<branch>/example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.infra.yaml`
 * PR - `https://github.com/gchq/Palisade/blob/<branch>/example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.pr.yaml`
+* maven - `https://github.com/gchq/Palisade/blob/<branch>/example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.maven.yaml`
+* docker - `https://github.com/gchq/Palisade/blob/<branch>/example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker.yaml`
+* k8 - `https://github.com/gchq/Palisade/blob/<branch>/example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.k8s.yaml`
 
 The build view should now appear as below:
 

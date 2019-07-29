@@ -1,8 +1,8 @@
+variables:
+  - template: ./azure-pipelines.defaults.yaml
+
 trigger:
   batch: true
-  paths:
-    include:
-    - azure-pipelines.maven.yaml
 
 steps:
 - task: Maven@3

@@ -1,6 +1,9 @@
 variables:
 - template: ./azure-pipelines.defaults.yaml
 
+trigger:
+  batch: true
+
 jobs:
 - job:
   variables:

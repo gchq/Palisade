@@ -6,7 +6,6 @@ trigger:
   paths:
     include:
       - example/deployment/local-docker/*
-      - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker.yaml
       - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
 
 #following this example here: https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/docker?view=azure-devops
