@@ -5,8 +5,6 @@ steps:
   inputs:
     buildType: specific
     project: '$(System.TeamProjectId)'
-    pipeline: 8
-    specificBuildWithTriggering: true
     artifactName: local-docker
     downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
 
@@ -14,5 +12,8 @@ steps:
   displayName: 'Building ${{ parameters.imageName }} image'
 
 
-- script: docker login -u $(dockerId) -p $(pswd) $(dockerId).azurecr.io && docker images && docker push '$(dockerId).azurecr.io/${{ parameters.imageName }}'
+- script: docker login -u $(dockerId) -p $(pswd) $(dockerId).azurecr.io && docker images'
+  displayName: 'login and list docker images'
+
+- script: docker push '$(dockerId).azurecr.io/${{ parameters.imageName }}'
   displayName: 'Pushing ${{ parameters.imageName }} image'
