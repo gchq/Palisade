@@ -1,5 +1,5 @@
 jobs:
-- job: Maven build services
+- job: Maven_build_services
   steps:
   - task: Maven@3
     inputs:
