@@ -2,7 +2,6 @@ steps:
   - task: DownloadBuildArtifacts@0
     displayName: 'Download Build Artifacts'
     inputs:
-      buildVersionToDownload: latestFromBranch
       artifactName: local-docker
       downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
 
