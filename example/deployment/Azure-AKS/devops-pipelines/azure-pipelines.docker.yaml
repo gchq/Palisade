@@ -11,6 +11,8 @@ trigger:
 
 stages:
   - stage: Docker_Build_and_Push
+    variables:
+    - group: ${{variables.groupName}}
     jobs:
     - template: azure-pipelines.docker-jobs-template.yaml
       parameters:
