@@ -1,0 +1,20 @@
+variables:
+- template: ./azure-pipelines.defaults.yaml
+
+jobs:
+- job:
+  variables:
+  - group: ${{variables.groupName}}
+  steps:
+  - task: HelmDeploy@0
+    displayName: 'helm upgrade palisade deployment'
+    inputs:
+      azureSubscription: ${{variables.devOpsServiceConnection}}
+      azureResourceGroup: 'palisade'
+      kubernetesCluster: 'palisade-aks'
+      command: upgrade
+      chartType: FilePath
+      chartPath: example/deployment/Azure-AKS/helm/palisade
+      releaseName: palisade
+      overrideValues: 'image.registry=$(registry_dns),image.tag=latest'
+      arguments: '--timeout 600 --force'

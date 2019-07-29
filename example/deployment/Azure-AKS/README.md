@@ -9,22 +9,10 @@ The pre-requisites of this example are:
 ##Configuring the Azure DevOps account: 
 [devOps](./ConfigureAzureDevOPS.md)
 
-N.B The pipeline id (*'pipeline:'*) defined in the following files:
-/Palisade/example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
-refers to a given devops setup.
-The documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/download-build-artifacts?view=azure-devops) describes the build artefacts.
-Currently this file contains the pipeline id == 8. This is the pipeline for *maven*
-The pipeline id can be found as shown in the diagram below:
-![public ip](./buildId.png)
-
 ##Pipelines to execute to build and deploy the example
 The order of executing the pipelines should be as follows:
 1. *infra* - Create the main infrastructure
-1. *maven* - Build all components of Palisade
-1. *docker* - Build and publish all the palisade docker images
-1. *k8* - Perform the Kubernetes cluster update
-
-N.B The *PR* pipeline combines *maven* *docker* and *k8* pipelines into one.
+2. *PR* - Build all components of Palisade, Build and publish all the palisade docker images, deploy Palisade on AKS
 
 ##Checking Palisade deployed correctly
 1. Open the Microsoft Azure Cloud Shell by following these [instructions](https://docs.microsoft.com/en-us/azure/cloud-shell/quickstart)

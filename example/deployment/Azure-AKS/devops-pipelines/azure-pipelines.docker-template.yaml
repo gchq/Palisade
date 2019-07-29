@@ -1,18 +1,16 @@
 steps:
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download Build Artifacts'
+    inputs:
+      buildVersionToDownload: latestFromBranch
+      artifactName: local-docker
+      downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
 
-- task: DownloadBuildArtifacts@0
-  displayName: 'Download Build Artifacts'
-  inputs:
-    buildVersionToDownload: latestFromBranch
-    artifactName: local-docker
-    downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
+  - script: docker build -t $(dockerId).azurecr.io/${{ parameters.imageName }}:latest -t $(dockerId).azurecr.io/${{ parameters.imageName }}:$(Build.BuildId) $(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}
+    displayName: 'Building ${{ parameters.imageName }} image'
 
-- script: docker build -t $(dockerId).azurecr.io/${{ parameters.imageName }}:latest -t $(dockerId).azurecr.io/${{ parameters.imageName }}:$(Build.BuildId) $(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}
-  displayName: 'Building ${{ parameters.imageName }} image'
+  - script: docker login -u $(dockerId) -p $(pswd) $(dockerId).azurecr.io
+    displayName: 'login to container register'
 
-
-- script: docker login -u $(dockerId) -p $(pswd) $(dockerId).azurecr.io
-  displayName: 'login to container register'
-
-- script: docker push '$(dockerId).azurecr.io/${{ parameters.imageName }}'
-  displayName: 'Pushing ${{ parameters.imageName }} image'
+  - script: docker push '$(dockerId).azurecr.io/${{ parameters.imageName }}'
+    displayName: 'Pushing ${{ parameters.imageName }} image'
