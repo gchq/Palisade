@@ -23,6 +23,7 @@ import uk.gov.gchq.palisade.rule.Rule;
 import uk.gov.gchq.palisade.rule.Rules;
 
 import java.net.URL;
+import java.security.CodeSource;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -187,6 +188,31 @@ public final class Util {
         } catch (Exception e) {
             LOGGER.error("Call to failed to {} due to {}", address.toString(), e.getMessage());
             throw e;
+        }
+    }
+
+    /**
+     * Debug utility for finding which JAR file (if any) a class was loaded from. This is useful in debugging classpath
+     * conflicts.
+     *
+     * @param clazz the fully qualified class name to search for
+     * @return where the class was loaded from, or {@code null}
+     */
+    public static String locateJarFile(final String clazz) {
+        requireNonNull(clazz, "clazz");
+        try {
+            Class c = Class.forName(clazz);
+            CodeSource codeSource = c.getProtectionDomain().getCodeSource();
+
+            if (codeSource != null) {
+                LOGGER.info("{} was loaded from {}", clazz, codeSource.getLocation());
+
+            } else {
+                LOGGER.info("Can't determine where {} was loaded from", clazz);
+            }
+            return (codeSource != null) ? codeSource.getLocation().toString() : null;
+        } catch (Exception e) {
+            return e.getMessage();
         }
     }
 }

@@ -3,10 +3,10 @@
 This example demonstrates different users querying an avro file over a REST api running locally in docker containers.
 
 The example runs several different queries by the different users, with different purposes. When you run the example you will see the data has been redacted in line with the rules.  
-For an overview of the example see [here](../../README.md)
+For an overview of the example see [here](../../README.md).
 
 ### Prerequisites for running in docker 
-As well as docker, running this example alse requires docker compose
+As well as docker, running this example also requires docker compose
 
 To run the example locally in docker containers follow these steps (from the root of the project):
 
