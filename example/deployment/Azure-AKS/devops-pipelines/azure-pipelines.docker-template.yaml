@@ -3,7 +3,7 @@ steps:
 - task: DownloadBuildArtifacts@0
   displayName: 'Download Build Artifacts'
   inputs:
-    buildType: specific
+    buildType: current
     project: '$(System.TeamProjectId)'
     artifactName: local-docker
     downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
