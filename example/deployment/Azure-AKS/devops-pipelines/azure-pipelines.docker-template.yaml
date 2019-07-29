@@ -12,7 +12,7 @@ steps:
   - script: docker build -t $(dockerId).azurecr.io/${{ parameters.imageName }}:latest -t $(dockerId).azurecr.io/${{ parameters.imageName }}:$(Build.BuildId) $(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}
     displayName: 'Building ${{ parameters.imageName }} image'
 
-  - script: az acr login $(dockerId).azurecr.io --name $(dockerId)
+  - script: az acr login --name $(dockerId)
     displayName: 'login to container register'
 
   - script: docker push '$(dockerId).azurecr.io/${{ parameters.imageName }}'
