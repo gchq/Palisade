@@ -6,11 +6,10 @@ trigger:
   paths:
     include:
     - azure-pipelines.maven.yaml
-    - azure-pipelines.docker.yaml
+    - azure-pipelines.docker-jobs-template.yaml
     - azure-pipelines.k8.yaml
     - example/deployment/local-docker/*
-    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker.yaml
-    - example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
+    - azure-pipelines.docker-template.yaml
 
 stages:
   - stage: Maven_Build
@@ -24,7 +23,9 @@ stages:
     variables:
       - group: ${{variables.groupName}}
     - jobs:
-        - template: azure-pipelines.docker.yaml
+        - template: azure-pipelines.docker-jobs-template.yaml
+          parameters:
+            buildType: 'current'
 
   - stage: Deploy_Palisade
     dependsOn: Docker_Build_and_Push

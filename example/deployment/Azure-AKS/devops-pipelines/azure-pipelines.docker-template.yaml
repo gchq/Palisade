@@ -4,6 +4,11 @@ steps:
     inputs:
       artifactName: local-docker
       downloadPath: '$(System.DefaultWorkingDirectory)/example/deployment/'
+      buildType: '$(parameters.buildType)'
+      project: '$(System.TeamProjectId)'
+      pipeline: '8'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: '$(Build.SourceBranchName)'
 
   - script: docker build -t $(dockerId).azurecr.io/${{ parameters.imageName }}:latest -t $(dockerId).azurecr.io/${{ parameters.imageName }}:$(Build.BuildId) $(System.DefaultWorkingDirectory)/example/deployment/local-docker/example-docker-services/${{ parameters.imageName }}
     displayName: 'Building ${{ parameters.imageName }} image'
