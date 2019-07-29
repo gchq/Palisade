@@ -1,9 +1,6 @@
 variables:
   - template: ./azure-pipelines.defaults.yaml
 
-trigger:
-  batch: true
-
 jobs:
 - job: Maven build services
       steps:
