@@ -16,6 +16,7 @@
     compatible with, so we relocate the Guava library in this shaded build. -->
 
     <!-- Activating the aws profile ensures the Amazon Web Services s3a connector is available in Palisade. -->
+
     <profiles>
         <profile>
             <id>aws</id>

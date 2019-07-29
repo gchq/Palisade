@@ -20,6 +20,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.exception.ForbiddenException;
@@ -45,6 +47,7 @@ public class GetConfigRequest extends Request {
      * The service for the configuration being requested.
      */
     private Optional<String> serviceClassName;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetConfigRequest.class);
 
     /**
      * Create an empty request.
