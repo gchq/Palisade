@@ -54,6 +54,8 @@ To run the AWS-EMR example follow these steps (from the root of the project):
     
     "key_name" = "<Name of EC2 key pair instance for EMR cluster>"
     
+    "pem_file" = "<Path to the private key (.pem file) for the above key pair>"
+    
     "vpc_id" = "<ID of a VPC in AWS subscription>"
     
     "ingress_ip_range" = [ "1.2.3.4/32" , "5.6.7.8/32" ]
@@ -78,18 +80,20 @@ To run the AWS-EMR example follow these steps (from the root of the project):
         2. Click "Create Key Pair" which will ask for a name and give you a private certificate to download.
         
        Put the name of your key pair in the `key_name` field  as it appears in AWS (no `.pem` extension).
-    4. `vpc_id` is the ID of the Virtual Private Cloud the EMR cluster will connect to. From AWS console, select Services -> VPC, then choose Your VPCs from the side menu.
+    
+    4. `pem_file` should be the path to the private key create in previous step (ending in `.pem` extension).
+    5. `vpc_id` is the ID of the Virtual Private Cloud the EMR cluster will connect to. From AWS console, select Services -> VPC, then choose Your VPCs from the side menu.
     You may create a new VPC for this example or use an existing one. Place the name in the `vpc_id` field.
-    5. The `ingress_ip_range` is a list of public IPs that will be able to connect into the EMR cluster. This should be your public IP for your client machine.
-    6. The `subnet_id` should be the ID of a valid subnet from the Subnets page of the VPC service in AWS. It should be part of the VPC named earlier.
-    7. The `palisade_version` should be the version of palisade to be deployed which should be the same as the version you have built locally.
-    8. **Optional**: Change the AWS region by uncommenting the `aws_region` key and setting a region name.
-    9. **Optional**: Change the number of employee records generated from the default of `10` by adding the variable `number_of_employees_in_test_data`
-    10. **Optional**: Change the number of files the records are split over from the default of `1` by adding the variable `number_of_files_to_split_test_data_over`
+    6. The `ingress_ip_range` is a list of public IPs that will be able to connect into the EMR cluster. This should be your public IP for your client machine.
+    7. The `subnet_id` should be the ID of a valid subnet from the Subnets page of the VPC service in AWS. It should be part of the VPC named earlier.
+    8. The `palisade_version` should be the version of palisade to be deployed which should be the same as the version you have built locally.
+    9. **Optional**: Change the AWS region by uncommenting the `aws_region` key and setting a region name.
+    10. **Optional**: Change the number of employee records generated from the default of `10` by adding the variable `number_of_employees_in_test_data`
+    11. **Optional**: Change the number of files the records are split over from the default of `1` by adding the variable `number_of_files_to_split_test_data_over`
 
-4. Run the script below to start creating instances on AWS and run the example. It requires the key pair PEM file from earlier. 
+4. Run the script below to start creating instances on AWS and run the example. 
 
-    ```./example/deployment/AWS-EMR/bash-scripts/runAWS-EMRExample.sh <path to PEM private key file>```
+    ```./example/deployment/AWS-EMR/bash-scripts/runAWS-EMRExample.sh```
 5. Answer `yes` when asked if Terraform may create AWS infrastructure.
 **You will start to incur charges to your AWS subscription at this point!**
 6. It will take several minutes to deploy the EMR cluster and run the Palisade example.
