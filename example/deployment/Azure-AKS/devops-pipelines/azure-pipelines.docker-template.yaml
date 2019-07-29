@@ -15,5 +15,5 @@ steps:
   - script: az acr login --name $(dockerId) --username $(dockerId) --password $(pswd)
     displayName: 'login to container register'
 
-  - script: docker push '$(dockerId).azurecr.io/${{ parameters.imageName }}'
+  - script: docker push $(dockerId).azurecr.io/${{ parameters.imageName }}:latest
     displayName: 'Pushing ${{ parameters.imageName }} image'
