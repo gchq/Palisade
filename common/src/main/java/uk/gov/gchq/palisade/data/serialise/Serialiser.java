@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -29,21 +30,24 @@ import java.util.stream.Stream;
 public interface Serialiser<I> extends Serializable {
 
     /**
-     * Serialises a {@link Stream} of objects to an {@link OutputStream}.
+     * Serialises a {@link Stream} of objects to an {@link OutputStream}. If {@code objects} is {@code null}, then
+     * nothing will be written.
      *
      * @param objects the stream of objects to be serialised
-     * @param output the output stream to write the serialised bytes to
+     * @param output  the output stream to write the serialised bytes to
      * @return this object
+     * @throws IOException if something fails while writing the object stream
      */
-    Serialiser<I> serialise(final Stream<I> objects, final OutputStream output);
+    Serialiser<I> serialise(final Stream<I> objects, final OutputStream output) throws IOException;
 
     /**
      * Deserialise an {@link InputStream} into a {@link Stream} of objects.
      *
      * @param stream the input stream to deserialise
      * @return the deserialised object
+     * @throws IOException if the input stream couldn't be read from.
      */
-    Stream<I> deserialise(final InputStream stream);
+    Stream<I> deserialise(final InputStream stream) throws IOException;
 
     @JsonGetter("class")
     default String _getClass() {
