@@ -21,23 +21,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileStream;
 import org.apache.avro.file.DataFileWriter;
-import org.apache.avro.io.DatumWriter;
 import org.apache.avro.reflect.ReflectData;
 import org.apache.avro.reflect.ReflectDatumReader;
 import org.apache.avro.reflect.ReflectDatumWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.io.Bytes;
-import uk.gov.gchq.palisade.io.BytesOutputStream;
-import uk.gov.gchq.palisade.io.BytesSuppliedInputStream;
-
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
