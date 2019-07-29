@@ -1,6 +1,3 @@
-variables:
-  - template: ./azure-pipelines.defaults.yaml
-
 jobs:
 - job: Maven build services
   steps:
