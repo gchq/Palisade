@@ -1,3 +1,6 @@
+variables:
+  - template: ./azure-pipelines.defaults.yaml
+
 steps:
   - task: DownloadBuildArtifacts@0
     displayName: 'Download Build Artifacts'

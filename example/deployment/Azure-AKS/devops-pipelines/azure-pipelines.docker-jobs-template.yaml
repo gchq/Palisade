@@ -14,6 +14,8 @@ trigger:
 jobs:
   - job: Docker_build_config_service
     displayName: config-service
+    variables:
+      - group: ${{variables.groupName}}
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
@@ -21,6 +23,8 @@ jobs:
           buildType: '$(parameters.buildType)'
   - job: Docker_build_configure_services
     displayName: configure-services
+    variables:
+      - group: ${{variables.groupName}}
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
@@ -28,6 +32,8 @@ jobs:
           buildType: '$(parameters.buildType)'
   - job: Docker_build_configure_example
     displayName: configure-example
+    variables:
+      - group: ${{variables.groupName}}
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
@@ -35,6 +41,8 @@ jobs:
           buildType: '$(parameters.buildType)'
   - job: Docker_build_data_service
     displayName: data-service
+    variables:
+      - group: ${{variables.groupName}}
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
@@ -42,6 +50,8 @@ jobs:
           buildType: '$(parameters.buildType)'
   - job: Docker_build_etcd
     displayName: etcd
+    variables:
+      - group: ${{variables.groupName}}
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
@@ -49,6 +59,8 @@ jobs:
           buildType: '$(parameters.buildType)'
   - job: Docker_build_palisade_service
     displayName: palisade-service
+    variables:
+      - group: ${{variables.groupName}}
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
@@ -56,6 +68,8 @@ jobs:
           buildType: '$(parameters.buildType)'
   - job: Docker_build_policy_service
     displayName: policy-service
+    variables:
+      - group: ${{variables.groupName}}
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
@@ -63,6 +77,8 @@ jobs:
           buildType: '$(parameters.buildType)'
   - job: Docker_build_resource_service
     displayName: resource-service
+    variables:
+      - group: ${{variables.groupName}}
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
@@ -70,6 +86,8 @@ jobs:
           buildType: '$(parameters.buildType)'
   - job: Docker_build_user_service
     displayName: user-service
+    variables:
+      - group: ${{variables.groupName}}
     steps:
       - template: azure-pipelines.docker-template.yaml
         parameters:
