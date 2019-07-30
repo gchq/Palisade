@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service.request;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -96,6 +97,28 @@ public abstract class ReadResponse {
 
     public void setMessage(final String message) {
         message(message);
+    }
+
+    /**
+     * Creates a {@link ReadResponse} that returns the given {@link InputStream} when requested with {@link ReadResponse#asInputStream()}.
+     * The {@link ReadResponse#writeTo(OutputStream)} method is a convenience call that performs a copy to the given {@link OutputStream}.
+     *
+     * @param dataStream the input data source
+     * @return a client read response
+     */
+    public static ReadResponse makeClientReadResponse(final InputStream dataStream) {
+        return new ReadResponse() {
+            @Override
+            public InputStream asInputStream() {
+                return dataStream;
+            }
+
+            @Override
+            public ReadResponse writeTo(final OutputStream output) throws IOException {
+                IOUtils.copy(asInputStream(), output);
+                return this;
+            }
+        };
     }
 
     @Override

@@ -37,7 +37,6 @@ import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
-import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 
 import java.io.IOException;
@@ -182,6 +181,14 @@ public class SimpleDataService implements DataService {
                 });
     }
 
+    /**
+     * Creates a {@link ReadResponse} that only supports writing the data to an {@link OutputStream}. Since a DataService
+     * shouldn't be providing an {@link InputStream} to a local JVM, then one method throws an exception. The other calls
+     * the data reader's write method to write to the given output stream.
+     *
+     * @param readerResponse the original data reader response
+     * @return a initialised read response
+     */
     protected ReadResponse createLocalReadResponse(final DataReaderResponse readerResponse) {
         return new ReadResponse() {
             @Override

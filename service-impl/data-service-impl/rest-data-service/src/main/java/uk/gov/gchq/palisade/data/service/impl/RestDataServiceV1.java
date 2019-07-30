@@ -119,8 +119,8 @@ public class RestDataServiceV1 implements DataService {
         public void write(final OutputStream outputStream) {
             final ReadResponse response = futureResponse.join();
 
-            try (final InputStream inputStream = response.getData()) {
-                IOUtils.copy(inputStream, outputStream);
+            try {
+                response.writeTo(outputStream);
             } catch (final IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);

@@ -63,8 +63,7 @@ public final class CreateDataFile implements Callable<Boolean> {
                 employeeStream = firstEmployeeStream;
             }
 
-            BytesSuppliedInputStream in = (BytesSuppliedInputStream) employeeAvroSerialiser.serialise(employeeStream);
-            IOUtils.copy(in, out);
+            employeeAvroSerialiser.serialise(employeeStream, out);
         } catch (final Exception error) {
             error.printStackTrace();
         }

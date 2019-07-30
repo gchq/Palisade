@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,9 @@ import uk.gov.gchq.palisade.service.Service;
 
 import javax.ws.rs.core.Response;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
@@ -65,10 +68,12 @@ public class ProxyRestDataService extends ProxyRestService implements DataServic
         LOGGER.debug("Invoking REST read: " + request);
         try {
             final CompletableFuture<Response> futureResponse = doPostAsync("read/chunked", request, Response.class);
-            return futureResponse.thenApply(r -> new ReadResponse().data(r.readEntity(InputStream.class)));
+            return futureResponse.thenApply(r -> ReadResponse.makeClientReadResponse(r.readEntity(InputStream.class)));
         } catch (NoCapacityException e) {
             LOGGER.warn("Palisade instance has no capacity to process data request on available data services.");
             throw e;
         }
     }
+
+
 }

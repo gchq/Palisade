@@ -167,7 +167,7 @@ public class PalisadeRecordReaderTest {
      */
     private static DataService createMockDS(Collection<String> dataToReturn, boolean shouldFail) {
         //create the simulated response
-        ReadResponse readResponse = new ReadResponse();
+        ReadResponse readResponse = ReadResponse.makeClientReadResponse(ser);
         readResponse.setData(serialiser.serialise(dataToReturn.stream()));
         //mock a data service to return it
         DataService mock = mock(DataService.class);
