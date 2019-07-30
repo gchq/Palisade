@@ -29,11 +29,20 @@ import java.io.OutputStream;
 public interface ResponseWriter extends AutoCloseable {
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    void close() throws IOException;
+
+    /**
      * Instruct the {@link uk.gov.gchq.palisade.data.service.reader.DataReader} that created this object to begin the process
      * of reading the data from the backing store, performing any necessary rules applications to it and then writing
      * it to the {@link OutputStream} provided. This is a serial operation that will block the current thread until writing
      * is complete. The provided stream will NOT be closed once the data has been written. It is the responsibility of the code
      * that created {@code output} to close it.
+     * <p>
+     * Once a data stream has been written to, then further attempts to call this method may result in an exception. Implementations
+     * are NOT required to support multiple writes.
      *
      * @param output the stream to write to
      * @return this object

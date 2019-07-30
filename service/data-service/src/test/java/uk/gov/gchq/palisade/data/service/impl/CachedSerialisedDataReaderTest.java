@@ -201,4 +201,9 @@ public class CachedSerialisedDataReaderTest {
         //Then
         assertThat(actual, equalTo(new StubSerialiser()));
     }
+
+    @Test
+    public void throwOnMultipleCallsToWrite() {
+        throw new UnsupportedOperationException("TODO: Implement this test!");
+    }
 }

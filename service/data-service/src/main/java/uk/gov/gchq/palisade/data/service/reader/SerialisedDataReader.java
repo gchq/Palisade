@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
@@ -111,9 +112,20 @@ public abstract class SerialisedDataReader implements DataReader {
         final Rules<Object> rules = request.getRules();
 
         ResponseWriter serialisedWriter = new ResponseWriter() {
+
+            private AtomicBoolean written = new AtomicBoolean(false);
+
             @Override
             public ResponseWriter write(final OutputStream output) throws IOException {
                 requireNonNull(output, "output");
+
+                //atomically get the previous value and set it to true
+                boolean previousValue = written.getAndSet(true);
+
+                if (previousValue) {
+                    throw new IOException("response already written");
+                }
+
                 //if nothing to do, then just copy the bytes across
                 if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
                     LOGGER.debug("No rules to apply");

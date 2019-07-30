@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.ToStringBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Objects.requireNonNull;
 
@@ -43,7 +44,7 @@ public abstract class ReadResponse {
     /**
      * Specifies if the data stream has been retrieved from this response.
      */
-    private volatile boolean isUsed;
+    private AtomicBoolean isUsed = new AtomicBoolean(false);
 
     /**
      * Retrieves the data returned from the request as an {@link InputStream}. This method can only be called once.
@@ -72,14 +73,14 @@ public abstract class ReadResponse {
      * @see ReadResponse#writeTo(OutputStream)
      */
     public boolean isUsed() {
-        return isUsed;
+        return isUsed.get();
     }
 
     /**
      * Sets the data stream as retrieved.
      */
-    protected void setUsed() {
-        this.isUsed = true;
+    protected boolean setUsed() {
+        return isUsed.getAndSet(true);
     }
 
     public ReadResponse message(final String message) {
