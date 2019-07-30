@@ -26,9 +26,9 @@ import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNativeTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeNoPolicyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadLargeWithPolicyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadSmallFileTrial;
+import uk.gov.gchq.palisade.example.perf.trial.ReadSmallNativeTrial;
 import uk.gov.gchq.palisade.example.perf.trial.ReadSmallNoPolicyTrial;
 import uk.gov.gchq.palisade.example.perf.trial.RequestOnlyTrial;
-import uk.gov.gchq.palisade.example.perf.trial.StreamSmallWithPolicyTrial;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 
 import java.net.URI;
@@ -38,7 +38,9 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.gchq.palisade.example.perf.PerfUtils.getLargeFile;
@@ -49,7 +51,7 @@ import static uk.gov.gchq.palisade.example.perf.PerfUtils.toURI;
 /**
  * Runs a series of performance tests under various circumstances and then reports the metrics to a collector.
  */
-public class RunAction extends PerfAction {
+public class RunAction implements PerfAction {
     /**
      * Amount of time to wait between each trial.
      */
@@ -60,22 +62,22 @@ public class RunAction extends PerfAction {
      */
     private Map<String, PerfTrial> testsToRun = new TreeMap<>();
 
-    /**
-     * The test to normalise against.
-     */
-    private PerfTrial normalised;
-
     public RunAction() {
         //create all the performance tests and add them in here
         //the one to normalise against
-        normalised = new ReadLargeNativeTrial();
-        addTrial(normalised);
-        addTrial(new ReadLargeNoPolicyTrial());
-        addTrial(new ReadSmallNoPolicyTrial());
-        addTrial(new ReadLargeWithPolicyTrial());
+        PerfTrial normalisedLarge = new ReadLargeNativeTrial();
+        //normalise to self
+        normalisedLarge.setNameForNormalisation(normalisedLarge);
+        addTrial(normalisedLarge);
+        PerfTrial normalisedSmall = new ReadSmallNativeTrial();
+        //normalise to self
+        normalisedSmall.setNameForNormalisation(normalisedSmall);
+        addTrial(normalisedSmall);
+        addTrial(new ReadLargeNoPolicyTrial().setNameForNormalisation(normalisedLarge));
+        addTrial(new ReadSmallNoPolicyTrial().setNameForNormalisation(normalisedSmall));
+        addTrial(new ReadLargeWithPolicyTrial().setNameForNormalisation(normalisedLarge));
         addTrial(new RequestOnlyTrial(1));
-        addTrial(new ReadSmallFileTrial(1));
-        addTrial(new StreamSmallWithPolicyTrial(1));
+        addTrial(new ReadSmallFileTrial(1).setNameForNormalisation(normalisedSmall));
     }
 
     /**
@@ -111,7 +113,7 @@ public class RunAction extends PerfAction {
 
         testsToRun.entrySet().stream()
                 .forEach(e -> {
-                    help.append(String.format("\t%20s\t%s%n", e.getValue().name(), Objects.toString(e.getValue().description(), "no description")));
+                    help.append(String.format("\t%30s\t%s%n", e.getValue().name(), Objects.toString(e.getValue().description(), "no description")));
                 });
 
         return help.toString();
@@ -167,9 +169,19 @@ public class RunAction extends PerfAction {
 
         //write the performance test outputs
         System.out.println();
-        collector.outputTo(System.out, normalised.name());
+        collector.outputTo(System.out, buildNormalMap());
 
         return Integer.valueOf(0);
+    }
+
+    /**
+     * Create the map of test names to optional normal test names.
+     *
+     * @return normal map
+     */
+    private Map<String, Optional<String>> buildNormalMap() {
+        return testsToRun.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().getNameForNormalisation()));
     }
 
     /**

@@ -271,6 +271,7 @@ public class Configurator {
         if (config == null) {
             throw new NoConfigException("unable to retrieve configuration in specified time");
         } else {
+            LOGGER.info("Successfully retrieved service configuration for {}", serviceClass.map(Class::getTypeName).orElse("anonymous client"));
             return config;
         }
     }

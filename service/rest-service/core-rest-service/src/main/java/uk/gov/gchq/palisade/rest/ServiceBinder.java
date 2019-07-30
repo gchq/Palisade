@@ -21,6 +21,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.gchq.palisade.service.Service;
 
 import java.util.ArrayList;
@@ -35,7 +38,7 @@ import static java.util.Objects.requireNonNull;
  * microservice classes.
  */
 public class ServiceBinder extends AbstractBinder {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBinder.class);
     /**
      * The map of which instances to bind to which classes when asked to configure.
      */
@@ -77,6 +80,7 @@ public class ServiceBinder extends AbstractBinder {
             throw new ClassCastException(service.getClass() + " is not an instance of " + serviceClass.getTypeName());
         }
         bindMap.computeIfAbsent(service, key -> new ArrayList<>()).add(serviceClass);
+        LOGGER.info("Successfully created and registered REST delegate {}", serviceClass.getTypeName());
         return this;
     }
 

@@ -49,8 +49,8 @@ public class Policy<RULE_DATA_TYPE> {
 
     // no-args constructor required
     public Policy() {
-        recordRules(new Rules<>());
-        resourceRules(new Rules<>());
+        recordRules = new Rules<>();
+        resourceRules = new Rules<>();
     }
 
     public Policy<RULE_DATA_TYPE> recordRules(final Rules<RULE_DATA_TYPE> recordRules) {

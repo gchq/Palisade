@@ -46,7 +46,6 @@ import static java.util.Objects.requireNonNull;
         property = "class"
 )
 public class User implements Cloneable {
-
     private UserId userId;
 
     private Set<String> roles = new HashSet<>();

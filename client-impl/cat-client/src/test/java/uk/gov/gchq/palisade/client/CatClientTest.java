@@ -113,7 +113,7 @@ public class CatClientTest {
         Mockito.verify(mockDataService, Mockito.times(1)).read(Mockito.refEq(readRequest2, "id"));
 
         //Then
-        assertEquals("Test data 1\nTest data 2\n", outContent.toString());
+        assertEquals(String.format("Test data 1%nTest data 2%n"), outContent.toString());
     }
 
     @After

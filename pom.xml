@@ -70,7 +70,7 @@
         <glassfish.hk2.javax.inject.version>2.4.0</glassfish.hk2.javax.inject.version>
         <servlet-api.version>4.0.1</servlet-api.version>
         <grizzly.version>2.4.3.1</grizzly.version>
-        <hadoop.version>2.9.2</hadoop.version>
+        <hadoop.version>2.8.5</hadoop.version>
         <avro.version>1.8.2</avro.version>
         <koryphe.version>1.5.0</koryphe.version>
         <jetcd.version>0.3.0</jetcd.version>
@@ -83,6 +83,7 @@
         <javax.activation.version>1.2.0</javax.activation.version>
 
         <!-- Testing properties -->
+        <hadoop-minicluster.version>3.2.0</hadoop-minicluster.version>
         <junit.version>4.12</junit.version>
         <hamcrest.version>1.3</hamcrest.version>
         <mockito.version>1.10.19</mockito.version>
@@ -91,14 +92,24 @@
         <skip.surefire.tests>false</skip.surefire.tests>
         <skip.failsafe.tests>false</skip.failsafe.tests>
         <checkstyle.phase>test</checkstyle.phase>
-        <spotbugs.phase>test</spotbugs.phase>
         <checkstyle.plugin.version>3.0.0</checkstyle.plugin.version>
-        <spotbugs.plugin.version>3.1.10</spotbugs.plugin.version>
         <jcip.annotations.version>1.0-1</jcip.annotations.version>
         <testcontainers.version>1.10.5</testcontainers.version>
+        <error.prone.version>2.3.3</error.prone.version>
+        <!-- TODO: remove errorprone.javac.version property once JDK9+ migration complete -->
+        <error.prone.javac.version>9+181-r4173-1</error.prone.javac.version>
         <surefireArgLine/>
         <failsafeArgLine/>
         <exclude.tests/>
+
+        <restRedirectorPort>9080</restRedirectorPort>
+        <restPalisadeMetricProviderPort>9080</restPalisadeMetricProviderPort>
+        <restPalisadeServicePort>9080</restPalisadeServicePort>
+        <restPolicyServicePort>9081</restPolicyServicePort>
+        <restResourceServicePort>9082</restResourceServicePort>
+        <restUserServicePort>9083</restUserServicePort>
+        <restDataServicePort>9084</restDataServicePort>
+        <restConfigServicePort>9085</restConfigServicePort>
 
         <!-- Other -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -160,12 +171,6 @@
             <version>${jcip.annotations.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-annotations</artifactId>
-            <version>${spotbugs.plugin.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
@@ -187,7 +192,6 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -197,7 +201,6 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>test</checkstyle.phase>
-                <spotbugs.phase>test</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -206,7 +209,6 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>false</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -215,7 +217,6 @@
                 <skip.surefire.tests>false</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
         <profile>
@@ -225,10 +226,38 @@
                 <skip.surefire.tests>true</skip.surefire.tests>
                 <skip.failsafe.tests>true</skip.failsafe.tests>
                 <checkstyle.phase>none</checkstyle.phase>
-                <spotbugs.phase>none</spotbugs.phase>
             </properties>
         </profile>
-
+        <profile>
+            <id>error-prone</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <!-- TODO: remove the fork once JDK9+ migration complete -->
+                            <fork>true</fork>
+                            <compilerArgs combine.children="append">
+                                <arg>-XDcompilePolicy=simple</arg>
+                                <arg>-Xplugin:ErrorProne</arg>
+                                <!-- TODO: remove next arg once JDK9+ migration complete -->
+                                <arg>
+                                    -J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${error.prone.javac.version}/javac-${error.prone.javac.version}.jar
+                                </arg>
+                            </compilerArgs>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>com.google.errorprone</groupId>
+                                    <artifactId>error_prone_core</artifactId>
+                                    <version>${error.prone.version}</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <build>
@@ -240,7 +269,9 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <compilerArgument>-Xlint:deprecation</compilerArgument>
+                    <compilerArgs>
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -277,10 +308,21 @@
                         <exclude>${exclude.tests}</exclude>
                     </excludes>
                     <systemPropertyVariables>
+                        <restUserServicePort>${restUserServicePort}</restUserServicePort>
+                        <restPolicyServicePort>${restPolicyServicePort}</restPolicyServicePort>
+                        <restRedirectorPort>${restRedirectorPort}</restRedirectorPort>
+                        <restConfigServicePort>${restConfigServicePort}</restConfigServicePort>
+                        <restDataServicePort>${restDataServicePort}</restDataServicePort>
+                        <restPalisadeMetricProviderPort>${restPalisadeMetricProviderPort}</restPalisadeMetricProviderPort>
+                        <restPalisadeServicePort>${restPalisadeServicePort}</restPalisadeServicePort>
+                        <restResourceServicePort>${restResourceServicePort}</restResourceServicePort>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
                     </systemPropertyVariables>
+                    <environmentVariables>
+                        <PALISADE_REST_CONFIG_PATH>example/example-model/src/main/resources/configRest.json</PALISADE_REST_CONFIG_PATH>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -308,11 +350,23 @@
                         <include>**/*ITs.java</include>
                         <include>**/*IntegrationTests.java</include>
                     </includes>
+                    <environmentVariables></environmentVariables>
                     <systemPropertyVariables>
+                        <restUserServicePort>${restUserServicePort}</restUserServicePort>
+                        <restPolicyServicePort>${restPolicyServicePort}</restPolicyServicePort>
+                        <restRedirectorPort>${restRedirectorPort}</restRedirectorPort>
+                        <restConfigServicePort>${restConfigServicePort}</restConfigServicePort>
+                        <restDataServicePort>${restDataServicePort}</restDataServicePort>
+                        <restPalisadeMetricProviderPort>${restPalisadeMetricProviderPort}</restPalisadeMetricProviderPort>
+                        <restPalisadeServicePort>${restPalisadeServicePort}</restPalisadeServicePort>
+                        <restResourceServicePort>${restResourceServicePort}</restResourceServicePort>
                         <log4j.configuration>
                             file:${project.build.testOutputDirectory}/log4j.xml
                         </log4j.configuration>
                     </systemPropertyVariables>
+                    <environmentVariables>
+                        <PALISADE_REST_CONFIG_PATH>example/example-model/src/main/resources/configRest.json</PALISADE_REST_CONFIG_PATH>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -343,50 +397,6 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${spotbugs.plugin.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs</artifactId>
-                        <version>${spotbugs.plugin.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-
-                    <effort>default</effort>
-                    <threshold>Low</threshold>
-                    <xmlOutput>true</xmlOutput>
-                    <xmlOutputDirectory>
-                        ${project.build.directory}/spotbugs
-                    </xmlOutputDirectory>
-                    <excludeFilterFile>
-                        code-style/spotbugs-exclude.xml
-                    </excludeFilterFile>
-                    <onlyAnalyze>uk.gov.gchq.palisade.*</onlyAnalyze>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>analyze-compile</id>
-                        <phase>${spotbugs.phase}</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <effort>default</effort>
-                            <threshold>Low</threshold>
-                            <xmlOutput>true</xmlOutput>
-                            <xmlOutputDirectory>
-                                ${project.build.directory}/spotbugs
-                            </xmlOutputDirectory>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

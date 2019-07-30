@@ -12,37 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-*/target/
 target/
-*/*.iml
 *.iml
-*/.settings
-*/.project
-*/bin
+.project/
 bin/
-*/*.class
+*.class
 */atlassian-ide*
-*/.idea
-.idea/*
-.idea
-*/.classpath
+.idea/
+.classpath/
 *.pem
 *.DS_Store
 _book
-node_modules
+node_modules/
 .extract/
-.project
 .project/
-.settings
 .settings/
-.classpath
-.classpath/
-.terraform
 .terraform/
-*/terraform.tfvars
 terraform.tfvars
 terraform.tfstate
-*/terraform.tfstate
-*/terraform.tfstate.backup
 terraform.tfstate.backup
+dependency-reduced-pom.xml
 
+##VSCODE default files that dont need to be tracked
+eclipse-formatter.xml
+.vscode/

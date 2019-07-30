@@ -43,6 +43,11 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
+            <artifactId>shade-hadoop-client</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
@@ -223,34 +228,4 @@
             </exclusions>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>avro</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.avro</groupId>
-                        <artifactId>avro-maven-plugin</artifactId>
-                        <version>1.8.2</version>
-                        <executions>
-                            <execution>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>schema</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
-                                    <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
-                                    <testSourceDirectory>${project.basedir}/src/test/resources/avro
-                                    </testSourceDirectory>
-                                    <testOutputDirectory>${project.basedir}/src/test/java</testOutputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

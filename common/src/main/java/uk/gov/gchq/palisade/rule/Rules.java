@@ -60,7 +60,8 @@ public class Rules<T> {
      */
     public Rules<T> rules(final LinkedHashMap<String, Rule<T>> rules) {
         Objects.requireNonNull(rules, "Rules can not be set to null.");
-        this.rules = rules;
+        this.rules.clear();
+        this.rules.putAll(rules);
         return this;
     }
 

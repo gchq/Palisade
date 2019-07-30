@@ -19,10 +19,13 @@ package uk.gov.gchq.palisade.example.util;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
@@ -48,20 +51,31 @@ public final class ExampleFileUtil {
         try {
             uriPath = new URI(path);
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Can't parse the given file name", e);
+            try {
+                uriPath = Paths.get(path).normalize().toUri();
+            } catch (IllegalArgumentException | FileSystemNotFoundException f) {
+                throw new RuntimeException("Can't parse the given file name: ", f);
+            }
         }
 
-        // if this path has the the file:// scheme, then convert it via URI
-        Path file;
-        if (FileSystems.getDefault().provider().getScheme().equals(uriPath.getScheme())) {
-            file = Paths.get(uriPath);
-        } else {
-            file = Paths.get(path);
-        }
-        //is this a local file URL? If so attempt to normalise it
+        // If the URI scheme is not provided or is not correct for this filesystem attempt to correct it if possible
 
         if (isNull(uriPath.getScheme()) ||
                 FileSystems.getDefault().provider().getScheme().equals(uriPath.getScheme())) {
+
+            Pattern patt = Pattern.compile(FileSystems.getDefault().provider().getScheme() + ":[/]?([^/].*)$");
+            Matcher matt = patt.matcher(uriPath.toString());
+            Path file;
+
+            if (matt.matches()) {
+                return URI.create(FileSystems.getDefault().provider().getScheme() + "://" + matt.group(1));
+            } else {
+                if (isNull(uriPath.getScheme())) {
+                    file = FileSystems.getDefault().getPath(uriPath.getPath());
+                } else {
+                    file = Paths.get(uriPath).normalize();
+                }
+            }
             //normalise this against the file system
             try {
                 file = file.toRealPath(LinkOption.NOFOLLOW_LINKS);
