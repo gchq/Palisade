@@ -38,49 +38,19 @@ import static java.util.Objects.requireNonNull;
 public class K8sBackingStore implements BackingStore {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(K8sBackingStore.class);
-    Config config = new ConfigBuilder().build();
-    KubernetesClient client = new DefaultKubernetesClient(config);
+
+    private final Config config = new ConfigBuilder().build();
+    private final KubernetesClient client = new DefaultKubernetesClient(config);
+
     private static final String NAMESPACE = "default";
-    String namespace;
+    private String namespace = Optional.ofNullable(client.getNamespace()).orElse(NAMESPACE);
 
     public K8sBackingStore() {
-        log("K8sBackingStore");
-        if (namespace == null) {
-            namespace = client.getNamespace();
-        }
-        if (namespace == null) {
-            namespace = NAMESPACE;
-        }
+        LOGGER.info("Current namespace is: {}", this.namespace);
 
-
-        try {
-//            Namespace existing = null;
-            log("K8sBackingStore before existing");
-//            NamespaceList namespaces = client.namespaces().list();
-//            log("K8sBackingStore before loop");
-//            for (Namespace namespace1 : namespaces.getItems()) {
-//                log("start of loop");
-//                log("namespace with name: " + namespace1.getMetadata().getName() + " has status: " + namespace1.getStatus());
-//                if (namespace1.getMetadata().getName().equalsIgnoreCase(namespace)) {
-//                    existing = namespace1;
-//                }
-//
-//            }
-//            Namespace existing = client.namespaces().withName(namespace).get();
-            log("K8sBackingStore after existing");
-//            if (existing == null) {
-//                log("K8sBackingStore create namespace");
-//                Namespace ns = new NamespaceBuilder().withNewMetadata().withName(namespace).addToLabels("name", namespace).endMetadata().build();
-//                client.namespaces().create(ns);
-//                log("New namespace " + namespace + " created");
-//
-//            }
-        } catch (Exception e) {
-            log("caught exception:" + e.getMessage());
-            throw e;
-        }
+        this.client.namespaces().list().getItems()
+                .forEach(ns -> LOGGER.info("Found namespace {} with status: {}", ns.getMetadata().getName(), ns.getStatus()));
     }
-
 
     /**
      * Clean up the resource
@@ -136,12 +106,12 @@ public class K8sBackingStore implements BackingStore {
         Resource<ConfigMap, DoneableConfigMap> configMapResource = client.configMaps().inNamespace(namespace).withName(dns1123Compatible);
 
         if (timeToLive.isPresent()) {
-            Long epochMilli = Instant.now().plusSeconds(timeToLive.get().getSeconds()).plusNanos(timeToLive.get().getNano()).toEpochMilli();
+            final long epochMilli = Instant.now().plusSeconds(timeToLive.get().getSeconds()).plusNanos(timeToLive.get().getNano()).toEpochMilli();
             ConfigMap configMap = configMapResource.createOrReplace(new ConfigMapBuilder()
                     .withNewMetadata().withName(dns1123Compatible).endMetadata()
                     .addToData("valueClass", valueClass.getName())
                     .addToData("value", new String(value))
-                    .addToData("expiryTimestamp", epochMilli.toString())
+                    .addToData("expiryTimestamp", String.valueOf(epochMilli))
                     .build());
             log("Upserted ConfigMap at " + configMap.getMetadata().getSelfLink() + " data " + configMap.getData());
 
@@ -184,7 +154,7 @@ public class K8sBackingStore implements BackingStore {
         } else {
             try {
                 if (configMap.getData().containsKey("expiryTimestamp")) {
-                    if (Instant.now().isAfter(Instant.ofEpochMilli(Long.valueOf(configMap.getData().get("expiryTimestamp"))))) {
+                    if (Instant.now().isAfter(Instant.ofEpochMilli(Long.parseLong(configMap.getData().get("expiryTimestamp"))))) {
                         remove(key);
                         log("Timedout on key " + key);
 
@@ -250,13 +220,8 @@ public class K8sBackingStore implements BackingStore {
         return client.configMaps().inNamespace(namespace).list().getItems()
                 .stream()
                 .filter(configMap -> configMap.getMetadata().getName().startsWith(dns1123Compatible))
-                .filter(configMap -> {
-                    if ((configMap.getData().containsKey("expiryTimestamp")) &&
-                            (Instant.now().isAfter(Instant.ofEpochMilli(Long.valueOf(configMap.getData().get("expiryTimestamp")))))) {
-                        return false;
-                    }
-                    return true;
-                })
+                .filter(configMap -> (!configMap.getData().containsKey("expiryTimestamp")) ||
+                        (!Instant.now().isAfter(Instant.ofEpochMilli(Long.parseLong(configMap.getData().get("expiryTimestamp"))))))
                 .map(configMap -> configMap.getMetadata().getName())
                 .distinct();
     }
