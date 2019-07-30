@@ -28,7 +28,7 @@ public final class ExampleUsers {
                 .trainingCompleted(TrainingCourse.PAYROLL_TRAINING_COURSE)
                 .userId("Alice")
                 .auths("public", "private")
-                .roles(Role.HR.name(), Role.PAYROLL.name());
+                .roles(Role.HR.name());
         return (alice);
     }
 

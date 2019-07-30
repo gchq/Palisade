@@ -112,26 +112,27 @@ public class DataRequestResponse {
         final DataRequestResponse that = (DataRequestResponse) o;
 
         return new EqualsBuilder()
-        .append(requestId, that.requestId)
-        .append(resources, that.resources)
-        .append(originalRequestId, that.originalRequestId)
-        .isEquals();
+                .append(requestId, that.requestId)
+                .append(resources, that.resources)
+                .append(originalRequestId, that.originalRequestId)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 67)
-        .append(requestId)
-        .append(resources)
-        .append(originalRequestId)
-        .toHashCode();
+                .append(requestId)
+                .append(resources)
+                .append(originalRequestId)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-        .append("requestId", requestId)
-        .append("resources", resources)
-        .toString();
+                .append("requestId", requestId)
+                .append("resources", resources)
+                .append("originalRequestId", originalRequestId)
+                .toString();
     }
 }

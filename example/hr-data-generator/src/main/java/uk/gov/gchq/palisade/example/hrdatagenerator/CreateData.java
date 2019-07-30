@@ -42,7 +42,7 @@ public final class CreateData {
             String outputFilePath = args[0];
             long numberOfEmployees = Long.parseLong(args[1]);
             int numberOfFiles = Integer.parseInt(args[2]);
-            int numberOfThreads = 1;
+            int numberOfThreads = numberOfFiles;
             if (args.length > 3) {
                 numberOfThreads = Integer.parseInt(args[3]);
             }

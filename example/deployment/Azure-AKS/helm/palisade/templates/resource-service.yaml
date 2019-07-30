@@ -1,0 +1,62 @@
+---
+# Source: palisade/templates/resource-service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: resource-service
+spec:
+  selector:
+    app: resource-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---    
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: resource-service
+  name: resource-service
+spec:
+  selector:
+    matchLabels:
+      app: resource-service
+  replicas: {{ .Values.resourceservice.replicas }}
+  template:
+    metadata:
+      labels:
+        app: resource-service
+    spec:
+      containers:
+      - name: resource-service
+        image: "{{ .Values.resourceservice.image.repository }}:{{ .Values.resourceservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.resourceservice.image.pullPolicy }}"
+        ports:
+          - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /resource/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /resource/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        volumeMounts:
+          - name: data
+            mountPath: /data
+        resources:
+          {{- toYaml .Values.resourceservice.resources | nindent 12 }}
+      restartPolicy: Always
+      volumes:
+      - name: data
+        azureFile:
+          secretName: data-share-secret
+          shareName: data
+          readOnly: true
