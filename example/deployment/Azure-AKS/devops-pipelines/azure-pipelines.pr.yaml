@@ -1,0 +1,35 @@
+variables:
+- template: ./azure-pipelines.defaults.yaml
+
+trigger:
+  batch: true
+  paths:
+    include:
+    - azure-pipelines.maven.yaml
+    - azure-pipelines.docker-jobs-template.yaml
+    - azure-pipelines.k8s.yaml
+    - example/deployment/local-docker/*
+    - azure-pipelines.docker-template.yaml
+
+stages:
+  - stage: Maven_Build
+    variables:
+      - group: ${{variables.groupName}}
+    jobs:
+      - template: azure-pipelines.maven.yaml
+
+  - stage: Docker_Build_and_Push
+    dependsOn: Maven_Build
+    variables:
+      - group: ${{variables.groupName}}
+    jobs:
+      - template: azure-pipelines.docker-jobs-template.yaml
+        parameters:
+          buildType: 'current'
+
+  - stage: Deploy_Palisade
+    dependsOn: Docker_Build_and_Push
+    variables:
+      - group: ${{variables.groupName}}
+    jobs:
+      - template: azure-pipelines.k8s.yaml

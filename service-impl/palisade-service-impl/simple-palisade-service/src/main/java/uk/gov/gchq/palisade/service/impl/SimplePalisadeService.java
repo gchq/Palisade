@@ -65,6 +65,7 @@ import java.util.concurrent.CompletionException;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
+
 /**
  * <p> A simple implementation of a Palisade Service that just connects up the Audit, Cache, User, Policy and Resource
  * services. </p> <p> It currently doesn't validate that the user is actually requesting the correct resources. It
