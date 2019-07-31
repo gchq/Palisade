@@ -48,8 +48,12 @@ public class K8sBackingStore implements BackingStore {
     public K8sBackingStore() {
         LOGGER.info("Current namespace is: {}", this.namespace);
 
-        this.client.namespaces().list().getItems()
-                .forEach(ns -> LOGGER.info("Found namespace {} with status: {}", ns.getMetadata().getName(), ns.getStatus()));
+        try {
+            this.client.namespaces().list().getItems()
+                    .forEach(ns -> LOGGER.info("Found namespace {} with status: {}", ns.getMetadata().getName(), ns.getStatus()));
+        } catch (KubernetesClientException e) {
+            LOGGER.info("Not running in kubernetes or RBAC not entitled");
+        }
     }
 
     /**
