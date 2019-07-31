@@ -53,13 +53,13 @@ public class RestDataServiceV1IT {
     private static final SystemResource sysResource = new SystemResource().id("File");
     private static final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
     private static final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);
-    
+
     @BeforeClass
     public static void beforeClass() throws IOException {
         String portNumber = System.getProperty("restDataServicePort");
         request.setOriginalRequestId(new RequestId().id("id1"));
         RestDataServiceV1.setDefaultDelegate(new MockDataService());
-        proxy = (ProxyRestDataService) new ProxyRestDataService("http://localhost:"+portNumber+"/data").retryMax(1);
+        proxy = (ProxyRestDataService) new ProxyRestDataService("http://localhost:" + portNumber + "/data").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
@@ -80,7 +80,7 @@ public class RestDataServiceV1IT {
         final byte[] data = "value1\nvalue2".getBytes();
         final InputStream dataStream = new ByteArrayInputStream(data);
 
-        final ReadResponse expectedResult = new ReadResponse().data(dataStream).message("some message");
+        final ReadResponse expectedResult = ReadResponse.makeClientReadResponse(dataStream).message("some message");
         final CompletableFuture futureExpectedResult = CompletableFuture.completedFuture(expectedResult);
         given(dataService.read(request)).willReturn(futureExpectedResult);
 
@@ -89,7 +89,7 @@ public class RestDataServiceV1IT {
         final ReadResponse result = futureRead.join();
 
         // Then
-        assertArrayEquals(data, IOUtils.toByteArray(result.getData()));
+        assertArrayEquals(data, IOUtils.toByteArray(result.asInputStream()));
         verify(dataService).read(request);
     }
 

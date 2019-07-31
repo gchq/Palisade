@@ -16,7 +16,6 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +28,7 @@ import uk.gov.gchq.palisade.service.Service;
 
 import javax.ws.rs.core.Response;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 

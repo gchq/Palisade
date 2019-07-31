@@ -16,8 +16,6 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator;
 
-import org.apache.commons.io.IOUtils;
-
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.AvroSerialiser;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;

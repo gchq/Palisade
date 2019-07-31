@@ -78,7 +78,9 @@ public abstract class ReadResponse {
     }
 
     /**
-     * Sets the data stream as retrieved.
+     * Sets the data stream as retrieved (atomically).
+     *
+     * @return the previous value
      */
     protected boolean setUsed() {
         return isUsed.getAndSet(true);
