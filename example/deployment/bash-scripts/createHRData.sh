@@ -18,7 +18,7 @@ then
 fi
 
 if [ "$FILE_PRESENT" -eq 0 ];then
-    echo "Can't find hr-data-generator-<version>-SNAPSHOT-shaded.jar in ${TARGET_DIR}. Have you run \"mvn install -Pexample\" ?"
+    echo "Can't find hr-data-generator-<version>-SNAPSHOT-shaded.jar in ${TARGET_DIR}. Have you run \"mvn install -P example\" ?"
     exit 1;
 fi
 
