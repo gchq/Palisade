@@ -32,15 +32,15 @@ Policy have defined the following rules:
 1. BankDetailsRule - The bankDetails field should be returned if the user querying the file has completed the PAYROLL_TRAINING_COURSE and the purpose of the query is SALARY  
    In all other cases the bankDetails field should be redacted.
 
-1. DutyOfCareRule - This rule is concerned with the contactNumbers and emergencyContacts fields. These fields should be returned 
+2. DutyOfCareRule - This rule is concerned with the contactNumbers and emergencyContacts fields. These fields should be returned 
     - if the user querying the file has the HR role and the purpose of the query is DUTY_OF_CARE
     - if the user querying the file is the line manager of the Employee record being queried and the purpose of the query is DUTY_OF_CARE  
    In all other cases these fields should be redacted.
 
-1. NationalityRule - The nationality field should be returned if the user querying the file has the HR role and the purpose of the query is STAFF_REPORT    
+3. NationalityRule - The nationality field should be returned if the user querying the file has the HR role and the purpose of the query is STAFF_REPORT    
    In all other cases the nationality field should be redacted.
 
-1. ZipCodeMaskingRule - This rule is concerned with the address field.
+4. ZipCodeMaskingRule - This rule is concerned with the address field.
     - if the user querying the file has the HR role then the whole address is returned
     - if the purpose of the query is DUTY_OF_CARE and the user querying the file is the line manager of the Employee record being queried then the whole address is returned
     - if the user querying the file has the ESTATES role then the address field should be returned with the zipcode/postcode masked to reduce its precision  
@@ -58,3 +58,5 @@ For deployment specific instructions on how to run the example see:
 [Local JVM](deployment/local-jvm/README.md)  
 [Local Docker](deployment/local-docker/README.md)  
 [Local Kubernetes](deployment/local-k8s/README.md)  
+[AWS-EMR](deployment/AWS-EMR/README.md)
+[Azure-AKS](deployment/Azure-AKS/README.md)

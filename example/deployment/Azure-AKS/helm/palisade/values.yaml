@@ -32,6 +32,20 @@ dataservice:
       memory: 10Gi
   replicas: 5
 
+etcd:
+  image:
+    pullPolicy: Always
+    repository: palisadeacr.azurecr.io/etcd
+    tag: latest
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 0.25
+      memory: 1Gi
+  replicas: 1
+
 palisadeservice:
   image:
     pullPolicy: Always
@@ -107,8 +121,8 @@ ingress:
   enabled: false
   annotations: {}
   hosts:
-  - host: chart-example.local
-    paths: []
+    - host: chart-example.local
+      paths: []
 
   tls: []
 
@@ -121,8 +135,8 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
   # requests:
-#   cpu: 100m
-#   memory: 128Mi
+  #   cpu: 100m
+  #   memory: 128Mi
 
 nodeSelector: {}
 

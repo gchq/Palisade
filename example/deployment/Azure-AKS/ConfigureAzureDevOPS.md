@@ -21,7 +21,7 @@ Your library entry should appear as below:
  
 ### Creating a container registry
 The Infra Azure DevOps pipeline should create the container registry.
-All docker images created as part of the build artefacts are stored in the azure container registry.
+All docker images created as part of the build artifacts are stored in the azure container registry.
 The infrastructure as code assumes that the name of the container registry will be *palisadeacr*
 If the pipeline *does not* create the container registry then follow these [instructions](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal) for creating it.
 Shown below is the view of the container registry:
@@ -35,7 +35,7 @@ Pipelines contain a series of builds - the builds we will create are defined as 
 
 * *infra* - The main infrastructure build - essentially responsible for creating the kubernetes cluster and infrastructure used by the Palisade deployment
 * *PR* - Joining together of the following build pipelines in this order: maven, docker, k8
-* *maven* - Build all components of Palisade, publish the local docker example artefacts to the pipeline build environment ready for subsequent pipelines to use
+* *maven* - Build all components of Palisade, publish the local docker example artifacts to the pipeline build environment ready for subsequent pipelines to use
 * *docker* - Build and push all the palisade docker images to the azure container registry: The container registry pushed to is defined in [azure-pipelines.docker-template.yaml](devops-pipelines/azure-pipelines.docker-template.yaml) - currently set to: *azureContainerRegistry: 'palisadeacr.azurecr.io'*
 * *k8* - kubernetes pipeline - performs the Azure kubernetes cluster update for the project.
 

@@ -49,6 +49,7 @@ data-service-64f596c6b9-cbr9t       1/1     Running     0          114m
 data-service-64f596c6b9-h8h68       1/1     Running     0          114m
 data-service-64f596c6b9-r86w5       1/1     Running     0          114m
 data-service-64f596c6b9-rsftk       1/1     Running     0          114m
+etcd-fcdf6b9f4-xlsgp                1/1     Running     1          27h
 palisade-service-c98d8b7c-kc9vr     1/1     Running     0          114m
 policy-service-6594d845db-dg2fm     1/1     Running     0          114m
 resource-service-79487d98d8-s5jpk   1/1     Running     0          114m
@@ -85,7 +86,7 @@ Filesystem                                   1K-blocks     Used Available Use% M
 Checkout the Palisade repository:
 ```bash
 git clone https://github.com/gchq/Palisade.git
-cd Palisade && git checkout '<branch>'
+cd Palisade && git checkout <branch>
 ```
 
 ##Modify /etc/hosts on the client VM
@@ -95,7 +96,7 @@ Obtain the ingress public IP:
 
 ```bash
 vim /etc/hosts
-'<ingress public ip>' config-service palisade-service data-service
+<ingress public ip> config-service palisade-service data-service
 ```
 
 ##Generate the test data 
@@ -103,7 +104,7 @@ vim /etc/hosts
 Use the following command to create a test data set:
 
 ```bash
-java -cp Palisade/example/hr-data-generator/target/hr-data-generator-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData /data/testData/ '<number of records>' '<number of files to split records over>' '<number of threads to use>' &
+java -cp Palisade/example/hr-data-generator/target/hr-data-generator-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData /data/testData/ <number of records> <number of files to split records over> <number of threads to use> &
 ```
 
 ##Run the test example:
@@ -113,7 +114,7 @@ This example only uses a single threaded java client to read the resources one a
 java -cp Palisade/example/example-model/target/example-model-*-shaded.jar -DPALISADE_REST_CONFIG_PATH=Palisade/example/deployment/Azure-AKS/configRest.json uk.gov.gchq.palisade.example.runner.RestExample /data/testData 
 example.runner.RestExample INFO  - Going to request /data/testData from Palisade
 example.runner.RestExample INFO  - 
-example.runner.RestExample INFO  - Alice  ExampleUser[userId=UserId[id=Alice],roles=[HR],auths=[private, public],trainingCourses=[PAYROLL_TRAINING_COURSE]]  is reading the Employee file with a purpose of SALARY...
+example.runner.RestExample INFO  - Alice [ ExampleUser[userId=UserId[id=Alice],roles=[HR],auths=[private, public],trainingCourses=[PAYROLL_TRAINING_COURSE]] } is reading the Employee file with a purpose of SALARY...
 setting original request id: RequestId[id=6c111aee-2a13-443f-aa19-391aaf014269]
 example.runner.RestExample INFO  - Alice got back: 
 
