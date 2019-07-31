@@ -29,7 +29,6 @@ import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.reader.DataReader;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
-import uk.gov.gchq.palisade.data.service.reader.request.ResponseWriter;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.exception.NoConfigException;
@@ -39,9 +38,6 @@ import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
@@ -169,7 +165,7 @@ public class SimpleDataService implements DataService {
             final DataReaderResponse readerResult = getReader().read(readerRequest);
             LOGGER.debug("Reader returned: {}", readerResult);
 
-            final ReadResponse response = createLocalReadResponse(readerResult);
+            final ReadResponse response = ReadResponse.createNoInputResponse(readerResult);
             LOGGER.debug("Returning from read: {}", response);
             auditReadResponse(request);
             return response;
@@ -179,39 +175,6 @@ public class SimpleDataService implements DataService {
                     auditRequestReceivedException(request, ex);
                     throw new RuntimeException(ex); //rethrow the exception
                 });
-    }
-
-    /**
-     * Creates a {@link ReadResponse} that only supports writing the data to an {@link OutputStream}. Since a DataService
-     * shouldn't be providing an {@link InputStream} to a local JVM, then one method throws an exception. The other calls
-     * the data reader's write method to write to the given output stream.
-     *
-     * @param readerResponse the original data reader response
-     * @return a initialised read response
-     */
-    protected static ReadResponse createLocalReadResponse(final DataReaderResponse readerResponse) {
-        return new ReadResponse() {
-            @Override
-            public InputStream asInputStream() throws IOException {
-                throw new IOException("JVM local data-service cannot provide an InputStream. Please use writeTo()!");
-            }
-
-            @Override
-            public ReadResponse writeTo(final OutputStream output) throws IOException {
-                requireNonNull(output, "output");
-                //check this hasn't already been used
-                boolean used = setUsed();
-                if (used) {
-                    throw new IOException("writeTo can only be called once per instance");
-                }
-
-                //write all data to the given stream and ensure stream closed
-                try (ResponseWriter writer = readerResponse.getWriter()) {
-                    writer.write(output);
-                    return this;
-                }
-            }
-        };
     }
 
     public PalisadeService getPalisadeService() {

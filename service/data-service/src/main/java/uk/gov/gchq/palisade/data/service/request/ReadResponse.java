@@ -21,6 +21,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
+import uk.gov.gchq.palisade.data.service.reader.request.ResponseWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -119,6 +121,39 @@ public abstract class ReadResponse {
             public ReadResponse writeTo(final OutputStream output) throws IOException {
                 IOUtils.copy(asInputStream(), output);
                 return this;
+            }
+        };
+    }
+
+    /**
+     * Creates a {@link ReadResponse} that only supports writing the data to an {@link OutputStream}. Since a DataService
+     * shouldn't be providing an {@link InputStream} to a local JVM, then one method throws an exception. The other calls
+     * the data reader's write method to write to the given output stream.
+     *
+     * @param readerResponse the original data reader response
+     * @return a initialised read response
+     */
+    public static ReadResponse createNoInputResponse(final DataReaderResponse readerResponse) {
+        return new ReadResponse() {
+            @Override
+            public InputStream asInputStream() throws IOException {
+                throw new IOException("JVM local data-service cannot provide an InputStream. Please use writeTo()!");
+            }
+
+            @Override
+            public ReadResponse writeTo(final OutputStream output) throws IOException {
+                requireNonNull(output, "output");
+                //check this hasn't already been used
+                boolean used = setUsed();
+                if (used) {
+                    throw new IOException("writeTo can only be called once per instance");
+                }
+
+                //write all data to the given stream and ensure stream closed
+                try (ResponseWriter writer = readerResponse.getWriter()) {
+                    writer.write(output);
+                    return this;
+                }
             }
         };
     }
