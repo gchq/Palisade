@@ -121,7 +121,6 @@ public class RestDataServiceV1 implements DataService {
             try {
                 response.writeTo(outputStream);
             } catch (final IOException e) {
-                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }

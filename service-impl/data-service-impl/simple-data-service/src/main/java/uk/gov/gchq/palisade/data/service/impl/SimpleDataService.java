@@ -189,7 +189,7 @@ public class SimpleDataService implements DataService {
      * @param readerResponse the original data reader response
      * @return a initialised read response
      */
-    protected ReadResponse createLocalReadResponse(final DataReaderResponse readerResponse) {
+    protected static ReadResponse createLocalReadResponse(final DataReaderResponse readerResponse) {
         return new ReadResponse() {
             @Override
             public InputStream asInputStream() throws IOException {

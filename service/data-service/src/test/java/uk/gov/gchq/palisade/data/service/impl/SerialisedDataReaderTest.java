@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
+import org.apache.commons.io.input.NullInputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -78,7 +79,7 @@ public class SerialisedDataReaderTest {
                 )
         );
 
-        reader = new TestDataReader();
+        reader = new TestDataReader(new NullInputStream(10));
         reader.serialisers(serMap);
         reader.cacheService(mockCache);
     }
@@ -96,5 +97,18 @@ public class SerialisedDataReaderTest {
         //Then - should fail on second attempt
         response.getWriter().write(NULL_OUTPUT_STREAM);
         fail("exception expected");
+    }
+
+    @Test
+    public void shouldCloseInputStreamNormally() {
+        //Given
+        //make a mock input stream and have the test data reader return it, check that the mock has its close method called
+
+    }
+
+    @Test
+    public void shouldCloseInputStreamExceptionally() {
+        //Given
+        //same as above, but kill the stream early, make sure it still closes properly
     }
 }

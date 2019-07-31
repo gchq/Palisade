@@ -16,24 +16,24 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
-import uk.gov.gchq.palisade.data.service.reader.CachedSerialisedDataReader;
-import uk.gov.gchq.palisade.resource.LeafResource;
+import org.apache.commons.lang3.builder.ToStringExclude;
+import org.junit.Test;
 
-import java.io.InputStream;
+import static org.junit.Assert.*;
 
-import static java.util.Objects.requireNonNull;
+public class SimpleDataServiceTest {
 
-public final class TestDataReader extends CachedSerialisedDataReader {
+    @Test
+    public void shouldCloseResponseWriterNormally() {
+        //call create local response method in SDS
+        //check it closes the input stream, both under normal and expcetional conditions
 
-    private final InputStream returnStream;
-
-    public TestDataReader(final InputStream returnStream) {
-        requireNonNull(returnStream, "returnStream");
-        this.returnStream = returnStream;
     }
 
-    @Override
-    protected InputStream readRaw(LeafResource resource) {
-        return returnStream;
+    @Test
+    public void shouldCloseResponseWriterExceptionally() {
+        //call create local response method in SDS
+        //check it closes the input stream, both under normal and expcetional conditions
+
     }
 }

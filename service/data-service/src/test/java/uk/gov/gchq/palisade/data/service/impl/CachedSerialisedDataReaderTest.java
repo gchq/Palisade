@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
+import org.apache.commons.io.input.NullInputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -106,7 +107,7 @@ public class CachedSerialisedDataReaderTest {
     @Test
     public void shouldBeAbleToRetrieveSerialiser() {
         //Given
-        TestDataReader reader = (TestDataReader) new TestDataReader()
+        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10))
                 .cacheService(mockCache);
 
         //When
@@ -120,7 +121,7 @@ public class CachedSerialisedDataReaderTest {
     @Test
     public void shouldReturnDefaultSerialiserOnNoRead() {
         //Given
-        TestDataReader reader = (TestDataReader) new TestDataReader()
+        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10))
                 .cacheService(mockCache);
         //set default serialiser
         Serialiser<?> defSerialiser = new SimpleStringSerialiser();
@@ -137,7 +138,7 @@ public class CachedSerialisedDataReaderTest {
     @Test
     public void shouldReturnSerialiserFromCache() {
         //Given
-        TestDataReader reader = (TestDataReader) new TestDataReader()
+        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10))
                 .cacheService(mockCache);
         //set default serialiser
         Serialiser<?> defSerialiser = new SimpleStringSerialiser();
