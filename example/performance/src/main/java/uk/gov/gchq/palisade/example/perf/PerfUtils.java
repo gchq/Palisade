@@ -91,6 +91,9 @@ public final class PerfUtils {
      */
     public static <T> void sink(final Stream<T> data) {
         requireNonNull(data, "data");
-        System.err.println(data.count());
+        long recordCount = data.count();
+        if (recordCount < 1) {
+            System.err.println("\nNo records returned! Did you forget to run the \"policy\" action to set the security policy?");
+        }
     }
 }

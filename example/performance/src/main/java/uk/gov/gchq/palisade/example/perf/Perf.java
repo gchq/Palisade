@@ -69,7 +69,7 @@ public final class Perf {
     private Perf() {
     }
 
-    public static void main(final String... args) throws Exception {
+    public static void main(final String... args) {
         String action = "";
         String[] actionArgs = new String[0];
 

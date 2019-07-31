@@ -24,4 +24,4 @@ if [ "$FILE_PRESENT" -eq 0 ];then
 fi
 
 # Run the performance tool
-java -cp $MODEL_JAR:$JAR_FILE uk.gov.gchq.palisade.example.perf.Perf $@
+PALISADE_REST_CONFIG_PATH=example/example-model/src/main/resources/configRest.json java -cp $JAR_FILE:$MODEL_JAR uk.gov.gchq.palisade.example.perf.Perf $@
