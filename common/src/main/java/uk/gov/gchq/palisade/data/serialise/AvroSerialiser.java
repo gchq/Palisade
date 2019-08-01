@@ -99,17 +99,4 @@ public class AvroSerialiser<O> implements Serialiser<O> {
     public Class<O> getDomainClass() {
         return domainClass;
     }
-
-    //TODO: check output streams get closed properly
-//        private <T> T onError(final Closeable closeable, final String errorMsg, final Exception e) {
-//            LOGGER.debug("Closing streams");
-//            if (nonNull(closeable)) {
-//                try {
-//                    closeable.close();
-//                } catch (Exception ignored) {
-//
-//                }
-//            }
-//            throw new RuntimeException(errorMsg, e);
-//        }
 }
