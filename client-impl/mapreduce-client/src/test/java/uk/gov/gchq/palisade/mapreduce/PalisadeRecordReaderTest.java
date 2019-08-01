@@ -171,7 +171,7 @@ public class PalisadeRecordReaderTest {
         //create the simulated response
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         serialiser.serialise(dataToReturn.stream(),baos);
-        ReadResponse readResponse = ReadResponse.makeClientReadResponse(new ByteArrayInputStream(baos.toByteArray()));
+        ReadResponse readResponse = ReadResponse.createClientReadResponse(new ByteArrayInputStream(baos.toByteArray()));
         //mock a data service to return it
         DataService mock = mock(DataService.class);
         if (shouldFail) {

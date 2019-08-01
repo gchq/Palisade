@@ -80,7 +80,7 @@ public class RestDataServiceV1IT {
         final byte[] data = "value1\nvalue2".getBytes();
         final InputStream dataStream = new ByteArrayInputStream(data);
 
-        final ReadResponse expectedResult = ReadResponse.makeClientReadResponse(dataStream).message("some message");
+        final ReadResponse expectedResult = ReadResponse.createClientReadResponse(dataStream).message("some message");
         final CompletableFuture futureExpectedResult = CompletableFuture.completedFuture(expectedResult);
         given(dataService.read(request)).willReturn(futureExpectedResult);
 

@@ -65,7 +65,7 @@ public class ProxyRestDataService extends ProxyRestService implements DataServic
         LOGGER.debug("Invoking REST read: " + request);
         try {
             final CompletableFuture<Response> futureResponse = doPostAsync("read/chunked", request, Response.class);
-            return futureResponse.thenApply(r -> ReadResponse.makeClientReadResponse(r.readEntity(InputStream.class)));
+            return futureResponse.thenApply(r -> ReadResponse.createClientReadResponse(r.readEntity(InputStream.class)));
         } catch (NoCapacityException e) {
             LOGGER.warn("Palisade instance has no capacity to process data request on available data services.");
             throw e;

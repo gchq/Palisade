@@ -110,7 +110,7 @@ public abstract class ReadResponse {
      * @param dataStream the input data source
      * @return a client read response
      */
-    public static ReadResponse makeClientReadResponse(final InputStream dataStream) {
+    public static ReadResponse createClientReadResponse(final InputStream dataStream) {
         return new ReadResponse() {
             @Override
             public InputStream asInputStream() {
