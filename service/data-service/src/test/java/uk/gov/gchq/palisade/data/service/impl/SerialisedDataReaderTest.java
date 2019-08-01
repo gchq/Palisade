@@ -25,6 +25,7 @@ import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
+import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.reader.CachedSerialisedDataReader;
 import uk.gov.gchq.palisade.data.service.reader.DataFlavour;
@@ -33,15 +34,27 @@ import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.resource.StubResource;
 import uk.gov.gchq.palisade.rule.Rules;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 import static org.apache.commons.io.output.NullOutputStream.NULL_OUTPUT_STREAM;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.refEq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 public class SerialisedDataReaderTest {
@@ -53,6 +66,8 @@ public class SerialisedDataReaderTest {
     private AddCacheRequest<CachedSerialisedDataReader.MapWrap> addCacheRequest;
 
     private GetCacheRequest<CachedSerialisedDataReader.MapWrap> getCacheRequest;
+
+    private DataReaderRequest request;
 
     @Before
     public void resetCache() {
@@ -69,7 +84,7 @@ public class SerialisedDataReaderTest {
                 .service(DataService.class);
 
         Map<DataFlavour, Serialiser<?>> serMap = new HashMap<>();
-        serMap.put(DataFlavour.of("type1", "format1"), new StubSerialiser());
+        serMap.put(DataFlavour.of("type1", "format1"), new SimpleStringSerialiser());
 
         when(mockCache.get(refEq(getCacheRequest, "id"))).thenReturn(
                 CompletableFuture.completedFuture(
@@ -82,15 +97,16 @@ public class SerialisedDataReaderTest {
         reader = new TestDataReader(new NullInputStream(10));
         reader.serialisers(serMap);
         reader.cacheService(mockCache);
+
+        request = new DataReaderRequest().rules(new Rules()).resource(new StubResource().type("type1").serialisedFormat("format1"));
     }
 
     @Test(expected = IOException.class)
     public void throwOnMultipleCallsToWrite() throws IOException {
         //Given
-        DataReaderRequest req = new DataReaderRequest().rules(new Rules()).resource(new StubResource().type("type1").serialisedFormat("format1"));
+        DataReaderResponse response = reader.read(request);
 
         //When
-        DataReaderResponse response = reader.read(req);
         //make first write request
         response.getWriter().write(NULL_OUTPUT_STREAM);
 
@@ -100,15 +116,68 @@ public class SerialisedDataReaderTest {
     }
 
     @Test
-    public void shouldCloseInputStreamNormally() {
+    public void shouldCloseInputStreamNormally() throws IOException {
         //Given
-        //make a mock input stream and have the test data reader return it, check that the mock has its close method called
 
+        //flag that is set once stream is closed
+        AtomicBoolean closed = new AtomicBoolean(false);
+        DataReaderResponse response = createTestResponseForStringStream(closed);
+
+        //When
+        assertFalse(closed.get());
+        response.getWriter().write(NULL_OUTPUT_STREAM);
+
+        //Then
+        //close should have been called
+        assertTrue(closed.get());
     }
 
     @Test
-    public void shouldCloseInputStreamExceptionally() {
+    public void shouldCloseInputStreamExceptionally() throws IOException {
         //Given
-        //same as above, but kill the stream early, make sure it still closes properly
+        //flag that is set once stream is closed
+        AtomicBoolean closed = new AtomicBoolean(false);
+        DataReaderResponse response = createTestResponseForStringStream(closed);
+
+        //create an outputstream that throws an exception
+        OutputStream exceptionStream = Mockito.mock(OutputStream.class);
+        doThrow(IOException.class).when(exceptionStream).write(anyInt());
+        doThrow(IOException.class).when(exceptionStream).write(any());
+        doThrow(IOException.class).when(exceptionStream).write(any(), anyInt(), anyInt());
+
+        //When
+        assertFalse(closed.get());
+        try {
+            response.getWriter().write(exceptionStream);
+        } catch (IOException expected) {
+        }
+
+        //Then
+        assertTrue(closed.get());
+    }
+
+    private DataReaderResponse createTestResponseForStringStream(final AtomicBoolean closed) {
+        //create a simple input stream
+        SimpleStringSerialiser ser = new SimpleStringSerialiser();
+        ByteArrayOutputStream serialisedOS = new ByteArrayOutputStream();
+        ser.serialise(Stream.of("line1", "line2"), serialisedOS);
+
+        //create an input stream we can test for closure
+        InputStream serialisedSource = new FilterInputStream(new ByteArrayInputStream(serialisedOS.toByteArray())) {
+            @Override
+            public void close() throws IOException {
+                super.close();
+                closed.set(true);
+            }
+        };
+
+        //inject this into a data reader
+        reader = new TestDataReader(serialisedSource);
+        Map<DataFlavour, Serialiser<?>> serMap = new HashMap<>();
+        serMap.put(DataFlavour.of("type1", "format1"), ser);
+        reader.serialisers(serMap);
+        reader.cacheService(mockCache);
+
+        return reader.read(request);
     }
 }

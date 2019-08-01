@@ -126,22 +126,26 @@ public abstract class SerialisedDataReader implements DataReader {
                 }
 
                 //if nothing to do, then just copy the bytes across
-                if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
-                    LOGGER.debug("No rules to apply");
-                    IOUtils.copy(rawStream, output);
-                } else {
-                    LOGGER.debug("Applying rules: {}", rules);
-                    //create stream of filtered objects
-                    final Stream<Object> deserialisedData = Util.applyRulesToStream(
-                            serialiser.deserialise(rawStream),
-                            request.getUser(),
-                            request.getContext(),
-                            rules
-                    ).onClose(this::close);
-                    //write this stream to the output
-                    serialiser.serialise(deserialisedData, output);
+                try {
+                    if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
+                        LOGGER.debug("No rules to apply");
+                        IOUtils.copy(rawStream, output);
+                    } else {
+                        LOGGER.debug("Applying rules: {}", rules);
+                        //create stream of filtered objects
+                        final Stream<Object> deserialisedData = Util.applyRulesToStream(
+                                serialiser.deserialise(rawStream),
+                                request.getUser(),
+                                request.getContext(),
+                                rules
+                        );
+                        //write this stream to the output
+                        serialiser.serialise(deserialisedData, output);
+                    }
+                    return this;
+                } finally {
+                    this.close();
                 }
-                return this;
             }
 
             @Override
