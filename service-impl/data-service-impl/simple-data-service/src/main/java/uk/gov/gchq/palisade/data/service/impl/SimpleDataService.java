@@ -29,6 +29,7 @@ import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.reader.DataReader;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
+import uk.gov.gchq.palisade.data.service.request.NoInputReadResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.exception.NoConfigException;
@@ -165,7 +166,7 @@ public class SimpleDataService implements DataService {
             final DataReaderResponse readerResult = getReader().read(readerRequest);
             LOGGER.debug("Reader returned: {}", readerResult);
 
-            final ReadResponse response = ReadResponse.createNoInputResponse(readerResult);
+            final ReadResponse response = new NoInputReadResponse(readerResult);
             LOGGER.debug("Returning from read: {}", response);
             auditReadResponse(request);
             return response;

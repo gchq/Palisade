@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.data.service.reader.request.ResponseWriter;
+import uk.gov.gchq.palisade.data.service.request.NoInputReadResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class ReadResponseTest {
         DataReaderResponse testResponse = new DataReaderResponse().writer(writer);
 
         //When
-        ReadResponse resp = ReadResponse.createNoInputResponse(testResponse);
+        ReadResponse resp = new NoInputReadResponse(testResponse);
         resp.writeTo(NullOutputStream.NULL_OUTPUT_STREAM);
 
         //Then
@@ -62,7 +63,7 @@ public class ReadResponseTest {
         DataReaderResponse testResponse = new DataReaderResponse().writer(writer);
 
         //When
-        ReadResponse resp = ReadResponse.createNoInputResponse(testResponse);
+        ReadResponse resp = new NoInputReadResponse(testResponse);
         try {
             resp.writeTo(NullOutputStream.NULL_OUTPUT_STREAM);
         } catch (IOException expected) {

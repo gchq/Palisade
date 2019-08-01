@@ -16,8 +16,6 @@
 
 package uk.gov.gchq.palisade.data.service.reader.request;
 
-import uk.gov.gchq.palisade.data.service.reader.DataReader;
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -49,11 +47,4 @@ public interface ResponseWriter extends AutoCloseable {
      * @throws IOException if the data could not be written
      */
     ResponseWriter write(final OutputStream output) throws IOException;
-
-    /**
-     * Get the reader instance that created this response.
-     *
-     * @return the associated data reader
-     */
-    DataReader getReader();
 }

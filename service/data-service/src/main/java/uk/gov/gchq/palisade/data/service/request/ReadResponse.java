@@ -16,13 +16,10 @@
 
 package uk.gov.gchq.palisade.data.service.request;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
-import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
-import uk.gov.gchq.palisade.data.service.reader.request.ResponseWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,10 +59,9 @@ public abstract class ReadResponse {
      * once.
      *
      * @param output the stream to copy to the data to
-     * @return this object
      * @throws IOException if {@link ReadResponse#isUsed} returns {@code true}, or an underlying IO error occurs
      */
-    public abstract ReadResponse writeTo(final OutputStream output) throws IOException;
+    public abstract void writeTo(final OutputStream output) throws IOException;
 
     /**
      * Tests whether the data stream from this instance has already been retrieved, either as an {@link InputStream} or
@@ -101,61 +97,6 @@ public abstract class ReadResponse {
 
     public void setMessage(final String message) {
         message(message);
-    }
-
-    /**
-     * Creates a {@link ReadResponse} that returns the given {@link InputStream} when requested with {@link ReadResponse#asInputStream()}.
-     * The {@link ReadResponse#writeTo(OutputStream)} method is a convenience call that performs a copy to the given {@link OutputStream}.
-     *
-     * @param dataStream the input data source
-     * @return a client read response
-     */
-    public static ReadResponse createClientReadResponse(final InputStream dataStream) {
-        return new ReadResponse() {
-            @Override
-            public InputStream asInputStream() {
-                return dataStream;
-            }
-
-            @Override
-            public ReadResponse writeTo(final OutputStream output) throws IOException {
-                IOUtils.copy(asInputStream(), output);
-                return this;
-            }
-        };
-    }
-
-    /**
-     * Creates a {@link ReadResponse} that only supports writing the data to an {@link OutputStream}. Since a DataService
-     * shouldn't be providing an {@link InputStream} to a local JVM, then one method throws an exception. The other calls
-     * the data reader's write method to write to the given output stream.
-     *
-     * @param readerResponse the original data reader response
-     * @return a initialised read response
-     */
-    public static ReadResponse createNoInputResponse(final DataReaderResponse readerResponse) {
-        return new ReadResponse() {
-            @Override
-            public InputStream asInputStream() throws IOException {
-                throw new IOException("JVM local data-service cannot provide an InputStream. Please use writeTo()!");
-            }
-
-            @Override
-            public ReadResponse writeTo(final OutputStream output) throws IOException {
-                requireNonNull(output, "output");
-                //check this hasn't already been used
-                boolean used = setUsed();
-                if (used) {
-                    throw new IOException("writeTo can only be called once per instance");
-                }
-
-                //write all data to the given stream and ensure stream closed
-                try (ResponseWriter writer = readerResponse.getWriter()) {
-                    writer.write(output);
-                    return this;
-                }
-            }
-        };
     }
 
     @Override

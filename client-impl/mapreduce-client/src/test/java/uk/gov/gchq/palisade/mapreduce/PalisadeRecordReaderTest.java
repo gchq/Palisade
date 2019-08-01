@@ -27,6 +27,7 @@ import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
+import uk.gov.gchq.palisade.data.service.request.ClientReadResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.StubResource;
@@ -171,7 +172,7 @@ public class PalisadeRecordReaderTest {
         //create the simulated response
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         serialiser.serialise(dataToReturn.stream(),baos);
-        ReadResponse readResponse = ReadResponse.createClientReadResponse(new ByteArrayInputStream(baos.toByteArray()));
+        ReadResponse readResponse = new ClientReadResponse(new ByteArrayInputStream(baos.toByteArray()));
         //mock a data service to return it
         DataService mock = mock(DataService.class);
         if (shouldFail) {

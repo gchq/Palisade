@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.exception.NoCapacityException;
+import uk.gov.gchq.palisade.data.service.request.ClientReadResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.exception.RequestFailedException;
@@ -80,7 +81,7 @@ public class RestDataServiceV1IT {
         final byte[] data = "value1\nvalue2".getBytes();
         final InputStream dataStream = new ByteArrayInputStream(data);
 
-        final ReadResponse expectedResult = ReadResponse.createClientReadResponse(dataStream).message("some message");
+        final ReadResponse expectedResult = new ClientReadResponse(dataStream).message("some message");
         final CompletableFuture futureExpectedResult = CompletableFuture.completedFuture(expectedResult);
         given(dataService.read(request)).willReturn(futureExpectedResult);
 

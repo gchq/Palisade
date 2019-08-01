@@ -19,28 +19,20 @@ package uk.gov.gchq.palisade.data.service.reader;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 import uk.gov.gchq.palisade.data.service.reader.request.ResponseWriter;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.rule.Rules;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Stream;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -108,59 +100,7 @@ public abstract class SerialisedDataReader implements DataReader {
         //set up the raw input stream from the data source
         final InputStream rawStream = readRaw(request.getResource());
 
-        final Rules<Object> rules = request.getRules();
-
-        ResponseWriter serialisedWriter = new ResponseWriter() {
-
-            private AtomicBoolean written = new AtomicBoolean(false);
-
-            @Override
-            public ResponseWriter write(final OutputStream output) throws IOException {
-                requireNonNull(output, "output");
-
-                //atomically get the previous value and set it to true
-                boolean previousValue = written.getAndSet(true);
-
-                if (previousValue) {
-                    throw new IOException("response already written");
-                }
-
-                //if nothing to do, then just copy the bytes across
-                try {
-                    if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
-                        LOGGER.debug("No rules to apply");
-                        IOUtils.copy(rawStream, output);
-                    } else {
-                        LOGGER.debug("Applying rules: {}", rules);
-                        //create stream of filtered objects
-                        final Stream<Object> deserialisedData = Util.applyRulesToStream(
-                                serialiser.deserialise(rawStream),
-                                request.getUser(),
-                                request.getContext(),
-                                rules
-                        );
-                        //write this stream to the output
-                        serialiser.serialise(deserialisedData, output);
-                    }
-                    return this;
-                } finally {
-                    this.close();
-                }
-            }
-
-            @Override
-            public DataReader getReader() {
-                return SerialisedDataReader.this;
-            }
-
-            @Override
-            public void close() {
-                try {
-                    rawStream.close();
-                } catch (IOException ignored) {
-                }
-            }
-        };
+        ResponseWriter serialisedWriter = new SerialisingResponseWriter(rawStream, serialiser, request);
 
         //set reponse object to use the writer above
         return new DataReaderResponse().writer(serialisedWriter);

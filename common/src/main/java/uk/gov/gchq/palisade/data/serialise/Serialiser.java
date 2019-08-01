@@ -44,10 +44,9 @@ public interface Serialiser<I> extends Serializable {
      *
      * @param objects the stream of objects to be serialised
      * @param output  the output stream to write the serialised bytes to
-     * @return this object
      * @throws IOException if something fails while writing the object stream
      */
-    Serialiser<I> serialise(final Stream<I> objects, final OutputStream output) throws IOException;
+   void serialise(final Stream<I> objects, final OutputStream output) throws IOException;
 
     /**
      * Deserialise an {@link InputStream} into a {@link Stream} of objects.

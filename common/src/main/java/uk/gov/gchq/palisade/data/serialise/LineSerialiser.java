@@ -38,8 +38,8 @@ public abstract class LineSerialiser<T> implements Serialiser<T> {
     public abstract T deserialiseLine(final String line);
 
     @Override
-    public Serialiser<T> serialise(final Stream<T> objects, final OutputStream output) {
-        return serialise(objects.iterator(), output);
+    public void serialise(final Stream<T> objects, final OutputStream output) {
+        serialise(objects.iterator(), output);
     }
 
     public Serialiser<T> serialise(final Iterator<T> itr, final OutputStream output) {

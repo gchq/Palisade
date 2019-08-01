@@ -68,7 +68,7 @@ public class AvroSerialiser<O> implements Serialiser<O> {
     }
 
     @Override
-    public Serialiser<O> serialise(final Stream<O> objects, final OutputStream output) throws IOException {
+    public void serialise(final Stream<O> objects, final OutputStream output) throws IOException {
         requireNonNull(output, "output");
         if (nonNull(objects)) {
             //create a data file writer around the output stream
@@ -93,7 +93,6 @@ public class AvroSerialiser<O> implements Serialiser<O> {
                 }
             }
         }
-        return this;
     }
 
     public Class<O> getDomainClass() {
