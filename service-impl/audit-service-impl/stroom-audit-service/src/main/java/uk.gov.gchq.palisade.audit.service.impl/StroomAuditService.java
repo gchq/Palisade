@@ -175,11 +175,11 @@ public class StroomAuditService implements AuditService {
         return this;
     }
 
-    public void setSystemlassification(final String systemClassification) {
+    public void setSystemClassification(final String systemClassification) {
         systemClassification(systemClassification);
     }
 
-    public String getSystemlassification() {
+    public String getSystemClassification() {
         return SYSTEM.getClassification().getText();
     }
 
@@ -196,6 +196,7 @@ public class StroomAuditService implements AuditService {
         activity.setParent(parent);
         activity.setId(request.getId().getId());
         eventChain.setActivity(activity);
+        event.setEventChain(eventChain);
         // set the event source
         Event.EventSource eventSource = new Event.EventSource();
         eventSource.setSystem(SYSTEM);
@@ -232,6 +233,7 @@ public class StroomAuditService implements AuditService {
             Purpose purpose = new Purpose();
             purpose.setJustification(registerRequestReceivedAuditRequest.getContext().getPurpose());
             eventDetail.setPurpose(purpose);
+            event.setEventDetail(eventDetail);
             EVENT_LOGGING_SERVICE.log(event);
         });
         //handler for RegisterRequestCompleteAuditRequest
@@ -379,12 +381,9 @@ public class StroomAuditService implements AuditService {
             resource.setId(readResponseAuditRequest.getResource().getId());
             resource.setType(readResponseAuditRequest.getResource().getType());
             view.getObjects().add(resource);
-            // set the rules being applied
-            for (String rule : (Set<String>) readResponseAuditRequest.getRulesApplied().getRules().keySet()) {
-                Data data = new Data();
-                data.setName(rule);
-                view.getData().add(data);
-            }
+            Data data = new Data();
+            data.setName(readResponseAuditRequest.getRulesApplied().getMessage());
+            view.getData().add(data);
             viewEventDetail.setView(view);
             viewEvent.setEventDetail(viewEventDetail);
             EVENT_LOGGING_SERVICE.log(viewEvent);

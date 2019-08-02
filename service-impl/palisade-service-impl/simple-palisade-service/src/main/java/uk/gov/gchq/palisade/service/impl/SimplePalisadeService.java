@@ -265,7 +265,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         RegisterRequestCompleteAuditRequest registerRequestCompleteAuditRequest = new RegisterRequestCompleteAuditRequest()
                 .leafResources(multiPolicy.getPolicies().keySet())
                 .user(user);
-        registerRequestCompleteAuditRequest.setOriginalRequestId(request.getOriginalRequestId());
+        registerRequestCompleteAuditRequest.setOriginalRequestId(request.getId());
         LOGGER.debug("Auditing: {}", registerRequestCompleteAuditRequest);
         auditService.audit(registerRequestCompleteAuditRequest).join();
     }
@@ -275,7 +275,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 .context(request.getContext())
                 .userId(request.getUserId())
                 .resourceId(request.getResourceId());
-        requestReceivedAuditRequest.setOriginalRequestId(request.getOriginalRequestId());
+        requestReceivedAuditRequest.setOriginalRequestId(request.getId());
         auditService.audit(requestReceivedAuditRequest).join();
     }
 
@@ -283,7 +283,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         final RegisterRequestExceptionAuditRequest auditRequestWithException = new RegisterRequestExceptionAuditRequest()
                 .exception(ex)
                 .service(serviceClass);
-        auditRequestWithException.setOriginalRequestId(request.getOriginalRequestId());
+        auditRequestWithException.setOriginalRequestId(request.getId());
         LOGGER.debug("Error handling: " + ex.getMessage());
         auditService.audit(auditRequestWithException).join();
     }
