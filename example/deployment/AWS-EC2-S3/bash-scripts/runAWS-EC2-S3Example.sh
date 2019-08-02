@@ -12,13 +12,13 @@ fi
 
 # deploy the Palisade service on an ec2 instance
 cd ./example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade
-terraform apply  -var pem_file=$1
+terraform apply -input=false -auto-approve -var pem_file=$1
 
 # get the host name and security group from state
-terraform apply  -var pem_file=$1 > /var/tmp/terraformoutput
+terraform apply -var pem_file=$1 > /var/tmp/terraformoutput
 palisadehost=$(grep palisade_host_private_host_name /var/tmp/terraformoutput | cut -d " " -f3)
 securitygroup=$(grep sgname /var/tmp/terraformoutput | cut -d " " -f3)
 
 # now run the example on a different ec2 instance
 cd ../InstanceRunningExample
-echo yes | terraform apply  -var pem_file=$1 -var sg_name=palisade_allow_inbound -var palisade_host_private_host_name=${palisadehost}
+terraform apply -input=false -auto-approve -var pem_file=$1 -var sg_name=palisade_allow_inbound -var palisade_host_private_host_name=${palisadehost}

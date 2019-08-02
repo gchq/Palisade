@@ -62,7 +62,7 @@ To run this example follow these steps (from the root of the project):
 
 5. Run the Terraform to create the two EC2 instances, install and start up Palisade on the first instance, install the example on the second instance and run it.   
      ```bash
-       ./example/deployment/AWS-EC2-S3/bash-scripts/runAWS-EC2_S3Example.sh  /path/to/private/key.pem
+       ./example/deployment/AWS-EC2-S3/bash-scripts/runAWS-EC2-S3Example.sh  /path/to/private/key.pem
      ```
 
 After completion run terraform destroy to tear down the two EC2 instances:

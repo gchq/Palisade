@@ -16,14 +16,15 @@ resource "null_resource" "deploy_example" {
     user = "${var.ec2_userid}"
     private_key = "${file("${var.key_file}")}"
     agent = false
-    timeout = "30s"
+    timeout = "1h"
   }
 
   # install java
   provisioner "remote-exec" {
     inline = [
       "sudo yum update -y",
-      "sudo amazon-linux-extras install java-openjdk11 -y"
+      "sudo amazon-linux-extras install java-openjdk11 -y",
+      "sudo yum install dos2unix -y"
     ]
   }
 
@@ -45,6 +46,13 @@ resource "null_resource" "deploy_example" {
   provisioner "file" {
     source = "../../../bash-scripts/"
     destination = "/home/${var.ec2_userid}/example/deployment/bash-scripts"
+  }
+
+  # Used to convert all dos files to unix format 
+  provisioner "remote-exec" {
+    inline = [
+      "dos2unix /home/${var.ec2_userid}/example/deployment/bash-scripts/*.sh",
+    ]
   }
   provisioner "remote-exec" {
     inline = [
