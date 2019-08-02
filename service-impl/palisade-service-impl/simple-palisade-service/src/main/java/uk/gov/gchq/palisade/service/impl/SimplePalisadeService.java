@@ -234,38 +234,29 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         final DataRequestConfig config = new DataRequestConfig();
         config.setContext(request.getContext());
         config.setOriginalRequestId(originalRequestId);
-        return CompletableFuture.allOf(futureUser, futureResources)
-                .thenApply(t -> getPolicy(request, futureUser, futureResources, originalRequestId))
-                .thenApply(multiPolicy -> PalisadeService.ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
-                .thenAccept(multiPolicy -> {
-                    auditRegisterRequestComplete(request, futureUser.join(), multiPolicy);
-                    cache(request, futureUser.join(), requestId, multiPolicy, futureResources.join().size(), originalRequestId);
-                })
-                .thenApply(multiPolicy -> {
-                    final DataRequestResponse response = new DataRequestResponse().token(requestId.getId()).resources(futureResources.join());
 
         CompletableFuture<MultiPolicy> futureMultiPolicy = getPolicy(request, futureUser, futureResources, originalRequestId);
 
         return CompletableFuture.allOf(futureUser, futureResources, futureMultiPolicy)
-                .thenApply(t -> {
-                    //remove any resources from the map that the policy doesn't contain details for -> user should not even be told about
-                    //resources they don't have permission to see
-                    Map<LeafResource, ConnectionDetail> filteredResources = removeDisallowedResources(futureResources.join(), futureMultiPolicy.join());
+            .thenApply(t -> {
+                //remove any resources from the map that the policy doesn't contain details for -> user should not even be told about
+                //resources they don't have permission to see
+                Map<LeafResource, ConnectionDetail> filteredResources = removeDisallowedResources(futureResources.join(), futureMultiPolicy.join());
 
-                    PalisadeService.ensureRecordRulesAvailableFor(futureMultiPolicy.join(), filteredResources.keySet());
-                    auditProcessingStarted(request, futureUser.join(), futureMultiPolicy.join(), originalRequestId);
-                    cache(request, futureUser.join(), requestId, futureMultiPolicy.join(), filteredResources.size(), originalRequestId);
+                PalisadeService.ensureRecordRulesAvailableFor(futureMultiPolicy.join(), filteredResources.keySet());
+                auditRegisterRequestComplete(request, futureUser.join(), futureMultiPolicy.join());
+                cache(request, futureUser.join(), requestId, futureMultiPolicy.join(), filteredResources.size(), originalRequestId);
 
-                    final DataRequestResponse response = new DataRequestResponse().requestId(requestId).originalRequestId(originalRequestId).resources(filteredResources);
-                    response.setOriginalRequestId(originalRequestId);
-                    LOGGER.debug("Responding with: {}", response);
-                    return response;
-                })
-                .exceptionally(ex -> {
-                    LOGGER.error("Error handling: {}", ex.getMessage());
-                    auditRequestReceivedException(request, ex, PolicyService.class);
-                    throw new RuntimeException(ex); //rethrow the exception
-                });
+                final DataRequestResponse response = new DataRequestResponse().token(requestId.getId()).resources(filteredResources);
+                response.setOriginalRequestId(originalRequestId);
+                LOGGER.debug("Responding with: {}", response);
+                return response;
+            })
+            .exceptionally(ex -> {
+                LOGGER.error("Error handling: {}", ex.getMessage());
+                auditRequestReceivedException(request, ex, PolicyService.class);
+                throw new RuntimeException(ex); //rethrow the exception
+            });
     }
 
     /**
