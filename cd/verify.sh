@@ -17,7 +17,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Starting the local-docker-example containers"
     ./example/deployment/local-docker/bash-scripts/dockerComposeUp.sh
     # Sleep to allow containers to start
-    #sleep 120s
+    sleep 120s
     echo "Running the example application"
     OUTPUT=`./example/deployment/local-docker/bash-scripts/runLocalDockerExample.sh | tee /dev/tty`
     echo "Output is: $OUTPUT"
