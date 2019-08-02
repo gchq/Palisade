@@ -48,8 +48,12 @@ public final class ConfigUtils {
     public static String retrieveConfigurationPath() {
         String path = System.getenv(ConfigConsts.CONFIG_SERVICE_PATH);
         if (isNull(path)) {
-            LOGGER.error("Couldn't find path for file describing how to connect to the Palisade configuration service. You need to set an environment " +
-                    "variable named {} to the path, e.g. {}=/home/user/myConfig.json", ConfigConsts.CONFIG_SERVICE_PATH, ConfigConsts.CONFIG_SERVICE_PATH);
+            path = System.getProperty(ConfigConsts.CONFIG_SERVICE_PATH);
+        }
+        if (isNull(path)) {
+            LOGGER.error("Couldn't find path for file describing how to connect to the Palisade configuration service. You need to set an environment OR Java system property " +
+                            "variable named {} to the path, e.g. {}=/home/user/myConfig.json",
+                    ConfigConsts.CONFIG_SERVICE_PATH, ConfigConsts.CONFIG_SERVICE_PATH);
             throw new IllegalStateException(String.format("No configuration path due to environment variable %s not being set", ConfigConsts.CONFIG_SERVICE_PATH));
         }
         return path;
@@ -97,7 +101,10 @@ public final class ConfigUtils {
      * @throws NoConfigException if the configuration service could not find any configuration
      * @see Configurator#createFromConfig(Class, uk.gov.gchq.palisade.service.ServiceState, String...)
      */
-    public static <S extends Service> S createService(final Class<?> resolverClass, final String configDetailsPath, final Class<S> serviceClass, final String... overridable) throws NoConfigException {
+    public static <S extends Service> S createService(
+            final Class<?> resolverClass, final String configDetailsPath,
+            final Class<S> serviceClass, final String... overridable) throws
+            NoConfigException {
         ConfigurationService service = createConfigServiceFromPath(resolverClass, configDetailsPath);
         //get the config for this service, try repeatedly until we get a valid configuration
         return new Configurator(service).retrieveConfigAndCreate(serviceClass, ConfigConsts.CONFIG_TIMEOUT, overridable);
@@ -114,7 +121,8 @@ public final class ConfigUtils {
      * @see Class#getResourceAsStream(String)
      * @see StreamUtil#openStream(Class, String)
      */
-    public static ConfigurationService createConfigServiceFromPath(final Class<?> resolverClass, final String configDetailsPath) {
+    public static ConfigurationService createConfigServiceFromPath(
+            final Class<?> resolverClass, final String configDetailsPath) {
         //create config service object
         final InputStream stream = StreamUtil.openStream(resolverClass, configDetailsPath);
         return JSONSerialiser.deserialise(stream, ConfigurationService.class);
@@ -131,7 +139,9 @@ public final class ConfigUtils {
      * @return the service configuration for a class
      * @see Configurator#retrieveConfig(Optional)
      */
-    public static ServiceState retrieveConfig(final Class<?> resolverClass, final String configDetailsPath, final Class<? extends Service> serviceClass) {
+    public static ServiceState retrieveConfig(
+            final Class<?> resolverClass, final String configDetailsPath,
+            final Class<? extends Service> serviceClass) {
         //create config service object
         ConfigurationService service = createConfigServiceFromPath(resolverClass, configDetailsPath);
         //get the config for this service, try repeatedly until we get a valid configuration

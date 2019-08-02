@@ -203,6 +203,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
         final GetUserRequest userRequest = new GetUserRequest().userId(request.getUserId());
         userRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting user from userService: {}", userRequest);
+
         final CompletableFuture<User> futureUser = userService.getUser(userRequest)
                 .thenApply(user -> {
                     LOGGER.debug("Got user: {}", user);
@@ -213,6 +214,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     auditRequestReceivedException(request, ex, UserService.class);
                     throw new RuntimeException(ex); //rethrow the exception
                 });
+
         final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId());
         resourceRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting resources from resourceService: {}", resourceRequest);
@@ -226,7 +228,9 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     auditRequestReceivedException(request, ex, ResourceService.class);
                     throw new RuntimeException(ex); //rethrow the exception
                 });
+
         final RequestId requestId = new RequestId().id(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
+
         final DataRequestConfig config = new DataRequestConfig();
         config.setContext(request.getContext());
         config.setOriginalRequestId(originalRequestId);
@@ -239,6 +243,20 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 })
                 .thenApply(multiPolicy -> {
                     final DataRequestResponse response = new DataRequestResponse().token(requestId.getId()).resources(futureResources.join());
+
+        CompletableFuture<MultiPolicy> futureMultiPolicy = getPolicy(request, futureUser, futureResources, originalRequestId);
+
+        return CompletableFuture.allOf(futureUser, futureResources, futureMultiPolicy)
+                .thenApply(t -> {
+                    //remove any resources from the map that the policy doesn't contain details for -> user should not even be told about
+                    //resources they don't have permission to see
+                    Map<LeafResource, ConnectionDetail> filteredResources = removeDisallowedResources(futureResources.join(), futureMultiPolicy.join());
+
+                    PalisadeService.ensureRecordRulesAvailableFor(futureMultiPolicy.join(), filteredResources.keySet());
+                    auditProcessingStarted(request, futureUser.join(), futureMultiPolicy.join(), originalRequestId);
+                    cache(request, futureUser.join(), requestId, futureMultiPolicy.join(), filteredResources.size(), originalRequestId);
+
+                    final DataRequestResponse response = new DataRequestResponse().requestId(requestId).originalRequestId(originalRequestId).resources(filteredResources);
                     response.setOriginalRequestId(originalRequestId);
                     LOGGER.debug("Responding with: {}", response);
                     return response;
@@ -250,15 +268,35 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 });
     }
 
-    private MultiPolicy getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources, final RequestId originalRequestId) {
-        final GetPolicyRequest policyRequest = new GetPolicyRequest().user(futureUser.join()).context(request.getContext()).resources(new HashSet<>(futureResources.join().keySet()));
-        policyRequest.setOriginalRequestId(originalRequestId);
-        LOGGER.debug("Getting policy from policyService: {}", policyRequest);
-        return policyService.getPolicy(policyRequest)
-                .thenApply(policy -> {
+    /**
+     * Removes all resource mappings in the {@code resources} that do not have a defined policy in {@code policy}.
+     *
+     * @param resources the resources to modify
+     * @param policy    the policy for all resources
+     * @return the {@code resources} map after filtering
+     */
+    private Map<LeafResource, ConnectionDetail> removeDisallowedResources(final Map<LeafResource, ConnectionDetail> resources, final MultiPolicy policy) {
+        resources.keySet().retainAll(policy.getPolicies().keySet());
+        return resources;
+    }
+
+    private CompletableFuture<MultiPolicy> getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources, final RequestId originalRequestId) {
+        return CompletableFuture.allOf(futureUser, futureResources)
+                .thenApply(t -> {
+                    final GetPolicyRequest policyRequest = new GetPolicyRequest()
+                            .user(futureUser.join())
+                            .context(request.getContext())
+                            .resources(new HashSet<>(futureResources.join().keySet()));
+                    policyRequest.setOriginalRequestId(originalRequestId);
+                    return policyRequest;
+                })
+                .thenApply(req -> {
+                    LOGGER.debug("Getting policy from policyService: {}", req);
+                    return policyService.getPolicy(req).join();
+                }).thenApply(policy -> {
                     LOGGER.debug("Got policy: {}", policy);
                     return policy;
-                }).join();
+                });
     }
 
     private void auditRegisterRequestComplete(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy) {

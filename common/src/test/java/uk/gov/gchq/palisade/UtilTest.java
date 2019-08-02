@@ -11,15 +11,15 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static uk.gov.gchq.palisade.Util.applyRulesToRecord;
+import static uk.gov.gchq.palisade.Util.applyRulesToItem;
 
 public class UtilTest {
 
     @Test
     public void shouldReturnResourceIfNoRules() throws Exception {
         //when
-        final String actual1 = applyRulesToRecord("String", null, null, null);
-        final String actual2 = applyRulesToRecord("String", null, null, new Rules<>());
+        final String actual1 = applyRulesToItem("String", null, null, null);
+        final String actual2 = applyRulesToItem("String", null, null, new Rules<>());
         //then
         assertEquals("String", actual1);
         assertEquals("String", actual2);
@@ -30,7 +30,7 @@ public class UtilTest {
         //given
         final Rules<String> rules = new Rules<String>().rule("r1", (record, user, context) -> "fromRule");
         //when
-        final String actual1 = applyRulesToRecord("String", null, null, rules);
+        final String actual1 = applyRulesToItem("String", null, null, rules);
         assertEquals("fromRule", actual1);
     }
 
@@ -41,7 +41,7 @@ public class UtilTest {
                 .rule("r1", (record, user, context) -> "fromRule")
                 .rule("r2", (record, user, context) -> record.concat("2ndRule"));
         //when
-        final String actual1 = applyRulesToRecord("String", null, null, rules);
+        final String actual1 = applyRulesToItem("String", null, null, rules);
         //then
         assertEquals("fromRule" + "2ndRule", actual1);
     }

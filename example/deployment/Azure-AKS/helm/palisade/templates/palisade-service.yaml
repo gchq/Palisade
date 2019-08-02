@@ -1,0 +1,56 @@
+---
+# Source: palisade/templates/palisade-service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: palisade-service
+  name:  palisade-service
+spec:
+  selector:
+    app: palisade-service
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+---    
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+     app: palisade-service
+  name: palisade-service
+spec:
+  replicas: {{ .Values.palisadeservice.replicas }}
+  selector:
+    matchLabels:
+      app:  palisade-service
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: palisade-service
+    spec:
+      containers:
+      - name: palisade-service
+        image: "{{ .Values.palisadeservice.image.repository }}:{{ .Values.palisadeservice.image.tag }}"
+        imagePullPolicy: "{{ .Values.palisadeservice.image.pullPolicy }}"
+        ports:
+          - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /palisade/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /palisade/v1/status
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 60
+          timeoutSeconds: 10
+        resources:
+          {{- toYaml .Values.palisadeservice.resources | nindent 12 }}
+      restartPolicy: Always

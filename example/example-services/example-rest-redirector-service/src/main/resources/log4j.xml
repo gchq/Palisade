@@ -26,7 +26,7 @@
         </layout>
     </appender>
     <appender name="FILE_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="${catalina.home}/logs/debug.log" />
+        <param name="file" value="${java.io.tmpdir}/REST_Redirector_debug.log" />
         <param name="Threshold" value="DEBUG" />
         <param name="maxBackupIndex" value="5" />
         <param name="maxFileSize" value="1500MB" />

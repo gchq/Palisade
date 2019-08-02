@@ -60,9 +60,10 @@ If required, Palisade allows an organisation to use centralised services which e
 
 
 ### Prerequisites
-1. git
-1. maven
-1. to run any of the examples: docker
+1. [Git] (https://git-scm.com/)
+2. [Maven] (https://maven.apache.org/)
+3. To run any of the examples: [Docker](https://www.docker.com/)
+4. **Windows only** Microsoft Visual C++ 2010 SP1 Redistributable Package [x86](https://www.microsoft.com/en-gb/download/details.aspx?id=5555) or [x64](https://www.microsoft.com/en-gb/download/details.aspx?id=13523)
 
 ## Getting started
 
@@ -74,9 +75,9 @@ We have examples that demonstrate the automated policy rule enforcement when use
 These examples should provide a good start to understanding how Palisade works.
 
 1. A local JVM Rest based example
-1. A docker based example that will run on the local machine
-1. An AWS EMR based example (coming soon)
-1. An Azure HDInsight example (coming soon)
+2. A docker based example that will run on the local machine
+3. An AWS EMR based example (coming soon)
+4. An Azure HDInsight example (coming soon)
 
 For an overview of the example see [here](example/README.md)
 

@@ -1,0 +1,67 @@
+#following this example here: https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/docker?view=azure-devops
+#shows that it maybe necessary to run docker login. This script depends on the secret being stored as part of the pipeline as
+#a secret variable - this link shows how this can be achieved: https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
+jobs:
+  - job: Docker_build_config_service
+    displayName: config-service
+    steps:
+      - template: azure-pipelines.docker-template.yaml
+        parameters:
+          imageName: config-service
+          buildType: '$(parameters.buildType)'
+  - job: Docker_build_configure_services
+    displayName: configure-services
+    steps:
+      - template: azure-pipelines.docker-template.yaml
+        parameters:
+          imageName: configure-services
+          buildType: '$(parameters.buildType)'
+  - job: Docker_build_configure_example
+    displayName: configure-example
+    steps:
+      - template: azure-pipelines.docker-template.yaml
+        parameters:
+          imageName: configure-example
+          buildType: '$(parameters.buildType)'
+  - job: Docker_build_data_service
+    displayName: data-service
+    steps:
+      - template: azure-pipelines.docker-template.yaml
+        parameters:
+          imageName: data-service
+          buildType: '$(parameters.buildType)'
+  - job: Docker_build_etcd
+    displayName: etcd
+    steps:
+      - template: azure-pipelines.docker-template.yaml
+        parameters:
+          imageName: etcd
+          buildType: '$(parameters.buildType)'
+  - job: Docker_build_palisade_service
+    displayName: palisade-service
+    steps:
+      - template: azure-pipelines.docker-template.yaml
+        parameters:
+          imageName: palisade-service
+          buildType: '$(parameters.buildType)'
+  - job: Docker_build_policy_service
+    displayName: policy-service
+    steps:
+      - template: azure-pipelines.docker-template.yaml
+        parameters:
+          imageName: policy-service
+          buildType: '$(parameters.buildType)'
+  - job: Docker_build_resource_service
+    displayName: resource-service
+    steps:
+      - template: azure-pipelines.docker-template.yaml
+        parameters:
+          imageName: resource-service
+          buildType: '$(parameters.buildType)'
+  - job: Docker_build_user_service
+    displayName: user-service
+    steps:
+      - template: azure-pipelines.docker-template.yaml
+        parameters:
+          imageName: user-service
+          buildType: '$(parameters.buildType)'

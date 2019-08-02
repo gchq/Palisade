@@ -3,11 +3,11 @@
 This example demonstrates different users querying an avro file over a REST api running locally in JVMs.
 
 The example runs several different queries by the different users, with different purposes. When you run the example you will see the data has been redacted in line with the rules.  
-For an overview of the example see [here](../../README.md)
+For an overview of the example see [here](../../README.md).
 
 To run the example locally in JVMs follow these steps (from the root of the project):
 
- 1. Compile the code:
+1. Compile the code:
     ```bash
     mvn clean install -P example
     ```

@@ -33,6 +33,7 @@ import uk.gov.gchq.palisade.io.CloseActionInputStream;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.rule.Rules;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -147,6 +148,25 @@ public abstract class SerialisedDataReader implements DataReader {
         }
 
         return new DataReaderResponse().data(data);
+    }
+
+    public static class ClosingInputStream extends FilterInputStream {
+        private final Runnable closeAction;
+
+        public ClosingInputStream(final InputStream underlyingStream, final Runnable closeAction) {
+            super(underlyingStream);
+            requireNonNull(closeAction, "closeAction");
+            this.closeAction = closeAction;
+        }
+
+        @Override
+        public void close() throws IOException {
+            try {
+                super.close();
+            } finally {
+                closeAction.run();
+            }
+        }
     }
 
     /**

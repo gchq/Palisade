@@ -23,11 +23,8 @@ import uk.gov.gchq.palisade.rule.Rule;
 import uk.gov.gchq.palisade.rule.Rules;
 
 import java.net.URL;
+import java.security.CodeSource;
 import java.time.Duration;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -53,21 +50,6 @@ public final class Util {
     }
 
     /**
-     * Creates a new map from a collection of map entries. A new map instance is created.
-     *
-     * @param entries the entries to add to the new map
-     * @param <K>     the map key type
-     * @param <V>     the map value type
-     * @return a new map
-     */
-    public static <K, V> Map<K, V> newHashMap(final Collection<Entry<K, V>> entries) {
-        requireNonNull(entries);
-        final Map<K, V> map = new HashMap<>(entries.size());
-        entries.forEach(e -> map.put(e.getKey(), e.getValue()));
-        return map;
-    }
-
-    /**
      * Applies a collection of rules to a record stream.
      *
      * @param records record stream
@@ -83,31 +65,31 @@ public final class Util {
             return records;
         }
 
-        return records.map(record -> applyRulesToRecord(record, user, context, rules)).filter(record -> null != record);
+        return records.map(record -> applyRulesToItem(record, user, context, rules)).filter(record -> null != record);
     }
 
     /**
-     * Applies a collection of rules to a record.
+     * Applies a collection of rules to an item (record/resource).
      *
-     * @param record  record to filter
+     * @param item    resource or record to filter
      * @param user    user the record is being processed for
      * @param context the additional context
      * @param rules   rules collection
      * @param <T>     record type
-     * @return filtered record
+     * @return filtered item
      */
-    public static <T> T applyRulesToRecord(final T record, final User user, final Context context, final Rules<T> rules) {
+    public static <T> T applyRulesToItem(final T item, final User user, final Context context, final Rules<T> rules) {
         if (null == rules || rules.getRules().isEmpty()) {
-            return record;
+            return item;
         }
-        T updatedRecord = record;
-        for (final Rule<T> resourceRule : rules.getRules().values()) {
-            updatedRecord = resourceRule.apply(updatedRecord, user, context);
-            if (null == updatedRecord) {
+        T updateItem = item;
+        for (final Rule<T> rule : rules.getRules().values()) {
+            updateItem = rule.apply(updateItem, user, context);
+            if (null == updateItem) {
                 break;
             }
         }
-        return updatedRecord;
+        return updateItem;
     }
 
     /**
@@ -206,6 +188,31 @@ public final class Util {
         } catch (Exception e) {
             LOGGER.error("Call to failed to {} due to {}", address.toString(), e.getMessage());
             throw e;
+        }
+    }
+
+    /**
+     * Debug utility for finding which JAR file (if any) a class was loaded from. This is useful in debugging classpath
+     * conflicts.
+     *
+     * @param clazz the fully qualified class name to search for
+     * @return where the class was loaded from, or {@code null}
+     */
+    public static String locateJarFile(final String clazz) {
+        requireNonNull(clazz, "clazz");
+        try {
+            Class c = Class.forName(clazz);
+            CodeSource codeSource = c.getProtectionDomain().getCodeSource();
+
+            if (codeSource != null) {
+                LOGGER.info("{} was loaded from {}", clazz, codeSource.getLocation());
+
+            } else {
+                LOGGER.info("Can't determine where {} was loaded from", clazz);
+            }
+            return (codeSource != null) ? codeSource.getLocation().toString() : null;
+        } catch (Exception e) {
+            return e.getMessage();
         }
     }
 }

@@ -21,6 +21,7 @@ import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.request.SetTypePolicyRequest;
 import uk.gov.gchq.palisade.policy.service.response.CanAccessResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
+import uk.gov.gchq.palisade.resource.StubResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
@@ -30,14 +31,19 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -109,8 +115,10 @@ public class HierarchicalPolicyServiceTest {
     @Test
     public void getApplicableResourceLevelRules() {
         // try
-        Rules result = policyService.getApplicableRules(fileResource1, true, fileResource1.getType()).join();
+        Optional<Rules<Object>> optResult = policyService.getApplicableRules(fileResource1, true, fileResource1.getType()).join();
         // check
+        assertTrue(optResult.isPresent());
+        Rules<Object> result=optResult.get();
         assertEquals("Resource serialised format is txt, Input is not null", result.getMessage());
         assertEquals(2, result.getRules().keySet().size());
     }
@@ -118,10 +126,52 @@ public class HierarchicalPolicyServiceTest {
     @Test
     public void getApplicableRecordLevelRules() {
         // try
-        Rules result = policyService.getApplicableRules(fileResource1, false, fileResource1.getType()).join();
+        Optional<Rules<Object>> optResult = policyService.getApplicableRules(fileResource1, false, fileResource1.getType()).join();
         // check
+        assertTrue(optResult.isPresent());
+        Rules<Object> result=optResult.get();
         assertEquals("Does nothing, Check user has 'Sensitive' auth", result.getMessage());
         assertEquals(2, result.getRules().keySet().size());
+    }
+
+    @Test
+    public void shouldReturnEmptyResourceRulesOnNoPolicy() {
+        //Given
+        User user = new User().userId("testUser").auths("Sensitive");
+        Context context = new Context().purpose("testing");
+
+        //Set up a resource and parent with no policy attached
+        SystemResource noPolicyParent=new SystemResource().id("nowhere");
+        StubResource noPolicyStub = new StubResource();
+        noPolicyStub.type("test").id("something");
+        noPolicyStub.serialisedFormat("something");
+        noPolicyStub.parent(noPolicyParent);
+
+        //When
+        Optional<Rules<Object>> optResult=policyService.getApplicableRules(noPolicyStub,true,noPolicyStub.getType()).join();
+
+        //Then
+        assertFalse(optResult.isPresent());
+    }
+
+    @Test
+    public void shouldReturnEmptyRecordRulesOnNoPolicy() {
+        //Given
+        User user = new User().userId("testUser").auths("Sensitive");
+        Context context = new Context().purpose("testing");
+
+        //Set up a resource and parent with no policy attached
+        SystemResource noPolicyParent=new SystemResource().id("nowhere");
+        StubResource noPolicyStub = new StubResource();
+        noPolicyStub.type("test").id("something");
+        noPolicyStub.serialisedFormat("something");
+        noPolicyStub.parent(noPolicyParent);
+
+        //When
+        Optional<Rules<Object>> optResult=policyService.getApplicableRules(noPolicyStub,false,noPolicyStub.getType()).join();
+
+        //Then
+        assertFalse(optResult.isPresent());
     }
 
     @Test
@@ -144,6 +194,34 @@ public class HierarchicalPolicyServiceTest {
         assertEquals(1, resources.size());
         assertEquals(fileResource1, resources.iterator().next());
     }
+    //should filter out resources where no policy is defined
+
+    @Test
+    public void shouldRemoveResourcesWithNoPolicy() {
+        //Given
+        User user = new User().userId("testUser").auths("Sensitive");
+        Context context = new Context().purpose("testing");
+
+        //Set up a resource and parent with no policy attached
+        SystemResource noPolicyParent=new SystemResource().id("nowhere");
+        StubResource noPolicyStub = new StubResource();
+        noPolicyStub.type("test").id("something");
+        noPolicyStub.serialisedFormat("something");
+        noPolicyStub.parent(noPolicyParent);
+
+        //When
+        CompletableFuture<CanAccessResponse> future=policyService.canAccess(
+                new CanAccessRequest()
+                .user(user)
+                .context(context)
+                .resources(Collections.singletonList(noPolicyStub)));
+
+        CanAccessResponse response=future.join();
+
+        //Then
+        assertThat(response.getCanAccessResources(),is(equalTo(Collections.emptyList())));
+    }
+
 
     @Test
     public void getPolicy() throws InterruptedException, ExecutionException, TimeoutException {

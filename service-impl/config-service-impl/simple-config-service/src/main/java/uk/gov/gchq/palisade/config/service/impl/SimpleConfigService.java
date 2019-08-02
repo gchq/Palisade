@@ -197,7 +197,7 @@ public class SimpleConfigService implements ConfigurationService {
         if (genericResult.isPresent()) {
             return genericResult.get();
         } else {
-            throw new NoConfigException("no service configuration could be found for " + clazz);
+            throw new NoConfigException("no service configuration could be found for: " + clazz);
         }
     }
 }

@@ -365,10 +365,6 @@ public class HadoopFileResourceServiceTest {
 
         assertTrue(parent4 instanceof SystemResource);
         assertFalse(parent4 instanceof DirectoryResource);
-        final SystemResource sysRes = (SystemResource) parent4;
-        assertEquals(testFolder.getRoot().getAbsolutePath().replace("\\", "/"), sysRes.getId());
-
-
     }
 
     private void writeFile(final FileSystem fs, final String parentPath, final String name, final String format, final String type) throws IOException {

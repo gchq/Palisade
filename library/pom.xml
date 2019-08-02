@@ -27,5 +27,6 @@
 
     <modules>
         <!--<module>koryphe-library</module>-->
+        <module>shade-hadoop-client</module>
     </modules>
 </project>
