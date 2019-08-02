@@ -15,9 +15,9 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     export PALISADE_REST_CONFIG_PATH="$(pwd)/example/example-model/src/main/resources/configRest.json"
 
     echo "Starting the local-docker-example containers"
-    time ./example/deployment/local-docker/bash-scripts/dockerComposeUp.sh
+    ./example/deployment/local-docker/bash-scripts/dockerComposeUp.sh
     # Sleep to allow containers to start
-    sleep 120s
+    #sleep 120s
     echo "Running the example application"
     OUTPUT=`./example/deployment/local-docker/bash-scripts/runLocalDockerExample.sh | tee /dev/tty`
     echo "Output is: $OUTPUT"
