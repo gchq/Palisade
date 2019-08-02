@@ -16,7 +16,7 @@ resource "null_resource" "deploy_example" {
     user = "${var.ec2_userid}"
     private_key = "${file("${var.key_file}")}"
     agent = false
-    timeout = "1h"
+    timeout = "10m"
   }
 
   # install java

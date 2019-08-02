@@ -11,7 +11,7 @@ resource "null_resource" "deploy_palisade" {
     user        = "${var.ec2_userid}"
     private_key = "${file("${var.key_file}")}"
     agent       = false
-    timeout     = "1h"
+    timeout     = "10m"
   }
 
   # install and start docker, install java
@@ -106,7 +106,6 @@ resource "null_resource" "deploy_palisade" {
     inline = [
       # "sudo kill `ps -aef | grep example-rest-.*-service | grep -v grep | awk '{print $2}'` || echo Killed",
       "sudo ps -ef | grep example-rest-.*-service | grep -v grep | awk '{print $2}' | xargs -r kill -9 || echo Killed",
-
       "docker stop etcd-gcr-v3.3.12 || echo Killed",
     ]
   }
@@ -189,7 +188,7 @@ resource "null_resource" "deploy_palisade" {
   }
   provisioner "remote-exec" {
     inline = [
-       "nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startDataService.sh > /home/${var.ec2_userid}/example_logs/startDataService.log 2>&1 &"
+      "nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startDataService.sh > /home/${var.ec2_userid}/example_logs/startDataService.log 2>&1 &",
     ]
   }
   # Configure the Example - create some users and policies...
