@@ -70,6 +70,16 @@ public class StroomAuditService implements AuditService {
     private static final System SYSTEM = new System();
     private static final String EVENT_GENERATOR = "Palisade";
 
+    protected static final String REGISTER_REQUEST_RECEIVED_DESCRIPTION = "Audits the fact that a user has requested approval to access a data resource with a given purpose. All the details have been provided by the user and not yet validated.";
+    protected static final String REGISTER_REQUEST_COMPLETED_DESCRIPTION = "Audits the fact that this request for data has been approved and these are the resources they have been given course grain approval to query.";
+    protected static final String REGISTER_REQUEST_AUTHENTICATION_SUCCESS_DESCRIPTION = "Audits the fact that for this request for data the user has been successfully authenticated.";
+    protected static final String REGISTER_REQUEST_EXCEPTION_DESCRIPTION = "Audits the fact that the request failed and therefore this request will be denied, most likely because the resource they requested does not exist or there is a fault in the system configuration.";
+    protected static final String REGISTER_REQUEST_USER_EXCEPTION_DESCRIPTION = "Audits the fact that the user authentication failed and therefore this request will be denied.";
+    protected static final String READ_REQUEST_RECEIVED_DESCRIPTION = "Audits the fact that a user has requested access to a specific data resource.";
+    protected static final String READ_REQUEST_COMPLETED_DESCRIPTION = "Audits the fact that a user has finished reading a specific data resource.";
+    protected static final String READ_REQUEST_EXCEPTION_DESCRIPTION = "Audits the fact that an exception occurred while reading a specific data resource.";
+    protected static final String READ_RESPONSE_DESCRIPTION = "Audits the fact that the stream of data from a specific data resource has started to be returned to the client.";
+
     public StroomAuditService() {
     }
 
@@ -221,7 +231,7 @@ public class StroomAuditService implements AuditService {
             eventSource.setClient(DeviceUtil.createDevice(registerRequestReceivedAuditRequest.getServerHostname(), registerRequestReceivedAuditRequest.getServerIp()));
             // create View request event detail
             Event.EventDetail eventDetail = new Event.EventDetail();
-            eventDetail.setDescription("Audits the fact that a user has requested approval to access a data resource with a given purpose. All the details have been provided by the user and not yet validated.");
+            eventDetail.setDescription(REGISTER_REQUEST_RECEIVED_DESCRIPTION);
             ObjectOutcome view = new ObjectOutcome();
             // log the resource id being requested
             event.logging.Object resource = new event.logging.Object();
@@ -249,7 +259,7 @@ public class StroomAuditService implements AuditService {
             eventSource.setUser(user);
             // log authentication event
             Event.EventDetail authenticationEventDetail = new Event.EventDetail();
-            authenticationEventDetail.setDescription("Audits the fact that for this request for data the user has been successfully authenticated.");
+            authenticationEventDetail.setDescription(REGISTER_REQUEST_AUTHENTICATION_SUCCESS_DESCRIPTION);
             Event.EventDetail.Authenticate authenticate = new Event.EventDetail.Authenticate();
             authenticate.setUser(user);
             authenticate.setAction(AuthenticateAction.CONNECT);
@@ -264,7 +274,7 @@ public class StroomAuditService implements AuditService {
             // log the resources that the user is approved to access (authorisation)
             Event authorisationEvent = generateNewGenericEvent(registerRequestCompleteAuditRequest);
             Event.EventDetail authorisationEventDetail = new Event.EventDetail();
-            authenticationEventDetail.setDescription("Audits the fact that this request for data has been approved and these are the resources they have been given course grain approval to query.");
+            authorisationEventDetail.setDescription(REGISTER_REQUEST_COMPLETED_DESCRIPTION);
             // log the list of resources
             ObjectOutcome view = new ObjectOutcome();
             Outcome outcome;
@@ -281,6 +291,7 @@ public class StroomAuditService implements AuditService {
                 }
                 outcome = createOutcome(true);
             }
+            authorisationEventDetail.setView(view);
             Event.EventDetail.Authorise authorise = new Event.EventDetail.Authorise();
             authorise.setOutcome(outcome);
             authorise.setAction(Authorisation.REQUEST);
@@ -296,16 +307,21 @@ public class StroomAuditService implements AuditService {
             Event exceptionEvent = generateNewGenericEvent(registerRequestExceptionAuditRequest);
             Event.EventDetail exceptionEventDetail = new Event.EventDetail();
             if (registerRequestExceptionAuditRequest.getServiceClass().getSimpleName().equals("UserService")) {
-                exceptionEventDetail.setDescription("Audits the fact that the user authentication failed and therefore this request will be denied.");
+                exceptionEventDetail.setDescription(REGISTER_REQUEST_USER_EXCEPTION_DESCRIPTION);
                 Event.EventDetail.Authorise authorise = new Event.EventDetail.Authorise();
                 authorise.setOutcome(createOutcome(false));
                 exceptionEventDetail.setAuthorise(authorise);
             } else {
-                exceptionEventDetail.setDescription("Audits the fact that the request failed and therefore this request will be denied, most likely because the resource they requested does not exist or there is a fault in the system configuration.");
+                exceptionEventDetail.setDescription(REGISTER_REQUEST_EXCEPTION_DESCRIPTION);
                 ObjectOutcome viewOutcome = new ObjectOutcome();
                 viewOutcome.setOutcome(createOutcome(false));
                 exceptionEventDetail.setView(viewOutcome);
             }
+            Event.EventDetail.Process exceptionProcess = new Event.EventDetail.Process();
+            Outcome exceptionOutcome = new Outcome();
+            exceptionOutcome.setDescription(registerRequestExceptionAuditRequest.getException().getMessage());
+            exceptionProcess.setOutcome(exceptionOutcome);
+            exceptionEventDetail.setProcess(exceptionProcess);
             exceptionEvent.setEventDetail(exceptionEventDetail);
             EVENT_LOGGING_SERVICE.log(exceptionEvent);
         });
@@ -316,7 +332,7 @@ public class StroomAuditService implements AuditService {
             // view request to acknowledge that a request to view data has been received
             Event viewEvent = generateNewGenericEvent(readRequestReceivedAuditRequest);
             Event.EventDetail viewEventDetail = new Event.EventDetail();
-            viewEventDetail.setDescription("Audits the fact that a user has requested access to a specific data resource.");
+            viewEventDetail.setDescription(READ_REQUEST_RECEIVED_DESCRIPTION);
             ObjectOutcome view = new ObjectOutcome();
             LeafResource resource = readRequestReceivedAuditRequest.getResource();
             event.logging.Object stroomResource = new event.logging.Object();
@@ -334,7 +350,7 @@ public class StroomAuditService implements AuditService {
             // view request
             Event viewEvent = generateNewGenericEvent(readRequestCompleteAuditRequest);
             Event.EventDetail viewEventDetail = new Event.EventDetail();
-            viewEventDetail.setDescription("Audits the fact that a user has finished reading a specific data resource.");
+            viewEventDetail.setDescription(READ_REQUEST_COMPLETED_DESCRIPTION);
             Search search = new Search();
             search.setOutcome(createOutcome(true));
             // set the number of records returned
@@ -354,7 +370,7 @@ public class StroomAuditService implements AuditService {
             // view request
             Event viewEvent = generateNewGenericEvent(readRequestExceptionAuditRequest);
             Event.EventDetail viewEventDetail = new Event.EventDetail();
-            viewEventDetail.setDescription("Audits the fact that an exception occurred while reading a specific data resource.");
+            viewEventDetail.setDescription(READ_REQUEST_EXCEPTION_DESCRIPTION);
             Search search = new Search();
             search.setOutcome(createOutcome(false));
             // set the exception details
@@ -374,7 +390,7 @@ public class StroomAuditService implements AuditService {
             // view request
             Event viewEvent = generateNewGenericEvent(readResponseAuditRequest);
             Event.EventDetail viewEventDetail = new Event.EventDetail();
-            viewEventDetail.setDescription("Audits the fact that the stream of data from a specific data resource has started to be returned to the client.");
+            viewEventDetail.setDescription(READ_RESPONSE_DESCRIPTION);
             ObjectOutcome view = new ObjectOutcome();
             // set the resource that those records were read from
             event.logging.Object resource = new event.logging.Object();
