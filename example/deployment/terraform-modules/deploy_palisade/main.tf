@@ -186,10 +186,8 @@ resource "null_resource" "deploy_palisade" {
     source      = "../../../../example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
     destination = "/home/${var.ec2_userid}/example/example-services/example-rest-data-service/target/example-rest-data-service-0.2.1-SNAPSHOT-executable.jar"
   }
-  provisioner "remote-exec" {
-    inline = [
-      "nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startDataService.sh > /home/${var.ec2_userid}/example_logs/startDataService.log 2>&1 &",
-    ]
+  provisioner "local-exec" {
+      command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startDataService.sh > /home/${var.ec2_userid}/example_logs/startDataService.log 2>&1 &'"
   }
   # Configure the Example - create some users and policies...
   provisioner "remote-exec" {
