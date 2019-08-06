@@ -378,6 +378,7 @@ public class StroomAuditService implements AuditService {
             // set the resource that those records were read from
             Criteria.DataSources dataSources = new Criteria.DataSources();
             dataSources.getDataSource().add(readRequestExceptionAuditRequest.getResource().getId());
+            dataSources.getDataSource().add(readRequestExceptionAuditRequest.getToken());
             search.setDataSources(dataSources);
             viewEventDetail.setSearch(search);
             viewEvent.setEventDetail(viewEventDetail);

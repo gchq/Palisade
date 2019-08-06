@@ -8,16 +8,22 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.internal.util.collections.Sets;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ReadRequestExceptionAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ReadResponseAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.user.service.UserService;
 
 import java.io.ByteArrayOutputStream;
@@ -46,10 +52,6 @@ public class StroomAuditServiceTest {
     @Test
     public void auditRegisterRequestReceived() {
         // Given
-        //this test needs to be rewritten to use slf4j - and interept the loggerFactory for event-logger
-        //top level pom.xml includes log4j - log4j is deprecated by slf4j.
-        //The spring boot changes will convert all calls to log4j into slf4j
-
         final String resourceId = "a pointer to a data resource";
         final String userId = "an identifier for the user";
         final String purpose = "the purpose for the data access request";
@@ -74,6 +76,7 @@ public class StroomAuditServiceTest {
 
         //Then
         final String log = outContent.toString();
+        System.err.println(log);
         verify(mockUserId, Mockito.atLeastOnce()).getId();
         verify(mockContext, Mockito.atLeastOnce()).getPurpose();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
@@ -87,10 +90,6 @@ public class StroomAuditServiceTest {
     @Test
     public void auditRegisterRequestCompleted() {
         // Given
-        //this test needs to be rewritten to use slf4j - and interept the loggerFactory for event-logger
-        //top level pom.xml includes log4j - log4j is deprecated by slf4j.
-        //The spring boot changes will convert all calls to log4j into slf4j
-
         final String resourceId = "a pointer to a data resource";
         final String userId = "an identifier for the user";
         final String exceptionOriginalRequestId = "originalRequestId linking all logs from the same data access request together";
@@ -116,6 +115,7 @@ public class StroomAuditServiceTest {
 
         //Then
         final String log = outContent.toString();
+        System.err.println(log);
         verify(mockUserId, Mockito.atLeastOnce()).getId();
         verify(mockUser, Mockito.atLeastOnce()).getUserId();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
@@ -130,10 +130,6 @@ public class StroomAuditServiceTest {
     @Test
     public void auditRegisterRequestExceptionFromPolicyService() {
         // Given
-        //this test needs to be rewritten to use slf4j - and interept the loggerFactory for event-logger
-        //top level pom.xml includes log4j - log4j is deprecated by slf4j.
-        //The spring boot changes will convert all calls to log4j into slf4j
-
         final String exceptionMessage = "exception message";
         final String exceptionOriginalRequestId = "originalRequestId linking all logs from the same data access request together";
 
@@ -153,6 +149,7 @@ public class StroomAuditServiceTest {
 
         //Then
         final String log = outContent.toString();
+        System.err.println(log);
         verify(mockException, Mockito.atLeastOnce()).getMessage();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
         Assert.assertTrue(log.contains(exceptionMessage));
@@ -163,10 +160,6 @@ public class StroomAuditServiceTest {
     @Test
     public void auditRegisterRequestExceptionFromUserService() {
         // Given
-        //this test needs to be rewritten to use slf4j - and interept the loggerFactory for event-logger
-        //top level pom.xml includes log4j - log4j is deprecated by slf4j.
-        //The spring boot changes will convert all calls to log4j into slf4j
-
         final String exceptionMessage = "exception message";
         final String exceptionOriginalRequestId = "originalRequestId linking all logs from the same data access request together";
 
@@ -186,10 +179,150 @@ public class StroomAuditServiceTest {
 
         //Then
         final String log = outContent.toString();
+        System.err.println(log);
         verify(mockException, Mockito.atLeastOnce()).getMessage();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
         Assert.assertTrue(log.contains(exceptionMessage));
         Assert.assertTrue(log.contains(exceptionOriginalRequestId));
         Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_USER_EXCEPTION_DESCRIPTION));
+    }
+
+    @Test
+    public void auditReadRequestReceived() {
+        // Given
+        final String resourceType = "Resource type, e.g. Employee";
+        final String resourceId = "resource id";
+        final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
+
+        final ReadRequestReceivedAuditRequest auditReadRequestReceived = new ReadRequestReceivedAuditRequest();
+        FileResource mockResource = Mockito.mock(FileResource.class);
+        Mockito.doReturn(resourceType).when(mockResource).getType();
+        Mockito.doReturn(resourceId).when(mockResource).getId();
+        RequestId mockRequestId = Mockito.mock(RequestId.class);
+        Mockito.doReturn(originalRequestId).when(mockRequestId).getId();
+        auditReadRequestReceived
+                .resource(mockResource)
+                .originalRequestId(mockRequestId);
+
+        // When
+        StroomAuditService stroomAuditService = new StroomAuditService();
+        stroomAuditService.audit(auditReadRequestReceived);
+
+        //Then
+        final String log = outContent.toString();
+        System.err.println(log);
+        verify(mockResource, Mockito.atLeastOnce()).getType();
+        verify(mockResource, Mockito.atLeastOnce()).getId();
+        verify(mockRequestId, Mockito.atLeastOnce()).getId();
+        Assert.assertTrue(log.contains(resourceId));
+        Assert.assertTrue(log.contains(resourceType));
+        Assert.assertTrue(log.contains(originalRequestId));
+        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_RECEIVED_DESCRIPTION));
+    }
+
+    @Test
+    public void auditReadRequestComplete() {
+        // Given
+        final String resourceId = "resource id";
+        final long numberOfRecordsProcessed = Long.MAX_VALUE;
+        final long numberOfRecordsReturned = Long.MIN_VALUE;
+        final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
+
+        final ReadRequestCompleteAuditRequest auditReadRequestComplete = new ReadRequestCompleteAuditRequest();
+        FileResource mockResource = Mockito.mock(FileResource.class);
+        Mockito.doReturn(resourceId).when(mockResource).getId();
+        RequestId mockRequestId = Mockito.mock(RequestId.class);
+        Mockito.doReturn(originalRequestId).when(mockRequestId).getId();
+        auditReadRequestComplete
+                .resource(mockResource)
+                .numberOfRecordsProcessed(numberOfRecordsProcessed)
+                .numberOfRecordsReturned(numberOfRecordsReturned)
+                .originalRequestId(mockRequestId);
+
+        // When
+        StroomAuditService stroomAuditService = new StroomAuditService();
+        stroomAuditService.audit(auditReadRequestComplete);
+
+        //Then
+        final String log = outContent.toString();
+        System.err.println(log);
+        verify(mockResource, Mockito.atLeastOnce()).getId();
+        verify(mockRequestId, Mockito.atLeastOnce()).getId();
+        Assert.assertTrue(log.contains(resourceId));
+        // Stroom doesn't currently have the functionalility to state the number of records processed
+//        Assert.assertTrue(log.contains(String.valueOf(numberOfRecordsProcessed)));
+        Assert.assertTrue(log.contains(String.valueOf(numberOfRecordsReturned)));
+        Assert.assertTrue(log.contains(originalRequestId));
+        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_COMPLETED_DESCRIPTION));
+    }
+
+    @Test
+    public void auditReadRequestException() {
+        // Given
+        final String resourceId = "resource id";
+        final String token = "token in the form of a UUID";
+        final String exceptionErrorMessage = "The error message from the exception thrown";
+        final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
+
+        final ReadRequestExceptionAuditRequest auditReadRequestException = new ReadRequestExceptionAuditRequest();
+        FileResource mockResource = Mockito.mock(FileResource.class);
+        Mockito.doReturn(resourceId).when(mockResource).getId();
+        RequestId mockRequestId = Mockito.mock(RequestId.class);
+        Mockito.doReturn(originalRequestId).when(mockRequestId).getId();
+        auditReadRequestException
+                .resource(mockResource)
+                .token(token)
+                .exception(new Throwable(exceptionErrorMessage))
+                .originalRequestId(mockRequestId);
+
+        // When
+        StroomAuditService stroomAuditService = new StroomAuditService();
+        stroomAuditService.audit(auditReadRequestException);
+
+        //Then
+        final String log = outContent.toString();
+        System.err.println(log);
+        verify(mockResource, Mockito.atLeastOnce()).getId();
+        verify(mockRequestId, Mockito.atLeastOnce()).getId();
+        Assert.assertTrue(log.contains(resourceId));
+        Assert.assertTrue(log.contains(originalRequestId));
+        Assert.assertTrue(log.contains(token));
+        Assert.assertTrue(log.contains(exceptionErrorMessage));
+        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_EXCEPTION_DESCRIPTION));
+    }
+
+    @Test
+    public void auditReadResponse() {
+        // Given
+        final String resourceId = "resource id";
+        final String rulesAppliedMessage = "human readable description of the rules/policies been applied to the data";
+        final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
+
+        final ReadResponseAuditRequest auditReadResponse = new ReadResponseAuditRequest();
+        FileResource mockResource = Mockito.mock(FileResource.class);
+        Mockito.doReturn(resourceId).when(mockResource).getId();
+        RequestId mockRequestId = Mockito.mock(RequestId.class);
+        Mockito.doReturn(originalRequestId).when(mockRequestId).getId();
+        Rules mockRules = Mockito.mock(Rules.class);
+        Mockito.doReturn(rulesAppliedMessage).when(mockRules).getMessage();
+        auditReadResponse
+                .resource(mockResource)
+                .rulesApplied(mockRules)
+                .originalRequestId(mockRequestId);
+
+        // When
+        StroomAuditService stroomAuditService = new StroomAuditService();
+        stroomAuditService.audit(auditReadResponse);
+
+        //Then
+        final String log = outContent.toString();
+        System.err.println(log);
+        verify(mockResource, Mockito.atLeastOnce()).getId();
+        verify(mockRequestId, Mockito.atLeastOnce()).getId();
+        verify(mockRules, Mockito.atLeastOnce()).getMessage();
+        Assert.assertTrue(log.contains(resourceId));
+        Assert.assertTrue(log.contains(originalRequestId));
+        Assert.assertTrue(log.contains(rulesAppliedMessage));
+        Assert.assertTrue(log.contains(StroomAuditService.READ_RESPONSE_DESCRIPTION));
     }
 }
