@@ -22,3 +22,6 @@ This library module contains Palisade libraries such as useful plugins and compo
 
 For further details see the READMEs within each library module.
 
+- [Korphye library](./koryphe-library/README.md)
+- [Shade Hadoop Client](./shade-hadoop-client/README.md)
+

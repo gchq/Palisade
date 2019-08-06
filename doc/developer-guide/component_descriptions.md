@@ -1,12 +1,16 @@
 ## Description of each component
-1. [Client code](#client-code)
-2. [Palisade Service](#palisade-service)
-3. [Data Service](#data-service)
-4. [Audit Service](#audit-service)
-5. [User Service](#user-service)
-6. [Policy Service](#policy-service)
-7. [Resource Service](#resource-service)
-8. [Cache Service](#cache-service)
+1. [Client](#client-code)
+1. [Palisade Service](#palisade-service)
+1. [Data Service](#data-service)
+1. [Audit Service](#audit-service)
+1. [User Service](#user-service)
+1. [Policy Service](#policy-service)
+1. [Resource Service](#resource-service)
+1. [Cache Service](#cache-service)
+1. [Config Service](#config-service)
+
+
+![picture](../img/Palisade_high_level_architecture.jpg)
 
 ### Client code
 The job of the client code is to send the request for data into Palisade and to interpret the result as required for the data processing technology it is written for.

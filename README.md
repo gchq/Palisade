@@ -18,7 +18,7 @@ limitations under the License.
 
 # <img src="logos/logo.svg" width="180">
 
-#### Scalable Data Policy Management and Enforcement
+# Scalable Data Policy Management and Enforcement
 
 ## Status
 <span style="color:red">
@@ -60,30 +60,30 @@ If required, Palisade allows an organisation to use centralised services which e
 
 
 ### Prerequisites
-1. [Git] (https://git-scm.com/)
-2. [Maven] (https://maven.apache.org/)
-3. To run any of the examples: [Docker](https://www.docker.com/)
-4. **Windows only** Microsoft Visual C++ 2010 SP1 Redistributable Package [x86](https://www.microsoft.com/en-gb/download/details.aspx?id=5555) or [x64](https://www.microsoft.com/en-gb/download/details.aspx?id=13523)
+1. [Git](https://git-scm.com/)
+2. [Maven](https://maven.apache.org/)
+3. To run any of the examples: [Docker](https://www.docker.com/) and [Kubernetes](https://kubernetes.io)
+4. If you are running on Windows then you will need this: Microsoft Visual C++ 2010 SP1 Redistributable Package [x86](https://www.microsoft.com/en-gb/download/details.aspx?id=5555) or [x64](https://www.microsoft.com/en-gb/download/details.aspx?id=13523)
 
 ## Getting started
 
 To get started, clone the Palisade repo: 
 
-`git clone https://github.com/gchq/Palisade.git`
-
+```bash
+git clone https://github.com/gchq/Palisade.git
+```
 We have examples that demonstrate the automated policy rule enforcement when users read some data.
 These examples should provide a good start to understanding how Palisade works.
 
-1. A local JVM Rest based example
-2. A docker based example that will run on the local machine
-3. An AWS EMR based example (coming soon)
-4. An Azure HDInsight example (coming soon)
+For an overview of the example see [here](example/README.md).
 
-For an overview of the example see [here](example/README.md)
+1. A local JVM Rest based example. To run the local JVM REST based example follow this guide: [Local JVM](example/deployment/local-jvm/README.md).
+2. A docker based example that will run on the local machine. To run the local docker REST based example follow this guide: [Local Docker](example/deployment/local-docker/README.md).
+3. An AWS EMR based example. To run the AWS EMR example follow this guide: [AWS EMR](example/deployment/AWS-EMR/README.md).
+4. An Azure AKS based example. To run the Azure AKS example follow this guide:  [Azure AKS](example/deployment/Azure-AKS/README.md).
 
-To run the local JVM REST based example follow this guide: [Local JVM](example/deployment/local-jvm/README.md)
 
-To run the local docker REST based example follow this guide: [Local Docker](example/deployment/local-docker/README.md)
+
 
 For more details about the code structure see the [Developer Guide](doc/developer-guide/developer_guide.md)
 
@@ -101,5 +101,11 @@ We welcome contributions to the project. Detailed information on our ways of wor
 
 ## FAQ
 
-* What versions of Java are supported? Java 8 with plans to upgrade to Java 11+ soon.
+What versions of Java are supported? Java 8 with plans to upgrade to Java 11+ soon.
 
+```bash
+java -version
+openjdk version "1.8.0_212"
+OpenJDK Runtime Environment (AdoptOpenJDK)(build 1.8.0_212-b03)
+OpenJDK 64-Bit Server VM (AdoptOpenJDK)(build 25.212-b03, mixed mode)
+```

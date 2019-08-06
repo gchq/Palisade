@@ -1,4 +1,4 @@
-# Docker Example
+# Local Docker Example
 
 This example demonstrates different users querying an avro file over a REST api running locally in docker containers.
 
