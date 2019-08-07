@@ -14,30 +14,40 @@
  * limitations under the License.
  */
 
-package uk.gov.gchq.palisade.io;
+package uk.gov.gchq.palisade.data.service.impl;
 
-import java.io.ByteArrayOutputStream;
+import uk.gov.gchq.palisade.data.serialise.LineSerialiser;
 
-/**
- * A {@code BytesOutputStream} extends {@link ByteArrayOutputStream} and
- * exposes the buffered bytes and count fields.
- */
-public class BytesOutputStream extends ByteArrayOutputStream implements Bytes {
+public final class StubSerialiser extends LineSerialiser {
+
     @Override
-    public byte[] getBytes() {
-        return buf;
+    public String serialiseLine(Object obj) {
+        return null;
     }
 
     @Override
-    public int getCount() {
-        return count;
+    public Object deserialiseLine(String line) {
+        return null;
     }
 
     /**
-     * Resets the byte buffer to a new byte array.
+     * All are equal.
+     *
+     * @return
      */
-    public void reset() {
-        buf = new byte[2048]; //improve performance by having a larger serialised buffer
-        count = 0;
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+
+    /**
+     * All instances are equal.
+     *
+     * @param obj
+     * @return
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return true;
     }
 }
