@@ -10,8 +10,8 @@ multi_jvm_cat_client_result=0
 
 if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     echo "Building Palisade code: mvn install -q -B -V -P error-prone"
-    time mvn install -q -B -V -P error-prone
-    time ./example/deployment/local-jvm/bash-scripts/buildServices.sh
+    mvn install -q -B -V -P error-prone
+    ./example/deployment/local-jvm/bash-scripts/buildServices.sh
     export PALISADE_REST_CONFIG_PATH="$(pwd)/example/example-model/src/main/resources/configRest.json"
 
     echo "Starting the local-docker-example containers"
@@ -25,7 +25,6 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     container_result=$?
     echo "Stopping the local-docker-example containers"
     ./example/deployment/local-docker/bash-scripts/dockerComposeDown.sh
-    #echo "y" | ./example/deployment/local-docker/bash-scripts/dockerCleanSystem.sh
 
     echo "Starting the local-jvm-example"
     ./example/deployment/local-jvm/bash-scripts/startAllServices.sh
