@@ -29,6 +29,7 @@ import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -71,7 +72,13 @@ public class SimpleClient<T> {
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
-                    dataResponse -> getSerialiser().deserialise(dataResponse.getData())
+                    dataResponse -> {
+                        try {
+                            return getSerialiser().deserialise(dataResponse.asInputStream());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
             );
             futureResults.add(futureResult);
         }

@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
+import org.apache.commons.io.input.NullInputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -24,18 +25,15 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
-import uk.gov.gchq.palisade.data.serialise.LineSerialiser;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.reader.CachedSerialisedDataReader;
 import uk.gov.gchq.palisade.data.service.reader.DataFlavour;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
-import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.rule.Rules;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -49,40 +47,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class CachedSerialisedDataReaderTest {
-
-    public static final class StubSerialiser extends LineSerialiser {
-
-        @Override
-        public String serialiseLine(Object obj) {
-            return null;
-        }
-
-        @Override
-        public Object deserialiseLine(String line) {
-            return null;
-        }
-
-        /**
-         * All are equal.
-         *
-         * @return
-         */
-        @Override
-        public int hashCode() {
-            return 0;
-        }
-
-        /**
-         * All instances are equal
-         *
-         * @param obj
-         * @return
-         */
-        @Override
-        public boolean equals(Object obj) {
-            return true;
-        }
-    }
 
     private static CacheService mockCache;
 
@@ -140,18 +104,10 @@ public class CachedSerialisedDataReaderTest {
         assertThat(captured.getValue().getInstance(), equalTo(expectedMap));
     }
 
-    public static final class TestDataReader extends CachedSerialisedDataReader {
-
-        @Override
-        protected InputStream readRaw(LeafResource resource) {
-            return null;
-        }
-    }
-
     @Test
     public void shouldBeAbleToRetrieveSerialiser() {
         //Given
-        TestDataReader reader = (TestDataReader) new TestDataReader()
+        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10))
                 .cacheService(mockCache);
 
         //When
@@ -165,7 +121,7 @@ public class CachedSerialisedDataReaderTest {
     @Test
     public void shouldReturnDefaultSerialiserOnNoRead() {
         //Given
-        TestDataReader reader = (TestDataReader) new TestDataReader()
+        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10))
                 .cacheService(mockCache);
         //set default serialiser
         Serialiser<?> defSerialiser = new SimpleStringSerialiser();
@@ -182,7 +138,7 @@ public class CachedSerialisedDataReaderTest {
     @Test
     public void shouldReturnSerialiserFromCache() {
         //Given
-        TestDataReader reader = (TestDataReader) new TestDataReader()
+        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10))
                 .cacheService(mockCache);
         //set default serialiser
         Serialiser<?> defSerialiser = new SimpleStringSerialiser();
@@ -194,7 +150,6 @@ public class CachedSerialisedDataReaderTest {
         } catch (NullPointerException ignored) {
             //this will throw a null pointer because the input stream is null in the readRaw method above
         }
-
 
         Serialiser<?> actual = reader.getSerialiser(DataFlavour.of("type1", "format1"));
 

@@ -21,21 +21,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileStream;
 import org.apache.avro.file.DataFileWriter;
-import org.apache.avro.io.DatumWriter;
 import org.apache.avro.reflect.ReflectData;
 import org.apache.avro.reflect.ReflectDatumReader;
 import org.apache.avro.reflect.ReflectDatumWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.io.Bytes;
-import uk.gov.gchq.palisade.io.BytesOutputStream;
-import uk.gov.gchq.palisade.io.BytesSuppliedInputStream;
-
-import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -64,83 +59,43 @@ public class AvroSerialiser<O> implements Serialiser<O> {
     }
 
     @Override
-    public InputStream serialise(final Stream<O> stream) {
-        return new BytesSuppliedInputStream(new AvroSupplier<>(stream, datumWriter, schema));
+    public Stream<O> deserialise(final InputStream input) throws IOException {
+        DataFileStream<O> in;
+        in = new DataFileStream<>(input, new ReflectDatumReader<>(schema));
+        //Don't use try-with-resources here! This input stream needs to stay open until it is closed manually by the
+        //stream it is feeding below
+        return StreamSupport.stream(in.spliterator(), false);
     }
 
     @Override
-    public Stream<O> deserialise(final InputStream input) {
-        DataFileStream<O> in;
-        try {
-            in = new DataFileStream<>(input, new ReflectDatumReader<>(schema));
-            //Don't use try-with-resources here! This input stream needs to stay open until it is closed manually by the
-            //stream it is feeding below
-            return StreamSupport.stream(in.spliterator(), false);
-        } catch (final Exception e) {
-            LOGGER.debug("Closing streams");
-            throw new RuntimeException("Unable to deserialise object, failed to read input bytes", e);
+    public void serialise(final Stream<O> objects, final OutputStream output) throws IOException {
+        requireNonNull(output, "output");
+        if (nonNull(objects)) {
+            //create a data file writer around the output stream
+            //since we didn't create the output stream, we shouldn't close it either, someone else might want it afterwards!
+            final DataFileWriter<O> dataFileWriter = new DataFileWriter<>(datumWriter);
+            LOGGER.debug("Creating data file writer");
+            try {
+                dataFileWriter.create(schema, output);
+                //iterate and append items -- we can't use forEach on the stream as the lambda can't throw an IOException
+                Iterator<O> objectIt = objects.iterator();
+
+                while (objectIt.hasNext()) {
+                    O next = objectIt.next();
+                    dataFileWriter.append(next);
+                }
+
+            } finally {
+                try {
+                    dataFileWriter.flush();
+                } catch (IOException e) {
+                    LOGGER.warn("Unable to flush Avro DataFileWriter", e);
+                }
+            }
         }
     }
 
     public Class<O> getDomainClass() {
         return domainClass;
-    }
-
-    private static class AvroSupplier<O> implements Supplier<Bytes> {
-        private final Schema schema;
-        private final DataFileWriter<O> dataFileWriter;
-        private final BytesOutputStream outputStream;
-        private final Iterator<O> items;
-
-        private boolean isCreated;
-
-        AvroSupplier(final Stream<O> stream, final DatumWriter<O> datumWriter, final Schema schema) {
-            outputStream = new BytesOutputStream();
-            dataFileWriter = new DataFileWriter<>(datumWriter);
-            items = stream.iterator();
-            this.schema = schema;
-        }
-
-        @Override
-        public Bytes get() {
-            outputStream.reset();
-            if (!isCreated) {
-                LOGGER.debug("Creating data file writer");
-                try {
-                    dataFileWriter.create(schema, outputStream);
-                } catch (final Exception e) {
-                    return onError(dataFileWriter, "Unable to create data file writer", e);
-                }
-                isCreated = true;
-            }
-            while (items.hasNext() && outputStream.getCount() == 0) {
-                final O next = items.next();
-                try {
-                    dataFileWriter.append(next);
-                } catch (final Exception e) {
-                    return onError(dataFileWriter, "Unable to serialise item", e);
-                }
-            }
-            if (!items.hasNext()) {
-                try {
-                    dataFileWriter.flush();
-                } catch (final Exception e) {
-                    return onError(dataFileWriter, "Unable to serialise flush after reading input stream", e);
-                }
-            }
-            return outputStream;
-        }
-
-        private <T> T onError(final Closeable closeable, final String errorMsg, final Exception e) {
-            LOGGER.debug("Closing streams");
-            if (nonNull(closeable)) {
-                try {
-                    closeable.close();
-                } catch (Exception ignored) {
-
-                }
-            }
-            throw new RuntimeException(errorMsg, e);
-        }
     }
 }

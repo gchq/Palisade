@@ -19,6 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -47,11 +48,13 @@ public class SimpleStringSerialiserTest {
         // Given
         final SimpleStringSerialiser serialiser = new SimpleStringSerialiser();
         final Stream<String> input = Stream.of("line1", "line2");
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         // When
-        final InputStream result = serialiser.serialise(input);
+        serialiser.serialise(input, bos);
+        InputStream inputBytes = new ByteArrayInputStream(bos.toByteArray());
 
         // Then
-        assertEquals(Arrays.asList("line1", "line2"), IOUtils.readLines(result, StandardCharsets.UTF_8));
+        assertEquals(Arrays.asList("line1", "line2"), IOUtils.readLines(inputBytes, StandardCharsets.UTF_8));
     }
 }
