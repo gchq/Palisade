@@ -15,6 +15,7 @@ resource "null_resource" "deploy_example" {
     host = "${var.host_name}"
     user = "${var.ec2_userid}"
     private_key = "${file("${var.key_file}")}"
+    # private_key = "${var.key_file}"
     agent = false
     timeout = "10m"
   }
