@@ -27,7 +27,6 @@ import event.logging.Event;
 import event.logging.ObjectOutcome;
 import event.logging.Outcome;
 import event.logging.Purpose;
-import event.logging.Search;
 import event.logging.System;
 import event.logging.User;
 import event.logging.impl.DefaultEventLoggingService;
@@ -49,7 +48,6 @@ import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.ServiceState;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -351,15 +349,23 @@ public class StroomAuditService implements AuditService {
             Event viewEvent = generateNewGenericEvent(readRequestCompleteAuditRequest);
             Event.EventDetail viewEventDetail = new Event.EventDetail();
             viewEventDetail.setDescription(READ_REQUEST_COMPLETED_DESCRIPTION);
-            Search search = new Search();
-            search.setOutcome(createOutcome(true));
+            ObjectOutcome view = new ObjectOutcome();
+            view.setOutcome(createOutcome(true));
             // set the number of records returned
-            search.setTotalResults(BigInteger.valueOf(readRequestCompleteAuditRequest.getNumberOfRecordsReturned()));
+            Data resultsReturned = new Data();
+            resultsReturned.setName("Number of records returned");
+            resultsReturned.setValue(String.valueOf(readRequestCompleteAuditRequest.getNumberOfRecordsReturned()));
+            view.getData().add(resultsReturned);
+            Data resultsProcessed = new Data();
+            resultsProcessed.setName("Number of records processed");
+            resultsProcessed.setValue(String.valueOf(readRequestCompleteAuditRequest.getNumberOfRecordsProcessed()));
+            view.getData().add(resultsProcessed);
             // set the resource that those records were read from
-            Criteria.DataSources dataSources = new Criteria.DataSources();
-            dataSources.getDataSource().add(readRequestCompleteAuditRequest.getResource().getId());
-            search.setDataSources(dataSources);
-            viewEventDetail.setSearch(search);
+            Data resource = new Data();
+            resource.setName("Resource");
+            resource.setValue(readRequestCompleteAuditRequest.getResource().getId());
+            view.getData().add(resource);
+            viewEventDetail.setView(view);
             viewEvent.setEventDetail(viewEventDetail);
             EVENT_LOGGING_SERVICE.log(viewEvent);
         });
@@ -371,16 +377,21 @@ public class StroomAuditService implements AuditService {
             Event viewEvent = generateNewGenericEvent(readRequestExceptionAuditRequest);
             Event.EventDetail viewEventDetail = new Event.EventDetail();
             viewEventDetail.setDescription(READ_REQUEST_EXCEPTION_DESCRIPTION);
-            Search search = new Search();
-            search.setOutcome(createOutcome(false));
+            ObjectOutcome view = new ObjectOutcome();
+            view.setOutcome(createOutcome(false));
             // set the exception details
-            search.getOutcome().setDescription(readRequestExceptionAuditRequest.getException().getMessage());
+            view.getOutcome().setDescription(readRequestExceptionAuditRequest.getException().getMessage());
             // set the resource that those records were read from
             Criteria.DataSources dataSources = new Criteria.DataSources();
-            dataSources.getDataSource().add(readRequestExceptionAuditRequest.getResource().getId());
-            dataSources.getDataSource().add(readRequestExceptionAuditRequest.getToken());
-            search.setDataSources(dataSources);
-            viewEventDetail.setSearch(search);
+            Data resource = new Data();
+            resource.setName("data resource");
+            resource.setValue(readRequestExceptionAuditRequest.getResource().getId());
+            view.getData().add(resource);
+            Data token = new Data();
+            token.setName("token");
+            token.setValue(readRequestExceptionAuditRequest.getToken());
+            view.getData().add(token);
+            viewEventDetail.setView(view);
             viewEvent.setEventDetail(viewEventDetail);
             EVENT_LOGGING_SERVICE.log(viewEvent);
         });
