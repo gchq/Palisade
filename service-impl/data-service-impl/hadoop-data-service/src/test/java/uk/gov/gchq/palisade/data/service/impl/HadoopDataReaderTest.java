@@ -37,9 +37,10 @@ import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.util.TestUtil;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -79,8 +80,9 @@ public class HadoopDataReaderTest {
         final DataReaderResponse response = reader.read(request);
 
         // Then
-        final InputStream stream = response.getData();
-        final Stream<String> lines = new BufferedReader(new InputStreamReader(stream)).lines();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        response.getWriter().write(os);
+        final Stream<String> lines = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(os.toByteArray()))).lines();
         assertEquals(Arrays.asList("some data", "some more data"), lines.collect(Collectors.toList()));
     }
 
@@ -109,8 +111,9 @@ public class HadoopDataReaderTest {
         final DataReaderResponse response = reader.read(request);
 
         // Then
-        final InputStream stream = response.getData();
-        final Stream<String> lines = new BufferedReader(new InputStreamReader(stream)).lines();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        response.getWriter().write(os);
+        final Stream<String> lines = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(os.toByteArray()))).lines();
         assertEquals(Collections.singletonList("some data"), lines.collect(Collectors.toList()));
     }
 
