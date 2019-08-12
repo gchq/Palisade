@@ -41,6 +41,10 @@
 * [Libraries](library/README.md)
   * [Shaded Hadoop Client](library/shade-hadoop-client/README.md)
   * [Koryphe](library/koryphe-library/README.md)
+  
+* [Client Implementations](client-impl/README.md)
+  * [Cat client](client-impl/cat-client/README.md)
+  * [MapReduce client](client-impl/mapreduce-client/README.md)
 
 * [Service Implementations](service-impl/README.md)
   * [Audit Service Implementations](service-impl/audit-service-impl/README.md)

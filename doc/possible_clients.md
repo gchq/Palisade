@@ -33,7 +33,7 @@ To do that we would need to write a client that mimics the behaviour of the 'cat
 Then you could alias 'cat' to run that client code. 
 Therefore to the end user there is again very little difference to how they would normally use 'cat' if they did not have the data access policy restrictions.
 
-See [cat-client](client-impl/cat-client/README.md) for the implementation of this client.
+See [cat-client](../client-impl/cat-client/README.md) for the implementation of this client.
 
 ## Creating an S3 client endpoint
 It should be possible to create an S3 endpoint that allows any out of the box data processing technology that supports S3 to route requests via Palisade. 
