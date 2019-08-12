@@ -11,7 +11,7 @@ resource "null_resource" "deploy_palisade" {
     host = "${var.host_name}"
     user = "${var.ec2_userid}"
     private_key = "${file("${var.key_file}")}"
-    private_key = "${var.key_file}" #Needed when running terraform destroy, comment out line above
+    # private_key = "${var.key_file}" #Needed when running terraform destroy, comment out line above
     agent = false
     timeout = "30s"
   }
@@ -23,7 +23,8 @@ resource "null_resource" "deploy_palisade" {
       "sudo amazon-linux-extras install docker -y",
       "sudo service docker start",
       "sudo usermod -a -G docker ${var.ec2_userid}",
-      "sudo amazon-linux-extras install java-openjdk11 -y"
+      "sudo amazon-linux-extras install java-openjdk11 -y",
+      "sudo yum install dos2unix -y"
     ]
   }
 
@@ -59,13 +60,19 @@ resource "null_resource" "deploy_palisade" {
     source = "../../../local-jvm/bash-scripts/"
     destination = "/home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts"
   }
+  # Convert all dos line endings to unix
+    provisioner "remote-exec" {
+      inline = [
+        "dos2unix /home/${var.ec2_userid}/example/deployment/bash-scripts/*.sh",
+        "dos2unix /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/*.sh",
+      ]
+    }
   provisioner "remote-exec" {
     inline = [
       "chmod 774 /home/${var.ec2_userid}/example/deployment/bash-scripts/*.sh",
       "chmod 774 /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/*.sh",
     ]
   }
-
   # Copy configRest.json to ec2 instance
   provisioner "file" {
     source = "../../../../example-model/src/main/resources/configRest.json"
