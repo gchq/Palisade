@@ -70,10 +70,10 @@ We must then instruct Palisade to create some compliance policies regarding thes
 This then produces:
 ```bash
 example.perf.Perf INFO  - Specified path perf_test has been normalised to file:///<user home directory>/Palisade/perf_test/
-example.perf.Perf INFO  - Security policy has been set for file:///Users/username/Palisade/perf_test/employee_small.avro: true
-example.perf.Perf INFO  - Security policy has been set for file:///Users/username/Palisade/perf_test/large/employee_large.avro: true
+example.perf.Perf INFO  - Security policy has been set for file:///<user home directory>//Palisade/perf_test/employee_small.avro: true
+example.perf.Perf INFO  - Security policy has been set for file:///<user home directory>//Palisade/perf_test/large/employee_large.avro: true
 example.perf.Perf INFO  - Security policy has been set for file:///<user home directory>/Palisade/perf_test/employee_small-nopolicy.avro: true
-example.perf.Perf INFO  - Security policy has been set for file:///Users/username/Palisade/perf_test/large/employee_large-nopolicy.avro: true
+example.perf.Perf INFO  - Security policy has been set for file:///<user home directory>//Palisade/perf_test/large/employee_large-nopolicy.avro: true
 ```
 
 ### Running

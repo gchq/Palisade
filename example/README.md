@@ -55,8 +55,8 @@ The ExampleConfigurator class creates the users and uses the rule classes mentio
 The example runs several different queries by the different users, with different purposes. When you run the example you will see the data has been redacted in line with the rules.
 
 For deployment specific instructions on how to run the example see:  
-- [Local JVM](deployment/local-jvm/README.md)  
-- [Local Docker](deployment/local-docker/README.md)  
-- [Local Kubernetes](deployment/local-k8s/README.md)  
-- [AWS-EMR](deployment/AWS-EMR/README.md)  
-- [Azure-AKS](deployment/Azure-AKS/README.md)
+- [Local JVM](deployment/local-jvm/README.md) - Runs the example in separate JVM's on the local machine 
+- [Local Docker](deployment/local-docker/README.md) - Runs the example in docker containers on the local machine
+- [Local Kubernetes](deployment/local-k8s/README.md) - Runs the example in Kubernetes on the local machine
+- [AWS-EMR](deployment/AWS-EMR/README.md) - Runs the example using the MapReduce client on the AWS EMR service which demonstrates that Palisade can process large volumes of data when deployed on bare metal as JVM's on a Hadoop cluster.
+- [Azure-AKS](deployment/Azure-AKS/README.md) - Runs the example on Azure's Kubernetes as a service, showing that it can be deployed on different architectures and different cloud providers.

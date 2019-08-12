@@ -7,11 +7,11 @@ The pre-requisites of this example are:
 - Azure DevOps account
 
 ##Configuring the Azure DevOps account: 
-[devOps](./ConfigureAzureDevOPS.md)
+To configure an Azure Devops account follow the guidance [here](./ConfigureAzureDevOPS.md).
 
-N.B The pipeline id (*'pipeline:'*) defined in the following files:
-/Palisade/example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml
-refers to a given devops setup.
+N.B The pipeline id (*'pipeline:'*) defined in [/Palisade/example/deployment/Azure-AKS/devops-pipelines/azure-pipelines.docker-template.yaml](devops-pipelines/azure-pipelines.docker-template.yaml)
+refers to a given DevOps setup.
+
 The documentation [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/download-build-artifacts?view=azure-devops) describes the build artefacts.
 Currently this file contains the pipeline id == 8. This is the pipeline for *maven*
 The pipeline id can be found as shown in the diagram below:
