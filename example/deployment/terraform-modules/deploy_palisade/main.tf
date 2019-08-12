@@ -11,6 +11,7 @@ resource "null_resource" "deploy_palisade" {
     host = "${var.host_name}"
     user = "${var.ec2_userid}"
     private_key = "${file("${var.key_file}")}"
+    private_key = "${var.key_file}" #Needed when running terraform destroy, comment out line above
     agent = false
     timeout = "30s"
   }
@@ -154,11 +155,6 @@ resource "null_resource" "deploy_palisade" {
     command = "ssh -f -i ${var.key_file} -o 'StrictHostKeyChecking no' ${var.ec2_userid}@${var.host_name} 'nohup /home/${var.ec2_userid}/example/deployment/local-jvm/bash-scripts/startDataService.sh > /home/${var.ec2_userid}/example_logs/startDataService.log 2>&1 &'"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "echo done here",
-    ]
-  }
   # Configure the Example - create some users and policies...
   provisioner "remote-exec" {
       inline = [

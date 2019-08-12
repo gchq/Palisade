@@ -14,8 +14,8 @@ resource "null_resource" "deploy_example" {
     type = "ssh"
     host = "${var.host_name}"
     user = "${var.ec2_userid}"
-    private_key = "${file("${var.key_file}")}"
-    # private_key = "${var.key_file}"
+    # private_key = "${file("${var.key_file}")}"
+    private_key = "${var.key_file}" #Needed when running terraform destroy, comment out line above
     agent = false
     timeout = "10m"
   }
