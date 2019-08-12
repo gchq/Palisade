@@ -1,4 +1,6 @@
-# Palisade Use Cases
+# Potential Palisade Clients
+
+This section gives some insight into how clients could be used as the entry point for users to access data via Palisade.
 
 ## Reading a stream of data using Apache Spark
 If you had a data stream in Kafka, you would normally be able to access it using kafka connectors in Java or Python, however it would not apply the data filtering/transformations that are required by the data policies.
@@ -25,13 +27,15 @@ Then the Spark client can format the stream of data into a DataFrame so that the
 
 Therefore as far as the user is concerned they just had to add the option and use the different format, as they would not be able to access the data via any of the other formats. This keeps the API similar to Spark's standard read API. 
 
-## Integrating Palisade with Alluxio
-
-Given that Alluxio already has connectors that allows it to sit between data processing technologies and the data storage technologies; it would be great to hook into Alluxio to apply the Palisade services just before Alluxio feeds the data back to the data processing technology.
-This would make the Palisade integration transparent to the user (except getting the purpose passed through).
-
 ## Using the 'cat' command line tool
 It should be possible to use command line tools like 'cat' to be able to view files that are being protected by Palisade. 
 To do that we would need to write a client that mimics the behaviour of the 'cat' command but routing the request for data via Palisade. 
 Then you could alias 'cat' to run that client code. 
 Therefore to the end user there is again very little difference to how they would normally use 'cat' if they did not have the data access policy restrictions.
+
+See [cat-client](client-impl/cat-client/README.md) for the implementation of this client.
+
+## Creating an S3 client endpoint
+It should be possible to create an S3 endpoint that allows any out of the box data processing technology that supports S3 to route requests via Palisade. 
+This mechanism would require a way to register your user supplied information such as the purpose for your query to a separate service which provides you a token to embed in the resource URL.
+Then the client would be able to go to strip out the context token and retrieve the contextual information to be used by Palisade.

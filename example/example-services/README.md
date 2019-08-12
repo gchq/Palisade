@@ -1,4 +1,4 @@
-# Examples
+# Example
 
 We have 2 simple examples that demonstrate the automated auditing and policy rule enforcement when users read some data. With 2 more coming soon.
 
