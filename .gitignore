@@ -32,6 +32,7 @@ terraform.tfvars
 terraform.tfstate
 terraform.tfstate.backup
 dependency-reduced-pom.xml
+version.properties
 
 ##VSCODE default files that dont need to be tracked
 eclipse-formatter.xml

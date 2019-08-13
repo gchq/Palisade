@@ -1,0 +1,6 @@
+nexus:
+  enabled: false
+nexusServiceLink:
+  enabled: true
+  externalName: "nexus.jx.svc.cluster.local"
+
