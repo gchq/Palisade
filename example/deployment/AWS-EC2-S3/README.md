@@ -16,7 +16,7 @@ Terraform will then spin up a second EC2 instance and install the example on thi
 When Terraform runs the example on the second EC2 instance the example connects to the Rest endpoints of the palisade services running on the first EC2 instance and runs queries as the users Alice, Bob and Eve.
 Palisade queries the data in the S3 bucket and returns data to the example client redacted accordinging to the appropiate policy rules.
 
-PREREQUISITES
+##### PREREQUISITES
 - Terraform
 - Git 
 - An AWS Account
@@ -73,5 +73,36 @@ After completion run terraform destroy to tear down the two EC2 instances:
   cd example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade;  terraform destroy; cd -
 ```
 
-TO-DO 
-Show the EC2 instance where the example runs trying and failing to access the data in the S3 bucket
+#### Running the Example
+After the terraform scripts have run and the 2 instances are up and running, ssh on to the box using the following command:
+```bash
+ssh -i <Location of your .pem file> <user>@<public DNS of Example box>
+```
+A quick "ps ax | grep java" will show that no java services are running locally. Meaning that the example will using the Palisade services on the "Services" box.
+To then run the example with the option to display the results based on different users or roles, run this command: 
+```bash
+$ export PALISADE_REST_CONFIG_PATH="/home/<user>/example/example-model/src/main/resources/configRest.json"
+$ java -cp /home/<user>/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> <filename> <PURPOSE> | /home/<user>/example/deployment/bash-scripts/formatOutput.sh
+```
+The example list of users, purposes and file locations are:
+- Alice, Bob, Eve
+- SALARY, DUTY_OF_CARE, STAFF_REPORT or no purpose by using: ""
+- s3a://palisadeec2test.s3-eu-west-1.amazonaws.com/employee_file0.avro
+
+If you want to compare the different outputs of the Palisade service for different users and purposes, you can redirect the output to a text file, such as "> User-PURPOSE.txt", and then re-run the command with a change in user or purpose and redirect the output to a different file. 
+You can then run:
+```bash
+diff file1.txt file2.txt
+```
+
+##### Running the fixed demo
+To run the static demo, run this:
+```bash
+$ export PALISADE_REST_CONFIG_PATH="/home/<user>/example/example-model/src/main/resources/configRest.json"
+$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.runner.RestExample s3a://palisadeec2test.s3-eu-west-1.amazonaws.com/employee_file0.avro | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+```
+ 
+
+
+###### TO-DO:
+- [ ] Show the EC2 instance where the example runs trying and failing to access the data in the S3 bucket
