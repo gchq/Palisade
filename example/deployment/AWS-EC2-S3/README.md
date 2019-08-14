@@ -34,12 +34,28 @@ To run this example follow these steps (from the root of the project):
 ```
 3.  Create the file terraform.tfvars in example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade with content based on this
 ```bash
+    # Set the access and secret key plus token OR the profile name, not both!
+ 
+    "aws_access_key" = "<Your AWS subscription access key>"
+    
+    "aws_secret_key" = "<Your AWS subscription secret key>"
+ 
+    "aws_session_token" = "<Your AWS subscription session token>"
+     
+    "aws_profile_name" = "<Your AWS profile name>"
+
+    # Override the default eu-west-1 if you want
+    # "aws_region" = ""
+
+    
   project = "PalisadeExample"
   owner = "your_name"
   aws_region = "eu-west-1"
+  # Either set the profile name or the access key, secret key and token
   aws_access_key_id = "xxx"
   aws_secret_access_key = "xxx"
   aws_session_token = "xxx"
+  #aws_profile_name = "xxx"
   bucket_name = "palisadeec2test"
   s3_endpoint = "s3-eu-west-1.amazonaws.com"
   key_name = "create a key and put its name here"
@@ -48,46 +64,40 @@ To run this example follow these steps (from the root of the project):
   instance_name = "PalisadeExample"
   instance_type = "t2.large"
   data_file_name = "employee_file0.avro"
-  ec2_userid = "ec2-user"
 ```
 
 4. Create a symbolic link to the above terraform.tfvars file in example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningExample
 ```bash
-  cd example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningExample; ln -s ../InstanceRunningPalisade/terraform.tfvars terraform.tfvars
+  cd example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningExample; ln -s ../InstanceRunningPalisade/terraform.tfvars terraform.tfvars; cd -
 ```
 
 5. Run the Terraform to create the two EC2 instances, install and start up Palisade on the first instance, install the example on the second instance and run it.
 ```bash
-  ./example/deployment/AWS-EC2-S3/bash-scripts/runAWS-EC2-S3Example.sh  /path/to/private/key.pem
+  ./example/deployment/AWS-EC2-S3/bash-scripts/runAWS-EC2-S3Example.sh
 ```
 
 After completion run terraform destroy to tear down the two EC2 instances:
 
 1. Tear down the instance running the example
 ```bash
-  cd example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningExample;  terraform destroy;  cd -
-```
-
-2.  Tear down the instance running the Palisade services
-```bash
-  cd example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade;  terraform destroy; cd -
+  ./example/deployment/AWS-EC2-S3/bash-scripts/destroyTerraform.sh
 ```
 
 #### Running the Example
 After the terraform scripts have run and the 2 instances are up and running, ssh on to the box using the following command:
 ```bash
-ssh -i <Location of your .pem file> <user>@<public DNS of Example box>
+ssh -i <Location of your .pem file> ec2-user@<public DNS of Example box>
 ```
 A quick "ps ax | grep java" will show that no java services are running locally. Meaning that the example will using the Palisade services on the "Services" box.
 To then run the example with the option to display the results based on different users or roles, run this command: 
 ```bash
-$ export PALISADE_REST_CONFIG_PATH="/home/<user>/example/example-model/src/main/resources/configRest.json"
-$ java -cp /home/<user>/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> <filename> <PURPOSE> | /home/<user>/example/deployment/bash-scripts/formatOutput.sh
+$ export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/resources/configRest.json"
+$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> <filename> <PURPOSE> | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
 ```
 The example list of users, purposes and file locations are:
 - Alice, Bob, Eve
 - SALARY, DUTY_OF_CARE, STAFF_REPORT or no purpose by using: ""
-- s3a://palisadeec2test.s3-eu-west-1.amazonaws.com/employee_file0.avro
+- s3a://<bucket name>.<s3_endpoint>/employee_file0.avro
 
 If you want to compare the different outputs of the Palisade service for different users and purposes, you can redirect the output to a text file, such as "> User-PURPOSE.txt", and then re-run the command with a change in user or purpose and redirect the output to a different file. 
 You can then run:
