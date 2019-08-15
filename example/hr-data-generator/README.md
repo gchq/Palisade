@@ -5,7 +5,7 @@ synthetic HR data.
 
 To use the generator, then from the Palisade root directory run:
 
-```mvn clean install -Pexample```
+```mvn clean install -P example```
 
 then to start the generator:
 

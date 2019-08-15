@@ -2,10 +2,10 @@
 
 ## Contents
 1. [Git branching model](#git-branching-model)
-2. [Issues](#issues)
-3. [Pull requests](#pull-requests)
-4. [Coding style](#coding-style)
-5. [Releases](#releases)
+1. [Issues](#issues)
+1. [Pull requests](#pull-requests)
+1. [Coding style](#coding-style)
+1. [Releases](#releases)
 
 ## Git branching model
 We have adopted the following branching strategy: [Git Branching Model](https://nvie.com/files/Git-branching-model.pdf)

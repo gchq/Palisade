@@ -1,5 +1,5 @@
 # Building the documentation
-Gaffer's documentation is built using [GitBook](https://www.gitbook.com). 
+Palisade's documentation is built using [GitBook](https://www.gitbook.com). 
 
 ## Prerequisites
 ### NPM

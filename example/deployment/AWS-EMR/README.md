@@ -1,4 +1,4 @@
-# Amazon Web Services - Elastic MapReduce Example
+# Amazon Web Services - Elastic MapReduce (EMR) Example
 
 This example shows how Palisade can be run on an AWS - EMR cluster. It will create an AWS EMR cluster and install
 Palisade on to them. You can then launch some Palisade examples which will demonstrate the use of Palisade within
