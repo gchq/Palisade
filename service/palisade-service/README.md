@@ -6,6 +6,8 @@
 
 The core API for the Palisade service.
 
+The Palisade service has two methods, registerDataRequest() and getDataRequestConfig().
+
 The responsibility of the Palisade service is to send off the required auditing
 records and collate all the relevant information about a request for data 
 (using the other services) and to provide the Data service with the information 

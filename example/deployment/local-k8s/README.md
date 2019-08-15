@@ -1,4 +1,4 @@
-# Kubernetes Example
+# Local Kubernetes Example
 
 This example demonstrates different users querying an avro file over a REST api running locally in kubernetes containers.
 
