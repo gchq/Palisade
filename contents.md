@@ -49,6 +49,7 @@
 * [Service Implementations](service-impl/README.md)
   * [Audit Service Implementations](service-impl/audit-service-impl/README.md)
     * [Logger Audit Service](service-impl/audit-service-impl/logger-audit-service/README.md)
+    * [Stroom Audit Service](service-impl/audit-service-impl/stroom-audit-service/README.md)
   * [Cache Service Implementations](service-impl/cache-service-impl/README.md)
     * [Simple Cache Service](service-impl/cache-service-impl/simple-cache-service/README.md)
     * [Hashmap Backing Store](service-impl/cache-service-impl/hashmap-backing-store/README.md)
