@@ -225,8 +225,6 @@ public class StroomAuditService implements AuditService {
             // log who the user is claiming to be
             Event.EventSource eventSource = event.getEventSource();
             eventSource.setUser(EventLoggingUtil.createUser(registerRequestReceivedAuditRequest.getUserId().getId()));
-            // log where the client (palisade service) that the audit request came from
-            eventSource.setClient(DeviceUtil.createDevice(registerRequestReceivedAuditRequest.getServerHostname(), registerRequestReceivedAuditRequest.getServerIp()));
             // create View request event detail
             Event.EventDetail eventDetail = new Event.EventDetail();
             eventDetail.setDescription(REGISTER_REQUEST_RECEIVED_DESCRIPTION);

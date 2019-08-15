@@ -42,8 +42,7 @@ public class AuditRequest extends Request {
     // no-arg constructor required
     public AuditRequest() {
         timestamp = new Date();
-        //TODO check this is the right thing to do
-        InetAddress inetAddress = null;
+        InetAddress inetAddress;
         try {
             inetAddress = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {

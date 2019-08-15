@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
@@ -59,13 +60,13 @@ public final class Util {
      * @param <T>     record type
      * @return filtered stream
      */
-    public static <T> Stream<T> applyRulesToStream(final Stream<T> records, final User user, final Context context, final Rules<T> rules) {
+    public static <T> Stream<T> applyRulesToStream(final Stream<T> records, final User user, final Context context, final Rules<T> rules, final AtomicLong numberOfRecordsProcessed, final AtomicLong numberOfRecordsReturned) {
         Objects.requireNonNull(records);
         if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
             return records;
         }
 
-        return records.map(record -> applyRulesToItem(record, user, context, rules)).filter(record -> null != record);
+        return records.map(record -> applyRulesToItem(record, user, context, rules, numberOfRecordsProcessed, numberOfRecordsReturned)).filter(record -> null != record);
     }
 
     /**
@@ -78,8 +79,10 @@ public final class Util {
      * @param <T>     record type
      * @return filtered item
      */
-    public static <T> T applyRulesToItem(final T item, final User user, final Context context, final Rules<T> rules) {
+    public static <T> T applyRulesToItem(final T item, final User user, final Context context, final Rules<T> rules, final AtomicLong numberOfRecordsProcessed, final AtomicLong numberOfRecordsReturned) {
+        numberOfRecordsProcessed.incrementAndGet();
         if (null == rules || rules.getRules().isEmpty()) {
+            numberOfRecordsReturned.incrementAndGet();
             return item;
         }
         T updateItem = item;
@@ -89,6 +92,7 @@ public final class Util {
                 break;
             }
         }
+        numberOfRecordsReturned.incrementAndGet();
         return updateItem;
     }
 

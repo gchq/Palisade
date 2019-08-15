@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
@@ -59,8 +60,8 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class SerialisedDataReader implements DataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialisedDataReader.class);
-    protected long numberOfRecordsProcessed = 0;
-    protected long numberOfRecordsReturned = 0;
+    protected AtomicLong numberOfRecordsProcessed = new AtomicLong(0);
+    protected AtomicLong numberOfRecordsReturned = new AtomicLong(0);
 
     @JsonProperty("default")
     private Serialiser<?> defaultSerialiser = new SimpleStringSerialiser();
@@ -123,18 +124,19 @@ public abstract class SerialisedDataReader implements DataReader {
             data = rawStream;
         } else {
             LOGGER.debug("Applying rules: {}", rules);
-            // TODO identify way to count the number of records processed and returned
             final Stream<Object> deserialisedData = Util.applyRulesToStream(
                     serialiser.deserialise(rawStream),
                     request.getUser(),
                     request.getContext(),
-                    rules
+                    rules,
+                    numberOfRecordsProcessed,
+                    numberOfRecordsReturned
             ).onClose(() -> {
                 // Audit log the number of results returned
                 ReadRequestCompleteAuditRequest auditRequest = new ReadRequestCompleteAuditRequest()
                         .resource(request.getResource())
-                        .numberOfRecordsProcessed(numberOfRecordsProcessed)
-                        .numberOfRecordsReturned(numberOfRecordsReturned);
+                        .numberOfRecordsProcessed(numberOfRecordsProcessed.get())
+                        .numberOfRecordsReturned(numberOfRecordsReturned.get());
                 auditRequest.originalRequestId(request.getOriginalRequestId());
                 getAuditService().audit(auditRequest);
                 //ensure the original stream is closed as well
