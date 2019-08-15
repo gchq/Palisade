@@ -1,10 +1,14 @@
 package uk.gov.gchq.palisade.audit.service.impl;
 
-import org.junit.AfterClass;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.util.collections.Sets;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -26,32 +30,36 @@ import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.user.service.UserService;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.Set;
 
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StroomAuditServiceTest {
 
-    private static final PrintStream sysOut = System.out;
-    private static final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private static final PrintStream newSysOut = new PrintStream(outContent);
+    private static final StroomAuditService stroomAuditService= createStroomAuditService();
 
-    @BeforeClass
-    public static void before() {
-        System.setOut(newSysOut);
-    }
+    @Mock
+    AppenderSkeleton appender;
+    @Captor
+    ArgumentCaptor<LoggingEvent> logCaptor;
 
-    @AfterClass
-    public static void after() {
-        System.setOut(sysOut);
+    private static StroomAuditService createStroomAuditService() {
+        return new StroomAuditService()
+                .organisation("Test Org")
+                .systemClassification("Some system classification")
+                .systemDescription("some system description")
+                .systemEnv("some system env")
+                .systemName("some system name")
+                .systemVersion("some system version");
     }
 
     @Test
     public void auditRegisterRequestReceived() {
         // Given
+        Logger.getRootLogger().addAppender(appender);
+
         final String resourceId = "a pointer to a data resource";
         final String userId = "an identifier for the user";
         final String purpose = "the purpose for the data access request";
@@ -71,12 +79,11 @@ public class StroomAuditServiceTest {
                 .originalRequestId(mockRequestId);
 
         // When
-        StroomAuditService stroomAuditService = new StroomAuditService();
         stroomAuditService.audit(auditRequestReceived);
 
         //Then
-        final String log = outContent.toString();
-        System.err.println(log);
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
         verify(mockUserId, Mockito.atLeastOnce()).getId();
         verify(mockContext, Mockito.atLeastOnce()).getPurpose();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
@@ -90,6 +97,8 @@ public class StroomAuditServiceTest {
     @Test
     public void auditRegisterRequestCompleted() {
         // Given
+        Logger.getRootLogger().addAppender(appender);
+
         final String resourceId = "a pointer to a data resource";
         final String userId = "an identifier for the user";
         final String exceptionOriginalRequestId = "originalRequestId linking all logs from the same data access request together";
@@ -110,26 +119,29 @@ public class StroomAuditServiceTest {
                 .originalRequestId(mockRequestId);
 
         // When
-        StroomAuditService stroomAuditService = new StroomAuditService();
         stroomAuditService.audit(auditRequestComplete);
 
         //Then
-        final String log = outContent.toString();
-        System.err.println(log);
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String authenticationLog = logCaptor.getAllValues().get(1).getRenderedMessage();
+        final String registerSuccessLog = logCaptor.getAllValues().get(2).getRenderedMessage();
         verify(mockUserId, Mockito.atLeastOnce()).getId();
         verify(mockUser, Mockito.atLeastOnce()).getUserId();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
-        Assert.assertTrue(log.contains(resourceId));
-        Assert.assertTrue(log.contains(userId));
-        Assert.assertTrue(log.contains(exceptionOriginalRequestId));
-        Assert.assertTrue(log.contains(resourceDataType));
-        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_AUTHENTICATION_SUCCESS_DESCRIPTION));
-        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_COMPLETED_DESCRIPTION));
+        Assert.assertTrue(authenticationLog.contains(userId));
+        Assert.assertTrue(authenticationLog.contains(exceptionOriginalRequestId));
+        Assert.assertTrue(authenticationLog.contains(StroomAuditService.REGISTER_REQUEST_AUTHENTICATION_SUCCESS_DESCRIPTION));
+        Assert.assertTrue(registerSuccessLog.contains(resourceId));
+        Assert.assertTrue(registerSuccessLog.contains(exceptionOriginalRequestId));
+        Assert.assertTrue(registerSuccessLog.contains(resourceDataType));
+        Assert.assertTrue(registerSuccessLog.contains(StroomAuditService.REGISTER_REQUEST_COMPLETED_DESCRIPTION));
     }
 
     @Test
     public void auditRegisterRequestExceptionFromPolicyService() {
         // Given
+        Logger.getRootLogger().addAppender(appender);
+
         final String exceptionMessage = "exception message";
         final String exceptionOriginalRequestId = "originalRequestId linking all logs from the same data access request together";
 
@@ -144,12 +156,11 @@ public class StroomAuditServiceTest {
                 .originalRequestId(mockRequestId);
 
         // When
-        StroomAuditService stroomAuditService = new StroomAuditService();
         stroomAuditService.audit(auditRequestWithException);
 
         //Then
-        final String log = outContent.toString();
-        System.err.println(log);
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
         verify(mockException, Mockito.atLeastOnce()).getMessage();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
         Assert.assertTrue(log.contains(exceptionMessage));
@@ -160,6 +171,8 @@ public class StroomAuditServiceTest {
     @Test
     public void auditRegisterRequestExceptionFromUserService() {
         // Given
+        Logger.getRootLogger().addAppender(appender);
+
         final String exceptionMessage = "exception message";
         final String exceptionOriginalRequestId = "originalRequestId linking all logs from the same data access request together";
 
@@ -174,12 +187,11 @@ public class StroomAuditServiceTest {
                 .originalRequestId(mockRequestId);
 
         // When
-        StroomAuditService stroomAuditService = new StroomAuditService();
         stroomAuditService.audit(auditRequestWithException);
 
         //Then
-        final String log = outContent.toString();
-        System.err.println(log);
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
         verify(mockException, Mockito.atLeastOnce()).getMessage();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
         Assert.assertTrue(log.contains(exceptionMessage));
@@ -190,6 +202,8 @@ public class StroomAuditServiceTest {
     @Test
     public void auditReadRequestReceived() {
         // Given
+        Logger.getRootLogger().addAppender(appender);
+
         final String resourceType = "Resource type, e.g. Employee";
         final String resourceId = "resource id";
         final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
@@ -205,12 +219,11 @@ public class StroomAuditServiceTest {
                 .originalRequestId(mockRequestId);
 
         // When
-        StroomAuditService stroomAuditService = new StroomAuditService();
         stroomAuditService.audit(auditReadRequestReceived);
 
         //Then
-        final String log = outContent.toString();
-        System.err.println(log);
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
         verify(mockResource, Mockito.atLeastOnce()).getType();
         verify(mockResource, Mockito.atLeastOnce()).getId();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
@@ -223,9 +236,11 @@ public class StroomAuditServiceTest {
     @Test
     public void auditReadRequestComplete() {
         // Given
+        Logger.getRootLogger().addAppender(appender);
+
         final String resourceId = "resource id";
         final long numberOfRecordsProcessed = Long.MAX_VALUE;
-        final long numberOfRecordsReturned = Long.MIN_VALUE;
+        final long numberOfRecordsReturned = 5;
         final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
 
         final ReadRequestCompleteAuditRequest auditReadRequestComplete = new ReadRequestCompleteAuditRequest();
@@ -240,12 +255,11 @@ public class StroomAuditServiceTest {
                 .originalRequestId(mockRequestId);
 
         // When
-        StroomAuditService stroomAuditService = new StroomAuditService();
         stroomAuditService.audit(auditReadRequestComplete);
 
         //Then
-        final String log = outContent.toString();
-        System.err.println(log);
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
         verify(mockResource, Mockito.atLeastOnce()).getId();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
         Assert.assertTrue(log.contains(resourceId));
@@ -259,6 +273,8 @@ public class StroomAuditServiceTest {
     @Test
     public void auditReadRequestException() {
         // Given
+        Logger.getRootLogger().addAppender(appender);
+
         final String resourceId = "resource id";
         final String token = "token in the form of a UUID";
         final String exceptionErrorMessage = "The error message from the exception thrown";
@@ -276,12 +292,11 @@ public class StroomAuditServiceTest {
                 .originalRequestId(mockRequestId);
 
         // When
-        StroomAuditService stroomAuditService = new StroomAuditService();
         stroomAuditService.audit(auditReadRequestException);
 
         //Then
-        final String log = outContent.toString();
-        System.err.println(log);
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
         verify(mockResource, Mockito.atLeastOnce()).getId();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
         Assert.assertTrue(log.contains(resourceId));
@@ -294,6 +309,8 @@ public class StroomAuditServiceTest {
     @Test
     public void auditReadResponse() {
         // Given
+        Logger.getRootLogger().addAppender(appender);
+
         final String resourceId = "resource id";
         final String rulesAppliedMessage = "human readable description of the rules/policies been applied to the data";
         final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
@@ -311,12 +328,11 @@ public class StroomAuditServiceTest {
                 .originalRequestId(mockRequestId);
 
         // When
-        StroomAuditService stroomAuditService = new StroomAuditService();
         stroomAuditService.audit(auditReadResponse);
 
         //Then
-        final String log = outContent.toString();
-        System.err.println(log);
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
         verify(mockResource, Mockito.atLeastOnce()).getId();
         verify(mockRequestId, Mockito.atLeastOnce()).getId();
         verify(mockRules, Mockito.atLeastOnce()).getMessage();

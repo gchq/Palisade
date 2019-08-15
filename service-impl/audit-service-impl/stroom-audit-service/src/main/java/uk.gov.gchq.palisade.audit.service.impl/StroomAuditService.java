@@ -209,7 +209,7 @@ public class StroomAuditService implements AuditService {
         Event.EventSource eventSource = new Event.EventSource();
         eventSource.setSystem(SYSTEM);
         eventSource.setGenerator(EVENT_GENERATOR);
-        eventSource.setServer(DeviceUtil.createDevice(request.getServerHostname(), request.getServerIp()));
+        eventSource.setDevice(DeviceUtil.createDevice(request.getServerHostname(), request.getServerIp()));
         event.setEventSource(eventSource);
         return event;
     }
