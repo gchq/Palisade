@@ -100,12 +100,11 @@ A quick "ps ax | grep java" will show that no java services are running locally.
 To then run the example with the option to display the results based on different users or roles, run this command: 
 ```bash
 $ export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/resources/configRest.json"
-$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> <filename> <PURPOSE> | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> s3a://<bucket name>.<s3_endpoint>/employee_file0.avro <PURPOSE> | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
 ```
-The example list of users, purposes and file locations are:
+The example list of users andpurposes are:
 - Alice, Bob, Eve
-- SALARY, DUTY_OF_CARE, STAFF_REPORT or no purpose by using: ""
-- s3a://<bucket name>.<s3_endpoint>/employee_file0.avro
+- SALARY, DUTY_OF_CARE, STAFF_REPORT or no purpose by using: "" (double quotes)
 
 If you want to compare the different outputs of the Palisade service for different users and purposes, you can redirect the output to a text file, such as "> User-PURPOSE.txt", and then re-run the command with a change in user or purpose and redirect the output to a different file. 
 You can then run:
@@ -116,11 +115,6 @@ diff file1.txt file2.txt
 ##### Running the fixed demo
 To run the static demo, run this:
 ```bash
-$ export PALISADE_REST_CONFIG_PATH="/home/<user>/example/example-model/src/main/resources/configRest.json"
-$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.runner.RestExample s3a://palisadeec2test.s3-eu-west-1.amazonaws.com/employee_file0.avro | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+$ export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/resources/configRest.json"
+$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.runner.RestExample s3a://<bucket name>.<s3_endpoint>/employee_file0.avro | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
 ```
- 
-
-
-###### TO-DO:
-- [ ] Show the EC2 instance where the example runs trying and failing to access the data in the S3 bucket
