@@ -6,11 +6,11 @@
 
 The core API for the data service.
 
+The data service has one method read().
+
 The responsibility of the data service is to take the read request from the
 client, request the trusted details about the request from the Palisade
-service (what policies to apply, user details, etc). The data service then
-loops over the list of resources passing the list of rules that need to be
-applied, taken from the palisade service response (instance of a `DataRequestConfig` class) and the
-resource to be read to the `DataReader`. The `DataReader` will then
-connect to the resource and apply the rules before streaming the data back to
-the `DataService` which forwards the data back to the client.
+service (what policies to apply, user details, context, etc). The data service then
+passes that information to the `DataReader` which is then responsible for connecting to the resource, 
+deserialising the data, applying the rules and then serialising the data ready to be sent to the client.
+The data service is also responsible for ensuring the relevant audit logs are generated.

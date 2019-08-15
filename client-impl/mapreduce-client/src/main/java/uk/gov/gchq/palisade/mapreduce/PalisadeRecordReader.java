@@ -217,7 +217,13 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
         final CompletableFuture<ReadResponse> futureResponse = service.read(readRequest);
         errResource = resource;
         //when this future completes, we should have an iterator of things once we deserialise
-        itemIt = futureResponse.thenApply(response -> serialiser.deserialise(response.getData()).iterator())
+        itemIt = futureResponse.thenApply(response -> {
+            try {
+                return serialiser.deserialise(response.asInputStream()).iterator();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        })
                 //force code to block at this point waiting for resource data to become available
                 .join();
         //stash the resource

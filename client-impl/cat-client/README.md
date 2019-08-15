@@ -10,7 +10,7 @@ PALISADE_REST_CONFIG_PATH="$(pwd)/example/example-model/src/main/resources/confi
 
 That command makes it easy for a system admin to create an alias for users such that it hides most of the complication of the command and just leaves the user to specify the resource to access and the purpose for accessing it. For example the system administrator could set the following alias:
 ```bash
-alias cat="PALISADE_REST_CONFIG_PATH=$(pwd)/example/example-model/src/main/resources/configRest.json java -cp $(pwd)/client-impl/cat-client/target/cat-client-0.2.1-SNAPSHOT-shaded.jar uk.gov.gchq.palisade.client.CatClient "'$(whoami)'
+alias cat="PALISADE_REST_CONFIG_PATH=$(pwd)/example/example-model/src/main/resources/configRest.json java -cp $(pwd)/client-impl/cat-client/target/cat-client-*-shaded.jar uk.gov.gchq.palisade.client.CatClient "'$(whoami)'
 ```
 
 Then a user could run the command:

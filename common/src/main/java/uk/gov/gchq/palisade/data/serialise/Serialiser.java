@@ -20,28 +20,42 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.stream.Stream;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = As.EXISTING_PROPERTY, property = "class")
+/**
+ * Serialisers are the part of Palisade that convert from a particular data serialised format to a stream of objects
+ * and back again.
+ *
+ * <b>IMPORTANT:</b> All instances of this interface must be thread safe. That is, they must support multiple threads performing
+ * calling either {@link Serialiser#deserialise(InputStream)} or {@link Serialiser#serialise(Stream, OutputStream)} concurrently.
+ * The easiest and recommended way to do this is to make the {@code Serialiser} instance stateless; don't store anything related to
+ * a particular de/serialisation operation in class member fields.
+ */
 public interface Serialiser<I> extends Serializable {
 
     /**
-     * Serialises a {@link Stream} of objects into an {@link InputStream}.
+     * Serialises a {@link Stream} of objects to an {@link OutputStream}. If {@code objects} is {@code null}, then
+     * nothing will be written.
      *
      * @param objects the stream of objects to be serialised
-     * @return the serialised form
+     * @param output  the output stream to write the serialised bytes to
+     * @throws IOException if something fails while writing the object stream
      */
-    InputStream serialise(final Stream<I> objects);
+   void serialise(final Stream<I> objects, final OutputStream output) throws IOException;
 
     /**
      * Deserialise an {@link InputStream} into a {@link Stream} of objects.
      *
      * @param stream the input stream to deserialise
      * @return the deserialised object
+     * @throws IOException if the input stream couldn't be read from.
      */
-    Stream<I> deserialise(final InputStream stream);
+    Stream<I> deserialise(final InputStream stream) throws IOException;
 
     @JsonGetter("class")
     default String _getClass() {

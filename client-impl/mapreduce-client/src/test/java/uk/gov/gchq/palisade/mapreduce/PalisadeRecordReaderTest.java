@@ -27,6 +27,7 @@ import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
+import uk.gov.gchq.palisade.data.service.request.ClientReadResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.StubResource;
@@ -34,6 +35,8 @@ import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -165,10 +168,11 @@ public class PalisadeRecordReaderTest {
      * @param shouldFail   if true the service will fail to return the data
      * @return a mock data service instance
      */
-    private static DataService createMockDS(Collection<String> dataToReturn, boolean shouldFail) {
+    private static DataService createMockDS(Collection<String> dataToReturn, boolean shouldFail) throws IOException {
         //create the simulated response
-        ReadResponse readResponse = new ReadResponse();
-        readResponse.setData(serialiser.serialise(dataToReturn.stream()));
+        ByteArrayOutputStream baos=new ByteArrayOutputStream();
+        serialiser.serialise(dataToReturn.stream(),baos);
+        ReadResponse readResponse = new ClientReadResponse(new ByteArrayInputStream(baos.toByteArray()));
         //mock a data service to return it
         DataService mock = mock(DataService.class);
         if (shouldFail) {

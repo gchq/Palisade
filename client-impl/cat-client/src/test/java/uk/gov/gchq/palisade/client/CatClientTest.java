@@ -26,6 +26,7 @@ import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.impl.MockDataService;
+import uk.gov.gchq.palisade.data.service.request.ClientReadResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -83,6 +84,15 @@ public class CatClientTest {
 
         registerDataRequest = new RegisterDataRequest().userId(new UserId().id(userId)).resourceId(dir).context(new Context().purpose(purpose));
 
+        reqResponse = CompletableFuture.completedFuture(
+                new DataRequestResponse()
+                        .requestId(reqId)
+                        .resource(resource1, mockConnectionDetail)
+                        .resource(resource2, mockConnectionDetail)
+                        .originalRequestId(new RequestId().id("Test ID")));
+
+        readRequest1 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource1).originalRequestId(reqId);
+        readRequest2 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource2).originalRequestId(reqId);
         DataRequestResponse response = new DataRequestResponse()
                 .token(token)
                 .resource(resource1, mockConnectionDetail)
@@ -90,15 +100,15 @@ public class CatClientTest {
         response.originalRequestId(new RequestId().id("Test ID"));
 
         reqResponse = CompletableFuture.completedFuture(response);
-        
+
         readRequest1 = (ReadRequest) new ReadRequest().token(token).resource(resource1).originalRequestId(reqId);
         readRequest2 = (ReadRequest) new ReadRequest().token(token).resource(resource2).originalRequestId(reqId);
 
         readResponse1 = CompletableFuture.completedFuture(
-                new ReadResponse().data(IOUtils.toInputStream("Test data 1", StandardCharsets.UTF_8)));
+                new ClientReadResponse(IOUtils.toInputStream("Test data 1", StandardCharsets.UTF_8)));
 
         readResponse2 = CompletableFuture.completedFuture(
-                new ReadResponse().data(IOUtils.toInputStream("Test data 2", StandardCharsets.UTF_8)));
+                new ClientReadResponse(IOUtils.toInputStream("Test data 2", StandardCharsets.UTF_8)));
 
         Mockito.when(mockPalisadeService.registerDataRequest(Mockito.refEq(registerDataRequest, "id"))).thenReturn(reqResponse);
         Mockito.when(mockDataService.read(Mockito.refEq(readRequest1, "id", "originalRequestId"))).thenReturn(readResponse1);

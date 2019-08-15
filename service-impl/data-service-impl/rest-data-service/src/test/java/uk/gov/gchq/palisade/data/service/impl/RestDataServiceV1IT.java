@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.exception.NoCapacityException;
+import uk.gov.gchq.palisade.data.service.request.ClientReadResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.exception.RequestFailedException;
@@ -59,7 +60,7 @@ public class RestDataServiceV1IT {
         String portNumber = System.getProperty("restDataServicePort");
         request.setOriginalRequestId(new RequestId().id("id1"));
         RestDataServiceV1.setDefaultDelegate(new MockDataService());
-        proxy = (ProxyRestDataService) new ProxyRestDataService("http://localhost:"+portNumber+"/data").retryMax(1);
+        proxy = (ProxyRestDataService) new ProxyRestDataService("http://localhost:" + portNumber + "/data").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
@@ -80,7 +81,7 @@ public class RestDataServiceV1IT {
         final byte[] data = "value1\nvalue2".getBytes();
         final InputStream dataStream = new ByteArrayInputStream(data);
 
-        final ReadResponse expectedResult = new ReadResponse().data(dataStream).message("some message");
+        final ReadResponse expectedResult = new ClientReadResponse(dataStream).message("some message");
         final CompletableFuture futureExpectedResult = CompletableFuture.completedFuture(expectedResult);
         given(dataService.read(request)).willReturn(futureExpectedResult);
 
@@ -89,7 +90,7 @@ public class RestDataServiceV1IT {
         final ReadResponse result = futureRead.join();
 
         // Then
-        assertArrayEquals(data, IOUtils.toByteArray(result.getData()));
+        assertArrayEquals(data, IOUtils.toByteArray(result.asInputStream()));
         verify(dataService).read(request);
     }
 

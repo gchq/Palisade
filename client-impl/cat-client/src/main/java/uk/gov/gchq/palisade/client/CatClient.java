@@ -28,6 +28,7 @@ import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map.Entry;
@@ -77,7 +78,13 @@ public class CatClient {
             readRequest.setOriginalRequestId(dataRequestResponse.getOriginalRequestId());
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
-            final CompletableFuture<InputStream> futureResult = futureResponse.thenApply(ReadResponse::getData);
+            final CompletableFuture<InputStream> futureResult = futureResponse.thenApply(readResponse -> {
+                try {
+                    return readResponse.asInputStream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
             new BufferedReader(new InputStreamReader(futureResult.join())).lines().forEachOrdered(System.out::println);
         }
     }
