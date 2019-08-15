@@ -22,9 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.Util;
 import uk.gov.gchq.palisade.audit.service.AuditService;
-import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
@@ -35,8 +33,6 @@ import uk.gov.gchq.palisade.resource.LeafResource;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -57,8 +53,6 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class SerialisedDataReader implements DataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialisedDataReader.class);
-    protected AtomicLong numberOfRecordsProcessed = new AtomicLong(0);
-    protected AtomicLong numberOfRecordsReturned = new AtomicLong(0);
 
     @JsonProperty("default")
     private Serialiser<?> defaultSerialiser = new SimpleStringSerialiser();
@@ -115,9 +109,9 @@ public abstract class SerialisedDataReader implements DataReader {
         //set up the raw input stream from the data source
         final InputStream rawStream = readRaw(request.getResource());
 
-        ResponseWriter serialisedWriter = new SerialisingResponseWriter(rawStream, serialiser, request);
+        ResponseWriter serialisedWriter = new SerialisingResponseWriter(rawStream, serialiser, request, getAuditService());
 
-        //set reponse object to use the writer above
+        //set response object to use the writer above
         return new DataReaderResponse().writer(serialisedWriter);
     }
 

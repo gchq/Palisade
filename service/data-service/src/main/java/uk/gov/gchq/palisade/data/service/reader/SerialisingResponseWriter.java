@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.Util;
+import uk.gov.gchq.palisade.audit.service.AuditService;
+import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.ResponseWriter;
@@ -33,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
@@ -60,6 +63,18 @@ public class SerialisingResponseWriter implements ResponseWriter {
      * The user data request.
      */
     private final DataReaderRequest request;
+    /**
+     * an audit service to send logs too once the steam has been read
+     */
+    private final AuditService auditService;
+    /**
+     * Atomic counter to know the number of records that have been processed
+     */
+    private final AtomicLong recordsProcessed = new AtomicLong(0);
+    /**
+     * Atomic counter to know the number of records that have been returned
+     */
+    private final AtomicLong recordsReturned = new AtomicLong(0);
 
     /**
      * Create a serialising response writer instance.
@@ -67,14 +82,17 @@ public class SerialisingResponseWriter implements ResponseWriter {
      * @param stream     the underlying data stream
      * @param serialiser the serialiser for the request
      * @param request    the context for the request
+     * @param auditService the audit service to send audit logs too
      */
-    public SerialisingResponseWriter(final InputStream stream, final Serialiser<?> serialiser, final DataReaderRequest request) {
+    public SerialisingResponseWriter(final InputStream stream, final Serialiser<?> serialiser, final DataReaderRequest request, final AuditService auditService) {
         requireNonNull(stream, "stream");
         requireNonNull(serialiser, "serialiser");
         requireNonNull(request, "request");
+        requireNonNull(auditService, "auditService");
         this.stream = stream;
         this.serialiser = (Serialiser<Object>) serialiser;
         this.request = request;
+        this.auditService = auditService;
     }
 
     @Override
@@ -102,7 +120,9 @@ public class SerialisingResponseWriter implements ResponseWriter {
                         serialiser.deserialise(stream),
                         request.getUser(),
                         request.getContext(),
-                        rules
+                        rules,
+                        recordsProcessed,
+                        recordsReturned
                 );
                 //write this stream to the output
                 serialiser.serialise(deserialisedData, output);
@@ -115,6 +135,13 @@ public class SerialisingResponseWriter implements ResponseWriter {
 
     @Override
     public void close() {
+        // Audit log the number of results returned
+        ReadRequestCompleteAuditRequest auditRequest = new ReadRequestCompleteAuditRequest()
+                .resource(request.getResource())
+                .numberOfRecordsProcessed(recordsProcessed.get())
+                .numberOfRecordsReturned(recordsReturned.get());
+        auditRequest.originalRequestId(request.getOriginalRequestId());
+        auditService.audit(auditRequest);
         try {
             stream.close();
         } catch (IOException ignored) {
@@ -138,6 +165,9 @@ public class SerialisingResponseWriter implements ResponseWriter {
                 .append(written, that.written)
                 .append(serialiser, that.serialiser)
                 .append(request, that.request)
+                .append(auditService, that.auditService)
+                .append(recordsProcessed, that.recordsProcessed)
+                .append(recordsReturned, that.recordsReturned)
                 .isEquals();
     }
 
@@ -149,6 +179,9 @@ public class SerialisingResponseWriter implements ResponseWriter {
                 .append("written", written)
                 .append("serialiser", serialiser)
                 .append("request", request)
+                .append("auditService", auditService)
+                .append("recordsProcessed", recordsProcessed)
+                .append("recordsReturned", recordsReturned)
                 .toString();
     }
 
@@ -159,6 +192,9 @@ public class SerialisingResponseWriter implements ResponseWriter {
                 .append(written)
                 .append(serialiser)
                 .append(request)
+                .append(auditService)
+                .append(recordsProcessed)
+                .append(recordsReturned)
                 .toHashCode();
     }
 }

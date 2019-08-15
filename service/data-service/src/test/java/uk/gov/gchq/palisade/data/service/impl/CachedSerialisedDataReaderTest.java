@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
@@ -50,6 +51,8 @@ public class CachedSerialisedDataReaderTest {
 
     private static CacheService mockCache;
 
+    private static AuditService mockAudit;
+
     private AddCacheRequest<CachedSerialisedDataReader.MapWrap> addCacheRequest;
 
     private GetCacheRequest<CachedSerialisedDataReader.MapWrap> getCacheRequest;
@@ -57,6 +60,7 @@ public class CachedSerialisedDataReaderTest {
     @Before
     public void resetCache() {
         mockCache = Mockito.mock(CacheService.class);
+        mockAudit = Mockito.mock(AuditService.class);
 
         addCacheRequest = new AddCacheRequest<>()
                 .key(CachedSerialisedDataReader.SERIALISER_KEY)
@@ -107,7 +111,7 @@ public class CachedSerialisedDataReaderTest {
     @Test
     public void shouldBeAbleToRetrieveSerialiser() {
         //Given
-        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10))
+        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10), mockAudit)
                 .cacheService(mockCache);
 
         //When
@@ -121,7 +125,7 @@ public class CachedSerialisedDataReaderTest {
     @Test
     public void shouldReturnDefaultSerialiserOnNoRead() {
         //Given
-        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10))
+        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10), mockAudit)
                 .cacheService(mockCache);
         //set default serialiser
         Serialiser<?> defSerialiser = new SimpleStringSerialiser();
@@ -138,7 +142,7 @@ public class CachedSerialisedDataReaderTest {
     @Test
     public void shouldReturnSerialiserFromCache() {
         //Given
-        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10))
+        TestDataReader reader = (TestDataReader) new TestDataReader(new NullInputStream(10), mockAudit)
                 .cacheService(mockCache);
         //set default serialiser
         Serialiser<?> defSerialiser = new SimpleStringSerialiser();
