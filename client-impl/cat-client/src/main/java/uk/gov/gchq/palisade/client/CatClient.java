@@ -71,10 +71,9 @@ public class CatClient {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
 
-            final ReadRequest readRequest = (ReadRequest) new ReadRequest()
+            final ReadRequest readRequest = new ReadRequest()
                     .token(dataRequestResponse.getToken())
-                    .resource(entry.getKey())
-                    .originalRequestId(dataRequestResponse.getOriginalRequestId());
+                    .resource(entry.getKey());
             readRequest.setOriginalRequestId(dataRequestResponse.getOriginalRequestId());
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);

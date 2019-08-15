@@ -94,9 +94,6 @@ public class CatClientTest {
 
         reqResponse = CompletableFuture.completedFuture(response);
 
-        readRequest1 = (ReadRequest) new ReadRequest().token(token).resource(resource1).originalRequestId(reqId);
-        readRequest2 = (ReadRequest) new ReadRequest().token(token).resource(resource2).originalRequestId(reqId);
-
         readResponse1 = CompletableFuture.completedFuture(
                 new ClientReadResponse(IOUtils.toInputStream("Test data 1", StandardCharsets.UTF_8)));
 
