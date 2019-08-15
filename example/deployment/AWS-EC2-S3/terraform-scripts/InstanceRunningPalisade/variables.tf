@@ -29,7 +29,7 @@ variable "aws_profile_name" {
 variable "bucket_name" {}
 
 variable "s3_endpoint" {
-  default = "s3-eu-west-1.amazonaws.com"
+  default = ""
 }
 
 variable "key_name" {}
@@ -55,3 +55,5 @@ variable "data_file_name" {
 variable "ec2_userid" {
   default = "ec2-user"
 }
+
+variable "palisade_version" {}

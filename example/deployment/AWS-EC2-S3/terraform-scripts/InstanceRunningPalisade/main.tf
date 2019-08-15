@@ -68,7 +68,9 @@ module "deploy_palisade" {
   ec2_userid = "${var.ec2_userid}"
   data_file_name = "${var.data_file_name}"
   bucket_name = "${var.bucket_name}"
-  s3_endpoint = "${var.s3_endpoint}"
+  s3_endpoint = "s3-${var.aws_region}.amazonaws.com"
+  palisade_version = "${var.palisade_version}"
+
 }
 
 output "palisade_host_private_host_name" {

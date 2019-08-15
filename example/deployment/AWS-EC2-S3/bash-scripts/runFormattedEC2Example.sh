@@ -9,4 +9,4 @@ export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/
 # java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.runner.RestExample $1 | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
 
 # Runs the example and allows user to pass in a name, file and purpose
-java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient Alice s3a://palisadeec2test.s3-eu-west-1.amazonaws.com/employee_file0.avro SALARY | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient Alice $1 SALARY | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh

@@ -34,37 +34,42 @@ To run this example follow these steps (from the root of the project):
 ```
 3.  Create the file terraform.tfvars in example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade with content based on this
 ```bash
-    # Set the access and secret key plus token OR the profile name, not both!
- 
-    "aws_access_key" = "<Your AWS subscription access key>"
-    
-    "aws_secret_key" = "<Your AWS subscription secret key>"
- 
-    "aws_session_token" = "<Your AWS subscription session token>"
-     
-    "aws_profile_name" = "<Your AWS profile name>"
-
-    # Override the default eu-west-1 if you want
-    # "aws_region" = ""
-
-    
   project = "PalisadeExample"
   owner = "your_name"
-  aws_region = "eu-west-1"
-  # Either set the profile name or the access key, secret key and token
-  aws_access_key_id = "xxx"
-  aws_secret_access_key = "xxx"
-  aws_session_token = "xxx"
-  #aws_profile_name = "xxx"
-  bucket_name = "palisadeec2test"
-  s3_endpoint = "s3-eu-west-1.amazonaws.com"
-  key_name = "create a key and put its name here"
+
+  # Override the default eu-west-1 if you want
+  "aws_region" = ""
+
+  # Set the access and secret key plus token OR the profile name, not both!
+  aws_access_key_id = "<Your AWS subscription access key>"
+  aws_secret_access_key = "<Your AWS subscription secret key>"
+  aws_session_token = "<Your AWS subscription session token>"
+  aws_profile_name = "<Your AWS profile name>"
+
+  bucket_name = "<Globally unique S3 bucket name>" #Only lowercase alphanumerica characters and hypens allowed
+  key_name = "<Name of EC2 key pair instance for EC2 cluster>"
   pem_file = "/path/to/created/private/key.pem"
   ingress_ip_range = ["1.2.3.4/32", "2.3.4.5/32"]
   instance_name = "PalisadeExample"
   instance_type = "t2.large"
-  data_file_name = "employee_file0.avro"
+  palisade_version = "<The Version of Palisade you want to run>"
 ```
+This needs to be populated with the values indicated above before the example will run.
+1. Your AWS session token, access key and secret key are specific to your AWS subscription. You can find information on where these are located [here](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html). 
+    You can setup a named profile according to instructions [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
+    
+    You should set **either** the access and secret keys plus session token **or** a profile name, not both. If you are using shared credentials, the profile name should be in the AWS shared credential file
+    `~/.aws/credentials` (or `%UserProfile%\.aws\credentials` on Windows). 
+                
+    2. The `bucket_name` must be a globally unique S3 bucket name of your choosing. Bucket naming rules are [here](https://docs.aws.amazon.com/AmazonS3/latest/dev//BucketRestrictions.html#bucketnamingrules).
+    3. You will need to create a key pair which allows you to SSH into the EMR cluster and for Terraform to provision the cluster:
+        1. Create a key pair by logging in and from the AWS console, select Services -> EC2. Then select Key Pairs from the side menu.
+        2. Click "Create Key Pair" which will ask for a name and give you a private certificate to download.
+        
+       Put the name of your key pair in the `key_name` field  as it appears in AWS (no `.pem` extension).
+    
+    4. `pem_file` should be the path to the private key create in previous step (ending in `.pem` extension).
+    6. The `ingress_ip_range` is a list of public IPs that will be able to connect into the EMR cluster. This should be your public IP for your client machine.
 
 4. Create a symbolic link to the above terraform.tfvars file in example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningExample
 ```bash
@@ -72,11 +77,14 @@ To run this example follow these steps (from the root of the project):
 ```
 
 5. Run the Terraform to create the two EC2 instances, install and start up Palisade on the first instance, install the example on the second instance and run it.
+
+    **You will start to incur charges to your AWS subscription at this point!**
 ```bash
   ./example/deployment/AWS-EC2-S3/bash-scripts/runAWS-EC2-S3Example.sh
 ```
 
 After completion run terraform destroy to tear down the two EC2 instances:
+**This will delete everything in your bucket!**
 
 1. Tear down the instance running the example
 ```bash

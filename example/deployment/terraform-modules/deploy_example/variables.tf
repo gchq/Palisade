@@ -5,3 +5,5 @@ variable "ec2_userid" {}
 variable "bucket_name" {}
 variable "s3_endpoint" {}
 variable "palisade_host_private_host_name" {}
+variable "palisade_version" {}
+

@@ -34,6 +34,8 @@ module "deploy_example" {
   private_host_name = "${aws_instance.instance_running_palisade_example.private_dns}"
   ec2_userid = "${var.ec2_userid}"
   bucket_name = "${var.bucket_name}"
-  s3_endpoint = "${var.s3_endpoint}"
+  s3_endpoint = "s3-${var.aws_region}.amazonaws.com"
   palisade_host_private_host_name = "${var.palisade_host_private_host_name}"
+  palisade_version = "${var.palisade_version}"
+
 }
