@@ -58,15 +58,17 @@ public final class Util {
      * @param context the additional context
      * @param rules   rules collection
      * @param <T>     record type
+     * @param recordsProcessed a counter for the number of records being processed
+     * @param recordsReturned a counter for the number of records being returned
      * @return filtered stream
      */
-    public static <T> Stream<T> applyRulesToStream(final Stream<T> records, final User user, final Context context, final Rules<T> rules, final AtomicLong numberOfRecordsProcessed, final AtomicLong numberOfRecordsReturned) {
+    public static <T> Stream<T> applyRulesToStream(final Stream<T> records, final User user, final Context context, final Rules<T> rules, final AtomicLong recordsProcessed, final AtomicLong recordsReturned) {
         Objects.requireNonNull(records);
         if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
             return records;
         }
 
-        return records.map(record -> applyRulesToItem(record, user, context, rules, numberOfRecordsProcessed, numberOfRecordsReturned)).filter(record -> null != record);
+        return records.map(record -> applyRulesToItem(record, user, context, rules, recordsProcessed, recordsReturned)).filter(record -> null != record);
     }
 
     /**
@@ -77,12 +79,14 @@ public final class Util {
      * @param context the additional context
      * @param rules   rules collection
      * @param <T>     record type
+     * @param recordsProcessed a counter for the number of records being processed
+     * @param recordsReturned a counter for the number of records being returned
      * @return filtered item
      */
-    public static <T> T applyRulesToItem(final T item, final User user, final Context context, final Rules<T> rules, final AtomicLong numberOfRecordsProcessed, final AtomicLong numberOfRecordsReturned) {
-        numberOfRecordsProcessed.incrementAndGet();
+    public static <T> T applyRulesToItem(final T item, final User user, final Context context, final Rules<T> rules, final AtomicLong recordsProcessed, final AtomicLong recordsReturned) {
+        recordsProcessed.incrementAndGet();
         if (null == rules || rules.getRules().isEmpty()) {
-            numberOfRecordsReturned.incrementAndGet();
+            recordsReturned.incrementAndGet();
             return item;
         }
         T updateItem = item;
@@ -92,7 +96,7 @@ public final class Util {
                 break;
             }
         }
-        numberOfRecordsReturned.incrementAndGet();
+        recordsReturned.incrementAndGet();
         return updateItem;
     }
 
