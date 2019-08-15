@@ -58,5 +58,6 @@ For deployment specific instructions on how to run the example see:
 - [Local JVM](deployment/local-jvm/README.md) - Runs the example in separate JVM's on the local machine 
 - [Local Docker](deployment/local-docker/README.md) - Runs the example in docker containers on the local machine
 - [Local Kubernetes](deployment/local-k8s/README.md) - Runs the example in Kubernetes on the local machine
+- [AWS-EC2](deployment/AWS-EC2-S3/README.md) - Runs the example on AWS EC2 which demonstrates Palisade integrating into AWS S3
 - [AWS-EMR](deployment/AWS-EMR/README.md) - Runs the example using the MapReduce client on the AWS EMR service which demonstrates that Palisade can process large volumes of data when deployed on bare metal as JVM's on a Hadoop cluster.
 - [Azure-AKS](deployment/Azure-AKS/README.md) - Runs the example on Azure's Kubernetes as a service, showing that it can be deployed on different architectures and different cloud providers.

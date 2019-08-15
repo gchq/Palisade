@@ -34,7 +34,8 @@
   * [Performance Test Harness](example/performance/README.md)
   * [Local JVM Deployment](example/deployment/local-jvm/README.md)  
   * [Local Docker Deployment](example/deployment/local-docker/README.md)  
-  * [Local Kubernetes Deployment](example/deployment/local-k8s/README.md)  
+  * [Local Kubernetes Deployment](example/deployment/local-k8s/README.md)
+  * [AWS EC2 Deployment](example/deployment/AWS-EC2-S3/README.md)  
   * [AWS-EMR Deployment](example/deployment/AWS-EMR/README.md)  
   * [Azure-AKS Deployment](example/deployment/Azure-AKS/README.md)
 

@@ -46,7 +46,7 @@ To run this example follow these steps (from the root of the project):
   aws_session_token = "<Your AWS subscription session token>"
   aws_profile_name = "<Your AWS profile name>"
 
-  bucket_name = "<Globally unique S3 bucket name>" #Only lowercase alphanumerica characters and hypens allowed
+  bucket_name = "<Globally unique S3 bucket name>" #Only lowercase alphanumeric characters and hypens allowed
   key_name = "<Name of EC2 key pair instance for EC2 cluster>"
   pem_file = "/path/to/created/private/key.pem"
   ingress_ip_range = ["1.2.3.4/32", "2.3.4.5/32"]
