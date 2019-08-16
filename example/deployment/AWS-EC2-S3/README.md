@@ -13,7 +13,7 @@ Terraform will also create an S3 bucket and grant IAM permissions on the bucket 
 Terraform will create a sample data file on this EC2 instance and then upload this file from the EC2 instance to the S3 bucket.
 
 Terraform will then spin up a second EC2 instance and install the example on this second instance. This instance does not get granted access to the S3 bucket.
-When Terraform runs the example on the second EC2 instance the example connects to the Rest endpoints of the palisade services running on the first EC2 instance and runs queries as the users Alice, Bob and Eve.
+When a user runs the example on the second EC2 instance the example connects to the Rest endpoints of the palisade services running on the first EC2 instance and runs a query as the supplied user.
 Palisade queries the data in the S3 bucket and returns data to the example client redacted accordinging to the appropiate policy rules.
 
 ##### PREREQUISITES
