@@ -56,7 +56,7 @@ To run this example follow these steps (from the root of the project):
 ```
 This needs to be populated with the values indicated above before the example will run.
 1. Your AWS session token, access key and secret key are specific to your AWS subscription. You can find information on where these are located [here](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html). 
-    You can setup a named profile according to instructions [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
+    Alternatively you can setup a named profile according to instructions [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
     
     You should set **either** the access and secret keys plus session token **or** a profile name, not both. If you are using shared credentials, the profile name should be in the AWS shared credential file
     `~/.aws/credentials` (or `%UserProfile%\.aws\credentials` on Windows). 
