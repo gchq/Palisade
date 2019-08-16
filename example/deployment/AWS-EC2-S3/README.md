@@ -38,7 +38,7 @@ To run this example follow these steps (from the root of the project):
   owner = "your_name"
 
   # Override the default eu-west-1 if you want
-  "aws_region" = ""
+  "#aws_region" = ""
 
   # Set the access and secret key plus token OR the profile name, not both!
   aws_access_key_id = "<Your AWS subscription access key>"
