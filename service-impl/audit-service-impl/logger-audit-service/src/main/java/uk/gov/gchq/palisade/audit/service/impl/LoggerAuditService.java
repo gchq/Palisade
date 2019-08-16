@@ -23,11 +23,8 @@ import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ReadResponseAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.RegisterRequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.ServiceState;
 
@@ -52,13 +49,6 @@ public class LoggerAuditService implements AuditService {
 
     //translate class object to handler
     static {
-        //handler for RegisterRequestReceivedAuditRequest
-        DISPATCH.put(RegisterRequestReceivedAuditRequest.class, (o) -> {
-            requireNonNull(o, "RegisterRequestReceivedAuditRequest cannot be null");
-            RegisterRequestReceivedAuditRequest registerRequestReceivedAuditRequest = (RegisterRequestReceivedAuditRequest) o;
-            final String msg = "'RegisterRequestReceivedAuditRequest': " + registerRequestReceivedAuditRequest;
-            LOGGER.info(msg);
-        });
         //handler for RegisterRequestCompleteAuditRequest
         DISPATCH.put(RegisterRequestCompleteAuditRequest.class, (o) -> {
             requireNonNull(o, "RegisterRequestCompleteAuditRequest cannot be null");
@@ -73,13 +63,6 @@ public class LoggerAuditService implements AuditService {
             final String msg = "'RegisterRequestExceptionAuditRequest': " + registerRequestExceptionAuditRequest;
             LOGGER.error(msg);
         });
-        //handler for ReadRequestReceivedAuditRequest
-        DISPATCH.put(ReadRequestReceivedAuditRequest.class, (o) -> {
-            requireNonNull(o, "ReadRequestReceivedAuditRequest cannot be null");
-            ReadRequestReceivedAuditRequest readRequestReceivedAuditRequest = (ReadRequestReceivedAuditRequest) o;
-            final String msg = "'ReadRequestReceivedAuditRequest': " + readRequestReceivedAuditRequest;
-            LOGGER.info(msg);
-        });
         //handler for ReadRequestCompleteAuditRequest
         DISPATCH.put(ReadRequestCompleteAuditRequest.class, (o) -> {
             requireNonNull(o, "ReadRequestCompleteAuditRequest cannot be null");
@@ -93,13 +76,6 @@ public class LoggerAuditService implements AuditService {
             ReadRequestExceptionAuditRequest readRequestExceptionAuditRequest = (ReadRequestExceptionAuditRequest) o;
             final String msg = "'readRequestExceptionAuditRequest': " + readRequestExceptionAuditRequest;
             LOGGER.error(msg);
-        });
-        //handler for ReadResponseAuditRequest
-        DISPATCH.put(ReadResponseAuditRequest.class, (o) -> {
-            requireNonNull(o, "ReadResponseAuditRequest cannot be null");
-            ReadResponseAuditRequest readResponseAuditRequest = (ReadResponseAuditRequest) o;
-            final String msg = "'ReadResponseAuditRequest': " + readResponseAuditRequest;
-            LOGGER.info(msg);
         });
     }
 

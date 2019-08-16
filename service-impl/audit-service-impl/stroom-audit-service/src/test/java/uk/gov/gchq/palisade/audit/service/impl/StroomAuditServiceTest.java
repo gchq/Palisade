@@ -17,20 +17,18 @@ import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ReadResponseAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.RegisterRequestReceivedAuditRequest;
-import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.rule.Rules;
+import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.user.service.UserService;
 
-import java.util.Set;
+import java.util.HashSet;
 
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -38,12 +36,18 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class StroomAuditServiceTest {
 
-    private static final StroomAuditService stroomAuditService= createStroomAuditService();
-
-    @Mock
-    AppenderSkeleton appender;
-    @Captor
-    ArgumentCaptor<LoggingEvent> logCaptor;
+    private static final StroomAuditService STROOM_AUDIT_SERVICE= createStroomAuditService();
+    private static final String TEST_USER_ID = "an identifier for the user";
+    private static final String TEST_RESOURCE_ID = "a pointer to a data resource";
+    private static final String TEST_PURPOSE = "the purpose for the data access request";
+    private static final String TEST_ORIGINAL_REQUEST_ID = "originalRequestId linking all logs from the same data access request together";
+    private static final String TEST_SERIALISED_FORMAT = "serialised format of the resource, e.g. Avro, CSV";
+    private static final String TEST_DATA_TYPE = "data type of the resource, e.g. Employee";
+    private static final String TEST_EXCEPTION_MESSAGE = "exception message";
+    private static final long TEST_NUMBER_OF_RECORDS_PROCESSED = 20;
+    private static final long TEST_NUMBER_OF_RECORDS_RETURNED = 5;
+    private static final String TEST_TOKEN = "token in the form of a UUID";
+    private static final String TEST_RULES_APPLIED = "human readable description of the rules/policies been applied to the data";
 
     private static StroomAuditService createStroomAuditService() {
         return new StroomAuditService()
@@ -55,290 +59,367 @@ public class StroomAuditServiceTest {
                 .systemVersion("some system version");
     }
 
+    private UserId mockUserID() {
+        final UserId mockUserId = Mockito.mock(UserId.class);
+        Mockito.doReturn(TEST_USER_ID).when(mockUserId).getId();
+        return mockUserId;
+    }
+
+    private User mockUser() {
+        final User mockUser = Mockito.mock(User.class);
+        Mockito.doReturn(mockUserID()).when(mockUser).getUserId();
+        return mockUser;
+    }
+
+    private Context mockContext() {
+        final Context mockContext = Mockito.mock(Context.class);
+        Mockito.doReturn(TEST_PURPOSE).when(mockContext).getPurpose();
+        return mockContext;
+    }
+
+    private RequestId mockOriginalRequestId() {
+        final RequestId mockOriginalRequestId = Mockito.mock(RequestId.class);
+        Mockito.doReturn(TEST_ORIGINAL_REQUEST_ID).when(mockOriginalRequestId).getId();
+        return mockOriginalRequestId;
+    }
+
+    private LeafResource mockResource() {
+        final LeafResource mockResource = Mockito.mock(LeafResource.class);
+        Mockito.doReturn(TEST_RESOURCE_ID).when(mockResource).getId();
+        Mockito.doReturn(TEST_DATA_TYPE).when(mockResource).getType();
+        Mockito.doReturn(TEST_SERIALISED_FORMAT).when(mockResource).getSerialisedFormat();
+        return mockResource;
+    }
+
+    private Exception mockException() {
+        final Exception mockException = Mockito.mock(Exception.class);
+        Mockito.doReturn(TEST_EXCEPTION_MESSAGE).when(mockException).getMessage();
+        return mockException;
+    }
+
+    private Rules mockRules() {
+        final Rules mockRules = Mockito.mock(Rules.class);
+        Mockito.doReturn(TEST_RULES_APPLIED).when(mockRules).getMessage();
+        return mockRules;
+    }
+
+
+    @Mock
+    AppenderSkeleton appender;
+    @Captor
+    ArgumentCaptor<LoggingEvent> logCaptor;
+
     @Test
-    public void auditRegisterRequestReceived() {
+    public void auditRegisterRequestWithNoResources() {
         // Given
         Logger.getRootLogger().addAppender(appender);
 
-        final String resourceId = "a pointer to a data resource";
-        final String userId = "an identifier for the user";
-        final String purpose = "the purpose for the data access request";
-        final String exceptionOriginalRequestId = "originalRequestId linking all logs from the same data access request together";
+        // mock user
+        final User mockUser = mockUser();
+        // mock context
+        final Context mockContext = mockContext();
+        // mock original request id
+        final RequestId mockOriginalRequestId = mockOriginalRequestId();
 
-        final RegisterRequestReceivedAuditRequest auditRequestReceived = new RegisterRequestReceivedAuditRequest();
-        UserId mockUserId = Mockito.mock(UserId.class);
-        Mockito.doReturn(userId).when(mockUserId).getId();
-        Context mockContext = Mockito.mock(Context.class);
-        Mockito.doReturn(purpose).when(mockContext).getPurpose();
-        RequestId mockRequestId = Mockito.mock(RequestId.class);
-        Mockito.doReturn(exceptionOriginalRequestId).when(mockRequestId).getId();
-        auditRequestReceived
-                .resourceId(resourceId)
-                .userId(mockUserId)
+        final AuditRequest auditRequest = new RegisterRequestCompleteAuditRequest()
+                .user(mockUser)
                 .context(mockContext)
-                .originalRequestId(mockRequestId);
+                .leafResources(new HashSet<>(0));
+        auditRequest.setOriginalRequestId(mockOriginalRequestId);
 
         // When
-        stroomAuditService.audit(auditRequestReceived);
+        STROOM_AUDIT_SERVICE.audit(auditRequest);
 
         //Then
         verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
         final String log = logCaptor.getValue().getRenderedMessage();
+        verify(mockOriginalRequestId, Mockito.atLeastOnce()).getId();
+        verify(mockUser, Mockito.atLeastOnce()).getUserId();
+        verify(mockContext, Mockito.atLeastOnce()).getPurpose();
+        Assert.assertTrue(log.contains(TEST_USER_ID));
+        Assert.assertTrue(log.contains(TEST_PURPOSE));
+        Assert.assertTrue(log.contains(TEST_ORIGINAL_REQUEST_ID));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_NO_RESOURCES_TYPE_ID));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_NO_RESOURCES_DESCRIPTION));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_NO_RESOURCES_OUTCOME_DESCRIPTION));
+    }
+
+    @Test
+    public void auditRegisterRequestSuccessful() {
+        // Given
+        Logger.getRootLogger().addAppender(appender);
+
+        // mock user
+        final User mockUser = mockUser();
+        // mock context
+        final Context mockContext = mockContext();
+        // mock original request id
+        final RequestId mockOriginalRequestId = mockOriginalRequestId();
+        // mock resource
+        final LeafResource mockResource = mockResource();
+
+        final AuditRequest auditRequest = new RegisterRequestCompleteAuditRequest()
+                .user(mockUser)
+                .context(mockContext)
+                .leafResources(Sets.newSet(mockResource));
+        auditRequest.setOriginalRequestId(mockOriginalRequestId);
+
+        // When
+        STROOM_AUDIT_SERVICE.audit(auditRequest);
+
+        //Then
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
+        verify(mockOriginalRequestId, Mockito.atLeastOnce()).getId();
+        verify(mockUser, Mockito.atLeastOnce()).getUserId();
+        verify(mockContext, Mockito.atLeastOnce()).getPurpose();
+        verify(mockResource, Mockito.atLeastOnce()).getId();
+        verify(mockResource, Mockito.atLeastOnce()).getType();
+        Assert.assertTrue(log.contains(TEST_USER_ID));
+        Assert.assertTrue(log.contains(TEST_PURPOSE));
+        Assert.assertTrue(log.contains(TEST_ORIGINAL_REQUEST_ID));
+        Assert.assertTrue(log.contains(TEST_RESOURCE_ID));
+        Assert.assertTrue(log.contains(TEST_DATA_TYPE));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_COMPLETED_TYPE_ID));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_COMPLETED_DESCRIPTION));
+    }
+
+    @Test
+    public void auditRegisterRequestUserException() {
+        // Given
+        Logger.getRootLogger().addAppender(appender);
+
+        // mock userId
+        final UserId mockUserId = mockUserID();
+        // mock context
+        final Context mockContext = mockContext();
+        // mock original request id
+        final RequestId mockOriginalRequestId = mockOriginalRequestId();
+        // mock exception
+        final Exception mockException = mockException();
+
+        final AuditRequest auditRequest = new RegisterRequestExceptionAuditRequest()
+                .userId(mockUserId)
+                .resourceId(TEST_RESOURCE_ID)
+                .context(mockContext)
+                .exception(mockException)
+                .service(UserService.class);
+        auditRequest.setOriginalRequestId(mockOriginalRequestId);
+
+        // When
+        STROOM_AUDIT_SERVICE.audit(auditRequest);
+
+        //Then
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
+        verify(mockOriginalRequestId, Mockito.atLeastOnce()).getId();
         verify(mockUserId, Mockito.atLeastOnce()).getId();
         verify(mockContext, Mockito.atLeastOnce()).getPurpose();
-        verify(mockRequestId, Mockito.atLeastOnce()).getId();
-        Assert.assertTrue(log.contains(resourceId));
-        Assert.assertTrue(log.contains(userId));
-        Assert.assertTrue(log.contains(purpose));
-        Assert.assertTrue(log.contains(exceptionOriginalRequestId));
-        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_RECEIVED_DESCRIPTION));
+        Assert.assertTrue(log.contains(TEST_USER_ID));
+        Assert.assertTrue(log.contains(TEST_PURPOSE));
+        Assert.assertTrue(log.contains(TEST_ORIGINAL_REQUEST_ID));
+        Assert.assertTrue(log.contains(TEST_RESOURCE_ID));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_EXCEPTION_USER_TYPE_ID));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_EXCEPTION_USER_DESCRIPTION));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_EXCEPTION_USER_OUTCOME_DESCRIPTION));
     }
 
     @Test
-    public void auditRegisterRequestCompleted() {
+    public void auditRegisterRequestResourceException() {
         // Given
         Logger.getRootLogger().addAppender(appender);
 
-        final String resourceId = "a pointer to a data resource";
-        final String userId = "an identifier for the user";
-        final String exceptionOriginalRequestId = "originalRequestId linking all logs from the same data access request together";
-        final String resourceSerialisedFormat = "serialised format of the resource";
-        final String resourceDataType = "data type of the resource";
+        // mock userId
+        final UserId mockUserId = mockUserID();
+        // mock context
+        final Context mockContext = mockContext();
+        // mock original request id
+        final RequestId mockOriginalRequestId = mockOriginalRequestId();
+        // mock exception
+        final Exception mockException = mockException();
 
-        final RegisterRequestCompleteAuditRequest auditRequestComplete = new RegisterRequestCompleteAuditRequest();
-        UserId mockUserId = Mockito.mock(UserId.class);
-        User mockUser = Mockito.mock(User.class);
-        Mockito.doReturn(userId).when(mockUserId).getId();
-        Mockito.doReturn(mockUserId).when(mockUser).getUserId();
-        Set<LeafResource> resources = Sets.newSet(new FileResource().id(resourceId).serialisedFormat(resourceSerialisedFormat).type(resourceDataType));
-        RequestId mockRequestId = Mockito.mock(RequestId.class);
-        Mockito.doReturn(exceptionOriginalRequestId).when(mockRequestId).getId();
-        auditRequestComplete
-                .user(mockUser)
-                .leafResources(resources)
-                .originalRequestId(mockRequestId);
+        final AuditRequest auditRequest = new RegisterRequestExceptionAuditRequest()
+                .userId(mockUserId)
+                .resourceId(TEST_RESOURCE_ID)
+                .context(mockContext)
+                .exception(mockException)
+                .service(ResourceService.class);
+        auditRequest.setOriginalRequestId(mockOriginalRequestId);
 
         // When
-        stroomAuditService.audit(auditRequestComplete);
+        STROOM_AUDIT_SERVICE.audit(auditRequest);
 
         //Then
         verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
-        final String authenticationLog = logCaptor.getAllValues().get(1).getRenderedMessage();
-        final String registerSuccessLog = logCaptor.getAllValues().get(2).getRenderedMessage();
+        final String log = logCaptor.getValue().getRenderedMessage();
+        verify(mockOriginalRequestId, Mockito.atLeastOnce()).getId();
         verify(mockUserId, Mockito.atLeastOnce()).getId();
+        verify(mockContext, Mockito.atLeastOnce()).getPurpose();
+        Assert.assertTrue(log.contains(TEST_USER_ID));
+        Assert.assertTrue(log.contains(TEST_PURPOSE));
+        Assert.assertTrue(log.contains(TEST_ORIGINAL_REQUEST_ID));
+        Assert.assertTrue(log.contains(TEST_RESOURCE_ID));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_EXCEPTION_RESOURCE_TYPE_ID));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_EXCEPTION_RESOURCE_DESCRIPTION));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_EXCEPTION_RESOURCE_OUTCOME_DESCRIPTION));
+    }
+
+    @Test
+    public void auditRegisterRequestOtherException() {
+        // Given
+        Logger.getRootLogger().addAppender(appender);
+
+        // mock userId
+        final UserId mockUserId = mockUserID();
+        // mock context
+        final Context mockContext = mockContext();
+        // mock original request id
+        final RequestId mockOriginalRequestId = mockOriginalRequestId();
+        // mock exception
+        final Exception mockException = mockException();
+
+        final AuditRequest auditRequest = new RegisterRequestExceptionAuditRequest()
+                .userId(mockUserId)
+                .resourceId(TEST_RESOURCE_ID)
+                .context(mockContext)
+                .exception(mockException)
+                .service(PalisadeService.class);
+        auditRequest.setOriginalRequestId(mockOriginalRequestId);
+
+        // When
+        STROOM_AUDIT_SERVICE.audit(auditRequest);
+
+        //Then
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
+        verify(mockOriginalRequestId, Mockito.atLeastOnce()).getId();
+        verify(mockUserId, Mockito.atLeastOnce()).getId();
+        verify(mockContext, Mockito.atLeastOnce()).getPurpose();
+        verify(mockException, Mockito.atLeastOnce()).getMessage();
+        Assert.assertTrue(log.contains(TEST_USER_ID));
+        Assert.assertTrue(log.contains(TEST_PURPOSE));
+        Assert.assertTrue(log.contains(TEST_ORIGINAL_REQUEST_ID));
+        Assert.assertTrue(log.contains(TEST_RESOURCE_ID));
+        Assert.assertTrue(log.contains(TEST_EXCEPTION_MESSAGE));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_EXCEPTION_OTHER_TYPE_ID));
+        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_EXCEPTION_OTHER_DESCRIPTION));
+    }
+
+    @Test
+    public void auditReadRequestSuccessful() {
+        // Given
+        Logger.getRootLogger().addAppender(appender);
+
+        // mock user
+        final User mockUser = mockUser();
+        // mock context
+        final Context mockContext = mockContext();
+        // mock original request id
+        final RequestId mockOriginalRequestId = mockOriginalRequestId();
+        // mock resource
+        final LeafResource mockResource = mockResource();
+        // mock rules
+        final Rules mockRules = mockRules();
+
+        final AuditRequest auditRequest = new ReadRequestCompleteAuditRequest()
+                .user(mockUser)
+                .resource(mockResource)
+                .context(mockContext)
+                .rulesApplied(mockRules)
+                .numberOfRecordsProcessed(TEST_NUMBER_OF_RECORDS_PROCESSED)
+                .numberOfRecordsReturned(TEST_NUMBER_OF_RECORDS_RETURNED);
+        auditRequest.setOriginalRequestId(mockOriginalRequestId);
+
+        // When
+        STROOM_AUDIT_SERVICE.audit(auditRequest);
+
+        //Then
+        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
+        final String log = logCaptor.getValue().getRenderedMessage();
+        verify(mockOriginalRequestId, Mockito.atLeastOnce()).getId();
         verify(mockUser, Mockito.atLeastOnce()).getUserId();
-        verify(mockRequestId, Mockito.atLeastOnce()).getId();
-        Assert.assertTrue(authenticationLog.contains(userId));
-        Assert.assertTrue(authenticationLog.contains(exceptionOriginalRequestId));
-        Assert.assertTrue(authenticationLog.contains(StroomAuditService.REGISTER_REQUEST_AUTHENTICATION_SUCCESS_DESCRIPTION));
-        Assert.assertTrue(registerSuccessLog.contains(resourceId));
-        Assert.assertTrue(registerSuccessLog.contains(exceptionOriginalRequestId));
-        Assert.assertTrue(registerSuccessLog.contains(resourceDataType));
-        Assert.assertTrue(registerSuccessLog.contains(StroomAuditService.REGISTER_REQUEST_COMPLETED_DESCRIPTION));
-    }
-
-    @Test
-    public void auditRegisterRequestExceptionFromPolicyService() {
-        // Given
-        Logger.getRootLogger().addAppender(appender);
-
-        final String exceptionMessage = "exception message";
-        final String exceptionOriginalRequestId = "originalRequestId linking all logs from the same data access request together";
-
-        final RegisterRequestExceptionAuditRequest auditRequestWithException = new RegisterRequestExceptionAuditRequest();
-        Throwable mockException = Mockito.mock(Throwable.class);
-        Mockito.doReturn(exceptionMessage).when(mockException).getMessage();
-        RequestId mockRequestId = Mockito.mock(RequestId.class);
-        Mockito.doReturn(exceptionOriginalRequestId).when(mockRequestId).getId();
-        auditRequestWithException
-                .exception(mockException)
-                .service(PolicyService.class)
-                .originalRequestId(mockRequestId);
-
-        // When
-        stroomAuditService.audit(auditRequestWithException);
-
-        //Then
-        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
-        final String log = logCaptor.getValue().getRenderedMessage();
-        verify(mockException, Mockito.atLeastOnce()).getMessage();
-        verify(mockRequestId, Mockito.atLeastOnce()).getId();
-        Assert.assertTrue(log.contains(exceptionMessage));
-        Assert.assertTrue(log.contains(exceptionOriginalRequestId));
-        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_EXCEPTION_DESCRIPTION));
-    }
-
-    @Test
-    public void auditRegisterRequestExceptionFromUserService() {
-        // Given
-        Logger.getRootLogger().addAppender(appender);
-
-        final String exceptionMessage = "exception message";
-        final String exceptionOriginalRequestId = "originalRequestId linking all logs from the same data access request together";
-
-        final RegisterRequestExceptionAuditRequest auditRequestWithException = new RegisterRequestExceptionAuditRequest();
-        Throwable mockException = Mockito.mock(Throwable.class);
-        Mockito.doReturn(exceptionMessage).when(mockException).getMessage();
-        RequestId mockRequestId = Mockito.mock(RequestId.class);
-        Mockito.doReturn(exceptionOriginalRequestId).when(mockRequestId).getId();
-        auditRequestWithException
-                .exception(mockException)
-                .service(UserService.class)
-                .originalRequestId(mockRequestId);
-
-        // When
-        stroomAuditService.audit(auditRequestWithException);
-
-        //Then
-        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
-        final String log = logCaptor.getValue().getRenderedMessage();
-        verify(mockException, Mockito.atLeastOnce()).getMessage();
-        verify(mockRequestId, Mockito.atLeastOnce()).getId();
-        Assert.assertTrue(log.contains(exceptionMessage));
-        Assert.assertTrue(log.contains(exceptionOriginalRequestId));
-        Assert.assertTrue(log.contains(StroomAuditService.REGISTER_REQUEST_USER_EXCEPTION_DESCRIPTION));
-    }
-
-    @Test
-    public void auditReadRequestReceived() {
-        // Given
-        Logger.getRootLogger().addAppender(appender);
-
-        final String resourceType = "Resource type, e.g. Employee";
-        final String resourceId = "resource id";
-        final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
-
-        final ReadRequestReceivedAuditRequest auditReadRequestReceived = new ReadRequestReceivedAuditRequest();
-        FileResource mockResource = Mockito.mock(FileResource.class);
-        Mockito.doReturn(resourceType).when(mockResource).getType();
-        Mockito.doReturn(resourceId).when(mockResource).getId();
-        RequestId mockRequestId = Mockito.mock(RequestId.class);
-        Mockito.doReturn(originalRequestId).when(mockRequestId).getId();
-        auditReadRequestReceived
-                .resource(mockResource)
-                .originalRequestId(mockRequestId);
-
-        // When
-        stroomAuditService.audit(auditReadRequestReceived);
-
-        //Then
-        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
-        final String log = logCaptor.getValue().getRenderedMessage();
+        verify(mockResource, Mockito.atLeastOnce()).getId();
         verify(mockResource, Mockito.atLeastOnce()).getType();
-        verify(mockResource, Mockito.atLeastOnce()).getId();
-        verify(mockRequestId, Mockito.atLeastOnce()).getId();
-        Assert.assertTrue(log.contains(resourceId));
-        Assert.assertTrue(log.contains(resourceType));
-        Assert.assertTrue(log.contains(originalRequestId));
-        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_RECEIVED_DESCRIPTION));
-    }
-
-    @Test
-    public void auditReadRequestComplete() {
-        // Given
-        Logger.getRootLogger().addAppender(appender);
-
-        final String resourceId = "resource id";
-        final long numberOfRecordsProcessed = Long.MAX_VALUE;
-        final long numberOfRecordsReturned = 5;
-        final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
-
-        final ReadRequestCompleteAuditRequest auditReadRequestComplete = new ReadRequestCompleteAuditRequest();
-        FileResource mockResource = Mockito.mock(FileResource.class);
-        Mockito.doReturn(resourceId).when(mockResource).getId();
-        RequestId mockRequestId = Mockito.mock(RequestId.class);
-        Mockito.doReturn(originalRequestId).when(mockRequestId).getId();
-        auditReadRequestComplete
-                .resource(mockResource)
-                .numberOfRecordsProcessed(numberOfRecordsProcessed)
-                .numberOfRecordsReturned(numberOfRecordsReturned)
-                .originalRequestId(mockRequestId);
-
-        // When
-        stroomAuditService.audit(auditReadRequestComplete);
-
-        //Then
-        verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
-        final String log = logCaptor.getValue().getRenderedMessage();
-        verify(mockResource, Mockito.atLeastOnce()).getId();
-        verify(mockRequestId, Mockito.atLeastOnce()).getId();
-        Assert.assertTrue(log.contains(resourceId));
-        // Stroom doesn't currently have the functionalility to state the number of records processed
-//        Assert.assertTrue(log.contains(String.valueOf(numberOfRecordsProcessed)));
-        Assert.assertTrue(log.contains(String.valueOf(numberOfRecordsReturned)));
-        Assert.assertTrue(log.contains(originalRequestId));
+        verify(mockContext, Mockito.atLeastOnce()).getPurpose();
+        Assert.assertTrue(log.contains(TEST_USER_ID));
+        Assert.assertTrue(log.contains(TEST_PURPOSE));
+        Assert.assertTrue(log.contains(TEST_ORIGINAL_REQUEST_ID));
+        Assert.assertTrue(log.contains(TEST_RESOURCE_ID));
+        Assert.assertTrue(log.contains(TEST_DATA_TYPE));
+        Assert.assertTrue(log.contains(TEST_RULES_APPLIED));
+        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_COMPLETED_TYPE_ID));
         Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_COMPLETED_DESCRIPTION));
     }
 
     @Test
-    public void auditReadRequestException() {
+    public void auditReadRequestTokenException() {
         // Given
         Logger.getRootLogger().addAppender(appender);
 
-        final String resourceId = "resource id";
-        final String token = "token in the form of a UUID";
-        final String exceptionErrorMessage = "The error message from the exception thrown";
-        final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
+        // mock original request id
+        final RequestId mockOriginalRequestId = mockOriginalRequestId();
+        // mock resource
+        final LeafResource mockResource = mockResource();
+        // mock exception
+        final Exception mockException = Mockito.mock(Exception.class);
+        Mockito.doReturn(PalisadeService.TOKEN_NOT_FOUND_MESSAGE).when(mockException).getMessage();
 
-        final ReadRequestExceptionAuditRequest auditReadRequestException = new ReadRequestExceptionAuditRequest();
-        FileResource mockResource = Mockito.mock(FileResource.class);
-        Mockito.doReturn(resourceId).when(mockResource).getId();
-        RequestId mockRequestId = Mockito.mock(RequestId.class);
-        Mockito.doReturn(originalRequestId).when(mockRequestId).getId();
-        auditReadRequestException
+        final AuditRequest auditRequest = new ReadRequestExceptionAuditRequest()
                 .resource(mockResource)
-                .token(token)
-                .exception(new Throwable(exceptionErrorMessage))
-                .originalRequestId(mockRequestId);
+                .token(TEST_TOKEN)
+                .exception(mockException);
+        auditRequest.setOriginalRequestId(mockOriginalRequestId);
 
         // When
-        stroomAuditService.audit(auditReadRequestException);
+        STROOM_AUDIT_SERVICE.audit(auditRequest);
 
         //Then
         verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
         final String log = logCaptor.getValue().getRenderedMessage();
+        verify(mockOriginalRequestId, Mockito.atLeastOnce()).getId();
         verify(mockResource, Mockito.atLeastOnce()).getId();
-        verify(mockRequestId, Mockito.atLeastOnce()).getId();
-        Assert.assertTrue(log.contains(resourceId));
-        Assert.assertTrue(log.contains(originalRequestId));
-        Assert.assertTrue(log.contains(token));
-        Assert.assertTrue(log.contains(exceptionErrorMessage));
-        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_EXCEPTION_DESCRIPTION));
+        verify(mockResource, Mockito.atLeastOnce()).getType();
+        Assert.assertTrue(log.contains(TEST_ORIGINAL_REQUEST_ID));
+        Assert.assertTrue(log.contains(TEST_RESOURCE_ID));
+        Assert.assertTrue(log.contains(TEST_DATA_TYPE));
+        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_EXCEPTION_TOKEN_TYPE_ID));
+        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_EXCEPTION_TOKEN_DESCRIPTION));
+        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_EXCEPTION_TOKEN_OUTCOME_DESCRIPTION));
     }
 
     @Test
-    public void auditReadResponse() {
+    public void auditReadRequestOtherException() {
         // Given
         Logger.getRootLogger().addAppender(appender);
 
-        final String resourceId = "resource id";
-        final String rulesAppliedMessage = "human readable description of the rules/policies been applied to the data";
-        final String originalRequestId = "originalRequestId linking all logs from the same data access request together";
+        // mock original request id
+        final RequestId mockOriginalRequestId = mockOriginalRequestId();
+        // mock resource
+        final LeafResource mockResource = mockResource();
+        // mock exception
+        final Exception mockException = mockException();
 
-        final ReadResponseAuditRequest auditReadResponse = new ReadResponseAuditRequest();
-        FileResource mockResource = Mockito.mock(FileResource.class);
-        Mockito.doReturn(resourceId).when(mockResource).getId();
-        RequestId mockRequestId = Mockito.mock(RequestId.class);
-        Mockito.doReturn(originalRequestId).when(mockRequestId).getId();
-        Rules mockRules = Mockito.mock(Rules.class);
-        Mockito.doReturn(rulesAppliedMessage).when(mockRules).getMessage();
-        auditReadResponse
+        final AuditRequest auditRequest = new ReadRequestExceptionAuditRequest()
                 .resource(mockResource)
-                .rulesApplied(mockRules)
-                .originalRequestId(mockRequestId);
+                .token(TEST_TOKEN)
+                .exception(mockException);
+        auditRequest.setOriginalRequestId(mockOriginalRequestId);
 
         // When
-        stroomAuditService.audit(auditReadResponse);
+        STROOM_AUDIT_SERVICE.audit(auditRequest);
 
         //Then
         verify(appender, atLeastOnce()).doAppend(logCaptor.capture());
         final String log = logCaptor.getValue().getRenderedMessage();
+        verify(mockOriginalRequestId, Mockito.atLeastOnce()).getId();
         verify(mockResource, Mockito.atLeastOnce()).getId();
-        verify(mockRequestId, Mockito.atLeastOnce()).getId();
-        verify(mockRules, Mockito.atLeastOnce()).getMessage();
-        Assert.assertTrue(log.contains(resourceId));
-        Assert.assertTrue(log.contains(originalRequestId));
-        Assert.assertTrue(log.contains(rulesAppliedMessage));
-        Assert.assertTrue(log.contains(StroomAuditService.READ_RESPONSE_DESCRIPTION));
+        verify(mockResource, Mockito.atLeastOnce()).getType();
+        verify(mockException, Mockito.atLeastOnce()).getMessage();
+        Assert.assertTrue(log.contains(TEST_ORIGINAL_REQUEST_ID));
+        Assert.assertTrue(log.contains(TEST_RESOURCE_ID));
+        Assert.assertTrue(log.contains(TEST_DATA_TYPE));
+        Assert.assertTrue(log.contains(TEST_EXCEPTION_MESSAGE));
+        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_EXCEPTION_OTHER_TYPE_ID));
+        Assert.assertTrue(log.contains(StroomAuditService.READ_REQUEST_EXCEPTION_OTHER_DESCRIPTION));
     }
 }

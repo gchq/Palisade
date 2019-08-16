@@ -7,7 +7,7 @@
 1. For a distributed workflow that client code will usually be made up of a driver component and an executor/mapper component. The driver component starts by registering the data request with the 
 palisade service, stating the resources/alias mapping to resources that they want to query, along with a user id and any required context such as a purpose for querying the data.
 
-1. The palisade service receives that request, sends a message to the audit service to log the request and then authenticates the user.
+1. The palisade service receives that request then authenticates the user.
 
 1. The palisade service then requests the full details about the user from the user service.
 
@@ -28,7 +28,7 @@ any context passed in by the client code and the list of resources returned by t
 1. The client code, having received the mapping of resource to data service connection details, can now split the resources up over its executors and then each executor can request each of the resources
 from the relevant data service(s).
 
-1. The data service receives the request to read a resource which is the logged for auditing.
+1. The data service receives the request to read a resource.
 
 1. The data service then passes that request to the palisade service to authenticate the request and provide the record level rules to be applied to that resource, the user attributes and the context.
 
@@ -39,3 +39,5 @@ from the relevant data service(s).
 1. The filtered and transformed data is then streamed back to the client.
 
 1. The client then formats the code in the way that the data processing technology expects the data, so the user's code can proceed as if Palisade was never there.
+
+1. On close of the data stream the data service will log the completion of the read request.

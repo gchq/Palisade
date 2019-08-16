@@ -40,6 +40,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface PalisadeService extends Service {
 
+    String TOKEN_NOT_FOUND_MESSAGE = "User's request was not in the cache: ";
+
     /**
      * This method is used by the client code to register that they want to read a resource or data set. This method
      * will check that the user can have access to the resource and pass back details of all the resources linked to the

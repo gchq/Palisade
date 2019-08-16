@@ -25,7 +25,6 @@ import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.RegisterRequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
@@ -199,7 +198,6 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
     public CompletableFuture<DataRequestResponse> registerDataRequest(final RegisterDataRequest request) {
         final RequestId originalRequestId = request.getId();
         LOGGER.debug("Registering data request: {}", request, originalRequestId);
-        auditRegisterRequestReceived(request);
         final GetUserRequest userRequest = new GetUserRequest().userId(request.getUserId());
         userRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting user from userService: {}", userRequest);
@@ -230,10 +228,6 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 });
 
         final RequestId requestId = new RequestId().id(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
-
-        final DataRequestConfig config = new DataRequestConfig();
-        config.setContext(request.getContext());
-        config.setOriginalRequestId(originalRequestId);
 
         CompletableFuture<MultiPolicy> futureMultiPolicy = getPolicy(request, futureUser, futureResources, originalRequestId);
 
@@ -293,23 +287,18 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
     private void auditRegisterRequestComplete(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy) {
         RegisterRequestCompleteAuditRequest registerRequestCompleteAuditRequest = new RegisterRequestCompleteAuditRequest()
                 .leafResources(multiPolicy.getPolicies().keySet())
-                .user(user);
+                .user(user)
+                .context(request.getContext());
         registerRequestCompleteAuditRequest.setOriginalRequestId(request.getId());
         LOGGER.debug("Auditing: {}", registerRequestCompleteAuditRequest);
         auditService.audit(registerRequestCompleteAuditRequest).join();
     }
 
-    private void auditRegisterRequestReceived(final RegisterDataRequest request) {
-        final RegisterRequestReceivedAuditRequest requestReceivedAuditRequest = new RegisterRequestReceivedAuditRequest()
-                .context(request.getContext())
-                .userId(request.getUserId())
-                .resourceId(request.getResourceId());
-        requestReceivedAuditRequest.setOriginalRequestId(request.getId());
-        auditService.audit(requestReceivedAuditRequest).join();
-    }
-
     private void auditRequestReceivedException(final RegisterDataRequest request, final Throwable ex, final Class<? extends Service> serviceClass) {
         final RegisterRequestExceptionAuditRequest auditRequestWithException = new RegisterRequestExceptionAuditRequest()
+                .userId(request.getUserId())
+                .resourceId(request.getResourceId())
+                .context(request.getContext())
                 .exception(ex)
                 .service(serviceClass);
         auditRequestWithException.setOriginalRequestId(request.getId());
@@ -384,7 +373,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
     }
 
     private RuntimeException createCacheException(final String id) {
-        return new RuntimeException("User's request was not in the cache: " + id);
+        return new RuntimeException(TOKEN_NOT_FOUND_MESSAGE + id);
     }
 
     public AuditService getAuditService() {

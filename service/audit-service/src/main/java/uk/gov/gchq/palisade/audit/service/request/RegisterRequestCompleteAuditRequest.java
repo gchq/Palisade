@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.audit.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -36,6 +37,7 @@ public class RegisterRequestCompleteAuditRequest extends AuditRequest {
 
     private User user;
     private Set<LeafResource> leafResources;
+    private Context context;
 
     // no-arg constructor required
     public RegisterRequestCompleteAuditRequest() {
@@ -59,6 +61,25 @@ public class RegisterRequestCompleteAuditRequest extends AuditRequest {
         requireNonNull(leafResources, "The leaf resources cannot be null");
         this.leafResources = leafResources;
         return this;
+    }
+
+    /**
+     * @param context the context that was passed by the client to the palisade service
+     * @return the {@link RegisterRequestCompleteAuditRequest}
+     */
+    public RegisterRequestCompleteAuditRequest context(final Context context) {
+        requireNonNull(context, "The context cannot be set to null");
+        this.context = context;
+        return this;
+    }
+
+    public Context getContext() {
+        requireNonNull(this.context, "The context has not been set");
+        return context;
+    }
+
+    public void setContext(final Context context) {
+        context(context);
     }
 
     public User getUser() {
@@ -92,6 +113,7 @@ public class RegisterRequestCompleteAuditRequest extends AuditRequest {
                 .appendSuper(super.equals(o))
                 .append(user, that.user)
                 .append(leafResources, that.leafResources)
+                .append(context, that.context)
                 .isEquals();
     }
 
@@ -101,6 +123,7 @@ public class RegisterRequestCompleteAuditRequest extends AuditRequest {
                 .appendSuper(super.hashCode())
                 .append(user)
                 .append(leafResources)
+                .append(context)
                 .toHashCode();
     }
 
@@ -110,6 +133,7 @@ public class RegisterRequestCompleteAuditRequest extends AuditRequest {
                 .appendSuper(super.toString())
                 .append("user", user)
                 .append("leafResources", leafResources)
+                .append("context", context)
                 .toString();
     }
 }

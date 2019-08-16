@@ -17,11 +17,8 @@
 package uk.gov.gchq.palisade.audit.service.impl;
 
 import event.logging.Activity;
-import event.logging.AuthenticateAction;
-import event.logging.AuthenticateOutcome;
 import event.logging.Authorisation;
 import event.logging.Classification;
-import event.logging.Criteria;
 import event.logging.Data;
 import event.logging.Event;
 import event.logging.ObjectOutcome;
@@ -39,13 +36,11 @@ import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ReadResponseAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.RegisterRequestReceivedAuditRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.resource.LeafResource;
+import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.util.HashMap;
@@ -68,15 +63,26 @@ public class StroomAuditService implements AuditService {
     private static final System SYSTEM = new System();
     private static final String EVENT_GENERATOR = "Palisade";
 
-    protected static final String REGISTER_REQUEST_RECEIVED_DESCRIPTION = "Audits the fact that a user has requested approval to access a data resource with a given purpose. All the details have been provided by the user and not yet validated.";
+    protected static final String REGISTER_REQUEST_NO_RESOURCES_TYPE_ID = "REGISTER_REQUEST_NO_RESOURCES";
+    protected static final String REGISTER_REQUEST_NO_RESOURCES_DESCRIPTION = "Audits the fact that the user requested access to some resources however they do not have permission to access any of those resources.";
+    protected static final String REGISTER_REQUEST_NO_RESOURCES_OUTCOME_DESCRIPTION = "The user does not have permission to access any of those resources.";
+    protected static final String REGISTER_REQUEST_COMPLETED_TYPE_ID = "REGISTER_REQUEST_COMPLETED";
     protected static final String REGISTER_REQUEST_COMPLETED_DESCRIPTION = "Audits the fact that this request for data has been approved and these are the resources they have been given course grain approval to query.";
-    protected static final String REGISTER_REQUEST_AUTHENTICATION_SUCCESS_DESCRIPTION = "Audits the fact that for this request for data the user has been successfully authenticated.";
-    protected static final String REGISTER_REQUEST_EXCEPTION_DESCRIPTION = "Audits the fact that the request failed and therefore this request will be denied, most likely because the resource they requested does not exist or there is a fault in the system configuration.";
-    protected static final String REGISTER_REQUEST_USER_EXCEPTION_DESCRIPTION = "Audits the fact that the user authentication failed and therefore this request will be denied.";
-    protected static final String READ_REQUEST_RECEIVED_DESCRIPTION = "Audits the fact that a user has requested access to a specific data resource.";
+    protected static final String REGISTER_REQUEST_EXCEPTION_USER_TYPE_ID = "REGISTER_REQUEST_EXCEPTION_USER";
+    protected static final String REGISTER_REQUEST_EXCEPTION_USER_DESCRIPTION = "Audits the fact that the user could not be authenticated by the system and therefore the request has been denied.";
+    protected static final String REGISTER_REQUEST_EXCEPTION_USER_OUTCOME_DESCRIPTION = "The user could not be authenticated by the system.";
+    protected static final String REGISTER_REQUEST_EXCEPTION_RESOURCE_TYPE_ID = "REGISTER_REQUEST_EXCEPTION_RESOURCE";
+    protected static final String REGISTER_REQUEST_EXCEPTION_RESOURCE_DESCRIPTION = "Audits the fact that the supplied resource id could not be resolved and therefore the request has been denied.";
+    protected static final String REGISTER_REQUEST_EXCEPTION_RESOURCE_OUTCOME_DESCRIPTION = "The supplied resource id could not be resolved.";
+    protected static final String REGISTER_REQUEST_EXCEPTION_OTHER_TYPE_ID = "REGISTER_REQUEST_EXCEPTION_OTHER";
+    protected static final String REGISTER_REQUEST_EXCEPTION_OTHER_DESCRIPTION = "Audits the fact that for some reason the request has thrown an exception and therefore the request has been denied";
+    protected static final String READ_REQUEST_COMPLETED_TYPE_ID = "READ_REQUEST_COMPLETED";
     protected static final String READ_REQUEST_COMPLETED_DESCRIPTION = "Audits the fact that a user has finished reading a specific data resource.";
-    protected static final String READ_REQUEST_EXCEPTION_DESCRIPTION = "Audits the fact that an exception occurred while reading a specific data resource.";
-    protected static final String READ_RESPONSE_DESCRIPTION = "Audits the fact that the stream of data from a specific data resource has started to be returned to the client.";
+    protected static final String READ_REQUEST_EXCEPTION_TOKEN_TYPE_ID = "READ_REQUEST_EXCEPTION_TOKEN";
+    protected static final String READ_REQUEST_EXCEPTION_TOKEN_DESCRIPTION = "Audits the fact that the provided token is invalid, probably because it the request wasn't registered first and therefore the request has been denied.";
+    protected static final String READ_REQUEST_EXCEPTION_TOKEN_OUTCOME_DESCRIPTION = "The provided token is invalid.";
+    protected static final String READ_REQUEST_EXCEPTION_OTHER_TYPE_ID = "READ_REQUEST_EXCEPTION_OTHER";
+    protected static final String READ_REQUEST_EXCEPTION_OTHER_DESCRIPTION = "Audits the fact that an exception was thrown when trying to provide the data to the user.";
 
     public StroomAuditService() {
     }
@@ -159,7 +165,7 @@ public class StroomAuditService implements AuditService {
      */
     public StroomAuditService systemVersion(final String systemVersion) {
         requireNonNull(systemVersion, "The systemVersion cannot be null.");
-        SYSTEM.setEnvironment(systemVersion);
+        SYSTEM.setVersion(systemVersion);
         return this;
     }
 
@@ -214,130 +220,99 @@ public class StroomAuditService implements AuditService {
         return event;
     }
 
+    private static void addUserToEvent(final Event event, final uk.gov.gchq.palisade.UserId user) {
+        Event.EventSource eventSource = event.getEventSource();
+        User stroomUser = EventLoggingUtil.createUser(user.getId());
+        eventSource.setUser(stroomUser);
+    }
+
+    private static void addPurposeToEvent(final Event event, final uk.gov.gchq.palisade.Context context) {
+        Event.EventDetail eventDetail = event.getEventDetail();
+        Purpose purpose = new Purpose();
+        purpose.setJustification(context.getPurpose());
+        eventDetail.setPurpose(purpose);
+    }
+
+    private static Outcome createOutcome(final boolean success) {
+        Outcome outcome = new Outcome();
+        outcome.setSuccess(success);
+        return outcome;
+    }
+
     //translate class object to handler
     static {
-        //handler for RegisterRequestReceivedAuditRequest
-        DISPATCH.put(RegisterRequestReceivedAuditRequest.class, (o) -> {
-            requireNonNull(o, "RegisterRequestReceivedAuditRequest cannot be null");
-            RegisterRequestReceivedAuditRequest registerRequestReceivedAuditRequest = (RegisterRequestReceivedAuditRequest) o;
-
-            Event event = generateNewGenericEvent(registerRequestReceivedAuditRequest);
-            // log who the user is claiming to be
-            Event.EventSource eventSource = event.getEventSource();
-            eventSource.setUser(EventLoggingUtil.createUser(registerRequestReceivedAuditRequest.getUserId().getId()));
-            // create View request event detail
-            Event.EventDetail eventDetail = new Event.EventDetail();
-            eventDetail.setDescription(REGISTER_REQUEST_RECEIVED_DESCRIPTION);
-            ObjectOutcome view = new ObjectOutcome();
-            // log the resource id being requested
-            event.logging.Object resource = new event.logging.Object();
-            resource.setId(registerRequestReceivedAuditRequest.getResourceId());
-            resource.setType("Request");
-            view.getObjects().add(resource);
-            eventDetail.setView(view);
-            // log the context that was supplied with the request
-            Purpose purpose = new Purpose();
-            purpose.setJustification(registerRequestReceivedAuditRequest.getContext().getPurpose());
-            eventDetail.setPurpose(purpose);
-            event.setEventDetail(eventDetail);
-            EVENT_LOGGING_SERVICE.log(event);
-        });
         //handler for RegisterRequestCompleteAuditRequest
         DISPATCH.put(RegisterRequestCompleteAuditRequest.class, (o) -> {
             requireNonNull(o, "RegisterRequestCompleteAuditRequest cannot be null");
             RegisterRequestCompleteAuditRequest registerRequestCompleteAuditRequest = (RegisterRequestCompleteAuditRequest) o;
-
-            // create authentication audit log
-            Event authenticationEvent = generateNewGenericEvent(registerRequestCompleteAuditRequest);
-            Event.EventSource eventSource = authenticationEvent.getEventSource();
-            // log the user
-            User user = EventLoggingUtil.createUser(registerRequestCompleteAuditRequest.getUser().getUserId().getId());
-            eventSource.setUser(user);
-            // log authentication event
-            Event.EventDetail authenticationEventDetail = new Event.EventDetail();
-            authenticationEventDetail.setDescription(REGISTER_REQUEST_AUTHENTICATION_SUCCESS_DESCRIPTION);
-            Event.EventDetail.Authenticate authenticate = new Event.EventDetail.Authenticate();
-            authenticate.setUser(user);
-            authenticate.setAction(AuthenticateAction.CONNECT);
-            AuthenticateOutcome authenticateOutcome = new AuthenticateOutcome();
-            authenticateOutcome.setSuccess(true);
-            authenticate.setOutcome(authenticateOutcome);
-            authenticationEventDetail.setAuthenticate(authenticate);
-            authenticationEvent.setEventDetail(authenticationEventDetail);
-            // send the authenticate audit log
-            EVENT_LOGGING_SERVICE.log(authenticationEvent);
-
-            // log the resources that the user is approved to access (authorisation)
             Event authorisationEvent = generateNewGenericEvent(registerRequestCompleteAuditRequest);
             Event.EventDetail authorisationEventDetail = new Event.EventDetail();
-            authorisationEventDetail.setDescription(REGISTER_REQUEST_COMPLETED_DESCRIPTION);
+            authorisationEvent.setEventDetail(authorisationEventDetail);
+            // log the user
+            addUserToEvent(authorisationEvent, registerRequestCompleteAuditRequest.getUser().getUserId());
+            // log the purpose that was supplied with the request
+            addPurposeToEvent(authorisationEvent, registerRequestCompleteAuditRequest.getContext());
             // log the list of resources
-            ObjectOutcome view = new ObjectOutcome();
+            Event.EventDetail.Authorise authorise = new Event.EventDetail.Authorise();
             Outcome outcome;
-            // if no files then view request failure
+            // if no files then authorisation request failure
             Set<LeafResource> resources = registerRequestCompleteAuditRequest.getLeafResources();
             if (resources.isEmpty()) {
+                authorisationEventDetail.setTypeId(REGISTER_REQUEST_NO_RESOURCES_TYPE_ID);
+                authorisationEventDetail.setDescription(REGISTER_REQUEST_NO_RESOURCES_DESCRIPTION);
                 outcome = createOutcome(false);
+                outcome.setDescription(REGISTER_REQUEST_NO_RESOURCES_OUTCOME_DESCRIPTION);
             } else {
+                authorisationEventDetail.setTypeId(REGISTER_REQUEST_COMPLETED_TYPE_ID);
+                authorisationEventDetail.setDescription(REGISTER_REQUEST_COMPLETED_DESCRIPTION);
                 for (LeafResource resource : resources) {
                     event.logging.Object stroomResource = new event.logging.Object();
                     stroomResource.setId(resource.getId());
                     stroomResource.setType(resource.getType());
-                    view.getObjects().add(stroomResource);
+                    authorise.getObjects().add(stroomResource);
                 }
                 outcome = createOutcome(true);
             }
-            authorisationEventDetail.setView(view);
-            Event.EventDetail.Authorise authorise = new Event.EventDetail.Authorise();
             authorise.setOutcome(outcome);
             authorise.setAction(Authorisation.REQUEST);
             authorisationEventDetail.setAuthorise(authorise);
-            authorisationEvent.setEventDetail(authorisationEventDetail);
             EVENT_LOGGING_SERVICE.log(authorisationEvent);
         });
         //handler for RegisterRequestExceptionAuditRequest
         DISPATCH.put(RegisterRequestExceptionAuditRequest.class, (o) -> {
             requireNonNull(o, "RegisterRequestExceptionAuditRequest cannot be null");
             RegisterRequestExceptionAuditRequest registerRequestExceptionAuditRequest = (RegisterRequestExceptionAuditRequest) o;
-            // view exception or authentication exception (if came from user service)
+            // authorisation exception
             Event exceptionEvent = generateNewGenericEvent(registerRequestExceptionAuditRequest);
             Event.EventDetail exceptionEventDetail = new Event.EventDetail();
-            if (registerRequestExceptionAuditRequest.getServiceClass().getSimpleName().equals("UserService")) {
-                exceptionEventDetail.setDescription(REGISTER_REQUEST_USER_EXCEPTION_DESCRIPTION);
-                Event.EventDetail.Authorise authorise = new Event.EventDetail.Authorise();
-                authorise.setOutcome(createOutcome(false));
-                exceptionEventDetail.setAuthorise(authorise);
-            } else {
-                exceptionEventDetail.setDescription(REGISTER_REQUEST_EXCEPTION_DESCRIPTION);
-                ObjectOutcome viewOutcome = new ObjectOutcome();
-                viewOutcome.setOutcome(createOutcome(false));
-                exceptionEventDetail.setView(viewOutcome);
-            }
-            Event.EventDetail.Process exceptionProcess = new Event.EventDetail.Process();
-            Outcome exceptionOutcome = new Outcome();
-            exceptionOutcome.setDescription(registerRequestExceptionAuditRequest.getException().getMessage());
-            exceptionProcess.setOutcome(exceptionOutcome);
-            exceptionEventDetail.setProcess(exceptionProcess);
             exceptionEvent.setEventDetail(exceptionEventDetail);
-            EVENT_LOGGING_SERVICE.log(exceptionEvent);
-        });
-        //handler for ReadRequestReceivedAuditRequest
-        DISPATCH.put(ReadRequestReceivedAuditRequest.class, (o) -> {
-            requireNonNull(o, "ReadRequestReceivedAuditRequest cannot be null");
-            ReadRequestReceivedAuditRequest readRequestReceivedAuditRequest = (ReadRequestReceivedAuditRequest) o;
-            // view request to acknowledge that a request to view data has been received
-            Event viewEvent = generateNewGenericEvent(readRequestReceivedAuditRequest);
-            Event.EventDetail viewEventDetail = new Event.EventDetail();
-            viewEventDetail.setDescription(READ_REQUEST_RECEIVED_DESCRIPTION);
-            ObjectOutcome view = new ObjectOutcome();
-            LeafResource resource = readRequestReceivedAuditRequest.getResource();
+            // log the user
+            addUserToEvent(exceptionEvent, registerRequestExceptionAuditRequest.getUserId());
+            // log the purpose that was supplied with the request
+            addPurposeToEvent(exceptionEvent, registerRequestExceptionAuditRequest.getContext());
+            Event.EventDetail.Authorise authorise = new Event.EventDetail.Authorise();
+            // log the resource
             event.logging.Object stroomResource = new event.logging.Object();
-            stroomResource.setId(resource.getId());
-            stroomResource.setType(resource.getType());
-            view.getObjects().add(stroomResource);
-            viewEventDetail.setView(view);
-            viewEvent.setEventDetail(viewEventDetail);
-            EVENT_LOGGING_SERVICE.log(viewEvent);
+            stroomResource.setId(registerRequestExceptionAuditRequest.getResourceId());
+            authorise.getObjects().add(stroomResource);
+            Outcome outcome = createOutcome(false);
+            if (registerRequestExceptionAuditRequest.getServiceClass().getSimpleName().equals("UserService")) {
+                exceptionEventDetail.setTypeId(REGISTER_REQUEST_EXCEPTION_USER_TYPE_ID);
+                exceptionEventDetail.setDescription(REGISTER_REQUEST_EXCEPTION_USER_DESCRIPTION);
+                outcome.setDescription(REGISTER_REQUEST_EXCEPTION_USER_OUTCOME_DESCRIPTION);
+            } else if (registerRequestExceptionAuditRequest.getServiceClass().getSimpleName().equals("ResourceService")) {
+                exceptionEventDetail.setTypeId(REGISTER_REQUEST_EXCEPTION_RESOURCE_TYPE_ID);
+                exceptionEventDetail.setDescription(REGISTER_REQUEST_EXCEPTION_RESOURCE_DESCRIPTION);
+                outcome.setDescription(REGISTER_REQUEST_EXCEPTION_RESOURCE_OUTCOME_DESCRIPTION);
+            } else {
+                exceptionEventDetail.setTypeId(REGISTER_REQUEST_EXCEPTION_OTHER_TYPE_ID);
+                exceptionEventDetail.setDescription(REGISTER_REQUEST_EXCEPTION_OTHER_DESCRIPTION);
+                outcome.setDescription(registerRequestExceptionAuditRequest.getException().getMessage());
+            }
+            authorise.setOutcome(outcome);
+            authorise.setAction(Authorisation.REQUEST);
+            exceptionEventDetail.setAuthorise(authorise);
+            EVENT_LOGGING_SERVICE.log(exceptionEvent);
         });
         //handler for ReadRequestCompleteAuditRequest
         DISPATCH.put(ReadRequestCompleteAuditRequest.class, (o) -> {
@@ -346,8 +321,16 @@ public class StroomAuditService implements AuditService {
             // view request
             Event viewEvent = generateNewGenericEvent(readRequestCompleteAuditRequest);
             Event.EventDetail viewEventDetail = new Event.EventDetail();
+            viewEvent.setEventDetail(viewEventDetail);
+            viewEventDetail.setTypeId(READ_REQUEST_COMPLETED_TYPE_ID);
             viewEventDetail.setDescription(READ_REQUEST_COMPLETED_DESCRIPTION);
+            // log the user
+            addUserToEvent(viewEvent, readRequestCompleteAuditRequest.getUser().getUserId());
+            // log the purpose that was supplied with the request
+            addPurposeToEvent(viewEvent, readRequestCompleteAuditRequest.getContext());
+            // log event outcome
             ObjectOutcome view = new ObjectOutcome();
+            viewEventDetail.setView(view);
             view.setOutcome(createOutcome(true));
             // set the number of records returned
             Data resultsReturned = new Data();
@@ -358,13 +341,15 @@ public class StroomAuditService implements AuditService {
             resultsProcessed.setName("Number of records processed");
             resultsProcessed.setValue(String.valueOf(readRequestCompleteAuditRequest.getNumberOfRecordsProcessed()));
             view.getData().add(resultsProcessed);
+            Data rulesApplied = new Data();
+            rulesApplied.setName("Rules applied");
+            rulesApplied.setValue(String.valueOf(readRequestCompleteAuditRequest.getRulesApplied().getMessage()));
+            view.getData().add(rulesApplied);
             // set the resource that those records were read from
-            Data resource = new Data();
-            resource.setName("Resource");
-            resource.setValue(readRequestCompleteAuditRequest.getResource().getId());
-            view.getData().add(resource);
-            viewEventDetail.setView(view);
-            viewEvent.setEventDetail(viewEventDetail);
+            event.logging.Object resource = new event.logging.Object();
+            resource.setId(readRequestCompleteAuditRequest.getResource().getId());
+            resource.setType(readRequestCompleteAuditRequest.getResource().getType());
+            view.getObjects().add(resource);
             EVENT_LOGGING_SERVICE.log(viewEvent);
         });
         //handler for ReadRequestExceptionAuditRequest
@@ -374,52 +359,32 @@ public class StroomAuditService implements AuditService {
             // view request
             Event viewEvent = generateNewGenericEvent(readRequestExceptionAuditRequest);
             Event.EventDetail viewEventDetail = new Event.EventDetail();
-            viewEventDetail.setDescription(READ_REQUEST_EXCEPTION_DESCRIPTION);
+            viewEvent.setEventDetail(viewEventDetail);
             ObjectOutcome view = new ObjectOutcome();
-            view.setOutcome(createOutcome(false));
-            // set the exception details
-            view.getOutcome().setDescription(readRequestExceptionAuditRequest.getException().getMessage());
+            viewEventDetail.setView(view);
+            Outcome outcome = createOutcome(false);
+            view.setOutcome(outcome);
+            if (readRequestExceptionAuditRequest.getException().getMessage().startsWith(PalisadeService.TOKEN_NOT_FOUND_MESSAGE)) {
+                viewEventDetail.setTypeId(READ_REQUEST_EXCEPTION_TOKEN_TYPE_ID);
+                viewEventDetail.setDescription(READ_REQUEST_EXCEPTION_TOKEN_DESCRIPTION);
+                outcome.setDescription(READ_REQUEST_EXCEPTION_TOKEN_OUTCOME_DESCRIPTION);
+            } else {
+                viewEventDetail.setTypeId(READ_REQUEST_EXCEPTION_OTHER_TYPE_ID);
+                viewEventDetail.setDescription(READ_REQUEST_EXCEPTION_OTHER_DESCRIPTION);
+                outcome.setDescription(readRequestExceptionAuditRequest.getException().getMessage());
+            }
             // set the resource that those records were read from
-            Criteria.DataSources dataSources = new Criteria.DataSources();
-            Data resource = new Data();
-            resource.setName("data resource");
-            resource.setValue(readRequestExceptionAuditRequest.getResource().getId());
-            view.getData().add(resource);
+            event.logging.Object resource = new event.logging.Object();
+            resource.setId(readRequestExceptionAuditRequest.getResource().getId());
+            resource.setType(readRequestExceptionAuditRequest.getResource().getType());
+            view.getObjects().add(resource);
+            // set the token used for this read request
             Data token = new Data();
             token.setName("token");
             token.setValue(readRequestExceptionAuditRequest.getToken());
             view.getData().add(token);
-            viewEventDetail.setView(view);
-            viewEvent.setEventDetail(viewEventDetail);
             EVENT_LOGGING_SERVICE.log(viewEvent);
         });
-        //handler for ReadResponseAuditRequest
-        DISPATCH.put(ReadResponseAuditRequest.class, (o) -> {
-            requireNonNull(o, "ReadResponseAuditRequest cannot be null");
-            ReadResponseAuditRequest readResponseAuditRequest = (ReadResponseAuditRequest) o;
-            // view request
-            Event viewEvent = generateNewGenericEvent(readResponseAuditRequest);
-            Event.EventDetail viewEventDetail = new Event.EventDetail();
-            viewEventDetail.setDescription(READ_RESPONSE_DESCRIPTION);
-            ObjectOutcome view = new ObjectOutcome();
-            // set the resource that those records were read from
-            event.logging.Object resource = new event.logging.Object();
-            resource.setId(readResponseAuditRequest.getResource().getId());
-            resource.setType(readResponseAuditRequest.getResource().getType());
-            view.getObjects().add(resource);
-            Data data = new Data();
-            data.setName(readResponseAuditRequest.getRulesApplied().getMessage());
-            view.getData().add(data);
-            viewEventDetail.setView(view);
-            viewEvent.setEventDetail(viewEventDetail);
-            EVENT_LOGGING_SERVICE.log(viewEvent);
-        });
-    }
-
-    private static Outcome createOutcome(final boolean success) {
-        Outcome outcome = new Outcome();
-        outcome.setSuccess(success);
-        return outcome;
     }
 
     @Override

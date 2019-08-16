@@ -137,6 +137,9 @@ public class SerialisingResponseWriter implements ResponseWriter {
     public void close() {
         // Audit log the number of results returned
         ReadRequestCompleteAuditRequest auditRequest = new ReadRequestCompleteAuditRequest()
+                .user(request.getUser())
+                .context(request.getContext())
+                .rulesApplied(request.getRules())
                 .resource(request.getResource())
                 .numberOfRecordsProcessed(recordsProcessed.get())
                 .numberOfRecordsReturned(recordsReturned.get());

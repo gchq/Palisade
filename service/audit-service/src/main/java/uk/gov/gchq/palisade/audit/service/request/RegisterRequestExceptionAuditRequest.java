@@ -18,7 +18,9 @@ package uk.gov.gchq.palisade.audit.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.service.Service;
 
 import static java.util.Objects.requireNonNull;
@@ -31,11 +33,34 @@ import static java.util.Objects.requireNonNull;
  */
 public class RegisterRequestExceptionAuditRequest extends AuditRequest {
 
+    private UserId userId;
+    private String resourceId;
+    private Context context;
     private Throwable exception;
     private Class<? extends Service> serviceClass;
 
     // no-arg constructor required
     public RegisterRequestExceptionAuditRequest() {
+    }
+
+    /**
+     * @param userId {@link UserId} is the user id provided in the register request
+     * @return the {@link RegisterRequestExceptionAuditRequest}
+     */
+    public RegisterRequestExceptionAuditRequest userId(final UserId userId) {
+        requireNonNull(userId, "The userId cannot be null");
+        this.userId = userId;
+        return this;
+    }
+
+    /**
+     * @param resourceId {@link String} is the resource id provided in the register request
+     * @return the {@link RegisterRequestExceptionAuditRequest}
+     */
+    public RegisterRequestExceptionAuditRequest resourceId(final String resourceId) {
+        requireNonNull(resourceId, "The resourceId cannot be null");
+        this.resourceId = resourceId;
+        return this;
     }
 
     /**
@@ -58,6 +83,43 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
         return this;
     }
 
+    /**
+     * @param context the context that was passed by the client to the palisade service
+     * @return the {@link RegisterRequestExceptionAuditRequest}
+     */
+    public RegisterRequestExceptionAuditRequest context(final Context context) {
+        requireNonNull(context, "The context cannot be set to null");
+        this.context = context;
+        return this;
+    }
+
+    public UserId getUserId() {
+        requireNonNull(this.userId, "The user id has not been set");
+        return userId;
+    }
+
+    public void setUserId(final UserId userId) {
+        userId(userId);
+    }
+
+    public String getResourceId() {
+        requireNonNull(this.resourceId, "The resource id has not been set");
+        return resourceId;
+    }
+
+    public void setResourceId(final String resourceId) {
+        resourceId(resourceId);
+    }
+
+    public Context getContext() {
+        requireNonNull(this.context, "The context has not been set");
+        return context;
+    }
+
+    public void setContext(final Context context) {
+        context(context);
+    }
+
     public Throwable getException() {
         requireNonNull(exception, "The exception type has not been set");
         return exception;
@@ -72,7 +134,7 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
         return serviceClass;
     }
 
-    public void setService(final Class<? extends Service> service) {
+    public void setServiceClass(final Class<? extends Service> service) {
         service(service);
     }
 
@@ -87,6 +149,9 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
         final RegisterRequestExceptionAuditRequest that = (RegisterRequestExceptionAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
+                .append(userId, that.userId)
+                .append(resourceId, that.resourceId)
+                .append(context, that.context)
                 .append(exception, that.exception)
                 .append(serviceClass, that.serviceClass)
                 .isEquals();
@@ -96,6 +161,9 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
     public int hashCode() {
         return new HashCodeBuilder(27, 41)
                 .appendSuper(super.hashCode())
+                .append(userId)
+                .append(resourceId)
+                .append(context)
                 .append(exception)
                 .append(serviceClass)
                 .toHashCode();
@@ -105,6 +173,9 @@ public class RegisterRequestExceptionAuditRequest extends AuditRequest {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
+                .append("userId", userId)
+                .append("resourceId", resourceId)
+                .append("context", context)
                 .append("exception", exception)
                 .append("serviceClass", serviceClass)
                 .toString();

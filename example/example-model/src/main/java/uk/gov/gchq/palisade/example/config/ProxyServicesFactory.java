@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
-import uk.gov.gchq.palisade.audit.service.impl.StroomAuditService;
+import uk.gov.gchq.palisade.audit.service.impl.LoggerAuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
@@ -108,7 +108,7 @@ public class ProxyServicesFactory {
     }
 
     public AuditService createInternalAuditService() {
-        return new StroomAuditService().organisation("ORG").systemEnv("Test").systemVersion("v0").systemName("SystemX").systemClassification("Sensitive").systemDescription("A test system");
+        return new LoggerAuditService();
     }
 
     public ConfigurationService createInternalConfigService() {
