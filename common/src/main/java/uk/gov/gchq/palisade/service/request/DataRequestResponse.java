@@ -95,6 +95,7 @@ public class DataRequestResponse extends Request {
         final DataRequestResponse that = (DataRequestResponse) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(token, that.token)
                 .append(resources, that.resources)
                 .isEquals();
@@ -103,6 +104,7 @@ public class DataRequestResponse extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 67)
+                .appendSuper(super.hashCode())
                 .append(token)
                 .append(resources)
                 .toHashCode();
@@ -111,6 +113,7 @@ public class DataRequestResponse extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .appendSuper(super.toString())
                 .append("token", token)
                 .append("resources", resources)
                 .toString();

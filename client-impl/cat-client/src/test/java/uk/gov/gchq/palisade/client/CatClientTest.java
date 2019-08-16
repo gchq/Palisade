@@ -84,8 +84,10 @@ public class CatClientTest {
 
         registerDataRequest = new RegisterDataRequest().userId(new UserId().id(userId)).resourceId(dir).context(new Context().purpose(purpose));
 
-        readRequest1 = (ReadRequest) new ReadRequest().token(token).resource(resource1).originalRequestId(reqId);
-        readRequest2 = (ReadRequest) new ReadRequest().token(token).resource(resource2).originalRequestId(reqId);
+        readRequest1 = new ReadRequest().token(token).resource(resource1);
+        readRequest1.originalRequestId(reqId);
+        readRequest2 = new ReadRequest().token(token).resource(resource2);
+        readRequest2.originalRequestId(reqId);
         DataRequestResponse response = new DataRequestResponse()
                 .token(token)
                 .resource(resource1, mockConnectionDetail)
