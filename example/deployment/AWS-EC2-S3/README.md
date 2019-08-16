@@ -44,7 +44,7 @@ To run this example follow these steps (from the root of the project):
   aws_access_key_id = "<Your AWS subscription access key>"
   aws_secret_access_key = "<Your AWS subscription secret key>"
   aws_session_token = "<Your AWS subscription session token>"
-  aws_profile_name = "<Your AWS profile name>"
+  #aws_profile_name = "<Your AWS profile name>"
 
   bucket_name = "<Globally unique S3 bucket name>" #Only lowercase alphanumeric characters and hypens allowed
   key_name = "<Name of EC2 key pair instance for EC2 cluster>"

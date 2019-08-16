@@ -73,8 +73,8 @@ resource "null_resource" "deploy_example" {
     ]
   }
   provisioner "file" {
-    source = "../../../../example-model/target/example-model-${var.palisade_version}-SNAPSHOT-shaded.jar"
-    destination = "/home/${var.ec2_userid}/example/example-model/target/example-model-${var.palisade_version}-SNAPSHOT-shaded.jar"
+    source = "../../../../example-model/target/example-model-${var.palisade_version}-shaded.jar"
+    destination = "/home/${var.ec2_userid}/example/example-model/target/example-model-${var.palisade_version}-shaded.jar"
   }
   provisioner "file" {
     source = "../../../../resources/hadoop_s3.xml"
