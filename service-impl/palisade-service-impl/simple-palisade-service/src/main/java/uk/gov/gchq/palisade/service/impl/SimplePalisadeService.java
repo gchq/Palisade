@@ -23,16 +23,14 @@ import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.audit.service.AuditService;
-import uk.gov.gchq.palisade.audit.service.request.ExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ProcessingStartedAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.RequestReceivedAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
-import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -56,7 +54,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -64,7 +61,6 @@ import java.util.concurrent.CompletionException;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-
 
 /**
  * <p> A simple implementation of a Palisade Service that just connects up the Audit, Cache, User, Policy and Resource
@@ -200,9 +196,8 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
 
     @Override
     public CompletableFuture<DataRequestResponse> registerDataRequest(final RegisterDataRequest request) {
-        final RequestId originalRequestId = new RequestId().id(UUID.randomUUID().toString());
+        final RequestId originalRequestId = request.getId();
         LOGGER.debug("Registering data request: {}", request, originalRequestId);
-        auditRequestReceived(request, originalRequestId);
         final GetUserRequest userRequest = new GetUserRequest().userId(request.getUserId());
         userRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting user from userService: {}", userRequest);
@@ -214,15 +209,12 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 })
                 .exceptionally(ex -> {
                     LOGGER.error("Failed to get user: {}", ex.getMessage());
-                    if (nonNull(ex)) {
-                        auditRequestReceivedException(request, originalRequestId, ex);
-                    }
+                    auditRequestReceivedException(request, ex, UserService.class);
                     throw new RuntimeException(ex); //rethrow the exception
                 });
 
         final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId());
         resourceRequest.setOriginalRequestId(originalRequestId);
-
         LOGGER.debug("Getting resources from resourceService: {}", resourceRequest);
         final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources = resourceService.getResourcesById(resourceRequest)
                 .thenApply(resources -> {
@@ -231,43 +223,34 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 })
                 .exceptionally(ex -> {
                     LOGGER.error("Failed to get resources: {}", ex.getMessage());
-                    if (nonNull(ex)) {
-                        auditRequestReceivedException(request, originalRequestId, ex);
-                    }
+                    auditRequestReceivedException(request, ex, ResourceService.class);
                     throw new RuntimeException(ex); //rethrow the exception
                 });
 
         final RequestId requestId = new RequestId().id(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
 
-        final DataRequestConfig config = new DataRequestConfig();
-        config.setContext(request.getContext());
-        config.setOriginalRequestId(originalRequestId);
-
         CompletableFuture<MultiPolicy> futureMultiPolicy = getPolicy(request, futureUser, futureResources, originalRequestId);
 
         return CompletableFuture.allOf(futureUser, futureResources, futureMultiPolicy)
-                .thenApply(t -> {
-                    //remove any resources from the map that the policy doesn't contain details for -> user should not even be told about
-                    //resources they don't have permission to see
-                    Map<LeafResource, ConnectionDetail> filteredResources = removeDisallowedResources(futureResources.join(), futureMultiPolicy.join());
+            .thenApply(t -> {
+                //remove any resources from the map that the policy doesn't contain details for -> user should not even be told about
+                //resources they don't have permission to see
+                Map<LeafResource, ConnectionDetail> filteredResources = removeDisallowedResources(futureResources.join(), futureMultiPolicy.join());
 
-                    PalisadeService.ensureRecordRulesAvailableFor(futureMultiPolicy.join(), filteredResources.keySet());
-                    auditProcessingStarted(request, futureUser.join(), futureMultiPolicy.join(), originalRequestId);
-                    cache(request, futureUser.join(), requestId, futureMultiPolicy.join(), filteredResources.size(), originalRequestId);
+                PalisadeService.ensureRecordRulesAvailableFor(futureMultiPolicy.join(), filteredResources.keySet());
+                auditRegisterRequestComplete(request, futureUser.join(), futureMultiPolicy.join());
+                cache(request, futureUser.join(), requestId, futureMultiPolicy.join(), filteredResources.size(), originalRequestId);
 
-                    final DataRequestResponse response = new DataRequestResponse().requestId(requestId).originalRequestId(originalRequestId).resources(filteredResources);
-                    response.setOriginalRequestId(originalRequestId);
-                    LOGGER.debug("Responding with: {}", response);
-                    return response;
-                })
-                .exceptionally(ex -> {
-                    LOGGER.error("Error handling: {}", ex.getMessage());
-                    if (nonNull(ex)) {
-                        auditRequestReceivedException(request, originalRequestId, ex);
-
-                    }
-                    throw new RuntimeException(ex); //rethrow the exception
-                });
+                final DataRequestResponse response = new DataRequestResponse().token(requestId.getId()).resources(filteredResources);
+                response.setOriginalRequestId(originalRequestId);
+                LOGGER.debug("Responding with: {}", response);
+                return response;
+            })
+            .exceptionally(ex -> {
+                LOGGER.error("Error handling: {}", ex.getMessage());
+                auditRequestReceivedException(request, ex, PolicyService.class);
+                throw new RuntimeException(ex); //rethrow the exception
+            });
     }
 
     /**
@@ -301,43 +284,24 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                 });
     }
 
-    private void auditProcessingStarted(final RegisterDataRequest request, final User user,
-                                        final MultiPolicy multiPolicy, final RequestId originalRequestId) {
-        for (final Entry<LeafResource, Policy> entry : multiPolicy.getPolicies().entrySet()) {
-            final ProcessingStartedAuditRequest auditRequestProcessingStarted =
-                    new ProcessingStartedAuditRequest();
-            auditRequestProcessingStarted.resource(entry.getKey()).user(user)
-                    .howItWasProcessed(entry.getValue().getMessage())
-                    .context(request.getContext(), ProcessingStartedAuditRequest.class)
-                    .userId(request.getUserId(), ProcessingStartedAuditRequest.class)
-                    .resourceId(request.getResourceId(), ProcessingStartedAuditRequest.class)
-                    .id(request.getId())
-                    .originalRequestId(originalRequestId);
-            LOGGER.debug("Auditing: {}", auditRequestProcessingStarted);
-            auditService.audit(auditRequestProcessingStarted).join();
-        }
+    private void auditRegisterRequestComplete(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy) {
+        RegisterRequestCompleteAuditRequest registerRequestCompleteAuditRequest = new RegisterRequestCompleteAuditRequest()
+                .leafResources(multiPolicy.getPolicies().keySet())
+                .user(user)
+                .context(request.getContext());
+        registerRequestCompleteAuditRequest.setOriginalRequestId(request.getId());
+        LOGGER.debug("Auditing: {}", registerRequestCompleteAuditRequest);
+        auditService.audit(registerRequestCompleteAuditRequest).join();
     }
 
-    private void auditRequestReceived(final RegisterDataRequest request, final RequestId originalRequestId) {
-        final RequestReceivedAuditRequest requestReceivedAuditRequest = new RequestReceivedAuditRequest();
-        requestReceivedAuditRequest.context(request.getContext(), RequestReceivedAuditRequest.class)
-                .userId(request.getUserId(), RequestReceivedAuditRequest.class)
-                .resourceId(request.getResourceId(), RequestReceivedAuditRequest.class)
-                .id(request.getId())
-                .originalRequestId(originalRequestId);
-        auditService.audit(requestReceivedAuditRequest).join();
-    }
-
-    private void auditRequestReceivedException(final RegisterDataRequest request,
-                                               final RequestId originalRequestId, final Throwable ex) {
-        final ExceptionAuditRequest auditRequestWithException = new ExceptionAuditRequest();
-        auditRequestWithException
+    private void auditRequestReceivedException(final RegisterDataRequest request, final Throwable ex, final Class<? extends Service> serviceClass) {
+        final RegisterRequestExceptionAuditRequest auditRequestWithException = new RegisterRequestExceptionAuditRequest()
+                .userId(request.getUserId())
+                .resourceId(request.getResourceId())
+                .context(request.getContext())
                 .exception(ex)
-                .context(request.getContext(), ExceptionAuditRequest.class)
-                .userId(request.getUserId(), ExceptionAuditRequest.class)
-                .resourceId(request.getResourceId(), ExceptionAuditRequest.class)
-                .id(request.getId())
-                .originalRequestId(originalRequestId);
+                .service(serviceClass);
+        auditRequestWithException.setOriginalRequestId(request.getId());
         LOGGER.debug("Error handling: " + ex.getMessage());
         auditService.audit(auditRequestWithException).join();
     }
@@ -373,16 +337,16 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
     public CompletableFuture<DataRequestConfig> getDataRequestConfig(
             final GetDataRequestConfig request) {
         requireNonNull(request);
-        requireNonNull(request.getRequestId());
+        requireNonNull(request.getToken());
         // TODO: need to validate that the user is actually requesting the correct info.
         // extract resources from request and check they are a subset of the original RegisterDataRequest resources
-        final GetCacheRequest<DataRequestConfig> cacheRequest = new GetCacheRequest<>().key(request.getRequestId().getId()).service(this.getClass());
+        final GetCacheRequest<DataRequestConfig> cacheRequest = new GetCacheRequest<>().key(request.getToken()).service(this.getClass());
         LOGGER.debug("Getting cached data: {}", cacheRequest);
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {
-                    DataRequestConfig value = cache.orElseThrow(() -> createCacheException(request.getRequestId().getId()));
+                    DataRequestConfig value = cache.orElseThrow(() -> createCacheException(request.getToken()));
                     if (null == value.getUser()) {
-                        throw createCacheException(request.getRequestId().getId());
+                        throw createCacheException(request.getToken());
                     }
                     LOGGER.debug("Got cache: {}", value);
                     return value;
@@ -409,7 +373,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
     }
 
     private RuntimeException createCacheException(final String id) {
-        return new RuntimeException("User's request was not in the cache: " + id);
+        return new RuntimeException(TOKEN_NOT_FOUND_MESSAGE + id);
     }
 
     public AuditService getAuditService() {

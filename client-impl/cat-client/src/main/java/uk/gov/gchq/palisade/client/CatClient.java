@@ -72,7 +72,7 @@ public class CatClient {
             final DataService dataService = connectionDetail.createService();
 
             final ReadRequest readRequest = new ReadRequest()
-                    .requestId(dataRequestResponse.getRequestId())
+                    .token(dataRequestResponse.getToken())
                     .resource(entry.getKey());
             readRequest.setOriginalRequestId(dataRequestResponse.getOriginalRequestId());
 

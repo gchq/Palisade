@@ -20,7 +20,6 @@ package uk.gov.gchq.palisade.data.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.Request;
@@ -33,12 +32,12 @@ import static java.util.Objects.requireNonNull;
  */
 
 public class ReadRequest extends Request {
-    private RequestId requestId;
+    private String token;
     private LeafResource resource;
 
-    public ReadRequest requestId(final RequestId requestId) {
-        requireNonNull(requestId, "The request id cannot be set to null.");
-        this.requestId = requestId;
+    public ReadRequest token(final String token) {
+        requireNonNull(token, "The token cannot be set to null.");
+        this.token = token;
         return this;
     }
 
@@ -48,13 +47,13 @@ public class ReadRequest extends Request {
         return this;
     }
 
-    public RequestId getRequestId() {
-        requireNonNull(requestId, "The request id has not been set.");
-        return requestId;
+    public String getToken() {
+        requireNonNull(token, "The token has not been set.");
+        return token;
     }
 
-    public void setRequestId(final RequestId requestId) {
-        requestId(requestId);
+    public void setToken(final String token) {
+        token(token);
     }
 
     public LeafResource getResource() {
@@ -79,7 +78,7 @@ public class ReadRequest extends Request {
         final ReadRequest that = (ReadRequest) o;
 
         return new EqualsBuilder()
-                .append(requestId, that.requestId)
+                .append(token, that.token)
                 .append(resource, that.resource)
                 .isEquals();
     }
@@ -87,7 +86,7 @@ public class ReadRequest extends Request {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(47, 37)
-                .append(requestId)
+                .append(token)
                 .append(resource)
                 .toHashCode();
     }
@@ -95,7 +94,7 @@ public class ReadRequest extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("requestId", requestId)
+                .append("token", token)
                 .append("resource", resource)
                 .toString();
     }

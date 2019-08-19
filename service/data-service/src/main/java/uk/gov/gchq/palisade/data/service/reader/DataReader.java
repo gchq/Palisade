@@ -32,7 +32,7 @@ import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
  * apply the rules, then passes back to the data service the stream of data in
  * the expected format.
  * <p>
- * There is a utility method {@link uk.gov.gchq.palisade.Util#applyRulesToStream(java.util.stream.Stream, uk.gov.gchq.palisade.User, uk.gov.gchq.palisade.Context, uk.gov.gchq.palisade.rule.Rules)}
+ * There is a utility method {@link uk.gov.gchq.palisade.Util#applyRulesToStream(java.util.stream.Stream, uk.gov.gchq.palisade.User, uk.gov.gchq.palisade.Context, uk.gov.gchq.palisade.rule.Rules, java.util.concurrent.atomic.AtomicLong, java.util.concurrent.atomic.AtomicLong)}
  * that does the part of applying the rules provided your input data is in the
  * format that the rules expect.
  */
