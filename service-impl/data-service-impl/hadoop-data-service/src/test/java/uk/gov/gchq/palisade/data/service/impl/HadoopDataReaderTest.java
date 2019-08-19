@@ -17,13 +17,16 @@ package uk.gov.gchq.palisade.data.service.impl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import org.mockito.Mockito;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
@@ -55,6 +58,7 @@ public class HadoopDataReaderTest {
     public TemporaryFolder testFolder = new TemporaryFolder(TestUtil.TMP_DIRECTORY);
 
     private static final CacheService cache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+    private static final AuditService mockAudit = Mockito.mock(AuditService.class);
 
     @Test
     public void shouldReadTextFileWithNoRules() throws IOException {
@@ -64,6 +68,7 @@ public class HadoopDataReaderTest {
 
         final Configuration conf = new Configuration();
         final HadoopDataReader reader = getReader(conf);
+        reader.auditService(mockAudit);
         reader.addSerialiser(DataFlavour.of("string", "string"), new SimpleStringSerialiser());
 
         final FileResource resource = (FileResource) new FileResource().type("string").id(tmpFile.getAbsolutePath()).serialisedFormat("string");
@@ -94,6 +99,7 @@ public class HadoopDataReaderTest {
 
         final Configuration conf = new Configuration();
         final HadoopDataReader reader = getReader(conf);
+        reader.auditService(mockAudit);
         reader.addSerialiser(DataFlavour.of("string", "string"), new SimpleStringSerialiser());
 
         final FileResource resource = new FileResource().id(tmpFile.getAbsolutePath()).type("string").serialisedFormat("string");

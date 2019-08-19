@@ -21,14 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.AuditRequestWithContext;
-import uk.gov.gchq.palisade.audit.service.request.ExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ProcessingCompleteAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ProcessingStartedAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.ReadRequestCompleteAuditRequest;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ReadResponseAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.RequestReceivedAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.ServiceState;
 
@@ -53,81 +49,34 @@ public class LoggerAuditService implements AuditService {
 
     //translate class object to handler
     static {
-        //handler for ExceptionAuditRequest
-        DISPATCH.put(ExceptionAuditRequest.class, (o) -> {
-            requireNonNull(o, "exceptionAuditRequest");
-            ExceptionAuditRequest exceptionAuditRequest = (ExceptionAuditRequest) o;
-            final String msg = " 'exception' " + auditLogContext(exceptionAuditRequest) + exceptionAuditRequest.getException().getMessage();
+        //handler for RegisterRequestCompleteAuditRequest
+        DISPATCH.put(RegisterRequestCompleteAuditRequest.class, (o) -> {
+            requireNonNull(o, "RegisterRequestCompleteAuditRequest cannot be null");
+            RegisterRequestCompleteAuditRequest registerRequestCompleteAuditRequest = (RegisterRequestCompleteAuditRequest) o;
+            final String msg = "'RegisterRequestCompleteAuditRequest': " + registerRequestCompleteAuditRequest;
+            LOGGER.info(msg);
+        });
+        //handler for RegisterRequestExceptionAuditRequest
+        DISPATCH.put(RegisterRequestExceptionAuditRequest.class, (o) -> {
+            requireNonNull(o, "RegisterRequestExceptionAuditRequest cannot be null");
+            RegisterRequestExceptionAuditRequest registerRequestExceptionAuditRequest = (RegisterRequestExceptionAuditRequest) o;
+            final String msg = "'RegisterRequestExceptionAuditRequest': " + registerRequestExceptionAuditRequest;
             LOGGER.error(msg);
         });
-        //handler for ProcessingCompleteAuditRequest
-        DISPATCH.put(ProcessingCompleteAuditRequest.class, (o) -> {
-            requireNonNull(o, "processingCompleteAuditRequest");
-            AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
-            final String msg = " 'processingComplete' " + auditLogContext(auditRequestWithContext);
-            LOGGER.info(msg);
-        });
-        //handler for ProcessingStartedAuditRequest
-        DISPATCH.put(ProcessingStartedAuditRequest.class, (o) -> {
-            requireNonNull(o, "processingStartedAuditRequest");
-            ProcessingStartedAuditRequest processingStartedAuditRequest = (ProcessingStartedAuditRequest) o;
-            final String msg = " 'processingStarted' " + auditLogContext(processingStartedAuditRequest)
-                    + processingStartedAuditRequest.getUser().toString()
-                    + "' accessed '" + processingStartedAuditRequest.getLeafResource().getId()
-                    + "' and it was processed using '" + processingStartedAuditRequest.getHowItWasProcessed();
-            LOGGER.info(msg);
-        });
-        //handler for RequestReceivedAuditRequest
-        DISPATCH.put(RequestReceivedAuditRequest.class, (o) -> {
-            requireNonNull(o, "RequestReceivedAuditRequest");
-            AuditRequestWithContext auditRequestWithContext = (AuditRequestWithContext) o;
-            final String msg = " auditRequest " + auditLogContext(auditRequestWithContext);
+        //handler for ReadRequestCompleteAuditRequest
+        DISPATCH.put(ReadRequestCompleteAuditRequest.class, (o) -> {
+            requireNonNull(o, "ReadRequestCompleteAuditRequest cannot be null");
+            ReadRequestCompleteAuditRequest readRequestCompleteAuditRequest = (ReadRequestCompleteAuditRequest) o;
+            final String msg = "'readRequestException': " + readRequestCompleteAuditRequest;
             LOGGER.info(msg);
         });
         //handler for ReadRequestExceptionAuditRequest
         DISPATCH.put(ReadRequestExceptionAuditRequest.class, (o) -> {
-            requireNonNull(o, "ReadRequestExceptionAuditRequest");
+            requireNonNull(o, "ReadRequestExceptionAuditRequest cannot be null");
             ReadRequestExceptionAuditRequest readRequestExceptionAuditRequest = (ReadRequestExceptionAuditRequest) o;
-            final String msg = " 'readRequestException' "
-                    + readRequestExceptionAuditRequest.getId() + " "
-                    + readRequestExceptionAuditRequest.getRequestId() + " "
-                    + readRequestExceptionAuditRequest.getOriginalRequestId() + " "
-                    + readRequestExceptionAuditRequest.getResource().toString() + " "
-                    + readRequestExceptionAuditRequest.getException().toString();
+            final String msg = "'readRequestExceptionAuditRequest': " + readRequestExceptionAuditRequest;
             LOGGER.error(msg);
         });
-        //handler for ReadRequestReceivedAuditRequest
-        DISPATCH.put(ReadRequestReceivedAuditRequest.class, (o) -> {
-            requireNonNull(o, "ReadRequestReceivedAuditRequest");
-            ReadRequestReceivedAuditRequest readRequestReceivedAuditRequest = (ReadRequestReceivedAuditRequest) o;
-            final String msg = " 'readRequestReceived' "
-                    + readRequestReceivedAuditRequest.getId() + " "
-                    + readRequestReceivedAuditRequest.getRequestId() + " "
-                    + readRequestReceivedAuditRequest.getOriginalRequestId() + " "
-                    + readRequestReceivedAuditRequest.getResource().toString() + " ";
-            LOGGER.info(msg);
-        });
-        //handler for ReadResponseAuditRequest
-        DISPATCH.put(ReadResponseAuditRequest.class, (o) -> {
-            requireNonNull(o, "ReadResponseAuditRequest");
-            ReadResponseAuditRequest readResponseAuditRequest = (ReadResponseAuditRequest) o;
-            final String msg = " 'readResponseAuditRequest' "
-                    + readResponseAuditRequest.getId() + " "
-                    + readResponseAuditRequest.getRequestId() + " "
-                    + readResponseAuditRequest.getOriginalRequestId() + " "
-                    + readResponseAuditRequest.getResource().toString() + " ";
-            LOGGER.info(msg);
-        });
-    }
-
-    static String auditLogContext(final AuditRequestWithContext auditRequestWithContext) {
-
-        final String msg = " 'userId' " + auditRequestWithContext.getUserId().getId()
-                + " 'purpose' " + auditRequestWithContext.getContext().getPurpose()
-                + "' resourceId '" + auditRequestWithContext.getResourceId()
-                + "' id '" + auditRequestWithContext.getId()
-                + "' originalRequestId '" + auditRequestWithContext.getOriginalRequestId();
-        return msg;
     }
 
     @Override

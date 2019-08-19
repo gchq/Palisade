@@ -18,19 +18,51 @@ package uk.gov.gchq.palisade.audit.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
+
 /**
  * This is the abstract class that is passed to the {@link uk.gov.gchq.palisade.audit.service.AuditService}
- * to be able to store an audit record. The default information is what resources
- * was being accessed.
+ * to be able to store an audit record. The default information is when was the audit record created and by what server
  */
 public class AuditRequest extends Request {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuditRequest.class);
+
+    private final Date timestamp;
+    private final String serverIp;
+    private final String serverHostname;
 
     // no-arg constructor required
     public AuditRequest() {
+        timestamp = new Date();
+        InetAddress inetAddress;
+        try {
+            inetAddress = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+        serverHostname = inetAddress.getHostName();
+        serverIp = inetAddress.getHostAddress();
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public String getServerIp() {
+        return serverIp;
+    }
+
+    public String getServerHostname() {
+        return serverHostname;
     }
 
     @Override
@@ -43,7 +75,11 @@ public class AuditRequest extends Request {
         }
         final AuditRequest that = (AuditRequest) o;
         return new EqualsBuilder()
+                //TODO should appendSuper be here, if so it needs adding on other objects where it is missing
                 .appendSuper(super.equals(o))
+                .append(timestamp, that.timestamp)
+                .append(serverIp, that.serverIp)
+                .append(serverHostname, that.serverHostname)
                 .isEquals();
     }
 
@@ -51,6 +87,9 @@ public class AuditRequest extends Request {
     public int hashCode() {
         return new HashCodeBuilder(19, 37)
                 .appendSuper(super.hashCode())
+                .append(timestamp)
+                .append(serverIp)
+                .append(serverHostname)
                 .toHashCode();
     }
 
@@ -58,7 +97,9 @@ public class AuditRequest extends Request {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
+                .append("timestamp", timestamp)
+                .append("serverIp", serverIp)
+                .append("serverHostname", serverHostname)
                 .toString();
     }
-
 }

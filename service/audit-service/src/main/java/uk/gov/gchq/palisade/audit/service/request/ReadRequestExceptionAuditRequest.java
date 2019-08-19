@@ -18,7 +18,6 @@ package uk.gov.gchq.palisade.audit.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.request.Request;
@@ -31,30 +30,21 @@ import static java.util.Objects.requireNonNull;
  * is used for the indication to the Audit logs that an exception has been received.
  */
 public class ReadRequestExceptionAuditRequest extends AuditRequest {
-    private Throwable exception;
-    private RequestId requestId;
+
+    private String token;
     private LeafResource resource;
+    private Throwable exception;
 
     public ReadRequestExceptionAuditRequest() {
     }
 
     /**
-     * @param exception {@link Throwable} is the type of the exception while processing
+     * @param token this is the token that is used to retrieve cached information from the palisade service
      * @return the {@link ReadRequestExceptionAuditRequest}
      */
-    public ReadRequestExceptionAuditRequest exception(final Throwable exception) {
-        requireNonNull(exception, "The exception type cannot be null");
-        this.exception = exception;
-        return this;
-    }
-
-    /**
-     * @param requestId {@link RequestId} is the requestId for the ReadRequest
-     * @return the {@link ReadRequestExceptionAuditRequest}
-     */
-    public ReadRequestExceptionAuditRequest requestId(final RequestId requestId) {
-        requireNonNull(requestId, "The requestId type cannot be null");
-        this.requestId = requestId;
+    public ReadRequestExceptionAuditRequest token(final String token) {
+        requireNonNull(token, "The token cannot be null");
+        this.token = token;
         return this;
     }
 
@@ -63,9 +53,46 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
      * @return the {@link ReadRequestExceptionAuditRequest}
      */
     public ReadRequestExceptionAuditRequest resource(final LeafResource resource) {
-        requireNonNull(resource, "The leafResource type cannot be null");
+        requireNonNull(resource, "The resource cannot be null");
         this.resource = resource;
         return this;
+    }
+
+    /**
+     * @param exception {@link Throwable} is the type of the exception while processing
+     * @return the {@link ReadRequestExceptionAuditRequest}
+     */
+    public ReadRequestExceptionAuditRequest exception(final Throwable exception) {
+        requireNonNull(exception, "The exception cannot be null");
+        this.exception = exception;
+        return this;
+    }
+
+    public String getToken() {
+        requireNonNull(token, "The token has not been set");
+        return token;
+    }
+
+    public void setToken(final String token) {
+        token(token);
+    }
+
+    public LeafResource getResource() {
+        requireNonNull(resource, "The resource has not been set");
+        return resource;
+    }
+
+    public void setResource(final LeafResource resource) {
+        resource(resource);
+    }
+
+    public Throwable getException() {
+        requireNonNull(exception, "The exception has not been set");
+        return exception;
+    }
+
+    public void setException(final Throwable exception) {
+        exception(exception);
     }
 
     @Override
@@ -79,9 +106,9 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
         final ReadRequestExceptionAuditRequest that = (ReadRequestExceptionAuditRequest) o;
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(exception, that.exception)
-                .append(requestId, that.requestId)
+                .append(token, that.token)
                 .append(resource, that.resource)
+                .append(exception, that.exception)
                 .isEquals();
     }
 
@@ -89,9 +116,9 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
     public int hashCode() {
         return new HashCodeBuilder(19, 39)
                 .appendSuper(super.hashCode())
-                .append(exception)
-                .append(requestId)
+                .append(token)
                 .append(resource)
+                .append(exception)
                 .toHashCode();
     }
 
@@ -99,38 +126,9 @@ public class ReadRequestExceptionAuditRequest extends AuditRequest {
     public String toString() {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
-                .append("exception", exception)
-                .append("requestId", requestId)
+                .append("token", token)
                 .append("resource", resource)
+                .append("exception", exception)
                 .toString();
-    }
-
-
-    public RequestId getRequestId() {
-        requireNonNull(requestId, "The request id has not been set.");
-        return requestId;
-    }
-
-
-    public LeafResource getResource() {
-        requireNonNull(resource, "The resource has not been set.");
-        return resource;
-    }
-
-    public Throwable getException() {
-        requireNonNull(exception, "The exception type cannot be null.");
-        return exception;
-    }
-
-    public void setException(final Throwable exception) {
-        exception(exception);
-    }
-
-    public void setRequestId(final RequestId requestId) {
-        requestId(requestId);
-    }
-
-    public void setResource(final LeafResource resource) {
-        resource(resource);
     }
 }

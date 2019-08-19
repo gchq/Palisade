@@ -53,9 +53,9 @@ public class PalisadeInputSplitTest {
     public void shouldSerialiseToEqualObject() throws IOException {
         //Given
         DataRequestResponse drr = new DataRequestResponse()
-                .requestId(new RequestId().id("test string"))
-                .resource(stubResource, stubConnectionDetail)
-                .originalRequestId(new RequestId().id("test id"));
+                .token("test string")
+                .resource(stubResource, stubConnectionDetail);
+        drr.originalRequestId(new RequestId().id("test id"));
         PalisadeInputSplit test = new PalisadeInputSplit(drr);
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();

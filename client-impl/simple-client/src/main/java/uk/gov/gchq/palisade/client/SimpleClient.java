@@ -66,7 +66,7 @@ public class SimpleClient<T> {
             final RequestId uuid = response.getOriginalRequestId();
 
             final ReadRequest readRequest = new ReadRequest()
-                    .requestId(response.getRequestId())
+                    .token(response.getToken())
                     .resource(entry.getKey());
             readRequest.setOriginalRequestId(uuid);
 

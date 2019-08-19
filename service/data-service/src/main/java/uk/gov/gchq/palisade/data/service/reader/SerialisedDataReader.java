@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
@@ -65,6 +66,8 @@ public abstract class SerialisedDataReader implements DataReader {
     @JsonDeserialize(keyUsing = DataFlavour.FlavourDeserializer.class)
     private Map<DataFlavour, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
 
+    private AuditService auditService;
+
     /**
      * @param serialisers a mapping of data type to serialiser
      * @return the {@link SerialisedDataReader}
@@ -78,6 +81,12 @@ public abstract class SerialisedDataReader implements DataReader {
     public SerialisedDataReader defaultSerialiser(final Serialiser<?> serialiser) {
         requireNonNull(serialiser, "The default serialiser cannot be set to null.");
         this.defaultSerialiser = serialiser;
+        return this;
+    }
+
+    public SerialisedDataReader auditService(final AuditService auditService) {
+        requireNonNull(auditService, "The audit service cannot be set to null");
+        this.auditService = auditService;
         return this;
     }
 
@@ -100,9 +109,9 @@ public abstract class SerialisedDataReader implements DataReader {
         //set up the raw input stream from the data source
         final InputStream rawStream = readRaw(request.getResource());
 
-        ResponseWriter serialisedWriter = new SerialisingResponseWriter(rawStream, serialiser, request);
+        ResponseWriter serialisedWriter = new SerialisingResponseWriter(rawStream, serialiser, request, getAuditService());
 
-        //set reponse object to use the writer above
+        //set response object to use the writer above
         return new DataReaderResponse().writer(serialisedWriter);
     }
 
@@ -153,5 +162,14 @@ public abstract class SerialisedDataReader implements DataReader {
 
     public void setDefaultSerialiser(final Serialiser<?> defaultSerialiser) {
         defaultSerialiser(defaultSerialiser);
+    }
+
+    public AuditService getAuditService() {
+        requireNonNull(auditService, "The audit service has not been set.");
+        return auditService;
+    }
+
+    public void setAuditService(final AuditService auditService) {
+        auditService(auditService);
     }
 }

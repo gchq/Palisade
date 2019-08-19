@@ -208,7 +208,9 @@ public class PalisadeRecordReader<V> extends RecordReader<LeafResource, V> {
         final ConnectionDetail conDetails = entry.getValue();
         final DataService service = conDetails.createService();
         //lodge request with the data service
-        ReadRequest readRequest = new ReadRequest().requestId(dataRequestResponse.getRequestId()).resource(resource);
+        ReadRequest readRequest = new ReadRequest()
+                .token(dataRequestResponse.getToken())
+                .resource(resource);
         readRequest.setOriginalRequestId(dataRequestResponse.getOriginalRequestId());
 
         final CompletableFuture<ReadResponse> futureResponse = service.read(readRequest);
