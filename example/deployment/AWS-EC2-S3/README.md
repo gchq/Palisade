@@ -94,7 +94,7 @@ To then run the example with the option to display the results based on differen
 $ export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/resources/configRest.json"
 $ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> s3a://<bucket url>/employee_file0.avro <PURPOSE> | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
 ```
-The example list of users andpurposes are:
+The example list of users and purposes are:
 - Alice, Bob, Eve
 - SALARY, DUTY_OF_CARE, STAFF_REPORT or no purpose by using: "" (double quotes)
 
