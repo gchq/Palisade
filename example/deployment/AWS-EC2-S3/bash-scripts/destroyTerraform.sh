@@ -12,5 +12,4 @@ terraform destroy -var sg_name=palisade_allow_inbound -var palisade_host_private
 cd ../InstanceRunningPalisade
 terraform init
 terraform destroy
-
-rm example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade/terraformoutput.txt
+rm terraformoutput.txt

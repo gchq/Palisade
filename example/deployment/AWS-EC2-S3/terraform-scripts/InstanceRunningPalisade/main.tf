@@ -80,3 +80,7 @@ output "palisade_host_private_host_name" {
 output "sgname" {
   value = "${module.security_group.sg_name}"
 }
+
+output "aws_region" {
+  value = "${var.aws_region}"
+}

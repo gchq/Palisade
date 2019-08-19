@@ -62,7 +62,7 @@ public class ExampleSimpleClient extends SimpleClient<Employee> {
         }
     }
 
-    public Stream<Employee> read(final String userId, final String filename, final String purpose) {
+    public Stream<Employee> read(final String filename, final String userId, final String purpose) {
         URI absoluteFileURI = ExampleFileUtil.convertToFileURI(filename);
         String absoluteFile = absoluteFileURI.toString();
         return super.read(absoluteFile, ServicesConfigurator.RESOURCE_TYPE, userId, purpose);

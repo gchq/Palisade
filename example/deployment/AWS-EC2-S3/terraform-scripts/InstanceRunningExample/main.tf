@@ -37,5 +37,4 @@ module "deploy_example" {
   s3_endpoint = "s3-${var.aws_region}.amazonaws.com"
   palisade_host_private_host_name = "${var.palisade_host_private_host_name}"
   palisade_version = "${var.palisade_version}"
-
 }

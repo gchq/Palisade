@@ -28,10 +28,6 @@ variable "aws_profile_name" {
 
 variable "bucket_name" {}
 
-variable "s3_endpoint" {
-  default = ""
-}
-
 variable "key_name" {}
 
 variable "pem_file" {}
@@ -56,13 +52,9 @@ variable "ec2_userid" {
   default = "ec2-user"
 }
 
-variable "sg_name" {
-  default = ""
-}
+variable "sg_name" {}
 
-variable "palisade_host_private_host_name" {
-  default = ""
-}
+variable "palisade_host_private_host_name" {}
 
 variable "palisade_version" {}
 

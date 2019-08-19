@@ -6,16 +6,11 @@ resource "null_resource" "deploy_example" {
     update = 2
   }
 
-/*  triggers = {
-    cluster_instance_ids = "${join(",", aws_instance.cluster.*.id)}"
-  }*/
-
   connection {
     type = "ssh"
     host = "${var.host_name}"
     user = "${var.ec2_userid}"
     private_key = "${file("${var.key_file}")}"
-    # private_key = "${var.key_file}" #Needed when running terraform destroy, comment out line above
     agent = false
     timeout = "10m"
   }

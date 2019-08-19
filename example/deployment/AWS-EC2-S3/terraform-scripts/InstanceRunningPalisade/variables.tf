@@ -28,10 +28,6 @@ variable "aws_profile_name" {
 
 variable "bucket_name" {}
 
-variable "s3_endpoint" {
-  default = ""
-}
-
 variable "key_name" {}
 
 variable "pem_file" {}

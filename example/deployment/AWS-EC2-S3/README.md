@@ -83,14 +83,6 @@ This needs to be populated with the values indicated above before the example wi
   ./example/deployment/AWS-EC2-S3/bash-scripts/runAWS-EC2-S3Example.sh
 ```
 
-After completion run terraform destroy to tear down the two EC2 instances:
-**This will delete everything in your bucket!**
-
-1. Tear down the instance running the example
-```bash
-  ./example/deployment/AWS-EC2-S3/bash-scripts/destroyTerraform.sh
-```
-
 #### Running the Example
 After the terraform scripts have run and the 2 instances are up and running, ssh on to the box using the following command:
 ```bash
@@ -117,4 +109,12 @@ To run the static demo, run this:
 ```bash
 $ export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/resources/configRest.json"
 $ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.runner.RestExample s3a://<bucket name>.<s3_endpoint>/employee_file0.avro | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+```
+
+After demo, run terraform destroy to tear down the two EC2 instances:
+**This will delete everything in your bucket!**
+
+1. Tear down the instance running the example
+```bash
+  ./example/deployment/AWS-EC2-S3/bash-scripts/destroyTerraform.sh
 ```
