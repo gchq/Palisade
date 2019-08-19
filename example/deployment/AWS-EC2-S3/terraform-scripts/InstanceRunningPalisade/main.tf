@@ -8,7 +8,7 @@ provider "aws" {
 }
 
 module "security_group" {
-  source = "../../../terraform-modules/security_group"     # base directory from which modules are referenced is example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade
+  source = "../../../terraform-modules/security_group" # base directory from which modules are referenced is example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade
   ingress_ip_range = "${var.ingress_ip_range}"
   owner = "${var.owner}"
   project = "${var.project}"
@@ -41,7 +41,11 @@ resource "local_file" "hadoop_s3" {
   content = "${data.template_file.hadoop_s3.rendered}"
   filename = "../../../../resources/hadoop_s3.xml"
 }
-
+resource "null_resource" "create_palisade_instance" {
+  provisioner "local-exec" {
+    command = "sed -i 's/eu-west-1/${var.aws_region}/g' ../../../../resources/hadoop_s3.xml"
+  }
+}
 # create instance running Palisade
 resource "aws_instance" "palisade_instance" {
   ami = "${module.ami.ami_id}"
@@ -54,8 +58,7 @@ resource "aws_instance" "palisade_instance" {
     Project = "${var.project}"
   }
 
-  security_groups = [
-    "${module.security_group.sg_name}"]
+  security_groups = ["${module.security_group.sg_name}"]
 
   iam_instance_profile = "${module.iam.instance_profile_id}"
 }
@@ -70,7 +73,6 @@ module "deploy_palisade" {
   bucket_name = "${var.bucket_name}"
   s3_endpoint = "s3-${var.aws_region}.amazonaws.com"
   palisade_version = "${var.palisade_version}"
-
 }
 
 output "palisade_host_private_host_name" {
@@ -79,8 +81,4 @@ output "palisade_host_private_host_name" {
 
 output "sgname" {
   value = "${module.security_group.sg_name}"
-}
-
-output "aws_region" {
-  value = "${var.aws_region}"
 }

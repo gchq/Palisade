@@ -92,7 +92,7 @@ A quick "ps ax | grep java" will show that no java services are running locally.
 To then run the example with the option to display the results based on different users or roles, run this command: 
 ```bash
 $ export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/resources/configRest.json"
-$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> s3a://<bucket name>.<s3_endpoint>/employee_file0.avro <PURPOSE> | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> s3a://<bucket url>/employee_file0.avro <PURPOSE> | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
 ```
 The example list of users andpurposes are:
 - Alice, Bob, Eve
@@ -100,12 +100,8 @@ The example list of users andpurposes are:
 
 If you want to compare the different outputs of the Palisade service for different users and purposes, you can redirect the output to a text file, such as "> User-PURPOSE.txt", and then re-run the command with a change in user or purpose and redirect the output to a different file. 
 You can then run:
-
-##### Running the fixed demo
-To run the static demo, run this:
 ```bash
-$ export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/resources/configRest.json"
-$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.runner.RestExample s3a://<bucket name>.<s3_endpoint>/employee_file0.avro | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+diff file1.txt file2.txt
 ```
 
 After demo, run terraform destroy to tear down the two EC2 instances:
