@@ -5,8 +5,7 @@ cd ./example/deployment/AWS-EC2-S3/terraform-scripts/InstanceRunningPalisade
 terraform init
 terraform apply -input=false -auto-approve | tee terraformoutput.txt
 
-result=$?
-if [ result -ne 0 ]
+if [ $? -le 0 ]
 then
     # get the host name and security group from file
     palisadehost=$(grep palisade_host_private_host_name terraformoutput.txt | cut -d " " -f3)

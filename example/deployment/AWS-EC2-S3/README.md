@@ -26,7 +26,7 @@ To run this example follow these steps (from the root of the project):
 
 1.  Compile the code:
 ```bash
-  mvn clean install -P example
+  mvn clean install -P example,aws
 ```
 2.  Build the executable jars:
 ```bash
@@ -100,9 +100,6 @@ The example list of users andpurposes are:
 
 If you want to compare the different outputs of the Palisade service for different users and purposes, you can redirect the output to a text file, such as "> User-PURPOSE.txt", and then re-run the command with a change in user or purpose and redirect the output to a different file. 
 You can then run:
-```bash
-diff file1.txt file2.txt
-```
 
 ##### Running the fixed demo
 To run the static demo, run this:
