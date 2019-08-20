@@ -27,7 +27,7 @@
         <level value="ERROR"/>
     </logger>
     <root>
-        <priority value="info"></priority>
+        <priority value="INFO"></priority>
         <appender-ref ref="console"></appender-ref>
     </root>
 </log4j:configuration>
