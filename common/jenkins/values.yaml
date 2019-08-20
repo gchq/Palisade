@@ -2,3 +2,4 @@ jenkins:
 Master:
 RunAsUser: 1000
 FsGroup: 1000
+Persistence.ExistingClaim: jenkins-pvc

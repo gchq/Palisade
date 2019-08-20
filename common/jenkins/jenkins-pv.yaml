@@ -6,11 +6,10 @@ metadata:
      type: amazonEBS 
 spec:
   capacity:
-    storage: "5Gi" 
-  storageClassName: standard
+    storage: "11Gi" 
   accessModes:
     - "ReadWriteOnce"
-  awsElasticBlockStore: 
-    fsType: "ext4" 
-    volumeID: "vol-Insert Vol ID here" 
-
+    - "ReadOnlyMany"
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /ebs-data/jenkins

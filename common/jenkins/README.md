@@ -21,6 +21,7 @@ ssh -i "your pem.pem" ubuntu@ec2-XX-XXX-XXX-XX.eu-west-1.compute.amazonaws.com
 1.  N.B The above guide will leave group and user permissions for the folder: /ebs-data as root:root. To correct this add the following lines at the end of the .bashrc:
 ```bash
 sudo chown ubuntu:ubuntu /ebs-data
+mkdir /ebs-data/jenkins
 ```
 Run the following command to ensure the ebs directory is mounted correctly:
 ```bash
@@ -102,9 +103,6 @@ Run the following:
 kubectl apply -f jenkins-pv.yaml
 kubectl apply -f jenkins-pvc.yaml
 kubectl get pv
-NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                 STORAGECLASS        REASON   AGE
-jenkins-pv                                 5Gi        RWO            Retain           Available                         standard                     5h50m
-pvc-8c50eba5-9703-4e00-b2b3-xxxxxxxxxxxx   4Gi        RWO            Delete           Bound       default/jenkins-pvc   microk8s-hostpath            5h50m
 ```
 
 

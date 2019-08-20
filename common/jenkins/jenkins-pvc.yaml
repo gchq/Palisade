@@ -2,15 +2,11 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: jenkins-pvc
-  labels:
-      type: amazonEBS
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 4Gi
-  selector:
-      matchLabels:
-         type: "pv-jenkins"
+      storage: 10Gi
 
