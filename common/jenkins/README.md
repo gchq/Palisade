@@ -11,29 +11,39 @@
 1. Connect to the EC2 instance as follows and select yes:
 ```bash
 ssh -i "your pem.pem" ubuntu@ec2-XX-XXX-XXX-XX.eu-west-1.compute.amazonaws.com
-The authenticity of host 'ec2-``XX-XXX-XXX-XX.eu-west-1.compute.amazonaws.com (XX.XXX.XXX.XX)' can't be established.
-ECDSA key fingerprint is SHA256:6W5mciVvBve7QM9HdKtgpqQOgULt/J5So4a/9tuBOCI.
-Are you sure you want to continue connecting (yes/no)? 
 ```
 
 
 ## Package Installation
 
-### Install microk8s
+### Mount the EBS backed volume into the EC2 instance
+1. Follow this guide: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html to ensure that the EBS volume is mounted. The location mount point should be /ebs-data
+1.  N.B The above guide will leave group and user permissions for the folder: /ebs-data as root:root. To correct this add the following lines at the end of the .bashrc:
+```bash
+sudo chown ubuntu:ubuntu /ebs-data
+```
+Run the following command to ensure the ebs directory is mounted correctly:
+```bash
+df -h | grep ebs-data
+```
+
+
+
+### Install Microk8s, Docker and Helm
 MicroK8s is a snap lightweight kubernetes implementation: https://microk8s.io/docs/
 Run the following commands to install microk8s and verify that it's working:
 
 ```bash
-ubuntu@ip-XXX-XX-XX-XXX:~$ sudo snap install microk8s --classic
-ubuntu@ip-XXX-XX-XX-XXX:~$ microk8s.kubectl get nodes
-ubuntu@ip-XXX-XX-XX-XXX:~$ microk8s.kubectl get services
-ubuntu@ip-XXX-XX-XX-XXX:~$ sudo snap alias microk8s.kubectl kubectl
-ubuntu@ip-XXX-XX-XX-XXX:~$ kubectl get nodes
+sudo snap install microk8s --classic
+microk8s.kubectl get nodes
+microk8s.kubectl get services
+sudo snap alias microk8s.kubectl kubectl
+kubectl get nodes
 ```
 
 Check the status of the microk8s cluster:
 ```bash
-ubuntu@ip-XXX-XX-XX-XXX:~$ microk8s.status
+microk8s.status
 microk8s is running
 addons:
 knative: disabled
@@ -54,29 +64,30 @@ dashboard: disabled
 We will now enable the storage and dns add ons:
 
 ```bash
-ubuntu@ip-XXX-XX-XX-XXX:~$ microk8s.enable storage
-ubuntu@ip-XXX-XX-XX-XXX:~$ microk8s.enable dns
+microk8s.enable storage
+microk8s.enable dns
 
 ```
 
 Rerun microk8s.status and ensure that storage and dns are now enabled
 
 
-Install docker
+Install Docker
 ```bash
-ubuntu@ip-XXX-XX-XX-XXX:~$ sudo snap install docker
+sudo snap install docker
 ```
 
 Install Helm
 ```bash
-ubuntu@ip-XXX-XX-XX-XXX:~$ sudo snap install helm --classic
+sudo snap install helm --classic
 ```
 
-Run helm init to install tiller:
+Run Helm init to install Tiller:
 ```bash
-ubuntu@ip-XXX-XX-XX-XXX:~$ helm init
+helm init
 ```
 
+### Jenkins configuration
 Copy the following files from the repo into /home/ubuntu
 jenkins-chart.yaml
 jenkins-pv.yaml
@@ -88,9 +99,9 @@ Edit jenkins-pv.yaml and change the volume id to that saved above
 Run the following:
 
 ```bash
-ubuntu@ip-XXX-XX-XX-XXX:~$ kubectl apply -f jenkins-pv.yaml
-ubuntu@ip-XXX-XX-XX-XXX:~$ kubectl apply -f jenkins-pvc.yaml
-ubuntu@ip-XXX-XX-XX-XXX:~$ kubectl get pv
+kubectl apply -f jenkins-pv.yaml
+kubectl apply -f jenkins-pvc.yaml
+kubectl get pv
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                 STORAGECLASS        REASON   AGE
 jenkins-pv                                 5Gi        RWO            Retain           Available                         standard                     5h50m
 pvc-8c50eba5-9703-4e00-b2b3-xxxxxxxxxxxx   4Gi        RWO            Delete           Bound       default/jenkins-pvc   microk8s-hostpath            5h50m
@@ -106,7 +117,7 @@ helm install --name jenkins -f jenkins-chart.yaml stable/jenkins --values values
 wait for the pods to come into service:
 
 ```bash
-ubuntu@ip-XXX-XX-XX-XXX:~$ kubectl get pods
+kubectl get pods
 NAME                       READY   STATUS    RESTARTS   AGE
 jenkins-68f54d45fb-fkl4s   1/1     Running   0          79m
 ```
@@ -114,11 +125,11 @@ jenkins-68f54d45fb-fkl4s   1/1     Running   0          79m
 Run the following to get the connetion details:
 
 ```bash
-ubuntu@ip-XXX-XX-XX-XXX:~$ kubectl get secret --namespace default jenkins -o jsonpath="{.data.jenkins-admin-user}" | base64 --decode; echo
-ubuntu@ip-XXX-XX-XX-XXX:~$ kubectl get secret --namespace default jenkins -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode; echo
-ubuntu@ip-XXX-XX-XX-XXX:~$ export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services jenkins)
-ubuntu@ip-XXX-XX-XX-XXX:~$ export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.addresses[0].address}")
-ubuntu@ip-XXX-XX-XX-XXX:~$ echo http://$NODE_IP:$NODE_PORT/login
+kubectl get secret --namespace default jenkins -o jsonpath="{.data.jenkins-admin-user}" | base64 --decode; echo
+kubectl get secret --namespace default jenkins -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode; echo
+export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services jenkins)
+export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.addresses[0].address}")
+echo http://$NODE_IP:$NODE_PORT/login
 ```
 
 You should now be able to access the jenkins server 
