@@ -20,6 +20,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -31,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import static java.util.Objects.requireNonNull;
 
 /**
- * This class is used to request whether a user can access a resource for a given justification.
+ * This class is used to request whether a user can access a resource for a given context.
  */
 public class CanAccessRequest extends Request {
     private User user;
@@ -63,7 +64,7 @@ public class CanAccessRequest extends Request {
     }
 
     /**
-     * @param context containing contextual information such as justification or environmental data that can influence policies
+     * @param context containing contextual information such as purpose or environmental data that can influence policies
      * @return the {@link CanAccessRequest}
      */
     public CanAccessRequest context(final Context context) {
@@ -76,33 +77,45 @@ public class CanAccessRequest extends Request {
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param futureResources a completable future that will return a collection of {@link LeafResource}'s.
-     * @param futureUser a completable future that will return a {@link User}.
-     * @param justification the justification that the user stated for why they want access to the data.
+     * @param futureResources   a completable future that will return a collection of {@link LeafResource}'s.
+     * @param futureUser        a completable future that will return a {@link User}.
+     * @param purpose           the purpose that the user stated for why they want access to the data.
+     * @param originalRequestId the requestId of the service creating this object
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
             final CompletableFuture<? extends Collection<LeafResource>> futureResources,
             final CompletableFuture<User> futureUser,
-            final String justification) {
+            final String purpose,
+            final RequestId originalRequestId) {
         return CompletableFuture.allOf(futureResources, futureUser)
-                .thenApply(t -> new CanAccessRequest().resources(futureResources.join()).user(futureUser.join()).context(new Context().justification(justification)));
+                .thenApply(t -> {
+                    CanAccessRequest canAccessRequest = new CanAccessRequest().resources(futureResources.join()).user(futureUser.join()).context(new Context().purpose(purpose));
+                    canAccessRequest.setOriginalRequestId(originalRequestId);
+                    return canAccessRequest;
+                });
     }
 
     /**
      * Utility method to allow the CanAccessRequest to be created as part of a
      * chain of asynchronous requests.
      *
-     * @param resources a collection of {@link LeafResource}'s that the user wants access to.
-     * @param futureUser a completable future that will return a {@link User}.
-     * @param justification the justification that the user stated for why they want access to the data.
+     * @param resources         a collection of {@link LeafResource}'s that the user wants access to.
+     * @param futureUser        a completable future that will return a {@link User}.
+     * @param purpose           the purpose that the user stated for why they want access to the data.
+     * @param originalRequestId the requestId of the service creating this object
      * @return a completable future containing the {@link CanAccessRequest}.
      */
     public static CompletableFuture<CanAccessRequest> create(
             final Collection<LeafResource> resources,
             final CompletableFuture<User> futureUser,
-            final String justification) {
-        return futureUser.thenApply(auths -> new CanAccessRequest().resources(resources).user(futureUser.join()).context(new Context().justification(justification)));
+            final String purpose,
+            final RequestId originalRequestId) {
+        return futureUser.thenApply(auths -> {
+            CanAccessRequest canAccessRequest = new CanAccessRequest().resources(resources).user(futureUser.join()).context(new Context().purpose(purpose));
+            canAccessRequest.setOriginalRequestId(originalRequestId);
+            return canAccessRequest;
+        });
     }
 
     public Collection<LeafResource> getResources() {

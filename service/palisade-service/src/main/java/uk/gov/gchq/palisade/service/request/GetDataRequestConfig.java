@@ -19,7 +19,6 @@ package uk.gov.gchq.palisade.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.Resource;
 
@@ -29,22 +28,22 @@ import static java.util.Objects.requireNonNull;
  * This class is used to request the {@link DataRequestConfig}.
  */
 public class GetDataRequestConfig extends Request {
-    private RequestId requestId;
+    private String token;
     private Resource resource;
 
-    public RequestId getRequestId() {
-        requireNonNull(requestId, "The request id has not been set.");
-        return requestId;
+    public String getToken() {
+        requireNonNull(token, "The token has not been set.");
+        return token;
     }
 
-    public GetDataRequestConfig requestId(final RequestId requestId) {
-        requireNonNull(requestId, "The request id cannot be set to null.");
-        this.requestId = requestId;
+    public GetDataRequestConfig token(final String token) {
+        requireNonNull(token, "The token cannot be set to null.");
+        this.token = token;
         return this;
     }
 
-    public void setRequestId(final RequestId requestId) {
-        requestId(requestId);
+    public void setToken(final String token) {
+        token(token);
     }
 
     public Resource getResource() {
@@ -76,7 +75,7 @@ public class GetDataRequestConfig extends Request {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
-                .append(requestId, that.requestId)
+                .append(token, that.token)
                 .append(resource, that.resource)
                 .isEquals();
     }
@@ -85,7 +84,7 @@ public class GetDataRequestConfig extends Request {
     public int hashCode() {
         return new HashCodeBuilder(7, 37)
                 .appendSuper(super.hashCode())
-                .append(requestId)
+                .append(token)
                 .append(resource)
                 .toHashCode();
     }
@@ -93,7 +92,7 @@ public class GetDataRequestConfig extends Request {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("requestId", requestId)
+                .append("token", token)
                 .append("resource", resource)
                 .toString();
     }

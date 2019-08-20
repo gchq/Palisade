@@ -1,0 +1,37 @@
+<configuration>
+
+    <property>
+        <name>fs.s3a.access.key</name>
+        <value>Palisade_example</value>
+        <description>AWS access key ID.
+            Omit for IAM role-based or provider-based authentication.</description>
+    </property>
+
+    <property>
+        <name>fs.s3a.secret.key</name>
+        <value>test_access</value>
+        <description>AWS secret key.
+            Omit for IAM role-based or provider-based authentication.</description>
+    </property>
+
+    <property>
+        <name>fs.s3a.endpoint</name>
+        <value>http://127.0.0.1:9000</value>
+        <description>AWS S3 endpoint to connect to. An up-to-date list is
+            provided in the AWS Documentation: regions and endpoints. Without this
+            property, the standard region (s3.amazonaws.com) is assumed.
+        </description>
+    </property>
+
+    <property>
+        <name>fs.s3a.attempts.maximum</name>
+        <value>5</value>
+        <description>How many times we should retry commands on transient errors.</description>
+    </property>
+
+    <property>
+        <name>fs.defaultFS</name>
+        <value>s3a://palisade-example-bucket/</value>
+        <description>Set the scheme for the default Hadoop file system.</description>
+    </property>
+</configuration>

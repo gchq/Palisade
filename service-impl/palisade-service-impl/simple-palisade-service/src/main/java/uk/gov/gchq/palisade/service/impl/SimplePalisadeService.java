@@ -23,33 +23,38 @@ import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.audit.service.AuditService;
-import uk.gov.gchq.palisade.audit.service.request.AuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestCompleteAuditRequest;
+import uk.gov.gchq.palisade.audit.service.request.RegisterRequestExceptionAuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
-import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.PolicyService;
 import uk.gov.gchq.palisade.policy.service.request.GetPolicyRequest;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.PalisadeMetricProvider;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
+import uk.gov.gchq.palisade.service.request.GetMetricRequest;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.request.Request;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -63,14 +68,21 @@ import static java.util.Objects.requireNonNull;
  * should check the resources requested in getDataRequestConfig are the same or a subset of the resources passed in in
  * registerDataRequest. </p>
  */
-public class SimplePalisadeService implements PalisadeService {
+public class SimplePalisadeService implements PalisadeService, PalisadeMetricProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplePalisadeService.class);
-
+    //Cache keys
+    public static final String RES_COUNT_KEY = "res_count_";
+    //Configuration keys
     public static final String AUDIT_IMPL_KEY = "palisade.svc.audit.svc";
     public static final String POLICY_IMPL_KEY = "palisade.svc.policy.svc";
     public static final String USER_IMPL_KEY = "palisade.svc.user.svc";
     public static final String RESOURCE_IMPL_KEY = "palisade.svc.resource.svc";
     public static final String CACHE_IMPL_KEY = "palisade.svc.cache.svc";
+
+    /**
+     * Duration for how long the count of resources requested should live in the cache.
+     */
+    public static final Duration COUNT_PERSIST_DURATION = Duration.ofMinutes(10);
 
     private AuditService auditService;
     private PolicyService policyService;
@@ -82,17 +94,17 @@ public class SimplePalisadeService implements PalisadeService {
     }
 
     @Override
-    public void applyConfigFrom(final ServiceConfiguration config) throws NoConfigException {
+    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
         requireNonNull(config, "config");
-        auditService = getFromConfig(config, AUDIT_IMPL_KEY, AuditService.class);
-        policyService = getFromConfig(config, POLICY_IMPL_KEY, PolicyService.class);
-        userService = getFromConfig(config, USER_IMPL_KEY, UserService.class);
-        resourceService = getFromConfig(config, RESOURCE_IMPL_KEY, ResourceService.class);
-        cacheService = getFromConfig(config, CACHE_IMPL_KEY, CacheService.class);
+        setAuditService(getFromConfig(config, AUDIT_IMPL_KEY, AuditService.class));
+        setPolicyService(getFromConfig(config, POLICY_IMPL_KEY, PolicyService.class));
+        setUserService(getFromConfig(config, USER_IMPL_KEY, UserService.class));
+        setResourceService(getFromConfig(config, RESOURCE_IMPL_KEY, ResourceService.class));
+        setCacheService(getFromConfig(config, CACHE_IMPL_KEY, CacheService.class));
     }
 
     /**
-     * Given an {@link ServiceConfiguration} object, this will create an instance of the given service. The {@code key} gives the
+     * Given an {@link ServiceState} object, this will create an instance of the given service. The {@code key} gives the
      * name of the serialised form inside the configuration object.
      *
      * @param config       the configuration for this Palisade service
@@ -102,20 +114,20 @@ public class SimplePalisadeService implements PalisadeService {
      * @return a created service
      * @throws NoConfigException if the required configuration item could not be found
      */
-    private static <S extends Service> S getFromConfig(final ServiceConfiguration config, final String key, final Class<S> serviceClass) throws NoConfigException {
+    private static <S extends Service> S getFromConfig(final ServiceState config, final String key, final Class<S> serviceClass) throws NoConfigException {
         requireNonNull(config, "config");
         requireNonNull(key, "key");
         requireNonNull(serviceClass, "serviceClass");
         String serialised = config.getOrDefault(key, null);
         if (nonNull(serialised)) {
-            return JSONSerialiser.deserialise(serialised.getBytes(JSONSerialiser.UTF8), serviceClass);
+            return JSONSerialiser.deserialise(serialised.getBytes(StandardCharsets.UTF_8), serviceClass);
         } else {
             throw new NoConfigException("no service specified in configuration for class " + serviceClass.getTypeName());
         }
     }
 
     @Override
-    public void recordCurrentConfigTo(final ServiceConfiguration config) {
+    public void recordCurrentConfigTo(final ServiceState config) {
         requireNonNull(config, "config");
         config.put(PalisadeService.class.getTypeName(), getClass().getTypeName());
         storeInConfig(config, auditService, AUDIT_IMPL_KEY);
@@ -132,11 +144,11 @@ public class SimplePalisadeService implements PalisadeService {
      * @param service the service to store
      * @param key     the key name
      */
-    private static void storeInConfig(final ServiceConfiguration config, final Service service, final String key) {
+    private static void storeInConfig(final ServiceState config, final Service service, final String key) {
         requireNonNull(config, "config");
         requireNonNull(service, "service");
         requireNonNull(key, "key");
-        String serialised = new String(JSONSerialiser.serialise(service), JSONSerialiser.UTF8);
+        String serialised = new String(JSONSerialiser.serialise(service), StandardCharsets.UTF_8);
         config.put(key, serialised);
     }
 
@@ -184,102 +196,184 @@ public class SimplePalisadeService implements PalisadeService {
 
     @Override
     public CompletableFuture<DataRequestResponse> registerDataRequest(final RegisterDataRequest request) {
-        LOGGER.debug("Registering data request: {}", request);
-
+        final RequestId originalRequestId = request.getId();
+        LOGGER.debug("Registering data request: {}", request, originalRequestId);
         final GetUserRequest userRequest = new GetUserRequest().userId(request.getUserId());
+        userRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting user from userService: {}", userRequest);
+
         final CompletableFuture<User> futureUser = userService.getUser(userRequest)
                 .thenApply(user -> {
                     LOGGER.debug("Got user: {}", user);
                     return user;
+                })
+                .exceptionally(ex -> {
+                    LOGGER.error("Failed to get user: {}", ex.getMessage());
+                    auditRequestReceivedException(request, ex, UserService.class);
+                    throw new RuntimeException(ex); //rethrow the exception
                 });
 
         final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId());
+        resourceRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting resources from resourceService: {}", resourceRequest);
         final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources = resourceService.getResourcesById(resourceRequest)
                 .thenApply(resources -> {
                     LOGGER.debug("Got resources: {}", resources);
                     return resources;
+                })
+                .exceptionally(ex -> {
+                    LOGGER.error("Failed to get resources: {}", ex.getMessage());
+                    auditRequestReceivedException(request, ex, ResourceService.class);
+                    throw new RuntimeException(ex); //rethrow the exception
                 });
 
         final RequestId requestId = new RequestId().id(request.getUserId().getId() + "-" + UUID.randomUUID().toString());
 
-        final DataRequestConfig config = new DataRequestConfig();
-        config.setContext(request.getContext());
+        CompletableFuture<MultiPolicy> futureMultiPolicy = getPolicy(request, futureUser, futureResources, originalRequestId);
 
+        return CompletableFuture.allOf(futureUser, futureResources, futureMultiPolicy)
+            .thenApply(t -> {
+                //remove any resources from the map that the policy doesn't contain details for -> user should not even be told about
+                //resources they don't have permission to see
+                Map<LeafResource, ConnectionDetail> filteredResources = removeDisallowedResources(futureResources.join(), futureMultiPolicy.join());
+
+                PalisadeService.ensureRecordRulesAvailableFor(futureMultiPolicy.join(), filteredResources.keySet());
+                auditRegisterRequestComplete(request, futureUser.join(), futureMultiPolicy.join());
+                cache(request, futureUser.join(), requestId, futureMultiPolicy.join(), filteredResources.size(), originalRequestId);
+
+                final DataRequestResponse response = new DataRequestResponse().token(requestId.getId()).resources(filteredResources);
+                response.setOriginalRequestId(originalRequestId);
+                LOGGER.debug("Responding with: {}", response);
+                return response;
+            })
+            .exceptionally(ex -> {
+                LOGGER.error("Error handling: {}", ex.getMessage());
+                auditRequestReceivedException(request, ex, PolicyService.class);
+                throw new RuntimeException(ex); //rethrow the exception
+            });
+    }
+
+    /**
+     * Removes all resource mappings in the {@code resources} that do not have a defined policy in {@code policy}.
+     *
+     * @param resources the resources to modify
+     * @param policy    the policy for all resources
+     * @return the {@code resources} map after filtering
+     */
+    private Map<LeafResource, ConnectionDetail> removeDisallowedResources(final Map<LeafResource, ConnectionDetail> resources, final MultiPolicy policy) {
+        resources.keySet().retainAll(policy.getPolicies().keySet());
+        return resources;
+    }
+
+    private CompletableFuture<MultiPolicy> getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources, final RequestId originalRequestId) {
         return CompletableFuture.allOf(futureUser, futureResources)
-                .thenApply(t -> getPolicy(request, futureUser, futureResources))
-                .thenApply(multiPolicy -> ensureRecordRulesAvailableFor(multiPolicy, futureResources.join().keySet()))
-                .thenAccept(multiPolicy -> {
-                    audit(request, futureUser.join(), multiPolicy);
-                    cache(request, futureUser.join(), requestId, multiPolicy);
-                }).thenApply(t -> {
-                    final DataRequestResponse response = new DataRequestResponse().requestId(requestId).resources(futureResources.join());
-                    LOGGER.debug("Responding with: {}", response);
-                    return response;
+                .thenApply(t -> {
+                    final GetPolicyRequest policyRequest = new GetPolicyRequest()
+                            .user(futureUser.join())
+                            .context(request.getContext())
+                            .resources(new HashSet<>(futureResources.join().keySet()));
+                    policyRequest.setOriginalRequestId(originalRequestId);
+                    return policyRequest;
+                })
+                .thenApply(req -> {
+                    LOGGER.debug("Getting policy from policyService: {}", req);
+                    return policyService.getPolicy(req).join();
+                }).thenApply(policy -> {
+                    LOGGER.debug("Got policy: {}", policy);
+                    return policy;
                 });
     }
 
-    private MultiPolicy getPolicy(final RegisterDataRequest request, final CompletableFuture<User> futureUser, final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources) {
-        final GetPolicyRequest policyRequest = new GetPolicyRequest().user(futureUser.join()).context(request.getContext()).resources(new HashSet<>(futureResources.join().keySet()));
-        LOGGER.debug("Getting policy from policyService: {}", policyRequest);
-        return policyService.getPolicy(policyRequest)
-                .thenApply(policy -> {
-                    LOGGER.debug("Got policy: {}", policy);
-                    return policy;
-                }).join();
+    private void auditRegisterRequestComplete(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy) {
+        RegisterRequestCompleteAuditRequest registerRequestCompleteAuditRequest = new RegisterRequestCompleteAuditRequest()
+                .leafResources(multiPolicy.getPolicies().keySet())
+                .user(user)
+                .context(request.getContext());
+        registerRequestCompleteAuditRequest.setOriginalRequestId(request.getId());
+        LOGGER.debug("Auditing: {}", registerRequestCompleteAuditRequest);
+        auditService.audit(registerRequestCompleteAuditRequest).join();
     }
 
-    private void audit(final RegisterDataRequest request, final User user, final MultiPolicy multiPolicy) {
-        for (final Entry<LeafResource, Policy> entry : multiPolicy.getPolicies().entrySet()) {
-            final AuditRequest auditRequest =
-                    new AuditRequest()
-                            .resource(entry.getKey())
-                            .user(user)
-                            .context(request.getContext())
-                            .howItWasProcessed(entry.getValue().getMessage());
-            LOGGER.debug("Auditing: {}", auditRequest);
-            auditService.audit(auditRequest);
-        }
+    private void auditRequestReceivedException(final RegisterDataRequest request, final Throwable ex, final Class<? extends Service> serviceClass) {
+        final RegisterRequestExceptionAuditRequest auditRequestWithException = new RegisterRequestExceptionAuditRequest()
+                .userId(request.getUserId())
+                .resourceId(request.getResourceId())
+                .context(request.getContext())
+                .exception(ex)
+                .service(serviceClass);
+        auditRequestWithException.setOriginalRequestId(request.getId());
+        LOGGER.debug("Error handling: " + ex.getMessage());
+        auditService.audit(auditRequestWithException).join();
     }
 
-    private void cache(final RegisterDataRequest request, final User user, final RequestId requestId, final MultiPolicy multiPolicy) {
+    private void cache(final RegisterDataRequest request, final User user,
+                       final RequestId requestId, final MultiPolicy multiPolicy,
+                       final int resCount,
+                       final RequestId originalRequestId) {
+        DataRequestConfig dataRequestConfig = new DataRequestConfig()
+                .user(user)
+                .context(request.getContext())
+                .rules(multiPolicy.getRuleMap());
+        dataRequestConfig.setOriginalRequestId(originalRequestId);
         final AddCacheRequest<DataRequestConfig> cacheRequest = new AddCacheRequest<>()
                 .key(requestId.getId())
-                .value(new DataRequestConfig()
-                        .user(user)
-                        .context(request.getContext())
-                        .rules(multiPolicy.getRuleMap())
-                )
+                .value(dataRequestConfig)
                 .service(this.getClass());
         LOGGER.debug("Caching: {}", cacheRequest);
         final Boolean success = cacheService.add(cacheRequest).join();
         if (null == success || !success) {
             throw new CompletionException(new RuntimeException("Failed to cache request: " + request));
         }
+        //set a quick count of how many resources are needed for this request
+        final AddCacheRequest<byte[]> resourceCountRequest = new AddCacheRequest<>()
+                .key(RES_COUNT_KEY + requestId.getId() + "_" + resCount)
+                .value(new byte[1])
+                .timeToLive(Optional.of(COUNT_PERSIST_DURATION))
+                .service(this.getClass());
+        cacheService.add(resourceCountRequest).join();
     }
 
     @Override
-    public CompletableFuture<DataRequestConfig> getDataRequestConfig(final GetDataRequestConfig request) {
+    public CompletableFuture<DataRequestConfig> getDataRequestConfig(
+            final GetDataRequestConfig request) {
         requireNonNull(request);
-        requireNonNull(request.getRequestId());
+        requireNonNull(request.getToken());
         // TODO: need to validate that the user is actually requesting the correct info.
         // extract resources from request and check they are a subset of the original RegisterDataRequest resources
-        final GetCacheRequest<DataRequestConfig> cacheRequest = new GetCacheRequest<>().key(request.getRequestId().getId()).service(this.getClass());
+        final GetCacheRequest<DataRequestConfig> cacheRequest = new GetCacheRequest<>().key(request.getToken()).service(this.getClass());
         LOGGER.debug("Getting cached data: {}", cacheRequest);
         return cacheService.get(cacheRequest)
                 .thenApply(cache -> {
-                    DataRequestConfig value = cache.orElseThrow(() -> createCacheException(request.getRequestId().getId()));
+                    DataRequestConfig value = cache.orElseThrow(() -> createCacheException(request.getToken()));
                     if (null == value.getUser()) {
-                        throw createCacheException(request.getRequestId().getId());
+                        throw createCacheException(request.getToken());
                     }
                     LOGGER.debug("Got cache: {}", value);
                     return value;
                 });
     }
 
+    @Override
+    public CompletableFuture<Map<String, String>> getMetrics(
+            final GetMetricRequest request) {
+        requireNonNull(request, "request");
+        return CompletableFuture.completedFuture(new SimpleMetricProvider(getCacheService())
+                .computeMetrics(request.getFilters()));
+    }
+
+    @Override
+    public CompletableFuture<?> process(final Request request) {
+        //first try one parent interface
+        try {
+            return PalisadeService.super.process(request);
+        } catch (IllegalArgumentException e) {
+            //that failed try the other
+            return PalisadeMetricProvider.super.process(request);
+        }
+    }
+
     private RuntimeException createCacheException(final String id) {
-        return new RuntimeException("User's request was not in the cache: " + id);
+        return new RuntimeException(TOKEN_NOT_FOUND_MESSAGE + id);
     }
 
     public AuditService getAuditService() {

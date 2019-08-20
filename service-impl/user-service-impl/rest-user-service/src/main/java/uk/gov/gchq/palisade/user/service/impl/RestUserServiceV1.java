@@ -24,11 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.User;
-import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.user.service.UserService;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -51,21 +52,15 @@ public class RestUserServiceV1 implements UserService {
 
     private static UserService userService;
 
-    public RestUserServiceV1() {
-        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
-    }
-
-    public RestUserServiceV1(final String serviceConfigPath) {
-        this(createService(serviceConfigPath));
-    }
-
+    @Inject
     public RestUserServiceV1(final UserService delegate) {
+        requireNonNull(delegate, "delegate");
         this.delegate = delegate;
     }
 
-    private static synchronized UserService createService(final String serviceConfigPath) {
+    static synchronized UserService createService(final String serviceConfigPath) {
         if (userService == null) {
-            userService = RestUtil.createService(RestUserServiceV1.class, serviceConfigPath, UserService.class);
+            userService = ConfigUtils.createService(RestUserServiceV1.class, serviceConfigPath, UserService.class);
         }
         return userService;
     }

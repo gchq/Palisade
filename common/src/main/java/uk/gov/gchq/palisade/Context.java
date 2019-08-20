@@ -17,9 +17,11 @@
 package uk.gov.gchq.palisade;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -33,13 +35,17 @@ import static java.util.Objects.requireNonNull;
  * A structure to store contextual information from the client at query time that can be used when interacting with resources.
  * Interaction with a resource include both reading and writing and will often require
  * additional information that can be stored and recovered in this structure and passed along with the request/operation.
- * i.e A users justification for requesting the contents of a file.
+ * i.e. A users purpose for requesting the contents of a file.
  */
 @JsonPropertyOrder(value = {"class", "contents"}, alphabetic = true)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "class"
+)
 public class Context {
 
-    private static final String JUSTIFICATION = "justification";
-    public static final String NAMESPACE = "Context";
+    private static final String PURPOSE = "purpose";
     private Map<String, Object> contents;
 
     public Context() {
@@ -73,18 +79,18 @@ public class Context {
     }
 
     @JsonIgnore
-    public Context justification(final String justification) {
-        requireNonNull(justification, "The justification cannot be set to null");
-        contents.put(JUSTIFICATION, justification);
+    public Context purpose(final String purpose) {
+        requireNonNull(purpose, "The purpose cannot be set to null");
+        contents.put(PURPOSE, purpose);
         return this;
     }
 
     @JsonIgnore
-    public String getJustification() {
+    public String getPurpose() {
         try {
-            return (String) contents.get(JUSTIFICATION);
+            return (String) contents.get(PURPOSE);
         } catch (final ClassCastException e) {
-            throw new RuntimeException("The justification value should be a string");
+            throw new RuntimeException("The purpose value should be a string");
         }
     }
 
@@ -135,5 +141,10 @@ public class Context {
         requireNonNull(value, "The value cannot be null.");
         contents.putIfAbsent(key, value);
         return this;
+    }
+
+    @JsonGetter("class")
+    public String _getClass() {
+        return getClass().getName();
     }
 }

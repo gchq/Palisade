@@ -20,7 +20,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>palisade</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>service-impl</artifactId>
     <packaging>pom</packaging>
@@ -34,15 +34,7 @@
         <module>cache-service-impl</module>
         <module>palisade-service-impl</module>
         <module>config-service-impl</module>
+        <module>redirector-service-impl</module>
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.parent.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 </project>

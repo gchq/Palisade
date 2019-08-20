@@ -1,7 +1,7 @@
 # Services
 
 A collection of the different Palisade Services. The implementations 
-are located within the service-impl module.
+are located within the [service-impl module](../service-impl/README.md).
 
 Always check that there is not an existing service that could be tweaked before creating a new service.
 
@@ -13,6 +13,7 @@ Always check that there is not an existing service that could be tweaked before 
 * [Data Service](data-service/README.md)
 * [Palisade Service](palisade-service/README.md)
 * [Policy Service](policy-service/README.md)
+* [Redirector Service](redirector-service/README.md)
 * [Resource Service](resource-service/README.md)
 * [Rest Service](rest-service/README.md)
 * [User Service](user-service/README.md)

@@ -21,17 +21,18 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
+import uk.gov.gchq.palisade.data.service.exception.NoCapacityException;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
 
 /**
  * The core API for the data reader.
- *
+ * <p>
  * The responsibility of the data reader is to connect to the requested resource,
  * apply the rules, then passes back to the data service the stream of data in
  * the expected format.
- *
- * There is a utility method {@link uk.gov.gchq.palisade.Util#applyRulesToStream(java.util.stream.Stream, uk.gov.gchq.palisade.User, uk.gov.gchq.palisade.Context, uk.gov.gchq.palisade.rule.Rules)}
+ * <p>
+ * There is a utility method {@link uk.gov.gchq.palisade.Util#applyRulesToStream(java.util.stream.Stream, uk.gov.gchq.palisade.User, uk.gov.gchq.palisade.Context, uk.gov.gchq.palisade.rule.Rules, java.util.concurrent.atomic.AtomicLong, java.util.concurrent.atomic.AtomicLong)}
  * that does the part of applying the rules provided your input data is in the
  * format that the rules expect.
  */
@@ -44,13 +45,18 @@ public interface DataReader {
 
     /**
      * This method will read the data from a single resource and apply all the rules.
+     * If the data reader is unable to serve the request due to not having the resources
+     * to do so, or if it is currently serving too many requests then it may throw a
+     * {@link NoCapacityException}.
      *
      * @param request {@link DataReaderRequest} containing the resource to be
      *                read, rules to be applied, the user requesting the data
-     *                and the justification for accessing the data.
+     *                and the purpose for accessing the data.
      * @return a {@link DataReaderRequest} that contains the stream of data.
+     * @throws NoCapacityException if the data reader is unable to serve this request due to
+     *                             workload issues or lack of capacity
      */
-    DataReaderResponse read(final DataReaderRequest request);
+    DataReaderResponse read(final DataReaderRequest request) throws NoCapacityException;
 
     @JsonGetter("class")
     default String _getClass() {

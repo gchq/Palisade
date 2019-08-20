@@ -20,7 +20,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>user-service-impl</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>proxy-rest-user-service</artifactId>
 
@@ -28,6 +28,16 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>proxy-rest-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>user-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>

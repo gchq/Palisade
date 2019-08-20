@@ -40,6 +40,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface PalisadeService extends Service {
 
+    String TOKEN_NOT_FOUND_MESSAGE = "User's request was not in the cache: ";
+
     /**
      * This method is used by the client code to register that they want to read a resource or data set. This method
      * will check that the user can have access to the resource and pass back details of all the resources linked to the
@@ -83,14 +85,17 @@ public interface PalisadeService extends Service {
      * @return the {@code} policy object
      * @throws NoPolicyException if no record level rules are available for any {@link LeafResource} in {@code resources}
      */
-    default MultiPolicy ensureRecordRulesAvailableFor(final MultiPolicy policy, final Collection<LeafResource> resources) {
+    static MultiPolicy ensureRecordRulesAvailableFor(final MultiPolicy policy, final Collection<LeafResource> resources) {
         Objects.requireNonNull(policy, "policy");
         Objects.requireNonNull(resources, "resources");
         final Map<LeafResource, Rules> ruleMap = policy.getRuleMap();
-        final Rules defaultEmpty = new Rules();
         resources.forEach(resource -> {
-            if (!ruleMap.getOrDefault(resource, defaultEmpty).containsRules()) {
-                throw new NoPolicyException("No policy rules available for " + resource);
+            if (!ruleMap.containsKey(resource)) {
+                throw new NoPolicyException("No policy record rules available for " + resource);
+            }
+            if (!ruleMap.get(resource).containsRules()) {
+                //policy available but is empty
+                //TODO: audit this because it is unusual behaviour
             }
         });
         return policy;

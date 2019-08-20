@@ -18,6 +18,8 @@ package uk.gov.gchq.palisade.rest.factory;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.rest.SystemProperty;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * A {@code UserFactory} creates instances of {@link UserId}s.
  */
@@ -30,8 +32,10 @@ public interface UserFactory {
         try {
             return Class.forName(userFactoryClass)
                     .asSubclass(UserFactory.class)
+                    .getDeclaredConstructor()
                     .newInstance();
-        } catch (final InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        } catch (final InstantiationException | IllegalAccessException | NoSuchMethodException |
+                InvocationTargetException | ClassNotFoundException e) {
             throw new IllegalArgumentException("Unable to create user factory from class: " + userFactoryClass, e);
         }
     }

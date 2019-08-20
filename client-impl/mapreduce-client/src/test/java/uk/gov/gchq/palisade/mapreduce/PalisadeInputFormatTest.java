@@ -21,6 +21,7 @@ import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,9 +59,9 @@ public class PalisadeInputFormatTest {
         JobContext mockJob = Mockito.mock(JobContext.class);
         when(mockJob.getConfiguration()).thenReturn(c);
 
-        RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).context(new Context().justification("justification"));
+        RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).context(new Context().purpose("purpose"));
         RegisterDataRequest[] rdrArray = {rdr};
-        String json = new String(JSONSerialiser.serialise(rdrArray), JSONSerialiser.UTF8);
+        String json = new String(JSONSerialiser.serialise(rdrArray), StandardCharsets.UTF_8);
         //When
         PalisadeInputFormat.addDataRequest(mockJob, rdr);
         //Then
@@ -73,17 +74,17 @@ public class PalisadeInputFormatTest {
         Configuration c = new Configuration();
         JobContext mockJob = Mockito.mock(JobContext.class);
         when(mockJob.getConfiguration()).thenReturn(c);
-        RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).context(new Context().justification("justification"));
+        RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).context(new Context().purpose("purpose"));
         //When
         PalisadeInputFormat.addDataRequest(mockJob, rdr);
         PalisadeInputFormat.addDataRequest(mockJob, rdr);
         RegisterDataRequest[] rdrArray = {rdr, rdr};
-        String json = new String(JSONSerialiser.serialise(rdrArray), JSONSerialiser.UTF8);
+        String json = new String(JSONSerialiser.serialise(rdrArray), StandardCharsets.UTF_8);
         //Then
         assertEquals(json, c.get(PalisadeInputFormat.REGISTER_REQUESTS_KEY));
     }
 
-    @Test (expected = RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void shouldErrorWhenAddingEmptyRequest() {
         //Given
         Configuration c = new Configuration();
@@ -115,8 +116,8 @@ public class PalisadeInputFormatTest {
         Configuration c = new Configuration();
         JobContext mockJob = Mockito.mock(JobContext.class);
         when(mockJob.getConfiguration()).thenReturn(c);
-        RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).context(new Context().justification("justification"));
-        RegisterDataRequest rdr2 = new RegisterDataRequest().resourceId("testResource2").userId(new UserId().id("user2")).context(new Context().justification("justification2"));
+        RegisterDataRequest rdr = new RegisterDataRequest().resourceId("testResource").userId(new UserId().id("user")).context(new Context().purpose("purpose"));
+        RegisterDataRequest rdr2 = new RegisterDataRequest().resourceId("testResource2").userId(new UserId().id("user2")).context(new Context().purpose("purpose2"));
         //When
         PalisadeInputFormat.addDataRequests(mockJob, rdr, rdr2);
         List<RegisterDataRequest> expected = Stream.of(rdr, rdr2).collect(Collectors.toList());
@@ -146,18 +147,20 @@ public class PalisadeInputFormatTest {
 
     @BeforeClass
     public static void setup() {
-        request1 = new RegisterDataRequest().resourceId("res1").userId(new UserId().id("user1")).context(new Context().justification("just1"));
-        req1Response = new DataRequestResponse().requestId(new RequestId().id("request1"))
+        request1 = new RegisterDataRequest().resourceId("res1").userId(new UserId().id("user1")).context(new Context().purpose("purpose1"));
+        req1Response = new DataRequestResponse().token("token1")
                 .resource(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"))
                 .resource(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"))
                 .resource(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"))
                 .resource(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"))
                 .resource(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
+        req1Response.originalRequestId(new RequestId().id("request1.setup"));
 
-        request2 = new RegisterDataRequest().resourceId("res2").userId(new UserId().id("user2")).context(new Context().justification("just2"));
-        req2Response = new DataRequestResponse().requestId(new RequestId().id("request2"))
+        request2 = new RegisterDataRequest().resourceId("res2").userId(new UserId().id("user2")).context(new Context().purpose("purpose2"));
+        req2Response = new DataRequestResponse().token("request2")
                 .resource(new StubResource("type_a", "id6", "format6"), new StubConnectionDetail("con6"))
                 .resource(new StubResource("type_b", "id7", "format7"), new StubConnectionDetail("con7"));
+        req2Response.originalRequestId(new RequestId().id("request2.setup"));
     }
 
     /**
@@ -229,7 +232,7 @@ public class PalisadeInputFormatTest {
         //When
         List<PalisadeInputSplit> splits = convert(callGetSplits(1, resources, mockService));
         //Then
-        checkForExpectedResources(splits,0,0);
+        checkForExpectedResources(splits, 0, 0);
     }
 
     @Test

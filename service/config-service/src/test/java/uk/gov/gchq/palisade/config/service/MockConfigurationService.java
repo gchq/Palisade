@@ -19,7 +19,7 @@ import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -38,7 +38,7 @@ public class MockConfigurationService implements ConfigurationService {
     }
 
     @Override
-    public CompletableFuture<ServiceConfiguration> get(final GetConfigRequest request) {
+    public CompletableFuture<ServiceState> get(final GetConfigRequest request) {
         return mock.get(request);
     }
 

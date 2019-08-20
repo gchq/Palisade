@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 
 import java.util.UUID;
@@ -30,25 +31,31 @@ import static java.util.Objects.requireNonNull;
  * This makes sure each request has a unique identifier.
  */
 public abstract class Request {
-    private String id;
+    private RequestId id; //this is a unique ID for each individual request made between the micro-services
+    private RequestId originalRequestId; //this Id is unique per data access request from a user
 
     public Request() {
-        id(UUID.randomUUID().toString());
+        this.id = new RequestId().id(UUID.randomUUID().toString());
     }
 
-    public Request id(final String id) {
-        requireNonNull(id, "The id cannot be set to null.");
-        this.id = id;
+    public Request originalRequestId(final RequestId originalRequestId) {
+        requireNonNull(originalRequestId, "The originalRequestId cannot be set to null.");
+        this.originalRequestId = originalRequestId;
         return this;
     }
 
-    public void setId(final String id) {
-        id(id);
+    public RequestId getId() {
+        //id will never be null - set on construction
+        return id;
     }
 
-    public String getId() {
-        // id will never be null
-        return id;
+    public void setOriginalRequestId(final RequestId originalRequestId) {
+        originalRequestId(originalRequestId);
+    }
+
+    public RequestId getOriginalRequestId() {
+        requireNonNull(originalRequestId, "The originalRequestId type cannot be null");
+        return originalRequestId;
     }
 
     @Override
@@ -64,21 +71,24 @@ public abstract class Request {
         final Request request = (Request) o;
 
         return new EqualsBuilder()
-                .append(id, request.id)
-                .isEquals();
+        .append(id, request.id)
+        .append(originalRequestId, request.originalRequestId)
+        .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(5, 37)
-                .append(id)
-                .toHashCode();
+        .append(id)
+        .append(originalRequestId)
+        .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("id", id)
-                .toString();
+        .append("id", id)
+        .append("originalRequestId", originalRequestId)
+        .toString();
     }
 }

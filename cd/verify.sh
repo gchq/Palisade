@@ -4,28 +4,53 @@
 
 set -e
 
-result=0
+container_result=0
+multi_jvm_result=0
+multi_jvm_cat_client_result=0
 
 if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
-    echo "Running verify script: mvn -q verify -P analyze -B"
-    mvn -q verify -P analyze -B
-    echo "Starting the multi-jvm-example containerised"
-    ./example/multi-jvm-example/scripts/dockerComposeUp.sh
-    #Sleep to ensure all containers are up
-    sleep 2m
+    echo "Building Palisade code: mvn install -q -B -V -P error-prone"
+    mvn install -q -B -V -P error-prone
+    ./example/deployment/local-jvm/bash-scripts/buildServices.sh
+    export PALISADE_REST_CONFIG_PATH="$(pwd)/example/example-model/src/main/resources/configRest.json"
+
+    echo "Starting the local-docker-example containers"
+    ./example/deployment/local-docker/bash-scripts/dockerComposeUp.sh
+    # Sleep to allow containers to start
+    sleep 120s
     echo "Running the example application"
-    OUTPUT=`./example/multi-jvm-example/scripts/runDocker.sh`
+    OUTPUT=`./example/deployment/local-docker/bash-scripts/runLocalDockerExample.sh | tee /dev/tty`
     echo "Output is: $OUTPUT"
     validate_example_output "$OUTPUT"
-    result=$?
-    echo "Stopping the multi-jvm-example containers"
-    ./example/multi-jvm-example/scripts/dockerComposeDown.sh
+    container_result=$?
+    echo "Stopping the local-docker-example containers"
+    ./example/deployment/local-docker/bash-scripts/dockerComposeDown.sh
+
+    echo "Starting the local-jvm-example"
+    ./example/deployment/local-jvm/bash-scripts/startAllServices.sh
+    echo "Running the example application"
+    OUTPUT=`./example/deployment/local-jvm/bash-scripts/runLocalJVMExample.sh | tee /dev/tty`
+    echo "Output is: $OUTPUT"
+    validate_example_output "$OUTPUT"
+    multi_jvm_result=$?
+
+    OUTPUT=`java -cp $(pwd)/client-impl/cat-client/target/cat-client-*-shaded.jar uk.gov.gchq.palisade.client.CatClient Alice file://$(pwd)/example/resources/employee_file0.avro SALARY | tee /dev/tty`
+    echo "Output is: $OUTPUT"
+    validate_example_output "$OUTPUT"
+    multi_jvm_cat_client_result=$?
+    echo "Stopping the local-jvm-example"
+    ./example/deployment/local-jvm/bash-scripts/stopAllServices.sh
+
     echo "Compiling javadoc"
-    mvn -q javadoc:aggregate -P quick
-
+    mvn javadoc:aggregate -q
 fi
-
-exit $result
+if [[ ${container_result} -eq 0 ]] && [[ ${multi_jvm_result} -eq 0 ]] && [[ ${multi_jvm_cat_client_result} -eq 0 ]]; then
+    echo "exit 0"
+    exit 0
+else
+    echo "exit 1"
+    exit 1
+fi
 
 
 

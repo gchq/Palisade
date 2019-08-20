@@ -21,15 +21,15 @@ public class TupleRuleTest {
     public static final String RECORD_VAR2 = "Record.var2";
     public static final String USER_AUTHS = "User.auths";
     public static final String USER_ROLES = "User.roles";
-    public static final String CONTEXT_JUSTIFICATION = "Context.justification";
+    public static final String CONTEXT_PURPOSE = "Context.purpose";
     public static final String AUTH_1 = "auth1";
-    public static final String JUST_1 = "just1";
+    public static final String PURPOSE_1 = "purpose1";
     public static final String FROM_RULE = "fromRule";
     public static final String NOT_VAL1 = "notVal1";
     public static final String OTHER = "other";
     public static final String ROLE_1 = "role1";
     private static final User NULL_USER = new User().userId("user1");
-    private static final Context NULL_CONTEXT = new Context().justification("testing");
+    private static final Context NULL_CONTEXT = new Context().purpose("testing");
 
     private TupleRule<TestObj> testObject;
     private TestObj record;
@@ -169,46 +169,46 @@ public class TupleRuleTest {
     }
 
     @Test
-    public void shouldSelectAndMatchJust() throws Exception {
+    public void shouldSelectAndMatchPurpose() throws Exception {
         //given
-        final Context just = new Context().justification(JUST_1);
+        final Context purpose = new Context().purpose(PURPOSE_1);
         testObject = new TupleRule<TestObj>()
-                .selection(CONTEXT_JUSTIFICATION)
-                .predicate((String s) -> s.equals(JUST_1));
+                .selection(CONTEXT_PURPOSE)
+                .predicate((String s) -> s.equals(PURPOSE_1));
 
         //when
-        final TestObj actual = testObject.apply(record, NULL_USER, just);
+        final TestObj actual = testObject.apply(record, NULL_USER, purpose);
         //then
         assertEquals(record, actual);
     }
 
     @Test
-    public void shouldSelectAndNotMatchJust() throws Exception {
+    public void shouldSelectAndNotMatchPurpose() throws Exception {
         //given
-        final Context just = new Context().justification(JUST_1);
+        final Context purpose = new Context().purpose(PURPOSE_1);
         testObject = new TupleRule<TestObj>()
-                .selection(CONTEXT_JUSTIFICATION)
+                .selection(CONTEXT_PURPOSE)
                 .predicate((String s) -> s.equals(OTHER));
 
         //when
-        final TestObj actual2 = testObject.apply(record, NULL_USER, just);
+        final TestObj actual2 = testObject.apply(record, NULL_USER, purpose);
         //then
         assertEquals(null, actual2);
     }
 
     @Test
-    public void shouldSelectAndProjectJust() throws Exception {
+    public void shouldSelectAndProjectPurpose() throws Exception {
         //given
-        final Context just = new Context().justification(JUST_1);
+        final Context purpose = new Context().purpose(PURPOSE_1);
         testObject = new TupleRule<TestObj>()
-                .selection(CONTEXT_JUSTIFICATION)
+                .selection(CONTEXT_PURPOSE)
                 .function((String o) -> FROM_RULE)
-                .projection(CONTEXT_JUSTIFICATION);
+                .projection(CONTEXT_PURPOSE);
         //when
-        final TestObj actual = testObject.apply(record, NULL_USER, just);
+        final TestObj actual = testObject.apply(record, NULL_USER, purpose);
         //then
         assertEquals(record, actual);
-        assertEquals(FROM_RULE, just.getJustification());
+        assertEquals(FROM_RULE, purpose.getPurpose());
     }
 
 

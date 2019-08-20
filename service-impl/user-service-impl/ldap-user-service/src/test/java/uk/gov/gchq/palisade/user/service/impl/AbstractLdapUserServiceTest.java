@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
@@ -83,7 +84,9 @@ public class AbstractLdapUserServiceTest {
         service.setMock(mock);
 
         // When
-        final User user = service.getUser(new GetUserRequest().userId(userId)).join();
+        GetUserRequest getUserRequest = new GetUserRequest().userId(userId);
+        getUserRequest.setOriginalRequestId(new RequestId().id("TEST shouldFetchUserDetailsFromLdap"));
+        final User user = service.getUser(getUserRequest).join();
 
         // Then
         verify(context, times(1)).getAttributes("user\\#01", attrNames);
@@ -120,8 +123,12 @@ public class AbstractLdapUserServiceTest {
         service.setMock(mock);
 
         // When
-        final User user1 = service.getUser(new GetUserRequest().userId(userId)).join();
-        final User user2 = service.getUser(new GetUserRequest().userId(userId)).join();
+        GetUserRequest getUserRequest1 = new GetUserRequest().userId(userId);
+        getUserRequest1.setOriginalRequestId(new RequestId().id("test user1"));
+        GetUserRequest getUserRequest2 = new GetUserRequest().userId(userId);
+        getUserRequest2.setOriginalRequestId(new RequestId().id("test user2"));
+        final User user1 = service.getUser(getUserRequest1).join();
+        final User user2 = service.getUser(getUserRequest2).join();
 
         // Then
         assertEquals(userId, user1.getUserId());
@@ -189,8 +196,8 @@ public class AbstractLdapUserServiceTest {
         };
 
         given(context.search(searchBase,
-                        new BasicAttributes(attrIdForUserId, userId.getId()),
-                        requestAttrs)
+                new BasicAttributes(attrIdForUserId, userId.getId()),
+                requestAttrs)
         ).willReturn(responseAttrs);
 
         // When

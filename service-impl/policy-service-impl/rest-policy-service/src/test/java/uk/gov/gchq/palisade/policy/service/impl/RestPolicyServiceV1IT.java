@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.policy.service.MultiPolicy;
 import uk.gov.gchq.palisade.policy.service.Policy;
@@ -59,12 +60,12 @@ public class RestPolicyServiceV1IT {
     private static ProxyRestPolicyService proxy;
     private static EmbeddedHttpServer server;
 
-
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("restPolicyServicePort");
         RestPolicyServiceV1.setDefaultDelegate(new MockPolicyService());
-        proxy = new ProxyRestPolicyService("http://localhost:8081/policy");
-        server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
+        proxy = (ProxyRestPolicyService) new ProxyRestPolicyService("http://localhost:"+portNumber+"/policy").retryMax(1);
+        server = new EmbeddedHttpServer("http://0.0.0.0:"+portNumber+"/policy/v1", new ApplicationConfigV1());
         server.startServer();
     }
 
@@ -81,8 +82,9 @@ public class RestPolicyServiceV1IT {
         final PolicyService policyService = Mockito.mock(PolicyService.class);
         MockPolicyService.setMock(policyService);
 
-        final Context context = new Context().justification("justification1");
+        final Context context = new Context().purpose("purpose1");
         final CanAccessRequest request = new CanAccessRequest().resources(Collections.singletonList(fileResource1)).user(user).context(context);
+        request.setOriginalRequestId(new RequestId().id("shouldCallCanAccess"));
 
         given(policyService.canAccess(request)).willReturn(CompletableFuture.completedFuture(new CanAccessResponse().canAccessResources(Collections.singletonList(fileResource1))));
 
@@ -100,8 +102,9 @@ public class RestPolicyServiceV1IT {
         final PolicyService policyService = Mockito.mock(PolicyService.class);
         MockPolicyService.setMock(policyService);
 
-        final Context context = new Context().justification("justification1");
+        final Context context = new Context().purpose("purpose1");
         final GetPolicyRequest request = new GetPolicyRequest().user(user).context(context).resources(Arrays.asList(fileResource1, fileResource2));
+        request.setOriginalRequestId(new RequestId().id("test shouldGetPolicy"));
 
         final Map<LeafResource, Policy> policies = new HashMap<>();
         policies.put(fileResource1, new Policy<>().owner(user));

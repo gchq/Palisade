@@ -29,9 +29,10 @@ import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.jsonserialisation.JSONSerialiser;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.util.StreamUtil;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -41,6 +42,7 @@ import javax.ws.rs.Produces;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/")
@@ -48,44 +50,38 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 @Api(value = "/")
 public class RestConfigServiceV1 implements ConfigurationService {
-    public static final String BOOTSTRAP_CONFIG = "palisade.rest.bootstrap.path";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RestConfigServiceV1.class);
 
     private final ConfigurationService delegate;
 
     private static ConfigurationService configService;
 
-    public RestConfigServiceV1() {
-        this(System.getProperty(BOOTSTRAP_CONFIG));
-    }
-
-    public RestConfigServiceV1(final String serviceConfigPath) {
-        this(createService(serviceConfigPath));
-    }
-
+    @Inject
     public RestConfigServiceV1(final ConfigurationService delegate) {
+        requireNonNull(delegate, "delegate");
         this.delegate = delegate;
     }
 
-    private static synchronized ConfigurationService createService(final String serviceConfigPath) {
+    static synchronized ConfigurationService createService(final String serviceConfigPath) {
         if (configService == null) {
             //create the configuration service from the initial bootstrap information
             final InputStream stream = StreamUtil.openStream(RestConfigServiceV1.class, serviceConfigPath);
             configService = JSONSerialiser.deserialise(stream, ConfigurationService.class);
-            configService.configureSelfFromCache();
+            configService.configureSelfFromConfig();
         }
         return configService;
     }
 
     @POST
     @Path("/get")
-    @ApiOperation(value = "Gets the config in a ServiceConfiguration",
-            response = ServiceConfiguration.class)
+    @ApiOperation(value = "Gets the config in a ServiceState",
+            response = ServiceState.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something went wrong in the server")
     })
-    public ServiceConfiguration getSync(
+    public ServiceState getSync(
             @ApiParam(value = "The request") final GetConfigRequest request) {
         LOGGER.debug("Invoking get: {}", request);
         return get(request).join();
@@ -93,7 +89,7 @@ public class RestConfigServiceV1 implements ConfigurationService {
 
     @PUT
     @Path("/add")
-    @ApiOperation(value = "Adds the config from this ServiceConfiguration",
+    @ApiOperation(value = "Adds the config from this ServiceState",
             response = Boolean.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -106,7 +102,7 @@ public class RestConfigServiceV1 implements ConfigurationService {
     }
 
     @Override
-    public CompletableFuture<ServiceConfiguration> get(final GetConfigRequest request) {
+    public CompletableFuture<ServiceState> get(final GetConfigRequest request) {
         return delegate.get(request);
     }
 

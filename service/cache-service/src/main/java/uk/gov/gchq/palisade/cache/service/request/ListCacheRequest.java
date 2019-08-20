@@ -15,6 +15,12 @@
  */
 package uk.gov.gchq.palisade.cache.service.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import uk.gov.gchq.palisade.RequestId;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
+import uk.gov.gchq.palisade.service.Service;
+
 /**
  * This class is used to request the cache service return a list of known cache entries. The <code>key</code> methods
  * are overridden to throw UnsupportedOperationException. Clients must use the <code>prefix</code> methods instead.
@@ -51,6 +57,7 @@ public class ListCacheRequest extends CacheRequest {
      * @param prefix the prefix to use for filtering
      * @return this object
      */
+    @JsonIgnoreProperties(value = {"originalRequestId"})
     public ListCacheRequest prefix(final String prefix) {
         super.key(prefix);
         return this;
@@ -64,5 +71,24 @@ public class ListCacheRequest extends CacheRequest {
      */
     public void setPrefix(final String prefix) {
         super.setKey(prefix);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ListCacheRequest service(final Class<? extends Service> service) {
+        super.service(service);
+        return this;
+    }
+
+    @Override
+    public void setOriginalRequestId(final RequestId originalRequestId) {
+        throw new ForbiddenException("Should not call ListCacheRequest.setOriginalRequestId()");
+    }
+
+    @Override
+    public RequestId getOriginalRequestId() {
+        throw new ForbiddenException("Should not call ListCacheRequest.getOriginalRequestId()");
     }
 }

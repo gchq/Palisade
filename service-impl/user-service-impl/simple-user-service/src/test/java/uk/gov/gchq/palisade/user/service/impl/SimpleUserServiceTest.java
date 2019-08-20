@@ -18,11 +18,12 @@ package uk.gov.gchq.palisade.user.service.impl;
 
 import org.junit.Test;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
 import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.user.service.exception.NoSuchUserIdException;
 import uk.gov.gchq.palisade.user.service.request.AddUserRequest;
 import uk.gov.gchq.palisade.user.service.request.GetUserRequest;
@@ -44,7 +45,7 @@ public class SimpleUserServiceTest {
         hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(true)));
         hms.addUser(new AddUserRequest().user(user)).join();
 
-        ServiceConfiguration con = new ServiceConfiguration();
+        ServiceState con = new ServiceState();
         hms.recordCurrentConfigTo(con);
 
         //When
@@ -53,8 +54,12 @@ public class SimpleUserServiceTest {
         //add a user to the first service
         hms.addUser(new AddUserRequest().user(user2)).join();
         //both should be in the second service
-        User actual1 = test.getUser(new GetUserRequest().userId(new UserId().id("uid1"))).join();
-        User actual2 = test.getUser(new GetUserRequest().userId(new UserId().id("uid2"))).join();
+        GetUserRequest getUserRequest1 = new GetUserRequest().userId(new UserId().id("uid1"));
+        getUserRequest1.setOriginalRequestId(new RequestId().id("user1"));
+        GetUserRequest getUserRequest2 = new GetUserRequest().userId(new UserId().id("uid2"));
+        getUserRequest2.setOriginalRequestId(new RequestId().id("user2"));
+        User actual1 = test.getUser(getUserRequest1).join();
+        User actual2 = test.getUser(getUserRequest2).join();
 
         //Then
         assertThat(user, equalTo(actual1));
@@ -69,13 +74,15 @@ public class SimpleUserServiceTest {
         hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(true)));
         hms.addUser(new AddUserRequest().user(user)).join();
 
-        ServiceConfiguration con = new ServiceConfiguration();
+        ServiceState con = new ServiceState();
         hms.recordCurrentConfigTo(con);
 
         //When
         SimpleUserService test = new SimpleUserService();
         test.applyConfigFrom(con);
-        User actual1 = test.getUser(new GetUserRequest().userId(new UserId().id("uid1"))).join();
+        GetUserRequest getUserRequest = new GetUserRequest().userId(new UserId().id("uid1"));
+        getUserRequest.setOriginalRequestId(new RequestId().id("uid1"));
+        User actual1 = test.getUser(getUserRequest).join();
 
         //Then
         assertThat(actual1, equalTo(user));
@@ -87,14 +94,16 @@ public class SimpleUserServiceTest {
         SimpleUserService hms = new SimpleUserService();
         hms.cacheService(new SimpleCacheService().backingStore(new HashMapBackingStore(false)));
 
-        ServiceConfiguration con = new ServiceConfiguration();
+        ServiceState con = new ServiceState();
         hms.recordCurrentConfigTo(con);
 
         //When
         SimpleUserService test = new SimpleUserService();
         test.applyConfigFrom(con);
         try {
-            User actual1 = test.getUser(new GetUserRequest().userId(new UserId().id("uid1"))).join();
+            GetUserRequest getUserRequest = new GetUserRequest().userId(new UserId().id("uid1"));
+            getUserRequest.setOriginalRequestId(new RequestId().id("uid1"));
+            User actual1 = test.getUser(getUserRequest).join();
         } catch (CompletionException e) {
             throw e.getCause();
         }

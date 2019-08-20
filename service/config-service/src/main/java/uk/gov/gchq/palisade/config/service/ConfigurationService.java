@@ -19,8 +19,8 @@ import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
+import uk.gov.gchq.palisade.service.ServiceState;
 import uk.gov.gchq.palisade.service.request.Request;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -47,7 +47,7 @@ public interface ConfigurationService extends Service {
      * @return the configuration object
      * @throws NoConfigException if no configuration for the given request code be found
      */
-    CompletableFuture<ServiceConfiguration> get(final GetConfigRequest request) throws NoConfigException;
+    CompletableFuture<ServiceState> get(final GetConfigRequest request) throws NoConfigException;
 
     /**
      * Add the given initial configuration to the configuration service. This should not be used by clients and should
@@ -80,6 +80,6 @@ public interface ConfigurationService extends Service {
      *
      * @throws IllegalStateException if no cache has been configured
      */
-    default void configureSelfFromCache() {
+    default void configureSelfFromConfig() {
     }
 }

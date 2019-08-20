@@ -15,7 +15,6 @@
  */
 package uk.gov.gchq.palisade.cache.service.impl;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.io.IOException;
@@ -33,15 +32,9 @@ public class PropertiesBackingStoreTest extends AbstractBackingStoreTest {
         testFile = Files.createTempFile(null, null);
     }
 
-    @AfterClass
-    public static void removeTestStore() throws IOException {
-        Files.deleteIfExists(testFile);
-    }
-
     @Override
     public BackingStore createBackingStore() {
         try {
-            removeTestStore();
             //write empty file
             try (OutputStream o = Files.newOutputStream(testFile,
                     StandardOpenOption.CREATE)) {

@@ -1,0 +1,14 @@
+{
+  "@id" : 1,
+  "class" : "uk.gov.gchq.palisade.config.service.impl.SimpleConfigService",
+  "cache" : {
+    "@id" : 2,
+    "class" : "uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService",
+    "backingStore" : {
+      "class" : "uk.gov.gchq.palisade.cache.service.impl.EtcdBackingStore",
+      "connectionDetails" : ["http://etcd:2379"]
+    },
+    "codecs" : { },
+    "maximumLocalCacheDuration" : 300.000000000
+  }
+}

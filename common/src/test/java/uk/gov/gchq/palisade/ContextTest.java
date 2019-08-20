@@ -27,7 +27,7 @@ public class ContextTest {
 
     @Before
     public void setUp() throws Exception {
-        testObject = new Context().justification("justification1");
+        testObject = new Context().purpose("purpose1");
     }
 
     @Test
@@ -43,12 +43,16 @@ public class ContextTest {
     public void shouldHistoricalJsonSerialise() throws Exception {
         //when
         final byte[] serialise = JSONSerialiser.serialise(testObject, true);
+
+        String serialised = new String(serialise);
         Context deserialise = JSONSerialiser.deserialise(
                 "{\n" +
-                "  \"contents\" : {\n" +
-                "    \"justification\" : \"justification1\"\n" +
-                "  }\n" +
-                "}", Context.class);
+                        "  \"contents\" : {\n" +
+                        "    \"purpose\" : \"purpose1\"\n" +
+                        "  },\n" +
+                        "  \"class\" : \"uk.gov.gchq.palisade.Context\"\n" +
+                        "}", Context.class);
+
         //then
         Assert.assertEquals(new String(serialise), testObject, deserialise);
     }

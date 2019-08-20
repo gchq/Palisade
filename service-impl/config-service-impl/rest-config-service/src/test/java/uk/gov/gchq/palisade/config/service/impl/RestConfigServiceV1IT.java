@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.config.service.ConfigConsts;
 import uk.gov.gchq.palisade.config.service.ConfigurationService;
 import uk.gov.gchq.palisade.config.service.MockConfigurationService;
 import uk.gov.gchq.palisade.exception.NoConfigException;
@@ -33,7 +34,7 @@ import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -43,7 +44,6 @@ import java.util.concurrent.CompletionException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
 public class RestConfigServiceV1IT {
@@ -51,7 +51,7 @@ public class RestConfigServiceV1IT {
     private static final SystemResource sysResource = new SystemResource().id("file");
     private static final FileResource fileResource1 = new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource);
     private static final User user = new User().userId("user01").roles("role1", "role2").auths("auth1", "auth2");
-    private static final Context context = new Context().justification("justification1");
+    private static final Context context = new Context().purpose("purpose1");
     private static final RequestId requestId = new RequestId().id("id1");
     private static ProxyRestConfigService proxy;
     private static EmbeddedHttpServer server;
@@ -59,8 +59,9 @@ public class RestConfigServiceV1IT {
     @BeforeClass
     public static void beforeClass() throws IOException {
         //start the server
-        System.setProperty(RestConfigServiceV1.BOOTSTRAP_CONFIG, "mockBootstrapConfig.json");
-        proxy = new ProxyRestConfigService("http://localhost:8085/config");
+        String portNumber = System.getProperty("restConfigServicePort");
+        System.setProperty(ConfigConsts.BOOTSTRAP_CONFIG, "mockBootstrapConfig.json");
+        proxy = (ProxyRestConfigService) new ProxyRestConfigService("http://localhost:" + portNumber + "/config").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
@@ -83,7 +84,7 @@ public class RestConfigServiceV1IT {
         given(configService.get(request)).willThrow(new NoConfigException("No configuration has been set!"));
         // When
         try {
-            final ServiceConfiguration result = proxy.get(request).join();
+            final ServiceState result = proxy.get(request).join();
         } catch (CompletionException e) {
             throw e.getCause();
         }
@@ -99,12 +100,12 @@ public class RestConfigServiceV1IT {
 
         final GetConfigRequest request = new GetConfigRequest().service(Optional.empty());
 
-        ServiceConfiguration expected = new ServiceConfiguration().put("test_key", "test_value");
+        ServiceState expected = new ServiceState().put("test_key", "test_value");
 
         given(configService.get(request)).willReturn(CompletableFuture.completedFuture(expected));
 
         // When
-        final ServiceConfiguration result = proxy.get(request).join();
+        final ServiceState result = proxy.get(request).join();
 
         // Then
         assertEquals(expected, result);
@@ -119,12 +120,12 @@ public class RestConfigServiceV1IT {
 
         final GetConfigRequest request = new GetConfigRequest().service(Optional.empty());
 
-        ServiceConfiguration expected = new ServiceConfiguration().put("some_important_key", "some_important_value");
+        ServiceState expected = new ServiceState().put("some_important_key", "some_important_value");
 
         given(configService.get(request)).willReturn(CompletableFuture.completedFuture(expected));
 
         // When
-        final ServiceConfiguration result = proxy.get(request).join();
+        final ServiceState result = proxy.get(request).join();
 
         // Then
         assertEquals(expected, result);
@@ -137,7 +138,7 @@ public class RestConfigServiceV1IT {
         final ConfigurationService configService = Mockito.mock(ConfigurationService.class);
         MockConfigurationService.setMock(configService);
 
-        ServiceConfiguration expected = new ServiceConfiguration();
+        ServiceState expected = new ServiceState();
 
         final AddConfigRequest request = (AddConfigRequest) new AddConfigRequest().config(expected).service(Optional.empty());
 

@@ -15,10 +15,13 @@
  */
 package uk.gov.gchq.palisade.cache.service.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import uk.gov.gchq.palisade.RequestId;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.service.Service;
 
 import java.time.Duration;
@@ -28,13 +31,27 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * This class represents requests for things to be added to the cache.
+ * This class represents requests for things to be added to the cache. Cache requests may be given an optional time to live.
+ * If specified, then the backing store implementation is expected to remove items once the given duration has elapsed.
+ * If the time to live is left empty, then cached items never expire. Some cache implementations also support locally caching
+ * specific key/values. This avoids the need to repeatedly fetch the same key/value from the backing store which may involve a network request.
+ * This is an optional operation which not all cache implementations support. Only certain key/values are safe to be stored locally,
+ * so a hint flag is provided ({@link AddCacheRequest#locallyCacheable}) to state that this key/value may be stored locally by clients.
+ * The default for this flag is {@code false} and must be explicitly set on each add request. The cache may also enforce a maximum time to live
+ * on cache requests that are locally cacheable.
+ * <p>
+ * Note: Clients must be aware that locally cacheable key/values may become stale
+ * if other clients update the value after they have made the request.
  * <p>
  * All methods in this class throw {@link NullPointerException} if parameters are unset.
  *
  * @param <V> the type of object being cached
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class AddCacheRequest<V> extends CacheRequest {
+
+    public AddCacheRequest() {
+    }
 
     /**
      * An empty optional indicates no time to live specified.
@@ -46,7 +63,19 @@ public class AddCacheRequest<V> extends CacheRequest {
      */
     private V value;
 
-    public AddCacheRequest() {
+    /**
+     * Hint as to whether this cache value may be stored locally by clients.
+     */
+    private boolean locallyCacheable;
+
+    @Override
+    public void setOriginalRequestId(final RequestId originalRequestId) {
+        throw new ForbiddenException("Should not call AddCacheRequest.setOriginalRequestId()");
+    }
+
+    @Override
+    public RequestId getOriginalRequestId() {
+        throw new ForbiddenException("Should not call AddCacheRequest.getOriginalRequestId()");
     }
 
     /**
@@ -93,6 +122,35 @@ public class AddCacheRequest<V> extends CacheRequest {
         });
         this.timeToLive = timeToLive;
         return this;
+    }
+
+    /**
+     * Is this cache request locally cacheable by clients?
+     *
+     * @return true if the value can be cached locally
+     */
+    public boolean getLocallyCacheable() {
+        return locallyCacheable;
+    }
+
+    /**
+     * Sets whether this cache request key/value can be locally cached by clients.
+     *
+     * @param locallyCacheable if true, then clients may cache the key/value locally upon retrieval
+     * @return this object
+     */
+    public AddCacheRequest locallyCacheable(final boolean locallyCacheable) {
+        this.locallyCacheable = locallyCacheable;
+        return this;
+    }
+
+    /**
+     * Sets whether this cache request key/value can be locally cached by clients.
+     *
+     * @param locallyCacheable if true, then clients may cache the key/value locally upon retrieval
+     */
+    public void setLocallyCacheable(final boolean locallyCacheable) {
+        locallyCacheable(locallyCacheable);
     }
 
     /**
@@ -229,6 +287,7 @@ public class AddCacheRequest<V> extends CacheRequest {
                 .appendSuper(super.toString())
                 .append("timeToLive", timeToLive)
                 .append("value", value)
+                .append("locallyCacheable", locallyCacheable)
                 .toString();
     }
 
@@ -248,6 +307,7 @@ public class AddCacheRequest<V> extends CacheRequest {
                 .appendSuper(super.equals(o))
                 .append(timeToLive, that.timeToLive)
                 .append(value, that.value)
+                .append(locallyCacheable, that.locallyCacheable)
                 .isEquals();
     }
 
@@ -257,6 +317,7 @@ public class AddCacheRequest<V> extends CacheRequest {
                 .appendSuper(super.hashCode())
                 .append(timeToLive)
                 .append(value)
+                .append(locallyCacheable)
                 .toHashCode();
     }
 }

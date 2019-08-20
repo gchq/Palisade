@@ -20,7 +20,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>service-impl</artifactId>
-        <version>0.2.0</version>
+        <version>0.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>resource-service-impl</artifactId>
     <packaging>pom</packaging>
@@ -28,18 +28,13 @@
     <modules>
         <module>rest-resource-service</module>
         <module>proxy-rest-resource-service</module>
-        <module>hdfs-resource-service</module>
+        <module>hadoop-resource-service</module>
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>resource-service</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>config-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

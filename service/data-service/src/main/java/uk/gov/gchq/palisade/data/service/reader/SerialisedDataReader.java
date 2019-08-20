@@ -17,23 +17,23 @@
 package uk.gov.gchq.palisade.data.service.reader;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.Util;
+import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.serialise.SimpleStringSerialiser;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderRequest;
 import uk.gov.gchq.palisade.data.service.reader.request.DataReaderResponse;
+import uk.gov.gchq.palisade.data.service.reader.request.ResponseWriter;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.rule.Rules;
 
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -41,25 +41,38 @@ import static java.util.Objects.requireNonNull;
  * serialisers to serialise the data into the for that the rules need to be able
  * to apply those rules and then de-serialise to how the client is expecting the
  * data to be returned.
+ * <p>
  * This class means that the only places where the structure of the data needs
  * to be known is in the serialisers, rules and client code. Therefore you only
  * need to implement a {@link uk.gov.gchq.palisade.data.service.DataService} for
  * each data storage technology and data format combination, rather than also
  * having to add the data structure into the mix.
+ * <p>
+ * A serialiser is chosen based on a {@link DataFlavour} which is a combination of
+ * data type and serialised format.
  */
 public abstract class SerialisedDataReader implements DataReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialisedDataReader.class);
 
     @JsonProperty("default")
     private Serialiser<?> defaultSerialiser = new SimpleStringSerialiser();
+
+    /**
+     * Map of the types and formats to the serialising object. The first element of the key is the data type
+     * and the second element is the serialised format.
+     */
     @JsonProperty("serialisers")
-    private Map<String, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
+    @JsonSerialize(keyUsing = DataFlavour.FlavourSerializer.class)
+    @JsonDeserialize(keyUsing = DataFlavour.FlavourDeserializer.class)
+    private Map<DataFlavour, Serialiser<?>> serialisers = new ConcurrentHashMap<>();
+
+    private AuditService auditService;
 
     /**
      * @param serialisers a mapping of data type to serialiser
      * @return the {@link SerialisedDataReader}
      */
-    public SerialisedDataReader serialisers(final Map<String, Serialiser<?>> serialisers) {
+    public SerialisedDataReader serialisers(final Map<DataFlavour, Serialiser<?>> serialisers) {
         requireNonNull(serialisers, "The serialisers cannot be set to null.");
         this.serialisers = serialisers;
         return this;
@@ -71,6 +84,12 @@ public abstract class SerialisedDataReader implements DataReader {
         return this;
     }
 
+    public SerialisedDataReader auditService(final AuditService auditService) {
+        requireNonNull(auditService, "The audit service cannot be set to null");
+        this.auditService = auditService;
+        return this;
+    }
+
     /**
      * This read method uses the serialiser that matches the data type of the
      * resource to serialise the raw data and apply the rules to the data and
@@ -78,7 +97,7 @@ public abstract class SerialisedDataReader implements DataReader {
      *
      * @param request {@link DataReaderRequest} containing the resource to be
      *                read, rules to be applied, the user requesting the data
-     *                and the justification for accessing the data.
+     *                and the purpose for accessing the data.
      * @return a {@link DataReaderResponse} containing the stream of data
      * read to be streamed back to the client
      */
@@ -87,25 +106,13 @@ public abstract class SerialisedDataReader implements DataReader {
         requireNonNull(request, "The request cannot be null.");
 
         final Serialiser<Object> serialiser = getSerialiser(request.getResource());
+        //set up the raw input stream from the data source
         final InputStream rawStream = readRaw(request.getResource());
 
-        final InputStream data;
-        final Rules<Object> rules = request.getRules();
-        if (isNull(rules) || isNull(rules.getRules()) || rules.getRules().isEmpty()) {
-            LOGGER.debug("No rules to apply");
-            data = rawStream;
-        } else {
-            LOGGER.debug("Applying rules: {}", rules);
-            final Stream<Object> deserialisedData = Util.applyRulesToStream(
-                    serialiser.deserialise(rawStream),
-                    request.getUser(),
-                    request.getContext(),
-                    rules
-            );
-            data = serialiser.serialise(deserialisedData);
-        }
+        ResponseWriter serialisedWriter = new SerialisingResponseWriter(rawStream, serialiser, request, getAuditService());
 
-        return new DataReaderResponse().data(data);
+        //set response object to use the writer above
+        return new DataReaderResponse().writer(serialisedWriter);
     }
 
     /**
@@ -117,9 +124,10 @@ public abstract class SerialisedDataReader implements DataReader {
      */
     protected abstract InputStream readRaw(final LeafResource resource);
 
-    public <RULES_DATA_TYPE> Serialiser<RULES_DATA_TYPE> getSerialiser(final String type) {
-        requireNonNull(type, "The type cannot be null.");
-        Serialiser<?> serialiser = serialisers.get(type);
+    public <RULES_DATA_TYPE> Serialiser<RULES_DATA_TYPE> getSerialiser(final DataFlavour flavour) {
+        requireNonNull(flavour, "The flavour cannot be null.");
+        Serialiser<?> serialiser = serialisers.get(flavour);
+
         if (null == serialiser) {
             serialiser = defaultSerialiser;
         }
@@ -128,20 +136,40 @@ public abstract class SerialisedDataReader implements DataReader {
 
     public <I> Serialiser<I> getSerialiser(final LeafResource resource) {
         requireNonNull(resource, "The resource cannot be null.");
-        return getSerialiser(resource.getType());
+        return getSerialiser(DataFlavour.of(resource.getType(), resource.getSerialisedFormat()));
     }
 
-    public void addSerialiser(final String type, final Serialiser<?> serialiser) {
-        requireNonNull(type, "The type cannot be null.");
+    public void addSerialiser(final DataFlavour flavour, final Serialiser<?> serialiser) {
+        requireNonNull(flavour, "The flavour cannot be null.");
         requireNonNull(serialiser, "The serialiser cannot be null.");
-        serialisers.put(type, serialiser);
+        serialisers.put(flavour, serialiser);
     }
 
-    public void setSerialisers(final Map<String, Serialiser<?>> serialisers) {
+    /**
+     * Adds all the serialiser mappings to the current map of serialisers.Any existing mappings for a given {@link DataFlavour}
+     * are replaced.
+     *
+     * @param mergingSerialisers the new serialisers to merge
+     */
+    public void addAllSerialisers(final Map<DataFlavour, Serialiser<?>> mergingSerialisers) {
+        requireNonNull(mergingSerialisers, "mergingSerialisers");
+        serialisers.putAll(mergingSerialisers);
+    }
+
+    public void setSerialisers(final Map<DataFlavour, Serialiser<?>> serialisers) {
         serialisers(serialisers);
     }
 
     public void setDefaultSerialiser(final Serialiser<?> defaultSerialiser) {
         defaultSerialiser(defaultSerialiser);
+    }
+
+    public AuditService getAuditService() {
+        requireNonNull(auditService, "The audit service has not been set.");
+        return auditService;
+    }
+
+    public void setAuditService(final AuditService auditService) {
+        auditService(auditService);
     }
 }

@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
@@ -40,12 +41,13 @@ public class RestUserServiceV1IT {
 
     private static ProxyRestUserService proxy;
     private static EmbeddedHttpServer server;
-
+    
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("restUserServicePort");
         RestUserServiceV1.setDefaultDelegate(new MockUserService());
-        proxy = new ProxyRestUserService("http://localhost:8083/user");
-        server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
+        proxy = (ProxyRestUserService) new ProxyRestUserService("http://localhost:"+portNumber+"/user").retryMax(1);
+        server = new EmbeddedHttpServer("http://0.0.0.0:"+portNumber+"/user/v1", new ApplicationConfigV1());
         server.startServer();
     }
 
@@ -84,7 +86,9 @@ public class RestUserServiceV1IT {
 
         final UserId userId = new UserId().id("user01");
         final User user = new User().userId(userId).roles("role1", "role2").auths("auth1", "auth2");
+
         final GetUserRequest getUserRequest = new GetUserRequest().userId(user.getUserId());
+        getUserRequest.setOriginalRequestId(new RequestId().id("RestUserServiceV1IT.shouldGetUser"));
 
         given(userService.getUser(getUserRequest)).willReturn(CompletableFuture.completedFuture(user));
 

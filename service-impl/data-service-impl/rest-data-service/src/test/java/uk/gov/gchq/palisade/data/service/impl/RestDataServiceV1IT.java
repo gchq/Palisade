@@ -24,8 +24,11 @@ import org.mockito.Mockito;
 
 import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.data.service.DataService;
+import uk.gov.gchq.palisade.data.service.exception.NoCapacityException;
+import uk.gov.gchq.palisade.data.service.request.ClientReadResponse;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
+import uk.gov.gchq.palisade.exception.RequestFailedException;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
@@ -48,10 +51,16 @@ public class RestDataServiceV1IT {
     private static ProxyRestDataService proxy;
     private static EmbeddedHttpServer server;
 
+    private static final SystemResource sysResource = new SystemResource().id("File");
+    private static final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
+    private static final ReadRequest request = new ReadRequest().token("token1").resource(resource);
+
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("restDataServicePort");
+        request.setOriginalRequestId(new RequestId().id("id1"));
         RestDataServiceV1.setDefaultDelegate(new MockDataService());
-        proxy = new ProxyRestDataService("http://localhost:8084/data");
+        proxy = (ProxyRestDataService) new ProxyRestDataService("http://localhost:" + portNumber + "/data").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
@@ -69,13 +78,10 @@ public class RestDataServiceV1IT {
         final DataService dataService = Mockito.mock(DataService.class);
         MockDataService.setMock(dataService);
 
-        final SystemResource sysResource = new SystemResource().id("File");
-        final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
         final byte[] data = "value1\nvalue2".getBytes();
         final InputStream dataStream = new ByteArrayInputStream(data);
-        final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);
 
-        final ReadResponse expectedResult = new ReadResponse().data(dataStream).message("some message");
+        final ReadResponse expectedResult = new ClientReadResponse(dataStream).message("some message");
         final CompletableFuture futureExpectedResult = CompletableFuture.completedFuture(expectedResult);
         given(dataService.read(request)).willReturn(futureExpectedResult);
 
@@ -84,7 +90,7 @@ public class RestDataServiceV1IT {
         final ReadResponse result = futureRead.join();
 
         // Then
-        assertArrayEquals(data, IOUtils.toByteArray(result.getData()));
+        assertArrayEquals(data, IOUtils.toByteArray(result.asInputStream()));
         verify(dataService).read(request);
     }
 
@@ -93,10 +99,6 @@ public class RestDataServiceV1IT {
         // Given
         final DataService dataService = Mockito.mock(DataService.class);
         MockDataService.setMock(dataService);
-
-        final SystemResource sysResource = new SystemResource().id("File");
-        final FileResource resource = new FileResource().type("type01").serialisedFormat("format01").parent(sysResource).id("file1");
-        final ReadRequest request = new ReadRequest().requestId(new RequestId().id("id1")).resource(resource);
 
         final String message = "some message";
         given(dataService.read(request)).willThrow(new IllegalArgumentException(message));
@@ -112,6 +114,24 @@ public class RestDataServiceV1IT {
             assertEquals(message, e.getCause().getMessage());
         } catch (final IllegalArgumentException e) {
             assertEquals(message, e.getMessage());
+        }
+    }
+
+    @Test(expected = NoCapacityException.class)
+    public void throwNoCapacityException() {
+        //Given
+        final DataService dataService = Mockito.mock(DataService.class);
+        MockDataService.setMock(dataService);
+
+        given(dataService.read(request)).willThrow(new NoCapacityException("cannot serve request"));
+
+        //When / Then
+        try {
+            ReadResponse response = proxy.read(request).join();
+
+            fail("Exception expected");
+        } catch (CompletionException e) {
+            throw (RequestFailedException) e.getCause();
         }
     }
 }

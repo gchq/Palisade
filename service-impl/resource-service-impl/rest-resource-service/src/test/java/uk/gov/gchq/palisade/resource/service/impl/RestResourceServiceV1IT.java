@@ -19,14 +19,20 @@ package uk.gov.gchq.palisade.resource.service.impl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.data.service.impl.MockDataService;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
-import uk.gov.gchq.palisade.resource.service.request.*;
+import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.StubConnectionDetail;
 
 import java.io.IOException;
@@ -49,8 +55,9 @@ public class RestResourceServiceV1IT {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("restResourceServicePort");
         RestResourceServiceV1.setDefaultDelegate(new MockResourceService());
-        proxy = new ProxyRestResourceService("http://localhost:8082/resource");
+        proxy = (ProxyRestResourceService) new ProxyRestResourceService("http://localhost:"+portNumber+"/resource").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
@@ -69,7 +76,11 @@ public class RestResourceServiceV1IT {
         MockResourceService.setMock(resourceService);
 
         final FileResource file = new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource);
-        final AddResourceRequest request = new AddResourceRequest().resource(file).connectionDetail(new StubConnectionDetail().setServiceToCreate(new MockDataService()));
+
+
+        final AddResourceRequest request = new AddResourceRequest();
+
+        request.resource(file).connectionDetail(new StubConnectionDetail().setServiceToCreate(new MockDataService()));
 
         given(resourceService.addResource(request)).willReturn(CompletableFuture.completedFuture(true));
 
@@ -88,6 +99,7 @@ public class RestResourceServiceV1IT {
         MockResourceService.setMock(resourceService);
 
         final GetResourcesByResourceRequest request = new GetResourcesByResourceRequest().resource(sysResource);
+        request.setOriginalRequestId(new RequestId().id("test shouldGetResourcesByResource"));
 
         final Map<LeafResource, ConnectionDetail> expectedResult = new HashMap<>();
         expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new StubConnectionDetail().setServiceToCreate(new MockDataService()));
@@ -110,6 +122,7 @@ public class RestResourceServiceV1IT {
         MockResourceService.setMock(resourceService);
 
         final GetResourcesByIdRequest request = new GetResourcesByIdRequest().resourceId("file1");
+        request.setOriginalRequestId(new RequestId().id("test shouldGetResourceById"));
 
         final Map<LeafResource, ConnectionDetail> expectedResult = new HashMap<>();
         expectedResult.put(new FileResource().id("file1").type("testType").serialisedFormat("testFormat").parent(sysResource), new StubConnectionDetail().setServiceToCreate(new MockDataService()));
@@ -131,6 +144,8 @@ public class RestResourceServiceV1IT {
         MockResourceService.setMock(resourceService);
 
         final GetResourcesByTypeRequest request = new GetResourcesByTypeRequest().type("type1");
+        request.setOriginalRequestId(new RequestId().id("test shouldGetResourcesByType"));
+
 
         final Map<LeafResource, ConnectionDetail> expectedResult = new HashMap<>();
         expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new StubConnectionDetail().setServiceToCreate(new MockDataService()));
@@ -152,6 +167,7 @@ public class RestResourceServiceV1IT {
         MockResourceService.setMock(resourceService);
 
         final GetResourcesBySerialisedFormatRequest request = new GetResourcesBySerialisedFormatRequest().serialisedFormat("format1");
+        request.setOriginalRequestId(new RequestId().id("test shouldGetResourcesByFormat"));
 
         final Map<LeafResource, ConnectionDetail> expectedResult = new HashMap<>();
         expectedResult.put(new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource), new StubConnectionDetail().setServiceToCreate(new MockDataService()));

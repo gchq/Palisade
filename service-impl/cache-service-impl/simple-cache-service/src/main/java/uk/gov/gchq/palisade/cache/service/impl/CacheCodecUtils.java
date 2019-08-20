@@ -56,5 +56,4 @@ public final class CacheCodecUtils {
      * Byte array decoder just returns the array.
      */
     public static final BiFunction<byte[], ? extends Class<byte[]>, byte[]> BYTE_DECODER = (ob, ignore) -> ob;
-
 }

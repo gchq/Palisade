@@ -16,6 +16,9 @@
 
 package uk.gov.gchq.palisade.resource.service.impl;
 
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
+import uk.gov.gchq.palisade.resource.service.ResourceService;
+import uk.gov.gchq.palisade.rest.ServiceBinder;
 import uk.gov.gchq.palisade.rest.application.AbstractApplicationConfigV1;
 
 public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
@@ -25,5 +28,14 @@ public class ApplicationConfigV1 extends AbstractApplicationConfigV1 {
 
     public ApplicationConfigV1() {
         super(RESOURCES);
+        //make sure we can inject the service instance
+        String path;
+        try {
+            path = ConfigUtils.retrieveConfigurationPath();
+        } catch (IllegalStateException e) {
+            path = null;
+        }
+        ResourceService delegate = RestResourceServiceV1.createService(path);
+        register(new ServiceBinder(delegate, ResourceService.class));
     }
 }

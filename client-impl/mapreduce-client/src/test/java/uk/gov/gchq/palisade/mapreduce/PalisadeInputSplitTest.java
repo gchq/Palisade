@@ -46,15 +46,16 @@ public class PalisadeInputSplitTest {
         Assert.fail("exception expected");
     }
 
-    private StubResource stubResource = new StubResource("test type","test id","test format");
+    private StubResource stubResource = new StubResource("test type", "test id", "test format");
     private StubConnectionDetail stubConnectionDetail = new StubConnectionDetail("test con");
 
     @Test
     public void shouldSerialiseToEqualObject() throws IOException {
         //Given
         DataRequestResponse drr = new DataRequestResponse()
-                .requestId(new RequestId().id("test string"))
+                .token("test string")
                 .resource(stubResource, stubConnectionDetail);
+        drr.originalRequestId(new RequestId().id("test id"));
         PalisadeInputSplit test = new PalisadeInputSplit(drr);
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();

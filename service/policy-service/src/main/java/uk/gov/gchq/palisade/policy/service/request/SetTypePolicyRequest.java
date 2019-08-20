@@ -18,8 +18,11 @@ package uk.gov.gchq.palisade.policy.service.request;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -28,6 +31,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * This class is used in the request to set a {@link Policy} for a resource type.
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class SetTypePolicyRequest extends Request {
     private String type;
     private Policy policy;
@@ -72,6 +76,16 @@ public class SetTypePolicyRequest extends Request {
 
     public void setPolicy(final Policy policy) {
         policy(policy);
+    }
+
+    @Override
+    public void setOriginalRequestId(final RequestId originalRequestId) {
+        throw new ForbiddenException("Should not call SetTypePolicyRequest.setOriginalRequestId()");
+    }
+
+    @Override
+    public RequestId getOriginalRequestId() {
+        throw new ForbiddenException("Should not call SetTypePolicyRequest.getOriginalRequestId()");
     }
 
     @Override

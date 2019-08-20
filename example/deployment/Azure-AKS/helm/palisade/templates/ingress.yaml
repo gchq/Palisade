@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: name-virtual-host-ingress
+spec:
+  rules:
+    - host: config-service
+      http:
+        paths:
+          - backend:
+              serviceName: config-service
+              servicePort: 8080
+    - host: palisade-service
+      http:
+        paths:
+          - backend:
+              serviceName: palisade-service
+              servicePort: 8080
+    - host: data-service
+      http:
+        paths:
+          - backend:
+              serviceName: data-service
+              servicePort: 8080

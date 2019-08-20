@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
@@ -32,10 +33,10 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
-import uk.gov.gchq.palisade.rest.RestUtil;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -59,21 +60,15 @@ public class RestResourceServiceV1 implements ResourceService {
 
     private static ResourceService resourceService;
 
-    public RestResourceServiceV1() {
-        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
-    }
-
-    public RestResourceServiceV1(final String serviceConfigPath) {
-        this(createService(serviceConfigPath));
-    }
-
+    @Inject
     public RestResourceServiceV1(final ResourceService delegate) {
+        requireNonNull(delegate, "delegate");
         this.delegate = delegate;
     }
 
-    private static synchronized ResourceService createService(final String serviceConfigPath) {
+    static synchronized ResourceService createService(final String serviceConfigPath) {
         if (resourceService == null) {
-            resourceService = RestUtil.createService(RestResourceServiceV1.class, serviceConfigPath, ResourceService.class);
+            resourceService = ConfigUtils.createService(RestResourceServiceV1.class, serviceConfigPath, ResourceService.class);
         }
         return resourceService;
     }

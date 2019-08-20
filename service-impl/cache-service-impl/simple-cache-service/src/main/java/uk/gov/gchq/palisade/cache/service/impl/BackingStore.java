@@ -83,13 +83,24 @@ public interface BackingStore {
      * Attempt to get the given key from the backing store. Looks up the given key and attempts to get it. If the
      * requested key couldn't be found then the value of the returned {@link SimpleCacheObject} will be empty. A new
      * cache object should be returned for each call to this method. If the key can't be found, then the expected class
-     * should be <code>Object.class</code> inside the returned object.
+     * should be <code>Object.class</code> inside the returned object. The metadata object in the cache object returned
+     * from a backing store should be empty.
      *
      * @param key the key to lookup
      * @return a new cache object
      * @throws IllegalArgumentException if <code>key</code> is empty (once whitespace is trimmed)
      */
     SimpleCacheObject get(final String key);
+
+    /**
+     * Remove the given key from the backing store. If the key is present it will be removed, otherwise nothing will happen.
+     * The implementation must ensure that any supporting information that was originally added with the value such as the class name
+     * must also be removed.
+     *
+     * @param key the key to remove
+     * @return true if the key and value pair was removed, false otherwise
+     */
+    boolean remove(final String key);
 
     /**
      * Get a stream of all keys with a given prefix. This method acts as a way to query the backing store to find which
@@ -99,6 +110,12 @@ public interface BackingStore {
      * @return a stream of valid keys
      */
     Stream<String> list(final String prefix);
+
+    /**
+     * Closes the backing store. This method must be idempotent.
+     */
+    default void close() {
+    }
 
     /**
      * Check the provided key is not empty.

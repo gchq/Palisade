@@ -16,12 +16,15 @@
 
 package uk.gov.gchq.palisade.resource.service.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import static java.util.Objects.requireNonNull;
@@ -29,6 +32,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * This class is used to request that details about a resource is added to the {@link uk.gov.gchq.palisade.resource.service.ResourceService}.
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class AddResourceRequest extends Request {
     private LeafResource resource;
     private ConnectionDetail connectionDetail;
@@ -66,6 +70,16 @@ public class AddResourceRequest extends Request {
         resource(resource);
     }
 
+    @Override
+    public void setOriginalRequestId(final RequestId originalRequestId) {
+        throw new ForbiddenException("Should not call AddResourceRequest.setOriginalRequestId()");
+    }
+
+    @Override
+    public RequestId getOriginalRequestId() {
+        throw new ForbiddenException("Should not call AddResourceRequest.getOriginalRequestId()");
+    }
+
     public ConnectionDetail getConnectionDetail() {
         requireNonNull(connectionDetail, "The connection details have not been set.");
         return connectionDetail;
@@ -88,27 +102,27 @@ public class AddResourceRequest extends Request {
         final AddResourceRequest that = (AddResourceRequest) o;
 
         return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(resource, that.resource)
-                .append(connectionDetail, that.connectionDetail)
-                .isEquals();
+        .appendSuper(super.equals(o))
+        .append(resource, that.resource)
+        .append(connectionDetail, that.connectionDetail)
+        .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .appendSuper(super.hashCode())
-                .append(resource)
-                .append(connectionDetail)
-                .toHashCode();
+        .appendSuper(super.hashCode())
+        .append(resource)
+        .append(connectionDetail)
+        .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .appendSuper(super.toString())
-                .append("resource", resource)
-                .append("connectionDetail", connectionDetail)
-                .toString();
+        .appendSuper(super.toString())
+        .append("resource", resource)
+        .append("connectionDetail", connectionDetail)
+        .toString();
     }
 }

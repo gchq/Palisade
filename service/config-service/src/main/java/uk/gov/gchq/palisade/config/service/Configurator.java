@@ -21,9 +21,9 @@ import org.slf4j.LoggerFactory;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ConfigConsts;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
@@ -31,6 +31,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -41,7 +42,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * A {@code Configurator} is responsible for creating Palisade {@link Service}s either from a supplied {@link
- * ServiceConfiguration} or by connecting to a {@link ConfigurationService} and retrieving the configuration from
+ * ServiceState} or by connecting to a {@link ConfigurationService} and retrieving the configuration from
  * there.
  * <p>
  * No parameter may be {@code null}.
@@ -74,11 +75,11 @@ public class Configurator {
      * @param <S>          the type of service
      * @return a created service
      * @throws NoConfigException if no configuration for the service type could be found
-     * @see Configurator#createFromConfig(Class, ServiceConfiguration, String...)
+     * @see Configurator#createFromConfig(Class, ServiceState, String...)
      */
     public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass, final String... overridable) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
-        ServiceConfiguration config = retrieveConfig(Optional.of(serviceClass));
+        ServiceState config = retrieveConfig(Optional.of(serviceClass));
         return createFromConfig(serviceClass, config, overridable);
     }
 
@@ -93,21 +94,21 @@ public class Configurator {
      * @param <S>          the type of service
      * @return a created service
      * @throws NoConfigException if no configuration for the service type could be found, or the operation timed out
-     * @see Configurator#createFromConfig(Class, ServiceConfiguration, String...)
+     * @see Configurator#createFromConfig(Class, ServiceState, String...)
      */
     public <S extends Service> S retrieveConfigAndCreate(final Class<S> serviceClass, final Duration timeout, final String... overridable) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(timeout, "timeout");
-        ServiceConfiguration config = retrieveConfig(Optional.of(serviceClass), timeout);
+        ServiceState config = retrieveConfig(Optional.of(serviceClass), timeout);
         return createFromConfig(serviceClass, config, overridable);
     }
 
     /**
      * Create a Palisade service from the given configuration. This method will look up the implementing class name for
      * the given service class from the configuration, attempt to create it and then call {@link
-     * Service#applyConfigFrom(ServiceConfiguration)} on the object.
+     * Service#applyConfigFrom(ServiceState)} on the object.
      * <p>
-     * Certain keys and values can be overridden in the {@link ServiceConfiguration} from Java system properties. By default
+     * Certain keys and values can be overridden in the {@link ServiceState} from Java system properties. By default
      * none can be overridden, but by specifying regex patterns to this method,
      * clients can allow certain properties to be overridden. For example, providing a single entry of ".*" would allow all
      * properties to be overridden.
@@ -122,11 +123,11 @@ public class Configurator {
      *                               configuration
      * @see System#getProperties()
      */
-    public static <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final ServiceConfiguration config, final String... overridable) throws IllegalStateException {
+    public static <S extends Service> S createFromConfig(final Class<? extends Service> serviceClass, final ServiceState config, final String... overridable) throws IllegalStateException {
         requireNonNull(serviceClass, "serviceClass");
         requireNonNull(config, "config");
 
-        ServiceConfiguration adapted = applyOverrides(config, overridable);
+        ServiceState adapted = applyOverrides(config, overridable);
 
         try {
             String servClass = adapted.get(serviceClass.getTypeName());
@@ -135,18 +136,18 @@ public class Configurator {
             Class<S> classImpl = (Class<S>) Class.forName(servClass).asSubclass(Service.class);
 
             //create it
-            S instance = classImpl.newInstance();
+            S instance = classImpl.getDeclaredConstructor().newInstance();
 
             //configure it
             instance.applyConfigFrom(adapted);
             return instance;
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchElementException e) {
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException | NoSuchElementException e) {
             throw new IllegalStateException("couldn't create service class " + serviceClass, e);
         }
     }
 
     /**
-     * Allows for certain keys in the {@link ServiceConfiguration} to be overidden from values from Java system properties.
+     * Allows for certain keys in the {@link ServiceState} to be overidden from values from Java system properties.
      * Any of the regular expressions provided in {@code overridable} that match a key in the configuration key and values
      * pairs will be replaced with the identically named system property if it exists
      *
@@ -154,10 +155,10 @@ public class Configurator {
      * @param overridable the array of regular expressions to allow overriding for
      * @return a new configuration object
      */
-    public static ServiceConfiguration applyOverrides(final ServiceConfiguration config, final String... overridable) {
+    public static ServiceState applyOverrides(final ServiceState config, final String... overridable) {
         requireNonNull(config, "config");
         requireNonNull(overridable, "overridable");
-        ServiceConfiguration adapted = new ServiceConfiguration();
+        ServiceState adapted = new ServiceState();
         Map<String, String> entries = config.getConfig();
 
         //compile strings into set of patterns
@@ -196,7 +197,7 @@ public class Configurator {
      * @throws NoConfigException if no configuration data can be retrieved
      * @implNote This is equivalent to calling {@code retrieveConfig(serviceClass, 0)}.
      */
-    public ServiceConfiguration retrieveConfig(final Optional<Class<? extends Service>> serviceClass) throws NoConfigException {
+    public ServiceState retrieveConfig(final Optional<Class<? extends Service>> serviceClass) throws NoConfigException {
         return retrieveConfig(serviceClass, 0);
     }
 
@@ -211,7 +212,7 @@ public class Configurator {
      * @return the configuration data
      * @throws NoConfigException if no configuration data can be retrieved, or the operation timed out
      */
-    public ServiceConfiguration retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final Duration timeout) throws NoConfigException {
+    public ServiceState retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final Duration timeout) throws NoConfigException {
         requireNonNull(timeout, "timeout");
         return retrieveConfig(serviceClass, timeout.toMillis());
     }
@@ -226,7 +227,7 @@ public class Configurator {
      * @return the configuration
      * @throws NoConfigException if the time out expires or no configuration could be found
      */
-    private ServiceConfiguration retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final long timeout) throws NoConfigException {
+    private ServiceState retrieveConfig(final Optional<Class<? extends Service>> serviceClass, final long timeout) throws NoConfigException {
         requireNonNull(serviceClass, "serviceClass");
         if (timeout < 0) {
             throw new IllegalArgumentException("negative timeout not allowed");
@@ -236,7 +237,7 @@ public class Configurator {
         long timeExpiry = System.currentTimeMillis() + timeout;
 
         GetConfigRequest request = new GetConfigRequest().service(serviceClass);
-        ServiceConfiguration config = null;
+        ServiceState config = null;
         LOGGER.debug("Getting configuration for {} with timeout {}", serviceClass, timeout);
 
         while (config == null && (timeout == 0 || System.currentTimeMillis() < timeExpiry)) {
@@ -249,17 +250,20 @@ public class Configurator {
                     config = service.get(request).join();
                 }
 
-            } catch (InterruptedException | ExecutionException | CancellationException e) {
-                LOGGER.warn("Error while retrieving configuration for {}", serviceClass, e);
+            } catch (CompletionException | InterruptedException | ExecutionException | CancellationException e) {
+                LOGGER.warn("Error while retrieving configuration for {} due to {}", serviceClass.map(Class::getTypeName).orElse("anonymous client"), e.getMessage());
+                //this should be rethrown immediately
+                if (e.getCause() instanceof NoConfigException) {
+                    throw (NoConfigException) e.getCause();
+                }
                 //keep trying after short delay
                 try {
                     Thread.sleep(ConfigConsts.DELAY);
                 } catch (InterruptedException ignore) {
                 }
-                continue;
+
             } catch (TimeoutException e) {
                 LOGGER.debug("Timed out getting configuration for {}", serviceClass.getClass());
-                continue;
             }
         }
 
@@ -267,6 +271,7 @@ public class Configurator {
         if (config == null) {
             throw new NoConfigException("unable to retrieve configuration in specified time");
         } else {
+            LOGGER.info("Successfully retrieved service configuration for {}", serviceClass.map(Class::getTypeName).orElse("anonymous client"));
             return config;
         }
     }

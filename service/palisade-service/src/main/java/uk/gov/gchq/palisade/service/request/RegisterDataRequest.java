@@ -16,12 +16,15 @@
 
 package uk.gov.gchq.palisade.service.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -29,6 +32,7 @@ import static java.util.Objects.requireNonNull;
  * This class is used to wrap all the information that the user needs to supply
  * to the palisade service to register the data access request.
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class RegisterDataRequest extends Request {
     private UserId userId;
     private Context context;
@@ -95,18 +99,27 @@ public class RegisterDataRequest extends Request {
         context(context);
     }
 
+
+    @Override
+    public void setOriginalRequestId(final RequestId originalRequestId) {
+        throw new ForbiddenException("Should not call RegisterDataRequest.setOriginalRequestId()");
+    }
+
+    @Override
+    public RequestId getOriginalRequestId() {
+        throw new ForbiddenException("Should not call RegisterDataRequest.getOriginalRequestId()");
+    }
+
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
-
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         final RegisterDataRequest that = (RegisterDataRequest) o;
-
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
                 .append(userId, that.userId)
@@ -130,7 +143,7 @@ public class RegisterDataRequest extends Request {
         return new ToStringBuilder(this)
                 .appendSuper(super.toString())
                 .append("userId", userId)
-                .append("justification", context)
+                .append("context", context)
                 .append("resourceId", resourceId)
                 .toString();
     }

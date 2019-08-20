@@ -18,8 +18,11 @@ package uk.gov.gchq.palisade.config.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.RequestId;
+import uk.gov.gchq.palisade.exception.ForbiddenException;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import static java.util.Objects.requireNonNull;
 
@@ -33,9 +36,10 @@ import static java.util.Objects.requireNonNull;
  * authentication/authorisation constraints placed upon requestees. This means that for example, a client may not be
  * able to set configuration details for a particular service.
  */
+@JsonIgnoreProperties(value = {"originalRequestId"})
 public class AddConfigRequest extends GetConfigRequest {
 
-    private ServiceConfiguration config;
+    private ServiceState config;
 
     /**
      * Create an empty request.
@@ -48,7 +52,7 @@ public class AddConfigRequest extends GetConfigRequest {
      *
      * @return the configuration
      */
-    public ServiceConfiguration getConfig() {
+    public ServiceState getConfig() {
         requireNonNull(config, "config cannot be left null");
         return config;
     }
@@ -59,7 +63,7 @@ public class AddConfigRequest extends GetConfigRequest {
      * @param config the configuration
      * @return this object
      */
-    public AddConfigRequest config(final ServiceConfiguration config) {
+    public AddConfigRequest config(final ServiceState config) {
         requireNonNull(config, "config");
         this.config = config;
         return this;
@@ -70,8 +74,18 @@ public class AddConfigRequest extends GetConfigRequest {
      *
      * @param config the configuration
      */
-    public void setConfig(final ServiceConfiguration config) {
+    public void setConfig(final ServiceState config) {
         config(config);
+    }
+
+    @Override
+    public void setOriginalRequestId(final RequestId originalRequestId) {
+        throw new ForbiddenException("Should not call AddConfigRequest.setOriginalRequestId()");
+    }
+
+    @Override
+    public RequestId getOriginalRequestId() {
+        throw new ForbiddenException("Should not call AddConfigRequest.getOriginalRequestId()");
     }
 
     @Override

@@ -20,8 +20,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+
+import java.lang.reflect.InvocationTargetException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -42,8 +44,8 @@ public class ProxyRestConnectionDetail implements ConnectionDetail {
         requireNonNull(serviceClass, "serviceClass is required");
         final ProxyRestService service;
         try {
-            service = serviceClass.newInstance();
-        } catch (final InstantiationException | IllegalAccessException e) {
+            service = serviceClass.getDeclaredConstructor().newInstance();
+        } catch (final InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException("Unable to create service " + serviceClass.getName(), e);
         }
         service.setBaseUrl(url);

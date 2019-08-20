@@ -25,13 +25,14 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.rest.RestUtil;
+import uk.gov.gchq.palisade.config.service.ConfigUtils;
 import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -53,21 +54,15 @@ public class RestPalisadeServiceV1 implements PalisadeService {
 
     private static PalisadeService palisadeService;
 
-    public RestPalisadeServiceV1() {
-        this(System.getProperty(RestUtil.CONFIG_SERVICE_PATH));
-    }
-
-    public RestPalisadeServiceV1(final String serviceConfigPath) {
-        this(createService(serviceConfigPath));
-    }
-
+    @Inject
     public RestPalisadeServiceV1(final PalisadeService delegate) {
+        requireNonNull(delegate, "delegate");
         this.delegate = delegate;
     }
 
-    private static synchronized PalisadeService createService(final String serviceConfigPath) {
+    static synchronized PalisadeService createService(final String serviceConfigPath) {
         if (palisadeService == null) {
-            palisadeService = RestUtil.createService(RestPalisadeServiceV1.class, serviceConfigPath, PalisadeService.class);
+            palisadeService = ConfigUtils.createService(RestPalisadeServiceV1.class, serviceConfigPath, PalisadeService.class);
         }
         return palisadeService;
     }

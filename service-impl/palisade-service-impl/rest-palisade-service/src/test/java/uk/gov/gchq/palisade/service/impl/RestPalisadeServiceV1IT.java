@@ -31,11 +31,11 @@ import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.rest.EmbeddedHttpServer;
 import uk.gov.gchq.palisade.rule.Rules;
 import uk.gov.gchq.palisade.service.PalisadeService;
+import uk.gov.gchq.palisade.service.SimpleConnectionDetail;
 import uk.gov.gchq.palisade.service.request.DataRequestConfig;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.GetDataRequestConfig;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
-import uk.gov.gchq.palisade.service.request.SimpleConnectionDetail;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -48,18 +48,19 @@ import static org.mockito.Mockito.verify;
 
 public class RestPalisadeServiceV1IT {
 
-    private static final SystemResource sysResource = new SystemResource().id("file");
-    private static final FileResource fileResource1 = new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(sysResource);
-    private static final User user = new User().userId("user01").roles("role1", "role2").auths("auth1", "auth2");
-    private static final Context context = new Context().justification("justification1");
-    private static final RequestId requestId = new RequestId().id("id1");
+    private static final SystemResource SYSTEM_RESOURCE = new SystemResource().id("file");
+    private static final FileResource FILE_RESOURCE_1 = new FileResource().id("file1").type("type1").serialisedFormat("format1").parent(SYSTEM_RESOURCE);
+    private static final User USER = new User().userId("user01").roles("role1", "role2").auths("auth1", "auth2");
+    private static final Context CONTEXT = new Context().purpose("purpose1");
+    private static final String TOKEN = "token1";
+    private static final RequestId ORIGINAL_REQUEST_ID = new RequestId().id("id2");
     private static ProxyRestPalisadeService proxy;
     private static EmbeddedHttpServer server;
-
     @BeforeClass
     public static void beforeClass() throws IOException {
+        String portNumber = System.getProperty("restPalisadeServicePort");
         RestPalisadeServiceV1.setDefaultDelegate(new MockPalisadeService());
-        proxy = new ProxyRestPalisadeService("http://localhost:8080/palisade");
+        proxy = (ProxyRestPalisadeService) new ProxyRestPalisadeService("http://localhost:"+portNumber+"/palisade").retryMax(1);
         server = new EmbeddedHttpServer(proxy.getBaseUrlWithVersion(), new ApplicationConfigV1());
         server.startServer();
     }
@@ -77,9 +78,11 @@ public class RestPalisadeServiceV1IT {
         final PalisadeService palisadeService = Mockito.mock(PalisadeService.class);
         MockPalisadeService.setMock(palisadeService);
 
-        final RegisterDataRequest request = new RegisterDataRequest().resourceId("file1").userId(user.getUserId()).context(context);
 
-        final DataRequestResponse expectedResult = new DataRequestResponse().requestId(requestId).resource(fileResource1, new SimpleConnectionDetail().service(new MockPalisadeService()));
+        final RegisterDataRequest request = new RegisterDataRequest().resourceId("file1").userId(USER.getUserId()).context(CONTEXT);
+
+        final DataRequestResponse expectedResult = new DataRequestResponse().token(TOKEN).resource(FILE_RESOURCE_1, new SimpleConnectionDetail().service(new MockPalisadeService()));
+        expectedResult.originalRequestId(ORIGINAL_REQUEST_ID);
         given(palisadeService.registerDataRequest(request)).willReturn(CompletableFuture.completedFuture(expectedResult));
 
         // When
@@ -96,13 +99,15 @@ public class RestPalisadeServiceV1IT {
         final PalisadeService palisadeService = Mockito.mock(PalisadeService.class);
         MockPalisadeService.setMock(palisadeService);
 
-        final GetDataRequestConfig getDataRequestConfig = new GetDataRequestConfig().requestId(requestId).resource(fileResource1);
+        final GetDataRequestConfig getDataRequestConfig = new GetDataRequestConfig().token(TOKEN).resource(FILE_RESOURCE_1);
+        getDataRequestConfig.setOriginalRequestId(new RequestId().id("shouldGetDataRequestConfig"));
         final Map<LeafResource, Rules> rulesMap = new HashMap<>();
-        rulesMap.put(fileResource1, new Rules().rule("testRule", new TestRule()));
+        rulesMap.put(FILE_RESOURCE_1, new Rules().rule("testRule", new TestRule()));
         final DataRequestConfig expectedResult = new DataRequestConfig()
-                .user(user)
-                .context(context)
+                .user(USER)
+                .context(CONTEXT)
                 .rules(rulesMap);
+        expectedResult.setOriginalRequestId(new RequestId().id("test"));
         given(palisadeService.getDataRequestConfig(getDataRequestConfig))
                 .willReturn(CompletableFuture.completedFuture(expectedResult));
 

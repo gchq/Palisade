@@ -23,7 +23,7 @@ import uk.gov.gchq.palisade.config.service.request.AddConfigRequest;
 import uk.gov.gchq.palisade.config.service.request.GetConfigRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.service.Service;
-import uk.gov.gchq.palisade.service.request.ServiceConfiguration;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -45,8 +45,8 @@ public class ProxyRestConfigService extends ProxyRestService implements Configur
     }
 
     @Override
-    public CompletableFuture<ServiceConfiguration> get(final GetConfigRequest request) {
-        return doPostAsync("get", request, ServiceConfiguration.class);
+    public CompletableFuture<ServiceState> get(final GetConfigRequest request) {
+        return doPostAsync("get", request, ServiceState.class);
     }
 
     @Override

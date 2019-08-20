@@ -17,51 +17,68 @@
 package uk.gov.gchq.palisade.client;
 
 import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.serialise.Serialiser;
 import uk.gov.gchq.palisade.data.service.DataService;
 import uk.gov.gchq.palisade.data.service.request.ReadRequest;
 import uk.gov.gchq.palisade.data.service.request.ReadResponse;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.service.request.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.PalisadeService;
 import uk.gov.gchq.palisade.service.request.DataRequestResponse;
 import uk.gov.gchq.palisade.service.request.RegisterDataRequest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 public class SimpleClient<T> {
     private final Serialiser<T> serialiser;
 
-    private final ServicesFactory services;
+    private final PalisadeService palisadeService;
 
-    public SimpleClient(final ServicesFactory services, final Serialiser<T> serialiser) {
-        Objects.requireNonNull(services, "services factory must be provided");
-        this.services = services;
-        Objects.requireNonNull(serialiser, "serialiser cannot be null");
+    public SimpleClient(final PalisadeService palisadeService, final Serialiser<T> serialiser) {
+        requireNonNull(palisadeService, "palisade service must be provided");
+        this.palisadeService = palisadeService;
+        requireNonNull(serialiser, "serialiser cannot be null");
         this.serialiser = serialiser;
     }
 
-    public Stream<T> read(final String filename, final String resourceType, final String userId, final String justification) {
-        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(filename).userId(new UserId().id(userId)).context(new Context().justification(justification));
-        final DataRequestResponse dataRequestResponse = getServicesFactory().getPalisadeService().registerDataRequest(dataRequest).join();
-        final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(dataRequestResponse.getResources().size());
+    public DataRequestResponse makeRequest(final String fileName, final String resourceType, final String userId, final String purpose) {
+        final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(fileName).userId(new UserId().id(userId)).context(new Context().purpose(purpose));
+        final DataRequestResponse dataRequestResponse = palisadeService.registerDataRequest(dataRequest).join();
+        return dataRequestResponse;
+    }
 
-        for (final Entry<LeafResource, ConnectionDetail> entry : dataRequestResponse.getResources().entrySet()) {
+    public Stream<T> getObjectStreams(final DataRequestResponse response) {
+        requireNonNull(response, "response");
+
+        final List<CompletableFuture<Stream<T>>> futureResults = new ArrayList<>(response.getResources().size());
+        for (final Entry<LeafResource, ConnectionDetail> entry : response.getResources().entrySet()) {
             final ConnectionDetail connectionDetail = entry.getValue();
             final DataService dataService = connectionDetail.createService();
+            final RequestId uuid = response.getOriginalRequestId();
 
             final ReadRequest readRequest = new ReadRequest()
-                    .requestId(dataRequestResponse.getRequestId())
+                    .token(response.getToken())
                     .resource(entry.getKey());
+            readRequest.setOriginalRequestId(uuid);
 
             final CompletableFuture<ReadResponse> futureResponse = dataService.read(readRequest);
             final CompletableFuture<Stream<T>> futureResult = futureResponse.thenApply(
-                    response -> getSerialiser().deserialise(response.getData())
+                    dataResponse -> {
+                        try {
+                            return getSerialiser().deserialise(dataResponse.asInputStream());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
             );
             futureResults.add(futureResult);
         }
@@ -69,11 +86,13 @@ public class SimpleClient<T> {
         return futureResults.stream().flatMap(CompletableFuture::join);
     }
 
+    public Stream<T> read(final String filename, final String resourceType, final String userId, final String purpose) {
+        final DataRequestResponse dataRequestResponse = makeRequest(filename, resourceType, userId, purpose);
+        return getObjectStreams(dataRequestResponse);
+    }
+
     public Serialiser<T> getSerialiser() {
         return serialiser;
     }
 
-    public ServicesFactory getServicesFactory() {
-        return services;
-    }
 }
