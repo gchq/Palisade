@@ -10,27 +10,27 @@ spec:
         app: nexus-server
     spec:
       containers:
-        - name: nexus
-          image: sonatype/nexus3:latest
-          resources:
-            limits:
-              memory: "8Gi"
-              cpu: "1000m"
-            requests:
-              memory: "2Gi"
-              cpu: "500m"
-          ports:
-            - containerPort: 8081
-            - containerPort: 5000
-          volumeMounts:
-            - mountPath: "/nexus-data/db"
-              name: nexus-data
+      - name: nexus
+        image: sonatype/nexus3:latest
+        resources:
+          limits:
+            memory: "8Gi"
+            cpu: "1000m"
+          requests:
+            memory: "2Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8081
+        - containerPort: 5000
+        volumeMounts:
+        - mountPath: "/nexus-data"
+          name: nexus-data
       volumes:
-        - name: nexus-data
-          hostPath:
-             #directory location on host
-                  path: "/ebs-data/nexus"
-                  # this field is optional
-                  type: Directory
-                  #          persistentVolumeClaim:
-                  #          claimName: nexus-pvc 
+      - name: nexus-data
+        hostPath:
+          #directory location on host
+          path: "/ebs-data/nexus"
+          # this field is optional
+          type: Directory
+          #          persistentVolumeClaim:
+          #          claimName: nexus-pvc
