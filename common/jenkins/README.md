@@ -67,7 +67,6 @@ We will now enable the storage and dns add ons:
 ```bash
 microk8s.enable storage
 microk8s.enable dns
-
 ```
 
 Rerun microk8s.status and ensure that storage and dns are now enabled
