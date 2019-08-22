@@ -250,12 +250,13 @@ public class ServicesConfigurator {
     protected DataService createDataServiceForServer() {
         try {
             Configuration conf = createHadoopConfiguration();
-            HadoopDataReader reader = (HadoopDataReader) new HadoopDataReader().conf(conf).cacheService(clientServices.createInternalCacheService());
+            AuditService auditService = clientServices.createInternalAuditService();
+            HadoopDataReader reader = (HadoopDataReader) new HadoopDataReader().conf(conf).cacheService(clientServices.createInternalCacheService()).auditService(auditService);
             return new SimpleDataService()
                     .reader(reader)
                     .palisadeService(clientServices.createInternalPalisadeService())
                     .cacheService(clientServices.createInternalCacheService())
-                    .auditService(clientServices.createInternalAuditService());
+                    .auditService(auditService);
         } catch (final IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
             return null;

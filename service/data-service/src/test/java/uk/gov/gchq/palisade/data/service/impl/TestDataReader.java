@@ -16,6 +16,7 @@
 
 package uk.gov.gchq.palisade.data.service.impl;
 
+import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.data.service.reader.CachedSerialisedDataReader;
 import uk.gov.gchq.palisade.resource.LeafResource;
 
@@ -23,12 +24,14 @@ import java.io.InputStream;
 
 import static java.util.Objects.requireNonNull;
 
+
 public final class TestDataReader extends CachedSerialisedDataReader {
 
     private final InputStream returnStream;
 
-    public TestDataReader(final InputStream returnStream) {
+    public TestDataReader(final InputStream returnStream, final AuditService auditService) {
         requireNonNull(returnStream, "returnStream");
+        setAuditService(auditService);
         this.returnStream = returnStream;
     }
 

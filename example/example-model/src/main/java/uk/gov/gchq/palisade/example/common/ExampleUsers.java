@@ -23,6 +23,17 @@ public final class ExampleUsers {
     private ExampleUsers() {
     }
 
+    public static User getUser(final String userId) {
+        switch (userId) {
+            case "Bob":
+                return getBob();
+            case "Eve":
+                return getEve();
+            default:
+                return getAlice();
+        }
+    }
+
     public static User getAlice() {
         final User alice = new ExampleUser()
                 .trainingCompleted(TrainingCourse.PAYROLL_TRAINING_COURSE)

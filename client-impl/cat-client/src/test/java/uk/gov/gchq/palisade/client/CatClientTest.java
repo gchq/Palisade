@@ -79,19 +79,22 @@ public class CatClientTest {
         String userId = "Alice";
         String purpose = "test purpose";
 
-        RequestId reqId = new RequestId().id("Test ID");
+        String token = "Test token";
+        RequestId reqId = new RequestId().id("testId");
 
         registerDataRequest = new RegisterDataRequest().userId(new UserId().id(userId)).resourceId(dir).context(new Context().purpose(purpose));
 
-        reqResponse = CompletableFuture.completedFuture(
-                new DataRequestResponse()
-                        .requestId(reqId)
-                        .resource(resource1, mockConnectionDetail)
-                        .resource(resource2, mockConnectionDetail)
-                        .originalRequestId(new RequestId().id("Test ID")));
+        readRequest1 = new ReadRequest().token(token).resource(resource1);
+        readRequest1.originalRequestId(reqId);
+        readRequest2 = new ReadRequest().token(token).resource(resource2);
+        readRequest2.originalRequestId(reqId);
+        DataRequestResponse response = new DataRequestResponse()
+                .token(token)
+                .resource(resource1, mockConnectionDetail)
+                .resource(resource2, mockConnectionDetail);
+        response.originalRequestId(new RequestId().id("Test ID"));
 
-        readRequest1 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource1).originalRequestId(reqId);
-        readRequest2 = (ReadRequest) new ReadRequest().requestId(reqId).resource(resource2).originalRequestId(reqId);
+        reqResponse = CompletableFuture.completedFuture(response);
 
         readResponse1 = CompletableFuture.completedFuture(
                 new ClientReadResponse(IOUtils.toInputStream("Test data 1", StandardCharsets.UTF_8)));
@@ -110,8 +113,8 @@ public class CatClientTest {
         //Verify
 
         Mockito.verify(mockPalisadeService, Mockito.times(1)).registerDataRequest(Mockito.refEq(registerDataRequest, "id"));
-        Mockito.verify(mockDataService, Mockito.times(1)).read(Mockito.refEq(readRequest1, "id"));
-        Mockito.verify(mockDataService, Mockito.times(1)).read(Mockito.refEq(readRequest2, "id"));
+        Mockito.verify(mockDataService, Mockito.times(1)).read(Mockito.refEq(readRequest1, "id", "originalRequestId"));
+        Mockito.verify(mockDataService, Mockito.times(1)).read(Mockito.refEq(readRequest2, "id", "originalRequestId"));
 
         //Then
         assertEquals(String.format("Test data 1%nTest data 2%n"), outContent.toString());

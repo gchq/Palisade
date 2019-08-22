@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.audit.service.request.ReadRequestExceptionAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ReadRequestReceivedAuditRequest;
-import uk.gov.gchq.palisade.audit.service.request.ReadResponseAuditRequest;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.heart.Heartbeat;
 import uk.gov.gchq.palisade.data.service.DataService;
@@ -104,35 +102,15 @@ public class SimpleDataService implements DataService {
         return this;
     }
 
-    private void auditReadRequestReceived(final ReadRequest request) {
-        final ReadRequestReceivedAuditRequest requestReceivedAuditRequest = new ReadRequestReceivedAuditRequest();
-        requestReceivedAuditRequest
-                .requestId(request.getRequestId())
-                .resource(request.getResource())
-                .id(request.getId())
-                .originalRequestId(request.getOriginalRequestId());
-        auditService.audit(requestReceivedAuditRequest);
-    }
-
     private void auditRequestReceivedException(final ReadRequest request, final Throwable ex) {
-        final ReadRequestExceptionAuditRequest readRequestExceptionAuditRequest = new ReadRequestExceptionAuditRequest();
-        readRequestExceptionAuditRequest.exception(ex)
+        final ReadRequestExceptionAuditRequest readRequestExceptionAuditRequest = new ReadRequestExceptionAuditRequest()
+                .token(request.getToken())
                 .resource(request.getResource())
-                .requestId(request.getRequestId())
-                .id(request.getId())
+                .exception(ex);
+        readRequestExceptionAuditRequest
                 .originalRequestId(request.getOriginalRequestId());
         LOGGER.debug("Error handling: " + ex.getMessage());
         auditService.audit(readRequestExceptionAuditRequest);
-    }
-
-    private void auditReadResponse(final ReadRequest request) {
-        final ReadResponseAuditRequest readResponseAuditRequest = new ReadResponseAuditRequest();
-        readResponseAuditRequest
-                .resource(request.getResource())
-                .requestId(request.getRequestId())
-                .id(request.getId())
-                .originalRequestId(request.getOriginalRequestId());
-        auditService.audit(readResponseAuditRequest);
     }
 
     @Override
@@ -140,7 +118,6 @@ public class SimpleDataService implements DataService {
         requireNonNull(request, "The request cannot be null.");
         //check that we have an active heartbeat before serving request
 
-        auditReadRequestReceived(request);
         if (!heartbeat.isBeating()) {
             throw new IllegalStateException("data service is not sending heartbeats! Can't send data. Has the cache service been configured?");
         }
@@ -148,7 +125,7 @@ public class SimpleDataService implements DataService {
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.debug("Starting to read: {}", request);
             final GetDataRequestConfig getConfig = new GetDataRequestConfig()
-                    .requestId(request.getRequestId())
+                    .token(request.getToken())
                     .resource(request.getResource());
             getConfig.setOriginalRequestId(request.getOriginalRequestId());
             LOGGER.debug("Calling palisade service with: {}", getConfig);
@@ -168,7 +145,6 @@ public class SimpleDataService implements DataService {
 
             final ReadResponse response = new NoInputReadResponse(readerResult);
             LOGGER.debug("Returning from read: {}", response);
-            auditReadResponse(request);
             return response;
         })
                 .exceptionally(ex -> {

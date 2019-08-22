@@ -19,7 +19,6 @@ package uk.gov.gchq.palisade.service.request;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import uk.gov.gchq.palisade.RequestId;
 import uk.gov.gchq.palisade.ToStringBuilder;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
@@ -36,27 +35,26 @@ import static java.util.Objects.requireNonNull;
  * It is also the object that the client then passes to the data service to access the data. When it is passed to the
  * data service the resources field might have been changed to be a subset of the resources.
  */
-public class DataRequestResponse {
-    private RequestId requestId;
-    private RequestId originalRequestId; //this Id is unique per data access request from a user
+public class DataRequestResponse extends Request {
+    private String token;
     private Map<LeafResource, ConnectionDetail> resources;
 
     public DataRequestResponse() {
     }
 
-    public DataRequestResponse requestId(final RequestId requestId) {
-        requireNonNull(requestId, "The request id cannot be null.");
-        this.requestId = requestId;
+    public DataRequestResponse token(final String token) {
+        requireNonNull(token, "The token cannot be null.");
+        this.token = token;
         return this;
     }
 
-    public void setRequestId(final RequestId requestId) {
-        requestId(requestId);
+    public void setToken(final String token) {
+        token(token);
     }
 
-    public RequestId getRequestId() {
-        requireNonNull(requestId, "The request id has not been set.");
-        return requestId;
+    public String getToken() {
+        requireNonNull(token, "The token has not been set.");
+        return token;
     }
 
     public DataRequestResponse resource(final LeafResource resource, final ConnectionDetail connectionDetail) {
@@ -75,12 +73,6 @@ public class DataRequestResponse {
         return this;
     }
 
-    public DataRequestResponse originalRequestId(final RequestId originalRequestId) {
-        requireNonNull(originalRequestId, "The originalRequestId cannot be null.");
-        this.originalRequestId = originalRequestId;
-        return this;
-    }
-
     public void setResources(final Map<LeafResource, ConnectionDetail> resources) {
         resources(resources);
     }
@@ -88,15 +80,6 @@ public class DataRequestResponse {
     public Map<LeafResource, ConnectionDetail> getResources() {
         requireNonNull(resources, "The Resources have not been set.");
         return resources;
-    }
-
-    public void setOriginalRequestId(final RequestId originalRequestId) {
-        originalRequestId(originalRequestId);
-    }
-
-    public RequestId getOriginalRequestId() {
-        requireNonNull(originalRequestId, "The originalRequestId type cannot be null");
-        return originalRequestId;
     }
 
     @Override
@@ -112,27 +95,27 @@ public class DataRequestResponse {
         final DataRequestResponse that = (DataRequestResponse) o;
 
         return new EqualsBuilder()
-                .append(requestId, that.requestId)
+                .appendSuper(super.equals(o))
+                .append(token, that.token)
                 .append(resources, that.resources)
-                .append(originalRequestId, that.originalRequestId)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 67)
-                .append(requestId)
+                .appendSuper(super.hashCode())
+                .append(token)
                 .append(resources)
-                .append(originalRequestId)
                 .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("requestId", requestId)
+                .appendSuper(super.toString())
+                .append("token", token)
                 .append("resources", resources)
-                .append("originalRequestId", originalRequestId)
                 .toString();
     }
 }

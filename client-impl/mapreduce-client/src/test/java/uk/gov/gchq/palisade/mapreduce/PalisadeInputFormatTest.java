@@ -148,19 +148,19 @@ public class PalisadeInputFormatTest {
     @BeforeClass
     public static void setup() {
         request1 = new RegisterDataRequest().resourceId("res1").userId(new UserId().id("user1")).context(new Context().purpose("purpose1"));
-        req1Response = new DataRequestResponse().requestId(new RequestId().id("request1"))
+        req1Response = new DataRequestResponse().token("token1")
                 .resource(new StubResource("type1", "id1", "format1"), new StubConnectionDetail("con1"))
                 .resource(new StubResource("type2", "id2", "format2"), new StubConnectionDetail("con2"))
                 .resource(new StubResource("type3", "id3", "format3"), new StubConnectionDetail("con3"))
                 .resource(new StubResource("type4", "id4", "format4"), new StubConnectionDetail("con4"))
-                .resource(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"))
-                .originalRequestId(new RequestId().id("request1.setup"));
+                .resource(new StubResource("type5", "id5", "format5"), new StubConnectionDetail("con5"));
+        req1Response.originalRequestId(new RequestId().id("request1.setup"));
 
         request2 = new RegisterDataRequest().resourceId("res2").userId(new UserId().id("user2")).context(new Context().purpose("purpose2"));
-        req2Response = new DataRequestResponse().requestId(new RequestId().id("request2"))
+        req2Response = new DataRequestResponse().token("request2")
                 .resource(new StubResource("type_a", "id6", "format6"), new StubConnectionDetail("con6"))
-                .resource(new StubResource("type_b", "id7", "format7"), new StubConnectionDetail("con7"))
-                .originalRequestId(new RequestId().id("request2.setup"));
+                .resource(new StubResource("type_b", "id7", "format7"), new StubConnectionDetail("con7"));
+        req2Response.originalRequestId(new RequestId().id("request2.setup"));
     }
 
     /**

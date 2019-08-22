@@ -20,7 +20,11 @@ import org.apache.commons.io.input.NullInputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
+import uk.gov.gchq.palisade.Context;
+import uk.gov.gchq.palisade.RequestId;
+import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.audit.service.AuditService;
 import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.cache.service.request.AddCacheRequest;
 import uk.gov.gchq.palisade.cache.service.request.GetCacheRequest;
@@ -55,6 +59,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.refEq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class SerialisedDataReaderTest {
@@ -62,6 +67,14 @@ public class SerialisedDataReaderTest {
     private CachedSerialisedDataReader reader;
 
     private CacheService mockCache;
+
+    private AuditService mockAudit;
+
+    private User mockUser;
+
+    private UserId mockUserId;
+
+    private Context mockContext;
 
     private AddCacheRequest<CachedSerialisedDataReader.MapWrap> addCacheRequest;
 
@@ -72,6 +85,14 @@ public class SerialisedDataReaderTest {
     @Before
     public void resetCache() {
         mockCache = Mockito.mock(CacheService.class);
+        mockAudit = Mockito.mock(AuditService.class);
+        mockUser = Mockito.mock(User.class);
+        mockUserId = Mockito.mock(UserId.class);
+        when(mockUser.getUserId()).thenReturn(mockUserId);
+        when(mockUserId.getId()).thenReturn("user id");
+        mockContext = Mockito.mock(Context.class);
+        when(mockContext.getPurpose()).thenReturn("A purpose");
+
 
         addCacheRequest = new AddCacheRequest<>()
                 .key(CachedSerialisedDataReader.SERIALISER_KEY)
@@ -94,11 +115,12 @@ public class SerialisedDataReaderTest {
                 )
         );
 
-        reader = new TestDataReader(new NullInputStream(10));
+        reader = new TestDataReader(new NullInputStream(10), mockAudit);
         reader.serialisers(serMap);
         reader.cacheService(mockCache);
 
-        request = new DataReaderRequest().rules(new Rules()).resource(new StubResource().type("type1").serialisedFormat("format1"));
+        request = new DataReaderRequest().user(mockUser).context(mockContext).rules(new Rules()).resource(new StubResource().type("type1").serialisedFormat("format1"));
+        request.originalRequestId(new RequestId().id("originalRequestId"));
     }
 
     @Test(expected = IOException.class)
@@ -139,7 +161,7 @@ public class SerialisedDataReaderTest {
         AtomicBoolean closed = new AtomicBoolean(false);
         DataReaderResponse response = createTestResponseForStringStream(closed);
 
-        //create an outputstream that throws an exception
+        //create an output stream that throws an exception
         OutputStream exceptionStream = Mockito.mock(OutputStream.class);
         doThrow(IOException.class).when(exceptionStream).write(anyInt());
         doThrow(IOException.class).when(exceptionStream).write(any());
@@ -172,7 +194,7 @@ public class SerialisedDataReaderTest {
         };
 
         //inject this into a data reader
-        reader = new TestDataReader(serialisedSource);
+        reader = new TestDataReader(serialisedSource, mockAudit);
         Map<DataFlavour, Serialiser<?>> serMap = new HashMap<>();
         serMap.put(DataFlavour.of("type1", "format1"), ser);
         reader.serialisers(serMap);
