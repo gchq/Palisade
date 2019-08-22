@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nexus
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nexus-server
+    spec:
+      containers:
+      - name: nexus
+        image: sonatype/nexus3:latest
+        resources:
+          limits:
+            memory: "8Gi"
+            cpu: "1000m"
+          requests:
+            memory: "2Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8081
+        - containerPort: 5000
+        volumeMounts:
+        - mountPath: "/nexus-data"
+          name: nexus-data
+      volumes:
+      - name: nexus-data
+        hostPath:
+          #directory location on host
+          path: "/ebs-data/nexus"
+          # this field is optional
+          type: Directory
+          #          persistentVolumeClaim:
+          #          claimName: nexus-pvc
