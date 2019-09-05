@@ -16,13 +16,10 @@
 
 package uk.gov.gchq.palisade.resource.service.impl;
 
-import org.odpi.openmetadata.accessservices.assetconsumer.AssetConsumerAssetInterface;
+import org.odpi.openmetadata.accessservices.assetconsumer.api.AssetConsumerAssetInterface;
 import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetConnections;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
-import org.odpi.openmetadata.frameworks.connectors.properties.RelatedAsset;
-import org.odpi.openmetadata.frameworks.connectors.properties.RelatedAssets;
-
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
@@ -81,33 +78,34 @@ public class EgeriaResourceService implements ResourceService {
         AssetConsumer assetConsumer = null;
 
 //        TODO need to add some code here !!
-        String userId = null;
-        String assetGUID = null;
-        Map<LeafResource, ConnectionDetail> connections = new HashMap<>();
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                AssetUniverse assetUniverse = assetConsumer.getAssetProperties(userId, request.getResourceId());
-//            AssetConnections assetConnections = assetUniverse.getConnections();
-                RelatedAssets relatedAssets = assetUniverse.getRelatedAssets(); //assimng that there will be a method to get child assets
-                Iterator<RelatedAsset> relatedAssetsIterator = relatedAssets;
-                while (relatedAssetsIterator.hasNext()) { //forEach not supported in relatedAssets
-                    RelatedAsset asset = relatedAssetsIterator.next();
-                    //the asset bean is related to the Resource in some way !!!
-                    AssetConnections assetConnections = asset.getRelatedAssetProperties().getAssetDetail().getConnections();
-                    //TODO need to create a ConnectionDetail from the assetConnection.next()
-                    ConnectionDetail connectionDetail = null;
-                    //TODO need to create a LeafResource from the RelatedAsset
-                    LeafResource leafResource = null;
-
-                    connections.put(leafResource, connectionDetail);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(ERROR_RESOLVING_ID, e);
-//            TODO need to handle the exception correctly
-            } finally {
-                return connections;
-            }
-        });
+//        String userId = null;
+//        String assetGUID = null;
+//        Map<LeafResource, ConnectionDetail> connections = new HashMap<>();
+//        return CompletableFuture.supplyAsync(() -> {
+//            try {
+//                AssetUniverse assetUniverse = assetConsumer.getAssetProperties(userId, request.getResourceId());
+////            AssetConnections assetConnections = assetUniverse.getConnections();
+//                RelatedAssets relatedAssets = assetUniverse.getRelatedAssets(); //assimng that there will be a method to get child assets
+//                Iterator<RelatedAsset> relatedAssetsIterator = relatedAssets;
+//                while (relatedAssetsIterator.hasNext()) { //forEach not supported in relatedAssets
+//                    RelatedAsset asset = relatedAssetsIterator.next();
+//                    //the asset bean is related to the Resource in some way !!!
+//                    AssetConnections assetConnections = asset.getRelatedAssetProperties().getAssetDetail().getConnections();
+//                    //TODO need to create a ConnectionDetail from the assetConnection.next()
+//                    ConnectionDetail connectionDetail = null;
+//                    //TODO need to create a LeafResource from the RelatedAsset
+//                    LeafResource leafResource = null;
+//
+//                    connections.put(leafResource, connectionDetail);
+//                }
+//            } catch (Exception e) {
+//                throw new RuntimeException(ERROR_RESOLVING_ID, e);
+////            TODO need to handle the exception correctly
+//            } finally {
+//                return connections;
+//            }
+//        });
+        return null;
     }
 
     /**
