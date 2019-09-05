@@ -29,6 +29,7 @@
         <module>rest-resource-service</module>
         <module>proxy-rest-resource-service</module>
         <module>hadoop-resource-service</module>
+        <module>egeria-resource-service</module>
     </modules>
 
     <dependencies>
