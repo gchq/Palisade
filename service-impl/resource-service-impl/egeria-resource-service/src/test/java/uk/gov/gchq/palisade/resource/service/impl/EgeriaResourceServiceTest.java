@@ -9,6 +9,9 @@ import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedExcepti
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class EgeriaResourceServiceTest {
 
 
@@ -27,8 +30,8 @@ public class EgeriaResourceServiceTest {
     public void experiment() {
         AssetConsumer assetConsumer;
         try {
-            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:8080");
-            AssetUniverse assetUniverse = assetConsumer.getAssetProperties("peterprofile", "0b561efd-6224-4a2b-9b2a-861b866d45d2");
+            assetConsumer = new AssetConsumer("cocoMDS1","http://localhost:8080");
+            AssetUniverse assetUniverse = assetConsumer.getAssetProperties("peterprofile", "afd95cfe-1296-45cd-8dd7-3f8dc2a9d637");
             System.out.println(assetUniverse);
         } catch (InvalidParameterException e) {
             e.printStackTrace();
