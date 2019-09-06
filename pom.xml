@@ -15,14 +15,29 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.gov.gchq.palisade</groupId>
     <artifactId>palisade</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.0-${revision}</version>
+    <version>0.3.1-SNAPSHOT</version>
+    <modules>
+        <module>common</module>
+        <module>service</module>
+        <module>service-impl</module>
+        <module>client-impl</module>
+        <module>library</module>
+        <module>example</module>
+    </modules>
+
+    <developers>
+        <developer>
+            <name>PalisadeDevelopers</name>
+            <organization>GCHQ</organization>
+            <organizationUrl>https://github.com/gchq</organizationUrl>
+        </developer>
+    </developers>
 
     <licenses>
         <license>
@@ -33,14 +48,9 @@
 
     <properties>
         <!-- Versions -->
-        <java.version>11</java.version>
-        <!-- Sane default when no revision property is passed in from the command line -->
-        <revision>SNAPSHOT</revision>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-
         <jar.plugin.version>3.1.1</jar.plugin.version>
         <compiler.plugin.version>3.8.0</compiler.plugin.version>
         <javadoc.plugin.version>3.0.1</javadoc.plugin.version>
@@ -115,17 +125,6 @@
             scm:git:https://github.com/gchq/Palisade.git
         </scm.developer.connection>
     </properties>
-
-
-    <modules>
-        <module>common</module>
-        <module>service</module>
-        <module>service-impl</module>
-        <module>client-impl</module>
-        <module>library</module>
-        <module>example</module>
-    </modules>
-
 
     <scm>
         <url>${scm.url}</url>
