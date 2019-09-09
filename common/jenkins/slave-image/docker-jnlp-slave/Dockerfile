@@ -66,6 +66,12 @@ RUN curl -LO https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz \
 # You will need to configure $HELM_HOST to specify the location of the tiller host - this will be the host machine
 # and will be running on port 8080
 
+################# get docker #################
+# we will not run docker - instead we will redirect the docker socket from the host machine by
+# starting the container as follows:
+# docker run -v /var/run/docker.sock:/var/run/docker.sock -i -t <<id>> sh
+RUN apt-get install docker.io
+
 ################# finished with sudo so switch to jenkins user #################
 USER ${user}
 RUN mkdir -p /home/${user}/.kube
