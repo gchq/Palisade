@@ -17,6 +17,7 @@
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import com.github.javafaker.Faker;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
 
@@ -45,6 +46,13 @@ public class WorkLocation {
         workLocation.setAddress(Address.generate(faker,random));
         workLocation.setWorkLocationName(WorkLocationName.generate(random));
         return workLocation;
+    }
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("workLocationName", workLocationName)
+                .append("address", address)
+                .toString();
     }
 }
 

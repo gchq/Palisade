@@ -224,6 +224,13 @@ public class Employee {
                 .append("taxCode", taxCode)
                 .append("nationality", nationality)
                 .append("manager", manager)
+                .append("hireDate", hireDate)
+                .append("grade",grade)
+                .append("department", department)
+                .append("salaryAmount", salaryAmount)
+                .append("salaryBonus",salaryBonus)
+                .append("workLocation",workLocation)
+                .append("sex",sex)
                 .toString();
     }
 }
