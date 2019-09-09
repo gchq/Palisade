@@ -37,6 +37,14 @@ public class Employee {
     private String taxCode;
     private Nationality nationality;
     private Manager[] manager;
+    private String hireDate;
+    private Grade grade;
+    private String department;
+    private int salaryAmount;
+    private int salaryBonus;
+    private String workLocation;
+    private Sex sex;
+
 
     public static Employee generate(final Random random) {
         Employee employee = new Employee();
