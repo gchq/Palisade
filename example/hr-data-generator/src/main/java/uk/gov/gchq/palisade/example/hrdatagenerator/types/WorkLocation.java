@@ -29,7 +29,7 @@ public class WorkLocation {
         return workLocationName;
     }
 
-    public void setWorkLocationName( WorkLocationName workLocationName) {
+    public void setWorkLocationName(final WorkLocationName workLocationName) {
         this.workLocationName = workLocationName;
     }
 
@@ -37,7 +37,7 @@ public class WorkLocation {
         return address;
     }
 
-    public void setAddress(Address address) {
+    public void setAddress(final Address address) {
         this.address = address;
     }
 

@@ -163,7 +163,7 @@ public class Employee {
         return hireDate;
     }
 
-    public void setHireDate(String hireDate) {
+    public void setHireDate(final String hireDate) {
         this.hireDate = hireDate;
     }
 
@@ -171,7 +171,7 @@ public class Employee {
         return grade;
     }
 
-    public void setGrade(Grade grade) {
+    public void setGrade(final Grade grade) {
         this.grade = grade;
     }
 
@@ -179,7 +179,7 @@ public class Employee {
         return salaryAmount;
     }
 
-    public void setSalaryAmount(int salaryAmount) {
+    public void setSalaryAmount(final int salaryAmount) {
         this.salaryAmount = salaryAmount;
     }
 
@@ -187,11 +187,11 @@ public class Employee {
         return salaryBonus;
     }
 
-    public void setSalaryBonus(int salaryBonus) {
+    public void setSalaryBonus(final int salaryBonus) {
         this.salaryBonus = salaryBonus;
     }
 
-    public void setDepartment(Department department) {
+    public void setDepartment(final Department department) {
         this.department = department;
     }
 
@@ -199,7 +199,7 @@ public class Employee {
         return workLocation;
     }
 
-    public void setWorkLocation(WorkLocation workLocation) {
+    public void setWorkLocation(final WorkLocation workLocation) {
         this.workLocation = workLocation;
     }
 
