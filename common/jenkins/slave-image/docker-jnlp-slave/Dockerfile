@@ -23,6 +23,7 @@ ARG user=jenkins
 ARG group=jenkins
 ARG uid=1000
 ARG gid=1000
+ARG gid_docker=1001
 
 RUN groupadd -g ${gid} ${group}
 RUN useradd -c "Jenkins user" -d /home/${user} -u ${uid} -g ${gid} -m ${user}
@@ -61,7 +62,8 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.3/b
 ################# install helm #################
 RUN curl -LO https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz \
   && tar -zxvf helm-v2.14.3-linux-amd64.tar.gz && mv linux-amd64/helm /usr/local/bin/helm \
-  && mv linux-amd64/tiller /usr/local/bin/tiller
+  && mv linux-amd64/tiller /usr/local/bin/tiller \
+  && rm -rf helm-v2.14.3-linux-amd64.tar.gz
 
 # You will need to configure $HELM_HOST to specify the location of the tiller host - this will be the host machine
 # and will be running on port 8080
@@ -70,7 +72,16 @@ RUN curl -LO https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz \
 # we will not run docker - instead we will redirect the docker socket from the host machine by
 # starting the container as follows:
 # docker run -v /var/run/docker.sock:/var/run/docker.sock -i -t <<id>> sh
-RUN apt-get install docker.io
+#RUN apt install docker.io
+
+RUN curl -LO https://download.docker.com/linux/static/stable/aarch64/docker-19.03.2.tgz \
+ && tar -zxvf docker-19.03.2.tgz \
+ && mv docker/docker /usr/local/bin/docker \
+ && rm -rf docker docker-1.13.1.tgz
+
+RUN groupadd -g ${gid_docker} docker
+RUN gpasswd -a ${user} docker
+RUN usermod -aG docker ${user}
 
 ################# finished with sudo so switch to jenkins user #################
 USER ${user}
