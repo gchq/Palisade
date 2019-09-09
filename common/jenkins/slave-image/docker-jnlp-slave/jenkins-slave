@@ -41,7 +41,9 @@ else
     echo "failed to get sec creds - are you running on an EC2 instance??"
 fi
 
-
+#now change the default docker image repository to ECR
+#N.B add on --registry-ids if you have more than one repository
+$(aws ecr get-login --no-include-email --region eu-west-1)
 
 if [ $# -eq 1 ]; then
 
