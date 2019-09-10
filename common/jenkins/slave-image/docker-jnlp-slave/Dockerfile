@@ -83,6 +83,8 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-19
 USER ${user}
 RUN mkdir -p /home/${user}/.kube
 COPY jenkins-slave /usr/local/bin/jenkins-slave
+COPY create-repository /usr/local/bin/create-repository
+
 
 # On a MAC you can access the host ports on host.docker.internal
 # see: https://docs.docker.com/docker-for-mac/networking/
