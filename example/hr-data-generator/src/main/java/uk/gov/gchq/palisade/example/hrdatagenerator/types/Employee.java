@@ -63,7 +63,7 @@ public class Employee {
         employee.setHireDate(DateHelper.generateHireDate(employee.dateOfBirth, random));
         employee.setGrade(Grade.generate(random));
         employee.setDepartment(Department.generate(random));
-        employee.setSalaryAmount(20000 + random.nextInt());
+        employee.setSalaryAmount(20000 + random.nextInt(1000000));
         employee.setSalaryBonus(random.nextInt(10000));
         employee.setWorkLocation(WorkLocation.generate(faker, random));
         employee.setSex(Sex.generate(random));
