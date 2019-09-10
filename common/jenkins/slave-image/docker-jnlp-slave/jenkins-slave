@@ -52,6 +52,12 @@ $(aws ecr get-login --no-include-email --region eu-west-1)
 #You can apply up to 100 tags per image in Amazon ECR.
 
 
+create_repository() {
+   echo "creating Repisitory with name $1"
+   aws ecr create-repository --repository-name $1
+}
+
+
 # In order to push to ecr the following role will be required:
 # ecr:InitiateLayerUpload
 
