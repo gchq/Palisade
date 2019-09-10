@@ -16,11 +16,6 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator.utils;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Random;
 
@@ -40,8 +35,8 @@ public final class DateHelper {
     }
 
     public static String generateHireDate(final String dateOfBirthStr, final Random random) {
-        String birthYearStr = dateOfBirthStr.substring(dateOfBirthStr.length()-4);
-        String hireDateStr = dateOfBirthStr.substring(0, dateOfBirthStr.length()-4);
+        String birthYearStr = dateOfBirthStr.substring(dateOfBirthStr.length() - 4);
+        String hireDateStr = dateOfBirthStr.substring(0, dateOfBirthStr.length() - 4);
 
         int birthYear = new Integer(birthYearStr).intValue();
         int hireYear = birthYear + 20 + random.nextInt(40);
