@@ -74,14 +74,25 @@ RUN curl -LO https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz \
 # docker run -v /var/run/docker.sock:/var/run/docker.sock -i -t <<id>> sh
 #RUN apt install docker.io
 
-RUN curl -LO https://download.docker.com/linux/static/stable/aarch64/docker-19.03.2.tgz \
- && tar -zxvf docker-19.03.2.tgz \
- && mv docker/docker /usr/local/bin/docker \
- && rm -rf docker docker-1.13.1.tgz
+#RUN curl -LO https://download.docker.com/linux/static/stable/aarch64/docker-19.03.2.tgz \
+# && tar -zxvf docker-19.03.2.tgz \
+# && mv docker/docker /usr/local/bin/docker \
+# && rm -rf docker docker-1.13.1.tgz
+#
+#RUN groupadd -g ${gid_docker} docker
+#RUN gpasswd -a ${user} docker
+#RUN usermod -aG docker ${user}
 
-RUN groupadd -g ${gid_docker} docker
-RUN gpasswd -a ${user} docker
-RUN usermod -aG docker ${user}
+RUN apt-get -y install sudo
+RUN adduser ${user} sudo
+RUN echo "${user} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
+    chmod 0440 /etc/sudoers.d/user
+#RUN chpasswd | adduser ${user} sudo
+
+
+RUN curl -fsSLO https://download.docker.com/linux/static/stable/aarch64/docker-19.03.2.tgz \
+ &&  tar --strip-components=1 -xvzf docker-19.03.2.tgz -C /usr/local/bin
+# RUN chown -R ${user}:${user} /var/run/docker.sockdocker
 
 ################# finished with sudo so switch to jenkins user #################
 USER ${user}
