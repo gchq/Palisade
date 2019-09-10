@@ -90,7 +90,7 @@ RUN echo "${user} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/user && \
 #RUN chpasswd | adduser ${user} sudo
 
 
-RUN curl -fsSLO https://download.docker.com/linux/static/stable/aarch64/docker-19.03.2.tgz \
+RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-19.03.2.tgz \
  &&  tar --strip-components=1 -xvzf docker-19.03.2.tgz -C /usr/local/bin
 # RUN chown -R ${user}:${user} /var/run/docker.sockdocker
 
