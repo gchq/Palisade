@@ -43,7 +43,7 @@ public class WorkLocation {
 
     public static WorkLocation generate(final Faker faker, final Random random) {
         WorkLocation workLocation = new WorkLocation();
-        workLocation.setAddress(Address.generate(faker,random));
+        workLocation.setAddress(Address.generate(faker, random));
         workLocation.setWorkLocationName(WorkLocationName.generate(random));
         return workLocation;
     }

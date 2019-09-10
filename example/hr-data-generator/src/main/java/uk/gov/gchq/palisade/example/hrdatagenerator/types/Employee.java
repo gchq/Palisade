@@ -60,12 +60,12 @@ public class Employee {
         employee.setTaxCode(generateTaxCode());
         employee.setNationality(Nationality.generate(random));
         employee.setManager(Manager.generateMany(random, random.nextInt(3) + 2));
-        employee.setHireDate(DateHelper.generateDateOfBirth(random));
+        employee.setHireDate(DateHelper.generateHireDate(employee.dateOfBirth, random));
         employee.setGrade(Grade.generate(random));
         employee.setDepartment(Department.generate(random));
-        employee.setSalaryAmount(20000+random.nextInt());
+        employee.setSalaryAmount(20000 + random.nextInt());
         employee.setSalaryBonus(random.nextInt(10000));
-        employee.setWorkLocation(WorkLocation.generate(faker,random));
+        employee.setWorkLocation(WorkLocation.generate(faker, random));
         employee.setSex(Sex.generate(random));
 
         return employee;
@@ -207,7 +207,7 @@ public class Employee {
         return sex;
     }
 
-    public void setSex(Sex sex) {
+    public void setSex(final Sex sex) {
         this.sex = sex;
     }
 
@@ -225,12 +225,12 @@ public class Employee {
                 .append("nationality", nationality)
                 .append("manager", manager)
                 .append("hireDate", hireDate)
-                .append("grade",grade)
+                .append("grade", grade)
                 .append("department", department)
                 .append("salaryAmount", salaryAmount)
-                .append("salaryBonus",salaryBonus)
-                .append("workLocation",workLocation)
-                .append("sex",sex)
+                .append("salaryBonus", salaryBonus)
+                .append("workLocation", workLocation)
+                .append("sex", sex)
                 .toString();
     }
 }
