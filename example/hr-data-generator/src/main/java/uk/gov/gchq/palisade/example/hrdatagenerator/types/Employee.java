@@ -39,10 +39,10 @@ public class Employee {
     private Manager[] manager;
     private String hireDate;
     private Grade grade;
-    private String department;
+    private Department department;
     private int salaryAmount;
     private int salaryBonus;
-    private String workLocation;
+    private WorkLocation workLocation;
     private Sex sex;
 
 
@@ -60,6 +60,14 @@ public class Employee {
         employee.setTaxCode(generateTaxCode());
         employee.setNationality(Nationality.generate(random));
         employee.setManager(Manager.generateMany(random, random.nextInt(3) + 2));
+        employee.setHireDate(DateHelper.generateHireDate(employee.dateOfBirth, random));
+        employee.setGrade(Grade.generate(random));
+        employee.setDepartment(Department.generate(random));
+        employee.setSalaryAmount(20000 + random.nextInt(1000000));
+        employee.setSalaryBonus(random.nextInt(10000));
+        employee.setWorkLocation(WorkLocation.generate(faker, random));
+        employee.setSex(Sex.generate(random));
+
         return employee;
     }
 
@@ -151,6 +159,58 @@ public class Employee {
         this.manager = manager;
     }
 
+    public String getHireDate() {
+        return hireDate;
+    }
+
+    public void setHireDate(final String hireDate) {
+        this.hireDate = hireDate;
+    }
+
+    public Grade getGrade() {
+        return grade;
+    }
+
+    public void setGrade(final Grade grade) {
+        this.grade = grade;
+    }
+
+    public int getSalaryAmount() {
+        return salaryAmount;
+    }
+
+    public void setSalaryAmount(final int salaryAmount) {
+        this.salaryAmount = salaryAmount;
+    }
+
+    public int getSalaryBonus() {
+        return salaryBonus;
+    }
+
+    public void setSalaryBonus(final int salaryBonus) {
+        this.salaryBonus = salaryBonus;
+    }
+
+    public void setDepartment(final Department department) {
+        this.department = department;
+    }
+
+    public WorkLocation getWorkLocation() {
+        return workLocation;
+    }
+
+    public void setWorkLocation(final WorkLocation workLocation) {
+        this.workLocation = workLocation;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public void setSex(final Sex sex) {
+        this.sex = sex;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -164,6 +224,13 @@ public class Employee {
                 .append("taxCode", taxCode)
                 .append("nationality", nationality)
                 .append("manager", manager)
+                .append("hireDate", hireDate)
+                .append("grade", grade)
+                .append("department", department)
+                .append("salaryAmount", salaryAmount)
+                .append("salaryBonus", salaryBonus)
+                .append("workLocation", workLocation)
+                .append("sex", sex)
                 .toString();
     }
 }
