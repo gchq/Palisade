@@ -66,6 +66,10 @@ RUN curl -LO https://get.helm.sh/helm-v2.14.3-linux-amd64.tar.gz \
   && mv linux-amd64/tiller /usr/local/bin/tiller \
   && rm -rf helm-v2.14.3-linux-amd64.tar.gz
 
+#add in eks ctl to create default clusters if required
+RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp \
+  && mv /tmp/eksctl /usr/local/bin
+
 # You will need to configure $HELM_HOST to specify the location of the tiller host - this will be the host machine
 # and will be running on port 8080
 

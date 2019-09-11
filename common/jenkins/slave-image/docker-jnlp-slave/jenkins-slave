@@ -43,6 +43,8 @@ fi
 
 #login to the ecr registry
 $(aws ecr get-login --no-include-email --region eu-west-1)
+#create the ~/.kube/config file such that the docker container is communicating with EKS
+$(aws eks --region eu-west-1 update-kubeconfig --name palisade-terraform-eks)
 
 #Important an image needs to be tagged with the following syntax:
 #This means that a repository must be created for each output / pineline

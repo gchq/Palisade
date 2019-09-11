@@ -26,5 +26,6 @@ Ensure docker is installed and the aws-cli
 ```bash
 make
 sudo chmod 666 /var/run/docker.sock
-docker run -v /var/run/docker.sock:/var/run/docker.sock -i -t <<image name>> sh
+docker run -v /var/run/docker.sock:/var/run/docker.sock --net=host -i -t <<image name>> sh
 ```
+
