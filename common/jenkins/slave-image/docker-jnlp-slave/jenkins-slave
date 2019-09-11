@@ -42,10 +42,13 @@ else
 fi
 
 #login to the ecr registry
-$(aws ecr get-login --no-include-email --region eu-west-1)
-#create the ~/.kube/config file such that the docker container is communicating with EKS
-$(aws eks --region eu-west-1 update-kubeconfig --name palisade-terraform-eks)
+aws ecr get-login --no-include-email --region eu-west-1
 
+echo "before creation"
+#create the ~/.kube/config file such that the docker container is communicating with EKS
+aws eks --region eu-west-1 update-kubeconfig --name palisade-terraform-eks
+
+echo "after creation"
 #Important an image needs to be tagged with the following syntax:
 #This means that a repository must be created for each output / pineline
 #docker tag <<image-id>> aws_account_id.dkr.ecr.eu-west-1.amazonaws.com/<<repository name>>:tag
@@ -55,7 +58,7 @@ $(aws eks --region eu-west-1 update-kubeconfig --name palisade-terraform-eks)
 
 
 create_repository() {
-   echo "creating Repisitory with name $1"
+   echo "creating Repository with name $1"
    aws ecr create-repository --repository-name $1
 }
 
