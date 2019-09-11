@@ -20,3 +20,11 @@
 This image uses jenkins/slave latest-jdk11 image released on 16th August 2019 from this repo: [repo](https://hub.docker.com/r/jenkins/slave/builds)
 It is based on the Dockerfile extracted from here [link](https://github.com/jenkinsci/docker-jnlp-slave/blob/master/Dockerfile) and adds helm and tiller functionality.
 
+
+## running on an EC2 instance
+Ensure docker is installed and the aws-cli
+```bash
+make
+sudo chmod 666 /var/run/docker.sock
+docker run -v /var/run/docker.sock:/var/run/docker.sock -i -t <<image name>> sh
+```

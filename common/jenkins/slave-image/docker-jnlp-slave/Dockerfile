@@ -50,6 +50,7 @@ WORKDIR /home/${user}
 #install aws-cli N.B the creds required are found by running: curl http://169.254.169.254/latest/meta-data/iam/security-credentials/palisade-admin
 RUN apt-get install vim -y
 RUN apt-get install python3 -y
+RUN apt-get install -y net-tools
 RUN curl -O https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && pip3 install awscli --upgrade
 RUN curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.8/2019-08-14/bin/linux/amd64/aws-iam-authenticator \
     && chmod +x ./aws-iam-authenticator && mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
