@@ -51,8 +51,7 @@ public class RecordMaskingRule implements Rule<Employee> {
         }
         if ((EmployeeUtils.isManager(managers, userId).equals(Boolean.TRUE))) {
             return null;
-        }
-        else {
+        } else {
             return null;
         }
     }
