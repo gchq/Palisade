@@ -19,14 +19,16 @@ package uk.gov.gchq.palisade.example.rule;
 import org.junit.Test;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.example.common.Role;
+import uk.gov.gchq.palisade.resource.impl.FileResource;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class FirstResourceTest {
 
     private static final User TEST_USER_HR = new User().userId("1").roles(Role.HR.name());
     private static final User TEST_USER_NOT_HR = new User().userId("1").roles("Not HR");
-    private static final String ACCESS_DENIED = "You are not allowed to access this file";
+    private static final FileResource TEST_RESOURCE = new FileResource();
     private static final String FILE_ID_1 = "file1.avro";
     private static final String FILE_ID_2 = "file.other.file2.avro";
     private static final FirstResourceRule RESOURCE_RULE = new FirstResourceRule();
@@ -34,44 +36,48 @@ public class FirstResourceTest {
     @Test
     public void hrGetFirstFile() {
         //Given - FileId, User
+        TEST_RESOURCE.setId(FILE_ID_1);
 
         //When
-        String actual = RESOURCE_RULE.apply(FILE_ID_1, TEST_USER_HR);
+        FileResource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_HR);
 
         //Then
-        assertEquals(FILE_ID_1, actual);
+        assertEquals(TEST_RESOURCE, actual);
     }
 
     @Test
     public void nonHrGetFirstFile() {
         //Given - FileId, User
+        TEST_RESOURCE.setId(FILE_ID_1);
 
         //When
-        String actual = RESOURCE_RULE.apply(FILE_ID_1, TEST_USER_NOT_HR);
+        FileResource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_NOT_HR);
 
         //Then
-        assertEquals(ACCESS_DENIED, actual);
+        assertNull(actual);
     }
 
     @Test
     public void hrGetSecondFile() {
         //Given - FileId, User
+        TEST_RESOURCE.setId(FILE_ID_2);
 
         //When
-        String actual = RESOURCE_RULE.apply(FILE_ID_2, TEST_USER_HR);
+        FileResource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_HR);
 
         //Then
-        assertEquals(FILE_ID_2, actual);
+        assertEquals(TEST_RESOURCE, actual);
     }
 
     @Test
     public void nonHrGetSecondFile() {
         //Given - FileId, User
+        TEST_RESOURCE.setId(FILE_ID_2);
 
         //When
-        String actual = RESOURCE_RULE.apply(FILE_ID_2, TEST_USER_NOT_HR);
+        FileResource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_NOT_HR);
 
         //Then
-        assertEquals(FILE_ID_2, actual);
+        assertEquals(TEST_RESOURCE, actual);
     }
 }

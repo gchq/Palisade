@@ -18,6 +18,7 @@ package uk.gov.gchq.palisade.example.rule;
 
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.example.common.Role;
+import uk.gov.gchq.palisade.resource.impl.FileResource;
 
 import java.util.Set;
 
@@ -28,20 +29,21 @@ public class FirstResourceRule {
     public FirstResourceRule() {
     }
 
-    public String apply(final String fileId, final User user) {
+    public FileResource apply(final FileResource resource, final User user) {
 
         Set<String> roles = user.getRoles();
+        String fileId = resource.getId();
         String fileName = removeFileExtension(fileId);
         String lastChar = fileName.substring(fileName.length() - 1);
 
         if (lastChar.equals("1")) {
             if (roles.contains(Role.HR.name())) {
-                return fileId;
+                return resource;
             } else {
-                return ACCESS_DENIED;
+                return null;
             }
         } else {
-            return fileId;
+            return resource;
         }
     }
 
