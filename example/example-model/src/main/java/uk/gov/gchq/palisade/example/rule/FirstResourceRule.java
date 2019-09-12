@@ -16,6 +16,37 @@
 
 package uk.gov.gchq.palisade.example.rule;
 
+import uk.gov.gchq.palisade.User;
+import uk.gov.gchq.palisade.example.common.Role;
+
+import java.util.Set;
+
 public class FirstResourceRule {
+
+    private static final String ACCESS_DENIED = "You are not allowed to access this file";
+
+    public FirstResourceRule() {
+    }
+
+    public String apply(final String fileId, final User user) {
+
+        Set<String> roles = user.getRoles();
+        String fileName = removeFileExtension(fileId);
+        String lastChar = fileName.substring(fileName.length()-1);
+
+        if (lastChar.equals("1")) {
+            if (roles.contains(Role.HR.name())) {
+                return fileId;
+            } else {
+                return ACCESS_DENIED;
+            }
+        } else {
+            return fileId;
+        }
+    }
+
+    private String removeFileExtension(final String fileId) {
+        return fileId.substring(0, fileId.lastIndexOf('.'));
+    }
 
 }
