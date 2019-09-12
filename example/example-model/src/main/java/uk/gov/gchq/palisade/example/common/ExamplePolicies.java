@@ -17,7 +17,11 @@
 package uk.gov.gchq.palisade.example.common;
 
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
-import uk.gov.gchq.palisade.example.rule.*;
+import uk.gov.gchq.palisade.example.rule.BankDetailsRule;
+import uk.gov.gchq.palisade.example.rule.DutyOfCareRule;
+import uk.gov.gchq.palisade.example.rule.FirstResourceRule;
+import uk.gov.gchq.palisade.example.rule.NationalityRule;
+import uk.gov.gchq.palisade.example.rule.ZipCodeMaskingRule;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 import uk.gov.gchq.palisade.policy.service.Policy;
 import uk.gov.gchq.palisade.policy.service.request.SetResourcePolicyRequest;
