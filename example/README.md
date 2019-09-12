@@ -48,7 +48,8 @@ Policy have defined the following rules:
    
 1. RecordMaskingRule - This rule is concerned with the full record.
     - if the user querying the file has the HR role then no modifications are made to the file
-    - if the user querying the file has the ESTATES role then no modifications are made to the file  
+    - if the user querying the file has the ESTATES role then no modifications are made to the file
+    - if the user is in the management tree of the employee then no modifications are made to the file  
    In all other cases the record will have no information returned.
   
 The ExampleConfigurator class creates the users and uses the rule classes mentioned above to create the rules. The example will be run with 3 users:

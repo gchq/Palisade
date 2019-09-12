@@ -83,7 +83,7 @@ public final class ExamplePolicies {
                                 new ZipCodeMaskingRule()
                         )
                         .recordLevelRule(
-                                "5-Record content masked for managers who are not part of the estates or HR roles.",
+                                "5-Record content masked for all who are not in the employee's management chain or part of the estates or HR.",
                                 new RecordMaskingRule()
                         )
                 );

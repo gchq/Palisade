@@ -51,8 +51,8 @@ public class RecordMaskingTest {
         assertNull(actual);
     }
 
-    /*@Test
-    public void partialRedactionForFirstLevelManager() {
+    @Test
+    public void noRedactionForFirstLevelManager() {
         //Given - Employee, Role, Reason
 
         //When
@@ -63,7 +63,7 @@ public class RecordMaskingTest {
     }
 
     @Test
-    public void partialRedactionForMidLevelManager() {
+    public void noRedactionForMidLevelManager() {
         //Given - Employee, Role, Reason
 
         //When
@@ -74,7 +74,7 @@ public class RecordMaskingTest {
     }
 
     @Test
-    public void partialRedactionForEndLevelManager() {
+    public void noRedactionForEndLevelManager() {
         //Given - Employee, Role, Reason
 
         //When
@@ -82,39 +82,6 @@ public class RecordMaskingTest {
 
         //Then
         assertEquals(TEST_EMPLOYEE, actual);
-    }*/
-
-    @Test
-    public void fullRedactionForFirstLevelManager() {
-        //Given - Employee, Role, Reason
-
-        //When
-        Employee actual = RECORD_MASKING_RULE.apply(TEST_EMPLOYEE, TEST_USER_2, TEST_CONTEXT);
-
-        //Then
-        assertNull(actual);
-    }
-
-    @Test
-    public void fullRedactionForMidLevelManager() {
-        //Given - Employee, Role, Reason
-
-        //When
-        Employee actual = RECORD_MASKING_RULE.apply(TEST_EMPLOYEE, TEST_USER_3, TEST_CONTEXT);
-
-        //Then
-        assertNull(actual);
-    }
-
-    @Test
-    public void fullRedactionForEndLevelManager() {
-        //Given - Employee, Role, Reason
-
-        //When
-        Employee actual = RECORD_MASKING_RULE.apply(TEST_EMPLOYEE, TEST_USER_4, TEST_CONTEXT);
-
-        //Then
-        assertNull(actual);
     }
 
     @Test
