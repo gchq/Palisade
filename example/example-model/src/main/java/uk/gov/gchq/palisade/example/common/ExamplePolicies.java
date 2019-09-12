@@ -20,6 +20,7 @@ import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.rule.BankDetailsRule;
 import uk.gov.gchq.palisade.example.rule.DutyOfCareRule;
 import uk.gov.gchq.palisade.example.rule.NationalityRule;
+import uk.gov.gchq.palisade.example.rule.RecordMaskingRule;
 import uk.gov.gchq.palisade.example.rule.ZipCodeMaskingRule;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 import uk.gov.gchq.palisade.policy.service.Policy;
@@ -80,6 +81,10 @@ public final class ExamplePolicies {
                         .recordLevelRule(
                                 "4-Address masked for estates staff and otherwise only available for duty of care",
                                 new ZipCodeMaskingRule()
+                        )
+                        .recordLevelRule(
+                                "5-Record content masked for all who are not in the employee's management chain or part of the estates or HR.",
+                                new RecordMaskingRule()
                         )
                 );
     }

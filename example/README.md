@@ -45,6 +45,12 @@ Policy have defined the following rules:
     - if the purpose of the query is DUTY_OF_CARE and the user querying the file is the line manager of the Employee record being queried then the whole address is returned
     - if the user querying the file has the ESTATES role then the address field should be returned with the zipcode/postcode masked to reduce its precision  
    In all other cases the address field should be redacted.
+   
+1. RecordMaskingRule - This rule is concerned with the full record.
+    - if the user querying the file has the HR role then no modifications are made to the record
+    - if the user querying the file has the ESTATES role then no modifications are made to the record
+    - if the user is in the management tree of the employee then no modifications are made to the record  
+   In all other cases the record will have no information returned.
   
 The ExampleConfigurator class creates the users and uses the rule classes mentioned above to create the rules. The example will be run with 3 users:
 
