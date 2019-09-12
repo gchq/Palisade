@@ -17,8 +17,10 @@
 package uk.gov.gchq.palisade.example.rule;
 
 import org.junit.Test;
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.example.common.Role;
+import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 
 import static org.junit.Assert.assertEquals;
@@ -28,6 +30,7 @@ public class FirstResourceTest {
 
     private static final User TEST_USER_HR = new User().userId("1").roles(Role.HR.name());
     private static final User TEST_USER_NOT_HR = new User().userId("1").roles("Not HR");
+    private static final Context TEST_CONTEXT = new Context().purpose("purpose");
     private static final FileResource TEST_RESOURCE = new FileResource();
     private static final String FILE_ID_1 = "file1.avro";
     private static final String FILE_ID_2 = "file.other.file2.avro";
@@ -39,7 +42,7 @@ public class FirstResourceTest {
         TEST_RESOURCE.setId(FILE_ID_1);
 
         //When
-        FileResource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_HR);
+        Resource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_HR, TEST_CONTEXT);
 
         //Then
         assertEquals(TEST_RESOURCE, actual);
@@ -51,7 +54,7 @@ public class FirstResourceTest {
         TEST_RESOURCE.setId(FILE_ID_1);
 
         //When
-        FileResource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_NOT_HR);
+        Resource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_NOT_HR, TEST_CONTEXT);
 
         //Then
         assertNull(actual);
@@ -63,7 +66,7 @@ public class FirstResourceTest {
         TEST_RESOURCE.setId(FILE_ID_2);
 
         //When
-        FileResource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_HR);
+        Resource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_HR, TEST_CONTEXT);
 
         //Then
         assertEquals(TEST_RESOURCE, actual);
@@ -75,7 +78,7 @@ public class FirstResourceTest {
         TEST_RESOURCE.setId(FILE_ID_2);
 
         //When
-        FileResource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_NOT_HR);
+        Resource actual = RESOURCE_RULE.apply(TEST_RESOURCE, TEST_USER_NOT_HR, TEST_CONTEXT);
 
         //Then
         assertEquals(TEST_RESOURCE, actual);

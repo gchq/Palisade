@@ -16,20 +16,20 @@
 
 package uk.gov.gchq.palisade.example.rule;
 
+import uk.gov.gchq.palisade.Context;
 import uk.gov.gchq.palisade.User;
 import uk.gov.gchq.palisade.example.common.Role;
-import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.Resource;
+import uk.gov.gchq.palisade.rule.Rule;
 
 import java.util.Set;
 
-public class FirstResourceRule {
-
-    private static final String ACCESS_DENIED = "You are not allowed to access this file";
+public class FirstResourceRule implements Rule<Resource> {
 
     public FirstResourceRule() {
     }
 
-    public FileResource apply(final FileResource resource, final User user) {
+    public Resource apply(final Resource resource, final User user, final Context context) {
 
         Set<String> roles = user.getRoles();
         String fileId = resource.getId();
