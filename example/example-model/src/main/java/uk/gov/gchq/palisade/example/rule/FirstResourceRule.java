@@ -32,7 +32,7 @@ public class FirstResourceRule {
 
         Set<String> roles = user.getRoles();
         String fileName = removeFileExtension(fileId);
-        String lastChar = fileName.substring(fileName.length()-1);
+        String lastChar = fileName.substring(fileName.length() - 1);
 
         if (lastChar.equals("1")) {
             if (roles.contains(Role.HR.name())) {
