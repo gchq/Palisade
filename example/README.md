@@ -46,6 +46,12 @@ Policy have defined the following rules:
     - if the user querying the file has the ESTATES role then the address field should be returned with the zipcode/postcode masked to reduce its precision  
    In all other cases the address field should be redacted.
    
+1. RecordMaskingRule - This rule is concerned with the full record.
+    - if the user querying the file has the HR role then no modifications are made to the record
+    - if the user querying the file has the ESTATES role then no modifications are made to the record
+    - if the user is in the management tree of the employee then no modifications are made to the record  
+   In all other cases the record will have no information returned.
+   
 1. FirstResourceRule - This rule is concerned with the resource file that is being requested.
     - if the user has an HR role they will be able to access the first resource file  
    In all other cases the first resource will not be returned to the user.
