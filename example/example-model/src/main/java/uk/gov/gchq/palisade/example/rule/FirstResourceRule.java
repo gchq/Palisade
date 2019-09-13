@@ -22,6 +22,7 @@ import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.resource.Resource;
 import uk.gov.gchq.palisade.rule.Rule;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class FirstResourceRule implements Rule<Resource> {
@@ -31,6 +32,8 @@ public class FirstResourceRule implements Rule<Resource> {
 
     public Resource apply(final Resource resource, final User user, final Context context) {
 
+        Objects.requireNonNull(user);
+        Objects.requireNonNull(context);
         Set<String> roles = user.getRoles();
         String fileId = resource.getId();
         String fileName = removeFileExtension(fileId);
