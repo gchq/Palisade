@@ -31,6 +31,19 @@ public final class DateHelper {
         localCalendar.set(localCalendar.YEAR, year);
         int dayOfYear = random.nextInt(localCalendar.getActualMaximum(localCalendar.DAY_OF_YEAR));
         localCalendar.set(localCalendar.DAY_OF_YEAR, dayOfYear);
-        return localCalendar.get(localCalendar.DAY_OF_MONTH) + "/" + localCalendar.get(localCalendar.MONTH) + "/" + year;
+        return localCalendar.get(localCalendar.DAY_OF_MONTH) + "/" + (localCalendar.get(localCalendar.MONTH) + 1) + "/" + year;
+    }
+
+    public static String generateHireDate(final String dateOfBirthStr, final Random random) {
+        String birthYearStr = dateOfBirthStr.substring(dateOfBirthStr.length() - 4);
+        String hireDateStr = dateOfBirthStr.substring(0, dateOfBirthStr.length() - 4);
+
+        int birthYear = new Integer(birthYearStr).intValue();
+        int hireYear = birthYear + 20 + random.nextInt(40);
+
+        hireDateStr = hireDateStr + hireYear;
+
+        return hireDateStr;
+
     }
 }
