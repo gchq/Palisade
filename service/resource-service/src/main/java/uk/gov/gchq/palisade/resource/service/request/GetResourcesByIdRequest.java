@@ -20,6 +20,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
+import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import static java.util.Objects.requireNonNull;
@@ -32,6 +33,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class GetResourcesByIdRequest extends Request {
     private String resourceId;
+    private UserId userId;
 
     // no-args constructor required
     public GetResourcesByIdRequest() {
@@ -47,6 +49,16 @@ public class GetResourcesByIdRequest extends Request {
         return this;
     }
 
+    /**
+     * @param userId the unique identifier of the userId that you want to {@code ls}
+     * @return the {@link GetResourcesByIdRequest}
+     */
+    public GetResourcesByIdRequest userId(final UserId userId) {
+        requireNonNull(userId, "The userId cannot be set to null.");
+        this.userId = userId;
+        return this;
+    }
+
     public String getResourceId() {
         requireNonNull(resourceId, "The resource id has not been set.");
         return resourceId;
@@ -54,6 +66,15 @@ public class GetResourcesByIdRequest extends Request {
 
     public void setResourceId(final String resourceId) {
         resourceId(resourceId);
+    }
+
+    public UserId getUserId() {
+        requireNonNull(userId, "The user id has not been set.");
+        return userId;
+    }
+
+    public void setUserId(final UserId userId) {
+        this.userId = userId;
     }
 
     @Override

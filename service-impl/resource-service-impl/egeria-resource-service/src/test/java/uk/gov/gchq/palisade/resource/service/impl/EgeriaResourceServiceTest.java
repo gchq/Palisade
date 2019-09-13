@@ -7,10 +7,10 @@ import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterExceptio
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
+import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.List;
 
 public class EgeriaResourceServiceTest {
 
@@ -22,16 +22,16 @@ public class EgeriaResourceServiceTest {
     }
 
     @Before
-    public void setUp() throws Exception {
-        resourceService = new EgeriaResourceService();
+    public void setUp() {
+        resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18080");
     }
 
     @Test
     public void experiment() {
         AssetConsumer assetConsumer;
         try {
-            assetConsumer = new AssetConsumer("cocoMDS1","http://localhost:8080");
-            AssetUniverse assetUniverse = assetConsumer.getAssetProperties("peterprofile", "afd95cfe-1296-45cd-8dd7-3f8dc2a9d637");
+            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18080");
+            AssetUniverse assetUniverse = assetConsumer.getAssetProperties("peterprofile", "6c94ad6b-d41b-439a-bd82-7cf28a6d40ea");
             System.out.println(assetUniverse);
         } catch (InvalidParameterException e) {
             e.printStackTrace();
@@ -43,7 +43,41 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void shouldGetResourcesByIdOfAFile() throws Exception {
+    public void getAll() {
+        AssetConsumer assetConsumer;
+        try {
+            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18080");
+            List<String> assetUniverse = assetConsumer.getAssetsByToken("peterprofile", "file://secured/research/clinical-trials/drop-foot/", 0, 10);
+            assetUniverse.forEach((guid) -> {
+                try {
+                    AssetUniverse assets = assetConsumer.getAssetProperties("peterprofile", guid);
+                    System.out.println(assets);
+                } catch (InvalidParameterException e) {
+                    e.printStackTrace();
+                } catch (PropertyServerException e) {
+                    e.printStackTrace();
+                } catch (UserNotAuthorizedException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (InvalidParameterException e) {
+            e.printStackTrace();
+        } catch (PropertyServerException e) {
+            e.printStackTrace();
+        } catch (UserNotAuthorizedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void getResourcesByIdTest() {
+        UserId peter = new UserId().id("peterprofile");
+        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot/chrisfolder").userId(peter);
+        resourceService.getResourcesById(idRequest).join();
+    }
+
+    @Test
+    public void shouldGetResourcesByIdOfAFile() {
         //given
 
         //when
@@ -52,7 +86,7 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void shouldGetResourcesOutsideOfScope() throws Exception {
+    public void shouldGetResourcesOutsideOfScope() {
         //given
 
         //when
@@ -61,7 +95,7 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void shouldGetResourcesByIdOfAFolder() throws Exception {
+    public void shouldGetResourcesByIdOfAFolder() {
         //given
 
         //when
@@ -70,7 +104,7 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void shouldGetResourcesByType() throws Exception {
+    public void shouldGetResourcesByType() {
         //given
 
         //when
@@ -88,7 +122,7 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void shouldGetResourcesByFormat() throws Exception {
+    public void shouldGetResourcesByFormat() {
         //given
 
         //when
@@ -97,7 +131,7 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void shouldGetResourcesByResource() throws Exception {
+    public void shouldGetResourcesByResource()  {
         //given
 
         //when
@@ -106,23 +140,23 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void testAddResource() throws Exception {
+    public void testAddResource() {
     }
 
     @Test
-    public void shouldJSONSerialiser() throws Exception {
+    public void shouldJSONSerialiser()  {
     }
 
     @Test
-    public void shouldErrorWithNoConnectionDetails() throws Exception {
+    public void shouldErrorWithNoConnectionDetails()  {
     }
 
     @Test
-    public void shouldGetFormatConnectionWhenNoTypeConnection() throws Exception {
+    public void shouldGetFormatConnectionWhenNoTypeConnection()  {
     }
 
 
     @Test
-    public void shouldResolveParents() throws Exception {
+    public void shouldResolveParents()  {
     }
 }

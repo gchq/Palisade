@@ -16,11 +16,16 @@
 
 package uk.gov.gchq.palisade.resource.service.impl;
 
-import org.odpi.openmetadata.accessservices.assetconsumer.api.AssetConsumerAssetInterface;
 import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetConnections;
+import org.odpi.openmetadata.frameworks.connectors.Connector;
+import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterException;
+import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
+import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
+
 import uk.gov.gchq.palisade.resource.LeafResource;
+
+import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
@@ -30,10 +35,15 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A implementation of the ResourceService for Hadoop.
@@ -44,8 +54,29 @@ import java.util.concurrent.CompletableFuture;
  * @see ResourceService
  */
 public class EgeriaResourceService implements ResourceService {
-
     public static final String ERROR_RESOLVING_ID = "Error occurred while resolving resource by id";
+    protected String egeriaServer;
+    protected String egeriaServerURL;
+    private List<String> assetLists;
+
+
+    private transient AssetConsumer assetConsumer;
+
+    public EgeriaResourceService() {
+        try {
+            assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
+        } catch (InvalidParameterException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public EgeriaResourceService(final String egeriaServer, final String egeriaServerURL) {
+        try {
+            assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
+        } catch (InvalidParameterException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Get a list of resources based on a specific resource. This allows for the retrieval of the appropriate {@link
@@ -74,39 +105,89 @@ public class EgeriaResourceService implements ResourceService {
      */
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
-        AssetConsumerAssetInterface assetConsumerAssetInterface = null;
-        AssetConsumer assetConsumer = null;
 
 //        TODO need to add some code here !!
-//        String userId = null;
-//        String assetGUID = null;
-//        Map<LeafResource, ConnectionDetail> connections = new HashMap<>();
-//        return CompletableFuture.supplyAsync(() -> {
-//            try {
-//                AssetUniverse assetUniverse = assetConsumer.getAssetProperties(userId, request.getResourceId());
-////            AssetConnections assetConnections = assetUniverse.getConnections();
-//                RelatedAssets relatedAssets = assetUniverse.getRelatedAssets(); //assimng that there will be a method to get child assets
-//                Iterator<RelatedAsset> relatedAssetsIterator = relatedAssets;
-//                while (relatedAssetsIterator.hasNext()) { //forEach not supported in relatedAssets
-//                    RelatedAsset asset = relatedAssetsIterator.next();
-//                    //the asset bean is related to the Resource in some way !!!
-//                    AssetConnections assetConnections = asset.getRelatedAssetProperties().getAssetDetail().getConnections();
-//                    //TODO need to create a ConnectionDetail from the assetConnection.next()
-//                    ConnectionDetail connectionDetail = null;
-//                    //TODO need to create a LeafResource from the RelatedAsset
-//                    LeafResource leafResource = null;
+        Map<LeafResource, ConnectionDetail> connections = new HashMap<>();
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                fileFolderRecursion(request);
+                for (String guid : assetLists) {
+                    AssetUniverse assets = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
+//                    System.out.println(assets);
+
+                    String id = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(":") + 2);
+                    String serialisedFormat = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(".") + 1);
+                    String type = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf("/") + 1, assets.getQualifiedName().indexOf("."));
+
+                    FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
+                    Connector a = assetConsumer.getConnectorForAsset(request.getUserId().getId(), guid);
+
+//                    AssetRelatedAssets relatedAssets = assets.getRelatedAssets(); //assuming that there will be a method to get child assets
+//                    while (relatedAssets.hasNext()) { //forEach not supported in relatedAssets
+//                        AssetRelatedAsset asset = relatedAssets.next();
+//                        //the asset bean is related to the Resource in some way !!!
+//                        RelatedAssetProperties assetConnections = asset.getRelatedAssetProperties();
 //
-//                    connections.put(leafResource, connectionDetail);
-//                }
-//            } catch (Exception e) {
-//                throw new RuntimeException(ERROR_RESOLVING_ID, e);
-////            TODO need to handle the exception correctly
-//            } finally {
-//                return connections;
-//            }
-//        });
-        return null;
+//                        //TODO need to create a ConnectionDetail from the assetConnection.next()
+//                        ConnectionDetail connectionDetail = null;
+//                        //TODO need to create a LeafResource from the RelatedAsset
+//                        LeafResource leafResource = null;
+//
+//                        connections.put(leafResource, connectionDetail);
+//
+//
+////                    //TODO need to create a ConnectionDetail from the assetConnection.next()
+////                    ConnectionDetail connectionDetail = null;
+////                    //TODO need to create a LeafResource from the RelatedAsset
+////                    LeafResource leafResource = null;
+////
+////                    connections.put(leafResource, connectionDetail);
+//                    }
+                }
+//                AssetUniverse assetUniverse = assetConsumer.getAssetProperties(request.getUserId().getId(), request.getResourceId());
+//                AssetConnections assetConnections = assetUniverse.getConnections();
+//                AssetRelatedAssets relatedAssets = assetUniverse.getRelatedAssets(); //assuming that there will be a method to get child assets
+
+            } catch (Exception e) {
+                System.err.println(e);
+                throw new RuntimeException(ERROR_RESOLVING_ID, e);
+//            TODO need to handle the exception correctly
+            } finally {
+                return connections;
+            }
+        });
     }
+
+    public List<String> fileFolderRecursion(final GetResourcesByIdRequest request) {
+        try {
+            List<String> newAssetsList = assetConsumer.getAssetsByToken(request.getUserId().getId(), request.getResourceId(), 0, 100);
+            if (assetLists == null) {
+                assetLists = newAssetsList;
+            } else if (assetLists != null && assetLists.size() != newAssetsList.size()) {
+                Set<String> set = new HashSet<>(assetLists);
+                set.addAll(newAssetsList);
+                List<String> mergedList = new ArrayList<>(set);
+                assetLists = mergedList;
+            }
+            String urlUpDirectory = (request.getResourceId().toString().substring(0, request.getResourceId().toString().lastIndexOf('/')));
+            Pattern p = Pattern.compile("^(\\w+)\\:\\/$");
+            Matcher m = p.matcher(urlUpDirectory);
+            if (!m.find()) {
+                request.setResourceId(urlUpDirectory);
+                fileFolderRecursion(request);
+            } else {
+                return assetLists;
+            }
+        } catch (InvalidParameterException e) {
+            e.printStackTrace();
+        } catch (PropertyServerException e) {
+            e.printStackTrace();
+        } catch (UserNotAuthorizedException e) {
+            e.printStackTrace();
+        }
+        return assetLists;
+    }
+
 
     /**
      * Obtain a list of resources that match a specifc resource type. This method allows a client to obtain potentially
@@ -119,7 +200,8 @@ public class EgeriaResourceService implements ResourceService {
      * matching a type
      */
     @Override
-    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByType(final GetResourcesByTypeRequest request) {
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByType(
+            final GetResourcesByTypeRequest request) {
         return null;
     }
 
@@ -134,7 +216,8 @@ public class EgeriaResourceService implements ResourceService {
      * resources
      */
     @Override
-    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(final GetResourcesBySerialisedFormatRequest request) {
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(
+            final GetResourcesBySerialisedFormatRequest request) {
         return null;
     }
 

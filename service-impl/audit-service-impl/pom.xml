@@ -27,7 +27,7 @@
 
     <modules>
         <module>logger-audit-service</module>
-        <module>stroom-audit-service</module>
+        <!-- <module>stroom-audit-service</module> -->
     </modules>
 
     <dependencies>
