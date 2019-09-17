@@ -87,9 +87,6 @@ public final class ExamplePolicies {
                                 "5-Record content masked for all who are not in the employee's management chain or part of the estates or HR.",
                                 new RecordMaskingRule()
                         )
-                )
-                .policy(new Policy<Resource>()
-                        .owner(ExampleUsers.getAlice())
                         .resourceLevelRule(
                                 "1-Only HR can access the first resource",
                                 new FirstResourceRule()

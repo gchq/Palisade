@@ -24,6 +24,7 @@ import uk.gov.gchq.palisade.example.common.Purpose;
 import uk.gov.gchq.palisade.example.common.Role;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Manager;
+import uk.gov.gchq.palisade.example.hrdatagenerator.types.PhoneNumber;
 import uk.gov.gchq.palisade.rule.Rule;
 
 import java.util.Set;
@@ -37,6 +38,7 @@ public class DutyOfCareRule implements Rule<Employee> {
     private Employee redactRecord(final Employee redactedRecord) {
         redactedRecord.setContactNumbers(null);
         redactedRecord.setEmergencyContacts(null);
+        redactedRecord.setSex(null);
         return redactedRecord;
     }
 

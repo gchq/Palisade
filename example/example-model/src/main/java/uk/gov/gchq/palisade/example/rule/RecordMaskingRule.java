@@ -33,6 +33,14 @@ public class RecordMaskingRule implements Rule<Employee> {
     public RecordMaskingRule() {
     }
 
+    private Employee estatesRedactRecord(final Employee maskedRecord) {
+        maskedRecord.setDateOfBirth(null);
+        maskedRecord.setManager(null);
+        maskedRecord.setHireDate(null);
+        maskedRecord.setGrade(null);
+        return maskedRecord;
+    }
+
     public Employee apply(final Employee record, final User user, final Context context) {
 
         Objects.requireNonNull(user);
@@ -47,7 +55,7 @@ public class RecordMaskingRule implements Rule<Employee> {
             return record;
         }
         if (roles.contains(Role.ESTATES.name())) {
-            return record;
+            return estatesRedactRecord(record);
         }
         if (EmployeeUtils.isManager(managers, userId)) {
             return record;
