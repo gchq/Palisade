@@ -56,6 +56,12 @@ RUN curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/
     && chmod +x ./aws-iam-authenticator && mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
 
 
+RUN curl -LO  https://www-us.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz \
+   && tar -zxvf apache-maven-3.6.2-bin.tar.gz
+
+ENV M2_HOME=/home/jenkins/apache-maven-3.6.2
+ENV MAVEN_HOME=/home/jenkins/apache-maven-3.6.2
+
 ################# install kubectl #################
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.3/bin/linux/amd64/kubectl \
   && chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
@@ -89,6 +95,8 @@ USER ${user}
 RUN mkdir -p /home/${user}/.kube
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 COPY create-repository /usr/local/bin/create-repository
+
+ENV PATH=${M2_HOME}/bin:${PATH}
 
 
 # On a MAC you can access the host ports on host.docker.internal
