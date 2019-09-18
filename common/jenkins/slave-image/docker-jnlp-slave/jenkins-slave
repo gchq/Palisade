@@ -42,15 +42,15 @@ else
 fi
 
 #create the ~/.kube/config file such that the docker container is communicating with EKS
-#aws eks --region eu-west-1 update-kubeconfig --name created-from-eksctl
-#
-#mkdir ~/tiller_logs
-#
-#export TILLER_NAMESPACE=tiller
-#export HELM_HOST=:44134
-#nohup tiller -listen=localhost:44134 -storage=secret -log_dir ~/tiller_logs > ~/tiller_logs/tiller-command.log &
-#helm init --client-only
-#helm repo update
+aws eks --region eu-west-1 update-kubeconfig --name created-from-eksctl
+
+mkdir ~/tiller_logs
+
+export TILLER_NAMESPACE=tiller
+export HELM_HOST=:44134
+nohup tiller -listen=localhost:44134 -storage=secret -log_dir ~/tiller_logs > ~/tiller_logs/tiller-command.log &
+helm init --client-only
+helm repo update
 
 
 #Important an image needs to be tagged with the following syntax:
