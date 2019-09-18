@@ -7,6 +7,5 @@ mkdir ~/tiller_logs
 export TILLER_NAMESPACE=tiller
 export HELM_HOST=:44134
 nohup tiller -listen=localhost:44134 -storage=secret -log_dir ~/tiller_logs > ~/tiller_logs/tiller-command.log &
-sleep 60
 helm init --client-only
 helm repo update
