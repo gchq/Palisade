@@ -94,6 +94,7 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-19
 USER ${user}
 RUN mkdir -p /home/${user}/.kube
 COPY jenkins-slave /usr/local/bin/jenkins-slave
+COPY palisade-login /usr/local/bin/palisade-login
 COPY create-repository /usr/local/bin/create-repository
 
 ENV PATH=${M2_HOME}/bin:${PATH}
