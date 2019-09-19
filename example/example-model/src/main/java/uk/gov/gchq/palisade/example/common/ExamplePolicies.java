@@ -19,6 +19,7 @@ package uk.gov.gchq.palisade.example.common;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.rule.BankDetailsRule;
 import uk.gov.gchq.palisade.example.rule.DutyOfCareRule;
+import uk.gov.gchq.palisade.example.rule.FirstResourceRule;
 import uk.gov.gchq.palisade.example.rule.NationalityRule;
 import uk.gov.gchq.palisade.example.rule.RecordMaskingRule;
 import uk.gov.gchq.palisade.example.rule.ZipCodeMaskingRule;
@@ -85,6 +86,13 @@ public final class ExamplePolicies {
                         .recordLevelRule(
                                 "5-Record content masked for all who are not in the employee's management chain or part of the estates or HR.",
                                 new RecordMaskingRule()
+                        )
+                )
+                .policy(new Policy<Resource>()
+                        .owner(ExampleUsers.getAlice())
+                        .resourceLevelRule(
+                                "1-Only HR can access the first resource",
+                                new FirstResourceRule()
                         )
                 );
     }

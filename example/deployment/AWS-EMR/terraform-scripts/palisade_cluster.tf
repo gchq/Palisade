@@ -23,6 +23,10 @@ resource "aws_emr_cluster" "palisade_cluster" {
     instance_role  = "MASTER"
     instance_type  = "${var.master_instance_type}"
     instance_count = "${var.master_instance_count}"
+    ebs_config {
+      size = 50
+      type = "gp2"
+    }
   }
 
   instance_group {

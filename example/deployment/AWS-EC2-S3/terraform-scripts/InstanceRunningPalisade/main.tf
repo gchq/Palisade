@@ -43,7 +43,7 @@ resource "local_file" "hadoop_s3" {
 }
 resource "null_resource" "create_palisade_instance" {
   provisioner "local-exec" {
-    command = "sed -i 's/eu-west-1/${var.aws_region}/g' ../../../../resources/hadoop_s3.xml"
+    command = "sed -i -e 's/eu-west-1/${var.aws_region}/g' ../../../../resources/hadoop_s3.xml"
   }
 }
 # create instance running Palisade
