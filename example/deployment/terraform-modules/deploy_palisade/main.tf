@@ -146,8 +146,8 @@ resource "null_resource" "deploy_palisade" {
   # Generate a data file on the instance....1st copy over the jar...
   provisioner "remote-exec" {
     inline = [
-      "java -cp /home/${var.ec2_userid}/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData  /home/${var.ec2_userid}/example_data  10  2 > /home/${var.ec2_userid}/example_logs/createDataFile.log 2>&1 ",
-      "aws s3 cp /home/${var.ec2_userid}/example_data/ s3://${var.bucket_name}/ || echo Files not copied to S3 bucket"
+      "java -cp /home/${var.ec2_userid}/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.hrdatagenerator.CreateData /home/${var.ec2_userid}/example_data 10 2 > /home/${var.ec2_userid}/example_logs/createDataFile.log 2>&1 ",
+      "aws s3 cp /home/${var.ec2_userid}/example_data/ s3://${var.bucket_name}/data/ || echo Files not copied to S3 bucket"
     ]
   }
 
@@ -163,7 +163,7 @@ resource "null_resource" "deploy_palisade" {
   # Configure the Example - create some users and policies...
   provisioner "remote-exec" {
       inline = [
-        "/home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8081/policy/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8082/resource/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8083/user/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/configureExamples.sh s3a://${var.bucket_name}.${var.s3_endpoint} > /home/${var.ec2_userid}/example_logs/configureExamples.log 2>&1 ",
+        "/home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8081/policy/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8082/resource/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/waitForHost.sh http://${var.private_host_name}:8083/user/v1/status /home/${var.ec2_userid}/example/deployment/bash-scripts/configureExamples.sh s3a://${var.bucket_name}.${var.s3_endpoint}/data/ > /home/${var.ec2_userid}/example_logs/configureExamples.log 2>&1 ",
       ]
   }
 }

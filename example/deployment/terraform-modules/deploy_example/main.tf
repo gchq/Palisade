@@ -71,15 +71,4 @@ resource "null_resource" "deploy_example" {
     source = "../../../../example-model/target/example-model-${var.palisade_version}-shaded.jar"
     destination = "/home/${var.ec2_userid}/example/example-model/target/example-model-${var.palisade_version}-shaded.jar"
   }
-  provisioner "file" {
-    source = "../../../../resources/hadoop_s3.xml"
-    destination = "/home/${var.ec2_userid}/example/resources/hadoop_s3.xml"
-  }
-
-  # Run the Example...
-  provisioner "remote-exec" {
-    inline = [
-      "/home/${var.ec2_userid}/example/deployment/bash-scripts/runFormattedEC2Example.sh Alice s3a://${var.bucket_name}.${var.s3_endpoint}/ SALARY"
-    ]
-  }
 }

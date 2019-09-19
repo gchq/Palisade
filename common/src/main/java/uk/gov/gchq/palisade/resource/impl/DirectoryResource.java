@@ -37,7 +37,7 @@ public class DirectoryResource extends AbstractResource implements ChildResource
         } else {
             super.id(id + "/");
         }
-        return this ;
+        return this;
     }
 
     public DirectoryResource parent(final ParentResource parent) {

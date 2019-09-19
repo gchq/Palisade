@@ -63,7 +63,7 @@ public final class ExampleFileUtil {
         if (isNull(uriPath.getScheme()) ||
                 FileSystems.getDefault().provider().getScheme().equals(uriPath.getScheme())) {
 
-            Pattern patt = Pattern.compile(FileSystems.getDefault().provider().getScheme() + ":/(?=([^/]|$))");
+            Pattern patt = Pattern.compile(FileSystems.getDefault().provider().getScheme() + ":[/]?([^/].*)$");
             Matcher matt = patt.matcher(uriPath.toString());
             Path file;
 

@@ -44,10 +44,6 @@ variable "instance_type" {
   default = "t2.large"
 }
 
-variable "data_file_name" {
-  default = "employee_file*"
-}
-
 variable "ec2_userid" {
   default = "ec2-user"
 }
