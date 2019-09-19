@@ -13,5 +13,5 @@ spec:
         - image: example_configure-example:latest
           name: configure-example
           imagePullPolicy: Never
-          command: ["/tmp/waitForHost.sh", "http://policy-service:8080/policy/v1/status", "/tmp/waitForHost.sh", "http://config-service:8080/config/v1/status", "/tmp/waitForHost.sh", "http://data-service:8080/data/v1/status", "/tmp/waitForHost.sh", "http://user-service:8080/user/v1/status", "/tmp/waitForHost.sh", "http://palisade-service:8080/palisade/v1/status", "java", "-cp", "/tmp/example-model-*-shaded.jar", "-Dpalisade.rest.config.path=/tmp/configRest.json", "uk.gov.gchq.palisade.example.config.ExampleConfigurator", "/data/employee_file0.avro"]
+          command: ["/tmp/waitForHost.sh", "http://policy-service:8080/policy/v1/status", "/tmp/waitForHost.sh", "http://config-service:8080/config/v1/status", "/tmp/waitForHost.sh", "http://data-service:8080/data/v1/status", "/tmp/waitForHost.sh", "http://user-service:8080/user/v1/status", "/tmp/waitForHost.sh", "http://palisade-service:8080/palisade/v1/status", "java", "-cp", "/tmp/example-model-*-shaded.jar", "-Dpalisade.rest.config.path=/tmp/configRest.json", "uk.gov.gchq.palisade.example.config.ExampleConfigurator", "/data"]
       restartPolicy: Never

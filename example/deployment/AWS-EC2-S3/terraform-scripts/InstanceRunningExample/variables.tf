@@ -45,7 +45,7 @@ variable "instance_type" {
 }
 
 variable "data_file_name" {
-  default = "employee_file0.avro"
+  default = "employee_file*"
 }
 
 variable "ec2_userid" {

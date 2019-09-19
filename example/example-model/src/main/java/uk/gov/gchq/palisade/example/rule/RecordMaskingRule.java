@@ -48,8 +48,6 @@ public class RecordMaskingRule implements Rule<Employee> {
         UserId userId = user.getUserId();
         Manager[] managers = record.getManager();
         Set<String> roles = user.getRoles();
-        String purpose = context.getPurpose();
-
 
         if (roles.contains(Role.HR.name())) {
             return record;

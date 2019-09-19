@@ -34,7 +34,7 @@ if [ "$TRAVIS_PULL_REQUEST" != 'false' ]; then
     validate_example_output "$OUTPUT"
     multi_jvm_result=$?
 
-    OUTPUT=`java -cp $(pwd)/client-impl/cat-client/target/cat-client-*-shaded.jar uk.gov.gchq.palisade.client.CatClient Alice file://$(pwd)/example/resources/employee_file0.avro SALARY | tee /dev/tty`
+    OUTPUT=`java -cp $(pwd)/client-impl/cat-client/target/cat-client-*-shaded.jar uk.gov.gchq.palisade.client.CatClient Alice file://$(pwd)/example/resources/data SALARY | tee /dev/tty`
     echo "Output is: $OUTPUT"
     validate_example_output "$OUTPUT"
     multi_jvm_cat_client_result=$?

@@ -79,7 +79,7 @@ resource "null_resource" "deploy_example" {
   # Run the Example...
   provisioner "remote-exec" {
     inline = [
-      "/home/${var.ec2_userid}/example/deployment/bash-scripts/runFormattedEC2Example.sh Alice s3a://${var.bucket_name}.${var.s3_endpoint}/employee_file0.avro SALARY"
+      "/home/${var.ec2_userid}/example/deployment/bash-scripts/runFormattedEC2Example.sh Alice s3a://${var.bucket_name}.${var.s3_endpoint}/ SALARY"
     ]
   }
 }

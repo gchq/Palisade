@@ -92,7 +92,7 @@ A quick "ps ax | grep java" will show that no java services are running locally.
 To then run the example with the option to display the results based on different users or roles, run this command: 
 ```bash
 $ export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/resources/configRest.json"
-$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> s3a://<bucket url>/employee_file0.avro <PURPOSE> | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> s3a://<bucket url> <PURPOSE> | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
 ```
 The example list of users and purposes are:
 - Alice, Bob, Eve
