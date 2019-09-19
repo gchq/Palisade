@@ -32,7 +32,12 @@ public class DirectoryResource extends AbstractResource implements ChildResource
 
     @Override
     public DirectoryResource id(final String id) {
-        return (DirectoryResource) super.id(id);
+        if (id.endsWith("/")) {
+            super.id(id);
+        } else {
+            super.id(id + "/");
+        }
+        return this ;
     }
 
     public DirectoryResource parent(final ParentResource parent) {
