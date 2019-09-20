@@ -3,9 +3,9 @@
 export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/resources/configRest.json"
 
 if [[ $# -eq 1 ]]; then
-    java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient $1 s3a://palisade-ec2-demo.s3-eu-west-1.amazonaws.com/ "" | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+    java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient $1 s3a://palisade-ec2-demo/data "" | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
 else
-    java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient $1 s3a://palisade-ec2-demo.s3-eu-west-1.amazonaws.com/ $2 | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+    java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient $1 s3a://palisade-ec2-demo/data $2 | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
 fi
 
 # Runs the demo example, start to finish, all users, all purposes
