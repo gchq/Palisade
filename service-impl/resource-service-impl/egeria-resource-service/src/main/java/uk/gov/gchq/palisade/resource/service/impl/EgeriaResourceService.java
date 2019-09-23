@@ -21,13 +21,24 @@ import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterExceptio
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
+
 import uk.gov.gchq.palisade.resource.LeafResource;
+
 import uk.gov.gchq.palisade.resource.service.ResourceService;
-import uk.gov.gchq.palisade.resource.service.request.*;
+import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
