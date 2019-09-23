@@ -36,6 +36,7 @@ Run the following commands to install microk8s and verify that it's working:
 
 ```bash
 sudo snap install microk8s --classic
+sudo usermod -a -G microk8s $USER
 microk8s.kubectl get nodes
 microk8s.kubectl get services
 sudo snap alias microk8s.kubectl kubectl

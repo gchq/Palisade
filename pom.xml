@@ -97,9 +97,9 @@
         <error.prone.version>2.3.3</error.prone.version>
         <!-- TODO: remove errorprone.javac.version property once JDK9+ migration complete -->
         <error.prone.javac.version>9+181-r4173-1</error.prone.javac.version>
-        <surefireArgLine />
-        <failsafeArgLine />
-        <exclude.tests />
+        <surefireArgLine/>
+        <failsafeArgLine/>
+        <exclude.tests/>
 
         <restRedirectorPort>9080</restRedirectorPort>
         <restPalisadeMetricProviderPort>9080</restPalisadeMetricProviderPort>
@@ -349,7 +349,7 @@
                         <include>**/*ITs.java</include>
                         <include>**/*IntegrationTests.java</include>
                     </includes>
-                    <environmentVariables />
+                    <environmentVariables/>
                     <systemPropertyVariables>
                         <restUserServicePort>${restUserServicePort}</restUserServicePort>
                         <restPolicyServicePort>${restPolicyServicePort}</restPolicyServicePort>
