@@ -361,7 +361,7 @@ public class HadoopFileResourceServiceTest {
         final ChildResource child3 = (ChildResource) parent3;
         HadoopResourceService.resolveParents(child3, conf);
         final ParentResource parent4 = child3.getParent();
-        assertEquals(testFolder.getRoot().getAbsolutePath().replace("\\", "/"), parent4.getId());
+        assertEquals(testFolder.getRoot().getAbsolutePath().replace("\\", "/") + "/", parent4.getId());
 
         assertTrue(parent4 instanceof SystemResource);
         assertFalse(parent4 instanceof DirectoryResource);
