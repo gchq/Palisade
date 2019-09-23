@@ -68,7 +68,7 @@ variable "apps_to_install" {
 }
 
 variable "master_instance_type" {
-  default = "m4.4xlarge"
+  default = "m4.4large"
 }
 
 variable "core_instance_type" {
@@ -80,15 +80,15 @@ variable "master_instance_count" {
 }
 
 variable "core_instance_count" {
-  default = "10"
+  default = "2"
 }
 
 variable "palisade_version" {}
 
 variable "number_of_employees_in_test_data" {
-  default = "100000"
+  default = "100"
 }
 
 variable "number_of_files_to_split_test_data_over" {
-  default = "10"
+  default = "2"
 }
