@@ -47,7 +47,8 @@ public class EgeriaResourceServiceTest {
         AssetConsumer assetConsumer;
         try {
             assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18080");
-            List<String> assetUniverse = assetConsumer.getAssetsByToken("peterprofile", "file://secured/research/clinical-trials/drop-foot/", 0, 10);
+//            List<String> assetUniverse = assetConsumer.getAssetsByToken("peterprofile", "file://secured/research/clinical-trials/drop-foot/", 0, 10);
+            List<String> assetUniverse = assetConsumer.getAssetsByName("peterprofile", "file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv", 0, 10 );
             assetUniverse.forEach((guid) -> {
                 try {
                     AssetUniverse assets = assetConsumer.getAssetProperties("peterprofile", guid);
@@ -72,7 +73,7 @@ public class EgeriaResourceServiceTest {
     @Test
     public void getResourcesByIdTest() {
         UserId peter = new UserId().id("peterprofile");
-        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot/chrisfolder").userId(peter);
+        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot/").userId(peter);
         resourceService.getResourcesById(idRequest).join();
     }
 

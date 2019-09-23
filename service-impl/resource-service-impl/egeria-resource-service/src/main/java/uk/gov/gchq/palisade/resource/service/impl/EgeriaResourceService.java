@@ -17,30 +17,17 @@
 package uk.gov.gchq.palisade.resource.service.impl;
 
 import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
-import org.odpi.openmetadata.frameworks.connectors.Connector;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
-
 import uk.gov.gchq.palisade.resource.LeafResource;
-
-import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
-import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
+import uk.gov.gchq.palisade.resource.service.request.*;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -119,8 +106,8 @@ public class EgeriaResourceService implements ResourceService {
                     String serialisedFormat = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(".") + 1);
                     String type = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf("/") + 1, assets.getQualifiedName().indexOf("."));
 
-                    FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
-                    Connector a = assetConsumer.getConnectorForAsset(request.getUserId().getId(), guid);
+//                    FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
+//                    Connector a = assetConsumer.getConnectorForAsset(request.getUserId().getId(), guid);
 
 //                    AssetRelatedAssets relatedAssets = assets.getRelatedAssets(); //assuming that there will be a method to get child assets
 //                    while (relatedAssets.hasNext()) { //forEach not supported in relatedAssets
