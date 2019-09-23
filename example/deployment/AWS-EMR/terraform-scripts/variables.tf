@@ -68,7 +68,7 @@ variable "apps_to_install" {
 }
 
 variable "master_instance_type" {
-  default = "m4.4large"
+  default = "m4.xlarge"
 }
 
 variable "core_instance_type" {
