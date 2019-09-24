@@ -334,7 +334,7 @@ public class HadoopFileResourceServiceTest {
 
     @Test
     public void shouldResolveParents() throws Exception {
-        final String parent = testFolder.getRoot().getAbsolutePath().replace("\\", "/") + "/inputDir" + "/" + "folder1" + "/" + "folder2";
+        final String parent = testFolder.getRoot().getAbsolutePath().replace("\\", "/") + "/inputDir" + "/" + "folder1" + "/" + "folder2/";
         final String id = parent + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE);
         final FileResource fileResource = new FileResource().id(id);
         HadoopResourceService.resolveParents(fileResource, conf);
@@ -347,21 +347,21 @@ public class HadoopFileResourceServiceTest {
         final ChildResource child = (ChildResource) parent1;
         HadoopResourceService.resolveParents(child, conf);
         final ParentResource parent2 = child.getParent();
-        assertEquals(testFolder.getRoot().getAbsolutePath().replace("\\", "/") + "/inputDir" + "/" + "folder1", parent2.getId());
+        assertEquals(testFolder.getRoot().getAbsolutePath().replace("\\", "/") + "/inputDir" + "/" + "folder1/", parent2.getId());
 
         assertTrue(parent2 instanceof ChildResource);
         assertTrue(parent2 instanceof DirectoryResource);
         final ChildResource child2 = (ChildResource) parent2;
         HadoopResourceService.resolveParents(child2, conf);
         final ParentResource parent3 = child2.getParent();
-        assertEquals(testFolder.getRoot().getAbsolutePath().replace("\\", "/") + "/inputDir", parent3.getId());
+        assertEquals(testFolder.getRoot().getAbsolutePath().replace("\\", "/") + "/inputDir/", parent3.getId());
 
         assertTrue(parent3 instanceof ChildResource);
         assertTrue(parent3 instanceof DirectoryResource);
         final ChildResource child3 = (ChildResource) parent3;
         HadoopResourceService.resolveParents(child3, conf);
         final ParentResource parent4 = child3.getParent();
-        assertEquals(testFolder.getRoot().getAbsolutePath().replace("\\", "/"), parent4.getId());
+        assertEquals(testFolder.getRoot().getAbsolutePath().replace("\\", "/") + "/", parent4.getId());
 
         assertTrue(parent4 instanceof SystemResource);
         assertFalse(parent4 instanceof DirectoryResource);

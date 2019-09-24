@@ -41,7 +41,7 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - "../../../resources:/data"
+      - "../../../resources/data:/data"
     depends_on:
       - config-service
       - palisade-service
@@ -68,7 +68,7 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - "../../../resources:/data"
+      - "../../../resources/data:/data"
     depends_on:
       - config-service
   user-service:

@@ -5,4 +5,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 export PALISADE_REST_CONFIG_PATH="configRest.json"
 
-java -cp "$EXAMPLE"/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.config.ExampleConfigurator "$EXAMPLE/resources/employee_file0.avro"
+java -cp "$EXAMPLE"/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.config.ExampleConfigurator "$EXAMPLE/resources/data/"
