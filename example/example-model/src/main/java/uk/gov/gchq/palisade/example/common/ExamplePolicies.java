@@ -56,15 +56,8 @@ public final class ExamplePolicies {
      */
     public static SetResourcePolicyRequest getExamplePolicy(final String file) {
 
-        Resource resource;
-        if (file.endsWith(".avro")) {
-            resource = new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file));
-        } else {
-            resource = new DirectoryResource().id(file).parent(getParent(file));
-        }
-
         return new SetResourcePolicyRequest()
-                .resource(resource)
+                .resource(createResource(file))
                 .policy(new Policy<Employee>()
                         .owner(ExampleUsers.getAlice())
                         .recordLevelRule(
@@ -87,14 +80,21 @@ public final class ExamplePolicies {
                                 "5-Record content masked for all who are not in the employee's management chain or part of the estates or HR.",
                                 new RecordMaskingRule()
                         )
-                )
-                .policy(new Policy<Resource>()
-                        .owner(ExampleUsers.getAlice())
                         .resourceLevelRule(
                                 "1-Only HR can access the first resource",
                                 new FirstResourceRule()
                         )
                 );
+    }
+
+    private static Resource createResource(final String resourceURL) {
+        URI normalised = ExampleFileUtil.convertToFileURI(resourceURL);
+        String resource = normalised.toString();
+        if (resource.endsWith(".avro")) {
+            return new FileResource().id(resource).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(resource));
+        } else {
+            return new DirectoryResource().id(resource).parent(getParent(resource));
+        }
     }
 
     /**
@@ -105,7 +105,7 @@ public final class ExamplePolicies {
      */
     public static SetResourcePolicyRequest getEmptyPolicy(final String file) {
         return new SetResourcePolicyRequest()
-                .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
+                .resource(createResource(file))
                 .policy(new Policy<Employee>()
                         .owner(ExampleUsers.getAlice())
                 );

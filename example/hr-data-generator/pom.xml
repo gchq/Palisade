@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>uk.gov.gchq.palisade</groupId>
-            <artifactId>hadoop-data-service</artifactId>
+            <artifactId>common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
