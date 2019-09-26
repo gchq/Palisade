@@ -35,6 +35,8 @@ public class BankDetailsRule implements Rule<Employee> {
     private Employee redactRecord(final Employee redactedRecord) {
         redactedRecord.setBankDetails(null);
         redactedRecord.setTaxCode(null);
+        redactedRecord.setSalaryAmount(-1);
+        redactedRecord.setSalaryBonus(-1);
         return redactedRecord;
     }
 

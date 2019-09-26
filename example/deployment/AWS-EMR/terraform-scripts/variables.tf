@@ -80,15 +80,15 @@ variable "master_instance_count" {
 }
 
 variable "core_instance_count" {
-  default = "3"
+  default = "2"
 }
 
 variable "palisade_version" {}
 
 variable "number_of_employees_in_test_data" {
-  default = "10"
+  default = "100"
 }
 
 variable "number_of_files_to_split_test_data_over" {
-  default = "1"
+  default = "2"
 }
