@@ -92,7 +92,7 @@ public final class BulkTestExample {
 
             //run test
             RestExample.main(directory);
-            
+
         } finally {
             if (shouldDelete) {
                 removeBulkData(directory);
@@ -107,7 +107,7 @@ public final class BulkTestExample {
      * @param shouldDelete whether the deletion should occur at all
      * @param directory    the directory path for the original data
      */
-    private static void configureShutdownHook(boolean shouldDelete, String directory) {
+    private static void configureShutdownHook(final boolean shouldDelete, final String directory) {
         //register shutdown hook in case someone tries to terminate the VM gracefully
         if (shouldDelete) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
