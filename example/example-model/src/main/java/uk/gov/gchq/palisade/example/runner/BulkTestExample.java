@@ -81,6 +81,33 @@ public final class BulkTestExample {
             }
         }
 
+        //ensure we clean up if a SIGTERM occurs
+        configureShutdownHook(shouldDelete, directory);
+
+        //First create some bulk data (unless flag set)
+        try {
+            if (shouldCreate) {
+                createBulkData(directory, numFiles);
+            }
+
+            //run test
+            RestExample.main(directory);
+            
+        } finally {
+            if (shouldDelete) {
+                removeBulkData(directory);
+            }
+        }
+    }
+
+    /**
+     * Ensures that the removal/restoration of the original data directory occurs if the VM is closed. This intercepts
+     * things like SIGTERM (Ctrl-C) events, but not abnormal termination.
+     *
+     * @param shouldDelete whether the deletion should occur at all
+     * @param directory    the directory path for the original data
+     */
+    private static void configureShutdownHook(boolean shouldDelete, String directory) {
         //register shutdown hook in case someone tries to terminate the VM gracefully
         if (shouldDelete) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -91,20 +118,6 @@ public final class BulkTestExample {
                     //don't throw exceptions from shutdown hooks!
                 }
             }));
-        }
-
-        //First create some bulk data (unless flag set)
-        try {
-            if (shouldCreate) {
-                createBulkData(directory, numFiles);
-            }
-
-            //run test
-            RestExample.main(directory);
-        } finally {
-            if (shouldDelete) {
-                removeBulkData(directory);
-            }
         }
     }
 
@@ -164,6 +177,8 @@ public final class BulkTestExample {
         if (!Files.exists(startFile)) {
             throw new IOException("Creation of employee file failed, couldn't find file " + startFile);
         }
+
+        //copy the files out n times
         cloneFiles(numCopies, startFile);
     }
 
