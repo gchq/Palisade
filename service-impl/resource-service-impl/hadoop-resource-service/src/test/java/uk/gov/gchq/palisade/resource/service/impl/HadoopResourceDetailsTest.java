@@ -36,6 +36,17 @@ public class HadoopResourceDetailsTest {
     public static final String INVALID4 = "";
     public static final String INVALID5 = ".avro";
 
+    @Test
+    public void shouldExtractFileName() {
+        //Given
+        String fileName = "/some/path/to/nowhere/" + VALID1;
+        //When
+        HadoopResourceDetails details = HadoopResourceDetails.getResourceDetailsFromFileName(fileName);
+        //Then
+        assertThat("employee", is(equalTo(details.getType())));
+        assertThat(fileName, is(equalTo(details.getFileName())));
+        assertThat("avro", is(equalTo(details.getFormat())));
+    }
 
     @Test
     public void shouldCreateValidDetails() {
@@ -47,15 +58,15 @@ public class HadoopResourceDetailsTest {
 
         //Then - check components match
         assertThat("employee", is(equalTo(valid1ob.getType())));
-        assertThat("file0", is(equalTo(valid1ob.getFileName())));
+        assertThat(VALID1, is(equalTo(valid1ob.getFileName())));
         assertThat("avro", is(equalTo(valid1ob.getFormat())));
 
         assertThat("emplo   yee", is(equalTo(valid2ob.getType())));
-        assertThat("file0", is(equalTo(valid2ob.getFileName())));
+        assertThat(VALID2, is(equalTo(valid2ob.getFileName())));
         assertThat("avro", is(equalTo(valid2ob.getFormat())));
 
         assertThat("employee", is(equalTo(valid3ob.getType())));
-        assertThat("fi   le0", is(equalTo(valid3ob.getFileName())));
+        assertThat(VALID3, is(equalTo(valid3ob.getFileName())));
         assertThat("av   ro", is(equalTo(valid3ob.getFormat())));
     }
 

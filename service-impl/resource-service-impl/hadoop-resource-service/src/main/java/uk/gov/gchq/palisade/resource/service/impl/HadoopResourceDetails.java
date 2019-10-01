@@ -87,7 +87,7 @@ public class HadoopResourceDetails {
             throw new IllegalArgumentException("Filename doesn't comply with " + FORMAT + ": " + fileName);
         }
 
-        return new HadoopResourceDetails(match.group("name"), match.group("type"), match.group("format"));
+        return new HadoopResourceDetails(fileName, match.group("type"), match.group("format"));
     }
 
     @Override
