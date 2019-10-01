@@ -17,7 +17,10 @@ package uk.gov.gchq.palisade.resource.service.impl;
 
 import uk.gov.gchq.palisade.ToStringBuilder;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A storage class for the resources within {@link HadoopResourceService}.
@@ -25,9 +28,14 @@ import java.util.regex.Pattern;
  * This class has logic for manipulating the path of the resource into [fileName, type, format]
  */
 public class HadoopResourceDetails {
-    public static final String TYPE_DEL = "_";
-    public static final String FORMAT_DEL = ".";
-    public static final String FILE_NAME_FORMAT = "%s" + TYPE_DEL + "%s" + FORMAT_DEL + "%s";
+    /**
+     * The name schema regex. An example is "employee_file0.avro" where employee is the type, file0 is the name and avro
+     * is the format.
+     */
+    public static final Pattern FILENAME_PATTERN = Pattern.compile("(?<type>.+)_(?<name>.+)\\.(?<format>.+)");
+
+    public static final String FORMAT = "TYPE_FILENAME.FORMAT";
+
     private String fileName, type, format;
 
     public HadoopResourceDetails(final String fileName, final String type, final String format) {
@@ -48,22 +56,38 @@ public class HadoopResourceDetails {
         return format;
     }
 
+    /**
+     * Checks if the given name is a valid name according to the schema in {@link HadoopResourceDetails#FILENAME_PATTERN}.
+     *
+     * @param fileName the name to test
+     * @return true if the {@code fileName} is a valid name
+     */
+    public static boolean isValidResourceName(final String fileName) {
+        requireNonNull(fileName);
+        return validateNameRegex(fileName).matches();
+    }
+
+    /**
+     * Returns the result of matching {@code fileName} against the regular expression parser in {@link HadoopResourceDetails#FILENAME_PATTERN}.
+     *
+     * @param fileName the name to test
+     * @return the relevant matcher or {@code null} if no match could be found
+     */
+    private static Matcher validateNameRegex(final String fileName) {
+        return FILENAME_PATTERN.matcher(fileName);
+    }
+
     protected static HadoopResourceDetails getResourceDetailsFromFileName(final String fileName) {
-        //The mirror of the FILE_NAME_FORMAT
+        //get filename component
         final String[] split = fileName.split(Pattern.quote("/"));
         final String fileString = split[split.length - 1];
-        final String[] typeSplit = fileString.split(TYPE_DEL);
-        if (typeSplit.length == 2) {
-            final String type = typeSplit[0];
-            final String[] idSplit = typeSplit[1].split(Pattern.quote(FORMAT_DEL));
-            if (idSplit.length == 2) {
-                final String name = idSplit[0];
-                final String format = idSplit[1];
-
-                return new HadoopResourceDetails(fileName, type, format);
-            }
+        //check match
+        Matcher match = validateNameRegex(fileString);
+        if (!match.matches()) {
+            throw new IllegalArgumentException("Filename doesn't comply with " + FORMAT + ": " + fileName);
         }
-        throw new IllegalArgumentException("Incorrect format expected:" + FILE_NAME_FORMAT + " found: " + fileString);
+
+        return new HadoopResourceDetails(match.group("name"), match.group("type"), match.group("format"));
     }
 
     @Override

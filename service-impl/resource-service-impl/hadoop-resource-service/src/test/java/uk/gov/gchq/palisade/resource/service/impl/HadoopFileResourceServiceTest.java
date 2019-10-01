@@ -388,6 +388,6 @@ public class HadoopFileResourceServiceTest {
 
     private static String getFileNameFromResourceDetails(final String name, final String type, final String format) {
         //Type, Id, Format
-        return String.format(HadoopResourceDetails.FILE_NAME_FORMAT, type, name, format);
+        return type + "_" + name + "." + format;
     }
 }
