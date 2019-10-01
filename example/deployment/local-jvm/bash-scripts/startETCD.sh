@@ -8,6 +8,7 @@ docker run \
   -p 2379:2379 \
   -p 2380:2380 \
   -d \
+  --rm \
   --mount type=bind,source=/tmp/etcd-data.tmp,destination=/etcd-data \
   --name etcd-gcr-${ETCD_VER} \
   gcr.io/etcd-development/etcd:${ETCD_VER} \
