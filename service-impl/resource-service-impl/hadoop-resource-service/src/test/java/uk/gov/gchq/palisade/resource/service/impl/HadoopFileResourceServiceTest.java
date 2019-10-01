@@ -152,6 +152,31 @@ public class HadoopFileResourceServiceTest {
     }
 
     @Test
+    public void shouldFilterOutIllegalFileName() throws Exception {
+        //given
+        final String id = inputPathString.replace("\\", "/");
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00001, FORMAT_VALUE, TYPE_VALUE);
+        writeFile(fs, inputPathString, FILE_NAME_VALUE_00002, FORMAT_VALUE, TYPE_VALUE);
+        writeFile(fs, inputPathString + "/I AM AN ILLEGAL FILENAME");
+        expected.put(new FileResource().id(FILE + id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00001, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id(FILE + inputPathString.replace("\\", "/")).parent(
+                        new SystemResource().id(FILE + testFolder.getRoot().getAbsolutePath())
+                )
+        ), simpleConnection);
+        expected.put(new FileResource().id(FILE + id + "/" + getFileNameFromResourceDetails(FILE_NAME_VALUE_00002, TYPE_VALUE, FORMAT_VALUE)).type(TYPE_VALUE).serialisedFormat(FORMAT_VALUE).parent(
+                new DirectoryResource().id(FILE + inputPathString.replace("\\", "/")).parent(
+                        new SystemResource().id(FILE + testFolder.getRoot().getAbsolutePath())
+                )
+        ), simpleConnection);
+
+        //when
+        final CompletableFuture<Map<LeafResource, ConnectionDetail>> resourcesById = hadoopService.getResourcesById(new GetResourcesByIdRequest().resourceId(FILE + id));
+
+        //then
+        assertEquals(expected, resourcesById.get());
+    }
+
+    @Test
     public void shouldGetResourcesByType() throws Exception {
         //given
         final String id = inputPathString.replace("\\", "/");
@@ -330,7 +355,6 @@ public class HadoopFileResourceServiceTest {
         //then
         assertEquals(expected, resourcesById.join());
     }
-
 
     @Test
     public void shouldResolveParents() throws Exception {
