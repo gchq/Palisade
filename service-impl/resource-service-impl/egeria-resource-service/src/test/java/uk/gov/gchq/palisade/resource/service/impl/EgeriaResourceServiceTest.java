@@ -23,14 +23,14 @@ public class EgeriaResourceServiceTest {
 
     @Before
     public void setUp() {
-        resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18080");
+        resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18082");
     }
 
     @Test
     public void experiment() {
         AssetConsumer assetConsumer;
         try {
-            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18080");
+            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18082");
             AssetUniverse assetUniverse = assetConsumer.getAssetProperties("peterprofile", "6c94ad6b-d41b-439a-bd82-7cf28a6d40ea");
             System.out.println(assetUniverse);
         } catch (InvalidParameterException e) {
@@ -46,9 +46,10 @@ public class EgeriaResourceServiceTest {
     public void getAll() {
         AssetConsumer assetConsumer;
         try {
-            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18080");
-//            List<String> assetUniverse = assetConsumer.getAssetsByToken("peterprofile", "file://secured/research/clinical-trials/drop-foot/", 0, 10);
-            List<String> assetUniverse = assetConsumer.getAssetsByName("peterprofile", "file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv", 0, 10 );
+            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18082");
+            List<String> assetUniverse = assetConsumer.getAssetsByToken("peterprofile", "file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv", 0, 10);
+//            List<String> assetUniverse = assetConsumer.getAssetsByName("peterprofile", "file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv", 0, 10 );
+//            List<String> assetUniverse = assetConsumer.findAssets("peterprofile", ".*file.*", 0, 10);
             assetUniverse.forEach((guid) -> {
                 try {
                     AssetUniverse assets = assetConsumer.getAssetProperties("peterprofile", guid);
