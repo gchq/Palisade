@@ -78,3 +78,36 @@ For deployment specific instructions on how to run the example see:
 - [AWS-EC2](deployment/AWS-EC2-S3/README.md) - Runs the example on AWS EC2 which demonstrates Palisade integrating into AWS S3
 - [AWS-EMR](deployment/AWS-EMR/README.md) - Runs the example using the MapReduce client on the AWS EMR service which demonstrates that Palisade can process large volumes of data when deployed on bare metal as JVM's on a Hadoop cluster.
 - [Azure-AKS](deployment/Azure-AKS/README.md) - Runs the example on Azure's Kubernetes as a service, showing that it can be deployed on different architectures and different cloud providers.
+
+## Bulk Retrieval Test (developer/maintenance only)
+
+There is a test script built into the deployment directory for testing how many resources Palisade can retrieve in one request
+without experiencing an error. This is intended for developers and maintainers of Palisade only.
+
+This script will create the given number of files in a data directory (while backing up the original one) and then trying to
+send one request to retrieve all the resources in that directory.
+
+To run it:
+
+1. Compile the code:
+    ```bash
+    mvn clean install -P example
+    ```
+
+1.  Build the executable jars:
+    ```bash
+      ./example/deployment/local-jvm/bash-scripts/buildServices.sh
+    ```
+
+1. Start the REST services, each service runs within a dedicated Tomcat instance:
+
+    From a separate terminal start them all in a single terminal using:
+    ```bash
+     ./example/deployment/local-jvm/bash-scripts/startAllServices.sh
+    ```
+
+1. Run the launch script:
+
+    ```bash
+    ./example/deployment/local-jvm/bash-scripts/attemptBulkTest.sh <number of resources>
+    ```
