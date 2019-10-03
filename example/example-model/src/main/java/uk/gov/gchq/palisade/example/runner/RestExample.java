@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 public class RestExample {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestExample.class);
 
-    public static void main(final String[] args) throws Exception {
+    public static void main(final String... args) throws Exception {
         if (args.length < 1) {
             System.out.printf("Usage: %s file\n", RestExample.class.getTypeName());
             System.out.println("\nfile\tfile containing serialised Employee instances to read");
