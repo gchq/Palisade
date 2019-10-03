@@ -45,7 +45,6 @@ function init(onSwaggerComplete, onPropertiesLoad){
         defaultModelRendering: 'schema',
         showRequestHeaders: false,
         showOperationIds: false,
-        docExpansion: "none",
         sorter: "alpha",
         apisSorter: "alpha",
         operationsSorter: "alpha"
