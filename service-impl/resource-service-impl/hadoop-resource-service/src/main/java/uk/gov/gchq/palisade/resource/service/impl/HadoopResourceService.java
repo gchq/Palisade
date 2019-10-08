@@ -239,6 +239,7 @@ public class HadoopResourceService implements ResourceService {
                 final RemoteIterator<LocatedFileStatus> remoteIterator = this.getFileSystem().listFiles(new Path(pathString), true);
                 return getPaths(remoteIterator)
                         .stream()
+                        .filter(HadoopResourceDetails::isValidResourceName)
                         .map(HadoopResourceDetails::getResourceDetailsFromFileName)
                         .filter(predicate)
                         .collect(Collectors.toMap(
