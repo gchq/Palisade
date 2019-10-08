@@ -18,6 +18,8 @@ package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import com.github.javafaker.Faker;
 import com.github.javafaker.Name;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
@@ -78,5 +80,57 @@ public class EmergencyContact {
                 .append("relation", relation)
                 .append("contactNumbers", contactNumbers)
                 .toString();
+    }
+
+    public EmergencyContact clone() {
+        EmergencyContact clone;
+        try {
+            clone = (EmergencyContact) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new EmergencyContact();
+        }
+
+        // Immutable
+        clone.setContactName(contactName);
+        clone.setRelation(relation);
+
+        // Nested
+        if (null != contactNumbers) {
+            PhoneNumber[] cloneContactNumbers = contactNumbers.clone();
+            for (int i = 0; i < cloneContactNumbers.length; i++) {
+                cloneContactNumbers[i] = cloneContactNumbers[i].clone();
+            }
+            clone.setContactNumbers(cloneContactNumbers);
+        }
+
+        return clone;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final EmergencyContact emergencyContact = (EmergencyContact) o;
+
+        return new EqualsBuilder()
+                .append(contactName, emergencyContact.contactName)
+                .append(relation, emergencyContact.relation)
+                .append(contactNumbers, emergencyContact.contactNumbers)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(15, 47)
+                .append(contactName)
+                .append(relation)
+                .append(contactNumbers)
+                .toHashCode();
     }
 }

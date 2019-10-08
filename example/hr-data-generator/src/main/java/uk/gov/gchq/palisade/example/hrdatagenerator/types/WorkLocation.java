@@ -17,11 +17,13 @@
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import com.github.javafaker.Faker;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
 
-public class WorkLocation {
+public class WorkLocation implements Cloneable {
     private WorkLocationName workLocationName;
     private Address address;
 
@@ -47,12 +49,58 @@ public class WorkLocation {
         workLocation.setWorkLocationName(WorkLocationName.generate(random));
         return workLocation;
     }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("workLocationName", workLocationName)
                 .append("address", address)
                 .toString();
+    }
+
+    public WorkLocation clone() {
+        WorkLocation clone;
+        try {
+            clone = (WorkLocation) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new WorkLocation();
+        }
+
+        // Immutable
+        clone.setWorkLocationName(workLocationName);
+
+        // Mutable
+        if (null != address) {
+            clone.setAddress(address.clone());
+        }
+
+        return clone;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final WorkLocation workLocation = (WorkLocation) o;
+
+        return new EqualsBuilder()
+                .append(workLocationName, workLocation.workLocationName)
+                .append(address, workLocation.address)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(13, 41)
+                .append(workLocationName)
+                .append(address)
+                .toHashCode();
     }
 }
 

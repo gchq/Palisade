@@ -18,6 +18,8 @@ package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import com.github.javafaker.Faker;
 import com.github.javafaker.Name;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import uk.gov.gchq.palisade.UserId;
@@ -232,5 +234,121 @@ public class Employee {
                 .append("workLocation", workLocation)
                 .append("sex", sex)
                 .toString();
+    }
+
+    public Employee clone() {
+        Employee clone;
+        try {
+            clone = (Employee) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new Employee();
+        }
+
+        // Immutable
+        clone.setDateOfBirth(dateOfBirth);
+        clone.setTaxCode(taxCode);
+        clone.setNationality(nationality);
+        clone.setHireDate(hireDate);
+        clone.setGrade(grade);
+        clone.setDepartment(department);
+        clone.setSalaryAmount(salaryAmount);
+        clone.setSalaryBonus(salaryBonus);
+        clone.setSex(sex);
+        clone.setName(name);
+
+        // Mutable
+        if (null != uid) {
+            clone.setUid(uid.clone());
+        }
+        if (null != workLocation) {
+            clone.setWorkLocation(workLocation.clone());
+        }
+        if (null != bankDetails) {
+            clone.setBankDetails(bankDetails.clone());
+        }
+        if (null != address) {
+            clone.setAddress(address.clone());
+        }
+
+        // Nested
+        if (null != contactNumbers) {
+            PhoneNumber[] cloneContactNumbers = contactNumbers.clone();
+            for (int i = 0; i < cloneContactNumbers.length; i++) {
+                cloneContactNumbers[i] = cloneContactNumbers[i].clone();
+            }
+            clone.setContactNumbers(cloneContactNumbers);
+        }
+        if (null != emergencyContacts) {
+            EmergencyContact[] cloneEmergencyContacts = emergencyContacts.clone();
+            for (int i = 0; i < cloneEmergencyContacts.length; i++) {
+                cloneEmergencyContacts[i] = cloneEmergencyContacts[i].clone();
+            }
+            clone.setEmergencyContacts(cloneEmergencyContacts);
+        }
+        if (null != manager) {
+            Manager[] cloneManagers = manager.clone();
+            for (int i = 0; i < manager.length; i++) {
+                cloneManagers[i] = cloneManagers[i].clone();
+            }
+            clone.setManager(cloneManagers);
+        }
+
+        return clone;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final Employee employee = (Employee) o;
+
+        return new EqualsBuilder()
+                .append(uid, employee.uid)
+                .append(name, employee.name)
+                .append(dateOfBirth, employee.dateOfBirth)
+                .append(contactNumbers, employee.contactNumbers)
+                .append(emergencyContacts, employee.emergencyContacts)
+                .append(address, employee.address)
+                .append(bankDetails, employee.bankDetails)
+                .append(taxCode, employee.taxCode)
+                .append(nationality, employee.nationality)
+                .append(manager, employee.manager)
+                .append(hireDate, employee.hireDate)
+                .append(grade, employee.grade)
+                .append(department, employee.department)
+                .append(salaryAmount, employee.salaryAmount)
+                .append(salaryBonus, employee.salaryBonus)
+                .append(workLocation, employee.workLocation)
+                .append(sex, employee.sex)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(7, 45)
+                .append(uid)
+                .append(name)
+                .append(dateOfBirth)
+                .append(contactNumbers)
+                .append(emergencyContacts)
+                .append(address)
+                .append(bankDetails)
+                .append(taxCode)
+                .append(nationality)
+                .append(manager)
+                .append(hireDate)
+                .append(grade)
+                .append(department)
+                .append(salaryAmount)
+                .append(salaryBonus)
+                .append(workLocation)
+                .append(sex)
+                .toHashCode();
     }
 }

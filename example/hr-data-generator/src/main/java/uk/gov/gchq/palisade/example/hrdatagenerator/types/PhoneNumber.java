@@ -16,11 +16,13 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
 
-public class PhoneNumber {
+public class PhoneNumber implements Cloneable {
     private String type; // is this a home number, work number, mobile number ...
     private String phoneNumber;
     private static final String[] DEFAULT_TYPES = new String[]{"Mobile"};
@@ -77,5 +79,46 @@ public class PhoneNumber {
                 .append("type", type)
                 .append("phone number", phoneNumber)
                 .toString();
+    }
+
+    public PhoneNumber clone() {
+        PhoneNumber clone;
+        try {
+            clone = (PhoneNumber) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new PhoneNumber();
+        }
+
+        // Immutable
+        clone.setType(type);
+        clone.setPhoneNumber(phoneNumber);
+
+        return clone;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final PhoneNumber otherNumber = (PhoneNumber) o;
+
+        return new EqualsBuilder()
+                .append(type, otherNumber.type)
+                .append(phoneNumber, otherNumber.phoneNumber)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(13, 43)
+                .append(type)
+                .append(phoneNumber)
+                .toHashCode();
     }
 }

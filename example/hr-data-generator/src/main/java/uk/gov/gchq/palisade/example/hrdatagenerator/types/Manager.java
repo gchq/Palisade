@@ -16,13 +16,15 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import uk.gov.gchq.palisade.UserId;
 
 import java.util.Random;
 
-public class Manager {
+public class Manager implements Cloneable {
     private UserId uid;
     private Manager[] manager;
     private String managerType;
@@ -84,5 +86,61 @@ public class Manager {
                 .append("uid", uid)
                 .append("manager", manager)
                 .toString();
+    }
+
+    public Manager clone() {
+        Manager clone;
+        try {
+            clone = (Manager) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            clone = new Manager();
+        }
+
+        // Immutable
+        clone.setManagerType(managerType);
+
+        // Mutable
+        if (null != uid) {
+            clone.setUid(uid.clone());
+        }
+
+        // Nested
+        if (null != manager) {
+            Manager[] cloneManagers = manager.clone();
+            for (int i = 0; i < manager.length; i++) {
+                cloneManagers[i] = cloneManagers[i].clone();
+            }
+            clone.setManager(cloneManagers);
+        }
+
+        return clone;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final Manager otherManager = (Manager) o;
+
+        return new EqualsBuilder()
+                .append(uid, otherManager.uid)
+                .append(manager, otherManager.manager)
+                .append(managerType, otherManager.managerType)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(15, 43)
+                .append(uid)
+                .append(manager)
+                .append(managerType)
+                .toHashCode();
     }
 }
