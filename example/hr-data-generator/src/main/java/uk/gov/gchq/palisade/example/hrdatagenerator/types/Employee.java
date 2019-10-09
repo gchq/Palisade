@@ -28,7 +28,6 @@ import uk.gov.gchq.palisade.example.hrdatagenerator.utils.DateHelper;
 import java.util.Random;
 
 public class Employee {
-
     private UserId uid;
     private String name;
     private String dateOfBirth;
@@ -47,6 +46,64 @@ public class Employee {
     private WorkLocation workLocation;
     private Sex sex;
 
+    public Employee() {
+    }
+
+    public Employee(final Employee employee) {
+        name = employee.name;
+        dateOfBirth = employee.dateOfBirth;
+        taxCode = employee.taxCode;
+        nationality = employee.nationality;
+        hireDate = employee.hireDate;
+        grade = employee.grade;
+        department = employee.department;
+        salaryAmount = employee.salaryAmount;
+        salaryBonus = employee.salaryBonus;
+        sex = employee.sex;
+
+        if (employee.uid != null) {
+            uid = employee.uid.clone();
+        }
+
+        if (employee.address != null) {
+            address = new Address(employee.address);
+        }
+        if (employee.bankDetails != null) {
+            bankDetails = new BankDetails(employee.bankDetails);
+        }
+        if (employee.workLocation != null) {
+            workLocation = new WorkLocation(employee.workLocation);
+        }
+
+        // Nested
+        if (employee.contactNumbers != null) {
+            int arrayLen = employee.contactNumbers.length;
+            contactNumbers = new PhoneNumber[arrayLen];
+            for (int i = 0; i < arrayLen; i++) {
+                if (employee.contactNumbers[i] != null) {
+                    contactNumbers[i] = new PhoneNumber(employee.contactNumbers[i]);
+                }
+            }
+        }
+        if (employee.emergencyContacts != null) {
+            int arrayLen = employee.emergencyContacts.length;
+            emergencyContacts = new EmergencyContact[arrayLen];
+            for (int i = 0; i < arrayLen; i++) {
+                if (employee.emergencyContacts[i] != null) {
+                    emergencyContacts[i] = new EmergencyContact(employee.emergencyContacts[i]);
+                }
+            }
+        }
+        if (employee.manager != null) {
+            int arrayLen = employee.manager.length;
+            manager = new Manager[arrayLen];
+            for (int i = 0; i < arrayLen; i++) {
+                if (employee.manager[i] != null) {
+                    manager[i] = new Manager(employee.manager[i]);
+                }
+            }
+        }
+    }
 
     public static Employee generate(final Random random) {
         Employee employee = new Employee();
@@ -234,66 +291,6 @@ public class Employee {
                 .append("workLocation", workLocation)
                 .append("sex", sex)
                 .toString();
-    }
-
-    public Employee clone() {
-        Employee clone;
-        try {
-            clone = (Employee) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            clone = new Employee();
-        }
-
-        // Immutable
-        clone.setDateOfBirth(dateOfBirth);
-        clone.setTaxCode(taxCode);
-        clone.setNationality(nationality);
-        clone.setHireDate(hireDate);
-        clone.setGrade(grade);
-        clone.setDepartment(department);
-        clone.setSalaryAmount(salaryAmount);
-        clone.setSalaryBonus(salaryBonus);
-        clone.setSex(sex);
-        clone.setName(name);
-
-        // Mutable
-        if (null != uid) {
-            clone.setUid(uid.clone());
-        }
-        if (null != workLocation) {
-            clone.setWorkLocation(workLocation.clone());
-        }
-        if (null != bankDetails) {
-            clone.setBankDetails(bankDetails.clone());
-        }
-        if (null != address) {
-            clone.setAddress(address.clone());
-        }
-
-        // Nested
-        if (null != contactNumbers) {
-            PhoneNumber[] cloneContactNumbers = contactNumbers.clone();
-            for (int i = 0; i < cloneContactNumbers.length; i++) {
-                cloneContactNumbers[i] = cloneContactNumbers[i].clone();
-            }
-            clone.setContactNumbers(cloneContactNumbers);
-        }
-        if (null != emergencyContacts) {
-            EmergencyContact[] cloneEmergencyContacts = emergencyContacts.clone();
-            for (int i = 0; i < cloneEmergencyContacts.length; i++) {
-                cloneEmergencyContacts[i] = cloneEmergencyContacts[i].clone();
-            }
-            clone.setEmergencyContacts(cloneEmergencyContacts);
-        }
-        if (null != manager) {
-            Manager[] cloneManagers = manager.clone();
-            for (int i = 0; i < manager.length; i++) {
-                cloneManagers[i] = cloneManagers[i].clone();
-            }
-            clone.setManager(cloneManagers);
-        }
-
-        return clone;
     }
 
     @Override

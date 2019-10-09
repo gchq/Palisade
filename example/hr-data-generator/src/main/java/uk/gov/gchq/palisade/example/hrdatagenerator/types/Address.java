@@ -23,13 +23,23 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
 
-public class Address implements Cloneable {
-
+public class Address {
     private String streetAddressNumber;
     private String streetName;
     private String city;
     private String state;
     private String zipCode;
+
+    public Address() {
+    }
+
+    public Address(final Address address) {
+        streetAddressNumber = address.streetAddressNumber;
+        streetName = address.streetName;
+        city = address.city;
+        state = address.state;
+        zipCode = address.zipCode;
+    }
 
     public static Address generate(final Faker faker, final Random random) {
         Address address = new Address();
@@ -91,24 +101,6 @@ public class Address implements Cloneable {
                 .append("state", state)
                 .append("zipCode", zipCode)
                 .toString();
-    }
-
-    public Address clone() {
-        Address clone;
-        try {
-            clone = (Address) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            clone = new Address();
-        }
-
-        // Immutable
-        clone.setStreetAddressNumber(streetAddressNumber);
-        clone.setStreetName(streetName);
-        clone.setCity(city);
-        clone.setState(state);
-        clone.setZipCode(zipCode);
-
-        return clone;
     }
 
     @Override

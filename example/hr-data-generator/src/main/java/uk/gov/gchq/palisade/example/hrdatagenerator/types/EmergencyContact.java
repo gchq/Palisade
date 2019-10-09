@@ -29,6 +29,25 @@ public class EmergencyContact {
     private Relation relation;
     private PhoneNumber[] contactNumbers;
 
+    public EmergencyContact() {
+    }
+
+    public EmergencyContact(final EmergencyContact emergencyContact) {
+        contactName = emergencyContact.contactName;
+        relation = emergencyContact.relation;
+
+        // Nested
+        if (emergencyContact.contactNumbers != null) {
+            int arrayLen = emergencyContact.contactNumbers.length;
+            contactNumbers = new PhoneNumber[arrayLen];
+            for (int i = 0; i < arrayLen; i++) {
+                if (emergencyContact.contactNumbers[i] != null) {
+                    contactNumbers[i] = new PhoneNumber(emergencyContact.contactNumbers[i]);
+                }
+            }
+        }
+    }
+
     public static EmergencyContact generate(final Faker faker, final Random random) {
         EmergencyContact contact = new EmergencyContact();
         Name tempName = faker.name();
@@ -80,30 +99,6 @@ public class EmergencyContact {
                 .append("relation", relation)
                 .append("contactNumbers", contactNumbers)
                 .toString();
-    }
-
-    public EmergencyContact clone() {
-        EmergencyContact clone;
-        try {
-            clone = (EmergencyContact) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            clone = new EmergencyContact();
-        }
-
-        // Immutable
-        clone.setContactName(contactName);
-        clone.setRelation(relation);
-
-        // Nested
-        if (null != contactNumbers) {
-            PhoneNumber[] cloneContactNumbers = contactNumbers.clone();
-            for (int i = 0; i < cloneContactNumbers.length; i++) {
-                cloneContactNumbers[i] = cloneContactNumbers[i].clone();
-            }
-            clone.setContactNumbers(cloneContactNumbers);
-        }
-
-        return clone;
     }
 
     @Override

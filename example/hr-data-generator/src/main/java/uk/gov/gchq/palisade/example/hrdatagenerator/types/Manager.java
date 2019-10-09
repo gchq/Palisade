@@ -24,10 +24,32 @@ import uk.gov.gchq.palisade.UserId;
 
 import java.util.Random;
 
-public class Manager implements Cloneable {
+public class Manager {
     private UserId uid;
     private Manager[] manager;
     private String managerType;
+
+    public Manager() {
+    }
+
+    public Manager(final Manager otherManager) {
+        managerType = otherManager.managerType;
+
+        if (otherManager.uid != null) {
+            uid = otherManager.uid.clone();
+        }
+
+        // Nested
+        if (otherManager.manager != null) {
+            int arrayLen = otherManager.manager.length;
+            manager = new Manager[arrayLen];
+            for (int i = 0; i < arrayLen; i++) {
+                if (otherManager.manager[i] != null) {
+                    manager[i] = new Manager(otherManager.manager[i]);
+                }
+            }
+        }
+    }
 
     public static Manager[] generateMany(final Random random, final int chain) {
         Manager[] managers = new Manager[3];
@@ -86,34 +108,6 @@ public class Manager implements Cloneable {
                 .append("uid", uid)
                 .append("manager", manager)
                 .toString();
-    }
-
-    public Manager clone() {
-        Manager clone;
-        try {
-            clone = (Manager) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            clone = new Manager();
-        }
-
-        // Immutable
-        clone.setManagerType(managerType);
-
-        // Mutable
-        if (null != uid) {
-            clone.setUid(uid.clone());
-        }
-
-        // Nested
-        if (null != manager) {
-            Manager[] cloneManagers = manager.clone();
-            for (int i = 0; i < manager.length; i++) {
-                cloneManagers[i] = cloneManagers[i].clone();
-            }
-            clone.setManager(cloneManagers);
-        }
-
-        return clone;
     }
 
     @Override

@@ -22,11 +22,19 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
 
-public class PhoneNumber implements Cloneable {
+public class PhoneNumber {
     private String type; // is this a home number, work number, mobile number ...
     private String phoneNumber;
     private static final String[] DEFAULT_TYPES = new String[]{"Mobile"};
     private static final String[] POSSIBLE_TYPES = new String[]{"Home", "Work", "Work Mobile"};
+
+    public PhoneNumber() {
+    }
+
+    public PhoneNumber(final PhoneNumber otherNumber) {
+        type = otherNumber.type;
+        phoneNumber = otherNumber.phoneNumber;
+    }
 
     public static PhoneNumber[] generateMany(final Random random) {
         int numberOfExtraContacts = random.nextInt(3);
@@ -79,21 +87,6 @@ public class PhoneNumber implements Cloneable {
                 .append("type", type)
                 .append("phone number", phoneNumber)
                 .toString();
-    }
-
-    public PhoneNumber clone() {
-        PhoneNumber clone;
-        try {
-            clone = (PhoneNumber) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            clone = new PhoneNumber();
-        }
-
-        // Immutable
-        clone.setType(type);
-        clone.setPhoneNumber(phoneNumber);
-
-        return clone;
     }
 
     @Override

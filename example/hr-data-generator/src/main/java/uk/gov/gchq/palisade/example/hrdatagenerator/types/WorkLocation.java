@@ -23,9 +23,20 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
 
-public class WorkLocation implements Cloneable {
+public class WorkLocation {
     private WorkLocationName workLocationName;
     private Address address;
+
+    public WorkLocation() {
+    }
+
+    public WorkLocation(final WorkLocation workLocation) {
+        workLocationName = workLocation.workLocationName;
+
+        if (workLocation.address != null) {
+            address = new Address(workLocation.address);
+        }
+    }
 
     public  WorkLocationName getWorkLocationName() {
         return workLocationName;
@@ -56,25 +67,6 @@ public class WorkLocation implements Cloneable {
                 .append("workLocationName", workLocationName)
                 .append("address", address)
                 .toString();
-    }
-
-    public WorkLocation clone() {
-        WorkLocation clone;
-        try {
-            clone = (WorkLocation) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            clone = new WorkLocation();
-        }
-
-        // Immutable
-        clone.setWorkLocationName(workLocationName);
-
-        // Mutable
-        if (null != address) {
-            clone.setAddress(address.clone());
-        }
-
-        return clone;
     }
 
     @Override

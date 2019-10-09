@@ -26,6 +26,14 @@ public class BankDetails {
     private String sortCode;
     private String accountNumber;
 
+    public BankDetails() {
+    }
+
+    public BankDetails(final BankDetails bankDetails) {
+        sortCode = bankDetails.sortCode;
+        accountNumber = bankDetails.accountNumber;
+    }
+
     public static BankDetails generate(final Random random) {
         BankDetails bankDetails = new BankDetails();
         StringBuilder sortCode = new StringBuilder(String.valueOf(random.nextInt(999999)));
@@ -63,21 +71,6 @@ public class BankDetails {
                 .append("sortCode", sortCode)
                 .append("accountNumber", accountNumber)
                 .toString();
-    }
-
-    public BankDetails clone() {
-        BankDetails clone;
-        try {
-            clone = (BankDetails) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            clone = new BankDetails();
-        }
-
-        // Immutable
-        clone.setSortCode(sortCode);
-        clone.setAccountNumber(accountNumber);
-
-        return clone;
     }
 
     @Override
