@@ -41,7 +41,6 @@ public class ExampleSimpleClient extends SimpleClient<Employee> {
     }
 
     public static void main(final String[] args) throws InterruptedException {
-
         if (args.length == 3) {
 
             String userId = args[0];

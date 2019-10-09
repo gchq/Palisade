@@ -35,7 +35,7 @@ public final class CreateData {
     private CreateData() {
     }
 
-    public static void main(final String[] args) {
+    public static void main(final String... args) {
         if (args.length < 3) {
             LOGGER.error("This method needs at least three arguments. The directory path to save the files in, the number of employee's to generate and the number of files to split those employees between. An optional 4th argument is the number of threads to use which will default to 1.");
         } else {
