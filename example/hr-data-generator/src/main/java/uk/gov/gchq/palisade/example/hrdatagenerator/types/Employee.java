@@ -18,6 +18,8 @@ package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import com.github.javafaker.Faker;
 import com.github.javafaker.Name;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import uk.gov.gchq.palisade.UserId;
@@ -26,7 +28,6 @@ import uk.gov.gchq.palisade.example.hrdatagenerator.utils.DateHelper;
 import java.util.Random;
 
 public class Employee {
-
     private UserId uid;
     private String name;
     private String dateOfBirth;
@@ -45,6 +46,64 @@ public class Employee {
     private WorkLocation workLocation;
     private Sex sex;
 
+    public Employee() {
+    }
+
+    public Employee(final Employee employee) {
+        name = employee.name;
+        dateOfBirth = employee.dateOfBirth;
+        taxCode = employee.taxCode;
+        nationality = employee.nationality;
+        hireDate = employee.hireDate;
+        grade = employee.grade;
+        department = employee.department;
+        salaryAmount = employee.salaryAmount;
+        salaryBonus = employee.salaryBonus;
+        sex = employee.sex;
+
+        if (employee.uid != null) {
+            uid = employee.uid.clone();
+        }
+
+        if (employee.address != null) {
+            address = new Address(employee.address);
+        }
+        if (employee.bankDetails != null) {
+            bankDetails = new BankDetails(employee.bankDetails);
+        }
+        if (employee.workLocation != null) {
+            workLocation = new WorkLocation(employee.workLocation);
+        }
+
+        // Nested
+        if (employee.contactNumbers != null) {
+            int arrayLen = employee.contactNumbers.length;
+            contactNumbers = new PhoneNumber[arrayLen];
+            for (int i = 0; i < arrayLen; i++) {
+                if (employee.contactNumbers[i] != null) {
+                    contactNumbers[i] = new PhoneNumber(employee.contactNumbers[i]);
+                }
+            }
+        }
+        if (employee.emergencyContacts != null) {
+            int arrayLen = employee.emergencyContacts.length;
+            emergencyContacts = new EmergencyContact[arrayLen];
+            for (int i = 0; i < arrayLen; i++) {
+                if (employee.emergencyContacts[i] != null) {
+                    emergencyContacts[i] = new EmergencyContact(employee.emergencyContacts[i]);
+                }
+            }
+        }
+        if (employee.manager != null) {
+            int arrayLen = employee.manager.length;
+            manager = new Manager[arrayLen];
+            for (int i = 0; i < arrayLen; i++) {
+                if (employee.manager[i] != null) {
+                    manager[i] = new Manager(employee.manager[i]);
+                }
+            }
+        }
+    }
 
     public static Employee generate(final Random random) {
         Employee employee = new Employee();
@@ -232,5 +291,61 @@ public class Employee {
                 .append("workLocation", workLocation)
                 .append("sex", sex)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final Employee employee = (Employee) o;
+
+        return new EqualsBuilder()
+                .append(uid, employee.uid)
+                .append(name, employee.name)
+                .append(dateOfBirth, employee.dateOfBirth)
+                .append(contactNumbers, employee.contactNumbers)
+                .append(emergencyContacts, employee.emergencyContacts)
+                .append(address, employee.address)
+                .append(bankDetails, employee.bankDetails)
+                .append(taxCode, employee.taxCode)
+                .append(nationality, employee.nationality)
+                .append(manager, employee.manager)
+                .append(hireDate, employee.hireDate)
+                .append(grade, employee.grade)
+                .append(department, employee.department)
+                .append(salaryAmount, employee.salaryAmount)
+                .append(salaryBonus, employee.salaryBonus)
+                .append(workLocation, employee.workLocation)
+                .append(sex, employee.sex)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(7, 45)
+                .append(uid)
+                .append(name)
+                .append(dateOfBirth)
+                .append(contactNumbers)
+                .append(emergencyContacts)
+                .append(address)
+                .append(bankDetails)
+                .append(taxCode)
+                .append(nationality)
+                .append(manager)
+                .append(hireDate)
+                .append(grade)
+                .append(department)
+                .append(salaryAmount)
+                .append(salaryBonus)
+                .append(workLocation)
+                .append(sex)
+                .toHashCode();
     }
 }
