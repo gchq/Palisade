@@ -55,7 +55,7 @@ public class EgeriaResourceServiceTest {
             assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18081");
 //            List<String> assetUniverse = assetConsumer.getAssetsByToken("peterprofile", "file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv", 0, 10);
 //            List<String> assetUniverse = assetConsumer.getAssetsByName("peterprofile", "file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv", 0, 10 );
-            List<String> assetUniverse = assetConsumer.findAssets("peterprofile", ".*file.*", 0, 10);
+            List<String> assetUniverse = assetConsumer.findAssets("peterprofile", ".*file.*", 5, 10);
             assetUniverse.forEach((guid) -> {
                 try {
                     assetUni.add(assetConsumer.getAssetProperties("peterprofile", guid));
@@ -87,7 +87,7 @@ public class EgeriaResourceServiceTest {
     @Test
     public void getResourcesByIdTest() {
         UserId peter = new UserId().id("peterprofile");
-        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("CSVFile:file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv").userId(peter);
+        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot/").userId(peter);
         resourceService.getResourcesById(idRequest).join();
     }
 

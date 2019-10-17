@@ -39,9 +39,12 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -105,35 +108,66 @@ public class EgeriaResourceService implements ResourceService {
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
         Map<LeafResource, ConnectionDetail> connections = new HashMap<>();
         return CompletableFuture.supplyAsync(() -> {
-            try {
-                List<String> newAssetsList = assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), 0, 10);
-
-                for (String guid : newAssetsList) {
-                    AssetUniverse assets = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
-                    AssetDetail assetDetail = assets;
-                    AssetSummary assetSummary = assetDetail;
-                    AssetDescriptor assetDescriptor = assetSummary;
-                    AssetElementType assetElementType = assetSummary.getType();
-                    System.out.println(assetElementType.getElementTypeName());
-                    if ("FileFolder".equals(assetElementType.getElementTypeName())) {
-                        AssetRelatedAssets relatedAssets = assets.getRelatedAssets();
-                        while (relatedAssets.hasNext()) {
-                            AssetRelatedAsset asset = relatedAssets.next();
-                            RelatedAssetProperties assetConnections = asset.getRelatedAssetProperties();
-                            //TODO need to create a ConnectionDetail from the assetConnection.next()
-                            ConnectionDetail connectionDetail = null;
-//                        //TODO need to create a LeafResource from the RelatedAsset
-                            LeafResource leafResource = null;
-                            connections.put(leafResource, connectionDetail);
-                        }
-                        //TODO if there are more related files then loop and build resources using all guids in folder
-
-                    } else if ("CSVFile".equals(assetElementType.getElementTypeName())) {
-                        String id = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(":") + 2);
-                        String serialisedFormat = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(".") + 1);
-                        String type = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf("/") + 1, assets.getQualifiedName().indexOf("."));
-                        FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
+            if (request.getResourceId().endsWith("/")) {
+                List<AssetUniverse> assetUni = new ArrayList();
+                List<String> assetUniverse = new ArrayList();
+                try {
+                    for (int maxPage = 5; assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage).size() != 0; maxPage += 5) {
+                        assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
                     }
+                    Set<String> set = new LinkedHashSet<>();
+                    set.addAll(assetUniverse);
+                    assetUniverse.clear();
+                    assetUniverse.addAll(set);
+                    assetUniverse.forEach((guid) -> {
+                        try {
+                            assetUni.add(assetConsumer.getAssetProperties(request.getUserId().getId(), guid));
+                        } catch (InvalidParameterException e) {
+                            e.printStackTrace();
+                        } catch (PropertyServerException e) {
+                            e.printStackTrace();
+                        } catch (UserNotAuthorizedException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (InvalidParameterException e) {
+                    e.printStackTrace();
+                } catch (PropertyServerException e) {
+                    e.printStackTrace();
+                } catch (UserNotAuthorizedException e) {
+                    e.printStackTrace();
+                }
+
+
+            } else if (request.getResourceId().endsWith(".csv") || request.getResourceId().endsWith(".AVRO")) {
+                try {
+                    List<String> newAssetsList = assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), 0, 10);
+                    for (String guid : newAssetsList) {
+                        AssetUniverse assets = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
+                        AssetDetail assetDetail = assets;
+                        AssetSummary assetSummary = assetDetail;
+                        AssetDescriptor assetDescriptor = assetSummary;
+                        AssetElementType assetElementType = assetSummary.getType();
+                        System.out.println(assetElementType.getElementTypeName());
+                        if ("FileFolder".equals(assetElementType.getElementTypeName())) {
+                            AssetRelatedAssets relatedAssets = assets.getRelatedAssets();
+                            while (relatedAssets.hasNext()) {
+                                AssetRelatedAsset asset = relatedAssets.next();
+                                RelatedAssetProperties assetConnections = asset.getRelatedAssetProperties();
+                                //TODO need to create a ConnectionDetail from the assetConnection.next()
+                                ConnectionDetail connectionDetail = null;
+//                        //TODO need to create a LeafResource from the RelatedAsset
+                                LeafResource leafResource = null;
+                                connections.put(leafResource, connectionDetail);
+                            }
+                            //TODO if there are more related files then loop and build resources using all guids in folder
+
+                        } else if ("CSVFile".equals(assetElementType.getElementTypeName())) {
+                            String id = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(":") + 2);
+                            String serialisedFormat = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(".") + 1);
+                            String type = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf("/") + 1, assets.getQualifiedName().indexOf("."));
+                            FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
+                        }
 
 
 //                    Connector a = assetConsumer.getConnectorForAsset(request.getUserId().getId(), guid);
@@ -162,19 +196,20 @@ public class EgeriaResourceService implements ResourceService {
 //                AssetUniverse assetUniverse = assetConsumer.getAssetProperties(request.getUserId().getId(), request.getResourceId());
 //                AssetConnections assetConnections = assetUniverse.getConnections();
 //                AssetRelatedAssets relatedAssets = assetUniverse.getRelatedAssets(); //assuming that there will be a method to get child assets
+                    }
+                } catch (InvalidParameterException e) {
+                    e.printStackTrace();
+                } catch (PropertyServerException e) {
+                    e.printStackTrace();
+                } catch (UserNotAuthorizedException e) {
+                    e.printStackTrace();
+                } finally {
+                    return connections;
                 }
-            } catch (InvalidParameterException e) {
-                e.printStackTrace();
-            } catch (PropertyServerException e) {
-                e.printStackTrace();
-            } catch (UserNotAuthorizedException e) {
-                e.printStackTrace();
-            } finally {
-                return connections;
             }
-
-
+            return null;
         });
+
     }
 
 
