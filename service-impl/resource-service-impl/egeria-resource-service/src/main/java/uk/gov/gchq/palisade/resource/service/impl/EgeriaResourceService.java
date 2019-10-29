@@ -20,14 +20,11 @@ import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetDescriptor;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetDetail;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetElementType;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetRelatedAsset;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetRelatedAssets;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetSummary;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
 import org.odpi.openmetadata.frameworks.connectors.properties.RelatedAssetProperties;
+
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
@@ -60,15 +57,9 @@ public class EgeriaResourceService implements ResourceService {
     protected String egeriaServer;
     protected String egeriaServerURL;
 
-
     private transient AssetConsumer assetConsumer;
 
     public EgeriaResourceService() {
-        try {
-            assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
-        } catch (InvalidParameterException e) {
-            e.printStackTrace();
-        }
     }
 
     public EgeriaResourceService(final String egeriaServer, final String egeriaServerURL) {
@@ -111,10 +102,12 @@ public class EgeriaResourceService implements ResourceService {
             if (request.getResourceId().endsWith("/")) {
                 List<AssetUniverse> assetUni = new ArrayList();
                 List<String> assetUniverse = new ArrayList();
+                int maxPage = 5;
                 try {
-                    for (int maxPage = 5; assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage).size() != 0; maxPage += 5) {
+                    for (maxPage = 5; assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage).size() % maxPage == 0; maxPage += 5) {
                         assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
                     }
+                    assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
                     Set<String> set = new LinkedHashSet<>();
                     set.addAll(assetUniverse);
                     assetUniverse.clear();
@@ -144,12 +137,8 @@ public class EgeriaResourceService implements ResourceService {
                     List<String> newAssetsList = assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), 0, 10);
                     for (String guid : newAssetsList) {
                         AssetUniverse assets = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
-                        AssetDetail assetDetail = assets;
-                        AssetSummary assetSummary = assetDetail;
-                        AssetDescriptor assetDescriptor = assetSummary;
-                        AssetElementType assetElementType = assetSummary.getType();
-                        System.out.println(assetElementType.getElementTypeName());
-                        if ("FileFolder".equals(assetElementType.getElementTypeName())) {
+                        System.out.println(assets.getAssetTypeName());
+                        if ("FileFolder".equals(assets.getAssetTypeName())) {
                             AssetRelatedAssets relatedAssets = assets.getRelatedAssets();
                             while (relatedAssets.hasNext()) {
                                 AssetRelatedAsset asset = relatedAssets.next();
@@ -162,7 +151,7 @@ public class EgeriaResourceService implements ResourceService {
                             }
                             //TODO if there are more related files then loop and build resources using all guids in folder
 
-                        } else if ("CSVFile".equals(assetElementType.getElementTypeName())) {
+                        } else if ("CSVFile".equals(assets.getAssetTypeName())) {
                             String id = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(":") + 2);
                             String serialisedFormat = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(".") + 1);
                             String type = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf("/") + 1, assets.getQualifiedName().indexOf("."));
@@ -208,6 +197,70 @@ public class EgeriaResourceService implements ResourceService {
                 }
             }
             return null;
+        });
+
+    }
+
+
+    /**
+     * Retrieve resource and connection details by resource ID. The request object allows the client to specify the
+     * resource ID and obtain the connection details once the returned future has completed.
+     *
+     * @param request the details of which ID to request
+     * @return a {@link CompletableFuture} that upon completion will contain details on how to retrieve the requested
+     * resource.
+     */
+    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById1(final GetResourcesByIdRequest request) {
+        Map<LeafResource, ConnectionDetail> connections = new HashMap<>();
+        List<String> assetUniverse = new ArrayList();
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                if (request.getResourceId().endsWith("/") || (!(request.getResourceId().endsWith(".csv")))) {
+                    int maxPage = 5;
+                    for (maxPage = 5; assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage).size() % maxPage == 0; maxPage += 5) {
+                        assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
+                    }
+                    assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
+                    Set<String> set = new LinkedHashSet<>();
+                    set.addAll(assetUniverse);
+                    assetUniverse.clear();
+                    assetUniverse.addAll(set);
+                } else {
+                    assetUniverse.addAll(assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), 0, 10));
+                }
+                assetUniverse.forEach((guid) -> {
+                    try {
+                        AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
+                        System.out.println(asset.getAssetTypeName());
+                        if ("CSVFile".equals(asset.getAssetTypeName())) {
+                            String id = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(":") + 2);
+                            String serialisedFormat = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(".") + 1);
+                            String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf("/") + 1, asset.getQualifiedName().indexOf("."));
+                            FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
+//                          TODO need to create a ConnectionDetail from the assetConnection.next()
+                            ConnectionDetail connectionDetail = null;
+//                          TODO need to create a LeafResource from the RelatedAsset
+                            connections.put(file, connectionDetail);
+                        }
+                    } catch (InvalidParameterException e) {
+                        e.printStackTrace();
+                    } catch (PropertyServerException e) {
+                        e.printStackTrace();
+                    } catch (UserNotAuthorizedException e) {
+                        e.printStackTrace();
+                    }
+                });
+            } catch (InvalidParameterException e) {
+                e.printStackTrace();
+            } catch (PropertyServerException e) {
+                e.printStackTrace();
+            } catch (UserNotAuthorizedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("here");
+//            final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(fileArray.get(1).toString()).userId(new UserId().id(request.getUserId().toString())).context(new Context().purpose("SALARY"));
+//            final DataRequestResponse dataRequestResponse = PalisadeService.registerDataRequest(dataRequest).join();
+            return connections;
         });
 
     }

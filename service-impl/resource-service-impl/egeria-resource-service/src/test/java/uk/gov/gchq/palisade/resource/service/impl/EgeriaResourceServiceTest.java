@@ -6,11 +6,8 @@ import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetDescriptor;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetDetail;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetElementType;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetSummary;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
+
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 
@@ -68,13 +65,9 @@ public class EgeriaResourceServiceTest {
                 }
             });
             System.out.println(assetUni.size());
-
-            AssetDetail assetDetail = assetUni.get(0);
-            AssetSummary assetSummary = assetDetail;
-            AssetDescriptor assetDescriptor = assetSummary;
-            AssetElementType assetElementType = assetSummary.getType();
-            System.out.println(assetElementType.getElementTypeName());
             System.out.println(assetUni.get(0));
+            System.out.println(assetUni.get(0).getAssetTypeName());
+
         } catch (InvalidParameterException e) {
             e.printStackTrace();
         } catch (PropertyServerException e) {
@@ -87,8 +80,8 @@ public class EgeriaResourceServiceTest {
     @Test
     public void getResourcesByIdTest() {
         UserId peter = new UserId().id("peterprofile");
-        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot/").userId(peter);
-        resourceService.getResourcesById(idRequest).join();
+        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot").userId(peter);
+        resourceService.getResourcesById1(idRequest).join();
     }
 
     @Test
