@@ -7,6 +7,8 @@ import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterExceptio
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.resource.LeafResource;
@@ -25,7 +27,7 @@ import static org.hamcrest.core.Is.is;
 
 public class EgeriaResourceServiceTest {
 
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(EgeriaResourceServiceTest.class);
     private EgeriaResourceService resourceService;
 
 
@@ -38,39 +40,21 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void experiment() {
-        AssetConsumer assetConsumer;
-        try {
-            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18081");
-            AssetUniverse assetUniverse = assetConsumer.getAssetProperties("peterprofile", "6c94ad6b-d41b-439a-bd82-7cf28a6d40ea");
-            System.out.println(assetUniverse);
-        } catch (InvalidParameterException e) {
-            e.printStackTrace();
-        } catch (PropertyServerException e) {
-            e.printStackTrace();
-        } catch (UserNotAuthorizedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void getAll() {
         AssetConsumer assetConsumer;
         List<AssetUniverse> assetUni = new ArrayList();
         try {
             assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18081");
-//            List<String> assetUniverse = assetConsumer.getAssetsByToken("peterprofile", "file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv", 0, 10);
-//            List<String> assetUniverse = assetConsumer.getAssetsByName("peterprofile", "file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv", 0, 10 );
             List<String> assetUniverse = assetConsumer.findAssets("peterprofile", ".*file.*", 5, 10);
             assetUniverse.forEach((guid) -> {
                 try {
                     assetUni.add(assetConsumer.getAssetProperties("peterprofile", guid));
                 } catch (PropertyServerException e) {
-                    e.printStackTrace();
+                    LOGGER.debug("PropertyServerException: " + e);
                 } catch (UserNotAuthorizedException e) {
-                    e.printStackTrace();
+                    LOGGER.debug("UserNotAuthorizedException: " + e);
                 } catch (InvalidParameterException e) {
-                    e.printStackTrace();
+                    LOGGER.debug("InvalidParameterException: " + e);
                 }
             });
             System.out.println(assetUni.size());
@@ -78,11 +62,11 @@ public class EgeriaResourceServiceTest {
             System.out.println(assetUni.get(0).getAssetTypeName());
 
         } catch (InvalidParameterException e) {
-            e.printStackTrace();
+            LOGGER.debug("InvalidParameterException: " + e);
         } catch (PropertyServerException e) {
-            e.printStackTrace();
+            LOGGER.debug("PropertyServerException: " + e);
         } catch (UserNotAuthorizedException e) {
-            e.printStackTrace();
+            LOGGER.debug("UserNotAuthorizedException: " + e);
         }
     }
 

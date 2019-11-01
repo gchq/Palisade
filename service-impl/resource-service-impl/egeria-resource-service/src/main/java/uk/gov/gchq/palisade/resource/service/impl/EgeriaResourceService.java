@@ -21,6 +21,8 @@ import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterExceptio
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -52,9 +54,9 @@ import java.util.concurrent.CompletableFuture;
  */
 public class EgeriaResourceService implements ResourceService {
     public static final String ERROR_RESOLVING_ID = "Error occurred while resolving resource by id";
+    private static final Logger LOGGER = LoggerFactory.getLogger(EgeriaResourceService.class);
     protected String egeriaServer;
     protected String egeriaServerURL;
-
     private transient AssetConsumer assetConsumer;
 
     public EgeriaResourceService() {
@@ -66,7 +68,7 @@ public class EgeriaResourceService implements ResourceService {
             this.egeriaServerURL = egeriaServerURL;
             assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
         } catch (InvalidParameterException e) {
-            e.printStackTrace();
+            LOGGER.debug("InvalidParameterException: " + e);
         }
     }
 
@@ -137,19 +139,19 @@ public class EgeriaResourceService implements ResourceService {
                             connections.put(file, egeriaConnection);
                         }
                     } catch (InvalidParameterException e) {
-                        e.printStackTrace();
+                        LOGGER.debug("InvalidParameterException: " + e);
                     } catch (PropertyServerException e) {
-                        e.printStackTrace();
+                        LOGGER.debug("PropertyServerException: " + e);
                     } catch (UserNotAuthorizedException e) {
-                        e.printStackTrace();
+                        LOGGER.debug("UserNotAuthorizedException: " + e);
                     }
                 });
             } catch (InvalidParameterException e) {
-                e.printStackTrace();
+                LOGGER.debug("InvalidParameterException: " + e);
             } catch (PropertyServerException e) {
-                e.printStackTrace();
+                LOGGER.debug("PropertyServerException: " + e);
             } catch (UserNotAuthorizedException e) {
-                e.printStackTrace();
+                LOGGER.debug("UserNotAuthorizedException: " + e);
             }
             return connections;
         });
