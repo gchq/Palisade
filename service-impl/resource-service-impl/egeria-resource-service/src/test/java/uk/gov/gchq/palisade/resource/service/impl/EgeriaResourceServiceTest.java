@@ -7,14 +7,27 @@ import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterExceptio
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
-import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.resource.LeafResource;
+import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.EgeriaConnection;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 public class EgeriaResourceServiceTest {
 
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(EgeriaResourceServiceTest.class);
     private EgeriaResourceService resourceService;
 
 
@@ -23,68 +36,61 @@ public class EgeriaResourceServiceTest {
 
     @Before
     public void setUp() {
-        resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18082");
-    }
-
-    @Test
-    public void experiment() {
-        AssetConsumer assetConsumer;
-        try {
-            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18082");
-            AssetUniverse assetUniverse = assetConsumer.getAssetProperties("peterprofile", "6c94ad6b-d41b-439a-bd82-7cf28a6d40ea");
-            System.out.println(assetUniverse);
-        } catch (InvalidParameterException e) {
-            e.printStackTrace();
-        } catch (PropertyServerException e) {
-            e.printStackTrace();
-        } catch (UserNotAuthorizedException e) {
-            e.printStackTrace();
-        }
+        resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18081");
     }
 
     @Test
     public void getAll() {
         AssetConsumer assetConsumer;
+        List<AssetUniverse> assetUni = new ArrayList();
         try {
-            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18082");
-            List<String> assetUniverse = assetConsumer.getAssetsByToken("peterprofile", "file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv", 0, 10);
-//            List<String> assetUniverse = assetConsumer.getAssetsByName("peterprofile", "file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek1.csv", 0, 10 );
-//            List<String> assetUniverse = assetConsumer.findAssets("peterprofile", ".*file.*", 0, 10);
+            assetConsumer = new AssetConsumer("cocoMDS1", "http://localhost:18081");
+            List<String> assetUniverse = assetConsumer.findAssets("peterprofile", ".*file.*", 5, 10);
             assetUniverse.forEach((guid) -> {
                 try {
-                    AssetUniverse assets = assetConsumer.getAssetProperties("peterprofile", guid);
-                    System.out.println(assets);
-                } catch (InvalidParameterException e) {
-                    e.printStackTrace();
+                    assetUni.add(assetConsumer.getAssetProperties("peterprofile", guid));
                 } catch (PropertyServerException e) {
-                    e.printStackTrace();
+                    LOGGER.debug("PropertyServerException: " + e);
                 } catch (UserNotAuthorizedException e) {
-                    e.printStackTrace();
+                    LOGGER.debug("UserNotAuthorizedException: " + e);
+                } catch (InvalidParameterException e) {
+                    LOGGER.debug("InvalidParameterException: " + e);
                 }
             });
+            System.out.println(assetUni.size());
+            System.out.println(assetUni.get(0));
+            System.out.println(assetUni.get(0).getAssetTypeName());
+
         } catch (InvalidParameterException e) {
-            e.printStackTrace();
+            LOGGER.debug("InvalidParameterException: " + e);
         } catch (PropertyServerException e) {
-            e.printStackTrace();
+            LOGGER.debug("PropertyServerException: " + e);
         } catch (UserNotAuthorizedException e) {
-            e.printStackTrace();
+            LOGGER.debug("UserNotAuthorizedException: " + e);
         }
     }
 
     @Test
     public void getResourcesByIdTest() {
         UserId peter = new UserId().id("peterprofile");
-        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot/").userId(peter);
+        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot").userId(peter);
         resourceService.getResourcesById(idRequest).join();
     }
 
     @Test
     public void shouldGetResourcesByIdOfAFile() {
-        //given
+        UserId peter = new UserId().id("peterprofile");
+        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek3.csv").userId(peter);
+        Map<LeafResource, ConnectionDetail> actual = resourceService.getResourcesById(idRequest).join();
 
-        //when
+        Map<LeafResource, ConnectionDetail> expected = new HashMap<>();
+        FileResource file = new FileResource().id("/secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek3.csv").serialisedFormat("csv").type("DropFootMeasurementsWeek3");
+        EgeriaConnection egeriaConnection = new EgeriaConnection("http://localhost:18081", "cocoMDS1", idRequest.getUserId().toString());
+        expected.put(file, egeriaConnection);
 
-        //then
+        assertThat(actual.size(), is((1)));
+        assertThat(actual, is(expected));
+
     }
 
     @Test
@@ -133,7 +139,7 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void shouldGetResourcesByResource()  {
+    public void shouldGetResourcesByResource() {
         //given
 
         //when
@@ -146,19 +152,19 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void shouldJSONSerialiser()  {
+    public void shouldJSONSerialiser() {
     }
 
     @Test
-    public void shouldErrorWithNoConnectionDetails()  {
+    public void shouldErrorWithNoConnectionDetails() {
     }
 
     @Test
-    public void shouldGetFormatConnectionWhenNoTypeConnection()  {
+    public void shouldGetFormatConnectionWhenNoTypeConnection() {
     }
 
 
     @Test
-    public void shouldResolveParents()  {
+    public void shouldResolveParents() {
     }
 }

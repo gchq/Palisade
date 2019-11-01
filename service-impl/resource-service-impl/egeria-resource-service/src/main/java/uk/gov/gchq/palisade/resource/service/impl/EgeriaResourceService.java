@@ -21,9 +21,11 @@ import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterExceptio
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.resource.LeafResource;
-
+import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
@@ -31,17 +33,16 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.EgeriaConnection;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * A implementation of the ResourceService for Hadoop.
@@ -53,26 +54,21 @@ import java.util.regex.Pattern;
  */
 public class EgeriaResourceService implements ResourceService {
     public static final String ERROR_RESOLVING_ID = "Error occurred while resolving resource by id";
+    private static final Logger LOGGER = LoggerFactory.getLogger(EgeriaResourceService.class);
     protected String egeriaServer;
     protected String egeriaServerURL;
-    private List<String> assetLists;
-
-
     private transient AssetConsumer assetConsumer;
 
     public EgeriaResourceService() {
-        try {
-            assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
-        } catch (InvalidParameterException e) {
-            e.printStackTrace();
-        }
     }
 
     public EgeriaResourceService(final String egeriaServer, final String egeriaServerURL) {
         try {
+            this.egeriaServer = egeriaServer;
+            this.egeriaServerURL = egeriaServerURL;
             assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
         } catch (InvalidParameterException e) {
-            e.printStackTrace();
+            LOGGER.debug("InvalidParameterException: " + e);
         }
     }
 
@@ -101,89 +97,65 @@ public class EgeriaResourceService implements ResourceService {
      * @return a {@link CompletableFuture} that upon completion will contain details on how to retrieve the requested
      * resource.
      */
-    @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
-
-//        TODO need to add some code here !!
         Map<LeafResource, ConnectionDetail> connections = new HashMap<>();
+        List<String> assetUniverse = new ArrayList();
         return CompletableFuture.supplyAsync(() -> {
             try {
-                fileFolderRecursion(request);
-                for (String guid : assetLists) {
-                    AssetUniverse assets = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
-//                    System.out.println(assets);
-
-                    String id = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(":") + 2);
-                    String serialisedFormat = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(".") + 1);
-                    String type = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf("/") + 1, assets.getQualifiedName().indexOf("."));
-
-//                    FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
-//                    Connector a = assetConsumer.getConnectorForAsset(request.getUserId().getId(), guid);
-
-//                    AssetRelatedAssets relatedAssets = assets.getRelatedAssets(); //assuming that there will be a method to get child assets
-//                    while (relatedAssets.hasNext()) { //forEach not supported in relatedAssets
-//                        AssetRelatedAsset asset = relatedAssets.next();
-//                        //the asset bean is related to the Resource in some way !!!
-//                        RelatedAssetProperties assetConnections = asset.getRelatedAssetProperties();
-//
-//                        //TODO need to create a ConnectionDetail from the assetConnection.next()
-//                        ConnectionDetail connectionDetail = null;
-//                        //TODO need to create a LeafResource from the RelatedAsset
-//                        LeafResource leafResource = null;
-//
-//                        connections.put(leafResource, connectionDetail);
-//
-//
-////                    //TODO need to create a ConnectionDetail from the assetConnection.next()
-////                    ConnectionDetail connectionDetail = null;
-////                    //TODO need to create a LeafResource from the RelatedAsset
-////                    LeafResource leafResource = null;
-////
-////                    connections.put(leafResource, connectionDetail);
-//                    }
+                /**
+                 * If the user passes in an absolute path then the code will return one asset
+                 * If the user passes in a folder, the code will return all assets, including folders, in all folders including nested
+                 **/
+                if (request.getResourceId().endsWith("/") || (!(request.getResourceId().endsWith(".csv")))) {
+                    //loops through, increments page number by 5
+                    //currently if the returned number is not devisable by 5 it will exit the loop and get the last set of results, this is a temp solution awaiting egeria
+                    int maxPage = 5;
+                    for (maxPage = 5; assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage).size() % maxPage == 0; maxPage += 5) {
+                        assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
+                    }
+                    assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
+                    //prevents duplicates
+                    Set<String> set = new LinkedHashSet<>();
+                    set.addAll(assetUniverse);
+                    assetUniverse.clear();
+                    assetUniverse.addAll(set);
+                } else {
+                    //if user passes in absolute path, it will call this api and return one file
+                    assetUniverse.addAll(assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), 0, 10));
                 }
-//                AssetUniverse assetUniverse = assetConsumer.getAssetProperties(request.getUserId().getId(), request.getResourceId());
-//                AssetConnections assetConnections = assetUniverse.getConnections();
-//                AssetRelatedAssets relatedAssets = assetUniverse.getRelatedAssets(); //assuming that there will be a method to get child assets
-
-            } catch (Exception e) {
-                System.err.println(e);
-                throw new RuntimeException(ERROR_RESOLVING_ID, e);
-//            TODO need to handle the exception correctly
-            } finally {
-                return connections;
+                assetUniverse.forEach((guid) -> {
+                    try {
+                        AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
+                        System.out.println(asset.getAssetTypeName());
+                        //gets all files that aren't FileFolder, i.e csv/avro
+                        if (!asset.getAssetTypeName().equals("FileFolder")) {
+                            //Strips the Qualified name to form the FileResource Type
+                            String id = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(":") + 2);
+                            String serialisedFormat = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(".") + 1);
+                            String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf("/") + 1, asset.getQualifiedName().indexOf("."));
+                            FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
+//                          TODO need to create a ConnectionDetail from the assetConnection.next()
+                            EgeriaConnection egeriaConnection = new EgeriaConnection(egeriaServerURL, egeriaServer, request.getUserId().toString());
+                            connections.put(file, egeriaConnection);
+                        }
+                    } catch (InvalidParameterException e) {
+                        LOGGER.debug("InvalidParameterException: " + e);
+                    } catch (PropertyServerException e) {
+                        LOGGER.debug("PropertyServerException: " + e);
+                    } catch (UserNotAuthorizedException e) {
+                        LOGGER.debug("UserNotAuthorizedException: " + e);
+                    }
+                });
+            } catch (InvalidParameterException e) {
+                LOGGER.debug("InvalidParameterException: " + e);
+            } catch (PropertyServerException e) {
+                LOGGER.debug("PropertyServerException: " + e);
+            } catch (UserNotAuthorizedException e) {
+                LOGGER.debug("UserNotAuthorizedException: " + e);
             }
+            return connections;
         });
-    }
 
-    public List<String> fileFolderRecursion(final GetResourcesByIdRequest request) {
-        try {
-            List<String> newAssetsList = assetConsumer.getAssetsByToken(request.getUserId().getId(), request.getResourceId(), 0, 100);
-            if (assetLists == null) {
-                assetLists = newAssetsList;
-            } else if (assetLists != null && assetLists.size() != newAssetsList.size()) {
-                Set<String> set = new HashSet<>(assetLists);
-                set.addAll(newAssetsList);
-                List<String> mergedList = new ArrayList<>(set);
-                assetLists = mergedList;
-            }
-            String urlUpDirectory = (request.getResourceId().toString().substring(0, request.getResourceId().toString().lastIndexOf('/')));
-            Pattern p = Pattern.compile("^(\\w+)\\:\\/$");
-            Matcher m = p.matcher(urlUpDirectory);
-            if (!m.find()) {
-                request.setResourceId(urlUpDirectory);
-                fileFolderRecursion(request);
-            } else {
-                return assetLists;
-            }
-        } catch (InvalidParameterException e) {
-            e.printStackTrace();
-        } catch (PropertyServerException e) {
-            e.printStackTrace();
-        } catch (UserNotAuthorizedException e) {
-            e.printStackTrace();
-        }
-        return assetLists;
     }
 
 
