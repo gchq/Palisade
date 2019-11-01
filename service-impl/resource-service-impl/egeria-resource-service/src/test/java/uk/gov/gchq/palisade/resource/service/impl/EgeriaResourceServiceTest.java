@@ -9,10 +9,19 @@ import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedExcepti
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
 
 import uk.gov.gchq.palisade.UserId;
+import uk.gov.gchq.palisade.resource.LeafResource;
+import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
+import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.EgeriaConnection;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 public class EgeriaResourceServiceTest {
 
@@ -81,16 +90,23 @@ public class EgeriaResourceServiceTest {
     public void getResourcesByIdTest() {
         UserId peter = new UserId().id("peterprofile");
         GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot").userId(peter);
-        resourceService.getResourcesById1(idRequest).join();
+        resourceService.getResourcesById(idRequest).join();
     }
 
     @Test
     public void shouldGetResourcesByIdOfAFile() {
-        //given
+        UserId peter = new UserId().id("peterprofile");
+        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek3.csv").userId(peter);
+        Map<LeafResource, ConnectionDetail> actual = resourceService.getResourcesById(idRequest).join();
 
-        //when
+        Map<LeafResource, ConnectionDetail> expected = new HashMap<>();
+        FileResource file = new FileResource().id("/secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek3.csv").serialisedFormat("csv").type("DropFootMeasurementsWeek3");
+        EgeriaConnection egeriaConnection = new EgeriaConnection("http://localhost:18081", "cocoMDS1", idRequest.getUserId().toString());
+        expected.put(file, egeriaConnection);
 
-        //then
+        assertThat(actual.size(), is((1)));
+        assertThat(actual, is(expected));
+
     }
 
     @Test

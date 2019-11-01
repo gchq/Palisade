@@ -20,10 +20,7 @@ import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetRelatedAsset;
-import org.odpi.openmetadata.frameworks.connectors.properties.AssetRelatedAssets;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
-import org.odpi.openmetadata.frameworks.connectors.properties.RelatedAssetProperties;
 
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -34,6 +31,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.EgeriaConnection;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.util.ArrayList;
@@ -64,6 +62,8 @@ public class EgeriaResourceService implements ResourceService {
 
     public EgeriaResourceService(final String egeriaServer, final String egeriaServerURL) {
         try {
+            this.egeriaServer = egeriaServer;
+            this.egeriaServerURL = egeriaServerURL;
             assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
         } catch (InvalidParameterException e) {
             e.printStackTrace();
@@ -95,152 +95,46 @@ public class EgeriaResourceService implements ResourceService {
      * @return a {@link CompletableFuture} that upon completion will contain details on how to retrieve the requested
      * resource.
      */
-    @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
-        Map<LeafResource, ConnectionDetail> connections = new HashMap<>();
-        return CompletableFuture.supplyAsync(() -> {
-            if (request.getResourceId().endsWith("/")) {
-                List<AssetUniverse> assetUni = new ArrayList();
-                List<String> assetUniverse = new ArrayList();
-                int maxPage = 5;
-                try {
-                    for (maxPage = 5; assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage).size() % maxPage == 0; maxPage += 5) {
-                        assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
-                    }
-                    assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
-                    Set<String> set = new LinkedHashSet<>();
-                    set.addAll(assetUniverse);
-                    assetUniverse.clear();
-                    assetUniverse.addAll(set);
-                    assetUniverse.forEach((guid) -> {
-                        try {
-                            assetUni.add(assetConsumer.getAssetProperties(request.getUserId().getId(), guid));
-                        } catch (InvalidParameterException e) {
-                            e.printStackTrace();
-                        } catch (PropertyServerException e) {
-                            e.printStackTrace();
-                        } catch (UserNotAuthorizedException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                } catch (InvalidParameterException e) {
-                    e.printStackTrace();
-                } catch (PropertyServerException e) {
-                    e.printStackTrace();
-                } catch (UserNotAuthorizedException e) {
-                    e.printStackTrace();
-                }
-
-
-            } else if (request.getResourceId().endsWith(".csv") || request.getResourceId().endsWith(".AVRO")) {
-                try {
-                    List<String> newAssetsList = assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), 0, 10);
-                    for (String guid : newAssetsList) {
-                        AssetUniverse assets = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
-                        System.out.println(assets.getAssetTypeName());
-                        if ("FileFolder".equals(assets.getAssetTypeName())) {
-                            AssetRelatedAssets relatedAssets = assets.getRelatedAssets();
-                            while (relatedAssets.hasNext()) {
-                                AssetRelatedAsset asset = relatedAssets.next();
-                                RelatedAssetProperties assetConnections = asset.getRelatedAssetProperties();
-                                //TODO need to create a ConnectionDetail from the assetConnection.next()
-                                ConnectionDetail connectionDetail = null;
-//                        //TODO need to create a LeafResource from the RelatedAsset
-                                LeafResource leafResource = null;
-                                connections.put(leafResource, connectionDetail);
-                            }
-                            //TODO if there are more related files then loop and build resources using all guids in folder
-
-                        } else if ("CSVFile".equals(assets.getAssetTypeName())) {
-                            String id = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(":") + 2);
-                            String serialisedFormat = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf(".") + 1);
-                            String type = assets.getQualifiedName().substring(assets.getQualifiedName().lastIndexOf("/") + 1, assets.getQualifiedName().indexOf("."));
-                            FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
-                        }
-
-
-//                    Connector a = assetConsumer.getConnectorForAsset(request.getUserId().getId(), guid);
-
-//                    AssetRelatedAssets relatedAssets = assets.getRelatedAssets(); //assuming that there will be a method to get child assets
-//                    while (relatedAssets.hasNext()) { //forEach not supported in relatedAssets
-//                        AssetRelatedAsset asset = relatedAssets.next();
-//                        //the asset bean is related to the Resource in some way !!!
-//                        RelatedAssetProperties assetConnections = asset.getRelatedAssetProperties();
-//
-//                        //TODO need to create a ConnectionDetail from the assetConnection.next()
-//                        ConnectionDetail connectionDetail = null;
-//                        //TODO need to create a LeafResource from the RelatedAsset
-//                        LeafResource leafResource = null;
-//
-//                        connections.put(leafResource, connectionDetail);
-//
-//
-////                    //TODO need to create a ConnectionDetail from the assetConnection.next()
-////                    ConnectionDetail connectionDetail = null;
-////                    //TODO need to create a LeafResource from the RelatedAsset
-////                    LeafResource leafResource = null;
-////
-////                    connections.put(leafResource, connectionDetail);
-//                    }
-//                AssetUniverse assetUniverse = assetConsumer.getAssetProperties(request.getUserId().getId(), request.getResourceId());
-//                AssetConnections assetConnections = assetUniverse.getConnections();
-//                AssetRelatedAssets relatedAssets = assetUniverse.getRelatedAssets(); //assuming that there will be a method to get child assets
-                    }
-                } catch (InvalidParameterException e) {
-                    e.printStackTrace();
-                } catch (PropertyServerException e) {
-                    e.printStackTrace();
-                } catch (UserNotAuthorizedException e) {
-                    e.printStackTrace();
-                } finally {
-                    return connections;
-                }
-            }
-            return null;
-        });
-
-    }
-
-
-    /**
-     * Retrieve resource and connection details by resource ID. The request object allows the client to specify the
-     * resource ID and obtain the connection details once the returned future has completed.
-     *
-     * @param request the details of which ID to request
-     * @return a {@link CompletableFuture} that upon completion will contain details on how to retrieve the requested
-     * resource.
-     */
-    public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById1(final GetResourcesByIdRequest request) {
         Map<LeafResource, ConnectionDetail> connections = new HashMap<>();
         List<String> assetUniverse = new ArrayList();
         return CompletableFuture.supplyAsync(() -> {
             try {
+                /**
+                 * If the user passes in an absolute path then the code will return one asset
+                 * If the user passes in a folder, the code will return all assets, including folders, in all folders including nested
+                 **/
                 if (request.getResourceId().endsWith("/") || (!(request.getResourceId().endsWith(".csv")))) {
+                    //loops through, increments page number by 5
+                    //currently if the returned number is not devisable by 5 it will exit the loop and get the last set of results, this is a temp solution awaiting egeria
                     int maxPage = 5;
                     for (maxPage = 5; assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage).size() % maxPage == 0; maxPage += 5) {
                         assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
                     }
                     assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
+                    //prevents duplicates
                     Set<String> set = new LinkedHashSet<>();
                     set.addAll(assetUniverse);
                     assetUniverse.clear();
                     assetUniverse.addAll(set);
                 } else {
+                    //if user passes in absolute path, it will call this api and return one file
                     assetUniverse.addAll(assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), 0, 10));
                 }
                 assetUniverse.forEach((guid) -> {
                     try {
                         AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
                         System.out.println(asset.getAssetTypeName());
-                        if ("CSVFile".equals(asset.getAssetTypeName())) {
+                        //gets all files that aren't FileFolder, i.e csv/avro
+                        if (!asset.getAssetTypeName().equals("FileFolder")) {
+                            //Strips the Qualified name to form the FileResource Type
                             String id = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(":") + 2);
                             String serialisedFormat = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(".") + 1);
                             String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf("/") + 1, asset.getQualifiedName().indexOf("."));
                             FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
 //                          TODO need to create a ConnectionDetail from the assetConnection.next()
-                            ConnectionDetail connectionDetail = null;
-//                          TODO need to create a LeafResource from the RelatedAsset
-                            connections.put(file, connectionDetail);
+                            EgeriaConnection egeriaConnection = new EgeriaConnection(egeriaServerURL, egeriaServer, request.getUserId().toString());
+                            connections.put(file, egeriaConnection);
                         }
                     } catch (InvalidParameterException e) {
                         e.printStackTrace();
@@ -257,9 +151,6 @@ public class EgeriaResourceService implements ResourceService {
             } catch (UserNotAuthorizedException e) {
                 e.printStackTrace();
             }
-            System.out.println("here");
-//            final RegisterDataRequest dataRequest = new RegisterDataRequest().resourceId(fileArray.get(1).toString()).userId(new UserId().id(request.getUserId().toString())).context(new Context().purpose("SALARY"));
-//            final DataRequestResponse dataRequestResponse = PalisadeService.registerDataRequest(dataRequest).join();
             return connections;
         });
 
