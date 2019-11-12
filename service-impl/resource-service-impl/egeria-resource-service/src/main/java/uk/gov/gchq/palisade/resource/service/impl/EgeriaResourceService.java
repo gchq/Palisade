@@ -62,14 +62,10 @@ public class EgeriaResourceService implements ResourceService {
     public EgeriaResourceService() {
     }
 
-    public EgeriaResourceService(final String egeriaServer, final String egeriaServerURL) {
-        try {
-            this.egeriaServer = egeriaServer;
-            this.egeriaServerURL = egeriaServerURL;
-            assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
-        } catch (InvalidParameterException e) {
-            LOGGER.debug("InvalidParameterException: " + e);
-        }
+    public EgeriaResourceService(final String egeriaServer, final String egeriaServerURL) throws InvalidParameterException {
+        this.egeriaServer = egeriaServer;
+        this.egeriaServerURL = egeriaServerURL;
+        assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
     }
 
     /**
@@ -149,6 +145,7 @@ public class EgeriaResourceService implements ResourceService {
             } catch (InvalidParameterException e) {
                 LOGGER.debug("InvalidParameterException: " + e);
             } catch (PropertyServerException e) {
+                System.out.println(e);
                 LOGGER.debug("PropertyServerException: " + e);
             } catch (UserNotAuthorizedException e) {
                 LOGGER.debug("UserNotAuthorizedException: " + e);
