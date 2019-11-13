@@ -35,7 +35,7 @@ public class EgeriaResourceServiceTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws InvalidParameterException {
         resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18081");
     }
 
