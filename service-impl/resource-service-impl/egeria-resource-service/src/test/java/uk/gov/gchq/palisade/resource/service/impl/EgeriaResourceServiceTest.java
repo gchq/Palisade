@@ -1,7 +1,14 @@
 package uk.gov.gchq.palisade.resource.service.impl;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.test.PathUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
@@ -11,32 +18,65 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
+import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
+import uk.gov.gchq.palisade.data.service.impl.MockDataService;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
-import uk.gov.gchq.palisade.service.ConnectionDetail;
-import uk.gov.gchq.palisade.service.EgeriaConnection;
+import uk.gov.gchq.palisade.service.SimpleConnectionDetail;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.fail;
 
 public class EgeriaResourceServiceTest {
 
+    public static final String FILE = System.getProperty("os.name").toLowerCase().startsWith("win") ? "file:///" : "file://";
     private static final Logger LOGGER = LoggerFactory.getLogger(EgeriaResourceServiceTest.class);
-    private EgeriaResourceService resourceService;
+    public static File TMP_DIRECTORY;
 
+    static {
+        TMP_DIRECTORY = PathUtils.getTestDir(EgeriaResourceServiceTest.class);
+    }
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder(TMP_DIRECTORY);
+    private EgeriaResourceService resourceService;
+    private SimpleConnectionDetail simpleConnection;
+    private Configuration conf;
+    private String inputPathString;
+    private FileSystem fs;
+    private SimpleCacheService simpleCache;
 
     public EgeriaResourceServiceTest() {
     }
 
+    private static String getFileNameFromResourceDetails(final String name, final String type, final String format) {
+        //Type, Id, Format
+        return String.format(HadoopResourceDetails.FILE_NAME_FORMAT, type, name, format);
+    }
+
     @Before
-    public void setUp() throws InvalidParameterException {
-        resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18081");
+    public void setUp() throws InvalidParameterException, IOException {
+        System.setProperty("hadoop.home.dir", Paths.get(".").toAbsolutePath().normalize().toString() + "/src/test/resources/hadoop-3.0.0");
+        conf = createConf();
+        inputPathString = testFolder.getRoot().getAbsolutePath() + "/inputDir";
+        fs = FileSystem.get(conf);
+        fs.mkdirs(new Path(inputPathString));
+        simpleConnection = new SimpleConnectionDetail().service(new MockDataService());
+        simpleCache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
+
+        resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18081", conf, simpleCache);
+    }
+
+    private Configuration createConf() {
+        // Set up local conf
+        final Configuration conf = new Configuration();
+        conf.set(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, FILE + testFolder.getRoot().getAbsolutePath().replace("\\", "/"));
+        return conf;
     }
 
     @Test
@@ -71,26 +111,18 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void getResourcesByIdTest() {
+    public void getResourcesByIdTest() throws Exception {
+        //given
         UserId peter = new UserId().id("peterprofile");
-        GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot").userId(peter);
-        resourceService.getResourcesById(idRequest).join();
-    }
-
-    @Test
-    public void shouldGetResourcesByIdOfAFile() {
-        UserId peter = new UserId().id("peterprofile");
+        //when
         GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek3.csv").userId(peter);
-        Map<LeafResource, ConnectionDetail> actual = resourceService.getResourcesById(idRequest).join();
 
-        Map<LeafResource, ConnectionDetail> expected = new HashMap<>();
-        FileResource file = new FileResource().id("/secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek3.csv").serialisedFormat("csv").type("DropFootMeasurementsWeek3");
-        EgeriaConnection egeriaConnection = new EgeriaConnection("http://localhost:18081", "cocoMDS1", idRequest.getUserId().toString());
-        expected.put(file, egeriaConnection);
-
-        assertThat(actual.size(), is((1)));
-        assertThat(actual, is(expected));
-
+        try {
+            resourceService.getResourcesById(idRequest);
+            fail("exception expected");
+        } catch (Exception e) {
+            //then
+        }
     }
 
     @Test
@@ -163,8 +195,8 @@ public class EgeriaResourceServiceTest {
     public void shouldGetFormatConnectionWhenNoTypeConnection() {
     }
 
-
     @Test
     public void shouldResolveParents() {
     }
+
 }

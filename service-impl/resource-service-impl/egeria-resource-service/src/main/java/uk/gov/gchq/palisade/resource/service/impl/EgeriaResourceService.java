@@ -16,16 +16,21 @@
 
 package uk.gov.gchq.palisade.resource.service.impl;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.hadoop.conf.Configuration;
 import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
+import org.odpi.openmetadata.frameworks.connectors.properties.beans.CommentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.resource.LeafResource;
-import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
@@ -33,15 +38,12 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
-import uk.gov.gchq.palisade.service.EgeriaConnection;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -59,13 +61,21 @@ public class EgeriaResourceService implements ResourceService {
     protected String egeriaServerURL;
     private transient AssetConsumer assetConsumer;
 
+    @JsonIgnore
+    private ResourceService proxyOf;
+
     public EgeriaResourceService() {
+        proxyOf = new HadoopResourceService();
     }
 
-    public EgeriaResourceService(final String egeriaServer, final String egeriaServerURL) throws InvalidParameterException {
+    @JsonCreator
+    public EgeriaResourceService(@JsonProperty("egeriServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL, @JsonProperty("conf") final Configuration conf, @JsonProperty("cacheService") final CacheService cacheService) throws InvalidParameterException, IOException {
         this.egeriaServer = egeriaServer;
         this.egeriaServerURL = egeriaServerURL;
         assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
+        if (conf != null) {
+            proxyOf = new HadoopResourceService(conf, cacheService);
+        }
     }
 
     /**
@@ -94,65 +104,40 @@ public class EgeriaResourceService implements ResourceService {
      * resource.
      */
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
-        Map<LeafResource, ConnectionDetail> connections = new HashMap<>();
-        List<String> assetUniverse = new ArrayList();
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                /**
-                 * If the user passes in an absolute path then the code will return one asset
-                 * If the user passes in a folder, the code will return all assets, including folders, in all folders including nested
-                 **/
-                if (request.getResourceId().endsWith("/") || (!(request.getResourceId().endsWith(".csv")))) {
-                    //loops through, increments page number by 5
-                    //currently if the returned number is not devisable by 5 it will exit the loop and get the last set of results, this is a temp solution awaiting egeria
-                    int maxPage = 5;
-                    for (maxPage = 5; assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage).size() % maxPage == 0; maxPage += 5) {
-                        assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
-                    }
-                    assetUniverse.addAll(assetConsumer.findAssets(request.getUserId().getId(), ".*file.*", maxPage - 5, maxPage));
-                    //prevents duplicates
-                    Set<String> set = new LinkedHashSet<>();
-                    set.addAll(assetUniverse);
-                    assetUniverse.clear();
-                    assetUniverse.addAll(set);
-                } else {
-                    //if user passes in absolute path, it will call this api and return one file
-                    assetUniverse.addAll(assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), 0, 10));
-                }
-                assetUniverse.forEach((guid) -> {
-                    try {
-                        AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
-                        System.out.println(asset.getAssetTypeName());
-                        //gets all files that aren't FileFolder, i.e csv/avro
-                        if (!asset.getAssetTypeName().equals("FileFolder")) {
-                            //Strips the Qualified name to form the FileResource Type
-                            String id = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(":") + 2);
-                            String serialisedFormat = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(".") + 1);
-                            String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf("/") + 1, asset.getQualifiedName().indexOf("."));
-                            FileResource file = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
-//                          TODO need to create a ConnectionDetail from the assetConnection.next()
-                            EgeriaConnection egeriaConnection = new EgeriaConnection(egeriaServerURL, egeriaServer, request.getUserId().toString());
-                            connections.put(file, egeriaConnection);
-                        }
-                    } catch (InvalidParameterException e) {
-                        LOGGER.debug("InvalidParameterException: " + e);
-                    } catch (PropertyServerException e) {
-                        LOGGER.debug("PropertyServerException: " + e);
-                    } catch (UserNotAuthorizedException e) {
-                        LOGGER.debug("UserNotAuthorizedException: " + e);
-                    }
-                });
-            } catch (InvalidParameterException e) {
-                LOGGER.debug("InvalidParameterException: " + e);
-            } catch (PropertyServerException e) {
-                System.out.println(e);
-                LOGGER.debug("PropertyServerException: " + e);
-            } catch (UserNotAuthorizedException e) {
-                LOGGER.debug("UserNotAuthorizedException: " + e);
-            }
-            return connections;
-        });
+        List<AssetUniverse> fileArray = new ArrayList();
+        System.out.println(request.getResourceId());
 
+        try {
+            List<String> assetUniverse = new ArrayList();
+            assetUniverse.addAll(assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), 0, 10));
+            assetUniverse.forEach((guid) -> {
+                try {
+                    AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
+                    if (!asset.getAssetTypeName().equals("FileFolder")) {
+                        assetConsumer.addCommentToAsset(request.getUserId().getId(), guid, CommentType.STANDARD_COMMENT, "User " + request.getUserId().getId() + " is accessing this file", true);
+                        fileArray.add(asset);
+                    }
+                } catch (InvalidParameterException e) {
+                    LOGGER.debug("InvalidParameterException: " + e);
+                } catch (PropertyServerException e) {
+                    LOGGER.debug("PropertyServerException: " + e);
+                } catch (UserNotAuthorizedException e) {
+                    LOGGER.debug("UserNotAuthorizedException: " + e);
+                }
+            });
+        } catch (InvalidParameterException e) {
+            LOGGER.debug("InvalidParameterException: " + e);
+        } catch (PropertyServerException e) {
+            System.out.println(e);
+            LOGGER.debug("PropertyServerException: " + e);
+        } catch (UserNotAuthorizedException e) {
+            LOGGER.debug("UserNotAuthorizedException: " + e);
+        }
+        if (!fileArray.isEmpty()) {
+            return proxyOf.getResourcesById(request);
+        } else {
+            return null;
+        }
     }
 
 
