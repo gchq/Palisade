@@ -30,8 +30,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.fail;
-
 public class EgeriaResourceServiceTest {
 
     public static final String FILE = System.getProperty("os.name").toLowerCase().startsWith("win") ? "file:///" : "file://";
@@ -111,18 +109,12 @@ public class EgeriaResourceServiceTest {
     }
 
     @Test
-    public void getResourcesByIdTest() throws Exception {
+    public void getResourcesByIdTest() {
         //given
         UserId peter = new UserId().id("peterprofile");
         //when
         GetResourcesByIdRequest idRequest = new GetResourcesByIdRequest().resourceId("file://secured/research/clinical-trials/drop-foot/DropFootMeasurementsWeek3.csv").userId(peter);
-
-        try {
-            resourceService.getResourcesById(idRequest);
-            fail("exception expected");
-        } catch (Exception e) {
-            //then
-        }
+        resourceService.getResourcesById(idRequest);
     }
 
     @Test
