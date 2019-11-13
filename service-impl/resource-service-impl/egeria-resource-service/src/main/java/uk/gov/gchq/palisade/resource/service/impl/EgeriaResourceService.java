@@ -145,6 +145,7 @@ public class EgeriaResourceService implements ResourceService {
             } catch (InvalidParameterException e) {
                 LOGGER.debug("InvalidParameterException: " + e);
             } catch (PropertyServerException e) {
+                System.out.println(e);
                 LOGGER.debug("PropertyServerException: " + e);
             } catch (UserNotAuthorizedException e) {
                 LOGGER.debug("UserNotAuthorizedException: " + e);
