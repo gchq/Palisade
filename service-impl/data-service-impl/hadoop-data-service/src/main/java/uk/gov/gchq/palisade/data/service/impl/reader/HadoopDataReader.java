@@ -32,6 +32,8 @@ import uk.gov.gchq.palisade.resource.LeafResource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -85,9 +87,15 @@ public class HadoopDataReader extends CachedSerialisedDataReader {
     protected InputStream readRaw(final LeafResource resource) {
         requireNonNull(resource, "resource is required");
 
-        final InputStream inputStream;
+        InputStream inputStream;
         try {
-            inputStream = fs.open(new Path(resource.getId()));
+            //1st attempt: process this as a URI
+            try {
+                inputStream = fs.open(new Path(new URI(resource.getId())));
+            } catch (URISyntaxException e) {
+                //2nd attempt: process as a string
+                inputStream = fs.open(new Path(resource.getId()));
+            }
         } catch (final IOException e) {
             throw new RuntimeException("Unable to read resource: " + resource.getId(), e);
         }

@@ -16,6 +16,8 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
@@ -25,6 +27,14 @@ public class PhoneNumber {
     private String phoneNumber;
     private static final String[] DEFAULT_TYPES = new String[]{"Mobile"};
     private static final String[] POSSIBLE_TYPES = new String[]{"Home", "Work", "Work Mobile"};
+
+    public PhoneNumber() {
+    }
+
+    public PhoneNumber(final PhoneNumber otherNumber) {
+        type = otherNumber.type;
+        phoneNumber = otherNumber.phoneNumber;
+    }
 
     public static PhoneNumber[] generateMany(final Random random) {
         int numberOfExtraContacts = random.nextInt(3);
@@ -77,5 +87,31 @@ public class PhoneNumber {
                 .append("type", type)
                 .append("phone number", phoneNumber)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final PhoneNumber otherNumber = (PhoneNumber) o;
+
+        return new EqualsBuilder()
+                .append(type, otherNumber.type)
+                .append(phoneNumber, otherNumber.phoneNumber)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(13, 43)
+                .append(type)
+                .append(phoneNumber)
+                .toHashCode();
     }
 }

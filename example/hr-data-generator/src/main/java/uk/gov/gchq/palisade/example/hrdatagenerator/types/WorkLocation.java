@@ -17,6 +17,8 @@
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import com.github.javafaker.Faker;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
@@ -24,6 +26,17 @@ import java.util.Random;
 public class WorkLocation {
     private WorkLocationName workLocationName;
     private Address address;
+
+    public WorkLocation() {
+    }
+
+    public WorkLocation(final WorkLocation workLocation) {
+        workLocationName = workLocation.workLocationName;
+
+        if (workLocation.address != null) {
+            address = new Address(workLocation.address);
+        }
+    }
 
     public  WorkLocationName getWorkLocationName() {
         return workLocationName;
@@ -47,12 +60,39 @@ public class WorkLocation {
         workLocation.setWorkLocationName(WorkLocationName.generate(random));
         return workLocation;
     }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("workLocationName", workLocationName)
                 .append("address", address)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final WorkLocation workLocation = (WorkLocation) o;
+
+        return new EqualsBuilder()
+                .append(workLocationName, workLocation.workLocationName)
+                .append(address, workLocation.address)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(13, 41)
+                .append(workLocationName)
+                .append(address)
+                .toHashCode();
     }
 }
 

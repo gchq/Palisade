@@ -3,7 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$DIR/setScriptPath.sh"
 
-# Check if necessary compiled JAR is present
+# Path for compiled JAR
 TARGET_DIR="${EXAMPLE}/performance/target"
 
 FILE_PRESENT=0

@@ -17,17 +17,29 @@
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
 import com.github.javafaker.Faker;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
 
 public class Address {
-
     private String streetAddressNumber;
     private String streetName;
     private String city;
     private String state;
     private String zipCode;
+
+    public Address() {
+    }
+
+    public Address(final Address address) {
+        streetAddressNumber = address.streetAddressNumber;
+        streetName = address.streetName;
+        city = address.city;
+        state = address.state;
+        zipCode = address.zipCode;
+    }
 
     public static Address generate(final Faker faker, final Random random) {
         Address address = new Address();
@@ -89,5 +101,37 @@ public class Address {
                 .append("state", state)
                 .append("zipCode", zipCode)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final Address address = (Address) o;
+
+        return new EqualsBuilder()
+                .append(streetAddressNumber, address.streetAddressNumber)
+                .append(streetName, address.streetName)
+                .append(city, address.city)
+                .append(state, address.state)
+                .append(zipCode, address.zipCode)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(11, 41)
+                .append(streetAddressNumber)
+                .append(streetName)
+                .append(city)
+                .append(state)
+                .append(zipCode)
+                .toHashCode();
     }
 }
