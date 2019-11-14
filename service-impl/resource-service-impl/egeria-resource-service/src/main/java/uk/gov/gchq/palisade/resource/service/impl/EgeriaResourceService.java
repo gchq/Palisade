@@ -19,7 +19,6 @@ package uk.gov.gchq.palisade.resource.service.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.hadoop.conf.Configuration;
 import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
@@ -29,7 +28,6 @@ import org.odpi.openmetadata.frameworks.connectors.properties.beans.CommentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.gchq.palisade.cache.service.CacheService;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
@@ -55,10 +53,7 @@ import java.util.concurrent.CompletableFuture;
  * @see ResourceService
  */
 public class EgeriaResourceService implements ResourceService {
-    public static final String ERROR_RESOLVING_ID = "Error occurred while resolving resource by id";
     private static final Logger LOGGER = LoggerFactory.getLogger(EgeriaResourceService.class);
-    protected String egeriaServer;
-    protected String egeriaServerURL;
     private transient AssetConsumer assetConsumer;
 
     @JsonIgnore
@@ -69,12 +64,10 @@ public class EgeriaResourceService implements ResourceService {
     }
 
     @JsonCreator
-    public EgeriaResourceService(@JsonProperty("egeriServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL, @JsonProperty("conf") final Configuration conf, @JsonProperty("cacheService") final CacheService cacheService) throws InvalidParameterException, IOException {
-        this.egeriaServer = egeriaServer;
-        this.egeriaServerURL = egeriaServerURL;
+    public EgeriaResourceService(@JsonProperty("egeriServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL, @JsonProperty("hadoopResourceService") final HadoopResourceService hadoopResourceService) throws InvalidParameterException, IOException {
         assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
-        if (conf != null) {
-            proxyOf = new HadoopResourceService(conf, cacheService);
+        if (hadoopResourceService != null) {
+            proxyOf = hadoopResourceService;
         }
     }
 

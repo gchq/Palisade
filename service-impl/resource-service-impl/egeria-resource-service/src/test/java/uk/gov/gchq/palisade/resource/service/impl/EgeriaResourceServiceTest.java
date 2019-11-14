@@ -48,13 +48,9 @@ public class EgeriaResourceServiceTest {
     private String inputPathString;
     private FileSystem fs;
     private SimpleCacheService simpleCache;
+    private HadoopResourceService hadoopResourceService;
 
     public EgeriaResourceServiceTest() {
-    }
-
-    private static String getFileNameFromResourceDetails(final String name, final String type, final String format) {
-        //Type, Id, Format
-        return String.format(HadoopResourceDetails.FILE_NAME_FORMAT, type, name, format);
     }
 
     @Before
@@ -67,7 +63,10 @@ public class EgeriaResourceServiceTest {
         simpleConnection = new SimpleConnectionDetail().service(new MockDataService());
         simpleCache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
 
-        resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18081", conf, simpleCache);
+        hadoopResourceService = new HadoopResourceService(conf, simpleCache);
+        hadoopResourceService.addDataService(simpleConnection);
+
+        resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18081", hadoopResourceService);
     }
 
     private Configuration createConf() {
