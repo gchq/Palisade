@@ -39,7 +39,6 @@ import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,7 +63,7 @@ public class EgeriaResourceService implements ResourceService {
     private String egeriaServerURL;
 
     @JsonCreator
-    public EgeriaResourceService(@JsonProperty("egeriaServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL) throws InvalidParameterException, IOException {
+    public EgeriaResourceService(@JsonProperty("egeriaServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL) throws InvalidParameterException {
         assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
         this.egeriaServer = egeriaServer;
         this.egeriaServerURL = egeriaServerURL;
