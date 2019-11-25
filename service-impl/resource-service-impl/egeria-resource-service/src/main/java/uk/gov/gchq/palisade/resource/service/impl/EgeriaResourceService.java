@@ -17,32 +17,37 @@
 package uk.gov.gchq.palisade.resource.service.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
+import org.odpi.openmetadata.frameworks.connectors.Connector;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterException;
-import org.odpi.openmetadata.frameworks.connectors.ffdc.PropertyServerException;
-import org.odpi.openmetadata.frameworks.connectors.ffdc.UserNotAuthorizedException;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
 import org.odpi.openmetadata.frameworks.connectors.properties.beans.CommentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
 import uk.gov.gchq.palisade.resource.LeafResource;
+import uk.gov.gchq.palisade.resource.impl.FileResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
+import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * A implementation of the ResourceService for Hadoop.
@@ -55,20 +60,14 @@ import java.util.concurrent.CompletableFuture;
 public class EgeriaResourceService implements ResourceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EgeriaResourceService.class);
     private transient AssetConsumer assetConsumer;
-
-    @JsonIgnore
-    private ResourceService proxyOf;
-
-    public EgeriaResourceService() {
-        proxyOf = new HadoopResourceService();
-    }
+    private String egeriaServer;
+    private String egeriaServerURL;
 
     @JsonCreator
-    public EgeriaResourceService(@JsonProperty("egeriServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL, @JsonProperty("hadoopResourceService") final HadoopResourceService hadoopResourceService) throws InvalidParameterException, IOException {
+    public EgeriaResourceService(@JsonProperty("egeriServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL) throws InvalidParameterException, IOException {
         assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
-        if (hadoopResourceService != null) {
-            proxyOf = hadoopResourceService;
-        }
+        this.egeriaServer = egeriaServer;
+        this.egeriaServerURL = egeriaServerURL;
     }
 
     /**
@@ -87,7 +86,6 @@ public class EgeriaResourceService implements ResourceService {
         return null;
     }
 
-
     /**
      * Retrieve resource and connection details by resource ID. The request object allows the client to specify the
      * resource ID and obtain the connection details once the returned future has completed.
@@ -97,40 +95,57 @@ public class EgeriaResourceService implements ResourceService {
      * resource.
      */
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
-        List<AssetUniverse> fileArray = new ArrayList();
+        Map<AssetUniverse, Connector> fileArray = new HashMap<>();
         System.out.println(request.getResourceId());
 
-        try {
-            List<String> assetUniverse = new ArrayList();
-            assetUniverse.addAll(assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), 0, 10));
-            assetUniverse.forEach((guid) -> {
-                try {
-                    AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
-                    if (!asset.getAssetTypeName().equals("FileFolder")) {
-                        assetConsumer.addCommentToAsset(request.getUserId().getId(), guid, CommentType.STANDARD_COMMENT, "User " + request.getUserId().getId() + " is accessing this file", true);
-                        fileArray.add(asset);
-                    }
-                } catch (InvalidParameterException e) {
-                    LOGGER.debug("InvalidParameterException: " + e);
-                } catch (PropertyServerException e) {
-                    LOGGER.debug("PropertyServerException: " + e);
-                } catch (UserNotAuthorizedException e) {
-                    LOGGER.debug("UserNotAuthorizedException: " + e);
+        // Get all asset guids
+        List<String> assetUniverse = new ArrayList<>();
+        int PAGE_SIZE = 10;
+        final BiFunction<Integer, Integer, List<String>> pager = (start, size) -> {
+            try {
+                return assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), start, size);
+            } catch (Throwable e) {
+                return Collections.emptyList();
+            }
+        };
+        for (int startFrom = 0; !pager.apply(startFrom, 1).isEmpty(); startFrom += PAGE_SIZE) {
+            assetUniverse.addAll(pager.apply(startFrom, PAGE_SIZE));
+        }
+
+        // Audit use of assets and get connectors
+        assetUniverse.forEach((guid) -> {
+            try {
+                AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
+                if (!asset.getAssetTypeName().equals("FileFolder")) {
+                    Connector connector = assetConsumer.getConnectorForAsset(request.getUserId().getId(), guid);
+                    String comment = String.format("User %s requested %s with request type %s", request.getUserId().getId(), request.getResourceId(), request.getClass().getName());
+                    assetConsumer.addCommentToAsset(request.getUserId().getId(), guid, CommentType.STANDARD_COMMENT, comment, true);
+                    fileArray.put(asset, connector);
                 }
-            });
-        } catch (InvalidParameterException e) {
-            LOGGER.debug("InvalidParameterException: " + e);
-        } catch (PropertyServerException e) {
-            System.out.println(e);
-            LOGGER.debug("PropertyServerException: " + e);
-        } catch (UserNotAuthorizedException e) {
-            LOGGER.debug("UserNotAuthorizedException: " + e);
-        }
-        if (!fileArray.isEmpty()) {
-            return proxyOf.getResourcesById(request);
-        } else {
-            return null;
-        }
+            } catch (Throwable e) {
+                LOGGER.debug(e.toString());
+            }
+        });
+
+        // Return LeafResource-ConnectionDetail map
+        return CompletableFuture.supplyAsync(() -> fileArray.entrySet()
+            .stream()
+            .filter(entry -> !entry.getKey().getAssetTypeName().equals("FileFolder"))
+            .collect(Collectors.toMap(
+                entry -> {
+                    AssetUniverse asset = entry.getKey();
+                    String id = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(":") + 2);
+                    String serialisedFormat = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(".") + 1);
+                    String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf("/") + 1, asset.getQualifiedName().indexOf("."));
+                    return new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
+                },
+                entry -> {
+                    Connector connector = entry.getValue();
+                    // TODO: Use proper information from Egeria rather than hardcoded
+                    return new ProxyRestConnectionDetail().serviceClass(ProxyRestDataService.class).url("localhost/data");
+                }
+            ))
+        );
     }
 
 
@@ -176,8 +191,7 @@ public class EgeriaResourceService implements ResourceService {
      * ResourceService}
      */
     @Override
-    public CompletableFuture<Boolean> addResource(
-            final AddResourceRequest request) {
+    public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
         return null;
     }
 

@@ -13,6 +13,7 @@
 
     <properties>
         <jackson.version>2.10.0</jackson.version>
+        <egeria.version>1.1</egeria.version>
     </properties>
 
     <dependencies>
@@ -24,19 +25,24 @@
         </dependency>
         <dependency>
             <groupId>org.odpi.egeria</groupId>
-            <artifactId>asset-consumer-client</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <artifactId>open-connector-framework</artifactId>
+            <version>${egeria.version}</version>
         </dependency>
         <dependency>
             <groupId>org.odpi.egeria</groupId>
+            <artifactId>asset-consumer-client</artifactId>
+            <version>${egeria.version}</version>
+        </dependency>
+        <!--<dependency>
+            <groupId>org.odpi.egeria</groupId>
             <artifactId>csv-file-connector</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <version>${egeria.version}</version>
         </dependency>
         <dependency>
             <groupId>org.odpi.egeria</groupId>
             <artifactId>ocf-metadata-client</artifactId>
-            <version>1.2-SNAPSHOT</version>
-        </dependency>
+            <version>${egeria.version}</version>
+        </dependency>-->
         <dependency>
             <groupId>uk.gov.gchq.palisade</groupId>
             <artifactId>client-common</artifactId>
@@ -56,11 +62,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.10.0</version>
-        </dependency>
-        <dependency>
             <groupId>uk.gov.gchq.palisade</groupId>
             <artifactId>hadoop-resource-service</artifactId>
             <version>0.3.1-SNAPSHOT</version>
@@ -76,12 +77,6 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-hdfs</artifactId>
             <version>3.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>uk.gov.gchq.palisade</groupId>
-            <artifactId>hashmap-backing-store</artifactId>
-            <version>0.3.1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
