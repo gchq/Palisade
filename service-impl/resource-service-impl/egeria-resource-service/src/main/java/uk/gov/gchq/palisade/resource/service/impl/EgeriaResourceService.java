@@ -64,7 +64,7 @@ public class EgeriaResourceService implements ResourceService {
     private String egeriaServerURL;
 
     @JsonCreator
-    public EgeriaResourceService(@JsonProperty("egeriServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL) throws InvalidParameterException, IOException {
+    public EgeriaResourceService(@JsonProperty("egeriaServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL) throws InvalidParameterException, IOException {
         assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
         this.egeriaServer = egeriaServer;
         this.egeriaServerURL = egeriaServerURL;
@@ -100,7 +100,7 @@ public class EgeriaResourceService implements ResourceService {
 
         // Get all asset guids
         List<String> assetUniverse = new ArrayList<>();
-        int PAGE_SIZE = 10;
+        int pageSize = 10;
         final BiFunction<Integer, Integer, List<String>> pager = (start, size) -> {
             try {
                 return assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), start, size);
@@ -108,8 +108,8 @@ public class EgeriaResourceService implements ResourceService {
                 return Collections.emptyList();
             }
         };
-        for (int startFrom = 0; !pager.apply(startFrom, 1).isEmpty(); startFrom += PAGE_SIZE) {
-            assetUniverse.addAll(pager.apply(startFrom, PAGE_SIZE));
+        for (int startFrom = 0; !pager.apply(startFrom, 1).isEmpty(); startFrom += pageSize) {
+            assetUniverse.addAll(pager.apply(startFrom, pageSize));
         }
 
         // Audit use of assets and get connectors
