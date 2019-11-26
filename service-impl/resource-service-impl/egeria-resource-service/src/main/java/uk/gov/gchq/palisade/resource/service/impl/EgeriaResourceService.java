@@ -39,11 +39,12 @@ import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -63,10 +64,14 @@ public class EgeriaResourceService implements ResourceService {
     private String egeriaServerURL;
 
     @JsonCreator
-    public EgeriaResourceService(@JsonProperty("egeriaServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL) throws InvalidParameterException {
-        assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
-        this.egeriaServer = egeriaServer;
-        this.egeriaServerURL = egeriaServerURL;
+    public EgeriaResourceService(@JsonProperty("egeriaServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL) throws RuntimeException {
+        try {
+            assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
+            this.egeriaServer = egeriaServer;
+            this.egeriaServerURL = egeriaServerURL;
+        } catch (InvalidParameterException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     /**
@@ -94,12 +99,8 @@ public class EgeriaResourceService implements ResourceService {
      * resource.
      */
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
-        Map<AssetUniverse, Connector> fileArray = new HashMap<>();
         System.out.println(request.getResourceId());
 
-        // Get all asset guids
-        List<String> assetUniverse = new ArrayList<>();
-        int pageSize = 10;
         final BiFunction<Integer, Integer, List<String>> pager = (start, size) -> {
             try {
                 return assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), start, size);
@@ -107,24 +108,37 @@ public class EgeriaResourceService implements ResourceService {
                 return Collections.emptyList();
             }
         };
-        for (int startFrom = 0; !pager.apply(startFrom, 1).isEmpty(); startFrom += pageSize) {
-            assetUniverse.addAll(pager.apply(startFrom, pageSize));
+
+        // Get all asset guids
+        List<String> assetUniverse = new ArrayList<>();
+        final int pageSize = 10;
+        int startFrom = 0;
+        List<String> page;
+        while (!(page = pager.apply(startFrom, pageSize)).isEmpty()) {
+            assetUniverse.addAll(page);
+            startFrom += pageSize;
         }
 
         // Audit use of assets and get connectors
-        assetUniverse.forEach((guid) -> {
-            try {
-                AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
-                if (!asset.getAssetTypeName().equals("FileFolder")) {
-                    Connector connector = assetConsumer.getConnectorForAsset(request.getUserId().getId(), guid);
-                    String comment = String.format("User %s requested %s with request type %s", request.getUserId().getId(), request.getResourceId(), request.getClass().getName());
-                    assetConsumer.addCommentToAsset(request.getUserId().getId(), guid, CommentType.STANDARD_COMMENT, comment, true);
-                    fileArray.put(asset, connector);
-                }
-            } catch (Throwable e) {
-                LOGGER.debug(e.toString());
-            }
-        });
+        Map<AssetUniverse, Connector> fileArray = assetUniverse.stream()
+                .map(guid -> {
+                    try {
+                        AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
+                        if (!asset.getAssetTypeName().equals("FileFolder")) {
+                            Connector connector = assetConsumer.getConnectorForAsset(request.getUserId().getId(), guid);
+                            String comment = String.format("User %s requested %s with request type %s", request.getUserId().getId(), request.getResourceId(), request.getClass().getName());
+                            assetConsumer.addCommentToAsset(request.getUserId().getId(), guid, CommentType.STANDARD_COMMENT, comment, true);
+                            return new SimpleEntry<AssetUniverse, Connector>(asset, connector);
+                        } else {
+                            return null;
+                        }
+                    } catch (Throwable e) {
+                        LOGGER.error(e.getMessage());
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 
         // Return LeafResource-ConnectionDetail map
         return CompletableFuture.supplyAsync(() -> fileArray.entrySet()
