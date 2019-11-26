@@ -74,6 +74,39 @@ public class EgeriaResourceService implements ResourceService {
         }
     }
 
+    List<String> pageAssets(BiFunction<Integer, Integer, List<String>> pager) {
+        List<String> assets = new ArrayList<>();
+        final int pageSize = 10;
+        int startFrom = 0;
+        List<String> page;
+        while (!(page = pager.apply(startFrom, pageSize)).isEmpty()) {
+            assets.addAll(page);
+            startFrom += pageSize;
+        }
+        return assets;
+    }
+
+    CompletableFuture<Map<LeafResource, ConnectionDetail>> asResourceMap(Map<AssetUniverse, Connector> connectorMap) {
+        return CompletableFuture.supplyAsync(() -> connectorMap.entrySet()
+                .stream()
+                .filter(entry -> !entry.getKey().getAssetTypeName().equals("FileFolder"))
+                .collect(Collectors.toMap(
+                        entry -> {
+                            AssetUniverse asset = entry.getKey();
+                            String id = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(":") + 2);
+                            String serialisedFormat = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(".") + 1);
+                            String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf("/") + 1, asset.getQualifiedName().indexOf("."));
+                            return new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
+                        },
+                        entry -> {
+                            Connector connector = entry.getValue();
+                            // TODO: Use proper information from Egeria rather than hardcoded
+                            return new ProxyRestConnectionDetail().serviceClass(ProxyRestDataService.class).url("localhost/data");
+                        }
+                ))
+        );
+    }
+
     /**
      * Get a list of resources based on a specific resource. This allows for the retrieval of the appropriate {@link
      * ConnectionDetail}s for a given resource. It may also be used to retrieve the details all the resources that are
@@ -105,22 +138,16 @@ public class EgeriaResourceService implements ResourceService {
             try {
                 return assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), start, size);
             } catch (Throwable e) {
+                LOGGER.debug("Egeria threw exception {}, expected empty paging response", e.getMessage());
                 return Collections.emptyList();
             }
         };
 
         // Get all asset guids
-        List<String> assetUniverse = new ArrayList<>();
-        final int pageSize = 10;
-        int startFrom = 0;
-        List<String> page;
-        while (!(page = pager.apply(startFrom, pageSize)).isEmpty()) {
-            assetUniverse.addAll(page);
-            startFrom += pageSize;
-        }
+        List<String> assets = pageAssets(pager);
 
         // Audit use of assets and get connectors
-        Map<AssetUniverse, Connector> fileArray = assetUniverse.stream()
+        Map<AssetUniverse, Connector> assetConnnectorMap = assets.stream()
                 .map(guid -> {
                     try {
                         AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
@@ -141,24 +168,7 @@ public class EgeriaResourceService implements ResourceService {
                 .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 
         // Return LeafResource-ConnectionDetail map
-        return CompletableFuture.supplyAsync(() -> fileArray.entrySet()
-            .stream()
-            .filter(entry -> !entry.getKey().getAssetTypeName().equals("FileFolder"))
-            .collect(Collectors.toMap(
-                entry -> {
-                    AssetUniverse asset = entry.getKey();
-                    String id = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(":") + 2);
-                    String serialisedFormat = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(".") + 1);
-                    String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf("/") + 1, asset.getQualifiedName().indexOf("."));
-                    return new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
-                },
-                entry -> {
-                    Connector connector = entry.getValue();
-                    // TODO: Use proper information from Egeria rather than hardcoded
-                    return new ProxyRestConnectionDetail().serviceClass(ProxyRestDataService.class).url("localhost/data");
-                }
-            ))
-        );
+        return asResourceMap(assetConnnectorMap);
     }
 
 
