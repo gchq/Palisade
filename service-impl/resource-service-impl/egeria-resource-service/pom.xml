@@ -33,12 +33,12 @@
             <artifactId>asset-consumer-client</artifactId>
             <version>${egeria.version}</version>
         </dependency>
-        <!--<dependency>
+        <dependency>
             <groupId>org.odpi.egeria</groupId>
             <artifactId>csv-file-connector</artifactId>
             <version>${egeria.version}</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.odpi.egeria</groupId>
             <artifactId>ocf-metadata-client</artifactId>
             <version>${egeria.version}</version>
