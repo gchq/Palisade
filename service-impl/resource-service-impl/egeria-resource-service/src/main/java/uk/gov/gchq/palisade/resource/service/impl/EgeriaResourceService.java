@@ -133,8 +133,11 @@ public class EgeriaResourceService implements ResourceService {
 
     static ChildResource resolveParents(final ChildResource resource) {
         String path = resource.getId();
+        if (path.endsWith(File.separator)) {
+            path = path.substring(0, path.length() - 1);
+        }
         String rootPath = path.substring(0, path.indexOf(File.separator));
-        String parentPath = path.substring(0, path.lastIndexOf(File.separator));;
+        String parentPath = path.substring(0, path.lastIndexOf(File.separator));
         if (parentPath.equals(rootPath)) {
             SystemResource root = new SystemResource().id(parentPath);
             resource.setParent(root);
@@ -154,7 +157,7 @@ public class EgeriaResourceService implements ResourceService {
                             AssetUniverse asset = entry.getKey();
                             String id = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(":") + 2);
                             String serialisedFormat = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(".") + 1);
-                            String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(File.separator + 1, asset.getQualifiedName().indexOf(".")));
+                            String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(File.separator) + 1, asset.getQualifiedName().indexOf("."));
                             FileResource resource = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
                             return (FileResource) resolveParents(resource);
                         },
