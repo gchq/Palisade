@@ -26,9 +26,13 @@ import org.odpi.openmetadata.frameworks.connectors.properties.beans.CommentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
+import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.LeafResource;
+import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
+import uk.gov.gchq.palisade.resource.impl.SystemResource;
 import uk.gov.gchq.palisade.resource.service.ResourceService;
 import uk.gov.gchq.palisade.resource.service.request.AddResourceRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
@@ -39,6 +43,7 @@ import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
+import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,8 +51,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A implementation of the ResourceService for Hadoop.
@@ -62,6 +68,7 @@ public class EgeriaResourceService implements ResourceService {
     private transient AssetConsumer assetConsumer;
     private String egeriaServer;
     private String egeriaServerURL;
+    private final int pageSize = 10;
 
     @JsonCreator
     public EgeriaResourceService(@JsonProperty("egeriaServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL) throws RuntimeException {
@@ -70,40 +77,93 @@ public class EgeriaResourceService implements ResourceService {
             this.egeriaServer = egeriaServer;
             this.egeriaServerURL = egeriaServerURL;
         } catch (InvalidParameterException e) {
+            LOGGER.error("Cast EgeriaException ({}) to RuntimeException", e.getClass().toString());
             throw new RuntimeException(e.getMessage());
         }
     }
 
-    List<String> pageAssets(BiFunction<Integer, Integer, List<String>> pager) {
+    Stream<String> pageAssets(final Function<Integer, List<String>> pager) {
         List<String> assets = new ArrayList<>();
-        final int pageSize = 10;
         int startFrom = 0;
         List<String> page;
-        while (!(page = pager.apply(startFrom, pageSize)).isEmpty()) {
+        while (!(page = pager.apply(startFrom)).isEmpty()) {
             assets.addAll(page);
             startFrom += pageSize;
         }
-        return assets;
+        return assets.stream();
     }
 
-    CompletableFuture<Map<LeafResource, ConnectionDetail>> asResourceMap(Map<AssetUniverse, Connector> connectorMap) {
-        return CompletableFuture.supplyAsync(() -> connectorMap.entrySet()
-                .stream()
-                .filter(entry -> !entry.getKey().getAssetTypeName().equals("FileFolder"))
+    Stream<AssetUniverse> asAssetUniverse(final Stream<String> assets, final UserId userId) {
+        return assets.map(guid -> {
+                try {
+                    return assetConsumer.getAssetProperties(userId.getId(), guid);
+                } catch (Throwable e) {
+                    LOGGER.error("Exception while getting properties for asset {}:", guid);
+                    LOGGER.error(e.getMessage());
+                    return null;
+                }
+            })
+        .filter(Objects::nonNull);
+    }
+
+    Stream<AssetUniverse> tagWithMetadata(final Stream<AssetUniverse> assets, final UserId userId, final String comment) {
+        return assets.peek(asset -> {
+                try {
+                    assetConsumer.addCommentToAsset(userId.getId(), asset.getGUID(), CommentType.STANDARD_COMMENT, comment, true);
+                    LOGGER.debug("Added comment {} to asset {}", comment, asset.getGUID());
+                } catch (Throwable e) {
+                    LOGGER.warn("Exception while adding comment to asset {}:", asset.getGUID());
+                    LOGGER.warn(e.getMessage());
+                }
+            });
+    }
+
+    Stream<SimpleEntry<AssetUniverse, Connector>> withConnectors(final Stream<AssetUniverse> assets, final UserId userId) {
+        return assets.map(asset -> {
+                Connector connector = null;
+                try {
+                    connector = assetConsumer.getConnectorForAsset(userId.getId(), asset.getGUID());
+                } catch (Throwable e) {
+                    LOGGER.warn("Exception while getting connector for asset {}:", asset.getGUID());
+                    LOGGER.warn(e.getMessage());
+                }
+                return new SimpleEntry<>(asset, connector);
+            });
+    }
+
+    static ChildResource resolveParents(final ChildResource resource) {
+        String path = resource.getId();
+        String rootPath = path.substring(0, path.indexOf(File.separator));
+        String parentPath = path.substring(0, path.lastIndexOf(File.separator));;
+        if (parentPath.equals(rootPath)) {
+            SystemResource root = new SystemResource().id(parentPath);
+            resource.setParent(root);
+        } else {
+            DirectoryResource parent = new DirectoryResource().id(parentPath);
+            resolveParents(parent);
+            resource.setParent(parent);
+        }
+        return resource;
+    }
+
+    CompletableFuture<Map<LeafResource, ConnectionDetail>> asResourceMap(final Stream<SimpleEntry<AssetUniverse, Connector>> assetConnectors) {
+        return CompletableFuture.supplyAsync(() -> assetConnectors
+                //.filter(entry -> !entry.getKey().getAssetTypeName().equals("FileFolder"))
                 .collect(Collectors.toMap(
                         entry -> {
                             AssetUniverse asset = entry.getKey();
                             String id = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(":") + 2);
                             String serialisedFormat = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(".") + 1);
-                            String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf("/") + 1, asset.getQualifiedName().indexOf("."));
-                            return new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
+                            String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(File.separator + 1, asset.getQualifiedName().indexOf(".")));
+                            FileResource resource = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
+                            return (FileResource) resolveParents(resource);
                         },
                         entry -> {
                             Connector connector = entry.getValue();
                             // TODO: Use proper information from Egeria rather than hardcoded
-                            return new ProxyRestConnectionDetail().serviceClass(ProxyRestDataService.class).url("localhost/data");
+                            return new ProxyRestConnectionDetail().serviceClass(ProxyRestDataService.class).url("http://localhost/data");
                         }
-                ))
+                    ))
         );
     }
 
@@ -132,48 +192,36 @@ public class EgeriaResourceService implements ResourceService {
      * resource.
      */
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesById(final GetResourcesByIdRequest request) {
-        System.out.println(request.getResourceId());
-
-        final BiFunction<Integer, Integer, List<String>> pager = (start, size) -> {
+        Function<Integer, List<String>> pager = (start) -> {
+            List<String> page = null;
             try {
-                return assetConsumer.getAssetsByName(request.getUserId().getId(), request.getResourceId(), start, size);
+                page = this.assetConsumer.findAssets(request.getUserId().getId(), request.getResourceId(), start, this.pageSize);
             } catch (Throwable e) {
-                LOGGER.debug("Egeria threw exception {}, expected empty paging response", e.getMessage());
-                return Collections.emptyList();
+                LOGGER.debug("Exception while paging (is the paging response expected to be empty?):");
+                LOGGER.debug(e.getMessage());
             }
+            return Objects.nonNull(page) ? page : Collections.emptyList();
         };
+        final UserId userId = request.getUserId();
 
         // Get all asset guids
-        List<String> assets = pageAssets(pager);
+        final Stream<String> assets = pageAssets(pager);
 
-        // Audit use of assets and get connectors
-        Map<AssetUniverse, Connector> assetConnnectorMap = assets.stream()
-                .map(guid -> {
-                    try {
-                        AssetUniverse asset = assetConsumer.getAssetProperties(request.getUserId().getId(), guid);
-                        if (!asset.getAssetTypeName().equals("FileFolder")) {
-                            Connector connector = assetConsumer.getConnectorForAsset(request.getUserId().getId(), guid);
-                            String comment = String.format("User %s requested %s with request type %s", request.getUserId().getId(), request.getResourceId(), request.getClass().getName());
-                            assetConsumer.addCommentToAsset(request.getUserId().getId(), guid, CommentType.STANDARD_COMMENT, comment, true);
-                            return new SimpleEntry<AssetUniverse, Connector>(asset, connector);
-                        } else {
-                            return null;
-                        }
-                    } catch (Throwable e) {
-                        LOGGER.error(e.getMessage());
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
+        // Filter out inaccessible assets
+        final Stream<AssetUniverse> availableAssets = asAssetUniverse(assets, userId);
 
-        // Return LeafResource-ConnectionDetail map
-        return asResourceMap(assetConnnectorMap);
+        // Audit use of assets with Egeria metadata tagging
+        final Stream<AssetUniverse> auditedAssets = tagWithMetadata(availableAssets, userId, request.toString());
+
+        // Get connectors for assets
+        final Stream<SimpleEntry<AssetUniverse, Connector>> assetConnectors = withConnectors(auditedAssets, userId);
+
+        // Return LeafResource-ConnectionDetail map for data service
+        return asResourceMap(assetConnectors);
     }
 
-
     /**
-     * Obtain a list of resources that match a specifc resource type. This method allows a client to obtain potentially
+     * Obtain a list of resources that match a specific resource type. This method allows a client to obtain potentially
      * large collections of resources by requesting all the resources of one particular type. For example, a client may
      * request all "employee contact card" records. Please note the warning in the class documentation above, that just
      * because a resource is available does not guarantee that the requesting client has the right to access it.
