@@ -21,7 +21,6 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class EgeriaResourceServiceTest {
 
-    public static final String FILE = System.getProperty("os.name").toLowerCase().startsWith("win") ? "file:///" : "file://";
     private static final Logger LOGGER = LoggerFactory.getLogger(EgeriaResourceServiceTest.class);
 
     private EgeriaResourceService resourceService;
