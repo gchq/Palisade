@@ -19,8 +19,8 @@ package uk.gov.gchq.palisade.resource.service.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.odpi.openmetadata.accessservices.assetconsumer.client.AssetConsumer;
-import org.odpi.openmetadata.frameworks.connectors.Connector;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.InvalidParameterException;
+import org.odpi.openmetadata.frameworks.connectors.properties.AdditionalProperties;
 import org.odpi.openmetadata.frameworks.connectors.properties.AssetUniverse;
 import org.odpi.openmetadata.frameworks.connectors.properties.beans.CommentType;
 import org.slf4j.Logger;
@@ -40,6 +40,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByResourceReque
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesBySerialisedFormatRequest;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
+import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
 import uk.gov.gchq.palisade.service.request.Request;
 
@@ -118,16 +119,20 @@ public class EgeriaResourceService implements ResourceService {
             });
     }
 
-    Stream<SimpleEntry<AssetUniverse, Connector>> withConnectors(final Stream<AssetUniverse> assets, final UserId userId) {
+    Stream<SimpleEntry<AssetUniverse, ConnectionDetail>> withConnectionDetails(final Stream<AssetUniverse> assets, final UserId userId) {
         return assets.map(asset -> {
-                Connector connector = null;
+                ConnectionDetail connectionDetail = null;
                 try {
-                    connector = assetConsumer.getConnectorForAsset(userId.getId(), asset.getGUID());
+                    //connector = assetConsumer.getConnectorForAsset(userId.getId(), asset.getGUID());
+                    AdditionalProperties props = asset.getAdditionalProperties();
+                    Class<? extends ProxyRestService> serviceClass = (Class<? extends ProxyRestService>) Class.forName(props.getProperty("proxyRestServiceClass"));
+                    String url = props.getProperty("proxyRestServiceUrl");
+                    connectionDetail = new ProxyRestConnectionDetail().serviceClass(serviceClass).url(url);
                 } catch (Throwable e) {
-                    LOGGER.warn("Exception while getting connector for asset {}:", asset.getGUID());
+                    LOGGER.warn("Exception while getting connection details for asset {}:", asset.getGUID());
                     LOGGER.warn(e.getMessage());
                 }
-                return new SimpleEntry<>(asset, connector);
+                return new SimpleEntry<>(asset, connectionDetail);
             });
     }
 
@@ -149,8 +154,8 @@ public class EgeriaResourceService implements ResourceService {
         return resource;
     }
 
-    CompletableFuture<Map<LeafResource, ConnectionDetail>> asResourceMap(final Stream<SimpleEntry<AssetUniverse, Connector>> assetConnectors) {
-        return CompletableFuture.supplyAsync(() -> assetConnectors
+    CompletableFuture<Map<LeafResource, ConnectionDetail>> asResourceMap(final Stream<SimpleEntry<AssetUniverse, ConnectionDetail>> assetConnections) {
+        return CompletableFuture.supplyAsync(() -> assetConnections
                 //.filter(entry -> !entry.getKey().getAssetTypeName().equals("FileFolder"))
                 .collect(Collectors.toMap(
                         entry -> {
@@ -162,9 +167,15 @@ public class EgeriaResourceService implements ResourceService {
                             return (FileResource) resolveParents(resource);
                         },
                         entry -> {
-                            Connector connector = entry.getValue();
-                            // TODO: Use proper information from Egeria rather than hardcoded
-                            return new ProxyRestConnectionDetail().serviceClass(ProxyRestDataService.class).url("http://localhost/data");
+                            ConnectionDetail connectionDetail = entry.getValue();
+                            if (Objects.isNull(connectionDetail)) {
+                                Class<? extends ProxyRestService> serviceClass = ProxyRestDataService.class;
+                                String url = "http://localhost/data";
+                                connectionDetail = new ProxyRestConnectionDetail().serviceClass(serviceClass).url(url);
+                                LOGGER.warn("ConnectionDetail for asset {} was null, using default: proxyRestServiceClass={}, proxyRestServiceUrl={}",
+                                        entry.getKey().getGUID(), serviceClass.getName(), url);
+                            }
+                            return connectionDetail;
                         }
                     ))
         );
@@ -217,7 +228,7 @@ public class EgeriaResourceService implements ResourceService {
         final Stream<AssetUniverse> auditedAssets = tagWithMetadata(availableAssets, userId, request.toString());
 
         // Get connectors for assets
-        final Stream<SimpleEntry<AssetUniverse, Connector>> assetConnectors = withConnectors(auditedAssets, userId);
+        final Stream<SimpleEntry<AssetUniverse, ConnectionDetail>> assetConnectors = withConnectionDetails(auditedAssets, userId);
 
         // Return LeafResource-ConnectionDetail map for data service
         return asResourceMap(assetConnectors);

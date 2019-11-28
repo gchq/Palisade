@@ -1,42 +1,28 @@
 package uk.gov.gchq.palisade.resource.service.impl;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.UserId;
-import uk.gov.gchq.palisade.cache.service.impl.HashMapBackingStore;
-import uk.gov.gchq.palisade.cache.service.impl.SimpleCacheService;
-import uk.gov.gchq.palisade.data.service.impl.MockDataService;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.service.request.GetResourcesByIdRequest;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
-import uk.gov.gchq.palisade.service.SimpleConnectionDetail;
 
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-@Ignore
+//@Ignore
 public class EgeriaResourceServiceTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EgeriaResourceServiceTest.class);
-
     private EgeriaResourceService resourceService;
-    private SimpleConnectionDetail simpleConnection;
-    private SimpleCacheService simpleCache;
 
     public EgeriaResourceServiceTest() {
     }
 
     @Before
     public void setUp() throws RuntimeException {
-        simpleConnection = new SimpleConnectionDetail().service(new MockDataService());
-        simpleCache = new SimpleCacheService().backingStore(new HashMapBackingStore(true));
-
         //resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:30881");
         resourceService = new EgeriaResourceService("cocoMDS1", "http://localhost:18081");
     }
