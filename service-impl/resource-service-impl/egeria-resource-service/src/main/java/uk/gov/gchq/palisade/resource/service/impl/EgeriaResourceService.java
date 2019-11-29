@@ -154,7 +154,7 @@ public class EgeriaResourceService implements ResourceService {
 
     CompletableFuture<Map<LeafResource, ConnectionDetail>> asResourceMap(final Stream<SimpleEntry<AssetUniverse, ConnectionDetail>> assetConnections) {
         return CompletableFuture.supplyAsync(() -> assetConnections
-                //.filter(entry -> !entry.getKey().getAssetTypeName().equals("FileFolder"))
+                .filter(entry -> !entry.getKey().getAssetTypeName().equals("FileFolder"))
                 .collect(Collectors.toMap(
                         entry -> {
                             AssetUniverse asset = entry.getKey();
