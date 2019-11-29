@@ -185,7 +185,7 @@ public class HadoopResourceService implements ResourceService {
     }
 
     /**
-     * Make Jackson interprett the deserialised list correctly.
+     * Make Jackson interpret the deserialised list correctly.
      */
     private static class ConnectionDetailType extends TypeReference<List<ConnectionDetail>> {
     }
