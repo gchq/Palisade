@@ -1,7 +1,6 @@
 package uk.gov.gchq.palisade.resource.service.impl;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.UserId;
@@ -14,7 +13,7 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-@Ignore
+//@Ignore
 public class EgeriaResourceServiceTest {
 
     private EgeriaResourceService resourceService;

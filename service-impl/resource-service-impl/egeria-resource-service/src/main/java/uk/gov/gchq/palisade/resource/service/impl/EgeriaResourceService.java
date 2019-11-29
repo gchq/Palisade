@@ -42,7 +42,6 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
-import uk.gov.gchq.palisade.service.request.Request;
 
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
@@ -123,7 +122,6 @@ public class EgeriaResourceService implements ResourceService {
         return assets.map(asset -> {
                 ConnectionDetail connectionDetail = null;
                 try {
-                    //connector = assetConsumer.getConnectorForAsset(userId.getId(), asset.getGUID());
                     AdditionalProperties props = asset.getAdditionalProperties();
                     Class<? extends ProxyRestService> serviceClass = (Class<? extends ProxyRestService>) Class.forName(props.getProperty("proxyRestServiceClass"));
                     String url = props.getProperty("proxyRestServiceUrl");
@@ -194,7 +192,7 @@ public class EgeriaResourceService implements ResourceService {
      */
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByResource(final GetResourcesByResourceRequest request) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -247,7 +245,7 @@ public class EgeriaResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesByType(
             final GetResourcesByTypeRequest request) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -263,7 +261,7 @@ public class EgeriaResourceService implements ResourceService {
     @Override
     public CompletableFuture<Map<LeafResource, ConnectionDetail>> getResourcesBySerialisedFormat(
             final GetResourcesBySerialisedFormatRequest request) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -277,11 +275,6 @@ public class EgeriaResourceService implements ResourceService {
      */
     @Override
     public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<?> process(final Request request) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }
