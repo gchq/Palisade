@@ -213,7 +213,7 @@ public class SimplePalisadeService implements PalisadeService, PalisadeMetricPro
                     throw new RuntimeException(ex); //rethrow the exception
                 });
 
-        final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId());
+        final GetResourcesByIdRequest resourceRequest = new GetResourcesByIdRequest().resourceId(request.getResourceId()).userId(request.getUserId());
         resourceRequest.setOriginalRequestId(originalRequestId);
         LOGGER.debug("Getting resources from resourceService: {}", resourceRequest);
         final CompletableFuture<Map<LeafResource, ConnectionDetail>> futureResources = resourceService.getResourcesById(resourceRequest)

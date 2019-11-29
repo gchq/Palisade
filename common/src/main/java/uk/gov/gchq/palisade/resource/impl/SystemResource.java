@@ -25,6 +25,11 @@ public class SystemResource extends AbstractResource implements ParentResource {
 
     @Override
     public SystemResource id(final String id) {
-        return (SystemResource) super.id(id);
+        if (id.endsWith("/")) {
+            super.id(id);
+        } else {
+            super.id(id + "/");
+        }
+        return this;
     }
 }

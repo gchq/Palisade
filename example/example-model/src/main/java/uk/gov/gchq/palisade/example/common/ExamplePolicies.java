@@ -19,7 +19,9 @@ package uk.gov.gchq.palisade.example.common;
 import uk.gov.gchq.palisade.example.hrdatagenerator.types.Employee;
 import uk.gov.gchq.palisade.example.rule.BankDetailsRule;
 import uk.gov.gchq.palisade.example.rule.DutyOfCareRule;
+import uk.gov.gchq.palisade.example.rule.FirstResourceRule;
 import uk.gov.gchq.palisade.example.rule.NationalityRule;
+import uk.gov.gchq.palisade.example.rule.RecordMaskingRule;
 import uk.gov.gchq.palisade.example.rule.ZipCodeMaskingRule;
 import uk.gov.gchq.palisade.example.util.ExampleFileUtil;
 import uk.gov.gchq.palisade.policy.service.Policy;
@@ -54,15 +56,8 @@ public final class ExamplePolicies {
      */
     public static SetResourcePolicyRequest getExamplePolicy(final String file) {
 
-        Resource resource;
-        if (file.endsWith(".avro")) {
-            resource = new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file));
-        } else {
-            resource = new DirectoryResource().id(file).parent(getParent(file));
-        }
-
         return new SetResourcePolicyRequest()
-                .resource(resource)
+                .resource(createResource(file))
                 .policy(new Policy<Employee>()
                         .owner(ExampleUsers.getAlice())
                         .recordLevelRule(
@@ -81,7 +76,25 @@ public final class ExamplePolicies {
                                 "4-Address masked for estates staff and otherwise only available for duty of care",
                                 new ZipCodeMaskingRule()
                         )
+                        .recordLevelRule(
+                                "5-Record content masked for all who are not in the employee's management chain or part of the estates or HR.",
+                                new RecordMaskingRule()
+                        )
+                        .resourceLevelRule(
+                                "1-Only HR can access the first resource",
+                                new FirstResourceRule()
+                        )
                 );
+    }
+
+    private static Resource createResource(final String resourceURL) {
+        URI normalised = ExampleFileUtil.convertToFileURI(resourceURL);
+        String resource = normalised.toString();
+        if (resource.endsWith(".avro")) {
+            return new FileResource().id(resource).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(resource));
+        } else {
+            return new DirectoryResource().id(resource).parent(getParent(resource));
+        }
     }
 
     /**
@@ -92,7 +105,7 @@ public final class ExamplePolicies {
      */
     public static SetResourcePolicyRequest getEmptyPolicy(final String file) {
         return new SetResourcePolicyRequest()
-                .resource(new FileResource().id(file).type(Employee.class.getTypeName()).serialisedFormat("avro").parent(getParent(file)))
+                .resource(createResource(file))
                 .policy(new Policy<Employee>()
                         .owner(ExampleUsers.getAlice())
                 );

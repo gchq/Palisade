@@ -185,7 +185,7 @@ public class HadoopResourceService implements ResourceService {
     }
 
     /**
-     * Make Jackson interprett the deserialised list correctly.
+     * Make Jackson interpret the deserialised list correctly.
      */
     private static class ConnectionDetailType extends TypeReference<List<ConnectionDetail>> {
     }
@@ -239,6 +239,7 @@ public class HadoopResourceService implements ResourceService {
                 final RemoteIterator<LocatedFileStatus> remoteIterator = this.getFileSystem().listFiles(new Path(pathString), true);
                 return getPaths(remoteIterator)
                         .stream()
+                        .filter(HadoopResourceDetails::isValidResourceName)
                         .map(HadoopResourceDetails::getResourceDetailsFromFileName)
                         .filter(predicate)
                         .collect(Collectors.toMap(
@@ -273,11 +274,11 @@ public class HadoopResourceService implements ResourceService {
             final int fsDepth = new Path(configuration.get(CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY)).depth();
 
             if (fileDepth > fsDepth + 1) {
-                DirectoryResource parent = new DirectoryResource().id(fixURIScheme(path.getParent().toString()));
+                DirectoryResource parent = new DirectoryResource().id(fixURIScheme(path.getParent().toUri().toString()));
                 resource.setParent(parent);
                 resolveParents(parent, configuration);
             } else {
-                resource.setParent(new SystemResource().id(fixURIScheme(path.getParent().toString())));
+                resource.setParent(new SystemResource().id(fixURIScheme(path.getParent().toUri().toString())));
             }
         } catch (Exception e) {
             throw new RuntimeException(ERROR_RESOLVING_PARENTS, e);

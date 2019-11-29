@@ -31,6 +31,7 @@ terraform.tfvars
 terraform.tfstate
 terraform.tfstate.backup
 terraform.tfstate.lock.info
+version.properties
 
 ##VSCODE default files that dont need to be tracked
 dependency-reduced-pom.xml

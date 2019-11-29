@@ -80,7 +80,7 @@ This needs to be populated with the values indicated above before the example wi
 
     **You will start to incur charges to your AWS subscription at this point!**
 ```bash
-  ./example/deployment/AWS-EC2-S3/bash-scripts/runAWS-EC2-S3Example.sh
+  ./example/deployment/AWS-EC2-S3/bash-scripts/setupAWS-EC2-S3Example.sh
 ```
 
 #### Running the Example
@@ -91,12 +91,11 @@ ssh -i <Location of your .pem file> ec2-user@<public DNS of Example box>
 A quick "ps ax | grep java" will show that no java services are running locally. Meaning that the example will using the Palisade services on the "Services" box.
 To then run the example with the option to display the results based on different users or roles, run this command: 
 ```bash
-$ export PALISADE_REST_CONFIG_PATH="/home/ec2-user/example/example-model/src/main/resources/configRest.json"
-$ java -cp /home/ec2-user/example/example-model/target/example-model-*-shaded.jar uk.gov.gchq.palisade.example.client.ExampleSimpleClient <User> s3a://<bucket url>/employee_file0.avro <PURPOSE> | /home/ec2-user/example/deployment/bash-scripts/formatOutput.sh
+$ ./example/deployment/bash-scripts/query.sh <User> <Purpose>
 ```
 The example list of users and purposes are:
 - Alice, Bob, Eve
-- SALARY, DUTY_OF_CARE, STAFF_REPORT or no purpose by using: "" (double quotes)
+- SALARY, DUTY_OF_CARE, STAFF_REPORT or no purpose by leaving it blank
 
 If you want to compare the different outputs of the Palisade service for different users and purposes, you can redirect the output to a text file, such as "> User-PURPOSE.txt", and then re-run the command with a change in user or purpose and redirect the output to a different file. 
 You can then run:

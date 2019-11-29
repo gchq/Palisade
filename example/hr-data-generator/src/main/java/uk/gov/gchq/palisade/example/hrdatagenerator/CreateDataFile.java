@@ -50,7 +50,7 @@ public final class CreateDataFile implements Callable<Boolean> {
             Employee firstEmployee = Employee.generate(random);
             Manager[] managers = firstEmployee.getManager();
             UserId lineManagerUid = managers[0].getUid();
-            lineManagerUid.setId("Bob");
+            lineManagerUid.setId("Eve");
             managers[0].setUid(lineManagerUid);
             firstEmployee.setManager(managers);
             Stream<Employee> firstEmployeeStream = Stream.of(firstEmployee);

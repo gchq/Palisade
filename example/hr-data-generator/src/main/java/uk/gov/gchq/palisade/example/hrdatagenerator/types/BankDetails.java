@@ -16,6 +16,8 @@
 
 package uk.gov.gchq.palisade.example.hrdatagenerator.types;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Random;
@@ -23,6 +25,14 @@ import java.util.Random;
 public class BankDetails {
     private String sortCode;
     private String accountNumber;
+
+    public BankDetails() {
+    }
+
+    public BankDetails(final BankDetails bankDetails) {
+        sortCode = bankDetails.sortCode;
+        accountNumber = bankDetails.accountNumber;
+    }
 
     public static BankDetails generate(final Random random) {
         BankDetails bankDetails = new BankDetails();
@@ -61,6 +71,32 @@ public class BankDetails {
                 .append("sortCode", sortCode)
                 .append("accountNumber", accountNumber)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final BankDetails bankDetails = (BankDetails) o;
+
+        return new EqualsBuilder()
+                .append(sortCode, bankDetails.sortCode)
+                .append(accountNumber, bankDetails.accountNumber)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(15, 45)
+                .append(sortCode)
+                .append(accountNumber)
+                .toHashCode();
     }
 }
 

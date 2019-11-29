@@ -10,7 +10,7 @@ FILE_PRESENT=0
 
 if [ -d "$TARGET_DIR" ];
 then
-    JAR_FILE=$(find "$TARGET_DIR" -type f -iname "hr-data-generator-*-SNAPSHOT-shaded.jar")
+    JAR_FILE=$(find "$TARGET_DIR" -type f -iname "hr-data-generator-*-shaded.jar")
     if [ ! -z "$JAR_FILE" ];
     then
         FILE_PRESENT=1
@@ -18,7 +18,7 @@ then
 fi
 
 if [ "$FILE_PRESENT" -eq 0 ];then
-    echo "Can't find hr-data-generator-<version>-SNAPSHOT-shaded.jar in ${TARGET_DIR}. Have you run \"mvn install -P example\" ?"
+    echo "Can't find hr-data-generator-<version>-shaded.jar in ${TARGET_DIR}. Have you run \"mvn install -P example\" ?"
     exit 1;
 fi
 

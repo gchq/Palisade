@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uk.gov.gchq.palisade.RequestId;
+import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.service.impl.MockDataService;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.FileResource;
@@ -120,8 +121,8 @@ public class RestResourceServiceV1IT {
         // Given
         final ResourceService resourceService = mock(ResourceService.class);
         MockResourceService.setMock(resourceService);
-
-        final GetResourcesByIdRequest request = new GetResourcesByIdRequest().resourceId("file1");
+        final UserId peter = new UserId().id("peter");
+        final GetResourcesByIdRequest request = new GetResourcesByIdRequest().resourceId("file1").userId(peter);
         request.setOriginalRequestId(new RequestId().id("test shouldGetResourceById"));
 
         final Map<LeafResource, ConnectionDetail> expectedResult = new HashMap<>();

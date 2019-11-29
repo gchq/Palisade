@@ -43,7 +43,7 @@ resource "local_file" "hadoop_s3" {
 }
 resource "null_resource" "create_palisade_instance" {
   provisioner "local-exec" {
-    command = "sed -i 's/eu-west-1/${var.aws_region}/g' ../../../../resources/hadoop_s3.xml"
+    command = "sed -i -e 's/eu-west-1/${var.aws_region}/g' ../../../../resources/hadoop_s3.xml"
   }
 }
 # create instance running Palisade
@@ -69,7 +69,6 @@ module "deploy_palisade" {
   host_name = "${aws_instance.palisade_instance.public_dns}"
   private_host_name = "${aws_instance.palisade_instance.private_dns}"
   ec2_userid = "${var.ec2_userid}"
-  data_file_name = "${var.data_file_name}"
   bucket_name = "${var.bucket_name}"
   s3_endpoint = "s3-${var.aws_region}.amazonaws.com"
   palisade_version = "${var.palisade_version}"

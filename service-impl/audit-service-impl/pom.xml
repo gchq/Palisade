@@ -20,14 +20,14 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>service-impl</artifactId>
-        <version>0.3.0</version>
+        <version>0.3.1-SNAPSHOT</version>
     </parent>
     <artifactId>audit-service-impl</artifactId>
     <packaging>pom</packaging>
 
     <modules>
         <module>logger-audit-service</module>
-        <module>stroom-audit-service</module>
+         <module>stroom-audit-service</module>
     </modules>
 
     <dependencies>

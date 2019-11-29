@@ -3,7 +3,7 @@
 private_dns=`hostname -f`
 
 # Resolve version
-SHADE_JAR=$(ls -1 /home/hadoop/jars/example-aws-emr-runner-*-SNAPSHOT-shaded.jar)
+SHADE_JAR=$(ls -1 /home/hadoop/jars/example-aws-emr-runner-*-shaded.jar)
 
 hdfs dfs -rm -r /user/hadoop/output
 

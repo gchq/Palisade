@@ -20,7 +20,7 @@
     <parent>
         <groupId>uk.gov.gchq.palisade</groupId>
         <artifactId>service-impl</artifactId>
-        <version>0.3.0</version>
+        <version>0.3.1-SNAPSHOT</version>
     </parent>
     <artifactId>resource-service-impl</artifactId>
     <packaging>pom</packaging>
@@ -29,6 +29,7 @@
         <module>rest-resource-service</module>
         <module>proxy-rest-resource-service</module>
         <module>hadoop-resource-service</module>
+        <module>egeria-resource-service</module>
     </modules>
 
     <dependencies>

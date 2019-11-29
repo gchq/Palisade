@@ -17,7 +17,7 @@ package uk.gov.gchq.palisade.data.service.impl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.junit.Before;
+import org.apache.hadoop.fs.Path;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -45,6 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -121,6 +122,37 @@ public class HadoopDataReaderTest {
         response.getWriter().write(os);
         final Stream<String> lines = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(os.toByteArray()))).lines();
         assertEquals(Collections.singletonList("some data"), lines.collect(Collectors.toList()));
+    }
+
+    @Test
+    public void shouldDecodeURIEncodedFilesCorrectly() throws IOException , URISyntaxException {
+        // Given
+        final File tmpFile = testFolder.newFile("fi le1.txt");
+        FileUtils.write(tmpFile, "some data\nsome more data", StandardCharsets.UTF_8);
+
+        final Configuration conf = new Configuration();
+        final HadoopDataReader reader = getReader(conf);
+        reader.auditService(mockAudit);
+        reader.addSerialiser(DataFlavour.of("string", "string"), new SimpleStringSerialiser());
+
+        final FileResource resource = (FileResource) new FileResource().type("string").id(new Path(tmpFile.getAbsolutePath()).toUri().toString()).serialisedFormat("string");
+        final Rules<String> rules = new Rules<>();
+
+        final DataReaderRequest request = new DataReaderRequest()
+                .resource(resource)
+                .user(new User())
+                .context(new Context())
+                .rules(rules);
+        request.setOriginalRequestId(new RequestId().id("test"));
+
+        // When
+        final DataReaderResponse response = reader.read(request);
+
+        // Then
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        response.getWriter().write(os);
+        final Stream<String> lines = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(os.toByteArray()))).lines();
+        assertEquals(Arrays.asList("some data", "some more data"), lines.collect(Collectors.toList()));
     }
 
     private static HadoopDataReader getReader(Configuration conf) throws IOException {

@@ -8,4 +8,4 @@ ENV PALISADE_REST_CONFIG_PATH="/example-model/configRest.json"
 
 ENTRYPOINT ["java"]
 
-CMD ["-cp", "/example-model/*", "uk.gov.gchq.palisade.example.runner.RestExample" , "/data/employee_file0.avro" ]
+CMD ["-cp", "/example-model/*", "uk.gov.gchq.palisade.example.runner.RestExample" , "/data" ]

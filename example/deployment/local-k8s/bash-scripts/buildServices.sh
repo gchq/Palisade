@@ -20,7 +20,7 @@ kubectl apply -f "${K8SBASHSCRIPTS}/ingress/k8sIngress.yaml"
 sleep 5
 export DATA_POD=$(kubectl get pod -l app=data-service -o jsonpath="{.items[0].metadata.name}")
 export RESOURCE_POD=$(kubectl get pod -l app=resource-service -o jsonpath="{.items[0].metadata.name}")
-kubectl cp "${EXAMPLE}/resources/employee_file0.avro" "$DATA_POD:/data"
+kubectl cp "${EXAMPLE}/resources/data" "$DATA_POD:/data"
 kubectl exec $RESOURCE_POD -- bash -c '[ -f "/data/employee_file0.avro" ] && echo "file exists (OK)" || echo "ERROR file NOT found /data/employee_file0.avro"'
 kubectl exec $DATA_POD     -- bash -c '[ -f "/data/employee_file0.avro" ] && echo "file exists (OK)" || echo "ERROR file NOT found /data/employee_file0.avro"'
 "${K8SBASHSCRIPTS}/configureExample.sh"
