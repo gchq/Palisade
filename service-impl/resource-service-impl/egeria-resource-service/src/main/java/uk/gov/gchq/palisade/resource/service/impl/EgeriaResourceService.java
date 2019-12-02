@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.gchq.palisade.UserId;
 import uk.gov.gchq.palisade.data.service.impl.ProxyRestDataService;
+import uk.gov.gchq.palisade.exception.NoConfigException;
 import uk.gov.gchq.palisade.resource.ChildResource;
 import uk.gov.gchq.palisade.resource.LeafResource;
 import uk.gov.gchq.palisade.resource.impl.DirectoryResource;
@@ -42,6 +43,7 @@ import uk.gov.gchq.palisade.resource.service.request.GetResourcesByTypeRequest;
 import uk.gov.gchq.palisade.rest.ProxyRestConnectionDetail;
 import uk.gov.gchq.palisade.rest.ProxyRestService;
 import uk.gov.gchq.palisade.service.ConnectionDetail;
+import uk.gov.gchq.palisade.service.ServiceState;
 
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
@@ -54,6 +56,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A implementation of the ResourceService for Hadoop.
@@ -68,10 +72,19 @@ public class EgeriaResourceService implements ResourceService {
     private transient AssetConsumer assetConsumer;
     private String egeriaServer;
     private String egeriaServerURL;
+    private static final String SERVER_KEY = "egeriaServer";
+    private static final String SERVER_URL_KEY = "egeriaServerURL";
     private final int pageSize = 10;
+
+    public EgeriaResourceService() {
+    }
 
     @JsonCreator
     public EgeriaResourceService(@JsonProperty("egeriaServer") final String egeriaServer, @JsonProperty("egeriaServerURL") final String egeriaServerURL) throws RuntimeException {
+        createAssetConsumer(egeriaServer, egeriaServerURL);
+    }
+
+    private void createAssetConsumer(final String egeriaServer, final String egeriaServerURL) throws RuntimeException {
         try {
             assetConsumer = new AssetConsumer(egeriaServer, egeriaServerURL);
             this.egeriaServer = egeriaServer;
@@ -276,5 +289,21 @@ public class EgeriaResourceService implements ResourceService {
     @Override
     public CompletableFuture<Boolean> addResource(final AddResourceRequest request) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void applyConfigFrom(final ServiceState config) throws NoConfigException {
+        requireNonNull(config, "config");
+        String egeriaServer = config.getOrDefault(SERVER_KEY, "cocoMDS1");
+        String egeriaServerURL = config.getOrDefault(SERVER_URL_KEY, "http://localhost/egeria");
+        createAssetConsumer(egeriaServer, egeriaServerURL);
+    }
+
+    @Override
+    public void recordCurrentConfigTo(final ServiceState config) {
+        requireNonNull(config, "config");
+        config.put(ResourceService.class.getTypeName(), getClass().getTypeName());
+        config.put(SERVER_KEY, egeriaServer);
+        config.put(SERVER_URL_KEY, egeriaServerURL);
     }
 }
