@@ -171,9 +171,9 @@ public class EgeriaResourceService implements ResourceService {
                 .collect(Collectors.toMap(
                         entry -> {
                             AssetUniverse asset = entry.getKey();
-                            String id = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(":") + 2);
+                            String id = asset.getQualifiedName().replace("//", "///");
                             String serialisedFormat = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(".") + 1);
-                            String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(File.separator) + 1, asset.getQualifiedName().indexOf("."));
+                            String type = asset.getQualifiedName().substring(asset.getQualifiedName().lastIndexOf(File.separator) + 1, asset.getQualifiedName().indexOf(".")).toLowerCase();
                             FileResource resource = new FileResource().id(id).serialisedFormat(serialisedFormat).type(type);
                             return (FileResource) resolveParents(resource);
                         },
@@ -181,7 +181,7 @@ public class EgeriaResourceService implements ResourceService {
                             ConnectionDetail connectionDetail = entry.getValue();
                             if (Objects.isNull(connectionDetail)) {
                                 Class<? extends ProxyRestService> serviceClass = ProxyRestDataService.class;
-                                String url = "http://localhost/data";
+                                String url = "http://data-service:8080/data";
                                 connectionDetail = new ProxyRestConnectionDetail().serviceClass(serviceClass).url(url);
                                 LOGGER.warn("ConnectionDetail for asset {} was null, using default: proxyRestServiceClass={}, proxyRestServiceUrl={}",
                                         entry.getKey().getGUID(), serviceClass.getName(), url);
@@ -220,7 +220,7 @@ public class EgeriaResourceService implements ResourceService {
         Function<Integer, List<String>> pager = (start) -> {
             List<String> page = null;
             try {
-                page = this.assetConsumer.findAssets(request.getUserId().getId(), request.getResourceId(), start, this.pageSize);
+                page = this.assetConsumer.findAssets(request.getUserId().getId(), request.getResourceId().replace("///", "//"), start, this.pageSize);
             } catch (Throwable e) {
                 LOGGER.debug("Exception while paging (is the paging response expected to be empty?):");
                 LOGGER.debug(e.getMessage());
