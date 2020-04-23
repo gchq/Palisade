@@ -54,7 +54,7 @@ For more technical information on how you can use Palisade, click on the link [T
 
 ?? Do we want a public email address and if so what will it be?
 
-For any questions or help please contact information@palisade.come
+For any questions or help please contact information@palisade.com
 
 ## Status
 Palisade is still in the early stages of development and is not production ready.  This information will be updated when there is a scheduled date for the production release.

@@ -6,7 +6,6 @@
 
 #### Mid term
 * Add support for pushing down user filters (predicate pushdown).
-* Support Java 11+.
 
 #### Long term
 * Add write support to the palisade service so it updates the relevant policies, which are set ready to read data back out.
