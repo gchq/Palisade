@@ -35,29 +35,29 @@ Policies can be applied on a per field basis. This means that fields (e.g. cells
 When a user submits a query (or executes some analytic code), Palisade uses the information about the user, the platform and the data requested, to look up the relevant data access policy. This policy is then used by a process, which ideally should be a data-local process to get the best performance, to return only the records that are allowed by the policy for the specific user, dataset and query time context. 
 
 
-### Multi-platform compatibility
 
-Palisade aims to provide a stable framework for defining and enforcing policy and auditing requirements for data access requests while allowing you to keep up with the fast-changing world of data science tools. Palisade does that by sharing with the community the burden of creating connectors to new data storage technologies and the connectors from new data processing technologies into Palisade. Palisade is not dependent on any platform ecosystem such as Hadoop, Kubernetes, AWS, Azure, Google.io, etc. 
+Palisade's aim is to provide a stable framework for defining and enforcing policy and auditing requirements for data access requests while at the same time, not limiting the solution any one platform ecosystem.  This will allow Palisade to be adapted into existing solutions that already do work in the different ecosystems such as Hadoop, Kubernetes, AWS, Azure, Google.io, etc.  Palisade does that by sharing with the community the task of creating connectors to new data storage technologies and the connectors from new data processing technologies into Palisade. 
 
-### Centralised or Local Policy
 
-If required, Palisade allows an organisation to use centralised services which each deployment of Palisade's data access services can share. This means that your data access policies, audit logs, user account details etc. don't need to be duplicated on every system. Of course, Palisade can still be deployed locally on a per platform basis.
 
 ![Palisade Overview](doc/img/Palisade_overview.png)
 
+
+If required, Palisade allows an organisation to use centralised services which each deployment of Palisade's data access services can share. This means that your data access policies, audit logs, user account details etc. don't need to be duplicated on every system. Of course, Palisade can still be deployed locally on a per platform basis.
 
 
 ###Additional Information 
 
 
 
-For more technical information on how you can use Palisade, go to [Documentation](https://github.com/gchq/Palisade/blob/doc/Documentation.md)
+For more technical information on how you can use Palisade, click on the link [TechnicalInformation](https://github.com/gchq/Palisade/blob/doc/TechnicalInformation.md)
 
-?? Do we want a public email address what will it be?
-Questions or help please contact information@palisade.come
+?? Do we want a public email address and if so what will it be?
+
+For any questions or help please contact information@palisade.come
 
 ## Status
-Palisade is still in the early stages of development and is not production ready.  This information will be updated when there is a scheduled date for release.
+Palisade is still in the early stages of development and is not production ready.  This information will be updated when there is a scheduled date for the production release.
 
 ### License
 Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) and is covered by [Crown Copyright](https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/).
@@ -65,7 +65,7 @@ Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licen
  
 
 
-For the latest's release of this README can be found [here](https://gchq.github.io/Palisade/blob/develop/Readme.md).
+The latest's release of this README can be found [here](https://gchq.github.io/Palisade/Readme.md).
 
 
 

@@ -17,6 +17,9 @@ limitations under the License.
 
 ###How to contribute to Palisade
 
+Helm has what looks like a good contributing guideline
+
+
 ?? 
 ?? Check to see what we will use for reporting issues.  Will it be GitHub Issue Tracking?
 
