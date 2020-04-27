@@ -14,11 +14,11 @@ npm install -g gitbook-cli
 ## Build
 Just run:
 ```bash
-./doc/scripts/buildGitbook.sh
+./scripts/buildGitbook.sh
 ```
 
 ## Serve
 To serve the gitbook locally at localhost:4000 just run:
 ```bash
-./doc/scripts/serveGitbook.sh
+./scripts/serveGitbook.sh
 ```
