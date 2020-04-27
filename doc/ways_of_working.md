@@ -47,7 +47,7 @@ In particular please ensure you have adhered to the following:
 * Checkstyle is run as part of 'mvn package' so you should ensure your code is compliant with these. The project will not build if there are issues which cause these plugins to fail.
 * Classes and methods should comply with the single responsibility principal.
 * Avoid magic numbers and strings literals.
-* Avoid duplicating code, if necessary refactor the section of code and split it out into a reusable class.
+* Avoid coupling services, if necessary duplicate code so individual services can be updated without causing cascading issues.
 * Look after your streams - if you open one make sure you close it too. This should apply to all volatile resource usage.
 * Don't swallow exceptions - ensure they are logged or rethrown.
 * Give credit for other peoples work.
