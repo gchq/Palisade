@@ -16,7 +16,7 @@ limitations under the License.
 --->
 
 
-# <img src="doc/logos/logo.svg" width="180">
+# <img src="logos/logo.svg" width="180">
 ###A Tool for Complex and Scalable Data Access Policy Enforcement
 
 Palisade aims to provide a stable framework for defining and enforcing policies for accessing data.
@@ -37,7 +37,7 @@ Palisade's aim is to provide a stable framework for defining and enforcing polic
 
 
 
-![Palisade Overview](doc/img/Palisade_overview.png)
+![Palisade Overview](img/Palisade_overview.png)
 
 
 If required, Palisade allows an organisation to use centralised services which each deployment of Palisade's data access services can share. This means that your data access policies, audit logs, user account details etc. don't need to be duplicated on every system. Of course, Palisade can still be deployed locally on a per platform basis.
@@ -45,9 +45,7 @@ If required, Palisade allows an organisation to use centralised services which e
 
 ###Additional Information 
 
-
-
-For more technical information on how you can use Palisade, read the included web pages.
+For more information on Palisade, [take a look here](https://gchq.github.io/Palisade/doc/developer_guide.html).
 
 
 For any questions or help please contact using the GitHub Issue tracking system.  Go to the Issue page and create and enter your query in a new issue and then submit.  We will try to respond as quick as possible in the form of a comment to the issue.  Here is the link to [Palisade issues](https://gchq.github.io/Palisade/issues).
@@ -57,11 +55,3 @@ Palisade is still in the early stages of development and is not production ready
 
 ### License
 Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) and is covered by [Crown Copyright](https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/).
-
- 
-
-The latest's release of this README can be found [here](https://gchq.github.io/Palisade/Readme.md).
-
-
-
-

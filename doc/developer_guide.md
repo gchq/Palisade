@@ -71,7 +71,7 @@ For an overview of the examples click [here](https://github.com/gchq/Palisade-ex
 
 
 
-We welcome contributions to the project. Detailed information on our ways of working can be found [here](https://gchq.github.io/Palisade/doc/other/ways_of_working.html).
+We welcome contributions to the project. Detailed information on our ways of working can be found [here](ways_of_working.md).
 
 The following gives some useful documentation intended to help with the developer onboarding experience.
 
@@ -79,11 +79,9 @@ The following gives some useful documentation intended to help with the develope
 
 * [Design Principles](design_principles.md) - the principles used throughout the design process.
 
-* [High level architectural diagram](high_level_architecture.md)
+* [High level architectural diagram](component_descriptions.md) - shows how the high level services link together
 
 * [High level architecture using a map reduce client](map_reduce_architecture.md)
-
-* [Description of each component](component_descriptions.md)
 
 * [Standard flow for a read request through the Palisade system](read_process.md) - Message Sequence Chart (MSC) covering this flow
 
@@ -93,7 +91,7 @@ The following gives some useful documentation intended to help with the develope
 
 * [Roadmap for Palisade](roadmap.md) - where Palisade is heading.
 
-* [Ways of Working](../other/ways_of_working.md) - developer guide to branching strategy etc.
+* [Ways of Working](ways_of_working.md) - developer guide to branching strategy etc.
 
 
 
