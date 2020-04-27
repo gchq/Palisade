@@ -16,9 +16,8 @@ limitations under the License.
 --->
 
 
-# <img src="logos/logo.svg" width="180">
-####A Tool for Scalable Data Access Policy Management and Enforcement
-
+# <img src="doc/logos/logo.svg" width="180">
+###A Tool for Complex and Scalable Data Access Policy Enforcement
 
 Palisade aims to provide a stable framework for defining and enforcing policies for accessing data.
 
@@ -30,9 +29,7 @@ Palisade can provide a solution to this problem.  It consists of a set of servic
 
 Consider the example of a set of datasets may have been assembled for specific purposes.   For a given dataset, only particular types of query are permitted for certain types of user.  Also, within each dataset a specific user may only be permitted to access a particular subset of the records. Palisade allows the policies for accessing datasets, redacting records and executing the query to be specified independently of the physical data and the platform hosting the data.  This will enable the clients to perform queries across the datasets while still conforming to company and regulatory policies.  
 
-Policies can be applied on a per field basis. This means that fields (e.g. cells) in a record can be redacted or masked based on: the contents of the record; the user accessing the record; and the contextual information given by the user or the system at the time of the query.
-
-When a user submits a query (or executes some analytic code), Palisade uses the information about the user, the platform and the data requested, to look up the relevant data access policy. This policy is then used by a process, which ideally should be a data-local process to get the best performance, to return only the records that are allowed by the policy for the specific user, dataset and query time context. 
+Policies are set per resource and are not changed by the user or context.  However, the policies can use the information about the user and context to decide how the data needs to be sanitised for this particular query.  This can be applied on a per field basis. This means that fields in a record can be redacted or masked based on: the contents of the record; the user accessing the record; and the contextual information given by the user or the system at the time of the query.
 
 
 
@@ -50,11 +47,10 @@ If required, Palisade allows an organisation to use centralised services which e
 
 
 
-For more technical information on how you can use Palisade, click on the link [TechnicalInformation](https://github.com/gchq/Palisade/blob/doc/TechnicalInformation.md)
+For more technical information on how you can use Palisade, read the included web pages.
 
-?? Do we want a public email address and if so what will it be?
 
-For any questions or help please contact information@palisade.com
+For any questions or help please contact using the GitHub Issue tracking system.  Go to the Issue page and create and enter your query in a new issue and then submit.  We will try to respond as quick as possible in the form of a comment to the issue.  Here is the link to [Palisade issues](https://gchq.github.io/Palisade/issues).
 
 ## Status
 Palisade is still in the early stages of development and is not production ready.  This information will be updated when there is a scheduled date for the production release.
@@ -63,7 +59,6 @@ Palisade is still in the early stages of development and is not production ready
 Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) and is covered by [Crown Copyright](https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/).
 
  
-
 
 The latest's release of this README can be found [here](https://gchq.github.io/Palisade/Readme.md).
 
