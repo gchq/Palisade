@@ -22,7 +22,7 @@ Palisade aims to provide a stable framework for defining and enforcing policies 
 
 
 #### Introduction
-Modern organisations can have multiple datasets that are each managed and accessed according to different policies and procedures. This can make it complicated for analysis while still ensuring reglatory compliance.  Most technologies "out of the box" do not provide the necessary solution for managing these complex issues for data access. This leads to data being siloed and often accesses being restricted with the outcome that the insight from data can be lost.   
+Modern organisations can have multiple datasets that are each managed and accessed according to different policies and procedures. This can make it complicated for analysis while still ensuring regulatory compliance.  Most technologies "out of the box" do not provide the necessary solution for managing these complex issues for data access. This leads to access to data being overly restrictive with potential insights from data being lost.   
 
 Palisade can provide a solution to this problem.  It consists of a set of services for managing and enforcing complex data access policies across different datasets and platforms.  These services are able to provide modular data access controllers and independent peripheral services to allow policies to be integral to the process a client uses to access data.  
 
@@ -53,4 +53,3 @@ Palisade is still in the early stages of development and is not production ready
 
 ### License
 Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) and is covered by [Crown Copyright](https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/).
-
