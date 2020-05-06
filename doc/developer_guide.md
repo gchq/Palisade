@@ -65,7 +65,7 @@ Library of code for connecting Palisade into different data storage technologies
 Library of code for the services used in the application
 
  
-Where Palisade Client, Common, Readers, Services are all required to run the existing solution.  The Examples provides a demonstration the automated policy rule enforcement when users read some data. They should provide a good start to understanding how Palisade works.
+Palisade Client, Common, Readers, Services are all required to run the existing solution. The examples provide a demonstration of how the automated policy rule enforcement is applied to data being read by a user. The examples will provide a good start to understanding how Palisade works.
 
 For an overview of the examples click [here](https://github.com/gchq/Palisade-examples).
 
