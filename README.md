@@ -23,19 +23,17 @@ Palisade aims to provide a stable framework for defining and enforcing policies 
 
 
 ####Introduction
-Modern organisations frequently  have multiple datasets with each dataset managed and accessed according to different policies and procedures. This can make it complicated for analysis while still ensuring regulatory compliance. Most technologies "out of the box" do not provide the necessary solution for managing these complex requirements for data access.   This results in access or analysis of data being so restricted that insights are lost or data simply being siloed.
+Modern organisations can have multiple datasets that are each managed and accessed according to different policies and procedures. This can make it complicated for analysis while still ensuring reglatory compliance.  Most technologies "out of the box" do not provide the necessary solution for managing these complex issues for data access. This leads to data being siloed and often accesses being restricted with the outcome that the insight from data can be lost.   
+
 Palisade can provide a solution to this problem.  It consists of a set of services for managing and enforcing complex data access policies across different datasets and platforms.  These services are able to provide modular data access controllers and independent peripheral services to allow policies to be integral to the process a client uses to access data.  
 
 Consider the example of a set of datasets may have been assembled for specific purposes.   For a given dataset, only particular types of query are permitted for certain types of user.  Also, within each dataset a specific user may only be permitted to access a particular subset of the records. Palisade allows the policies for accessing datasets, redacting records and executing the query to be specified independently of the physical data and the platform hosting the data.  This will enable the clients to perform queries across the datasets while still conforming to company and regulatory policies.  
 
-Policies are set per resource and are not changed by the user or context.  However, the policies can use the information about the user and context to decide how the data needs to be sanitised for any particular query.  This can be applied on a per field basis. This means that fields in a record can be redacted or masked based on: 
-* the contents of the record 
-* the user accessing the record 
-* and the contextual information given by the user or the system at the time of the query
+Policies are set per resource and are not changed by the user or context.  However, the policies can use the information about the user and context to decide how the data needs to be sanitised for this particular query.  This can be applied on a per field basis. This means that fields in a record can be redacted or masked based on: the contents of the record; the user accessing the record; and the contextual information given by the user or the system at the time of the query.
 
 
 
-Palisade's aim is to provide a stable framework for defining and enforcing policy and auditing requirements for data access requests, while ,at the same time, not limiting the solution to any single platform ecosystem. Palisade can  be adapted into existing solutions that already work in the different ecosystems such as Hadoop, Kubernetes, AWS, Azure and Google Cloud.  This is achieved by sharing with the community the tasks of creating connectors between Palisade and new technologies and solutions for storing data and for processing data.
+Palisade's aim is to provide a stable framework for defining and enforcing policy and auditing requirements for data access requests while at the same time, not limiting the solution any one platform ecosystem.  This will allow Palisade to be adapted into existing solutions that already do work in the different ecosystems such as Hadoop, Kubernetes, AWS, Azure, Google.io, etc.  Palisade does that by sharing with the community the task of creating connectors to new data storage technologies and the connectors from new data processing technologies into Palisade. 
 
 
 

@@ -12,3 +12,4 @@ The data service validates the token with a palisade service and uses it to get 
 
 This is to satisfy Hadoop's security architecture. In environments where users run as themselves (as opposed to everybody running as the Hadoop processing user), we can do client-auth at on connection to the PalisadeService and again at the connection to DataService.
 The underlying mechanism still works identically, but in addition we can also validate that a user is using the Token assigned to them by the PalisadeService and detect if that Token is being used by a different user (spoofing).  This validation check can not be done with Hadoop.
+
