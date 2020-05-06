@@ -28,12 +28,14 @@ Palisade can provide a solution to this problem.  It consists of a set of servic
 
 Consider the example of a set of datasets may have been assembled for specific purposes.   For a given dataset, only particular types of query are permitted for certain types of user.  Also, within each dataset a specific user may only be permitted to access a particular subset of the records. Palisade allows the policies for accessing datasets, redacting records and executing the query to be specified independently of the physical data and the platform hosting the data.  This will enable the clients to perform queries across the datasets while still conforming to company and regulatory policies.  
 
-Policies are set per resource and are not changed by the user or context.  However, the policies can use the information about the user and context to decide how the data needs to be sanitised for this particular query.  This can be applied on a per field basis. This means that fields in a record can be redacted or masked based on: the contents of the record; the user accessing the record; and the contextual information given by the user or the system at the time of the query.
+Policies are set per resource and are not changed by the user or context.  However, the policies can use the information about the user and context to decide how the data needs to be sanitised for any particular query.  This can be applied on a per field basis. This means that fields in a record can be redacted or masked based on: 
+* the contents of the record
+* the user accessing the record 
+* the contextual information given by the user or the system at the time of the query.
 
 
 
-Palisade's aim is to provide a stable framework for defining and enforcing policy and auditing requirements for data access requests while at the same time, not limiting the solution any one platform ecosystem.  This will allow Palisade to be adapted into existing solutions that already do work in the different ecosystems such as Hadoop, Kubernetes, AWS, Azure, Google.io, etc.  Palisade does that by sharing with the community the task of creating connectors to new data storage technologies and the connectors from new data processing technologies into Palisade. 
-
+Palisade's aim is to provide a stable framework for defining and enforcing policy and auditing requirements for data access requests, while ,at the same time, not limiting the solution to any single platform ecosystem. Palisade can be adapted into existing solutions that already work in the different ecosystems such as Hadoop, Kubernetes, AWS, Azure and Google Cloud.  This is achieved by sharing with the community the tasks of creating connectors between Palisade and new technologies and solutions for storing data and for processing data.
 
 
 ![Palisade Overview](img/Palisade_overview.png)
@@ -46,7 +48,7 @@ If required, Palisade allows an organisation to use centralised services which e
 For more information on Palisade, [take a look here](https://gchq.github.io/Palisade/doc/developer_guide.html).
 
 
-For any questions or help please contact using the GitHub Issue tracking system.  Go to the Issue page and create and enter your query in a new issue and then submit.  We will try to respond as quick as possible in the form of a comment to the issue.  Here is the link to [Palisade issues](https://gchq.github.io/Palisade/issues).
+For any questions or help please contact using the GitHub Issue tracking system.  Go to the Issue page and create and enter your query in a new issue and then submit.  We will try to respond as quick as possible in the form of a comment to the issue.  Here is the link to [Palisade issues](https://www.github.com/gchq/Palisade/issues).
 
 ## Status
 Palisade is still in the early stages of development and is not production ready.  This information will be updated when there is a scheduled date for the production release.
