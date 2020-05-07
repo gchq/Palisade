@@ -1,4 +1,3 @@
-
 <!---
 Copyright 2020 Crown Copyright
 
@@ -15,13 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 --->
 
-
-
 ## Developer Guide
 
 
 ### Status
-Palisade is still in the early stages of development and is not production ready.  This information will be updated when there is a scheduled date for the production release.
+Palisade is still in the early stages of development and is not production ready.
+This information will be updated when there is a scheduled date for the production release.
  
 Current version of Palisade 0.4.0
 
@@ -39,10 +37,10 @@ Prerequisites:<br/>
 
 ####GitHub repositories:
  
-  The Palisade project has been divided into a set of separate GitHub repositories for simplification of development and maintenance. 
-  They consists of the following:
-  
-  
+The Palisade project has been divided into a set of separate GitHub repositories for simplification of development and maintenance. 
+They consists of the following:
+
+
 [Palisade](https://gchq.github.io/Palisade)
 Documentation for how Palisade works at a high level
 
@@ -65,7 +63,9 @@ Library of code for connecting Palisade into different data storage technologies
 Library of code for the services used in the application
 
  
-Palisade Client, Common, Readers, Services are all required to run the existing solution. The examples provide a demonstration of how the automated policy rule enforcement is applied to data being read by a user. The examples will provide a good start to understanding how Palisade works.
+Palisade Client, Common, Readers, Services are all required to run the existing solution.
+The examples provide a demonstration of how the automated policy rule enforcement is applied to data being read by a user.
+The examples will provide a good start to understanding how Palisade works.
 
 For an overview of the examples click [here](https://github.com/gchq/Palisade-examples).
 
@@ -103,6 +103,10 @@ Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licen
 
 ## FAQ
 
-1. What is the version of Java is supported?   The existing version of the application is built with Javas 11.  It should work with later versions of Java, but this has not been tested and cannot be verified
-1. What build environments are supported?  We do not currently support Windows as a build environment, If you are running on Windows then you will need this: Microsoft Visual C++ 2010 SP1 Redistributable Package
+1. What is the version of Java is supported?
+The existing version of the application is built with Javas 11.
+It should work with later versions of Java, but this has not been tested and cannot be verified
+
+2. What build environments are supported?
+We do not currently support Windows as a build environment, If you are running on Windows then you will need this: Microsoft Visual C++ 2010 SP1 Redistributable Package
 

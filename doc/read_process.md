@@ -4,15 +4,16 @@
 
 1. The user makes use of a plug-in (client) for the data processing technology that they are using which makes it almost invisible to them that they are actually querying data via Palisade.
 
-1. For a distributed workflow that client code will usually be made up of a driver component and an executor/mapper component. The driver component starts by registering the data request with the 
-palisade service, stating the resources/alias mapping to resources that they want to query, along with a user id and any required context such as a purpose for querying the data.
+1. For a distributed workflow that client code will usually be made up of a driver component and an executor/mapper component.
+The driver component starts by registering the data request with the palisade service, stating the resources/alias mapping to resources that they want to query,
+along with a user id and any required context such as a purpose for querying the data.
 
 1. The palisade service receives that request then authenticates the user.
 
 1. The palisade service then requests the full details about the user from the user service.
 
-1. The palisade service then requests from the resource service the mapping of how to connect to the relevant data service(s) to retrieve each of the resources requested. This may allow aliases which map to a list of resources, 
-which would need to be resolved by the resource service.
+1. The palisade service then requests from the resource service the mapping of how to connect to the relevant data service(s) to retrieve each of the resources requested.
+This may allow aliases which map to a list of resources, which would need to be resolved by the resource service.
 
 1. The Palisade service requests from the policy service the details of which of the resources the user is allowed to access at a resource level.
 
