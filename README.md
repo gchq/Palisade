@@ -31,7 +31,7 @@ Consider the example of a set of datasets may have been assembled for specific p
 Policies are set per resource and are not changed by the user or context.  However, the policies can use the information about the user and context to decide how the data needs to be sanitised for any particular query.  This can be applied on a per field basis. This means that fields in a record can be redacted or masked based on: 
 * the contents of the record
 * the user accessing the record 
-* the contextual information given by the user or the system at the time of the query.
+* the contextual information provided by the user or the system at the time of the query.
 
 
 
