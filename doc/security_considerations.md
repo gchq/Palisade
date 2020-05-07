@@ -11,4 +11,5 @@ Then the palisade service can then provide a token to be passed to the data serv
 The data service validates the token with a palisade service and uses it to get the required trusted details from a cache service that is shared by all instances of the palisade service.
 
 This is to satisfy Hadoop's security architecture. In environments where users run as themselves (as opposed to everybody running as the Hadoop processing user), we can do client-auth at on connection to the PalisadeService and again at the connection to DataService.
-The underlying mechanism still works identically, but we can then also validate that Token A that Alice is passing to the DataService was originally issued to Alice by the PalisadeService. As opposed to Hadoop where we can't really check that Eve hasn't stolen the token.
+The underlying mechanism still works identically, but in addition we can also validate that a user is using the Token assigned to them by the PalisadeService and detect if that Token is being used by a different user (spoofing).  This validation check can not be done with Hadoop.
+

@@ -21,7 +21,7 @@ any context passed in by the client code and the list of resources returned by t
 
 1. The palisade service then caches the response from the policy service in the cache service, keyed by a unique token, so that any palisade service can respond to the data server later on.
 
-1. The palisade service then returns the token along with the resource to data service connection details mapping of the resources that the user is allow to access to the client in response to the client registering the request.
+1. The palisade service then returns the token along with the resource to data service connection details mapping of the resources that the user is allowed to access to the client in response to the client registering the request.
 
 1. The palisade service will log for auditing that the registration has been successful along with the details of what resources are being approved for the user to read.
 
