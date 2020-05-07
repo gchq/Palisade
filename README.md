@@ -35,7 +35,7 @@ Policies are set per resource and are not changed by the user or context.  Howev
 
 
 
-Palisade's aim is to provide a stable framework for defining and enforcing policy and auditing requirements for data access requests, while ,at the same time, not limiting the solution to any single platform ecosystem. Palisade can be adapted into existing solutions that already work in the different ecosystems such as Hadoop, Kubernetes, AWS, Azure and Google Cloud.  This is achieved by sharing with the community the tasks of creating connectors between Palisade and new technologies and solutions for storing data and for processing data.
+Palisade's aim is to provide a stable framework for enforcing policy and auditing requirements for data access requests, while, at the same time, not limiting the solution to any single platform ecosystem. Palisade can be deployed into many different ecosystems such as Hadoop, Kubernetes, AWS, Azure and Google Cloud. As adoption of Palisade grows then burden of creating new connectors between Palisade and new technologies for storing and processing data can be shared across the community.
 
 
 ![Palisade Overview](img/Palisade_overview.png)
