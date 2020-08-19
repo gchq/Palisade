@@ -14,28 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 --->
 
-# Building the documentation
-Palisade's documentation is built using [GitBook](https://www.gitbook.com). 
-
-## Prerequisites
-### NPM
-You need NPM to install the GitBook command line toolchain.
-To get NPM install [node](https://nodejs.org/en/).
-
-### GitBook command line tools
-
-```bash
-npm install -g gitbook-cli
-```
-
-## Build
-Just run:
-```bash
-./scripts/buildGitbook.sh
-```
-
-## Serve
-To serve the gitbook locally at localhost:4000 just run:
-```bash
-./scripts/serveGitbook.sh
-```
+## Design Principles
+* Reduce the work required to adopt new data processing and data storage technologies.
+* The service and common modules should remain technology agnostic.
+* Palisade should scale horizontally and enable monitoring, with the intention being to enable auto-scaling and auto-healing of each micro-service.
+* Palisade should also make it easy to debug by enabling the tracing of a request through all the micro-services that make up Palisade.
+* Minimise serialisation/de-serialisation by making use of Apache Arrow where sensible.
