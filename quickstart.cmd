@@ -11,7 +11,7 @@
 : # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 : # See the License for the specific language governing permissions and
 : # limitations under the License.
-:
+
 : # This script should be valid for both UNIX and DOS environments,
 : # thus the lack of any 'fancy' bash or powershell syntax, weird comments
 : # and use of string escapes for dotted command properties.
