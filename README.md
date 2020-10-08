@@ -60,6 +60,7 @@ Of course, Palisade can still be deployed locally on a per-platform basis.
 
 
 ### Additional Information 
+For a quickstart in using Palisade, [see the guide here](QUICKSTART.md).
 For more information on Palisade, [take a look here](https://gchq.github.io/Palisade/doc/developer_guide.html).
 
 
