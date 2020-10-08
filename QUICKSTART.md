@@ -55,6 +55,12 @@ More details of these rules and data structures [can be found here](https://gith
 The running services can be viewed from a Eureka dashboard visible at [http://localhost:8083](http://localhost:8083), and can be shutdown with a REST POST to their `/actuator/shutdown` endpoint.
 See the repo-specific documentation from this point.
 
+## Alternative Deployments
+
+### Kubernetes
+Palisade is also set-up for a kubernetes deployment, which [is documented here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-k8s).
+Under this setup, the `Palisade-services` directory will need to be rebuilt with a `mvn install` (the `quickstart.cmd` script uses a `-Pquick` profile which skips docker image builds).
+
 ## Status
 Palisade is still in the early stages of development and is not production ready.
 This information will be updated when there is a scheduled date for the production release.
