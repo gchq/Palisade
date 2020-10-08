@@ -28,15 +28,15 @@ The repo comes bundled with the following:
 * [Apache Maven 3.6.3](https://maven.apache.org/download.cgi) via `mvnw`
 
 ## Running the Quickstart Script
-Run the cross-platform [quickstart.cmd script](/quickstart.cmd):
-
-```
-    - On Linux/MacOS -
-bash quickstart.cmd
-
-    - or Windows -
-start quickstart.cmd
-```
+Run the cross-platform [quickstart.cmd script](quickstart.cmd):
+* On Linux/MacOS:
+  ```
+  /dev/Palisade> bash quickstart.cmd
+  ```
+* On Windows:
+  ```
+  C:/dev/Palisade> quickstart.cmd
+  ```
 
 This will perform the following tasks necessary to set-up and start using Palisade:
 * Download each of the Palisade repos ([common](https://https://github.com/gchq/Palisade-common), [readers](https://github.com/gchq/Palisade-readers), [clients](https://github.com/gchq/Palisade-clients), [services](https://github.com/gchq/Palisade-services), [examples](https://github.com/gchq/Palisade-examples))
@@ -49,11 +49,21 @@ Each Palisade module wil be installed into your `~/.m2` cache and jars built to 
 The services will be running locally in separate JVM processes.
 
 The script will have done an example run-through of Palisade, demonstrating a client with different users and purposes querying some Avro files for employee data, with some redaction and masking rules in place.
-The output of this example run-through can be found in the new `Palisade-services` directory, in particular `Palisade-services/rest-example.log` (though logs from all the services will also be available there).
+The output of this example run-through will be written to stdout once it has completed.
+The logging output of all the services can be found in the `Palisade-services` directory.
 More details of these rules and data structures [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/example-library).
 
 The running services can be viewed from a Eureka dashboard visible at [http://localhost:8083](http://localhost:8083), and can be shutdown with a REST POST to their `/actuator/shutdown` endpoint.
-See the repo-specific documentation from this point.
+This shutdown procedure can be automated using the [quickstop.cmd script](quickstop.cmd):
+* On Linux/MacOS:
+  ```
+  /dev/Palisade> bash quickstop.cmd
+  ```
+* On Windows:
+  ```
+  C:/dev/Palisade> quickstop.cmd
+  ```
+See the individual repositories and modules for their specific documentation from this point.
 
 ## Alternative Deployments
 

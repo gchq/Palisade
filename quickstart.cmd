@@ -43,6 +43,7 @@ done
 cd Palisade-services
 java -Dspring.profiles.active=discovery -Dmanager.mode=run -jar services-manager/target/services-manager-*-exec.jar
 java -Dspring.profiles.active=example-model -Dmanager.mode=run -jar services-manager/target/services-manager-*-exec.jar
+cat rest-example.log
 cd ..
 
 : # DOS GOTO jumps to here, so exit just before then
@@ -71,4 +72,5 @@ FOR %%s IN (%dir_list%) DO (
 cd Palisade-services
 java -D"spring.profiles.active=discovery" -D"manager.mode=run" -jar services-manager/target/services-manager-0.4.0-exec.jar
 java -D"spring.profiles.active=example-model" -D"manager.mode=run" -jar services-manager/target/services-manager-0.4.0-exec.jar
+cat rest-example.log
 cd ..
