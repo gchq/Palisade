@@ -49,7 +49,7 @@ Each Palisade module wil be installed into your `~/.m2` cache and jars built to 
 The services will be running locally in separate JVM processes.
 
 The script will have done an example run-through of Palisade, demonstrating a client with different users and purposes querying some Avro files for employee data, with some redaction and masking rules in place.
-The output of this example run-through will be written to stdout once it has completed.
+The output of this example run-through will be written to the terminal once it has completed.
 The logging output of all the services can be found in the `Palisade-services` directory.
 More details of these rules and data structures [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/example-library).
 
@@ -72,7 +72,7 @@ Palisade is also set-up for a kubernetes deployment, which [is documented here](
 Under this setup, the `Palisade-services` directory will need to be rebuilt with a `mvn install` (the `quickstart.cmd` script uses a `-Pquick` profile which skips docker image builds).
 
 ## Status
-Palisade is still in the early stages of development and is not production ready.
+Palisade is still in development and is not production ready.
 This information will be updated when there is a scheduled date for the production release.
 
 ### License
