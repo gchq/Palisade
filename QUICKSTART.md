@@ -49,7 +49,7 @@ Each Palisade module will be installed into your `~/.m2` cache and jars built to
 The services will be running locally in separate JVM processes.
 
 The script will have done an example run-through of Palisade, demonstrating a client with different users and purposes querying some Avro files for employee data, with some redaction and masking rules in place.
-The output of this example run-through will be written to stdout once it has completed.
+The output of this example run-through will be written to the terminal once it has completed.
 The logging output of all the services can be found in the `Palisade-services` directory.
 More details of these rules and data structures [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/example-library).
 
