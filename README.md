@@ -1,4 +1,3 @@
-
 <!---
 Copyright 2020 Crown Copyright
 
@@ -60,6 +59,7 @@ Of course, Palisade can still be deployed locally on a per-platform basis.
 
 
 ### Additional Information 
+For a quickstart in using Palisade, [see the guide here](QUICKSTART.md).
 For more information on Palisade, [take a look here](https://gchq.github.io/Palisade/doc/developer_guide.html).
 
 
@@ -69,7 +69,7 @@ We will try to respond as quick as possible in the form of a comment to the issu
 Here is the link to [Palisade issues](https://www.github.com/gchq/Palisade/issues).
 
 ## Status
-Palisade is still in the early stages of development and is not production ready.
+Palisade is still in development and is not production ready.
 This information will be updated when there is a scheduled date for the production release.
 
 ### License
