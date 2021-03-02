@@ -17,5 +17,4 @@
 : # Stop after running the REST example
 cd Palisade-services
 java -D"spring.profiles.active=example-runner" -D"manager.mode=shutdown" -jar services-manager/target/services-manager-0.5.0-exec.jar
-java -D"spring.profiles.active=discovery" -D"manager.mode=shutdown" -jar services-manager/target/services-manager-0.5.0-exec.jar
 cd ..

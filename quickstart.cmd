@@ -41,7 +41,7 @@ done
 
 : # Run the REST example
 cd Palisade-services
-java -Dspring.profiles.active=example-runner -Dmanager.mode=run -jar services-manager/target/services-manager-*-exec.jar
+java -Dspring.profiles.active=example-runner -Dmanager.mode=run -jar services-manager/target/services-manager-0.5.0-exec.jar
 cat rest-example.log
 cd ..
 
