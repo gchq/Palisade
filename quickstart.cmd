@@ -36,7 +36,7 @@ do
     cd $dir
     # Install it (skip dockerfile, tests, javadoc, etc.)
     ../mvnw install -Pquick
-    cd ..:
+    cd ..
 done
 
 : # Run the REST example
