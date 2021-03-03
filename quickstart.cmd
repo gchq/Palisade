@@ -32,7 +32,7 @@ GOTO :CMDSCRIPT
 for dir in Palisade-common Palisade-readers Palisade-clients Palisade-services Palisade-examples
 do
     # Clone it (0.5.0 release)
-    git clone --depth 1 --branch palisade-0.5.0 https://github.com/gchq/$dir.git
+    git clone --depth 1 --branch develop https://github.com/gchq/$dir.git
     cd $dir
     # Install it (skip dockerfile, tests, javadoc, etc.)
     ../mvnw install -Pquick
@@ -60,7 +60,7 @@ set "dir_list=Palisade-common Palisade-readers Palisade-clients Palisade-service
 FOR %%s IN (%dir_list%) DO (
     set "url=https://github.com/gchq/%%s.git"
     REM clone it
-    git clone --depth 1 --branch palisade-0.5.0 "!url!"
+    git clone --depth 1 --branch develop "!url!"
     cd %%s
     REM install it
     call ../mvnw.cmd install -Pquick
