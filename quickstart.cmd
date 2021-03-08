@@ -1,4 +1,4 @@
-: # Copyright 2020 Crown Copyright
+: # Copyright 2018-2021 Crown Copyright
 : #
 : # Licensed under the Apache License, Version 2.0 (the "License");
 : # you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@ GOTO :CMDSCRIPT
 : # For each palisade repo
 for dir in Palisade-common Palisade-readers Palisade-clients Palisade-services Palisade-examples
 do
-    # Clone it (0.4.0 release)
-    git clone --depth 1 --branch palisade-0.4.0 https://github.com/gchq/$dir.git
+    # Clone it (0.5.0 release)
+    git clone --depth 1 --branch develop https://github.com/gchq/$dir.git
     cd $dir
     # Install it (skip dockerfile, tests, javadoc, etc.)
     ../mvnw install -Pquick
@@ -41,8 +41,7 @@ done
 
 : # Run the REST example
 cd Palisade-services
-java -Dspring.profiles.active=discovery -Dmanager.mode=run -jar services-manager/target/services-manager-*-exec.jar
-java -Dspring.profiles.active=example-model -Dmanager.mode=run -jar services-manager/target/services-manager-*-exec.jar
+java -Dspring.profiles.active=example-runner -Dmanager.mode=run -jar services-manager/target/services-manager-0.5.0-exec.jar
 cat rest-example.log
 cd ..
 
@@ -61,7 +60,7 @@ set "dir_list=Palisade-common Palisade-readers Palisade-clients Palisade-service
 FOR %%s IN (%dir_list%) DO (
     set "url=https://github.com/gchq/%%s.git"
     REM clone it
-    git clone --depth 1 --branch palisade-0.4.0 "!url!"
+    git clone --depth 1 --branch develop "!url!"
     cd %%s
     REM install it
     call ../mvnw.cmd install -Pquick
@@ -70,7 +69,6 @@ FOR %%s IN (%dir_list%) DO (
 
 : # Run the REST example
 cd Palisade-services
-java -D"spring.profiles.active=discovery" -D"manager.mode=run" -jar services-manager/target/services-manager-0.4.0-exec.jar
-java -D"spring.profiles.active=example-model" -D"manager.mode=run" -jar services-manager/target/services-manager-0.4.0-exec.jar
+java -D"spring.profiles.active=example-runner" -D"manager.mode=run" -jar services-manager/target/services-manager-0.5.0-exec.jar
 cat rest-example.log
 cd ..

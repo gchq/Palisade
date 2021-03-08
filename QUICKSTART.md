@@ -1,6 +1,5 @@
-
 <!---
-Copyright 2020 Crown Copyright
+Copyright 2018-2021 Crown Copyright
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,12 +19,14 @@ limitations under the License.
 ## Getting started
 
 ### Prerequisites
+The repo comes bundled with the following:
+* [Apache Maven 3.6.3](https://maven.apache.org/download.cgi) via `mvnw`
+
 Before running, make sure you have installed and appropriately-configured the following:
 * [Git](https://git-scm.com/downloads)
 * [OpenJDK Java 11](https://openjdk.java.net/projects/jdk/11/) or [Oracle Java 11](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
-
-The repo comes bundled with the following:
-* [Apache Maven 3.6.3](https://maven.apache.org/download.cgi) via `mvnw`
+* [Apache Kafka](https://kafka.apache.org/downloads) and [Redis](https://redis.io/download) available at `localhost:9092` and `localhost:6379` respectively
+  * for a quick-and-easy option, the Palisade-examples repo comes bundled with a [docker-compose file](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-jvm/docker-compose.yml) for Kafka, Zookeeper and Redis - `docker-compose -f Palisade-examples/deployment/local-jvm/docker-compose.yml up`
 
 ## Running the Quickstart Script
 Run the cross-platform [quickstart.cmd script](quickstart.cmd):
@@ -39,8 +40,8 @@ Run the cross-platform [quickstart.cmd script](quickstart.cmd):
   ```
 
 This will perform the following tasks necessary to set-up and start using Palisade:
-* Download each of the Palisade repos required to run the example ([common](https://https://github.com/gchq/Palisade-common), [readers](https://github.com/gchq/Palisade-readers), [clients](https://github.com/gchq/Palisade-clients), [services](https://github.com/gchq/Palisade-services), [examples](https://github.com/gchq/Palisade-examples))
-    - Since Palisade remains in active development, we will be pulling the 0.4.0 release which uses a REST-based microservice architecture
+* Download each of the Palisade repos required to run the example ([common](https://github.com/gchq/Palisade-common/tree/develop), [readers](https://github.com/gchq/Palisade-readers/tree/develop), [clients](https://github.com/gchq/Palisade-clients/tree/develop), [services](https://github.com/gchq/Palisade-services/tree/develop), [examples](https://github.com/gchq/Palisade-examples/tree/develop))
+    - Since Palisade remains in active development, we will be pulling the 0.5.0 release which uses a Kafka-based streaming microservice architecture
 * Install each project in order of any dependencies
 * Run the Palisade local-jvm example (more details [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-jvm))
 
@@ -53,7 +54,6 @@ The output of this example run-through will be written to the terminal once it h
 The logging output of all the services can be found in the `Palisade-services` directory.
 More details of these rules and data structures [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/example-library).
 
-The running services can be viewed from a Eureka dashboard visible at [http://localhost:8083](http://localhost:8083).
 This shutdown procedure can be automated using the [quickstop.cmd script](quickstop.cmd):
 * On Linux/MacOS:
   ```
