@@ -21,13 +21,13 @@ This section gives some insight into how clients could be used as the entry poin
 ## Reading a stream of data
 By default, the data-service presents a HTTP stream of binary data to the client on request.
 
+A code sample using the `client-akka` package to read all AVRO resources in a dataset:
 ```java
-session
-    .createQuery("file:/data/local-data-store/", Map.of("purpose", "SALARY"))
-    .execute()
-    .thenApply(QueryResponse::stream)
+String token = client.register("Alice", "file:/palisade-data-store/dataset-1/", "").toCompletableFuture().join()
+Source<LeafResource, NotUsed> avroResources = client.fetch(token).filter(resource -> resource.getType().equals("AVRO"));
+Source<InputStream, NotUsed> avroRecords = avroResources.flatMapConcat(resource -> client.read(token, resource));
 ```
-
+This may then be interpreted by the client using an AVRO deserialiser.
 
 ## Using the 'cat' command line tool
 It should be possible to use command line tools like 'cat' to be able to view files that are being protected by Palisade. 
