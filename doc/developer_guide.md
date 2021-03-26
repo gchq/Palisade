@@ -54,14 +54,11 @@ Code examples showing an example of how Palisade can be used, as well as perform
 [Palisade Readers](https://github.com/gchq/Palisade-readers)  
 Library of code for connecting Palisade into different data storage technologies, such as Hadoop or S3
 
-[Palisade Common](https://github.com/gchq/Palisade-common)  
-Common code used by many of the Palisade repositories (at time of writing, we are working to remove need for this repo)
-
 [Palisade Integration Tests](https://github.com/gchq/Palisade-integration-tests)  
 Full-system tests such as smoke-tests and setup for exploratory testing (at time of writing, this is mostly unused)
 
 
-Palisade Common, Readers, Clients, and Services are all required to run the existing solution.
+Palisade Readers, Clients, and Services are all required to run the existing solution.
 The examples provide a demonstration of how the automated policy rule enforcement is applied to data being read by a user.
 The examples will provide a good start to understanding how Palisade works.
 
