@@ -51,4 +51,4 @@ This means services will not recover from crashes or critical errors.
 The Palisade services are accessed through their localhost address and port.
 Each microservice uses the local filesystem without any additional volume mounts.
 
-_n.b.Redis and Kafka are still required in some form, whether exposed in a local k8s cluster, running as local processes, or hosted externally as a SaaS_.
+_n.b. Redis and Kafka are still required in some form, whether exposed in a local k8s cluster, running as local processes, or hosted externally as a SaaS_.
