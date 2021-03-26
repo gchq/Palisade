@@ -15,25 +15,33 @@ limitations under the License.
 --->
 
 # Palisade Clients
-
 This section gives some insight into how clients could be used as the entry point for users to access data via Palisade.
 
 ## Reading a stream of data
 By default, the data-service presents a HTTP stream of binary data to the client on request.
 
-A code sample using the `client-akka` package to read all AVRO resources in a dataset:
+A code sample using the `client-akka` package to read all AVRO resources in a dataset (without the client interpreting the AVRO data):
 ```java
-String token = client.register("Alice", "file:/palisade-data-store/dataset-1/", "").toCompletableFuture().join()
-Source<LeafResource, NotUsed> avroResources = client.fetch(token).filter(resource -> resource.getType().equals("AVRO"));
-Source<InputStream, NotUsed> avroRecords = avroResources.flatMapConcat(resource -> client.read(token, resource));
+void printInputStream(InputStream is) {
+    new BufferedReader(new InputStreamReader(is))
+        .lines()
+        .forEach(line -> System.out.println(line));
+}
+
+void doRequest() {
+    String token = client.register("Alice", "file:/palisade-data-store/dataset-1/", "").toCompletableFuture().join()
+    Source<LeafResource, ?> avroResources = client.fetch(token).filter(resource -> resource.getType().equals("AVRO"));
+    Source<InputStream, ?> avroRecords = avroResources.flatMapConcat(resource -> client.read(token, resource));
+    avroRecords.runWith(Sink.forEach(this::printInputStream), materializer);
+}
 ```
-This may then be interpreted by the client using an AVRO deserialiser.
+In reality, this `Source<InputStream, ?>` would be interpreted by the client using an AVRO deserialiser.
 
 ## Using the 'cat' command line tool
 It should be possible to use command line tools like 'cat' to be able to view files that are being protected by Palisade. 
-To do that we would need to write a client that mimics the behaviour of the 'cat' command but routing the request for data via Palisade. 
+To do that, we would need to write a client that mimics the behaviour of the 'cat' command but routing the request for data via Palisade. 
 Then you could alias 'cat' to run that client code. 
-Therefore to the end user there is again very little difference to how they would normally use 'cat' if they did not have the data access policy restrictions.
+Therefore, to the end user, there is very little difference to how they would normally use 'cat' if they did not have the data access policy restrictions.
 
 ## Creating an S3 client endpoint
 It should be possible to create an S3 endpoint that allows any out of the box data processing technology that supports S3 to route requests via Palisade. 

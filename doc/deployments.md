@@ -21,6 +21,7 @@ limitations under the License.
 #### Kubernetes (Locally or AWS EKS)
 
 ![Palisade K8s Deployment](../img/K8s-Deployment.png)
+
 \* _Service in this case means K8s `Service` resource, which acts as an in-cluster DNS name._
 
 Palisade primarily supports deployment through `helm` to a K8s cluster.

@@ -33,7 +33,7 @@ Deploy prerequisites:
 * [Docker](https://www.docker.com/) for building containers
 * [Kubernetes](https://kubernetes.io/) for cluster orchestration and container management
 * [Helm 3](https://helm.sh/) for deploying to Kubernetes and managing deployments
- 
+
 
 #### GitHub Repositories
 The Palisade project has been divided into a set of separate GitHub repositories for simplification of development and maintenance.
@@ -49,16 +49,16 @@ Client code for using Palisade from different data processing technologies, diff
 Library of code for the services used in the application
 
 [Palisade Examples](https://github.com/gchq/Palisade-examples)  
-Code examples showing an example of how Palisade can be used
+Code examples showing an example of how Palisade can be used, as well as performance tests in synthetic scenarios
 
 [Palisade Readers](https://github.com/gchq/Palisade-readers)  
-Library of code for connecting Palisade into different data storage technologies
+Library of code for connecting Palisade into different data storage technologies, such as Hadoop or S3
 
 [Palisade Common](https://github.com/gchq/Palisade-common)  
-Common code used by many of the Palisade repositories(working to remove need for this repo)
+Common code used by many of the Palisade repositories (at time of writing, we are working to remove need for this repo)
 
 [Palisade Integration Tests](https://github.com/gchq/Palisade-integration-tests)  
-Tests for the integration of separate components
+Full-system tests such as smoke-tests and setup for exploratory testing (at time of writing, this is mostly unused)
 
 
 Palisade Common, Readers, Clients, and Services are all required to run the existing solution.
@@ -72,23 +72,15 @@ For an overview of the examples see [here](https://github.com/gchq/Palisade-exam
 We welcome contributions to the project.
 Detailed information on our ways of working can be found [here](ways_of_working.md).
 
-The following gives some useful documentation intended to help with the developer onboarding experience.
-
+The following gives some useful documentation intended to help with the developer onboarding experience:
 * [Initial Requirements](initial_requirements.md) - the initial design requirements for Palisade
-
 * [Design Principles](design_principles.md) - the principles used throughout the design process
-
 * [High level architectural diagram](component_descriptions.md) - shows how the high level services link together
-
 * [Standard flow for a read request through the Palisade system](read_process.md) - Message Sequence Chart (MSC) covering this flow
-
 * [How might the system be deployed?](deployments.md)
-
 * [Security considerations](security_considerations.md) - design thoughts on security
-
 * [Roadmap for Palisade](roadmap.md) - where Palisade is heading
-
-* [Ways of Working](ways_of_working.md) - developer guide to branching strategy etc
+* [Ways of Working](ways_of_working.md) - developer guide to branching strategy etc.
 
 
 ## License
@@ -97,8 +89,8 @@ Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licen
 
 ## FAQ
 1. What is the version of Java is supported?
-   The existing version of the application is built with Javas 11.
-   It should work with later versions of Java, but this has not been tested and cannot be verified
+   The existing version of the application is built with Java 11.
+   It should work with later versions of Java, but this has not been tested
 
 1. What build environments are supported?
-   We do not currently support Windows as a build environment, If you are running on Windows then you will need this: Microsoft Visual C++ 2010 SP1 Redistributable Package
+   We currently support Windows, MacOS and Linux environments, _although there are some caveats for Windows users wishing to use Hadoop components_
