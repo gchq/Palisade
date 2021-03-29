@@ -70,14 +70,14 @@ We welcome contributions to the project.
 Detailed information on our ways of working can be found [here](ways_of_working.md).
 
 The following gives some useful documentation intended to help with the developer onboarding experience:
-* [Initial Requirements](initial_requirements.md) - the initial design requirements for Palisade
-* [Design Principles](design_principles.md) - the principles used throughout the design process
-* [High level architectural diagram](component_descriptions.md) - shows how the high level services link together
-* [Standard flow for a read request through the Palisade system](read_process.md) - Message Sequence Chart (MSC) covering this flow
+* [Initial Requirements](initial_requirements.md)
+* [Design Principles](design_principles.md)
+* [High level architectural diagram](component_descriptions.md)
+* [Standard flow for a read request through the Palisade system](read_process.md)
 * [How might the system be deployed?](deployments.md)
-* [Security considerations](security_considerations.md) - design thoughts on security
-* [Roadmap for Palisade](roadmap.md) - where Palisade is heading
-* [Ways of Working](ways_of_working.md) - developer guide to branching strategy etc.
+* [Security considerations](security_considerations.md)
+* [Roadmap for Palisade](roadmap.md)
+* [Ways of Working](ways_of_working.md)
 
 
 ## License
