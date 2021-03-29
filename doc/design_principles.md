@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 --->
 
-## Design Principles
+# Design Principles
+
 * Reduce the work required to adopt new data processing and data storage technologies.
 * The service and common modules should remain technology agnostic.
 * Palisade should scale horizontally and enable monitoring, with the intention being to enable auto-scaling and auto-healing of each micro-service.
