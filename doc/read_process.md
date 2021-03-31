@@ -17,10 +17,10 @@ limitations under the License.
 # Read Process
 The full sequence of events for a client, eg. read a file through Palisade, is as follows:
 
-1. A client will connect to the palisade service and receive a token.
-1. This token will be used to connect to the filtered-resource service and receive many resources (and metadata for each resource).
+1. A client will connect to the Palisade Service and receive a token.
+1. This token will be used to connect to the Filtered-Resource Service and receive many resources (and metadata for each resource).
 1. The client may choose to do some filtering on this metadata for only the resources they are interested in.
-1. Each resource is then read from the data-service, returning a stream of serialised bytes (which the client may then further deserialise etc.).
+1. Each resource is then read from the Data Service, returning a stream of serialised bytes (which the client may then further deserialise etc.).
 
 
 ## Client Sequence Diagram

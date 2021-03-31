@@ -30,11 +30,11 @@ We have adopted the following branching strategy - see [Git Branching Model](htt
 
 
 ## Issues 
-Where possible a pull request should correlate to a single GitHub issue.
+Where possible, a pull request should correlate to a single GitHub issue.
 An issue should relate to a single functional or non-functional change - changes to alter/improve other pieces of functionality should be addressed in a separate issue in order to keep reviews atomic.
 The reasoning behind code changes should be documented in the GitHub issue. 
 All resolved issues should be included in the next GitHub milestone, this enables releases to be linked to the included issues.
-If a code change requires users to make changes in order for them to adopt it then the issue should be labelled 'migration-required' and a comment should be added similar to:
+If a code change requires users to make changes in order for them to adopt it, then the issue should be labelled 'migration-required', and a comment should be added similar to:
 ```
 ### Migration Steps
 
@@ -55,7 +55,7 @@ If a code change requires users to make changes in order for them to adopt it th
 ## Pull Requests
 Pull requests will undergo an in depth review by a Palisade committer to check the code changes are compliant with our coding style.
 This is a community so please be respectful of other members - offer encouragement, support and suggestions. 
-As described in our git branching model - please raise pull requests to merge you changes in our **develop** branch.
+As described in our git branching model - please raise pull requests to merge your changes into our **develop** branch.
 Please agree to the [GCHQ OSS Contributor License Agreement](https://github.com/GovernmentCommunicationsHeadquarters/Gaffer/wiki/GCHQ-OSS-Contributor-License-Agreement-V1.0) before submitting a pull request.
 
 

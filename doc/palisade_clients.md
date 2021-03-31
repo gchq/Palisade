@@ -18,7 +18,7 @@ limitations under the License.
 This section gives some insight into how clients could be used as the entry point for users to access data via Palisade.
 
 ## Reading a stream of data
-By default, the data-service presents a HTTP stream of binary data to the client on request.
+By default, the Data Service presents an HTTP stream of binary data to the client on request.
 
 A code sample using the `client-akka` package to read all AVRO resources in a dataset (without the client interpreting the AVRO data):
 ```java
@@ -69,10 +69,10 @@ The Spark client for Palisade would create a user (based on who is running the c
 Then the Spark client would then take the response of that request and split the list of resources over the number of executors Spark is running.
 Then it would get each executor to request access to the subset of resources assigned to that executor.
 
-The data service receives the request for data and passes that request to the palisade service to validate the request and to get the data access policies that apply to those resources.
-Then the data service can read the resource applying the column selection (columns requested plus any columns required to apply the policy) then apply the policies, transform the data so only the two requested columns are returned and then stream the data back to the executor that made the request.
+The Data Service receives the request for data, validates the request and the resources allowed, and gets the data access policies that apply to those resources.
+Then the Data Service can read the resource applying the column selection (columns requested plus any columns required to apply the policy) then apply the policies, transform the data so only the two requested columns are returned and then stream the data back to the executor that made the request.
 
 The Spark client can format the stream of data into a DataFrame so that the standard Spark code can do the rest of the request.
 
-Therefore as far as the user is concerned they just had to add the option and use the different format, as they would not be able to access the data via any of the other formats.
+Therefore, as far as the user is concerned, they just had to add the option and use the different format, as they would not be able to access the data via any of the other formats.
 This keeps the API similar to Spark's standard read API. 
