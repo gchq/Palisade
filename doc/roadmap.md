@@ -24,6 +24,6 @@ limitations under the License.
 * Add support for pushing down user filters (predicate pushdown).
 
 #### Long term
-* Add write support to the palisade service so it updates the relevant policies, which are set ready to read data back out.
-* Be able to update a data lineage graph which keeps track of what data sources were used to create this data set and what processing was done at each stage.
-* Be able to manage the deletion of data (file/record/item level) to which Palisade is protecting the access, based on purge policies.
+* Add write support to the services - User and Policy Services would allow for updating policy controls, Resource and Data Service would allow writing of data.
+* Update a data lineage graph which keeps track of what data sources were used to create this data set and what processing was done at each stage.
+* Manage the deletion of data (file/record/item level) to which Palisade is protecting the access, based on purge policies.
