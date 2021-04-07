@@ -4,11 +4,8 @@
 
 set -e
 
-echo "Installing gitbook plugins"
+echo "Installing gitbook"
+
 gitbook install
-
-echo "Building gitbook"
 gitbook build
-
-echo "'Deploying' build to doc directory"
 mv _book/* doc/

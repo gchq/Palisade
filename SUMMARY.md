@@ -17,15 +17,15 @@ limitations under the License.
 # Summary
 
 * [Introduction](README.md)
-* [Developer Guide](doc/developer_guide.md)
-    * [Ways Of Working](doc/ways_of_working.md)
+* [Developer Guide](src/developer_guide.md)
+    * [Ways Of Working](src/ways_of_working.md)
 * Overview
-    * [Initial Requirements](doc/initial_requirements.md)
-    * [Design Principles](doc/design_principles.md)
-    * [Future Roadmap](doc/roadmap.md)
+    * [Initial Requirements](src/initial_requirements.md)
+    * [Design Principles](src/design_principles.md)
+    * [Future Roadmap](src/roadmap.md)
 * Deep Dive
-    * [Component Descriptions and High-Level Architecture](doc/component_descriptions.md)
-    * [Standard Flow of Read Request](doc/read_process.md)
-    * [Deployments](doc/deployments.md)
-    * [Palisade Clients](doc/palisade_clients.md)
-    * [Security Considerations](doc/security_considerations.md)
+    * [Component Descriptions and High-Level Architecture](src/component_descriptions.md)
+    * [Standard Flow of Read Request](src/read_process.md)
+    * [Deployments](src/deployments.md)
+    * [Palisade Clients](src/palisade_clients.md)
+    * [Security Considerations](src/security_considerations.md)

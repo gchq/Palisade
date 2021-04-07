@@ -30,7 +30,7 @@
   },
   "root": "./",
   "structure": {
-    "readme": "readme.md",
-    "summary": "summary.md"
+    "readme": "README.md",
+    "summary": "SUMMARY.md"
   }
 }

@@ -1,0 +1,499 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Palisade Clients · Palisade Doc</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-expandable-chapters-interactive/expandable-chapters.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-codetabs/codetabs.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="security_considerations.html" />
+    
+    
+    <link rel="prev" href="deployments.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="developer_guide.html">
+            
+                <a href="developer_guide.html">
+            
+                    
+                    Developer Guide
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="ways_of_working.html">
+            
+                <a href="ways_of_working.html">
+            
+                    
+                    Ways Of Working
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" >
+            
+                <span>
+            
+                    
+                    Overview
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="initial_requirements.html">
+            
+                <a href="initial_requirements.html">
+            
+                    
+                    Initial Requirements
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="design_principles.html">
+            
+                <a href="design_principles.html">
+            
+                    
+                    Design Principles
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="roadmap.html">
+            
+                <a href="roadmap.html">
+            
+                    
+                    Future Roadmap
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" >
+            
+                <span>
+            
+                    
+                    Deep Dive
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.4.1" data-path="component_descriptions.html">
+            
+                <a href="component_descriptions.html">
+            
+                    
+                    Component Descriptions and High-Level Architecture
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="read_process.html">
+            
+                <a href="read_process.html">
+            
+                    
+                    Standard Flow of Read Request
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="deployments.html">
+            
+                <a href="deployments.html">
+            
+                    
+                    Deployments
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.4.4" data-path="palisade_clients.html">
+            
+                <a href="palisade_clients.html">
+            
+                    
+                    Palisade Clients
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.5" data-path="security_considerations.html">
+            
+                <a href="security_considerations.html">
+            
+                    
+                    Security Considerations
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Palisade Clients</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <!---
+Copyright 2018-2021 Crown Copyright
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+--->
+<h1 id="palisade-clients">Palisade Clients</h1>
+<p>This section gives some insight into how clients could be used as the entry point for users to access data via Palisade.</p>
+<h2 id="reading-a-stream-of-data">Reading a stream of data</h2>
+<p>By default, the Data Service presents an HTTP stream of binary data to the client on request.</p>
+<p>A code sample using the <code>client-akka</code> package to read all AVRO resources in a dataset (without the client interpreting the AVRO data):</p>
+<pre class="language-"><code class="lang-java"><span class="token keyword">void</span> <span class="token function">printInputStream</span><span class="token punctuation">(</span><span class="token class-name">InputStream</span> is<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">new</span> <span class="token class-name">BufferedReader</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">InputStreamReader</span><span class="token punctuation">(</span>is<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">lines</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span>line <span class="token operator">-&gt;</span> <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>line<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">doRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">String</span> token <span class="token operator">=</span> client<span class="token punctuation">.</span><span class="token function">register</span><span class="token punctuation">(</span><span class="token string">&quot;Alice&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;file:/palisade-data-store/dataset-1/&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;&quot;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toCompletableFuture</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token class-name">Source</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">LeafResource</span><span class="token punctuation">,</span> <span class="token operator">?</span><span class="token punctuation">&gt;</span></span> avroResources <span class="token operator">=</span> client<span class="token punctuation">.</span><span class="token function">fetch</span><span class="token punctuation">(</span>token<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span>resource <span class="token operator">-&gt;</span> resource<span class="token punctuation">.</span><span class="token function">getType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">&quot;AVRO&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">Source</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">InputStream</span><span class="token punctuation">,</span> <span class="token operator">?</span><span class="token punctuation">&gt;</span></span> avroRecords <span class="token operator">=</span> avroResources<span class="token punctuation">.</span><span class="token function">flatMapConcat</span><span class="token punctuation">(</span>resource <span class="token operator">-&gt;</span> client<span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span>token<span class="token punctuation">,</span> resource<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    avroRecords<span class="token punctuation">.</span><span class="token function">runWith</span><span class="token punctuation">(</span><span class="token class-name">Sink</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token operator">::</span><span class="token function">printInputStream</span><span class="token punctuation">)</span><span class="token punctuation">,</span> materializer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>In reality, this <code>Source<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>InputStream,</span> <span class="token attr-name">?</span><span class="token punctuation">&gt;</span></span></code> would be interpreted by the client using an AVRO deserialiser.</p>
+<h2 id="using-the-cat-command-line-tool">Using the &apos;cat&apos; command line tool</h2>
+<p>It should be possible to use command line tools like &apos;cat&apos; to be able to view files that are being protected by Palisade. 
+To do that, we would need to write a client that mimics the behaviour of the &apos;cat&apos; command but routing the request for data via Palisade. 
+Then you could alias &apos;cat&apos; to run that client code. 
+Therefore, to the end user, there is very little difference to how they would normally use &apos;cat&apos; if they did not have the data access policy restrictions.</p>
+<h2 id="creating-an-s3-client-endpoint">Creating an S3 client endpoint</h2>
+<p>It should be possible to create an S3 endpoint that allows any out of the box data processing technology that supports S3 to route requests via Palisade. 
+This mechanism would require a way to register your user supplied information such as the purpose for your query to a separate service which provides you a token to embed in the resource URL.
+Then the client would be able to go to strip out the context token and retrieve the contextual information to be used by Palisade.</p>
+<h2 id="reading-a-stream-of-data-using-apache-spark">Reading a stream of data using Apache Spark</h2>
+<p>If you had a data stream in Kafka, you would normally be able to access it using kafka connectors in Java or Python.
+However, it would not apply the data filtering/transformations that are required by the data policies.
+Therefore, we want to be able to provide the user with as similar an experience as possible so the user hardly realises any difference.</p>
+<p>To do that we would want the user to start the job off by running the following: </p>
+<pre class="language-"><code class="lang-java">spark<span class="token punctuation">.</span>readStream
+    <span class="token punctuation">.</span><span class="token function">option</span><span class="token punctuation">(</span><span class="token string">&quot;purpose&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;example purpose&quot;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span><span class="token string">&quot;uk.gov.gchq.palisade&quot;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">load</span><span class="token punctuation">(</span><span class="token string">&quot;data_set&quot;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">select</span><span class="token punctuation">(</span><span class="token string">&quot;colA&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;colB&quot;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<p>We would expect that Spark would create a filter to be pushed down to the data reader that says it only wants &quot;colA&quot; and &quot;colB&quot;.</p>
+<p>The Spark client for Palisade would create a user (based on who is running the command) and take the resource, purpose and filter to register a data request with the Palisade service.
+Then the Spark client would then take the response of that request and split the list of resources over the number of executors Spark is running.
+Then it would get each executor to request access to the subset of resources assigned to that executor.</p>
+<p>The Data Service receives the request for data, validates the request and the resources allowed, and gets the data access policies that apply to those resources.
+Then the Data Service can read the resource applying the column selection (columns requested plus any columns required to apply the policy) then apply the policies, transform the data so only the two requested columns are returned and then stream the data back to the executor that made the request.</p>
+<p>The Spark client can format the stream of data into a DataFrame so that the standard Spark code can do the rest of the request.</p>
+<p>Therefore, as far as the user is concerned, they just had to add the option and use the different format, as they would not be able to access the data via any of the other formats.
+This keeps the API similar to Spark&apos;s standard read API. </p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="deployments.html" class="navigation navigation-prev " aria-label="Previous page: Deployments">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="security_considerations.html" class="navigation navigation-next " aria-label="Next page: Security Considerations">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Palisade Clients","level":"1.4.4","depth":2,"next":{"title":"Security Considerations","level":"1.4.5","depth":2,"path":"src/security_considerations.md","ref":"src/security_considerations.md","articles":[]},"previous":{"title":"Deployments","level":"1.4.3","depth":2,"path":"src/deployments.md","ref":"src/deployments.md","articles":[]},"dir":"ltr"},"config":{"plugins":["expandable-chapters-interactive","codetabs","prism","-highlight","github","anchorjs","otherlink"],"root":"./","styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"prism":{},"github":{"url":"https://gchq.github.io/Palisade"},"search":{"maxIndexSize":5000000},"otherlink":{},"codetabs":{},"lunr":{"maxIndexSize":5000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"expandable-chapters-interactive":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchorjs":{},"expandable-chapters":{}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Palisade Doc","gitbook":"3.x.x"},"file":{"path":"src/palisade_clients.md","mtime":"2021-04-07T11:44:24.508Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-04-07T12:04:27.650Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-expandable-chapters-interactive/expandable-chapters.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-codetabs/codetabs.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-anchorjs/anchor.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-anchorjs/anchor-style.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-otherlink/js/otherlink.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

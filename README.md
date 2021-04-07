@@ -60,7 +60,7 @@ Of course, Palisade can still be deployed locally on a per-platform basis.
 
 ### Additional Information 
 For a quickstart in using Palisade, [see the guide here](QUICKSTART.md).
-For more information on Palisade, [take a look here](doc/developer_guide.md).
+For more information on Palisade, [take a look here](src/developer_guide.md).
 
 
 For any questions or help please contact using the GitHub Issue tracking system.

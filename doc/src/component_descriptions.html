@@ -1,0 +1,487 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Component Descriptions and High-Level Architecture · Palisade Doc</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-expandable-chapters-interactive/expandable-chapters.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-codetabs/codetabs.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="read_process.html" />
+    
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="developer_guide.html">
+            
+                <a href="developer_guide.html">
+            
+                    
+                    Developer Guide
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="ways_of_working.html">
+            
+                <a href="ways_of_working.html">
+            
+                    
+                    Ways Of Working
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" >
+            
+                <span>
+            
+                    
+                    Overview
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="initial_requirements.html">
+            
+                <a href="initial_requirements.html">
+            
+                    
+                    Initial Requirements
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="design_principles.html">
+            
+                <a href="design_principles.html">
+            
+                    
+                    Design Principles
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="roadmap.html">
+            
+                <a href="roadmap.html">
+            
+                    
+                    Future Roadmap
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" >
+            
+                <span>
+            
+                    
+                    Deep Dive
+            
+                </span>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter active" data-level="1.4.1" data-path="component_descriptions.html">
+            
+                <a href="component_descriptions.html">
+            
+                    
+                    Component Descriptions and High-Level Architecture
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.2" data-path="read_process.html">
+            
+                <a href="read_process.html">
+            
+                    
+                    Standard Flow of Read Request
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.3" data-path="deployments.html">
+            
+                <a href="deployments.html">
+            
+                    
+                    Deployments
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.4" data-path="palisade_clients.html">
+            
+                <a href="palisade_clients.html">
+            
+                    
+                    Palisade Clients
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4.5" data-path="security_considerations.html">
+            
+                <a href="security_considerations.html">
+            
+                    
+                    Security Considerations
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Component Descriptions and High-Level Architecture</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <!---
+Copyright 2020 Crown Copyright
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+--->
+<h1 id="component-descriptions">Component Descriptions</h1>
+<h2 id="message-sequence-through-the-palisade-system">Message Sequence through the Palisade System</h2>
+<p><img src="../img/Palisade-Message-Sequence.png" alt="Palisade Message Sequence"></p>
+<p>The above shows how messages might travel, and which services talk to which others.</p>
+<h3 id="clients">Clients</h3>
+<p>The job of the client code is to send the request for data into Palisade and to interpret the result as required for the data processing technology it is written for.
+The responsibility for implementations of the client code is to provide users with a way to request data from Palisade in a way that the user has to make minimal changes to how they would normally use that processing technology.
+Implementations of this component will usually require deep understanding of the data processing technology in order to best hook into that technology, without needing to fork the code for that technology.</p>
+<h3 id="palisade-service">Palisade Service</h3>
+<p>The Palisade Service is the entry-point to the Palisade system.
+A client will register a request with the Palisade Service and be returned a token, which will uniquely identify their request - e.g. to the Filtered-Resource Service and Data Service.</p>
+<h3 id="user-service">User Service</h3>
+<p>The User Service is responsible for retrieving details about the user from an authoritative source.
+This may be an LDAP User Service, Amazon Cognito, or any other User Service provider.</p>
+<h3 id="resource-service">Resource Service</h3>
+<p>The Resource Service is responsible for providing the detailed information about each resource based on a resource id (path or alias) being managed by Palisade.
+The detailed information the service provides could be the type and format of data in that resource, when the resource was created, additional access controls, data lifetime and expiry, categorisation and tagging, etc.</p>
+<h3 id="policy-service">Policy Service</h3>
+<p>The Policy Service is responsible for providing a mapping from resources to a set of rules (filters or transformations) that need to be applied, based on the user and query context.
+The service itself manages additional hierarchical logic, such that rules applied to parent resources are also applied to their children.</p>
+<h3 id="attribute-masking-service">Attribute-Masking Service</h3>
+<p>The Attribute-Masking Service persists the provided context for an authorised data read, that is the token and resource id are used as a key and the user, resource, context and rules as a value.
+This will later be queried by the Data Service.
+The service then decides what metadata attached to resources is returned to the client.</p>
+<h3 id="topic-offset-service">Topic-Offset Service</h3>
+<p>The Topic-Offset Service can be thought of as a basic performance optimisation to prevent reading through the whole kafka queue repeatedly.
+The Topic-Offset Service watches the output of the Attribute-Masking Service, decides if a message indicates the start of a set of results for a token, and if so will record this position.
+This will be used later by the Filtered-Resource Service for connecting to the queue in this exact position.</p>
+<h3 id="filtered-resource-service">Filtered-Resource Service</h3>
+<p>The Filtered-Resource Service is an exit-point from the Palisade system.
+A client will connect to the Filtered-Resource Service with their token and receive a stream of resource metadata back.
+Each of these responses can be requested from the Data Service, which will return the data records.</p>
+<h3 id="data-service">Data Service</h3>
+<p>The Data Service is responsible for returning requested record data to the client.
+This further involves validating the request, gathering the required trusted information (rules and the context in which to apply them) from the Attribute-Masking Service, and auditing what data was returned.</p>
+<h4 id="data-reader">Data Reader</h4>
+<p>The job of the Data Reader is to read a single resource, de-serialise it into the format that the set of rules for this resource will expect and then apply those rules before passing the data back to the Data Service.
+The Data Reader should also be able to push down filters where appropriate to optimise the read process, e.g. to only retrieve certain columns from a columnar database or a particular row range.
+It is this component that is unique to each data storage technology, not the Data Service as a whole.</p>
+<h3 id="audit-service">Audit Service</h3>
+<p>The Audit Service is responsible for recording audit logs as requested by other services.
+The audit logs produced by the services should be verbose by default.
+They will then be filtered, organised and reduced by the Audit Service.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                
+                <a href="read_process.html" class="navigation navigation-next navigation-unique" aria-label="Next page: Standard Flow of Read Request">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Component Descriptions and High-Level Architecture","level":"1.4.1","depth":2,"next":{"title":"Standard Flow of Read Request","level":"1.4.2","depth":2,"path":"src/read_process.md","ref":"src/read_process.md","articles":[]},"previous":{"title":"Deep Dive","level":"1.4","depth":1,"ref":"","articles":[{"title":"Component Descriptions and High-Level Architecture","level":"1.4.1","depth":2,"path":"src/component_descriptions.md","ref":"src/component_descriptions.md","articles":[]},{"title":"Standard Flow of Read Request","level":"1.4.2","depth":2,"path":"src/read_process.md","ref":"src/read_process.md","articles":[]},{"title":"Deployments","level":"1.4.3","depth":2,"path":"src/deployments.md","ref":"src/deployments.md","articles":[]},{"title":"Palisade Clients","level":"1.4.4","depth":2,"path":"src/palisade_clients.md","ref":"src/palisade_clients.md","articles":[]},{"title":"Security Considerations","level":"1.4.5","depth":2,"path":"src/security_considerations.md","ref":"src/security_considerations.md","articles":[]}]},"dir":"ltr"},"config":{"plugins":["expandable-chapters-interactive","codetabs","prism","-highlight","github","anchorjs","otherlink"],"root":"./","styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"prism":{},"github":{"url":"https://gchq.github.io/Palisade"},"search":{"maxIndexSize":5000000},"otherlink":{},"codetabs":{},"lunr":{"maxIndexSize":5000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"expandable-chapters-interactive":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchorjs":{},"expandable-chapters":{}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Palisade Doc","gitbook":"3.x.x"},"file":{"path":"src/component_descriptions.md","mtime":"2021-04-07T11:44:24.504Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-04-07T12:04:27.650Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-expandable-chapters-interactive/expandable-chapters.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-codetabs/codetabs.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-anchorjs/anchor.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-anchorjs/anchor-style.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-otherlink/js/otherlink.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
