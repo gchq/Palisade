@@ -26,7 +26,7 @@ limitations under the License.
 
 Palisade primarily supports deployment through `helm` to a K8s cluster.
 This allows for containerisation, scaling and auto-recovery on service failure.
-Palisade is regularly deployed to local k8s clusters for manual developer testing, and to AWS EKS for CI/CD automated testing.
+Palisade is regularly deployed to local K8s clusters for manual developer testing, and to AWS EKS for CI/CD automated testing.
 
 In this deployment, containers for each microservice are managed by various K8s workload resources, notably `Deployment`s and `Statefulset`s.
 These can then be scaled up or down as appropriate, with the optional metrics-server responsible for horizontal auto-scaling.
@@ -51,4 +51,4 @@ This means services will not recover from crashes or critical errors.
 The Palisade services are accessed through their localhost address and port.
 Each microservice uses the local filesystem without any additional volume mounts.
 
-_n.b. Redis and Kafka are still required in some form, whether exposed in a local k8s cluster, running as local processes, or hosted externally as a SaaS_.
+_n.b. Redis and Kafka are still required in some form, whether exposed in a local K8s cluster, running as local processes, or hosted externally as a SaaS_.

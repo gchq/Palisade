@@ -22,10 +22,10 @@ limitations under the License.
 * Overview
     * [Initial Requirements](doc/initial_requirements.md)
     * [Design Principles](doc/design_principles.md)
-    * [Roadmap](doc/roadmap.md)
+    * [Future Roadmap](doc/roadmap.md)
 * Deep Dive
-    * [High Level Architecture](doc/component_descriptions.md)
+    * [Component Descriptions and High-Level Architecture](doc/component_descriptions.md)
     * [Standard Flow of Read Request](doc/read_process.md)
-    * [Deployment Ideas](doc/deployments.md)
-    * [Possible Clients](doc/palisade_clients.md)
+    * [Deployments](doc/deployments.md)
+    * [Palisade Clients](doc/palisade_clients.md)
     * [Security Considerations](doc/security_considerations.md)

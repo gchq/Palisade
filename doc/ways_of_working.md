@@ -85,7 +85,8 @@ In particular please ensure you have adhered to the following:
 * Make use of generic typing
 * Make use of appropriate object-oriented design patterns
 * Use Loggers instead of System.out.print and Throwable.printStackTrace
-* Ensure that the toString(), equals() and hashCode() methods are implemented where appropriate
+* Ensure that the `toString()`, `equals()` and `hashCode()` methods are implemented where appropriate
+* Generated code should be tagged with a `@Generated` annotation such that it is excluded from coverage metrics
 
 
 #### Javadoc

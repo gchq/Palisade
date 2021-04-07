@@ -1,0 +1,36 @@
+
+{
+  "gitbook": "3.x.x",
+  "title": "Palisade Doc",
+  "plugins": [
+    "expandable-chapters-interactive",
+    "codetabs",
+    "prism",
+    "-highlight",
+    "github",
+    "anchorjs",
+    "otherlink"
+  ],
+  "pluginsConfig": {
+    "github": {
+      "url": "https://gchq.github.io/Palisade"
+    },
+    "theme-default": {
+      "styles": {
+        "website": "build/gitbook.css"
+      }
+    },
+    "expandable-chapters": {},
+    "lunr": {
+      "maxIndexSize": 5000000
+    },
+    "search": {
+      "maxIndexSize": 5000000
+    }
+  },
+  "root": "./",
+  "structure": {
+    "readme": "readme.md",
+    "summary": "summary.md"
+  }
+}

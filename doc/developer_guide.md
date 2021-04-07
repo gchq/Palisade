@@ -90,4 +90,5 @@ Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licen
    It should work with later versions of Java, but this has not been tested
 
 1. What build environments are supported?
-   We currently support Windows, MacOS and Linux environments, _although there are some caveats for Windows users wishing to use Hadoop components_
+   We currently support Windows, MacOS and Linux environments, _although there are some caveats for Windows users wishing to use Hadoop components._
+   As such, WSL is preferred over Windows.
