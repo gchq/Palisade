@@ -42,6 +42,9 @@ They consist of the following:
 [Palisade](https://gchq.github.io/Palisade)  
 Documentation for how Palisade works at a high level
 
+[Palisade Common](https://github.com/gchq/Palisade-common)  
+Set of core interfaces and POJOs used across the services, clients and readers
+
 [Palisade Clients](https://github.com/gchq/Palisade-clients)  
 Client code for using Palisade from different data processing technologies, different language libraries, or slightly different implementations each with pros and cons.
 
@@ -58,9 +61,9 @@ Library of code for connecting Palisade into different data storage technologies
 Full-system tests such as smoke-tests and setup for exploratory testing (at time of writing, this is mostly unused)
 
 
-Palisade Readers, Clients, and Services are all required to run the existing solution.
+Palisade Common, Clients, and Services are all required to run the existing solution.
 The examples provide a demonstration of how the automated policy rule enforcement is applied to data being read by a user.
-The examples will provide a good start to understanding how Palisade works.
+The examples are a good start to understanding how Palisade works.
 
 For an overview of the examples see [here](https://github.com/gchq/Palisade-examples).
 

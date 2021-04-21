@@ -40,7 +40,7 @@ Run the cross-platform [quickstart.cmd script](quickstart.cmd):
   ```
 
 This will perform the following tasks necessary to set-up and start using Palisade:
-* Download each of the Palisade repos required to run the example ([common](https://github.com/gchq/Palisade-common/tree/develop), [readers](https://github.com/gchq/Palisade-readers/tree/develop), [clients](https://github.com/gchq/Palisade-clients/tree/develop), [services](https://github.com/gchq/Palisade-services/tree/develop), [examples](https://github.com/gchq/Palisade-examples/tree/develop))
+* Download each of the Palisade repos required to run the example ([common](https://github.com/gchq/Palisade-common/tree/develop), [clients](https://github.com/gchq/Palisade-clients/tree/develop), [services](https://github.com/gchq/Palisade-services/tree/develop), [readers](https://github.com/gchq/Palisade-readers/tree/develop), [examples](https://github.com/gchq/Palisade-examples/tree/develop))
     - Since Palisade remains in active development, we will be pulling the 0.5.0 release which uses a Kafka-based streaming microservice architecture
 * Install each project in order of any dependencies
 * Run the Palisade local-jvm example (more details [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-jvm))
