@@ -4,5 +4,8 @@
 
 set -e
 
+echo "Installing gitbook plugins"
+gitbook install
+
 echo "Serving gitbook"
 gitbook serve

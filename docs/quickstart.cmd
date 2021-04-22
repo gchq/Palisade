@@ -29,7 +29,7 @@ GOTO :CMDSCRIPT
 : ###############
 
 : # For each palisade repo
-for dir in Palisade-common Palisade-readers Palisade-clients Palisade-services Palisade-examples
+for dir in Palisade-common Palisade-clients Palisade-services Palisade-readers Palisade-examples
 do
     # Clone it (0.5.0 release)
     git clone --depth 1 --branch develop https://github.com/gchq/$dir.git
@@ -54,7 +54,7 @@ exit $?
 : ##############
 
 setlocal EnableDelayedExpansion
-set "dir_list=Palisade-common Palisade-readers Palisade-clients Palisade-services Palisade-examples"
+set "dir_list=Palisade-common Palisade-clients Palisade-services Palisade-readers Palisade-examples"
 
 : # For each palisade repo
 FOR %%s IN (%dir_list%) DO (

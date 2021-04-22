@@ -6,8 +6,13 @@ set -e
 echo "Installing gitbook plugins"
 gitbook install
 
+echo "Cleaning build directory"
+rm -rf _book
+
 echo "Building gitbook"
 gitbook build
 
-echo "'Deploying' /_book build to /doc directory"
-mv _book/* docs/
+echo "'Deploying' /_book build to /docs directory"
+rm -rf docs
+mkdir docs
+mv -u _book/* docs
