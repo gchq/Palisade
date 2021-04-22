@@ -17,9 +17,8 @@ limitations under the License.
 # Summary
 
 * [Introduction](README.md)
-* [Developer Guide](src/developer_guide.md)
-    * [Ways Of Working](src/ways_of_working.md)
 * Overview
+    * [Motivating Scenario](src/motivating_scenario.md)
     * [Initial Requirements](src/initial_requirements.md)
     * [Design Principles](src/design_principles.md)
     * [Future Roadmap](src/roadmap.md)
@@ -29,3 +28,5 @@ limitations under the License.
     * [Deployments](src/deployments.md)
     * [Palisade Clients](src/palisade_clients.md)
     * [Security Considerations](src/security_considerations.md)
+* [Developer Guide](src/developer_guide.md)
+    * [Ways Of Working](src/ways_of_working.md)

@@ -16,10 +16,8 @@ limitations under the License.
 
 # Developer Guide
 
-## Palisade 0.5.0
-
 ### Status
-Palisade is still in the early stages of development and is not production ready.
+Palisade is in the stages of alpha-testing and is not yet production ready.
 This information will be updated when there is a scheduled date for the production release.
 
 
@@ -40,25 +38,25 @@ The Palisade project has been divided into a set of separate GitHub repositories
 They consist of the following:
 
 [Palisade](https://gchq.github.io/Palisade)  
-Documentation for how Palisade works at a high level
+Documentation for how Palisade works at a high level.
 
 [Palisade Common](https://github.com/gchq/Palisade-common)  
-Set of core interfaces and POJOs used across the services, clients and readers
+Set of interfaces and POJOs used across the services, clients and readers.
 
 [Palisade Clients](https://github.com/gchq/Palisade-clients)  
 Client code for using Palisade from different data processing technologies, different language libraries, or slightly different implementations each with pros and cons.
 
 [Palisade Services](https://github.com/gchq/Palisade-services)  
-Library of code for the services used in the application
-
-[Palisade Examples](https://github.com/gchq/Palisade-examples)  
-Code examples showing an example of how Palisade can be used, as well as performance tests in synthetic scenarios
+Core codebase for Palisade, where each package provides some high-level interface for an individual microservice component, along with the associated code to wrap up this implementation to talk to other services.
 
 [Palisade Readers](https://github.com/gchq/Palisade-readers)  
-Library of code for connecting Palisade into different data storage technologies, such as Hadoop or S3
+Library of implementations of some services interfaces for connecting Palisade into different data storage technologies, such as Hadoop or S3.
+
+[Palisade Examples](https://github.com/gchq/Palisade-examples)  
+Code examples showing an example of how Palisade can be used, as well as performance tests in synthetic scenarios.
 
 [Palisade Integration Tests](https://github.com/gchq/Palisade-integration-tests)  
-Full-system tests such as smoke-tests and setup for exploratory testing (at time of writing, this is mostly unused)
+Full-system tests such as smoke-tests and setup for exploratory testing (at time of writing, this is mostly unused).
 
 
 Palisade Common, Clients, and Services are all required to run the existing solution.

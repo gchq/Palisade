@@ -20,6 +20,11 @@ limitations under the License.
 
 #### Kubernetes (Locally or AWS EKS)
 
+You will need:
+* [Docker](https://www.docker.com/get-started)
+* [Kubernetes](https://kubernetes.io/)
+* [Helm](https://helm.sh/)
+
 ![Palisade K8s Deployment](../img/K8s-Deployment.png)
 
 \* _Service in this case means K8s `Service` resource, which acts as an in-cluster DNS name._
@@ -38,6 +43,12 @@ Redis and Kafka can be either installed into the same namespace as the Palisade 
 
 
 #### JVM Processes
+
+You will need:
+* [OpenJDK Java 11](https://openjdk.java.net/projects/jdk/11/) or [Oracle Java 11](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
+* [Apache Kafka](https://kafka.apache.org/downloads)
+* [Redis](https://redis.io/download)
+
 
 ![Palisade JVM Deployment](../img/JVM-Deployment.png)
 
