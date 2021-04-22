@@ -17,6 +17,7 @@ limitations under the License.
 # Summary
 
 * [Introduction](README.md)
+* [Quickstart Guide](QUICKSTART.md)
 * Overview
     * [Motivating Scenario](src/motivating_scenario.md)
     * [Initial Requirements](src/initial_requirements.md)

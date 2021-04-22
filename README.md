@@ -16,7 +16,6 @@ limitations under the License.
 
 # <img src="logos/logo.svg" width="180">
 ### A Tool for Complex and Scalable Data Access Policy Enforcement
-
 Palisade aims to provide a stable framework for defining and enforcing policies for accessing data.
 
 
@@ -35,23 +34,21 @@ Also, within each dataset a specific user may only be permitted to access a part
 Palisade allows the policies for accessing datasets, redacting records and executing the query to be specified independently of the physical data and the platform hosting the data.
 This will enable the clients to perform queries across the datasets while still conforming to company and regulatory policies.  
 
+> :information-source:
+See the [Motivating Scenario](src/motivating_scenario.md) for a detailed description of this example scenario, and the [Example Library](https://github.com/gchq/Palisade-examples/tree/develop/example-library) package for the concrete implementation of this example used for testing.
+
 Policies are set per resource and are not changed by the user or context.
 However, the policies can use the information about the user and context to decide how the data needs to be sanitised for any particular query.
-This can be applied on a per-field basis.
-This means that fields in a record can be redacted or masked based on:
+This can be applied on a per-field basis, which means that fields in a record can be redacted or masked based on:
 * the contents of the record
 * the user accessing the record 
 * the contextual information provided by the user or the system at the time of the query.
-
-
 
 Palisade's aim is to provide a stable framework for enforcing policy and auditing requirements for data access requests, while, at the same time, not limiting the solution to any single platform ecosystem.
 Palisade can be deployed into many different ecosystems such as Hadoop, Kubernetes, AWS, Azure and Google Cloud.
 As adoption of Palisade grows, then the burden of creating new connectors (between Palisade and new technologies for storing and processing data) can be shared across the community.
 
-
 ![Palisade Overview](img/Palisade_overview.png)
-
 
 If required, Palisade allows an organisation to use centralised services which each deployment of Palisade's data access services can share.
 This means that your data access policies, audit logs, user account details etc. don't need to be duplicated on every system.
@@ -59,18 +56,19 @@ Of course, Palisade can still be deployed locally on a per-platform basis.
 
 
 ### Additional Information 
-For a quickstart in using Palisade, [see the guide here](QUICKSTART.md).
-For more information on Palisade, [take a look here](src/developer_guide.md).
-
+For a quickstart in using Palisade, see the [Quickstart Guide](./QUICKSTART.md).
+For more information on Palisade, take a look at the [Developer Guide](src/developer_guide.md).
 
 For any questions or help please contact using the GitHub Issue tracking system.
 Go to the Issue page and create and enter your query in a new issue and then submit.
 We will try to respond as quick as possible in the form of a comment to the issue.
 Here is the link to [Palisade issues](https://www.github.com/gchq/Palisade/issues).
 
+
 ## Status
-Palisade is still in development and is not production ready.
+Palisade is still in development and early testing.
 This information will be updated when there is a scheduled date for the production release.
+
 
 ### License
 Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) and is covered by [Crown Copyright](https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/).
