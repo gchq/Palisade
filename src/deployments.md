@@ -53,7 +53,7 @@ You will need:
 ![Palisade JVM Deployment](../img/JVM-Deployment.png)
 
 Palisade also supports running as bare JVM processes outside of K8s, but of course without any of the benefits provided by K8s.
-The [quickstart.cmd script](/quickstart.cmd) runs using this approach, as it does not depend on availability of a cluster, as well as offering slightly faster startup times.
+The [quickstart.cmd script](https://github.com/gchq/Palisade/blob/main/quickstart.cmd) runs using this approach, as it does not depend on availability of a cluster, as well as offering slightly faster startup times.
 This is intended as a proof-of-concept and for lighter-weight testing, rather than as a production-ready deployment.
 
 In this deployment, a separate JVM is spawned for each microservice and will run unmanaged.

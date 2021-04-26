@@ -17,7 +17,9 @@ limitations under the License.
 # Palisade Clients
 This section gives some insight into how clients could be used as the entry point for users to access data via Palisade.
 
-## Reading a stream of data
+## Current
+
+### Reading a stream of data
 By default, the Data Service presents an HTTP stream of binary data to the client on request.
 
 A code sample using the `client-akka` package to read all AVRO resources in a dataset (without the client interpreting the AVRO data):
@@ -37,18 +39,34 @@ void doRequest() {
 ```
 In reality, this `Source<InputStream, ?>` would be interpreted by the client using an AVRO deserialiser.
 
-## Using the 'cat' command line tool
+Similarly, Palisade has a `client-java` package which implements the Palisade Service/Filtered-Resource Service/Data Service protocol using the java standard-library, instead exposing a `java.util.concurrent.Flow.Publisher` and `java.io.InputStream`.
+
+### Using the 'cat' command line tool
 It should be possible to use command line tools like 'cat' to be able to view files that are being protected by Palisade. 
 To do that, we would need to write a client that mimics the behaviour of the 'cat' command but routing the request for data via Palisade. 
 Then you could alias 'cat' to run that client code. 
 Therefore, to the end user, there is very little difference to how they would normally use 'cat' if they did not have the data access policy restrictions.
 
-## Creating an S3 client endpoint
+When using Palisade, there is some extra context to be managed, and a 'dumb' cat-client might be quite verbose (the user would have to keep track of tokens themself).
+Instead, there are two implementations of this style of client.
+
+The first of these, the `client-shell` package, is a simple shell text user interface with commands similar to `cat`, `cd`, and `ls`.
+This aims to demonstrate to a developer how Palisade works, mapping each part of the protocol between the client and server to a different UNIX-like command.
+As commands are executed, the data returned is printed out in a human-readable fashion.
+
+The second of these, the `client-fuse` package, is a connector between Palisade and the FUSE interface, which will mount the results of a Palisade query as a filesystem.
+This aims to allow a quick-and-easy way to provide compatibility with a whole host of existing tools, as well as present an interactive graphical way to explore returned data.
+Of course, this client also allows use of many existing UNIX CLI tools, such as `ls` and `cat`, but also more complex tools such as `sed` or `grep`.
+This approach is not the most performant, especially when querying many thousands of resources, but should be more than enough for proof-of-concept and demonstrative purposes.
+
+## Future
+
+### Creating an S3 client endpoint
 It should be possible to create an S3 endpoint that allows any out of the box data processing technology that supports S3 to route requests via Palisade. 
 This mechanism would require a way to register your user supplied information such as the purpose for your query to a separate service which provides you a token to embed in the resource URL.
 Then the client would be able to go to strip out the context token and retrieve the contextual information to be used by Palisade.
 
-## Reading a stream of data using Apache Spark
+### Reading a stream of data using Apache Spark
 If you had a data stream in Kafka, you would normally be able to access it using kafka connectors in Java or Python.
 However, it would not apply the data filtering/transformations that are required by the data policies.
 Therefore, we want to be able to provide the user with as similar an experience as possible so the user hardly realises any difference.

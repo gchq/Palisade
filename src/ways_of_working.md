@@ -61,7 +61,6 @@ Please agree to the [GCHQ OSS Contributor License Agreement](https://github.com/
 
 ## Coding style
 Please ensure your coding style is consistent with rest of the project and follow coding standards and best practices.
-In general, follow the [Gaffer Codestyle](https://github.com/gchq/Gaffer/tree/develop/code-style)
 
 In particular please ensure you have adhered to the following:
 * Strive for small, easy to read, and easy to understand classes and methods

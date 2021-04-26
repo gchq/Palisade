@@ -372,7 +372,8 @@ limitations under the License.
 --->
 <h1 id="palisade-clients">Palisade Clients</h1>
 <p>This section gives some insight into how clients could be used as the entry point for users to access data via Palisade.</p>
-<h2 id="reading-a-stream-of-data">Reading a stream of data</h2>
+<h2 id="current">Current</h2>
+<h3 id="reading-a-stream-of-data">Reading a stream of data</h3>
 <p>By default, the Data Service presents an HTTP stream of binary data to the client on request.</p>
 <p>A code sample using the <code>client-akka</code> package to read all AVRO resources in a dataset (without the client interpreting the AVRO data):</p>
 <pre class="language-"><code class="lang-java"><span class="token keyword">void</span> <span class="token function">printInputStream</span><span class="token punctuation">(</span><span class="token class-name">InputStream</span> is<span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -389,16 +390,27 @@ limitations under the License.
 <span class="token punctuation">}</span>
 </code></pre>
 <p>In reality, this <code>Source<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>InputStream,</span> <span class="token attr-name">?</span><span class="token punctuation">&gt;</span></span></code> would be interpreted by the client using an AVRO deserialiser.</p>
-<h2 id="using-the-cat-command-line-tool">Using the &apos;cat&apos; command line tool</h2>
+<p>Similarly, Palisade has a <code>client-java</code> package which implements the Palisade Service/Filtered-Resource Service/Data Service protocol using the java standard-library, instead exposing a <code>java.util.concurrent.Flow.Publisher</code> and <code>java.io.InputStream</code>.</p>
+<h3 id="using-the-cat-command-line-tool">Using the &apos;cat&apos; command line tool</h3>
 <p>It should be possible to use command line tools like &apos;cat&apos; to be able to view files that are being protected by Palisade. 
 To do that, we would need to write a client that mimics the behaviour of the &apos;cat&apos; command but routing the request for data via Palisade. 
 Then you could alias &apos;cat&apos; to run that client code. 
 Therefore, to the end user, there is very little difference to how they would normally use &apos;cat&apos; if they did not have the data access policy restrictions.</p>
-<h2 id="creating-an-s3-client-endpoint">Creating an S3 client endpoint</h2>
+<p>When using Palisade, there is some extra context to be managed, and a &apos;dumb&apos; cat-client might be quite verbose (the user would have to keep track of tokens themself).
+Instead, there are two implementations of this style of client.</p>
+<p>The first of these, the <code>client-shell</code> package, is a simple shell text user interface with commands similar to <code>cat</code>, <code>cd</code>, and <code>ls</code>.
+This aims to demonstrate to a developer how Palisade works, mapping each part of the protocol between the client and server to a different UNIX-like command.
+As commands are executed, the data returned is printed out in a human-readable fashion.</p>
+<p>The second of these, the <code>client-fuse</code> package, is a connector between Palisade and the FUSE interface, which will mount the results of a Palisade query as a filesystem.
+This aims to allow a quick-and-easy way to provide compatibility with a whole host of existing tools, as well as present an interactive graphical way to explore returned data.
+Of course, this client also allows use of many existing UNIX CLI tools, such as <code>ls</code> and <code>cat</code>, but also more complex tools such as <code>sed</code> or <code>grep</code>.
+This approach is not the most performant, especially when querying many thousands of resources, but should be more than enough for proof-of-concept and demonstrative purposes.</p>
+<h2 id="future">Future</h2>
+<h3 id="creating-an-s3-client-endpoint">Creating an S3 client endpoint</h3>
 <p>It should be possible to create an S3 endpoint that allows any out of the box data processing technology that supports S3 to route requests via Palisade. 
 This mechanism would require a way to register your user supplied information such as the purpose for your query to a separate service which provides you a token to embed in the resource URL.
 Then the client would be able to go to strip out the context token and retrieve the contextual information to be used by Palisade.</p>
-<h2 id="reading-a-stream-of-data-using-apache-spark">Reading a stream of data using Apache Spark</h2>
+<h3 id="reading-a-stream-of-data-using-apache-spark">Reading a stream of data using Apache Spark</h3>
 <p>If you had a data stream in Kafka, you would normally be able to access it using kafka connectors in Java or Python.
 However, it would not apply the data filtering/transformations that are required by the data policies.
 Therefore, we want to be able to provide the user with as similar an experience as possible so the user hardly realises any difference.</p>
@@ -462,7 +474,7 @@ This keeps the API similar to Spark&apos;s standard read API. </p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Palisade Clients","level":"1.4.4","depth":2,"next":{"title":"Security Considerations","level":"1.4.5","depth":2,"path":"src/security_considerations.md","ref":"src/security_considerations.md","articles":[]},"previous":{"title":"Deployments","level":"1.4.3","depth":2,"path":"src/deployments.md","ref":"src/deployments.md","articles":[]},"dir":"ltr"},"config":{"plugins":["expandable-chapters-interactive","codetabs","prism","-highlight","github","anchorjs","otherlink"],"root":"./","styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"prism":{},"github":{"url":"https://gchq.github.io/Palisade"},"search":{"maxIndexSize":5000000},"otherlink":{},"codetabs":{},"lunr":{"maxIndexSize":5000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"expandable-chapters-interactive":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchorjs":{},"expandable-chapters":{}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Palisade Doc","gitbook":"3.x.x"},"file":{"path":"src/palisade_clients.md","mtime":"2021-04-07T11:44:24.508Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-04-22T14:23:39.758Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Palisade Clients","level":"1.4.4","depth":2,"next":{"title":"Security Considerations","level":"1.4.5","depth":2,"path":"src/security_considerations.md","ref":"src/security_considerations.md","articles":[]},"previous":{"title":"Deployments","level":"1.4.3","depth":2,"path":"src/deployments.md","ref":"src/deployments.md","articles":[]},"dir":"ltr"},"config":{"plugins":["expandable-chapters-interactive","codetabs","prism","-highlight","github","anchorjs","otherlink"],"root":"./","styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"prism":{},"github":{"url":"https://gchq.github.io/Palisade"},"search":{"maxIndexSize":5000000},"otherlink":{},"codetabs":{},"lunr":{"maxIndexSize":5000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"expandable-chapters-interactive":{},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"theme-default":{"styles":{"website":"build/gitbook.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false},"anchorjs":{},"expandable-chapters":{}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Palisade Doc","gitbook":"3.x.x"},"file":{"path":"src/palisade_clients.md","mtime":"2021-04-26T10:43:33.237Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2021-04-26T10:57:15.381Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

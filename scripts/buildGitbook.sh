@@ -8,11 +8,11 @@ gitbook install
 
 echo "Cleaning build directory"
 rm -rf _book
+rm -rf docs
 
 echo "Building gitbook"
 gitbook build
 
 echo "'Deploying' /_book build to /docs directory"
-rm -rf docs
 mkdir docs
 mv -u _book/* docs

@@ -34,7 +34,7 @@ Also, within each dataset a specific user may only be permitted to access a part
 Palisade allows the policies for accessing datasets, redacting records and executing the query to be specified independently of the physical data and the platform hosting the data.
 This will enable the clients to perform queries across the datasets while still conforming to company and regulatory policies.  
 
-> :information-source:
+> :information_source:
 See the [Motivating Scenario](src/motivating_scenario.md) for a detailed description of this example scenario, and the [Example Library](https://github.com/gchq/Palisade-examples/tree/develop/example-library) package for the concrete implementation of this example used for testing.
 
 Policies are set per resource and are not changed by the user or context.
