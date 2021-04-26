@@ -9,7 +9,8 @@
     "-highlight",
     "github",
     "anchorjs",
-    "otherlink"
+    "otherlink",
+    "advanced-emoji"
   ],
   "pluginsConfig": {
     "github": {

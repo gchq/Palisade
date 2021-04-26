@@ -30,7 +30,6 @@ or a combination of these and others you might want to define.
 * Data can only be accessed via the approved mechanism.
 * Request for data, and request completion status is logged for auditing centrally or locally
 (preferably without logging 1000s of times for each analytic's request, for example if you had 1000 mappers reading in parallel).
-* Be able to write data behind Palisade in a way that minimises effort by user.
 * Be a solution that works on data in motion and at rest.
 
 ## Should have
@@ -42,5 +41,6 @@ or a combination of these and others you might want to define.
 Might just be a need to allow policy to dictate that data needs to be transformed when sent back to client.
 
 ## Could have
+* Be able to write data behind Palisade in a way that minimises effort by user.
 * When data is written then a data lineage graph can be updated showing where the data came from.
 * Data retention policies which are used to auto-delete data that has aged off or rewrite files to remove records that have been marked for purging on a given schedule (e.g. every night or once a month).

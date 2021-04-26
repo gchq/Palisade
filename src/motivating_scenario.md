@@ -64,13 +64,13 @@ In particular, `TrainingCourse` is specific to this scenario and not to Palisade
 ### Resources
 
 The `Resource` represents a coarse-grained collection of records with a hierarchical structure, although it does not actually contain the data therein.
-`Resource`s in this scenario are effectively filenames, with the following directory structure:
+A `Resource` in this scenario is effectively a filename, from the following directory structure:
 ```
 /data
   employee_file0.avro
   employee_file1.avro
 ```
-These `Resource`s are provided by a _data catalogue_ which is distinct from the target _data source_, and can be tagged with additional metadata.
+These are provided by a _data catalogue_ which is distinct from the target _data source_, and can be tagged with additional metadata.
 
 
 ### Purposes
