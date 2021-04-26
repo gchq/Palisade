@@ -33,7 +33,7 @@ Palisade primarily supports deployment through `helm` to a K8s cluster.
 This allows for containerisation, scaling and auto-recovery on service failure.
 Palisade is regularly deployed to local K8s clusters for manual developer testing, and to AWS EKS for CI/CD automated testing.
 
-In this deployment, containers for each microservice are managed by various K8s workload resources, notably `Deployment`s and `Statefulset`s.
+In this deployment, containers for each microservice are managed by various K8s workload resources, notably `Deployment` and `Statefulset`.
 These can then be scaled up or down as appropriate, with the optional metrics-server responsible for horizontal auto-scaling.
 
 The Palisade services are accessed through a Traefik ingress, which is installed into the `kube-system` namespace rather than with the rest of the Palisade services (the `palisade` namespace in this diagram).

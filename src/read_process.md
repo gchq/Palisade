@@ -36,4 +36,4 @@ This can be considered as the 'API' for Palisade.
 ![Palisade System Control-Flow Diagram](../img/Palisade-Control-Flow.png)
 
 The above diagram shows the flow of control for a single request through the Palisade system.
-Note the top-left trio of `Client xxx Request`s, each showing one of the interactions the client makes with the system.
+Note the top-left trio of `Client xxx Request` nodes, each showing one of the interactions the client makes with the system (to the Palisade, Filtered-Resource and Data Services).
