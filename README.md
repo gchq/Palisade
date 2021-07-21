@@ -17,7 +17,6 @@ limitations under the License.
 # <img src="logos/logo.svg" width="180">
 ## A Tool for Complex and Scalable Data Access Policy Enforcement
 
-# PALISADE
 Palisade aims to provide a stable framework for defining and enforcing policies for accessing data.
 
 ### Introduction
