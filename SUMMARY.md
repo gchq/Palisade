@@ -21,7 +21,6 @@ limitations under the License.
 * Overview
     * [Motivating Scenario](src/motivating_scenario.md)
     * [Initial Requirements](src/initial_requirements.md)
-    * [Design Principles](src/design_principles.md)
     * [Future Roadmap](src/roadmap.md)
 * Deep Dive
     * [Component Descriptions and High-Level Architecture](src/component_descriptions.md)

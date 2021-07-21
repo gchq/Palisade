@@ -28,9 +28,9 @@ Build prerequisites:
 * [Maven](https://maven.apache.org/) for the Java compile/test build process
 
 Deploy prerequisites:
-* [Docker](https://www.docker.com/) for building containers
-* [Kubernetes](https://kubernetes.io/) for cluster orchestration and container management
-* [Helm 3](https://helm.sh/) for deploying to Kubernetes and managing deployments
+* [Docker v19.03+](https://www.docker.com/) for building containers
+* [Kubernetes v1.18+](https://kubernetes.io/) for cluster orchestration and container management
+* [Helm v3+](https://v3.helm.sh/) for deploying to Kubernetes and managing deployments
 
 
 #### GitHub Repositories
@@ -55,16 +55,11 @@ Library of implementations of some services interfaces for connecting Palisade i
 [Palisade Examples](https://github.com/gchq/Palisade-examples)  
 Code examples showing an example of how Palisade can be used, as well as performance tests in synthetic scenarios.
 
-[Palisade Integration Tests](https://github.com/gchq/Palisade-integration-tests)  
-Full-system tests such as smoke-tests and setup for exploratory testing (at time of writing, this is mostly unused).
-
-
-Palisade Common, Clients, and Services are all required to run the existing solution.
+Palisade Common, Readers, Clients, and Services are all required to run the existing solution.
 The examples provide a demonstration of how the automated policy rule enforcement is applied to data being read by a user.
 The examples are a good start to understanding how Palisade works.
 
 For an overview of the examples see [here](https://github.com/gchq/Palisade-examples).
-
 
 ## Contributing
 We welcome contributions to the project.
@@ -72,7 +67,6 @@ Detailed information on our ways of working can be found [here](ways_of_working.
 
 The following gives some useful documentation intended to help with the developer onboarding experience:
 * [Initial Requirements](initial_requirements.md)
-* [Design Principles](design_principles.md)
 * [High level architectural diagram](component_descriptions.md)
 * [Standard flow for a read request through the Palisade system](read_process.md)
 * [How might the system be deployed?](deployments.md)
@@ -86,10 +80,9 @@ Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licen
 
 
 ## FAQ
-1. What is the version of Java is supported?
-   The existing version of the application is built with Java 11.
-   It should work with later versions of Java, but this has not been tested
+Q: What is the version of Java is supported?  
+A: The existing version of the application is built with Java 11. It should work with later versions of Java, but this has not been tested
 
-1. What build environments are supported?
-   We currently support Windows, MacOS and Linux environments, _although there are some caveats for Windows users wishing to use Hadoop components._
-   As such, WSL is preferred over Windows.
+Q: What build environments are supported?  
+A: We currently support Windows, MacOS and Linux environments, _although there are some caveats for Windows users wishing to use Hadoop components.
+   As such, WSL is preferred over Windows._

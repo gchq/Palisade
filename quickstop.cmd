@@ -14,7 +14,7 @@
 
 : # This script should be valid for both UNIX and DOS environments
 
-: # Stop after running the REST example
-cd Palisade-services
-java -D"spring.profiles.active=example-runner" -D"manager.mode=shutdown" -jar services-manager/target/services-manager-0.5.0-exec.jar
+: # Stop after running the Local K8s example
+cd Palisade-examples
+bash deployment-k8s/local-k8s/example-runner/stopK8sServices.sh
 cd ..
