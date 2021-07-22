@@ -15,7 +15,11 @@ limitations under the License.
 --->
 
 # <img src="logos/logo.svg" width="180">
+
 ## A Tool for Complex and Scalable Data Access Policy Enforcement
+Windows is not an explicitly supported environment, although where possible Palisade has been made compatible.  
+For Windows developer environments, we recommend setting up [WSL](https://docs.microsoft.com/en-us/windows/wsl/).
+
 
 Palisade aims to provide a stable framework for defining and enforcing policies for accessing data.
 
