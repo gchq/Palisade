@@ -96,4 +96,5 @@ With these, we hope to demonstrate Palisade is capable of applying complex recor
 * resource-level filtering - hide a resource `File /data/employee_file0.avro`
 * record-level filtering - hide the whole `Employee Alice` record
 * record-level masking - show the first half of `Alice`'s `PostCode` and hide the rest of the address
+* contextual rule application - show the full `BankDetails` if the purpose of the request was `SALARY` and the user has completed the `PAYROLL_TRAINING_COURSE`, otherwise hide it
 * complex (recursive) rules - show `Alice` the `PayGrade` of employees for whom she is in their management chain (managers of managers etc.)

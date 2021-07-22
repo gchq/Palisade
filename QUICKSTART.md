@@ -21,7 +21,6 @@ limitations under the License.
 ### Prerequisites
 Before running, make sure you have installed and appropriately-configured the following:
 * [Git](https://git-scm.com/downloads)
-* [OpenJDK Java 11](https://openjdk.java.net/projects/jdk/11/) or [Oracle Java 11](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
 * [Docker](https://www.docker.com/products/docker-desktop) and Kubernetes, which now is bundled with Docker Desktop. You may be required to create a Docker account and login to successfully pull images from DockerHub
 * [Helm 3](https://helm.sh/) for deploying to Kubernetes and managing deployments
 
