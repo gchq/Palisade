@@ -15,9 +15,11 @@ limitations under the License.
 --->
 
 # <img src="logos/logo.svg" width="180">
+Windows is not an explicitly supported environment, although where possible Palisade has been made compatible.  
+For Windows developer environments, we recommend setting up [WSL](https://docs.microsoft.com/en-us/windows/wsl/).
+
 ### A Tool for Complex and Scalable Data Access Policy Enforcement
 Palisade aims to provide a stable framework for defining and enforcing policies for accessing data.
-
 
 #### Introduction
 Modern organisations can have multiple datasets that are each managed and accessed according to different policies and procedures.
@@ -54,7 +56,6 @@ If required, Palisade allows an organisation to use centralised services which e
 This means that your data access policies, audit logs, user account details etc. don't need to be duplicated on every system.
 Of course, Palisade can still be deployed locally on a per-platform basis.
 
-
 ### Additional Information 
 For a quickstart in using Palisade, see the [Quickstart Guide](./QUICKSTART.md).
 For more information on Palisade, take a look at the [Developer Guide](src/developer_guide.md).
@@ -64,11 +65,9 @@ Go to the Issue page and create and enter your query in a new issue and then sub
 We will try to respond as quick as possible in the form of a comment to the issue.
 Here is the link to [Palisade issues](https://www.github.com/gchq/Palisade/issues).
 
-
 ## Status
 Palisade is still in development and early testing.
 This information will be updated when there is a scheduled date for the production release.
-
 
 ### License
 Palisade is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) and is covered by [Crown Copyright](https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/).
