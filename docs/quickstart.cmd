@@ -29,20 +29,17 @@ GOTO :CMDSCRIPT
 : ###############
 
 : # For each palisade repo
-for dir in Palisade-common Palisade-clients Palisade-services Palisade-readers Palisade-examples
+for dir in Palisade-services Palisade-examples
 do
     # Clone it (0.5.0 release)
-    git clone --depth 1 --branch develop https://github.com/gchq/$dir.git
-    cd $dir
-    # Install it (skip dockerfile, tests, javadoc, etc.)
-    ../mvnw install -Pquick
-    cd ..
+    git clone --depth 1 --branch palisade-0.5.0 https://github.com/gchq/$dir.git
 done
 
-: # Run the REST example
-cd Palisade-services
-java -Dspring.profiles.active=example-runner -Dmanager.mode=run -jar services-manager/target/services-manager-0.5.0-exec.jar
-cat rest-example.log
+: # Run the K8s example
+cd Palisade-examples
+bash deployment-k8s/local-k8s/example-runner/deployServicesToK8s.sh
+bash deployment-k8s/local-k8s/example-runner/runFormattedK8sExample.sh
+bash deployment-k8s/local-k8s/example-runner/verify.sh
 cd ..
 
 : # DOS GOTO jumps to here, so exit just before then
@@ -54,21 +51,18 @@ exit $?
 : ##############
 
 setlocal EnableDelayedExpansion
-set "dir_list=Palisade-common Palisade-clients Palisade-services Palisade-readers Palisade-examples"
+set "dir_list=Palisade-services Palisade-examples"
 
 : # For each palisade repo
 FOR %%s IN (%dir_list%) DO (
     set "url=https://github.com/gchq/%%s.git"
     REM clone it
-    git clone --depth 1 --branch develop "!url!"
-    cd %%s
-    REM install it
-    call ../mvnw.cmd install -Pquick
-    cd ..
+    git clone --depth 1 --branch palisade-0.5.0 "!url!"
 )
 
-: # Run the REST example
-cd Palisade-services
-java -D"spring.profiles.active=example-runner" -D"manager.mode=run" -jar services-manager/target/services-manager-0.5.0-exec.jar
-cat rest-example.log
+: # Run the K8s example
+cd Palisade-examples
+bash deployment-k8s/local-k8s/example-runner/deployServicesToK8s.sh
+bash deployment-k8s/local-k8s/example-runner/runFormattedK8sExample.sh
+bash deployment-k8s/local-k8s/example-runner/verify.sh
 cd ..
