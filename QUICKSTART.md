@@ -19,14 +19,10 @@ limitations under the License.
 ## Getting started
 
 ### Prerequisites
-The repo comes bundled with the following:
-* [Apache Maven 3.6.3](https://maven.apache.org/download.cgi) via `mvnw`
-
 Before running, make sure you have installed and appropriately-configured the following:
 * [Git](https://git-scm.com/downloads)
-* [OpenJDK Java 11](https://openjdk.java.net/projects/jdk/11/) or [Oracle Java 11](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
-* [Apache Kafka](https://kafka.apache.org/downloads) and [Redis](https://redis.io/download) available at `localhost:9092` and `localhost:6379` respectively
-  * for a quick-and-easy option, the Palisade-examples repo comes bundled with a [docker-compose file](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-jvm/docker-compose.yml) for Kafka, Zookeeper and Redis - `docker-compose -f Palisade-examples/deployment/local-jvm/docker-compose.yml up`
+* [Docker](https://www.docker.com/products/docker-desktop) and Kubernetes, which now is bundled with Docker Desktop. You may be required to create a Docker account and login to successfully pull images from DockerHub
+* [Helm 3](https://helm.sh/) for deploying to Kubernetes and managing deployments
 
 ## Running the Quickstart Script
 Run the cross-platform [quickstart.cmd script](quickstart.cmd):
@@ -40,18 +36,13 @@ Run the cross-platform [quickstart.cmd script](quickstart.cmd):
   ```
 
 This will perform the following tasks necessary to set-up and start using Palisade:
-* Download each of the Palisade repos required to run the example ([common](https://github.com/gchq/Palisade-common/tree/develop), [clients](https://github.com/gchq/Palisade-clients/tree/develop), [services](https://github.com/gchq/Palisade-services/tree/develop), [readers](https://github.com/gchq/Palisade-readers/tree/develop), [examples](https://github.com/gchq/Palisade-examples/tree/develop))
-    - Since Palisade remains in active development, we will be pulling the 0.5.0 release which uses a Kafka-based streaming microservice architecture
-* Install each project in order of any dependencies
-* Run the Palisade local-jvm example (more details [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-jvm))
-
-Once complete, you will have each of the Palisade projects cloned to your local machine.
-Each Palisade module will be installed into your `~/.m2` cache and jars built to the appropriate `.../target` directories.
-The services will be running locally in separate JVM processes.
+* Download each of the Palisade repos required to run the example ([services](https://github.com/gchq/Palisade-services/tree/develop) and [examples](https://github.com/gchq/Palisade-examples/tree/develop))
+    - We will be pulling the 0.5.0 release which uses a Kafka-based streaming microservice architecture
+* Run the Palisade local-k8s example (more details [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-k8s)), which pulls down the images from [DockerHub](https://hub.docker.com/u/gchq).
 
 The script will have done an example run-through of Palisade, demonstrating a client with different users and purposes querying some Avro files for employee data, with some redaction and masking rules in place.
-The output of this example run-through will be written to the terminal once it has completed.
-The logging output of all the services can be found in the `Palisade-services` directory.
+The output of this example run-through will be written to the terminal once it has completed, and if deployed successfully, you will see a success message returned.
+To view the logs of the services, use Kubernetes and run `kubectl get logs <ServiceName>-Service`. 
 More details of these rules and data structures [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/example-library).
 
 This shutdown procedure can be automated using the [quickstop.cmd script](quickstop.cmd):
@@ -67,6 +58,12 @@ See the individual repositories and modules for their specific documentation fro
 
 ## Alternative Deployments
 
-### Kubernetes
-Palisade is also set-up for a kubernetes deployment, which [is documented here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-k8s).
-Under this setup, the `Palisade-services` directory will need to be rebuilt with a `mvn install` (the `quickstart.cmd` script uses a `-Pquick` profile which skips docker image builds).
+### Local JVM
+Palisade is also set-up for a JVM deployment, which [is documented here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-jvm/README.md).  
+To run this example, you will need local installations of each service's jars, which involves cloning the remaining Palisade repositories, and using [maven](https://maven.apache.org/), installing them in the correct order, before following the local-jvm readme linked above.  
+The correct installation order for Palisade is:
+1. [Palisade-common](https://github.com/gchq/Palisade-common)
+1. [Palisade-clients](https://github.com/gchq/Palisade-clients)
+1. [Palisade-services](https://github.com/gchq/Palisade-services)
+1. [Palisade-readers](https://github.com/gchq/Palisade-readers)
+1. [Palisade-examples](https://github.com/gchq/Palisade-examples)

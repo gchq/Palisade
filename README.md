@@ -15,11 +15,11 @@ limitations under the License.
 --->
 
 # <img src="logos/logo.svg" width="180">
-### A Tool for Complex and Scalable Data Access Policy Enforcement
+## A Tool for Complex and Scalable Data Access Policy Enforcement
+
 Palisade aims to provide a stable framework for defining and enforcing policies for accessing data.
 
-
-#### Introduction
+### Introduction
 Modern organisations can have multiple datasets that are each managed and accessed according to different policies and procedures.
 This can make it complicated for analysis while still ensuring regulatory compliance.
 Most technologies "out of the box" do not provide the necessary solution for managing these complex issues for data access.

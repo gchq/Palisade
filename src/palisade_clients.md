@@ -59,38 +59,43 @@ This aims to allow a quick-and-easy way to provide compatibility with a whole ho
 Of course, this client also allows use of many existing UNIX CLI tools, such as `ls` and `cat`, but also more complex tools such as `sed` or `grep`.
 This approach is not the most performant, especially when querying many thousands of resources, but should be more than enough for proof-of-concept and demonstrative purposes.
 
-## Future
 
-### Creating an S3 client endpoint
-It should be possible to create an S3 endpoint that allows any out of the box data processing technology that supports S3 to route requests via Palisade. 
-This mechanism would require a way to register your user supplied information such as the purpose for your query to a separate service which provides you a token to embed in the resource URL.
-Then the client would be able to go to strip out the context token and retrieve the contextual information to be used by Palisade.
+### Using the S3 Client
+It is possible, via the [S3 Client](https://github.com/gchq/Palisade-clients/tree/develop/client-s3) to read resources stored in AWS S3 API compliant data stores, allowing for a full AWS implementation of Palisade. 
+Upon deployment of Palisade using the S3 client, the relevant services are configured to expect data stored in S3, and are loaded with the relevant serialisers required to deseralise the returned LeafResource to return to the client.  
 
 ### Reading a stream of data using Apache Spark
-If you had a data stream in Kafka, you would normally be able to access it using kafka connectors in Java or Python.
-However, it would not apply the data filtering/transformations that are required by the data policies.
-Therefore, we want to be able to provide the user with as similar an experience as possible so the user hardly realises any difference.
+You can easily adopt the S3 Client to read data from Apache Spark.  
+Given a Spark job running against AWS S3 as follows:
 
-To do that we would want the user to start the job off by running the following: 
-```java
-spark.readStream
-    .option("purpose", "example purpose")
-    .format("uk.gov.gchq.palisade")
-    .load("data_set")
-    .select("colA", "colB")
-    .show()
+```scala
+spark.sparkContext.hadoopConfiguration.set("fs.s3a.endpoint", "http://s3.eu-west-2.amazonaws.com/")
+spark.sparkContext.hadoopConfiguration.set("fs.s3a.path.style.access", "true")
+spark.sparkContext.hadoopConfiguration.set("fs.s3a.connection.ssl.enabled", "false")
+spark.sparkContext.hadoopConfiguration.set("fs.s3a.aws.credentials.provider", "com.amazonaws.auth.DefaultAWSCredentialsProviderChain")
+val nonrecursive = scala.io.Source.fromFile("/schema/nonrecursive.json").mkString
+spark.read.format("avro").option("avroSchema", nonrecursive).load("s3a://palisade-application-dev/data/remote-data-store/data/employee_file0.avro").show()
 ```
 
-We would expect that Spark would create a filter to be pushed down to the data reader that says it only wants "colA" and "colB".
+_Note that we use a modified non-recursive AVRO schema `/schema/nonrecursive.json` (this excludes the managers field) as recursive schema are not compatible with Spark SQL._
 
-The Spark client for Palisade would create a user (based on who is running the command) and take the resource, purpose and filter to register a data request with the Palisade service.
-Then the Spark client would then take the response of that request and split the list of resources over the number of executors Spark is running.
-Then it would get each executor to request access to the subset of resources assigned to that executor.
+Adapt the Spark job to run against the Palisade S3 client (ensure the client is running and correctly configured).
+This short snippet requires `curl`, but otherwise works wholly within `spark-shell` and the `s3` and `avro` libraries as the previous did:
 
-The Data Service receives the request for data, validates the request and the resources allowed, and gets the data access policies that apply to those resources.
-Then the Data Service can read the resource applying the column selection (columns requested plus any columns required to apply the policy) then apply the policies, transform the data so only the two requested columns are returned and then stream the data back to the executor that made the request.
+```scala
+import sys.process._;
+// User 'Alice' wants 'file:/data/local-data-store/' directory for 'SALARY' purposes
+// We get back the token '09d3a677-3d03-42e0-8cdb-f048f3929f8c', to be used as a bucket-name
+val token = (Seq("curl", "-X", "POST", "http://localhost:8092/register?userId=Alice&resourceId=file%3A%2Fdata%2Flocal-data-store%2F&purpose=SALARY")!!).stripSuffix("\n")
+Thread.sleep(5000)
 
-The Spark client can format the stream of data into a DataFrame so that the standard Spark code can do the rest of the request.
-
-Therefore, as far as the user is concerned, they just had to add the option and use the different format, as they would not be able to access the data via any of the other formats.
-This keeps the API similar to Spark's standard read API. 
+spark.sparkContext.hadoopConfiguration.set("fs.s3a.endpoint", "localhost:8092/request")
+spark.sparkContext.hadoopConfiguration.set("fs.s3a.path.style.access", "true")
+spark.sparkContext.hadoopConfiguration.set("fs.s3a.connection.ssl.enabled", "false")
+// These are not interpreted or validated by Palisade, but Spark requires them to be non-null
+spark.sparkContext.hadoopConfiguration.set("fs.s3a.access.key", "accesskey")
+spark.sparkContext.hadoopConfiguration.set("fs.s3a.secret.key", "secretkey")
+// spark.read.format("avro").load("s3a://" + token + "/with-policy/employee_small.avro").show()
+val nonrecursive = scala.io.Source.fromFile("/schema/nonrecursive.json").mkString
+spark.read.format("avro").option("avroSchema", nonrecursive).load("s3a://" + token + "/data/employee_file0.avro").show()
+```
