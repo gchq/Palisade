@@ -38,7 +38,7 @@ Run the cross-platform [quickstart.cmd script](/quickstart.cmd):
 This will perform the following tasks necessary to set-up and start using Palisade:
 * Download each of the Palisade repos required to run the example ([services](https://github.com/gchq/Palisade-services/tree/develop) and [examples](https://github.com/gchq/Palisade-examples/tree/develop))
     - We will be pulling the 0.5.0 release which uses a Kafka-based streaming microservice architecture
-* Run the Palisade local-k8s example (more details [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-k8s)), which pulls down the images from [DockerHub](https://hub.docker.com/u/gchq).
+* Run the Palisade local-k8s example (more details [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/deployment-k8s/local-k8s)), which pulls down the images from [DockerHub](https://hub.docker.com/u/gchq).
 
 The script will have done an example run-through of Palisade, demonstrating a client with different users and purposes querying some Avro files for employee data, with some redaction and masking rules in place.
 The output of this example run-through will be written to the terminal once it has completed, and if deployed successfully, you will see a success message returned.
@@ -59,7 +59,7 @@ See the individual repositories and modules for their specific documentation fro
 ## Alternative Deployments
 
 ### Local JVM
-Palisade is also set-up for a JVM deployment, which [is documented here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-jvm/README.md).  
+Palisade is also set-up for a JVM deployment, which [is documented here](https://github.com/gchq/Palisade-examples/tree/develop/deployment-jvm/local-jvm).  
 To run this example, you will need local installations of each service's jars, which involves cloning the remaining Palisade repositories, and using [maven](https://maven.apache.org/), installing them in the correct order, before following the local-jvm readme linked above.  
 The correct installation order for Palisade is:
 1. [Palisade-common](https://github.com/gchq/Palisade-common)
