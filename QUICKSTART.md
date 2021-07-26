@@ -25,7 +25,7 @@ Before running, make sure you have installed and appropriately-configured the fo
 * [Helm 3](https://helm.sh/) for deploying to Kubernetes and managing deployments
 
 ## Running the Quickstart Script
-Run the cross-platform [quickstart.cmd script](quickstart.cmd):
+Run the cross-platform [quickstart.cmd script](/quickstart.cmd):
 * On Linux/MacOS:
   ```
   /dev/Palisade> bash quickstart.cmd
@@ -45,7 +45,7 @@ The output of this example run-through will be written to the terminal once it h
 To view the logs of the services, use Kubernetes and run `kubectl get logs <ServiceName>-Service`. 
 More details of these rules and data structures [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/example-library).
 
-This shutdown procedure can be automated using the [quickstop.cmd script](quickstop.cmd):
+This shutdown procedure can be automated using the [quickstop.cmd script](/quickstop.cmd):
 * On Linux/MacOS:
   ```
   /dev/Palisade> bash quickstop.cmd
