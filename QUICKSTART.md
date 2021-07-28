@@ -59,7 +59,7 @@ See the individual repositories and modules for their specific documentation fro
 ## Alternative Deployments
 
 ### Local JVM
-Palisade is also set-up for a JVM deployment, which [is documented here](https://github.com/gchq/Palisade-examples/tree/develop/deployment-jvm/local-jvm).  
+Palisade is also set-up for a JVM deployment, which [is documented here](https://github.com/gchq/Palisade-examples/tree/develop/deployment-jvm/local-jvm/README.md).  
 To run this example, you will need local installations of each service's jars, which involves cloning the remaining Palisade repositories, and using [maven](https://maven.apache.org/), installing them in the correct order, before following the local-jvm readme linked above.  
 The correct installation order for Palisade is:
 1. [Palisade-common](https://github.com/gchq/Palisade-common)
