@@ -45,7 +45,7 @@ The output of this example run-through will be written to the terminal once it h
 To view the logs of the services, use Kubernetes and run `kubectl get logs <ServiceName>-Service`. 
 More details of these rules and data structures [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/example-library).
 
-This shutdown procedure can be automated using the [quickstop.cmd script](https://github.com/gchq/Palisade/blob/main/quickstart.cmd):
+This shutdown procedure can be automated using the [quickstop.cmd script](https://github.com/gchq/Palisade/blob/main/quickstop.cmd):
 * On Linux/MacOS:
   ```
   /dev/Palisade> bash quickstop.cmd
