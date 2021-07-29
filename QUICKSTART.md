@@ -25,7 +25,7 @@ Before running, make sure you have installed and appropriately-configured the fo
 * [Helm 3](https://helm.sh/) for deploying to Kubernetes and managing deployments
 
 ## Running the Quickstart Script
-Run the cross-platform [quickstart.cmd script](quickstart.cmd):
+Run the cross-platform [quickstart.cmd script](https://github.com/gchq/Palisade/blob/main/quickstart.cmd):
 * On Linux/MacOS:
   ```
   /dev/Palisade> bash quickstart.cmd
@@ -38,14 +38,14 @@ Run the cross-platform [quickstart.cmd script](quickstart.cmd):
 This will perform the following tasks necessary to set-up and start using Palisade:
 * Download each of the Palisade repos required to run the example ([services](https://github.com/gchq/Palisade-services/tree/develop) and [examples](https://github.com/gchq/Palisade-examples/tree/develop))
     - We will be pulling the 0.5.0 release which uses a Kafka-based streaming microservice architecture
-* Run the Palisade local-k8s example (more details [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-k8s)), which pulls down the images from [DockerHub](https://hub.docker.com/u/gchq).
+* Run the Palisade local-k8s example (more details [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/deployment-k8s/local-k8s)), which pulls down the images from [DockerHub](https://hub.docker.com/u/gchq).
 
 The script will have done an example run-through of Palisade, demonstrating a client with different users and purposes querying some Avro files for employee data, with some redaction and masking rules in place.
 The output of this example run-through will be written to the terminal once it has completed, and if deployed successfully, you will see a success message returned.
 To view the logs of the services, use Kubernetes and run `kubectl get logs <ServiceName>-Service`. 
 More details of these rules and data structures [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/example-library).
 
-This shutdown procedure can be automated using the [quickstop.cmd script](quickstop.cmd):
+This shutdown procedure can be automated using the [quickstop.cmd script](https://github.com/gchq/Palisade/blob/main/quickstop.cmd):
 * On Linux/MacOS:
   ```
   /dev/Palisade> bash quickstop.cmd
@@ -59,7 +59,7 @@ See the individual repositories and modules for their specific documentation fro
 ## Alternative Deployments
 
 ### Local JVM
-Palisade is also set-up for a JVM deployment, which [is documented here](https://github.com/gchq/Palisade-examples/tree/develop/deployment/local-jvm/README.md).  
+Palisade is also set-up for a JVM deployment, which [is documented here](https://github.com/gchq/Palisade-examples/tree/develop/deployment-jvm/local-jvm/README.md).  
 To run this example, you will need local installations of each service's jars, which involves cloning the remaining Palisade repositories, and using [maven](https://maven.apache.org/), installing them in the correct order, before following the local-jvm readme linked above.  
 The correct installation order for Palisade is:
 1. [Palisade-common](https://github.com/gchq/Palisade-common)
