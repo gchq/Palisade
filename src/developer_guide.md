@@ -29,7 +29,7 @@ Build prerequisites:
 
 Deploy prerequisites:
 * [Docker v19.03+](https://www.docker.com/) for building containers
-* [Kubernetes v1.18+](https://kubernetes.io/) for cluster orchestration and container management
+* [Kubernetes v1.21+](https://kubernetes.io/) for cluster orchestration and container management
 * [Helm v3+](https://v3.helm.sh/) for deploying to Kubernetes and managing deployments
 
 
