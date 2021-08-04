@@ -31,8 +31,8 @@ GOTO :CMDSCRIPT
 : # For each palisade repo
 for dir in Palisade-services Palisade-examples
 do
-    # Clone it (0.5.0 release)
-    git clone --depth 1 --branch palisade-0.5.0 https://github.com/gchq/$dir.git
+    # Clone it (0.5.1 release)
+    git clone --depth 1 --branch palisade-0.5.1 https://github.com/gchq/$dir.git
 done
 
 : # Run the K8s example
@@ -57,7 +57,7 @@ set "dir_list=Palisade-services Palisade-examples"
 FOR %%s IN (%dir_list%) DO (
     set "url=https://github.com/gchq/%%s.git"
     REM clone it
-    git clone --depth 1 --branch palisade-0.5.0 "!url!"
+    git clone --depth 1 --branch palisade-0.5.1 "!url!"
 )
 
 : # Run the K8s example

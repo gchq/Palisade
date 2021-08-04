@@ -37,7 +37,7 @@ Run the cross-platform [quickstart.cmd script](https://github.com/gchq/Palisade/
 
 This will perform the following tasks necessary to set-up and start using Palisade:
 * Download each of the Palisade repos required to run the example ([services](https://github.com/gchq/Palisade-services/tree/develop) and [examples](https://github.com/gchq/Palisade-examples/tree/develop))
-    - We will be pulling the 0.5.0 release which uses a Kafka-based streaming microservice architecture
+    - We will be pulling the 0.5.1 release which uses a Kafka-based streaming microservice architecture
 * Run the Palisade local-k8s example (more details [can be found here](https://github.com/gchq/Palisade-examples/tree/develop/deployment-k8s/local-k8s)), which pulls down the images from [DockerHub](https://hub.docker.com/u/gchq).
 
 The script will have done an example run-through of Palisade, demonstrating a client with different users and purposes querying some Avro files for employee data, with some redaction and masking rules in place.
