@@ -66,8 +66,7 @@ Here is the link to [Palisade issues](https://www.github.com/gchq/Palisade/issue
 
 
 ## Status
-Palisade is still in development and early testing.
-This information will be updated when there is a scheduled date for the production release.
+Palisade is no longer under active development
 
 
 ### License
