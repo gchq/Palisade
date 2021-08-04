@@ -17,8 +17,7 @@ limitations under the License.
 # Developer Guide
 
 ### Status
-Palisade is in the stages of alpha-testing and is not yet production ready.
-This information will be updated when there is a scheduled date for the production release.
+Palisade is no longer under active development.
 
 
 ### Getting Started
