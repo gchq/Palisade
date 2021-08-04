@@ -378,16 +378,16 @@ limitations under the License.
 </ul>
 <p>This will perform the following tasks necessary to set-up and start using Palisade:</p>
 <ul>
-<li>Download each of the Palisade repos required to run the example (<a href="https://github.com/gchq/Palisade-services/tree/develop" target="_blank">services</a> and <a href="https://github.com/gchq/Palisade-examples/tree/develop" target="_blank">examples</a>)<ul>
+<li>Download each of the Palisade repos required to run the example (<a href="https://github.com/gchq/Palisade-services/tree/main" target="_blank">services</a> and <a href="https://github.com/gchq/Palisade-examples/tree/main" target="_blank">examples</a>)<ul>
 <li>We will be pulling the 0.5.1 release which uses a Kafka-based streaming microservice architecture</li>
 </ul>
 </li>
-<li>Run the Palisade local-k8s example (more details <a href="https://github.com/gchq/Palisade-examples/tree/develop/deployment-k8s/local-k8s" target="_blank">can be found here</a>), which pulls down the images from <a href="https://hub.docker.com/u/gchq" target="_blank">DockerHub</a>.</li>
+<li>Run the Palisade local-k8s example (more details <a href="https://github.com/gchq/Palisade-examples/tree/main/deployment-k8s/local-k8s" target="_blank">can be found here</a>), which pulls down the images from <a href="https://hub.docker.com/u/gchq" target="_blank">DockerHub</a>.</li>
 </ul>
 <p>The script will have done an example run-through of Palisade, demonstrating a client with different users and purposes querying some Avro files for employee data, with some redaction and masking rules in place.
 The output of this example run-through will be written to the terminal once it has completed, and if deployed successfully, you will see a success message returned.
 To view the logs of the services, use Kubernetes and run <code>kubectl get logs <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ServiceName</span><span class="token punctuation">&gt;</span></span>-Service</code>. 
-More details of these rules and data structures <a href="https://github.com/gchq/Palisade-examples/tree/develop/example-library" target="_blank">can be found here</a>.</p>
+More details of these rules and data structures <a href="https://github.com/gchq/Palisade-examples/tree/main/example-library" target="_blank">can be found here</a>.</p>
 <p>This shutdown procedure can be automated using the <a href="https://github.com/gchq/Palisade/blob/main/quickstop.cmd" target="_blank">quickstop.cmd script</a>:</p>
 <ul>
 <li>On Linux/MacOS:<pre class="language-"><code>/dev/Palisade&gt; bash quickstop.cmd
@@ -397,7 +397,7 @@ More details of these rules and data structures <a href="https://github.com/gchq
 </ul>
 <h2 id="alternative-deployments">Alternative Deployments</h2>
 <h3 id="local-jvm">Local JVM</h3>
-<p>Palisade is also set-up for a JVM deployment, which <a href="https://github.com/gchq/Palisade-examples/tree/develop/deployment-jvm/local-jvm/README.md" target="_blank">is documented here</a>.<br>To run this example, you will need local installations of each service&apos;s jars, which involves cloning the remaining Palisade repositories, and using <a href="https://maven.apache.org/" target="_blank">maven</a>, installing them in the correct order, before following the local-jvm readme linked above.<br>The correct installation order for Palisade is:</p>
+<p>Palisade is also set-up for a JVM deployment, which <a href="https://github.com/gchq/Palisade-examples/tree/main/deployment-jvm/local-jvm/README.md" target="_blank">is documented here</a>.<br>To run this example, you will need local installations of each service&apos;s jars, which involves cloning the remaining Palisade repositories, and using <a href="https://maven.apache.org/" target="_blank">maven</a>, installing them in the correct order, before following the local-jvm readme linked above.<br>The correct installation order for Palisade is:</p>
 <ol>
 <li><a href="https://github.com/gchq/Palisade-common" target="_blank">Palisade-common</a></li>
 <li><a href="https://github.com/gchq/Palisade-clients" target="_blank">Palisade-clients</a></li>

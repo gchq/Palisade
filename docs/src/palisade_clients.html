@@ -397,7 +397,7 @@ This aims to allow a quick-and-easy way to provide compatibility with a whole ho
 Of course, this client also allows use of many existing UNIX CLI tools, such as <code>ls</code> and <code>cat</code>, but also more complex tools such as <code>sed</code> or <code>grep</code>.
 This approach is not the most performant, especially when querying many thousands of resources, but should be more than enough for proof-of-concept and demonstrative purposes.</p>
 <h3 id="using-the-s3-client">Using the S3 Client</h3>
-<p>It is possible, via the <a href="https://github.com/gchq/Palisade-clients/tree/develop/client-s3" target="_blank">S3 Client</a> to read resources stored in AWS S3 API compliant data stores, allowing for a full AWS implementation of Palisade. 
+<p>It is possible, via the <a href="https://github.com/gchq/Palisade-clients/tree/main/client-s3" target="_blank">S3 Client</a> to read resources stored in AWS S3 API compliant data stores, allowing for a full AWS implementation of Palisade. 
 Upon deployment of Palisade using the S3 client, the relevant services are configured to expect data stored in S3, and are loaded with the relevant serialisers required to deseralise the returned LeafResource to return to the client.  </p>
 <h3 id="reading-a-stream-of-data-using-apache-spark">Reading a stream of data using Apache Spark</h3>
 <p>You can easily adopt the S3 Client to read data from Apache Spark.<br>Given a Spark job running against AWS S3 as follows:</p>

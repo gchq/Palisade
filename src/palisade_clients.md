@@ -61,7 +61,7 @@ This approach is not the most performant, especially when querying many thousand
 
 
 ### Using the S3 Client
-It is possible, via the [S3 Client](https://github.com/gchq/Palisade-clients/tree/develop/client-s3) to read resources stored in AWS S3 API compliant data stores, allowing for a full AWS implementation of Palisade. 
+It is possible, via the [S3 Client](https://github.com/gchq/Palisade-clients/tree/main/client-s3) to read resources stored in AWS S3 API compliant data stores, allowing for a full AWS implementation of Palisade. 
 Upon deployment of Palisade using the S3 client, the relevant services are configured to expect data stored in S3, and are loaded with the relevant serialisers required to deseralise the returned LeafResource to return to the client.  
 
 ### Reading a stream of data using Apache Spark

@@ -21,7 +21,7 @@ This scenario involves a number of different users requesting access to some sen
 These different requests each demonstrate a different aspect of Palisade that we require.
 
 > :information_source:
-This scenario is implemented and demonstrated in the [Example Library](https://github.com/gchq/Palisade-examples/tree/develop/example-library) package of the examples repository.
+This scenario is implemented and demonstrated in the [Example Library](https://github.com/gchq/Palisade-examples/tree/main/example-library) package of the examples repository.
 
 
 ### Employee

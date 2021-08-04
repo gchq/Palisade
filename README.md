@@ -35,7 +35,7 @@ Palisade allows the policies for accessing datasets, redacting records and execu
 This will enable the clients to perform queries across the datasets while still conforming to company and regulatory policies.  
 
 > :information_source:
-See the [Motivating Scenario](src/motivating_scenario.md) for a detailed description of this example scenario, and the [Example Library](https://github.com/gchq/Palisade-examples/tree/develop/example-library) package for the concrete implementation of this example used for testing.
+See the [Motivating Scenario](src/motivating_scenario.md) for a detailed description of this example scenario, and the [Example Library](https://github.com/gchq/Palisade-examples/tree/main/example-library) package for the concrete implementation of this example used for testing.
 
 Policies are set per resource and are not changed by the user or context.
 However, the policies can use the information about the user and context to decide how the data needs to be sanitised for any particular query.
